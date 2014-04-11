@@ -1,4 +1,4 @@
-package org.jakduk.repo;
+package org.jakduk.repository;
 
 import org.jakduk.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -1,10 +1,10 @@
-package org.jakduk.service.user;
+package org.jakduk.service;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jakduk.model.User;
-import org.jakduk.repo.UserRepository;
+import org.jakduk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,5 +23,5 @@ public class UserService {
 	public List<User> findAll() {
 		return userRepository.findAll();
 	}
-
+	
 }
