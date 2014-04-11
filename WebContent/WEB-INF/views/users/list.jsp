@@ -8,9 +8,12 @@
 <title>Insert title here</title>
 </head>
 <body>
+<a href="<c:url value='/users/add' />">Add</a>
+<h2>User List</h2>
+<ul>
 <c:forEach items="${list}" var="member">
-	<li>${member.id}</li>
-	<li>${member.userName}</li>
+	<li>${member.id} / ${member.userName}</li>
 </c:forEach>
+</ul>
 </body>
 </html>

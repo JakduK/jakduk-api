@@ -143,6 +143,16 @@
 			<scope>compile</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>4.0.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.6-Final</version>
+		</dependency>				
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -216,10 +226,10 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>web/WEB-INF/lib</directory>
+                            <directory>WebContent/WEB-INF/lib</directory>
                         </fileset>
                         <fileset>
-                            <directory>web/WEB-INF/classes</directory>
+                            <directory>WebContent/WEB-INF/classes</directory>
                         </fileset>
                     </filesets>
                 </configuration>
