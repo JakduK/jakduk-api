@@ -12,9 +12,25 @@ public class BoardController {
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	@RequestMapping
-	public void free(Model model) {
+	public String root() {
 		
-		//model.addAllAttribute("list", null);
+		return "redirect:/board/free";
+	}
+	
+	@RequestMapping(value = "/free")
+	public String free(Model model) {
+		
+		return "board/free";
+		
+//		model.addAllAttribute("list", null);
+	}
+	
+	@RequestMapping(value = "/free/write")
+	public String freeWrite(Model model) {
+		
+		return "board/freeWrite";
+		
+//		model.addAllAttribute("list", null);
 	}
 
 }

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/user")
 @SessionAttributes("user")
 public class UserController {
 	
@@ -24,6 +24,12 @@ public class UserController {
 	private UserService userService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
+	
+	@RequestMapping
+	public String root() {
+		
+		return "redirect:/user/list";
+	}
 	
 	@RequestMapping(value = "/list")
 	public void list(Model model) {
@@ -33,6 +39,8 @@ public class UserController {
 		logger.debug("/list : " + users);
 		
 		model.addAttribute("list", users);
+		
+//		return "user/list";
 	}
 	
 	@RequestMapping(value = "/add")
@@ -49,11 +57,11 @@ public class UserController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String addSubmit(@Valid User user, BindingResult result) {
 		if (result.hasErrors()) {
-			return "users/add";
+			return "user/add";
 		}
 		
 		userService.create(user);
-		return "redirect:/users/list";
+		return "redirect:/user/list";
 	}
 	
 }
