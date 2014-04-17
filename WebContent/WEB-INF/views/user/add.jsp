@@ -10,7 +10,7 @@
 </head>
 <body>
 <a href="<c:url value='/user/list'/>">List</a>
-<form:form commandName="user" action="/jakduk/users" method="POST">
+<form:form commandName="user" action="/jakduk/user" method="POST">
 	<p>
 		<h3>Name</h3>
 		<form:input path="userName" size="50"/>

@@ -10,9 +10,6 @@
 
     <title>Starter Template for Bootstrap</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
 		<!-- Custom styles for this template -->
     <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/offcanvas.css" rel="stylesheet">
 

@@ -14,14 +14,18 @@ public class BoardFree {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	@NotNull
+//	@NotNull
 	@Size(min = 1, message="Input writer")
 	private String writer;
 	
 	@NotNull
+	@Size(min = 1, message="Input subject")
+	private String subject;
+	
+	@NotNull
 	@Size(min = 1, message="Input contents")
-	private String contents;
-
+	private String content;
+	
 	public String getId() {
 		return id;
 	}
@@ -38,12 +42,24 @@ public class BoardFree {
 		this.writer = writer;
 	}
 
-	public String getContents() {
-		return contents;
+	public String getSubject() {
+		return subject;
 	}
 
-	public void setContents(String contents) {
-		this.contents = contents;
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
-	
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	@Override
+	public String toString() {
+		return "BoardFree [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content + "]"; 
+	}
 }

@@ -1,11 +1,9 @@
 package org.jakduk.model;
 
-import java.util.Date;
+import java.util.List;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -13,18 +11,17 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class User {
+public class BoardCategory {
 
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
 	@NotNull
-	@Size(min = 1, message="Input userName")
-	private String userName;
+	@Size(min = 1, message="Input Name")
+	private String name;
 	
-	@Temporal(TemporalType.DATE)
-	private Date joined;
-	
+	private List<Integer> usingBoard;
+
 	public String getId() {
 		return id;
 	}
@@ -33,20 +30,26 @@ public class User {
 		this.id = id;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getName() {
+		return name;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public Date getJoined() {
-		return joined;
+	public List<Integer> getUsingBoard() {
+		return usingBoard;
 	}
 
-	public void setJoined(Date joined) {
-		this.joined = joined;
+	public void setUsingBoard(List<Integer> usingBoard) {
+		this.usingBoard = usingBoard;
 	}
+	
+	@Override
+	public String toString() {
+		return "BoardCategory [id=" + id + ", name=" + name + "]";
+	}
+	
 	
 }

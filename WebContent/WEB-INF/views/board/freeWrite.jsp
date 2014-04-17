@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -19,14 +20,27 @@
     
 			<div class="row-fluid">
 				<div class="span10">
-					<form accept-charset="UTF-8" action="" class="form-horizontal" id="addQuestion" method="post">
-						<legend>Ask a Question</legend>
+	<form:form commandName="board" action="/jakduk/board/free/write" method="POST">
+						<legend>Write</legend>
+						
+
+			<div class="control-group select optional">
+				<label class="select optional control-label" for="category"> Category</label>
+				<div class="controls">
+					<form:select path="content" cssClass="select optional">
+						<form:option value="None" label="None"/>
+						<form:option value="Free" label="Free"/>
+						<form:option value="Football" label="Football"/>
+					</form:select>
+				</div>
+			</div>
+						
 						<div class="control-group string required">
 							<label class="string required control-label" for="subject">
 								<abbr title="required">*</abbr> Subject
 							</label>
 							<div class="controls">
-								<input class="string required span12" id="subject" name="subject" type="text">
+								<form:input path="subject" cssClass="string required span12"/>
 							</div>
 						</div>
 						<div class="control-group text required">
@@ -34,27 +48,14 @@
 								<abbr title="required">*</abbr> Content
 							</label>
 							<div class="controls">
-								<textarea class="text required span12" id="content" name="content" rows="15" ></textarea>
-							</div>
-						</div>
-						<div class="control-group string required">
-							<label class="string required control-label" for="tags">
-								<abbr title="required">*</abbr> Tags
-							</label>
-							<div class="controls">
-								<div id="taglist" class="taglist">
-								    <span>
-								    	<input type="text" id="tags" size="10" name="tags" value="" placeholder="Input Tag" />
-								    </span>
-								</div>
-								<a href="#" id="addTag">Add Tag</a>
+								<form:textarea path="content" rows="15" cssClass="text required span12"/>
 							</div>
 						</div>
 						<div class="form-actions">
-							<input class="btn btn-primary" name="commit" type="submit" value="Post Question">
-							<a class="btn btn-danger" href="<c:url value="/"/>">Cancel</a> 
+							<input class="btn btn-primary" name="commit" type="submit" value="Submit">
+							<a class="btn btn-danger" href="<c:url value="/board"/>">Cancel</a> 
 						</div>
-					</form>
+	</form:form>
 				</div><!--/span-->
 			</div><!--/row-->    
     

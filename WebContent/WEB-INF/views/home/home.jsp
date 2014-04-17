@@ -4,6 +4,9 @@
 <html>
   <head>
 		<jsp:include page="../include/html-header.jsp"/>
+		
+		<!-- Bootstrap core CSS -->
+    <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   </head>
   <body>
 

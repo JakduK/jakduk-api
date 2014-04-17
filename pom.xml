@@ -12,6 +12,7 @@
 
   <properties>
    	<spring.version>3.2.8.RELEASE</spring.version>
+		<spring.security.core.version>3.2.3.RELEASE</spring.security.core.version>   	
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
  		<!-- Miscellaneous Dependencies -->
@@ -142,6 +143,18 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.security.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.security.core.version}</version>
+		</dependency>		
 		
 		<dependency>
 			<groupId>org.hibernate</groupId>
