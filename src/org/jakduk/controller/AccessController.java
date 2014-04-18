@@ -15,13 +15,21 @@ public class AccessController {
 	@RequestMapping("/login")
 	public String login(Model model,
 			@RequestParam(required = false) String message) {
+		
 		model.addAttribute("message", message);
+		logger.debug("login=" + model);
 		return "access/login";
 	}
 
 	@RequestMapping(value = "/login/failure")
 	public String loginFailure() {
 		String message = "Login Failure!";
+		return "redirect:/login?message=" + message;
+	}
+	
+	@RequestMapping(value = "/logout/success")
+	public String logoutSuccess() {
+		String message = "Logout Success!";
 		return "redirect:/login?message=" + message;
 	}
 }

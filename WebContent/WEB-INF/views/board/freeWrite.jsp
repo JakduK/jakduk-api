@@ -7,22 +7,17 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
-<!-- Custom styles for this template -->
-<!--  
-<link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/signin.css" rel="stylesheet">
--->
-
 <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrapApp.css" rel="stylesheet">
 
 </head>
 <body>
+<jsp:include page="../include/navigation-header.jsp"/>
     <div class="container-fluid">
     
 			<div class="row-fluid">
 				<div class="span10">
 	<form:form commandName="board" action="/jakduk/board/free/write" method="POST">
 						<legend>Write</legend>
-						
 
 			<div class="control-group select optional">
 				<label class="select optional control-label" for="category"> Category</label>

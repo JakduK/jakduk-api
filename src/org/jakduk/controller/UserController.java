@@ -43,23 +43,18 @@ public class UserController {
 //		return "user/list";
 	}
 	
-	@RequestMapping(value = "/add")
-	public void add(Model model) {
-		logger.debug("/add : ");
+	@RequestMapping(value = "/create")
+	public void create(Model model) {
 		model.addAttribute("user", new User());
-		
-//		User user = new User();
-//		user.setId("112");
-//		user.setUserName("Gwangsu");
-//		userService.create(user);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST)
-	public String addSubmit(@Valid User user, BindingResult result) {
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public String createSubmit(@Valid User user, BindingResult result) {
 		if (result.hasErrors()) {
-			return "user/add";
+			return "user/create";
 		}
 		
+		logger.debug("user=" + user);
 		userService.create(user);
 		return "redirect:/user/list";
 	}

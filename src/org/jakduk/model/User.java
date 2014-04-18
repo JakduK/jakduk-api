@@ -22,6 +22,10 @@ public class User {
 	@Size(min = 1, message="Input userName")
 	private String userName;
 	
+	@NotNull
+	@Size(min = 4, message="Input password")
+	private String password;
+	
 	@Temporal(TemporalType.DATE)
 	private Date joined;
 	
@@ -47,6 +51,19 @@ public class User {
 
 	public void setJoined(Date joined) {
 		this.joined = joined;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", userName=" + userName + ", password=" + password + ", joined=" + joined + "]"; 
 	}
 	
 }

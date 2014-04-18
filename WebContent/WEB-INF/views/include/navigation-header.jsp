@@ -21,6 +21,7 @@
             <li><a href="<c:url value="/board"/>">Board</a></li>
             <li><a href="<c:url value="/user"/>">User</a></li>
             <li><a href="#contact">Contact</a></li>
+            <li><a href="<c:url value="/logout"/>">Logout</a></li>
           </ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->

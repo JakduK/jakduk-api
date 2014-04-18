@@ -8,11 +8,11 @@
 <title>Insert title here</title>
 </head>
 <body>
-<a href="<c:url value='/user/add' />">Add</a>
+<a href="<c:url value='/user/create' />">Create</a>
 <h2>User List</h2>
 <ul>
 <c:forEach items="${list}" var="member">
-	<li>${member.id} / ${member.userName}</li>
+	<li>${member.id} / ${member.userName} / ${member.password}</li>
 </c:forEach>
 </ul>
 </body>
