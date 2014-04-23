@@ -11,7 +11,6 @@
 
 </head>
 <body>
-<jsp:include page="../include/navigation-header.jsp"/>
     <div class="container-fluid">
     
 			<div class="row-fluid">

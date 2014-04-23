@@ -19,6 +19,10 @@ public class User {
 	private String id;
 	
 	@NotNull
+	@Size(min = 1, message="Input userID")
+	private String principle;
+	
+	@NotNull
 	@Size(min = 1, message="Input userName")
 	private String userName;
 	
@@ -35,6 +39,14 @@ public class User {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public String getPrinciple() {
+		return principle;
+	}
+
+	public void setPrinciple(String principle) {
+		this.principle = principle;
 	}
 
 	public String getUserName() {
@@ -63,7 +75,7 @@ public class User {
 	
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", userName=" + userName + ", password=" + password + ", joined=" + joined + "]"; 
+		return "User [id=" + id + ", principle=" + principle + ", userName=" + userName + ", password=" + password + ", joined=" + joined + "]"; 
 	}
 	
 }

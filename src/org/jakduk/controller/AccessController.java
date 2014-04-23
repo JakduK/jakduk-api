@@ -17,7 +17,6 @@ public class AccessController {
 			@RequestParam(required = false) String message) {
 		
 		model.addAttribute("message", message);
-		logger.debug("login=" + model);
 		return "access/login";
 	}
 
@@ -31,5 +30,10 @@ public class AccessController {
 	public String logoutSuccess() {
 		String message = "Logout Success!";
 		return "redirect:/login?message=" + message;
+	}
+	
+	@RequestMapping(value = "/denied")
+	public String denied() {
+		return "access/denied";
 	}
 }

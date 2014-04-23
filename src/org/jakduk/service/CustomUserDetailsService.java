@@ -36,11 +36,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 			logger.debug("domainUser=" + domainUser);
 			
 			if (domainUser != null) {
-				authenticatedUser = new User(domainUser.getUserName(), 
-						domainUser.getPassword(), true, true, true, true, getAuthorities(1));
+				authenticatedUser = new User(domainUser.getPrinciple(), 
+						domainUser.getPassword(), true, true, true, true, getAuthorities(2));
 			} else {
 				authenticatedUser = new User("admin", "21232f297a57a5a743894a0e4a801fc3", true, true, true, true, getAuthorities(1));
 			}
+			
+			logger.debug("authenticatedUser=" + authenticatedUser);
 			
 			return authenticatedUser;
 			
@@ -62,7 +64,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 			roles.add("ROLE_ADMIN");
 
 		} else if (role.intValue() == 2) {
-			roles.add("ROLE_USER");
+			roles.add("ROLE_TEST_01");
 		}
 
 		return roles;

@@ -16,7 +16,14 @@
 		<form:form commandName="user" action="/jakduk/user/create" method="POST" cssClass="form-horizontal">
 			<legend>User registration</legend>
 			<div class="control-group string required">
-				<label class="string required control-label" for="userName"><abbr title="required">*</abbr> User Name</label>
+				<label class="string required control-label" for=principle><abbr title="required">*</abbr> UserID</label>
+				<div class="controls">
+					<form:input path="principle" cssClass="string required span6" size="50"/>
+					<form:errors path="principle" cssClass="smdis-error-message"/>
+				</div>
+			</div>
+			<div class="control-group string required">
+				<label class="string required control-label" for="userName"><abbr title="required">*</abbr> NickName</label>
 				<div class="controls">
 					<form:input path="userName" cssClass="string required span6" size="50"/>
 					<form:errors path="userName" cssClass="smdis-error-message"/>

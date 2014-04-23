@@ -1,8 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>    
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+    
     
         <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
       <div class="container">
@@ -21,7 +23,7 @@
             <li><a href="<c:url value="/board"/>">Board</a></li>
             <li><a href="<c:url value="/user"/>">User</a></li>
             <li><a href="#contact">Contact</a></li>
-            <li><a href="<c:url value="/logout"/>">Logout</a></li>
+            <li><a href="<c:url value="/logout"/>"><%=SecurityContextHolder.getContext().getAuthentication().getName()%> Logout</a></li>
           </ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
