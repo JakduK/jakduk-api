@@ -1,12 +1,10 @@
-package org.jakduk.controller;
+package com.jakduk.controller;
 
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
-import org.jakduk.model.User;
-import org.jakduk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +12,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+
+import com.jakduk.model.User;
+import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/user")

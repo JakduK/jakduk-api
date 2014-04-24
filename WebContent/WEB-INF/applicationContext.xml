@@ -20,7 +20,7 @@
 	
 	<context:property-placeholder properties-ref="deployProperties" />
 
-	<context:component-scan base-package="org.jakduk">
+	<context:component-scan base-package="com.jakduk">
 		<context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation" />
 	</context:component-scan>
 	

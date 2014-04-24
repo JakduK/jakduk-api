@@ -1,11 +1,10 @@
-package org.jakduk.service;
+package com.jakduk.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jakduk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.jakduk.repository.UserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -30,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		try {
 			User authenticatedUser;
 			
-			org.jakduk.model.User domainUser = userRepository.findByUserName(principle);
+			com.jakduk.model.User domainUser = userRepository.findByUserName(principle);
 			StandardPasswordEncoder encoder = new StandardPasswordEncoder();
 			
 			logger.debug("domainUser=" + domainUser);

@@ -1,13 +1,14 @@
-package org.jakduk.service;
+package com.jakduk.service;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jakduk.model.User;
-import org.jakduk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.jakduk.model.User;
+import com.jakduk.repository.UserRepository;
 
 @Service
 public class UserService {

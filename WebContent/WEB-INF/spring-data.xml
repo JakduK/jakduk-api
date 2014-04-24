@@ -16,7 +16,7 @@
 	<context:property-placeholder properties-ref="deployProperties" />
 
 	<!-- Activate Spring Data MongoDB repository support -->
-	<mongo:repositories base-package="org.jakduk.repository" />
+	<mongo:repositories base-package="com.jakduk.repository" />
 
 	<!-- MongoDB host -->
 	<mongo:mongo host="${mongo.host.name}" port="${mongo.host.port}" />

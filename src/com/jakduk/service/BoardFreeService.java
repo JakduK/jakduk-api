@@ -1,10 +1,11 @@
-package org.jakduk.service;
+package com.jakduk.service;
 
 import org.apache.log4j.Logger;
-import org.jakduk.model.BoardFree;
-import org.jakduk.repository.BoardFreeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.jakduk.model.BoardFree;
+import com.jakduk.repository.BoardFreeRepository;
 
 @Service
 public class BoardFreeService {

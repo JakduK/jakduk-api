@@ -1,7 +1,8 @@
-package org.jakduk.repository;
+package com.jakduk.repository;
 
-import org.jakduk.model.BoardFree;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.jakduk.model.BoardFree;
 
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String>{
 
