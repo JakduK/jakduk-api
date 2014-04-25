@@ -1,6 +1,7 @@
 package com.jakduk.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,16 +20,18 @@ public class User {
 	private String id;
 	
 	@NotNull
-	@Size(min = 1, message="Input userID")
-	private String principle;
+	@Size(min = 1, message="Input email")
+	private String email;
 	
 	@NotNull
 	@Size(min = 1, message="Input userName")
-	private String userName;
+	private String username;
 	
 	@NotNull
 	@Size(min = 4, message="Input password")
 	private String password;
+	
+	private List<String> rules;
 	
 	@Temporal(TemporalType.DATE)
 	private Date joined;
@@ -41,20 +44,20 @@ public class User {
 		this.id = id;
 	}
 	
-	public String getPrinciple() {
-		return principle;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setPrinciple(String principle) {
-		this.principle = principle;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public Date getJoined() {
@@ -73,9 +76,18 @@ public class User {
 		this.password = password;
 	}
 	
+	
+	public List<String> getRules() {
+		return rules;
+	}
+
+	public void setRules(List<String> rules) {
+		this.rules = rules;
+	}
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", principle=" + principle + ", userName=" + userName + ", password=" + password + ", joined=" + joined + "]"; 
+		return "User [id=" + id + ", email=" + email + ", username=" + username + ", password=" + password + ", rules=" + rules + "]"; 
 	}
 	
 }

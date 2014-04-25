@@ -11,16 +11,16 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-   	<spring.version>3.2.8.RELEASE</spring.version>
-		<spring.security.core.version>3.2.3.RELEASE</spring.security.core.version>   	
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<spring.version>3.2.8.RELEASE</spring.version>
+	<spring.security.core.version>3.2.3.RELEASE</spring.security.core.version>   	
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
- 		<!-- Miscellaneous Dependencies -->
-		<log4j.version>1.2.14</log4j.version>
+	<!-- Miscellaneous Dependencies -->
+	<log4j.version>1.2.14</log4j.version>
 		
-		<!-- Mongo DB driver & Spring Data MongoDB -->
-		<spring.data.mongodb.version>1.1.1.RELEASE</spring.data.mongodb.version>
-		<mongodb.driver.version>2.10.1</mongodb.driver.version>
+	<!-- Mongo DB driver & Spring Data MongoDB -->
+	<spring.data.mongodb.version>1.1.1.RELEASE</spring.data.mongodb.version>
+	<mongodb.driver.version>2.10.1</mongodb.driver.version>
   </properties>
 	  
  	<repositories>
@@ -155,7 +155,12 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.security.core.version}</version>
 		</dependency>		
-		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>${spring.security.core.version}</version>
+		</dependency>
+				
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>

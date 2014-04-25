@@ -36,24 +36,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-          </tr>
+        
+<c:forEach items="${posts}" var="post">
+	<tr>
+		<td>${post.subject}</td>
+		<td>${post.writer.username}</td>
+		<td>${post.subject}</td>
+		<td>${post.subject}</td>
+	</tr>
+</c:forEach>
         </tbody>
       </table>
     </div>

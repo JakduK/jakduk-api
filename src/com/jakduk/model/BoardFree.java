@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -13,10 +14,9 @@ public class BoardFree {
 
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
-	
-//	@NotNull
-	@Size(min = 1, message="Input writer")
-	private String writer;
+
+	@DBRef
+	private User writer;
 	
 	@NotNull
 	@Size(min = 1, message="Input subject")
@@ -33,12 +33,12 @@ public class BoardFree {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	public String getWriter() {
+	
+	public User getWriter() {
 		return writer;
 	}
 
-	public void setWriter(String writer) {
+	public void setWriter(User writer) {
 		this.writer = writer;
 	}
 

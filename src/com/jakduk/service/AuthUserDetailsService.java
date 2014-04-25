@@ -8,17 +8,17 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.jakduk.authority.AuthUser;
+import com.jakduk.model.User;
 import com.jakduk.repository.UserRepository;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class AuthUserDetailsService implements UserDetailsService {
 	
 	@Autowired
 	UserRepository userRepository;
@@ -26,26 +26,30 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private Logger logger = Logger.getLogger(this.getClass());
 
 	@Override
-	public UserDetails loadUserByUsername(String principle)
+	public UserDetails loadUserByUsername(String email)
 			throws UsernameNotFoundException {
 		try {
-			User authenticatedUser;
+			AuthUser authUser;
 			
-			com.jakduk.model.User domainUser = userRepository.findByUserName(principle);
-			StandardPasswordEncoder encoder = new StandardPasswordEncoder();
+			User domainUser = userRepository.findByEmail(email);
+			
+			boolean enabled = true;
+			boolean accountNonExpired = true;
+			boolean credentialsNonExpired = true;
+			boolean accountNonLocked = true;
 			
 			logger.debug("domainUser=" + domainUser);
 			
 			if (domainUser != null) {
-				authenticatedUser = new User(domainUser.getPrinciple(), 
-						domainUser.getPassword(), true, true, true, true, getAuthorities(2));
+				authUser = new AuthUser(domainUser.getEmail(), domainUser.getId(), domainUser.getPassword(), domainUser.getUsername(),
+						enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(2));
 			} else {
-				authenticatedUser = new User("admin", "21232f297a57a5a743894a0e4a801fc3", true, true, true, true, getAuthorities(1));
+				authUser = new AuthUser("admin", "admin", "21232f297a57a5a743894a0e4a801fc3", "admin", true, true, true, true, getAuthorities(1));
 			}
 			
-			logger.debug("authenticatedUser=" + authenticatedUser);
+			logger.debug("authUser=" + authUser);
 			
-			return authenticatedUser;
+			return authUser;
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -71,8 +75,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		return roles;
 	}
 	
-	public static List<GrantedAuthority> getGrantedAuthorities(
-			List<String> roles) {
+	public static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		for (String role : roles) {
 			authorities.add(new SimpleGrantedAuthority(role));

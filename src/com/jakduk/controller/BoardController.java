@@ -1,5 +1,7 @@
 package com.jakduk.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -31,6 +33,9 @@ public class BoardController {
 	@RequestMapping(value = "/free")
 	public String free(Model model) {
 		
+		List<BoardFree> posts = boardFreeService.findAll();
+		logger.debug("/posts : " + posts);
+		model.addAttribute("posts", posts);
 		return "board/free";
 	}
 	
@@ -45,7 +50,7 @@ public class BoardController {
 	public String freeWriteSubmit(@Valid BoardFree board, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("error=" + result.toString());
+			logger.error("error=" + result.toString());
 			return "board/free";
 		}
 		
