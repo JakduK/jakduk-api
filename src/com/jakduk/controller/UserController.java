@@ -34,7 +34,9 @@ public class UserController {
 	
 	@RequestMapping(value = "/list")
 	public void list(Model model) {
-//		logger.debug("/list : " + model);
+
+		
+		logger.debug("/test : " + userService.testFindId("test02"));
 		
 		List<User> users = userService.findAll();
 		logger.debug("/list : " + users);
