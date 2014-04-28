@@ -33,9 +33,10 @@ public class BoardController {
 	@RequestMapping(value = "/free")
 	public String free(Model model) {
 		
-		List<BoardFree> posts = boardFreeService.findAll();
-		logger.debug("/posts : " + posts);
-		model.addAttribute("posts", posts);
+		boardFreeService.getFree(model);
+		
+		logger.debug("ddd=" + model);
+		
 		return "board/free";
 	}
 	

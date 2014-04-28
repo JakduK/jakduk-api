@@ -5,7 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-    
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
     
         <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
       <div class="container">
@@ -16,12 +16,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Project name</a>
+          <a class="navbar-brand" href="#"><spring:message code="common.jakduk"/></a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="<c:url value="/home"/>">Home</a></li>
-            <li><a href="<c:url value="/board"/>">Board</a></li>
+            <li class="active"><a href="<c:url value="/home"/>"><spring:message code="common.home"/></a></li>
+            <li><a href="<c:url value="/board"/>"><spring:message code="board"/></a></li>
             <li><a href="<c:url value="/user"/>">User</a></li>
             <li><a href="#contact">Contact</a></li>
             <sec:authorize access="isAnonymous()">

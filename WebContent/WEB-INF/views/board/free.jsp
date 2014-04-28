@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -16,38 +19,47 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 <div class="container">
 
+<spring:message code="board.number"/>
+<spring:message code="board.subject"/>
 
 <p><a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button">Write</a></p>
 
-<div class="panel panel-default">
-      <!-- Default panel contents -->
-      <div class="panel-heading">Panel heading</div>
-      <div class="panel-body">
-        <p>Some default panel content here. Nulla vitae elit libero, a pharetra augue. Aenean lacinia bibendum nulla sed consectetur. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+
+            <div class="row">
+        <div class="col-sm-12">
+          <h4>Most Basic - Small Columns</h4>
+        </div>
       </div>
-      <!-- Table -->
-      <table class="table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-          </tr>
-        </thead>
-        <tbody>
+      <c:forEach items="${posts}" var="post">
+		<div class="row">
+			<div class="col-sm-1">${post.seq}</div>
+        <div class="col-sm-1"><strong>${post.subject}</strong></div>
+        <div class="col-sm-5">
+        ${post.writer.username}
+        |
+<%@page import="java.util.Date"%>
+<%
+Date CurrentDate = new Date();
+%>
+<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+
+	<c:choose>
+		<c:when test="${postDate < nowDate}">
+			<fmt:formatDate value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+		</c:when>
+		<c:otherwise>
+			<fmt:formatDate value="${createDate[post.id]}" pattern="hh:mm (a)" />
+		</c:otherwise>
+	</c:choose> 
+
+        </div>
         
-<c:forEach items="${posts}" var="post">
-	<tr>
-		<td>${post.subject}</td>
-		<td>${post.writer.username}</td>
-		<td>${post.subject}</td>
-		<td>${post.subject}</td>
-	</tr>
-</c:forEach>
-        </tbody>
-      </table>
-    </div>
+       
+        <hr>
+      </div>
+      </c:forEach>
+
     
 <jsp:include page="../include/footer.jsp"/>
 </div>

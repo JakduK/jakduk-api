@@ -16,7 +16,7 @@ public class BoardFree {
 	private String id;
 
 	@DBRef
-	private User writer;
+	private BoardWriter writer;
 	
 	@NotNull
 	@Size(min = 1, message="Input subject")
@@ -26,6 +26,8 @@ public class BoardFree {
 	@Size(min = 1, message="Input contents")
 	private String content;
 	
+	private long seq;
+	
 	public String getId() {
 		return id;
 	}
@@ -33,12 +35,12 @@ public class BoardFree {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-	public User getWriter() {
+
+	public BoardWriter getWriter() {
 		return writer;
 	}
 
-	public void setWriter(User writer) {
+	public void setWriter(BoardWriter writer) {
 		this.writer = writer;
 	}
 
@@ -58,8 +60,16 @@ public class BoardFree {
 		this.content = content;
 	}
 
+	public long getSeq() {
+		return seq;
+	}
+
+	public void setSeq(long seq) {
+		this.seq = seq;
+	}
+	
 	@Override
 	public String toString() {
-		return "BoardFree [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content + "]"; 
+		return "BoardFree [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content + ", seq=" + seq + "]"; 
 	}
 }

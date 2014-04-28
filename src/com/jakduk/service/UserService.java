@@ -40,6 +40,8 @@ public class UserService {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("email").is(userid));
 		
+		
+		
 		return mongoTemplate.findOne(query, BoardWriter.class);
 	}
 		
