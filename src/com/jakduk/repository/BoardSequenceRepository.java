@@ -6,6 +6,6 @@ import com.jakduk.model.BoardSequence;
 
 public interface BoardSequenceRepository extends MongoRepository<BoardSequence, String>{
 	BoardSequence findById(String id);
-	BoardSequence findByName(String name);
+	BoardSequence findByName(Integer name);
 
 }

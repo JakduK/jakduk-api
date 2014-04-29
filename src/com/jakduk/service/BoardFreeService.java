@@ -1,6 +1,7 @@
 package com.jakduk.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,10 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.authority.AuthUser;
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.BoardCategory;
 import com.jakduk.model.BoardFree;
 import com.jakduk.model.BoardSequence;
 import com.jakduk.model.BoardWriter;
 import com.jakduk.model.User;
+import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.BoardSequenceRepository;
 import com.jakduk.repository.UserRepository;
@@ -43,6 +47,9 @@ public class BoardFreeService {
 	private BoardSequenceRepository boardSequenceRepository;
 	
 	@Autowired
+	private BoardCategoryRepository boardCategoryRepository;
+	
+	@Autowired
 	private MongoTemplate mongoTemplate;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
@@ -59,7 +66,7 @@ public class BoardFreeService {
 			writer.setId(userid);
 			writer.setUsername(username);
 			boardFree.setWriter(writer);
-			boardFree.setSeq(getNextSequence("free"));
+			boardFree.setSeq(getNextSequence(CommonConst.BOARD_NAME_FREE));
 			
 			boardFreeRepository.save(boardFree);
 			logger.debug("boardFree=" + boardFree);
@@ -75,7 +82,7 @@ public class BoardFreeService {
 		return boardFreeRepository.findAll();
 	}	
 	
-	public Long getNextSequence(String name) {
+	public Long getNextSequence(Integer name) {
 		
 		Long returnVal = Long.valueOf(-1);
 		
@@ -111,7 +118,6 @@ public class BoardFreeService {
 		
 		List<BoardFree> posts = boardFreeRepository.findAll();
 		
-		Map<String, Object> extraInfo = new HashMap<String, Object>();
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		
 		for (Integer postIdx=0 ; postIdx<posts.size() ; postIdx++) {
@@ -120,10 +126,6 @@ public class BoardFreeService {
 			ObjectId objId = new ObjectId(tempId);
 			createDate.put(tempId, objId.getDate());
 		}
-		
-		
-		
-//		extraInfo.put("createDate", createDate);
 		
 		model.addAttribute("posts", posts);
 		model.addAttribute("createDate", createDate);

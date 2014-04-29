@@ -16,7 +16,7 @@ public class BoardSequence {
 	private Long seq;
 	
 	@NotNull
-	private String name;
+	private Integer name;
 
 	public Long getSeq() {
 		return seq;
@@ -25,15 +25,15 @@ public class BoardSequence {
 	public void setSeq(Long seq) {
 		this.seq = seq;
 	}
-
-	public String getName() {
+	
+	public Integer getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(Integer name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "BoardSequence [id=" + id + ", seq=" + seq + ", name=" + name + "]"; 
