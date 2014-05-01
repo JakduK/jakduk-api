@@ -22,8 +22,19 @@
 <spring:message code="board.number"/>
 <spring:message code="board.subject"/>
 
-<p><a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button">Write</a></p>
+<p><a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a></p>
 
+<!-- Single button -->
+<div class="btn-group">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    <spring:message code="board.category"/> <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+  <c:forEach items="${categorys}" var="category">
+   <li><a href="#"><spring:message code="${category.name}"/></a></li>	
+	</c:forEach>
+  </ul>
+</div>
 
             <div class="row">
         <div class="col-sm-12">
@@ -54,7 +65,6 @@ Date CurrentDate = new Date();
 	</c:choose> 
 
         </div>
-        
        
         <hr>
       </div>

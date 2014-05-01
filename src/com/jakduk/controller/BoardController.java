@@ -35,15 +35,14 @@ public class BoardController {
 		
 		boardFreeService.getFree(model);
 		
-		logger.debug("ddd=" + model);
-		
 		return "board/free";
 	}
 	
 	@RequestMapping(value = "/free/write")
 	public String freeWrite(Model model) {
 		
-		model.addAttribute("board", new BoardFree());
+		boardFreeService.getWrite(model);
+		
 		return "board/freeWrite";
 	}
 	
@@ -52,7 +51,7 @@ public class BoardController {
 		
 		if (result.hasErrors()) {
 			logger.error("error=" + result.toString());
-			return "board/free";
+			return "board/freeWrite";
 		}
 		
 		logger.debug("test " + board);

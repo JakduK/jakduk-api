@@ -1,7 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -19,19 +21,18 @@
 						<legend>Write</legend>
 
 			<div class="control-group select optional">
-				<label class="select optional control-label" for="category"> Category</label>
+				<label class="select optional control-label" for="categoryId"> <spring:message code="board.category"/></label>
 				<div class="controls">
-					<form:select path="content" cssClass="select optional">
-						<form:option value="None" label="None"/>
-						<form:option value="Free" label="Free"/>
-						<form:option value="Football" label="Football"/>
+					<form:select path="categoryId" cssClass="select optional">
+  <c:forEach items="${categorys}" var="category">
+  	<form:option value="${category.categoryId}"><fmt:message key="${category.name}"/></form:option>
+	</c:forEach>
 					</form:select>
 				</div>
 			</div>
-						
 						<div class="control-group string required">
 							<label class="string required control-label" for="subject">
-								<abbr title="required">*</abbr> Subject
+								<abbr title="required">*</abbr> <spring:message code="board.subject"/>
 							</label>
 							<div class="controls">
 								<form:input path="subject" cssClass="string required span12"/>
@@ -39,15 +40,15 @@
 						</div>
 						<div class="control-group text required">
 							<label class="text required control-label" for="content"> 
-								<abbr title="required">*</abbr> Content
+								<abbr title="required">*</abbr> <spring:message code="board.content"/>
 							</label>
 							<div class="controls">
 								<form:textarea path="content" rows="15" cssClass="text required span12"/>
 							</div>
 						</div>
 						<div class="form-actions">
-							<input class="btn btn-primary" name="commit" type="submit" value="Submit">
-							<a class="btn btn-danger" href="<c:url value="/board"/>">Cancel</a> 
+							<input class="btn btn-primary" name="commit" type="submit" value="<spring:message code="common.button.submit"/>">
+							<a class="btn btn-danger" href="<c:url value="/board"/>"><spring:message code="common.button.cancel"/></a> 
 						</div>
 	</form:form>
 				</div><!--/span-->

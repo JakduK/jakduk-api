@@ -20,6 +20,8 @@ public class BoardCategory {
 	@Size(min = 1, message="Input Name")
 	private String name;
 	
+	private Integer categoryId;
+	
 	private List<Integer> usingBoard;
 
 	public String getId() {
@@ -37,6 +39,14 @@ public class BoardCategory {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
 
 	public List<Integer> getUsingBoard() {
 		return usingBoard;
@@ -48,8 +58,7 @@ public class BoardCategory {
 	
 	@Override
 	public String toString() {
-		return "BoardCategory [id=" + id + ", name=" + name + "]";
+		return "BoardCategory [id=" + id + ", name=" + name + ", categoryId=" + categoryId + ", usingBoard=" + usingBoard+ "]";
 	}
-	
 	
 }

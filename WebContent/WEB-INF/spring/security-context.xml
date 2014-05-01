@@ -16,6 +16,7 @@
 	
 	<http auto-config="true" use-expressions="true">
 		<intercept-url pattern="/login" access="permitAll" requires-channel="http"/>
+		<intercept-url pattern="/admin" access="permitAll" requires-channel="http"/>
 		<intercept-url pattern="/logout" access="permitAll" />
 		<intercept-url pattern="/home" access="permitAll" />
 		<intercept-url pattern="/sample" access="hasRole('ROLE_ADMIN')" />

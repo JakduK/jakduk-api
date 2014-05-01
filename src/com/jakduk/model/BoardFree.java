@@ -28,6 +28,8 @@ public class BoardFree {
 	
 	private long seq;
 	
+	private Integer categoryId;
+	
 	public String getId() {
 		return id;
 	}
@@ -68,8 +70,19 @@ public class BoardFree {
 		this.seq = seq;
 	}
 	
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
+
 	@Override
 	public String toString() {
-		return "BoardFree [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content + ", seq=" + seq + "]"; 
+		String returnStr = "BoardFree [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content + ", seq=" + seq + "]";
+		returnStr += "BoardFree [categoryId=" + categoryId + "]";
+		
+		return returnStr;
 	}
 }

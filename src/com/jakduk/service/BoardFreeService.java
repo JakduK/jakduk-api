@@ -1,15 +1,12 @@
 package com.jakduk.service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
-import org.bson.types.BSONTimestamp;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -32,7 +29,6 @@ import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.BoardSequenceRepository;
 import com.jakduk.repository.UserRepository;
-import com.mongodb.BasicDBObject;
 
 @Service
 public class BoardFreeService {
@@ -127,8 +123,23 @@ public class BoardFreeService {
 			createDate.put(tempId, objId.getDate());
 		}
 		
+		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+		
+		logger.debug("posts=" + posts);
+		
 		model.addAttribute("posts", posts);
 		model.addAttribute("createDate", createDate);
+		model.addAttribute("categorys", categorys);
+		
+		return model;
+	}
+	
+	public Model getWrite(Model model) {
+		
+		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+		
+		model.addAttribute("board", new BoardFree());
+		model.addAttribute("categorys", categorys);
 		
 		return model;
 	}
