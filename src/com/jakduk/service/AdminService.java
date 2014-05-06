@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.BoardCategory;
+import com.jakduk.model.BoardSequence;
 import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.repository.BoardSequenceRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -24,6 +27,9 @@ public class AdminService {
 	@Autowired
 	private BoardCategoryRepository boardCategoryRepository;
 	
+	@Autowired
+	private BoardSequenceRepository boardSequenceRepository;
+
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	public String initData() {
@@ -50,6 +56,14 @@ public class AdminService {
 			result = "success input board category data at DB";
 		} else {
 			result = "already exist board category at DB.";
+		}
+		
+		BoardSequence getBoardSequence = boardSequenceRepository.findByName(CommonConst.BOARD_NAME_FREE);
+		
+		if (getBoardSequence == null) {
+			BoardSequence boardSequence = new BoardSequence();
+			boardSequence.setName(CommonConst.BOARD_NAME_FREE);
+			boardSequenceRepository.save(boardSequence);
 		}
 		
 		return result;

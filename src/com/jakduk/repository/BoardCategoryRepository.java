@@ -15,5 +15,5 @@ import com.jakduk.model.BoardCategory;
 public interface BoardCategoryRepository extends MongoRepository<BoardCategory, String> {
 	
 	List<BoardCategory> findByUsingBoard(Integer usingBoard);
-	
+	BoardCategory findByCategoryId(Integer categoryId);	
 }

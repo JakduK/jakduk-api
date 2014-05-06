@@ -43,7 +43,13 @@
       </div>
       <c:forEach items="${posts}" var="post">
 		<div class="row">
-			<div class="col-sm-1">${post.seq}</div>
+			<div class="col-sm-1">
+				${post.seq}
+				|
+				<c:if test="${!empty post.categoryId}">
+					<fmt:message key="${usingCategoryNames[post.categoryId]}"/>
+				</c:if>
+			</div>
         <div class="col-sm-1"><strong>${post.subject}</strong></div>
         <div class="col-sm-5">
         ${post.writer.username}
@@ -63,9 +69,7 @@ Date CurrentDate = new Date();
 			<fmt:formatDate value="${createDate[post.id]}" pattern="hh:mm (a)" />
 		</c:otherwise>
 	</c:choose> 
-
         </div>
-       
         <hr>
       </div>
       </c:forEach>

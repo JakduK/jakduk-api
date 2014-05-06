@@ -1,6 +1,6 @@
 package com.jakduk.service;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +9,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -24,7 +27,6 @@ import com.jakduk.model.BoardCategory;
 import com.jakduk.model.BoardFree;
 import com.jakduk.model.BoardSequence;
 import com.jakduk.model.BoardWriter;
-import com.jakduk.model.User;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.BoardSequenceRepository;
@@ -71,24 +73,9 @@ public class BoardFreeService {
 		}		
 	}
 
-	public List<BoardFree> findAll() {
-		User writer = userRepository.writerFindById("5359d92ce4b0efcb45ea8ba2");
-		logger.debug("writer=" + writer);
-		
-		return boardFreeRepository.findAll();
-	}	
-	
 	public Long getNextSequence(Integer name) {
 		
 		Long returnVal = Long.valueOf(-1);
-		
-		BoardSequence getBoardSequence = boardSequenceRepository.findByName(name);
-		
-		if (getBoardSequence == null) {
-			BoardSequence boardSequence = new BoardSequence();
-			boardSequence.setName(name);
-			boardSequenceRepository.save(boardSequence);
-		}
 		
 		Query query = new Query();
 		query.addCriteria(Criteria.where("name").is(name));
@@ -112,15 +99,25 @@ public class BoardFreeService {
 	
 	public Model getFree(Model model) {
 		
-		List<BoardFree> posts = boardFreeRepository.findAll();
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Pageable request = new PageRequest(0, 3, sort);
+		List<BoardFree> posts = boardFreeRepository.findAll(request).getContent();
 		
 		Map<String, Date> createDate = new HashMap<String, Date>();
+		Map<Integer, String> categoryName = new HashMap<Integer, String>();
 		
 		for (Integer postIdx=0 ; postIdx<posts.size() ; postIdx++) {
 			BoardFree tempPost = posts.get(postIdx);
 			String tempId = tempPost.getId();
+			Integer tempCategoryId = tempPost.getCategoryId();
 			ObjectId objId = new ObjectId(tempId);
 			createDate.put(tempId, objId.getDate());
+			
+			if (tempCategoryId != null && !categoryName.containsKey(tempCategoryId)) {
+				BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(tempCategoryId);
+				categoryName.put(tempCategoryId, boardCategory.getName());
+			}
+				
 		}
 		
 		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
@@ -130,6 +127,7 @@ public class BoardFreeService {
 		model.addAttribute("posts", posts);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("categorys", categorys);
+		model.addAttribute("usingCategoryNames", categoryName);
 		
 		return model;
 	}
