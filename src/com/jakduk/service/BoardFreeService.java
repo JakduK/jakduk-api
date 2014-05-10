@@ -136,7 +136,7 @@ public class BoardFreeService {
 		
 		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
 		
-		model.addAttribute("board", new BoardFree());
+		model.addAttribute("boardFree", new BoardFree());
 		model.addAttribute("categorys", categorys);
 		
 		return model;

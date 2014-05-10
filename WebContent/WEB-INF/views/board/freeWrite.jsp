@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>    
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -17,7 +17,7 @@
     
 			<div class="row-fluid">
 				<div class="span10">
-	<form:form commandName="board" action="/jakduk/board/free/write" method="POST">
+	<form:form commandName="boardFree" action="/jakduk/board/free/write" method="POST">
 						<legend>Write</legend>
 
 			<div class="control-group select optional">
@@ -36,6 +36,7 @@
 							</label>
 							<div class="controls">
 								<form:input path="subject" cssClass="string required span12"/>
+								<form:errors path="subject" cssClass="smdis-error-message"/>								
 							</div>
 						</div>
 						<div class="control-group text required">
@@ -44,6 +45,7 @@
 							</label>
 							<div class="controls">
 								<form:textarea path="content" rows="15" cssClass="text required span12"/>
+								<form:errors path="content" cssClass="smdis-error-message"/>
 							</div>
 						</div>
 						<div class="form-actions">

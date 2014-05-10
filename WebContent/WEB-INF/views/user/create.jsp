@@ -11,7 +11,6 @@
 </head>
 <body>
 <a href="<c:url value='/user/list'/>">List</a>
-
 	<div class="container">
 		<form:form commandName="user" action="/jakduk/user/create" method="POST" cssClass="form-horizontal">
 			<legend>User registration</legend>

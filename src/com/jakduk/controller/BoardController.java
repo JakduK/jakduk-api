@@ -1,7 +1,5 @@
 package com.jakduk.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -11,12 +9,15 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.jakduk.model.BoardFree;
 import com.jakduk.service.BoardFreeService;
 
 @Controller
 @RequestMapping("/board")
+@SessionAttributes("boardFree")
 public class BoardController {
 	
 	@Autowired
@@ -47,15 +48,15 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/write", method = RequestMethod.POST)
-	public String freeWriteSubmit(@Valid BoardFree board, BindingResult result) {
+	public String freeWriteSubmit(@Valid BoardFree boardFree, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
-			logger.error("error=" + result.toString());
 			return "board/freeWrite";
 		}
 		
-		logger.debug("test " + board);
-		boardFreeService.write(board);
+		logger.debug("test " + boardFree);
+		boardFreeService.write(boardFree);
+		sessionStatus.setComplete();
 		
 		return "redirect:/board/free";
 	}
