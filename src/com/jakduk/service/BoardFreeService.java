@@ -97,10 +97,14 @@ public class BoardFreeService {
 		}
 	}
 	
-	public Model getFree(Model model) {
+	public Model getFree(Model model, Integer page) {
+		
+		if (page == null) {
+			page = 0;
+		}
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable request = new PageRequest(0, 3, sort);
+		Pageable request = new PageRequest(page, 5, sort);
 		List<BoardFree> posts = boardFreeRepository.findAll(request).getContent();
 		
 		Map<String, Date> createDate = new HashMap<String, Date>();

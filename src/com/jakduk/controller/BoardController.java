@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
@@ -17,7 +18,7 @@ import com.jakduk.service.BoardFreeService;
 
 @Controller
 @RequestMapping("/board")
-@SessionAttributes("boardFree")
+@SessionAttributes({"boardFree","categorys"})
 public class BoardController {
 	
 	@Autowired
@@ -31,10 +32,11 @@ public class BoardController {
 		return "redirect:/board/free";
 	}
 	
-	@RequestMapping(value = "/free")
-	public String free(Model model) {
+	@RequestMapping(value = "/free", method = RequestMethod.GET)
+	public String free(Model model, @RequestParam(value="page", required=false) Integer page) {
 		
-		boardFreeService.getFree(model);
+		logger.debug("page=" + page);
+		boardFreeService.getFree(model, page);
 		
 		return "board/free";
 	}
@@ -54,7 +56,6 @@ public class BoardController {
 			return "board/freeWrite";
 		}
 		
-		logger.debug("test " + boardFree);
 		boardFreeService.write(boardFree);
 		sessionStatus.setComplete();
 		

@@ -43,14 +43,14 @@
       </div>
       <c:forEach items="${posts}" var="post">
 		<div class="row">
-			<div class="col-sm-1">
+			<div class="col-sm-2">
 				${post.seq}
 				|
 				<c:if test="${!empty post.categoryId}">
 					<fmt:message key="${usingCategoryNames[post.categoryId]}"/>
 				</c:if>
 			</div>
-        <div class="col-sm-1"><strong>${post.subject}</strong></div>
+        <div class="col-sm-2"><strong>${post.subject}</strong></div>
         <div class="col-sm-5">
         ${post.writer.username}
         |
@@ -74,6 +74,13 @@ Date CurrentDate = new Date();
       </div>
       </c:forEach>
 
+<ul class="pagination">
+	<li><a href="?page=0">&laquo;</a></li>
+	<li><a href="?page=1">1</a></li>
+	<li><a href="?page=2">2</a></li>
+	<li><a href="?page=3">3</a></li>
+	<li><a href="#">&raquo;</a></li>
+</ul>
     
 <jsp:include page="../include/footer.jsp"/>
 </div>
@@ -83,7 +90,7 @@ Date CurrentDate = new Date();
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
-		<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/offcanvas.js"></script>
+	<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/offcanvas.js"></script>
 		
 </body>
 </html>
