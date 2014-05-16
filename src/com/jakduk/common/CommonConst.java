@@ -12,6 +12,8 @@ public class CommonConst {
 	 */
 	public final static Integer BOARD_NAME_FREE = 10;
 	
+	public final static Integer BOARD_LINE_NUMBER = 5;
+	
 	/**
 	 * 게시판 말머리.
 	 */

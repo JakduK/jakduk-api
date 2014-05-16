@@ -10,4 +10,6 @@ public interface BoardFreeRepository extends MongoRepository<BoardFree, String>{
 
 	Page<BoardFree> findAll(Pageable pageable);
 	BoardFree findByWriter(String writer);
+	long countByCategoryId(Integer categoryId);
+	long count();
 }

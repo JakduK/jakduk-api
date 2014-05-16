@@ -25,6 +25,7 @@ import com.jakduk.authority.AuthUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.BoardCategory;
 import com.jakduk.model.BoardFree;
+import com.jakduk.model.BoardListInfo;
 import com.jakduk.model.BoardSequence;
 import com.jakduk.model.BoardWriter;
 import com.jakduk.repository.BoardCategoryRepository;
@@ -97,21 +98,20 @@ public class BoardFreeService {
 		}
 	}
 	
-	public Model getFree(Model model, Integer page) {
-		
-		if (page == null) {
-			page = 0;
-		}
+	public Model getFree(Model model, BoardListInfo boardListInfo) {
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable request = new PageRequest(page, 5, sort);
-		List<BoardFree> posts = boardFreeRepository.findAll(request).getContent();
+		Pageable paging = new PageRequest(boardListInfo.getPage(), CommonConst.BOARD_LINE_NUMBER, sort);
+		List<BoardFree> posts = boardFreeRepository.findAll(paging).getContent();
+		
+		logger.debug("countAll=" + boardFreeRepository.count());
+		logger.debug("countCategoty 11 =" + boardFreeRepository.countByCategoryId(11));
+		logger.debug("countCategoty 12 =" + boardFreeRepository.countByCategoryId(12));
 		
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		Map<Integer, String> categoryName = new HashMap<Integer, String>();
 		
-		for (Integer postIdx=0 ; postIdx<posts.size() ; postIdx++) {
-			BoardFree tempPost = posts.get(postIdx);
+		for (BoardFree tempPost : posts) {
 			String tempId = tempPost.getId();
 			Integer tempCategoryId = tempPost.getCategoryId();
 			ObjectId objId = new ObjectId(tempId);
@@ -121,7 +121,6 @@ public class BoardFreeService {
 				BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(tempCategoryId);
 				categoryName.put(tempCategoryId, boardCategory.getName());
 			}
-				
 		}
 		
 		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);

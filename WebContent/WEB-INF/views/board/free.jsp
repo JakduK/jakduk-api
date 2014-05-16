@@ -31,7 +31,7 @@
   </button>
   <ul class="dropdown-menu" role="menu">
   <c:forEach items="${categorys}" var="category">
-   <li><a href="#"><spring:message code="${category.name}"/></a></li>	
+   <li><a href="?category=${category.categoryId}"><spring:message code="${category.name}"/></a></li>	
 	</c:forEach>
   </ul>
 </div>
