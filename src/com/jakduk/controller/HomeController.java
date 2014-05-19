@@ -1,6 +1,5 @@
 package com.jakduk.controller;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/")
 public class HomeController {
 	
-	private Logger logger = Logger.getLogger(this.getClass());
+//	private Logger logger = Logger.getLogger(this.getClass());
 	
 	@RequestMapping
 	public String root() {
