@@ -1,4 +1,4 @@
-package com.jakduk.model;
+package com.jakduk.model.web;
 
 import com.jakduk.common.CommonConst;
 

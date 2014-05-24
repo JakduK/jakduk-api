@@ -23,11 +23,12 @@ import org.springframework.ui.Model;
 
 import com.jakduk.authority.AuthUser;
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.BoardCategory;
-import com.jakduk.model.BoardFree;
-import com.jakduk.model.BoardListInfo;
-import com.jakduk.model.BoardSequence;
-import com.jakduk.model.BoardWriter;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardSequence;
+import com.jakduk.model.db.BoardWriter;
+import com.jakduk.model.web.BoardListInfo;
+import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.BoardSequenceRepository;
@@ -50,6 +51,9 @@ public class BoardFreeService {
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private CommonService commonService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -100,13 +104,23 @@ public class BoardFreeService {
 	
 	public Model getFree(Model model, BoardListInfo boardListInfo) {
 		
+		Integer page = boardListInfo.getPage() - 1;
+		Long numberPosts = boardFreeRepository.count();
+		
+		if (page < 0) {
+			page = 0;
+		}
+		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable paging = new PageRequest(boardListInfo.getPage(), CommonConst.BOARD_LINE_NUMBER, sort);
+		Pageable paging = new PageRequest(page, CommonConst.BOARD_LINE_NUMBER, sort);
 		List<BoardFree> posts = boardFreeRepository.findAll(paging).getContent();
 		
-		logger.debug("countAll=" + boardFreeRepository.count());
-		logger.debug("countCategoty 11 =" + boardFreeRepository.countByCategoryId(11));
-		logger.debug("countCategoty 12 =" + boardFreeRepository.countByCategoryId(12));
+//		logger.debug("countCategoty 11 =" + boardFreeRepository.countByCategoryId(11));
+//		logger.debug("countCategoty 12 =" + boardFreeRepository.countByCategoryId(12));
+
+		BoardPageInfo boardPageInfo = commonService.getCountPages(boardListInfo.getPage().longValue(), numberPosts, 3);
+		
+		logger.debug("countAll=" + boardPageInfo);
 		
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		Map<Integer, String> categoryName = new HashMap<Integer, String>();
@@ -131,6 +145,7 @@ public class BoardFreeService {
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("categorys", categorys);
 		model.addAttribute("usingCategoryNames", categoryName);
+		model.addAttribute("pageInfo", boardPageInfo);
 		
 		return model;
 	}

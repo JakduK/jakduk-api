@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.jakduk.authority.AuthUser;
-import com.jakduk.model.User;
+import com.jakduk.model.db.User;
 import com.jakduk.repository.UserRepository;
 
 @Service

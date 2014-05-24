@@ -1,4 +1,4 @@
-package com.jakduk.model;
+package com.jakduk.model.db;
 
 import java.util.Date;
 import java.util.List;

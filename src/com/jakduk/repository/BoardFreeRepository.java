@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.jakduk.model.BoardFree;
+import com.jakduk.model.db.BoardFree;
 
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String>{
 

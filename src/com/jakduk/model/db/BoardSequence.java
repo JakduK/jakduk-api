@@ -1,4 +1,4 @@
-package com.jakduk.model;
+package com.jakduk.model.db;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

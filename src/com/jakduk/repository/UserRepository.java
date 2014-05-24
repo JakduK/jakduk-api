@@ -3,7 +3,7 @@ package com.jakduk.repository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import com.jakduk.model.User;
+import com.jakduk.model.db.User;
 
 public interface UserRepository extends MongoRepository<User, String> {
 	

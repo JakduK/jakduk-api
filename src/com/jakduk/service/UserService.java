@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.jakduk.model.BoardWriter;
-import com.jakduk.model.User;
+import com.jakduk.model.db.BoardWriter;
+import com.jakduk.model.db.User;
 import com.jakduk.repository.UserRepository;
 
 @Service

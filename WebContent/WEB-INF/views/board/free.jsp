@@ -19,9 +19,6 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 <div class="container">
 
-<spring:message code="board.number"/>
-<spring:message code="board.subject"/>
-
 <p><a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a></p>
 
 <!-- Single button -->
@@ -36,11 +33,11 @@
   </ul>
 </div>
 
-            <div class="row">
-        <div class="col-sm-12">
-          <h4>Most Basic - Small Columns</h4>
-        </div>
-      </div>
+<div class="row">
+	<div class="col-sm-12">
+		<h4><spring:message code="board.name.free"/></h4>
+	</div>
+</div>
       <c:forEach items="${posts}" var="post">
 		<div class="row">
 			<div class="col-sm-2">
@@ -75,22 +72,36 @@ Date CurrentDate = new Date();
       </c:forEach>
 
 <ul class="pagination">
-	<li><a href="?page=0">&laquo;</a></li>
-	<li><a href="?page=1">1</a></li>
-	<li><a href="?page=2">2</a></li>
-	<li><a href="?page=3">3</a></li>
-	<li><a href="#">&raquo;</a></li>
+ <c:choose>
+ 	<c:when test="${pageInfo.prevPage == -1}">
+ 		<li class="disabled"><a href="#">&laquo;</a></li>
+ 	</c:when>
+ 	<c:otherwise>
+ 		<li><a href="?page=${pageInfo.prevPage}">&laquo;</a></li>
+ 	</c:otherwise>
+ </c:choose>
+ <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="pageIdx">
+ 	<li><a href="?page=${pageIdx}">${pageIdx}</a></li>
+ </c:forEach>
+ <c:choose>
+ 	<c:when test="${pageInfo.nextPage == -1}">
+ 		<li class="disabled"><a href="#">&raquo;</a></li>
+ 	</c:when>
+ 	<c:otherwise>
+ 		<li><a href="?page=0">&raquo;</a></li>
+ 	</c:otherwise>
+ </c:choose> 
 </ul>
     
 <jsp:include page="../include/footer.jsp"/>
 </div>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
-	<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/offcanvas.js"></script>
+<!-- Bootstrap core JavaScript
+  ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
+<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/offcanvas.js"></script>
 		
 </body>
 </html>

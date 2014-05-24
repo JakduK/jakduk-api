@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
-import com.jakduk.model.BoardFree;
-import com.jakduk.model.BoardListInfo;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.service.BoardFreeService;
 
 @Controller
