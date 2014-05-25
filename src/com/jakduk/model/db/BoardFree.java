@@ -28,6 +28,7 @@ public class BoardFree {
 	
 	private long seq;
 	
+	@NotNull(message = "Input category")
 	private Integer categoryId;
 	
 	public String getId() {

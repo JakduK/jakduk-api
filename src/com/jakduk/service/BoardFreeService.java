@@ -1,5 +1,6 @@
 package com.jakduk.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -103,27 +104,34 @@ public class BoardFreeService {
 	}
 	
 	public Model getFree(Model model, BoardListInfo boardListInfo) {
+
+		Map<String, Date> createDate = new HashMap<String, Date>();
+		Map<Integer, String> categoryName = new HashMap<Integer, String>();
+		List<BoardFree> posts = new ArrayList<BoardFree>();
+		Long numberPosts = (long) 0;
 		
-		Integer page = boardListInfo.getPage() - 1;
-		Long numberPosts = boardFreeRepository.count();
+		Integer page = boardListInfo.getPage();
+		Integer categoryId = boardListInfo.getCategory();
 		
-		if (page < 0) {
-			page = 0;
+		if (page < 1) {
+			page = 1;
+			boardListInfo.setPage(page);
 		}
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable paging = new PageRequest(page, CommonConst.BOARD_LINE_NUMBER, sort);
-		List<BoardFree> posts = boardFreeRepository.findAll(paging).getContent();
+		Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_LINE_NUMBER, sort);
 		
-//		logger.debug("countCategoty 11 =" + boardFreeRepository.countByCategoryId(11));
-//		logger.debug("countCategoty 12 =" + boardFreeRepository.countByCategoryId(12));
-
-		BoardPageInfo boardPageInfo = commonService.getCountPages(boardListInfo.getPage().longValue(), numberPosts, 3);
+		if (categoryId == CommonConst.BOARD_CATEGORY_NONE || categoryId == CommonConst.BOARD_CATEGORY_ALL) {
+			posts = boardFreeRepository.findAll(pageable).getContent();
+			numberPosts = boardFreeRepository.count();
+		} else {
+			posts = boardFreeRepository.findByCategoryId(categoryId, pageable).getContent();
+			numberPosts = boardFreeRepository.countByCategoryId(categoryId);
+		}
+		
+		BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
 		
 		logger.debug("countAll=" + boardPageInfo);
-		
-		Map<String, Date> createDate = new HashMap<String, Date>();
-		Map<Integer, String> categoryName = new HashMap<Integer, String>();
 		
 		for (BoardFree tempPost : posts) {
 			String tempId = tempPost.getId();
@@ -146,16 +154,17 @@ public class BoardFreeService {
 		model.addAttribute("categorys", categorys);
 		model.addAttribute("usingCategoryNames", categoryName);
 		model.addAttribute("pageInfo", boardPageInfo);
+		model.addAttribute("listInfo", boardListInfo);
 		
 		return model;
 	}
 	
 	public Model getWrite(Model model) {
 		
-		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
 		
 		model.addAttribute("boardFree", new BoardFree());
-		model.addAttribute("categorys", categorys);
+		model.addAttribute("boardCategorys", boardCategorys);
 		
 		return model;
 	}

@@ -4,7 +4,7 @@ import com.jakduk.common.CommonConst;
 
 public class BoardListInfo {
 
-	private int page = 0;
+	private int page = 1;
 	private int category = CommonConst.BOARD_CATEGORY_NONE;
 
 	public Integer getPage() {

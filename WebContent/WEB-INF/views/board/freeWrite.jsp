@@ -24,10 +24,12 @@
 				<label class="select optional control-label" for="categoryId"> <spring:message code="board.category"/></label>
 				<div class="controls">
 					<form:select path="categoryId" cssClass="select optional">
-  <c:forEach items="${categorys}" var="category">
-  	<form:option value="${category.categoryId}"><fmt:message key="${category.name}"/></form:option>
-	</c:forEach>
+						<form:option value=""><fmt:message key="board.category.init"/></form:option>
+				  <c:forEach items="${boardCategorys}" var="category">
+				  	<form:option value="${category.categoryId}"><fmt:message key="${category.name}"/></form:option>
+					</c:forEach>
 					</form:select>
+					<form:errors path="categoryId" cssClass="smdis-error-message"/>
 				</div>
 			</div>
 						<div class="control-group string required">

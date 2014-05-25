@@ -20,10 +20,9 @@
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="<c:url value="/home"/>"><spring:message code="common.home"/></a></li>
+            <li><a href="<c:url value="/home"/>"><spring:message code="common.home"/></a></li>
             <li><a href="<c:url value="/board"/>"><spring:message code="board"/></a></li>
             <li><a href="<c:url value="/user"/>">User</a></li>
-            <li><a href="#contact">Contact</a></li>
             <sec:authorize access="isAnonymous()">
             	<li><a href="<c:url value="/login"/>">Login</a></li>
             </sec:authorize>
@@ -33,7 +32,6 @@
             	<sec:authentication property="principal.userid" var="aaa"/>
             	 	<li><a href="<c:url value="/logout"/>">${aaa}</a></li>
             </sec:authorize>
-            
            
           </ul>
         </div><!-- /.nav-collapse -->

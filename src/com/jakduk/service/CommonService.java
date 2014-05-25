@@ -19,17 +19,17 @@ public class CommonService {
 	private Logger logger = Logger.getLogger(this.getClass());
 
 	public BoardPageInfo getCountPages(Long page, Long numberPosts, Integer numberPages) {
+		
 		BoardPageInfo boardPageInfo = new BoardPageInfo();
 
 		Long totalPages = numberPosts / CommonConst.BOARD_LINE_NUMBER;
 		Long prevPage = (long) 1;
 		Long nextPage = (long) 1;
 		
-		if ((totalPages % CommonConst.BOARD_LINE_NUMBER) > 0) {
+		
+		if ((totalPages % CommonConst.BOARD_LINE_NUMBER) > 0 || (numberPosts - CommonConst.BOARD_LINE_NUMBER) <= 0) {
 			totalPages++; 
 		}
-		
-		logger.debug("totalPages=" + totalPages);
 		
 		Long startPage = page - (page % numberPages) + 1;
 		

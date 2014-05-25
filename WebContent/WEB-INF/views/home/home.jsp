@@ -7,9 +7,10 @@
 		
 		<!-- Bootstrap core CSS -->
     <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
   </head>
   <body>
-
+  
 <jsp:include page="../include/navigation-header.jsp"/>
 
     <div class="container">
@@ -75,8 +76,6 @@
 <jsp:include page="../include/footer.jsp"/>
 
     </div><!--/.container-->
-
-
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

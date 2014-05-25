@@ -3,5 +3,5 @@
 
       <hr>
       <footer>
-        <p>&copy; Company 2014</p>
+        <p>&copy; JakduK 2014</p>
       </footer>

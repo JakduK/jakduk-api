@@ -19,7 +19,7 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 <div class="container">
 
-<p><a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a></p>
+<h4><spring:message code="board.name.free"/> <small><spring:message code="board.name.free"/></small></h4>
 
 <!-- Single button -->
 <div class="btn-group">
@@ -27,18 +27,18 @@
     <spring:message code="board.category"/> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
-  <c:forEach items="${categorys}" var="category">
-   <li><a href="?category=${category.categoryId}"><spring:message code="${category.name}"/></a></li>	
-	</c:forEach>
+	  <li><a href="?category=14"><spring:message code="board.category.all"/></a></li>	
+	  <c:forEach items="${categorys}" var="category">
+	   <li><a href="?category=${category.categoryId}"><spring:message code="${category.name}"/></a></li>	
+		</c:forEach>
   </ul>
 </div>
 
-<div class="row">
-	<div class="col-sm-12">
-		<h4><spring:message code="board.name.free"/></h4>
-	</div>
-</div>
-      <c:forEach items="${posts}" var="post">
+<a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a>
+
+<hr/>
+<div class="bs-example bs-example-bg-classes">
+<c:forEach items="${posts}" var="post">
 		<div class="row">
 			<div class="col-sm-2">
 				${post.seq}
@@ -47,16 +47,16 @@
 					<fmt:message key="${usingCategoryNames[post.categoryId]}"/>
 				</c:if>
 			</div>
-        <div class="col-sm-2"><strong>${post.subject}</strong></div>
-        <div class="col-sm-5">
-        ${post.writer.username}
-        |
-<%@page import="java.util.Date"%>
-<%
-Date CurrentDate = new Date();
-%>
-<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
-<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+			<a href="<c:url value="/board/free/${post.seq}"/>">
+			<div class="col-sm-2"><strong>${post.subject}</strong></div>
+			</a>			
+			<div class="col-sm-5">
+				${post.writer.username}
+				|
+				<%@page import="java.util.Date"%>
+				<%Date CurrentDate = new Date();%>
+				<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+				<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
 
 	<c:choose>
 		<c:when test="${postDate < nowDate}">
@@ -66,10 +66,11 @@ Date CurrentDate = new Date();
 			<fmt:formatDate value="${createDate[post.id]}" pattern="hh:mm (a)" />
 		</c:otherwise>
 	</c:choose> 
-        </div>
-        <hr>
-      </div>
-      </c:forEach>
+		</div>
+	</div>
+<hr/>
+</c:forEach>
+</div>
 
 <ul class="pagination">
  <c:choose>
@@ -77,11 +78,18 @@ Date CurrentDate = new Date();
  		<li class="disabled"><a href="#">&laquo;</a></li>
  	</c:when>
  	<c:otherwise>
- 		<li><a href="?page=${pageInfo.prevPage}">&laquo;</a></li>
+ 		<li><a href="?page=${pageInfo.prevPage}&category=${listInfo.category}">&laquo;</a></li>
  	</c:otherwise>
  </c:choose>
  <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="pageIdx">
- 	<li><a href="?page=${pageIdx}">${pageIdx}</a></li>
+ 	<c:choose>
+ 		<c:when test="${listInfo.page == pageIdx}">
+ 			<li class="active"><a href="?page=${pageIdx}&category=${listInfo.category}">${pageIdx}</a></li>
+ 		</c:when>
+ 		<c:otherwise>
+ 			<li><a href="?page=${pageIdx}&category=${listInfo.category}">${pageIdx}</a></li>
+ 		</c:otherwise>
+ 	</c:choose>
  </c:forEach>
  <c:choose>
  	<c:when test="${pageInfo.nextPage == -1}">
@@ -92,7 +100,7 @@ Date CurrentDate = new Date();
  	</c:otherwise>
  </c:choose> 
 </ul>
-    
+ 
 <jsp:include page="../include/footer.jsp"/>
 </div>
 
