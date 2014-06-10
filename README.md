@@ -8,6 +8,6 @@ SUMMARY
 
 application framework : Spring
 
-web framework : Angular.js
+javascript framework : Angular.js
 
 database : mongoDB
