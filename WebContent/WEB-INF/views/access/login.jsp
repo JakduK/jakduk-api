@@ -38,7 +38,7 @@
 			  </div>
 			  <div class="control-group">
 			    <div class="controls">
-			      Not a User? <a href="<c:url value="/users/add"/>">Register Here</a>
+			      Not a User? <a href="<c:url value="/user/create"/>">Register Here</a>
 			    </div>
 			  </div>
 			</form>
