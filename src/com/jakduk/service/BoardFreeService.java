@@ -13,11 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -26,7 +21,6 @@ import com.jakduk.authority.AuthUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.db.BoardSequence;
 import com.jakduk.model.db.BoardWriter;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
@@ -51,13 +45,29 @@ public class BoardFreeService {
 	private BoardCategoryRepository boardCategoryRepository;
 	
 	@Autowired
-	private MongoTemplate mongoTemplate;
-	
-	@Autowired
 	private CommonService commonService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
+	/**
+	 * 자유게시판 글쓰기 페이지
+	 * @param model
+	 * @return
+	 */
+	public Model getWrite(Model model) {
+		
+		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+		
+		model.addAttribute("boardFree", new BoardFree());
+		model.addAttribute("boardCategorys", boardCategorys);
+		
+		return model;
+	}
+	
+	/**
+	 * 자유게시판 글쓰기 데이터 DB에 삽입
+	 * @param boardFree
+	 */
 	public void write(BoardFree boardFree) {
 		
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -70,7 +80,7 @@ public class BoardFreeService {
 			writer.setId(userid);
 			writer.setUsername(username);
 			boardFree.setWriter(writer);
-			boardFree.setSeq(getNextSequence(CommonConst.BOARD_NAME_FREE));
+			boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
 			
 			boardFreeRepository.save(boardFree);
 			logger.debug("boardFree=" + boardFree);
@@ -78,31 +88,13 @@ public class BoardFreeService {
 			logger.error("no writer.");
 		}		
 	}
-
-	public Long getNextSequence(Integer name) {
-		
-		Long returnVal = Long.valueOf(-1);
-		
-		Query query = new Query();
-		query.addCriteria(Criteria.where("name").is(name));
-		
-		Update update = new Update();
-		update.inc("seq", 1);
-		
-		FindAndModifyOptions options = new FindAndModifyOptions();
-		options.returnNew(true);
-		
-		BoardSequence board = mongoTemplate.findAndModify(query, update, options, BoardSequence.class);
-		
-		if (board == null) {
-			logger.debug("err result=" + board);
-			return returnVal;
-		} else {
-			returnVal = board.getSeq();
-			return returnVal;
-		}
-	}
 	
+	/**
+	 * 자유게시판 목록 페이지
+	 * @param model
+	 * @param boardListInfo
+	 * @return
+	 */
 	public Model getFree(Model model, BoardListInfo boardListInfo) {
 
 		Map<String, Date> createDate = new HashMap<String, Date>();
@@ -131,7 +123,7 @@ public class BoardFreeService {
 		
 		BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
 		
-		logger.debug("countAll=" + boardPageInfo);
+//		logger.debug("countAll=" + boardPageInfo);
 		
 		for (BoardFree tempPost : posts) {
 			String tempId = tempPost.getId();
@@ -159,12 +151,20 @@ public class BoardFreeService {
 		return model;
 	}
 	
-	public Model getWrite(Model model) {
+	public Model getFreeView(Model model, int seq) {
 		
-		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+		BoardFree boardFree = boardFreeRepository.findBySeq(seq);
+		BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(boardFree.getCategoryId());
 		
-		model.addAttribute("boardFree", new BoardFree());
-		model.addAttribute("boardCategorys", boardCategorys);
+		ObjectId objId = new ObjectId(boardFree.getId());
+		Date createDate = objId.getDate();
+		
+		logger.debug("post=" + boardFree);
+		logger.debug("boardCategory=" + boardCategory);
+		
+		model.addAttribute("post", boardFree);
+		model.addAttribute("category", boardCategory);
+		model.addAttribute("createDate", createDate);
 		
 		return model;
 	}

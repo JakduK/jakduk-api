@@ -10,22 +10,40 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class BoardSequence {
 	
+	/**
+	 * ID
+	 */
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	private Long seq;
+	/**
+	 * 글 번호
+	 */
+	private Integer seq;
 	
+	/**
+	 * 게시판 ID
+	 * CommonConst 의 게시판 ID 참고
+	 */
 	@NotNull
 	private Integer name;
 
-	public Long getSeq() {
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Integer getSeq() {
 		return seq;
 	}
 
-	public void setSeq(Long seq) {
+	public void setSeq(Integer seq) {
 		this.seq = seq;
 	}
-	
+
 	public Integer getName() {
 		return name;
 	}

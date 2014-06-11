@@ -35,7 +35,6 @@
 <a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a>
 
 <hr/>
-<div class="bs-example bs-example-bg-classes">
 <c:forEach items="${posts}" var="post">
 		<div class="row">
 			<div class="col-sm-2">
@@ -46,7 +45,7 @@
 				</c:if>
 			</div>
 			<a href="<c:url value="/board/free/${post.seq}"/>">
-			<div class="col-sm-2"><strong>${post.subject}</strong></div>
+				<div class="col-sm-2"><strong>${post.subject}</strong></div>
 			</a>			
 			<div class="col-sm-5">
 				${post.writer.username}
@@ -68,7 +67,6 @@
 	</div>
 <hr/>
 </c:forEach>
-</div>
 
 <ul class="pagination">
  <c:choose>
