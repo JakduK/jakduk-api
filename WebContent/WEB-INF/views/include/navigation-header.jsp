@@ -6,8 +6,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
-    
-        <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -16,13 +16,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><spring:message code="common.jakduk"/></a>
+          <a class="navbar-brand" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a>
         </div>
-        <div class="collapse navbar-collapse">
+        <div class="collapse navbar-collapse" ng-controller="headerCtrl">
           <ul class="nav navbar-nav">
-            <li><a href="<c:url value="/home"/>"><spring:message code="common.home"/></a></li>
-            <li><a href="<c:url value="/board"/>"><spring:message code="board"/></a></li>
-            <li><a href="<c:url value="/user"/>">User</a></li>
+            <li ng-class="{active:isActive('<c:url value="/home"/>')}">
+            	<a href="<c:url value="/home"/>"><spring:message code="common.home"/></a>
+            </li>
+            <li ng-class="{active:isActive('<c:url value="/board"/>')}">
+            	<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
+            </li>
+            <li ng-class="{active:isActive('<c:url value="/user"/>')}">
+            	<a href="<c:url value="/user"/>">User</a>
+            </li>
             <sec:authorize access="isAnonymous()">
             	<li><a href="<c:url value="/login"/>">Login</a></li>
             </sec:authorize>
@@ -36,4 +42,13 @@
           </ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
-    </div><!-- /.navbar -->
+</div><!-- /.navbar -->
+
+<script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
+<script type="text/javascript">
+function headerCtrl($scope, $location) {
+	$scope.isActive = function(viewLocation) {
+		return $location.absUrl().match(viewLocation);
+	}
+}
+</script>

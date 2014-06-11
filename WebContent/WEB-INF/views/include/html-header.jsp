@@ -10,6 +10,9 @@
     <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
 
     <title><spring:message code="common.jakduk"/></title>
+    
+<!-- Bootstrap core CSS -->
+<link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrap.css" rel="stylesheet">    
 
 <!-- Custom styles for this template -->
 <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/offcanvas.css" rel="stylesheet">
