@@ -3,10 +3,10 @@ package com.jakduk.model.web;
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
  * @date     : 2014. 5. 24.
- * @desc     :
+ * @desc     : 게시판 페이지네이션에 대한 정보를 담고 있음.
  */
 public class BoardPageInfo {
-	
+		
 	private long startPage = 1;
 	private long endPage = 1;
 	private long prevPage = 1;

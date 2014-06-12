@@ -2,6 +2,11 @@ package com.jakduk.model.web;
 
 import com.jakduk.common.CommonConst;
 
+/**
+ * 게시판의 현재 페이지와 분류에 대한 정보를 담고 있음.
+ * @author pyohwan
+ *
+ */
 public class BoardListInfo {
 
 	private int page = 1;

@@ -44,9 +44,9 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
-	public String view(@PathVariable int seq, Model model) {
+	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo boardListInfo, Model model) {
 		
-		boardFreeService.getFreeView(model, seq);
+		boardFreeService.getFreeView(model, seq, boardListInfo);
 		
 		return "board/freeView";
 	}
