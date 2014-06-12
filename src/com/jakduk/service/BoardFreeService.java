@@ -151,9 +151,16 @@ public class BoardFreeService {
 		return model;
 	}
 	
-	public Model getFreeView(Model model, int seq) {
+	/**
+	 * 자유게시판 게시물 보기 페이지
+	 * @param model
+	 * @param seq
+	 * @param boardListInfo
+	 * @return
+	 */
+	public Model getFreeView(Model model, int seq, BoardListInfo boardListInfo) {
 		
-		BoardFree boardFree = boardFreeRepository.findBySeq(seq);
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
 		BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(boardFree.getCategoryId());
 		
 		ObjectId objId = new ObjectId(boardFree.getId());
@@ -165,6 +172,7 @@ public class BoardFreeService {
 		model.addAttribute("post", boardFree);
 		model.addAttribute("category", boardCategory);
 		model.addAttribute("createDate", createDate);
+		model.addAttribute("listInfo", boardListInfo);
 		
 		return model;
 	}

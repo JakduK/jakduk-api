@@ -10,7 +10,7 @@ public interface BoardFreeRepository extends MongoRepository<BoardFree, String>{
 
 	Page<BoardFree> findAll(Pageable pageable);
 	Page<BoardFree> findByCategoryId(Integer categoryId, Pageable pageable);
-	BoardFree findBySeq(Integer seq);
+	BoardFree findOneBySeq(Integer seq);
 	BoardFree findByWriter(String writer);
 	long countByCategoryId(Integer categoryId);
 	long count();

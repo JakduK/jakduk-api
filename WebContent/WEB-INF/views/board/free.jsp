@@ -36,34 +36,35 @@
 
 <hr/>
 <c:forEach items="${posts}" var="post">
-		<div class="row">
-			<div class="col-sm-2">
-				${post.seq}
-				|
-				<c:if test="${!empty post.categoryId}">
-					<fmt:message key="${usingCategoryNames[post.categoryId]}"/>
-				</c:if>
-			</div>
-			<a href="<c:url value="/board/free/${post.seq}"/>">
-				<div class="col-sm-2"><strong>${post.subject}</strong></div>
-			</a>			
-			<div class="col-sm-5">
-				${post.writer.username}
-				|
-				<%@page import="java.util.Date"%>
-				<%Date CurrentDate = new Date();%>
-				<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
-				<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
-
-	<c:choose>
-		<c:when test="${postDate < nowDate}">
-			<fmt:formatDate value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
-		</c:when>
-		<c:otherwise>
-			<fmt:formatDate value="${createDate[post.id]}" pattern="hh:mm (a)" />
-		</c:otherwise>
-	</c:choose> 
-		</div>
+	<div class="row">
+	<div class="col-sm-2">
+		${post.seq}
+		|
+		<c:if test="${!empty post.categoryId}">
+			<fmt:message key="${usingCategoryNames[post.categoryId]}"/>
+		</c:if>
+	</div>
+	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">
+		<div class="col-sm-2"><strong>${post.subject}</strong></div>
+	</a>			
+	<div class="col-sm-5">
+		${post.writer.username}
+		|
+		<%@page import="java.util.Date"%>
+		<%Date CurrentDate = new Date();%>
+		<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+		<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+	
+		<c:choose>
+			<c:when test="${postDate < nowDate}">
+				<fmt:formatDate value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+			</c:when>
+			<c:otherwise>
+				<fmt:formatDate value="${createDate[post.id]}" pattern="hh:mm (a)" />
+			</c:otherwise>
+		</c:choose>
+		| <spring:message code="board.views"/> ${post.views}
+	</div>
 	</div>
 <hr/>
 </c:forEach>

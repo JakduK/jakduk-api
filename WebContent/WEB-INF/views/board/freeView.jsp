@@ -14,20 +14,21 @@
 <body>
 <jsp:include page="../include/navigation-header.jsp"/>
 
-    <!-- Begin page content -->
-    <div class="container">
+<!-- Begin page content -->
+<div class="container">
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading">
-  	<h4>${post.subject}&nbsp;<small><fmt:message key="${category.name}"/></small></h4>
+  	<h4>${post.subject}<c:if test="${!empty category}">&nbsp;<small><fmt:message key="${category.name}"/></small></c:if></h4>
   	<div class="row">
   		<div class="col-sm-1">
 	  		<small>${post.writer.username}</small>
   		</div>
-<%@page import="java.util.Date"%>
-<%Date CurrentDate = new Date();%>
-<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
-<fmt:formatDate var="postDate" value="${createDate}" pattern="yyyy-MM-dd" />
+  		
+	<%@page import="java.util.Date"%>
+	<%Date CurrentDate = new Date();%>
+	<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+	<fmt:formatDate var="postDate" value="${createDate}" pattern="yyyy-MM-dd" />
   		
   		<div class="col-md-5 visible-xs">
 	  		<small>
@@ -50,29 +51,24 @@
   		</div>  		
   	</div>
   </div>
-		
-    <!-- List group -->
-  <ul class="list-group">
-    <li class="list-group-item">
-    	<small>
-    	${post.writer.username} | <spring:message code="board.views"/> ${post.views} | <fmt:formatDate value="${createDate}" pattern="yyyy-MM-dd hh:mm (a)" />
-    	</small>
-    </li>
-    <li class="list-group-item">Dapibus ac facilisis in</li>
-    <li class="list-group-item">Morbi leo risus</li>
-    <li class="list-group-item">Porta ac consectetur ac</li>
-    <li class="list-group-item">Vestibulum at eros</li>
-  </ul>
-  <div class="panel-body">
-    <p>...</p>
-  </div>
   
+  <div class="panel-body">
+    <p>${post.content}</p>
+  </div>
+</div> <!-- /panel -->
 
+<c:url var="listUrl" value="/board/free">
+	<c:if test="${!empty listInfo.page}">
+		<c:param name="page" value="${listInfo.page}"/>
+	</c:if>
+	<c:if test="${!empty listInfo.category}">
+		<c:param name="category" value="${listInfo.category}"/>
+	</c:if>
+</c:url>
 
-</div>
+<a href="${listUrl}" class="btn btn-default" role="button"><spring:message code="board.list"/></a>
 
-    </div>
-
+</div> <!--/.container-->
     
 </body>
 </html>
