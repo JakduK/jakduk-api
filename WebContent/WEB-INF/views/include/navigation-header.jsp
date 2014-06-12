@@ -27,7 +27,7 @@
             	<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
             </li>
             
-            <li class="dropdown">
+            <li class="dropdown"  ng-class="{active:isActive('<c:url value="/admin|/user"/>')}">
             	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><spring:message code="common.admin"/><b class="caret"></b></a>
             	<ul class="dropdown-menu">
             		<li><a href="<c:url value="/admin/settings"/>"><spring:message code="common.setting"/></a></li>
