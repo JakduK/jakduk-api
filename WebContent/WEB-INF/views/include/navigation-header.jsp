@@ -26,19 +26,24 @@
             <li ng-class="{active:isActive('<c:url value="/board"/>')}">
             	<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
             </li>
-            <li ng-class="{active:isActive('<c:url value="/user"/>')}">
-            	<a href="<c:url value="/user"/>">User</a>
+            
+            <li class="dropdown">
+            	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><spring:message code="common.admin"/><b class="caret"></b></a>
+            	<ul class="dropdown-menu">
+            		<li><a href="<c:url value="/admin/settings"/>"><spring:message code="common.setting"/></a></li>
+            		<li><a href="<c:url value="/user"/>"><spring:message code="common.userlist"/></a></li>
+            	</ul>            	
             </li>
+            
             <sec:authorize access="isAnonymous()">
-            	<li><a href="<c:url value="/login"/>">Login</a></li>
+            	<li><a href="<c:url value="/login"/>"><spring:message code="common.login"/></a></li>
             </sec:authorize>
             <sec:authorize access="isAuthenticated()">
             	<sec:authentication property="principal.Username" var="userName"/>
-            	<li><a href="<c:url value="/logout"/>">${userName} Hello!</a></li>
+            	<li><a href="<c:url value="/logout"/>"><spring:message code="common.logout"/></a></li>
             	<sec:authentication property="principal.userid" var="aaa"/>
-            	 	<li><a href="<c:url value="/logout"/>">${aaa}</a></li>
             </sec:authorize>
-           
+            
           </ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->

@@ -25,7 +25,7 @@ public class AdminController {
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	@RequestMapping()
+	@RequestMapping("/settings")
 	public String root(Model model,
 			@RequestParam(required = false) String message) {
 		
