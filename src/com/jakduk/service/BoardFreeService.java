@@ -7,6 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,7 +162,7 @@ public class BoardFreeService {
 	 * @param boardListInfo
 	 * @return
 	 */
-	public Model getFreeView(Model model, int seq, BoardListInfo boardListInfo) {
+	public Model getFreeView(Model model, int seq, BoardListInfo boardListInfo, Boolean isAddCookie) {
 		
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
 		BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(boardFree.getCategoryId());
@@ -166,8 +170,12 @@ public class BoardFreeService {
 		ObjectId objId = new ObjectId(boardFree.getId());
 		Date createDate = objId.getDate();
 		
-		logger.debug("post=" + boardFree);
-		logger.debug("boardCategory=" + boardCategory);
+		if (isAddCookie == true) {
+			int views = boardFree.getViews();
+			boardFree.setViews(++views);
+			logger.debug("post=" + boardFree);
+			boardFreeRepository.save(boardFree);
+		}
 		
 		model.addAttribute("post", boardFree);
 		model.addAttribute("category", boardCategory);

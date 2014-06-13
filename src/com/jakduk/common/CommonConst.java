@@ -12,7 +12,15 @@ public class CommonConst {
 	 */
 	public final static Integer BOARD_NAME_FREE = 10;
 	
+	/**
+	 * 게시물 목록에서 보여지는 게시물 갯수
+	 */
 	public final static Integer BOARD_LINE_NUMBER = 5;
+
+	/**
+	 * 게시물 쿠키의 만료되는 시간(초)
+	 */
+	public final static Integer BOARD_COOKIE_EXPIRE_SECONDS = 10;
 	
 	/**
 	 * 게시판 말머리.

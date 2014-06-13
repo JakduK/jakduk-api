@@ -1,5 +1,9 @@
 package com.jakduk.service;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -111,5 +115,40 @@ public class CommonService {
 		boardPageInfo.setNextPage(nextPage);
 		
 		return boardPageInfo;
+	}
+	
+	/**
+	 * 게시물의 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
+	 * @param request
+	 * @param response
+	 * @param boardName 게시판 이름. CommonConst.BOARD_NAME_XXXX
+	 * @param seq 게시물 번호
+	 * @return 쿠키를 새로 저장했다면 true, 아니면 false. 
+	 */
+	public Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, int boardName, int seq) {
+		
+		Boolean findSameCookie = false;
+		String cookieName = boardName + "_" + seq;
+		
+		Cookie cookies[] = request.getCookies();
+		
+		for (int i = 0 ; i < cookies.length ; i++) {
+			String name = cookies[i].getName();
+			
+			if (cookieName.equals(name)) {
+				findSameCookie = true;
+				break;
+			}
+		}
+		
+		if (findSameCookie == false) {
+			Cookie cookie = new Cookie(cookieName, "r");
+			cookie.setMaxAge(CommonConst.BOARD_COOKIE_EXPIRE_SECONDS);
+			response.addCookie(cookie);
+			
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

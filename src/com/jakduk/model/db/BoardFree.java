@@ -9,6 +9,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * 자유게시판 모델
+ * @author pyohwan
+ *
+ */
 @Document
 public class BoardFree {
 
@@ -52,7 +57,7 @@ public class BoardFree {
 	/**
 	 * 조회
 	 */
-	private int views;
+	private int views = 0;
 	
 	public int getViews() {
 		return views;

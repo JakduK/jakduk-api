@@ -1,5 +1,8 @@
 package com.jakduk.controller;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -7,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.service.BoardFreeService;
+import com.jakduk.service.CommonService;
 
 @Controller
 @RequestMapping("/board")
@@ -25,6 +31,9 @@ public class BoardController {
 	
 	@Autowired
 	private BoardFreeService boardFreeService;
+	
+	@Autowired
+	private CommonService commonService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -44,9 +53,11 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
-	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo boardListInfo, Model model) {
+	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo boardListInfo, Model model
+			, HttpServletRequest request, HttpServletResponse response) {
 		
-		boardFreeService.getFreeView(model, seq, boardListInfo);
+		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.BOARD_NAME_FREE, seq);
+		boardFreeService.getFreeView(model, seq, boardListInfo, isAddCookie);
 		
 		return "board/freeView";
 	}
