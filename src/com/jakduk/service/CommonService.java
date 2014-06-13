@@ -68,14 +68,19 @@ public class CommonService {
 		
 		BoardPageInfo boardPageInfo = new BoardPageInfo();
 
-		Long totalPages = numberPosts / CommonConst.BOARD_LINE_NUMBER;
+		Long tmpVal = (long) 0;
+		Long totalPages = (long) 1;		
 		Long prevPage = (long) 1;
 		Long nextPage = (long) 1;
 		
-		if ((totalPages % CommonConst.BOARD_LINE_NUMBER) > 0 || (numberPosts - CommonConst.BOARD_LINE_NUMBER) <= 0) {
-			totalPages++; 
-		} else if ((totalPages % CommonConst.BOARD_LINE_NUMBER) == 0) {
-			totalPages--;
+		if((numberPosts - CommonConst.BOARD_LINE_NUMBER) > 0) {
+			tmpVal = (long) (numberPosts / CommonConst.BOARD_LINE_NUMBER);
+			
+			if((numberPosts % CommonConst.BOARD_LINE_NUMBER) == 0) {
+				totalPages = tmpVal;
+			} else {
+				totalPages = tmpVal + 1;
+			}
 		}
 		
 		Long startPage = page - (page % numberPages) + 1;
