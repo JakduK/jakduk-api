@@ -1,6 +1,5 @@
 package com.jakduk.controller;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,6 +79,18 @@ public class BoardController {
 		sessionStatus.setComplete();
 		
 		return "redirect:/board/free";
+	}
+	
+	@RequestMapping(value = "/good/{seq}")
+	public void setGood(@PathVariable int seq, Model model) {
+		
+		boardFreeService.getGoodOrBad(model, seq, 1);
+	}
+	
+	@RequestMapping(value = "/bad/{seq}")
+	public void setBad(@PathVariable int seq, Model model) {
+		
+		boardFreeService.getGoodOrBad(model, seq, 2);
 	}
 
 }

@@ -5,6 +5,11 @@ import javax.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * 게시판 작성자
+ * @author pyohwan
+ *
+ */
 @Document(collection = "user")
 public class BoardWriter {
 	

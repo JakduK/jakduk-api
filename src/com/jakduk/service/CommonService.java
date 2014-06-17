@@ -132,12 +132,14 @@ public class CommonService {
 		
 		Cookie cookies[] = request.getCookies();
 		
-		for (int i = 0 ; i < cookies.length ; i++) {
-			String name = cookies[i].getName();
-			
-			if (cookieName.equals(name)) {
-				findSameCookie = true;
-				break;
+		if (cookies != null) {
+			for (int i = 0 ; i < cookies.length ; i++) {
+				String name = cookies[i].getName();
+				
+				if (cookieName.equals(name)) {
+					findSameCookie = true;
+					break;
+				}
 			}
 		}
 		

@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app>
@@ -47,7 +48,7 @@
 	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">
 		<div class="col-sm-2"><strong>${post.subject}</strong></div>
 	</a>			
-	<div class="col-sm-5">
+	<div class="col-sm-4">
 		${post.writer.username}
 		|
 		<%@page import="java.util.Date"%>
@@ -63,7 +64,11 @@
 				<fmt:formatDate value="${createDate[post.id]}" pattern="hh:mm (a)" />
 			</c:otherwise>
 		</c:choose>
-		| <spring:message code="board.views"/> ${post.views}
+	</div>
+	<div class="col-sm-4">
+		<spring:message code="board.views"/> ${post.views}
+		| <spring:message code="board.good"/> ${fn:length(post.goodUsers)}
+		| <spring:message code="board.bad"/> ${fn:length(post.goodUsers)}
 	</div>
 	</div>
 <hr/>

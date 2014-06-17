@@ -7,10 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +21,7 @@ import com.jakduk.authority.AuthUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardUser;
 import com.jakduk.model.db.BoardWriter;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
@@ -52,7 +49,7 @@ public class BoardFreeService {
 	private CommonService commonService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	/**
 	 * 자유게시판 글쓰기 페이지
 	 * @param model
@@ -75,7 +72,7 @@ public class BoardFreeService {
 	public void write(BoardFree boardFree) {
 		
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				
+		
 		if (principal instanceof AuthUser) {
 			String userid = ((AuthUser) principal).getUserid();
 			String username = ((AuthUser) principal).getUsername();
@@ -182,6 +179,82 @@ public class BoardFreeService {
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("listInfo", boardListInfo);
 		
+		return model;
+	}
+	
+	/**
+	 * 게시물 좋아요 싫어요
+	 * @param model
+	 * @param seq
+	 * @param status
+	 * @return
+	 */
+	public Model getGoodOrBad(Model model, int seq, int status) {
+		Integer errCode = -1;
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		
+		List<BoardUser> goodUsers = boardFree.getGoodUsers();
+		List<BoardUser> badUsers = boardFree.getBadUsers();
+		
+		if (goodUsers == null) {
+			goodUsers = new ArrayList<BoardUser>(); 
+		}
+		
+		if (badUsers == null) {
+			badUsers = new ArrayList<BoardUser>(); 
+		}
+		
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		if (principal instanceof AuthUser) {
+			String userid = ((AuthUser) principal).getUserid();
+			String username = ((AuthUser) principal).getUsername();
+			
+			Boolean isSameUser = false;
+			
+			for (BoardUser boardUser : goodUsers) {
+				if (boardUser != null && userid.equals(boardUser.getUserid())) {
+					isSameUser = true;
+					errCode = 3; // 이미 좋아요 누름 
+					break;
+				}
+			}
+			
+			if (isSameUser == false) {
+				for (BoardUser boardUser : badUsers) {
+					if (boardUser != null && userid.equals(boardUser.getUserid())) {
+						isSameUser = true;
+						errCode = 3; // 이미 싫어요 누름
+						break;
+					}
+				}
+			}
+			
+			if (isSameUser == false) {
+				BoardUser boardUser = new BoardUser();
+				boardUser.setUserid(userid);
+				boardUser.setUsername(username);
+				boardUser.setId(new ObjectId().toString());
+				
+				if (status == 1) {
+					goodUsers.add(boardUser);
+					boardFree.setGoodUsers(goodUsers);
+					boardFreeRepository.save(boardFree);
+					errCode = 1; // 좋아요
+				} else if (status == 2) {
+					badUsers.add(boardUser);
+					boardFree.setBadUsers(badUsers);
+					boardFreeRepository.save(boardFree);
+					errCode = 2; // 싫어요
+				} 
+			}
+		} else if (principal.equals("anonymousUser")) {
+			errCode = 4; // 로그인 안했음
+		}	
+		
+		model.addAttribute("errorCode", errCode);
+		model.addAttribute("numberOfGood", goodUsers.size());
+		model.addAttribute("numberOfBad", badUsers.size());
 		return model;
 	}
 }
