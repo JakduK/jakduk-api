@@ -19,6 +19,7 @@
 		<intercept-url pattern="/admin" access="permitAll" requires-channel="http"/>
 		<intercept-url pattern="/logout" access="permitAll" />
 		<intercept-url pattern="/home" access="permitAll" />
+		<intercept-url pattern="/about" access="permitAll" />
 		<intercept-url pattern="/sample" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/user/list" access="hasRole('ROLE_TEST_01')" />
 		<intercept-url pattern="/board/*/write" access="authenticated" />

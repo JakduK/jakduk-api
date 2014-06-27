@@ -21,14 +21,14 @@
         </div>
         <div class="collapse navbar-collapse" ng-controller="headerCtrl">
           <ul class="nav navbar-nav">
-            <li ng-class="{active:isActive('<c:url value="/home"/>')}">
-            	<a href="<c:url value="/home"/>"><spring:message code="common.home"/></a>
+            <li ng-class="{active:isActive('<c:url value="/about"/>')}">
+            	<a href="<c:url value="/about"/>"><spring:message code="about"/></a>
             </li>
             <li ng-class="{active:isActive('<c:url value="/board"/>')}">
             	<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
             </li>
             
-            <li class="dropdown"  ng-class="{active:isActive('<c:url value="/admin|/user"/>')}">
+            <li class="dropdown" ng-class="{active:isActive('<c:url value="/admin|/user"/>')}">
             	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><spring:message code="common.admin"/><b class="caret"></b></a>
             	<ul class="dropdown-menu">
             		<li><a href="<c:url value="/admin/settings"/>"><spring:message code="common.setting"/></a></li>

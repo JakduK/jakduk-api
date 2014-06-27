@@ -8,17 +8,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app>
 <head>
-<jsp:include page="../include/html-header.jsp"></jsp:include>
-
-<!-- Bootstrap theme -->
-<link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-
+	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 <body>
 <jsp:include page="../include/navigation-header.jsp"/>
 <div class="container">
 
-<h4><spring:message code="board.name.free"/> <small><spring:message code="board.name.free"/></small></h4>
+<div class="page-header">
+  <h3><spring:message code="board.name.free"/> <small><spring:message code="board.name.free"/></small></h3>
+</div>
 
 <!-- Single button -->
 <div class="btn-group">
