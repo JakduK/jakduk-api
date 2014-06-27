@@ -23,6 +23,7 @@
         	<list>
         		<value>classpath:messages/common</value>
         		<value>classpath:messages/board</value>
+        		<value>classpath:messages/user</value>
         	</list>
         </property>
         <property name="defaultEncoding" value="UTF-8" />
