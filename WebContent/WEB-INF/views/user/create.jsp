@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -36,6 +36,12 @@
 					<form:errors path="password" cssClass="smdis-error-message"/>
 				</div>
 			</div>
+			<div class="control-group string required">
+				<label class="string required control-label" for="password-confirm"><abbr title="required">*</abbr> <spring:message code="user.password.confirm"/></label>
+				<div class="controls">
+					<input type="password" name="password-confirm" class="string required span6"/>
+				</div>
+			</div>			
 			<div class="control-group text optional">
 				<label class="text optional control-label" for="comments"> <spring:message code="user.comment"/></label>
 				<div class="controls">

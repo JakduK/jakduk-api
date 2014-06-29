@@ -52,6 +52,7 @@ public class UserController {
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String createSubmit(@Valid User user, BindingResult result) {
+		
 		if (result.hasErrors()) {
 			return "user/create";
 		}

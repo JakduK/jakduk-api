@@ -44,8 +44,17 @@
             	<li><a href="<c:url value="/logout"/>"><spring:message code="common.logout"/></a></li>
             	<sec:authentication property="principal.userid" var="aaa"/>
             </sec:authorize>
-            
           </ul>
+          
+          				<ul class="nav navbar-nav navbar-right">
+          					<li class="dropdown">
+          						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><spring:message code="common.language"/> <span class="caret"></span></a>
+          						<ul class="dropdown-menu" role="menu">
+          							<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
+          							<li><a href="?lang=en"><spring:message code="common.language.english"/></a></li>
+          						</ul>
+          					</li>          							
+          				</ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
 </div><!-- /.navbar -->

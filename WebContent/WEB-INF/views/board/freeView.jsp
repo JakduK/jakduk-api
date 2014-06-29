@@ -12,6 +12,51 @@
 
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
+<script type="text/javascript">
+angular.module('plunker', ['ui.bootstrap']);
+function AlertCtrl($scope, $http) {
+	$scope.alerts = []; 
+	$scope.btnGoodOrBad = function(status) {
+		
+		var bUrl = '<c:url value="/board/' + status + '/${post.seq}.json"/>';
+		
+		var reqPromise = $http.get(bUrl);
+		
+		reqPromise.success(function(data, status, headers, config) {
+			
+			if (data.errorCode == 1) {
+				message = '<spring:message code="board.msg.select.good"/>';
+				mType = "success";
+			} else if (data.errorCode == 2) {
+				message = '<spring:message code="board.msg.select.bad"/>';
+				mType = "success";
+			} else if (data.errorCode == 3) {
+				message = '<spring:message code="board.msg.select.already.good"/>';
+				mType = "warning";
+			} else if (data.errorCode == 4) {
+				message = '<spring:message code="board.msg.need.login"/>';
+				mType = "warning";
+			}
+			
+			$scope.numberOfGood = data.numberOfGood;
+			$scope.numberOfBad = data.numberOfBad;
+			$scope.user = data;
+			$scope.alerts.push({msg:message,type:mType});
+		});
+		reqPromise.error(error);
+	};
+			
+	function error(data, status, headers, config) {
+		$scope.user = {};
+		$scope.error = "로드실패"
+	}
+	
+	$scope.closeAlert = function(index) {
+		$scope.alerts.splice(index, 1);
+	};
+	
+}
+</script>
 </head>
 <body>
 <jsp:include page="../include/navigation-header.jsp"/>
@@ -87,52 +132,6 @@
 <a href="${listUrl}" class="btn btn-default" role="button"><spring:message code="board.list"/></a>
 
 </div> <!--/.container-->
-
-<script type="text/javascript">
-angular.module('plunker', ['ui.bootstrap']);
-function AlertCtrl($scope, $http) {
-	$scope.alerts = []; 
-	$scope.btnGoodOrBad = function(status) {
-		
-		var bUrl = '<c:url value="/board/' + status + '/${post.seq}.json"/>';
-		
-		var reqPromise = $http.get(bUrl);
-		
-		reqPromise.success(function(data, status, headers, config) {
-			
-			if (data.errorCode == 1) {
-				message = '<spring:message code="board.msg.select.good"/>';
-				mType = "success";
-			} else if (data.errorCode == 2) {
-				message = '<spring:message code="board.msg.select.bad"/>';
-				mType = "success";
-			} else if (data.errorCode == 3) {
-				message = '<spring:message code="board.msg.select.already.good"/>';
-				mType = "warning";
-			} else if (data.errorCode == 4) {
-				message = '<spring:message code="board.msg.need.login"/>';
-				mType = "warning";
-			}
-			
-			$scope.numberOfGood = data.numberOfGood;
-			$scope.numberOfBad = data.numberOfBad;
-			$scope.user = data;
-			$scope.alerts.push({msg:message,type:mType});
-		});
-		reqPromise.error(error);
-	};
-			
-	function error(data, status, headers, config) {
-		$scope.user = {};
-		$scope.error = "로드실패"
-	}
-	
-	$scope.closeAlert = function(index) {
-		$scope.alerts.splice(index, 1);
-	};
-	
-}
-</script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
