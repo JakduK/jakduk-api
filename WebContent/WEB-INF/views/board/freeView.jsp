@@ -6,13 +6,11 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app="plunker">
+<html ng-app>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <jsp:include page="../include/html-header.jsp"></jsp:include>
-
-
 
 </head>
 <body>
@@ -65,16 +63,16 @@
   
 	<div class="panel-footer text-center" ng-controller="AlertCtrl">
 		<button type="button" class="btn btn-primary" ng-click="btnGoodOrBad('good')">
-		<spring:message code="board.good"/>
-		<span ng-init="numberOfGood=${fn:length(post.goodUsers)}">{{numberOfGood}}</span>
-		<span class="glyphicon glyphicon-thumbs-up"></span>
+			<spring:message code="board.good"/>
+			<span ng-init="numberOfGood=${fn:length(post.goodUsers)}">{{numberOfGood}}</span>
+			<span class="glyphicon glyphicon-thumbs-up"></span>
 		</button>
 		<button type="button" class="btn btn-danger" ng-click="btnGoodOrBad('bad')">		
-		<spring:message code="board.bad"/>
-		<span ng-init="numberOfBad=${fn:length(post.badUsers)}">{{numberOfBad}}</span>
-		<span class="glyphicon glyphicon-thumbs-down"></span>
+			<spring:message code="board.bad"/>
+			<span ng-init="numberOfBad=${fn:length(post.badUsers)}">{{numberOfBad}}</span>
+			<span class="glyphicon glyphicon-thumbs-down"></span>
 		</button>
-		<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>		
+		<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
 	</div>
 </div> <!-- /panel -->
 
@@ -92,54 +90,55 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
-<script src="<%=request.getContextPath()%>/web-resources/angular/js/ui-bootstrap-tpls.js"></script>
 
 <script type="text/javascript">
-angular.module('plunker', ['ui.bootstrap']);
 function AlertCtrl($scope, $http) {
-	$scope.alerts = []; 
+	$scope.alert = {};
+	$scope.result = 0;
 	$scope.btnGoodOrBad = function(status) {
 		
 		var bUrl = '<c:url value="/board/' + status + '/${post.seq}.json"/>';
 		
-		var reqPromise = $http.get(bUrl);
-		
-		reqPromise.success(function(data, status, headers, config) {
+		if ($scope.result == 0) {
 			
-			if (data.errorCode == 1) {
-				message = '<spring:message code="board.msg.select.good"/>';
-				mType = "success";
-			} else if (data.errorCode == 2) {
-				message = '<spring:message code="board.msg.select.bad"/>';
-				mType = "success";
-			} else if (data.errorCode == 3) {
-				message = '<spring:message code="board.msg.select.already.good"/>';
-				mType = "warning";
-			} else if (data.errorCode == 4) {
-				message = '<spring:message code="board.msg.need.login"/>';
-				mType = "warning";
-			}
+			var reqPromise = $http.get(bUrl);
 			
-			$scope.numberOfGood = data.numberOfGood;
-			$scope.numberOfBad = data.numberOfBad;
-			$scope.user = data;
-			$scope.alerts.push({msg:message,type:mType});
-		});
-		reqPromise.error(error);
+			$scope.result = 1;
+			
+			reqPromise.success(function(data, status, headers, config) {
+				
+				if (data.errorCode == 1) {
+					message = '<spring:message code="board.msg.select.good"/>';
+					mType = "alert-success";
+				} else if (data.errorCode == 2) {
+					message = '<spring:message code="board.msg.select.bad"/>';
+					mType = "alert-success";
+				} else if (data.errorCode == 3) {
+					message = '<spring:message code="board.msg.select.already.good"/>';
+					mType = "alert-warning";
+				} else if (data.errorCode == 4) {
+					message = '<spring:message code="board.msg.need.login"/>';
+					mType = "alert-warning";
+				}
+				
+				$scope.alert.msg = message;
+				$scope.alert.classType = mType;
+				$scope.numberOfGood = data.numberOfGood;
+				$scope.numberOfBad = data.numberOfBad;
+				$scope.result = 2;
+				
+			});
+			reqPromise.error(error);
+		}
 	};
 			
 	function error(data, status, headers, config) {
-		$scope.user = {};
+		$scope.result = 0;
 		$scope.error = "로드실패"
 	}
 	
-	$scope.closeAlert = function(index) {
-		$scope.alerts.splice(index, 1);
-	};
-	
 }
 </script>
-
 
 </body>
 </html>
