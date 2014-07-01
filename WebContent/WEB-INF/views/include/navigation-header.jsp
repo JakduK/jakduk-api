@@ -5,7 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
@@ -35,31 +35,31 @@
             		<li><a href="<c:url value="/user"/>"><spring:message code="common.userlist"/></a></li>
             	</ul>            	
             </li>
-            
-            <sec:authorize access="isAnonymous()">
-            	<li><a href="<c:url value="/login"/>"><spring:message code="common.login"/></a></li>
-            </sec:authorize>
-            <sec:authorize access="isAuthenticated()">
-            	<sec:authentication property="principal.Username" var="userName"/>
-            	<li><a href="<c:url value="/logout"/>"><spring:message code="common.logout"/></a></li>
-            	<sec:authentication property="principal.userid" var="aaa"/>
-            </sec:authorize>
           </ul>
           
-          				<ul class="nav navbar-nav navbar-right">
-          					<li class="dropdown">
-          						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><spring:message code="common.language"/> <span class="caret"></span></a>
-          						<ul class="dropdown-menu" role="menu">
-          							<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
-          							<li><a href="?lang=en"><spring:message code="common.language.english"/></a></li>
-          						</ul>
-          					</li>          							
-          				</ul>
+			<ul class="nav navbar-nav navbar-right">
+	          <sec:authorize access="isAnonymous()">
+	          	<li><a href="<c:url value="/login"/>"><spring:message code="common.login"/></a></li>
+	          	<li><a href="<c:url value="/user/create"/>"><spring:message code="user.register"/></a></li>
+	          </sec:authorize>
+	          <sec:authorize access="isAuthenticated()">
+	          	<sec:authentication property="principal.Username" var="userName"/>
+	          	<li><a href="<c:url value="/logout"/>"><spring:message code="common.logout"/></a></li>
+	          	<sec:authentication property="principal.userid" var="aaa"/>
+	          </sec:authorize>
+            
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><spring:message code="common.language"/> <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
+						<li><a href="?lang=en"><spring:message code="common.language.english"/></a></li>
+					</ul>
+				</li>          							
+			</ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
 </div><!-- /.navbar -->
 
-<script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
 <script type="text/javascript">
 function headerCtrl($scope, $location) {
 	$scope.isActive = function(viewLocation) {
@@ -67,3 +67,5 @@ function headerCtrl($scope, $location) {
 	}
 }
 </script>
+
+<script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>

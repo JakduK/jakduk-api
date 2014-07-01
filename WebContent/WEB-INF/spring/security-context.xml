@@ -33,8 +33,7 @@
 			<concurrency-control max-sessions="1" expired-url="/login/duplicate"/>
 		</session-management>
 		
-		<logout invalidate-session="true" logout-success-url="/logout/success"
-			logout-url="/logout" />					
+		<logout invalidate-session="true" logout-url="/logout"/>					
 	</http>
 	
 	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
