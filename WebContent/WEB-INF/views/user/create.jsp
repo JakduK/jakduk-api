@@ -11,13 +11,24 @@
 <!--  
 <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrapApp.css" rel="stylesheet">
 -->
+<script type="text/javascript">
+function formSubmit() {
+	
+	var email = document.getElementById("email").value;
+	
+	var emailPattern = /^[\w]{4,}@[\w]+(\.[\w-]+){1,3}$/;
+	console.log(email, emailPattern.test(email));
+	
+	//return false;
+}
+</script>
 </head>
 <body>
 <jsp:include page="../include/navigation-header.jsp"/>
+<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 
 <div class="container">
-
-	<form:form commandName="user" action="/jakduk/user/create" method="POST" cssClass="form-horizontal">
+	<form:form commandName="user" action="${contextPath}/user/create" method="POST" cssClass="form-horizontal" onsubmit="return formSubmit();">
 		<legend><spring:message code="user.register"/> </legend>
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="email">
@@ -27,12 +38,18 @@
 				<div class="input-group">
 					<form:input path="email" cssClass="form-control" size="50" placeholder="Email"/>
 					<span class="input-group-btn">
-						<input type="button" value="<spring:message code="common.button.check"/>" class="btn btn-default"/>
+						<button class="btn btn-default" type="button"><spring:message code="common.button.check"/></button>
 					</span>
 				</div>
-				<form:errors path="email" cssClass="alert alert-warning" element="div"/>
+				<spring:hasBindErrors name="user">
+				${errors}
+				<form:errors path="email"/>
+				</spring:hasBindErrors>
+				
+				
 			</div>
 		</div>
+		
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="username">
 				<abbr title="required">*</abbr> <spring:message code="user.nickname"/>

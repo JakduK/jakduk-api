@@ -54,6 +54,7 @@ public class UserController {
 	public String createSubmit(@Valid User user, BindingResult result) {
 		
 		if (result.hasErrors()) {
+			logger.debug("result=" + result);
 			return "user/create";
 		}
 		
