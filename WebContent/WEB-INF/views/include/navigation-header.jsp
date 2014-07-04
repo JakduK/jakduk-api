@@ -40,7 +40,7 @@
 			<ul class="nav navbar-nav navbar-right">
 	          <sec:authorize access="isAnonymous()">
 	          	<li><a href="<c:url value="/login"/>"><spring:message code="common.login"/></a></li>
-	          	<li><a href="<c:url value="/user/create"/>"><spring:message code="user.register"/></a></li>
+	          	<li><a href="<c:url value="/user/write"/>"><spring:message code="user.register"/></a></li>
 	          </sec:authorize>
 	          <sec:authorize access="isAuthenticated()">
 	          	<sec:authentication property="principal.Username" var="userName"/>

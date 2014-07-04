@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.jakduk.model.db.User;
+import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/user")
-@SessionAttributes("user")
+@SessionAttributes("userWrite")
 public class UserController {
 	
 	@Autowired
@@ -45,21 +46,28 @@ public class UserController {
 //		return "user/list";
 	}
 	
-	@RequestMapping(value = "/create")
-	public void create(Model model) {
-		model.addAttribute("user", new User());
+	@RequestMapping(value = "/write")
+	public void write(Model model) {
+		model.addAttribute("userWrite", new UserWrite());
 	}
 	
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String createSubmit(@Valid User user, BindingResult result) {
+	@RequestMapping(value = "/write", method = RequestMethod.POST)
+	public String writeSubmit(@Valid UserWrite userWrite, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
-			return "user/create";
+			return "user/write";
 		}
 		
-		logger.debug("user=" + user);
-		userService.create(user);
+		userService.checkUserWrite(userWrite, result);
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "user/write";
+		}
+		
+		userService.userWrite(userWrite);
+		
 		return "redirect:/user/list";
 	}
 	

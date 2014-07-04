@@ -40,7 +40,7 @@
 			  <div class="control-group">
 			    <div class="controls">
 			      <spring:message code="user.msg.not.user"/> 
-			      <a href="<c:url value="/user/create"/>"><spring:message code="user.msg.register.here"/></a>
+			      <a href="<c:url value="/user/write"/>"><spring:message code="user.msg.register.here"/></a>
 			    </div>
 			  </div>
 			</form>

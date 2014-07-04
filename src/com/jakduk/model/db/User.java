@@ -36,6 +36,8 @@ public class User {
 	@Temporal(TemporalType.DATE)
 	private Date joined;
 	
+	private String about;
+	
 	public String getId() {
 		return id;
 	}
@@ -76,7 +78,6 @@ public class User {
 		this.password = password;
 	}
 	
-	
 	public List<String> getRules() {
 		return rules;
 	}
@@ -85,9 +86,19 @@ public class User {
 		this.rules = rules;
 	}
 
+	public String getAbout() {
+		return about;
+	}
+
+	public void setAbout(String about) {
+		this.about = about;
+	}
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", username=" + username + ", password=" + password + ", rules=" + rules + "]"; 
+		return "User [id=" + id + ", email=" + email + ", username=" + username
+				+ ", password=" + password + ", rules=" + rules + ", joined="
+				+ joined + ", about=" + about + "]";
 	}
 	
 }

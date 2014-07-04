@@ -15,11 +15,16 @@
 function formSubmit() {
 	
 	var email = document.getElementById("email").value;
-	
 	var emailPattern = /^[\w]{4,}@[\w]+(\.[\w-]+){1,3}$/;
-	console.log(email, emailPattern.test(email));
+	var emailCheck = emailPattern.test(email);
 	
-	//return false;
+	if (emailCheck == true) {
+		$("#alert-mail").text("").addClass("hidden");
+		return true;
+	} else {
+		$("#alert-mail").text("<spring:message code='user.msg.check.mail.format'/>").removeClass("hidden");
+		return false;	
+	}	
 }
 </script>
 </head>
@@ -28,25 +33,16 @@ function formSubmit() {
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 
 <div class="container">
-	<form:form commandName="user" action="${contextPath}/user/create" method="POST" cssClass="form-horizontal" onsubmit="return formSubmit();">
+	<form:form commandName="userWrite" action="${contextPath}/user/write" method="POST" cssClass="form-horizontal" onsubmit="return formSubmit();">
 		<legend><spring:message code="user.register"/> </legend>
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="email">
 				<abbr title="required">*</abbr> <spring:message code="user.email"/>
 			</label>
-			<div class="col-sm-4">
-				<div class="input-group">
-					<form:input path="email" cssClass="form-control" size="50" placeholder="Email"/>
-					<span class="input-group-btn">
-						<button class="btn btn-default" type="button"><spring:message code="common.button.check"/></button>
-					</span>
-				</div>
-				<spring:hasBindErrors name="user">
-				${errors}
-				<form:errors path="email"/>
-				</spring:hasBindErrors>
-				
-				
+			<div class="col-sm-3">
+				<form:input path="email" cssClass="form-control" size="50" placeholder="Email"/>
+				<form:errors path="email" cssClass="alert alert-warning" element="div"/>
+				<div id="alert-mail" class="alert alert-warning hidden" role="alert"></div>
 			</div>
 		</div>
 		
@@ -69,17 +65,18 @@ function formSubmit() {
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="col-sm-2 control-label" for="password-confirm">
+			<label class="col-sm-2 control-label" for="passwordConfirm">
 				<abbr title="required">*</abbr> <spring:message code="user.password.confirm"/>
 			</label>
 			<div class="col-sm-3">
-				<input type="password" name="password-confirm" class="string required span6"/>
+				<form:password path="passwordConfirm" cssClass="form-control" size="50" placeholder="Confirm password"/>
+				<form:errors path="passwordConfirm" cssClass="alert alert-warning" element="div"/>
 			</div>
 		</div>			
 		<div class="form-group">
-			<label class="col-sm-2 control-label" for="comments"> <spring:message code="user.comment"/></label>
+			<label class="col-sm-2 control-label" for="about"> <spring:message code="user.comment"/></label>
 			<div class="col-sm-4">
-				<textarea class="form-control" cols="40" id="comments" name="comments" rows="5"></textarea>
+				<form:textarea path="about" cssClass="form-control" cols="40" rows="5" placeholder="About"/>
 			</div>
 		</div>
 		<div class="form-group">
@@ -99,5 +96,6 @@ function formSubmit() {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/offcanvas.js"></script>
+
 </body>
 </html>
