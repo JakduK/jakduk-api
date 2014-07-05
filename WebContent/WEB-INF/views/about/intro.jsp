@@ -8,6 +8,7 @@
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 <body>
+<div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
 <div class="container">
 
@@ -33,6 +34,7 @@
 
 <jsp:include page="../include/footer.jsp"/>
 </div>
+</div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript
   ================================================== -->

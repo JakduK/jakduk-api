@@ -17,6 +17,9 @@
 		<c:if test="${not empty message}">
 			<div class="span6 offset2 alert">${message}</div>
 		</c:if>
+		
+		<p><a href="<c:url value="/admin/encyclopedia/write"/>" class="btn btn-primary" role="button">Encyclopedia Write</a></p>
+		
 		<jsp:include page="../include/footer.jsp"/>
 	</div>
 	<!-- Bootstrap core JavaScript

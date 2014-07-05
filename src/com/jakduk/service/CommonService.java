@@ -14,8 +14,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.BoardSequence;
+import com.jakduk.model.db.Sequence;
 import com.jakduk.model.web.BoardPageInfo;
+import com.jakduk.repository.SequenceRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -28,18 +29,21 @@ import com.jakduk.model.web.BoardPageInfo;
 public class CommonService {
 	
 	@Autowired
+	private SequenceRepository sequenceRepository;
+	
+	@Autowired
 	private MongoTemplate mongoTemplate;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	/**
-	 * 게시판의 차기 글번호를 가져온다.
+	 * 차기 SEQUENCE를 가져온다.
 	 * @param name 게시판 ID
 	 * @return 다음 글번호
 	 */
 	public Integer getNextSequence(Integer name) {
 		
-		Integer nextSeq = -1;
+		Integer nextSeq = 1;
 		
 		Query query = new Query();
 		query.addCriteria(Criteria.where("name").is(name));
@@ -50,13 +54,17 @@ public class CommonService {
 		FindAndModifyOptions options = new FindAndModifyOptions();
 		options.returnNew(true);
 		
-		BoardSequence board = mongoTemplate.findAndModify(query, update, options, BoardSequence.class);
+		Sequence sequence = mongoTemplate.findAndModify(query, update, options, Sequence.class);
 		
-		if (board == null) {
-			logger.debug("err result=" + board);
+		if (sequence == null) {
+			Sequence newSequence = new Sequence();
+			newSequence.setName(name);
+			sequenceRepository.save(newSequence);
+			logger.debug("sequence is Null. Insert new Sequence.");
+			
 			return nextSeq;
 		} else {
-			nextSeq = board.getSeq();
+			nextSeq = sequence.getSeq();
 			return nextSeq;
 		}
 	}

@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
  * @date     : 2014. 7. 4.
- * @desc     :
+ * @desc     : 회원 가입시에만 사용되는 모델. USER 모델로 바인딩 한다.
  */
 public class UserWrite {
 

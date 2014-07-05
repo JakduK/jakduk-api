@@ -47,16 +47,16 @@ public class UserService {
 	
 	public void checkUserWrite(UserWrite userWrite, BindingResult result) {
 		
-		Integer countEmail = userRepository.countByEmail(userWrite.getEmail());
-		Integer countUsername = userRepository.countByEmail(userWrite.getUsername());
+		User userByEmail = userRepository.findOneByEmail(userWrite.getEmail());
+		User userByUsername = userRepository.findOneByUsername(userWrite.getUsername());
 		String pwd = userWrite.getPassword();
 		String pwdCfm = userWrite.getPasswordConfirm();
 		
-		if (countEmail > 0) {
+		if (userByEmail != null) {
 			result.rejectValue("email", "user.msg.already.email");
 		}
 		
-		if (countUsername > 0) {
+		if (userByUsername != null) {
 			result.rejectValue("username", "user.msg.already.username");
 		}
 		

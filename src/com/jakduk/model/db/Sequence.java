@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class BoardSequence {
+public class Sequence {
 	
 	/**
 	 * ID
@@ -19,7 +19,7 @@ public class BoardSequence {
 	/**
 	 * 글 번호
 	 */
-	private Integer seq;
+	private Integer seq = 1;
 	
 	/**
 	 * 게시판 ID
@@ -54,8 +54,7 @@ public class BoardSequence {
 
 	@Override
 	public String toString() {
-		return "BoardSequence [id=" + id + ", seq=" + seq + ", name=" + name + "]"; 
+		return "Sequence [id=" + id + ", seq=" + seq + ", name=" + name + "]";
 	}
-	
 
 }

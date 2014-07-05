@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
-import com.jakduk.model.db.BoardSequence;
+import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.repository.BoardCategoryRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.BoardSequenceRepository;
+import com.jakduk.repository.SequenceRepository;
+import com.jakduk.repository.EncyclopediaRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -25,10 +25,16 @@ import com.jakduk.repository.BoardSequenceRepository;
 public class AdminService {
 	
 	@Autowired
+	private CommonService commonService;
+	
+	@Autowired
 	private BoardCategoryRepository boardCategoryRepository;
 	
 	@Autowired
-	private BoardSequenceRepository boardSequenceRepository;
+	private SequenceRepository sequenceRepository;
+	
+	@Autowired
+	private EncyclopediaRepository encyclopediaRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -65,14 +71,17 @@ public class AdminService {
 			result = "already exist board category at DB.";
 		}
 		
-		BoardSequence getBoardSequence = boardSequenceRepository.findByName(CommonConst.BOARD_NAME_FREE);
+		return result;
+	}
+	
+	public void shortHistoryWrite(Encyclopedia shortHistory) {
 		
-		if (getBoardSequence == null) {
-			BoardSequence boardSequence = new BoardSequence();
-			boardSequence.setName(CommonConst.BOARD_NAME_FREE);
-			boardSequenceRepository.save(boardSequence);
+		if (shortHistory.getLanguage().equals(CommonConst.LANGUAGE_EN)) {
+			shortHistory.setSeq(commonService.getNextSequence(CommonConst.SHORT_HISTORY_EN));			
+		} else if (shortHistory.getLanguage().equals(CommonConst.LANGUAGE_KO)) {
+			shortHistory.setSeq(commonService.getNextSequence(CommonConst.SHORT_HISTORY_KO));
 		}
 		
-		return result;
+		encyclopediaRepository.save(shortHistory);
 	}
 }

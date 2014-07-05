@@ -27,7 +27,7 @@ import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.BoardSequenceRepository;
+import com.jakduk.repository.SequenceRepository;
 import com.jakduk.repository.UserRepository;
 
 @Service
@@ -40,7 +40,7 @@ public class BoardFreeService {
 	private UserRepository userRepository;
 	
 	@Autowired
-	private BoardSequenceRepository boardSequenceRepository;
+	private SequenceRepository boardSequenceRepository;
 	
 	@Autowired
 	private BoardCategoryRepository boardCategoryRepository;

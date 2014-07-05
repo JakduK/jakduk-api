@@ -14,10 +14,10 @@
 
 </head>
 <body>
+<div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <!-- Begin page content -->
-<div class="container">
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading">
@@ -86,7 +86,7 @@
 </c:url>
 <a href="${listUrl}" class="btn btn-default" role="button"><spring:message code="board.list"/></a>
 
-</div> <!--/.container-->
+</div> <!-- /.container -->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>

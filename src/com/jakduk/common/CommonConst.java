@@ -8,19 +8,22 @@ package com.jakduk.common;
 public class CommonConst {
 	
 	/**
-	 * 게시판 목록.
+	 * 게시판 종류. SEQUNCE 생성에도 쓰임.
 	 */
 	public final static Integer BOARD_NAME_FREE = 10;
+	
+	public final static Integer SHORT_HISTORY_EN = 50;
+	public final static Integer SHORT_HISTORY_KO = 51;
 	
 	/**
 	 * 게시물 목록에서 보여지는 게시물 갯수
 	 */
-	public final static Integer BOARD_LINE_NUMBER = 5;
+	public final static Integer BOARD_LINE_NUMBER = 10;
 
 	/**
 	 * 게시물 쿠키의 만료되는 시간(초)
 	 */
-	public final static Integer BOARD_COOKIE_EXPIRE_SECONDS = 10;
+	public final static Integer BOARD_COOKIE_EXPIRE_SECONDS = 30;
 	
 	/**
 	 * 게시판 말머리.
@@ -30,5 +33,11 @@ public class CommonConst {
 	public final static Integer BOARD_CATEGORY_FOOTBALL = 12;
 	public final static Integer BOARD_CATEGORY_DEVELOP = 13;
 	public final static Integer BOARD_CATEGORY_ALL = 14;
+	
+	/**
+	 * 언어. 
+	 */
+	public final static Integer LANGUAGE_EN = 10;
+	public final static Integer LANGUAGE_KO = 11;
 	
 }
