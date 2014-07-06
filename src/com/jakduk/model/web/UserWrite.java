@@ -12,19 +12,19 @@ import javax.validation.constraints.Size;
 public class UserWrite {
 
 	@NotNull
-	@Size(min = 6, max=30)
+	@Size(min = 6, max=20)
 	private String email;
 	
 	@NotNull
-	@Size(min = 4, max=30)
+	@Size(min = 2, max=20)
 	private String username;
 	
 	@NotNull
-	@Size(min = 6, max=20)
+	@Size(min = 4, max=20)
 	private String password;
 	
 	@NotNull
-	@Size(min = 6, max=20)
+	@Size(min = 4, max=20)
 	private String passwordConfirm;
 	
 	private String about;

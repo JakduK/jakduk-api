@@ -33,16 +33,19 @@ function formSubmit() {
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 
 <div class="container">
-	<form:form commandName="userWrite" action="${contextPath}/user/write" method="POST" cssClass="form-horizontal" onsubmit="return formSubmit();">
+	<form:form commandName="userWrite" name="userWrite" action="${contextPath}/user/write" method="POST" cssClass="form-horizontal" onsubmit="return formSubmit();">
 		<legend><spring:message code="user.register"/> </legend>
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="email">
-				<abbr title="required">*</abbr> <spring:message code="user.email"/>
+				<abbr title='<spring:message code="user.msg.required"/>'>*</abbr> <spring:message code="user.email"/>
 			</label>
 			<div class="col-sm-3">
-				<form:input path="email" cssClass="form-control" size="50" placeholder="Email"/>
+				<form:input path="email" cssClass="form-control" size="50" placeholder="Email" ng-model="email" ng-required="true" ng-minlength="6" ng-maxlength="20"/>
 				<form:errors path="email" cssClass="alert alert-warning" element="div"/>
 				<div id="alert-mail" class="alert alert-warning hidden" role="alert"></div>
+				<span class="text-danger" ng-show="userWrite.email.$error.required"><spring:message code="user.msg.required"/></span>
+				<span class="text-danger" ng-show="userWrite.email.$error.minlength || userWrite.email.$error.maxlength"><spring:message code="Size.user.email"/></span>
+				{{userWrite.email.$error}}
 			</div>
 		</div>
 		
