@@ -21,7 +21,7 @@
 				<abbr title='<spring:message code="user.msg.required"/>'>*</abbr> <spring:message code="user.email"/>
 			</label>
 			<div class="col-sm-3">
-				<input type="email" name="email" id="email" class="form-control" size="50" placeholder="Email" 
+				<input type="email" name="email" class="form-control" size="50" ng-init="email='${userWrite.email}'"
 				ng-model="email" ng-required="true" ng-minlength="6" ng-maxlength="20" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
 				<form:errors path="email" cssClass="alert alert-warning" element="div"/>
 				<div id="alert-mail" class="alert alert-warning hidden" role="alert"></div>
@@ -29,7 +29,7 @@
 					<spring:message code="user.msg.required"/>
 				</span>
 				<span class="text-danger" ng-show="userWrite.email.$error.minlength || userWrite.email.$error.maxlength">
-					<spring:message code="Size.user.email"/>
+					<spring:message code="Size.userWrite.email"/>
 				</span>
 				<span class="text-danger" ng-show="userWrite.email.$error.pattern">
 					<spring:message code="user.msg.check.mail.format"/>
@@ -41,14 +41,14 @@
 				<abbr title='<spring:message code="user.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
 			<div class="col-sm-3">
-				<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname"
-				ng-model="username" ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+				<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" ng-init="username='${userWrite.username}'"
+				ng-model="username" ng-required="true" ng-minlength="1" ng-maxlength="20"/>
 				<form:errors path="username" cssClass="alert alert-warning" element="div"/>
 				<span class="text-danger" ng-show="userWrite.username.$error.required">
 					<spring:message code="user.msg.required"/>
 				</span>
 				<span class="text-danger" ng-show="userWrite.username.$error.minlength || userWrite.username.$error.maxlength">
-					<spring:message code="Size.user.username"/>
+					<spring:message code="Size.userWrite.username"/>
 				</span>
 			</div>
 		</div>
@@ -64,7 +64,7 @@
 					<spring:message code="user.msg.required"/>
 				</span>
 				<span class="text-danger" ng-show="userWrite.password.$error.minlength || userWrite.password.$error.maxlength">
-					<spring:message code="Size.user.password"/>
+					<spring:message code="Size.userWrite.password"/>
 				</span>
 			</div>
 		</div>
@@ -80,7 +80,7 @@
 					<spring:message code="user.msg.required"/>
 				</span>
 				<span class="text-danger" ng-show="userWrite.passwordConfirm.$error.minlength || userWrite.passwordConfirm.$error.maxlength">
-					<spring:message code="Size.user.password"/>
+					<spring:message code="Size.userWrite.password"/>
 				</span>
 				<span class="text-danger" ng-show="password != passwordConfirm">
 					<spring:message code="user.msg.password.mismatch"/>
@@ -95,7 +95,8 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
-				<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default" ng-disabled="userWrite.$invalid"/>
+				<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+				<input type="button" value="<spring:message code="common.button.submit"/>" class="btn btn-default" ng-click="test();"/>
 				<a class="btn btn-danger" href="<c:url value="/"/>"><spring:message code="common.button.cancel"/></a>
 			</div> 
 		</div>
@@ -112,11 +113,10 @@
 
 <script type="text/javascript">
 function writeCtrl($scope) {
-	$scope.login = {
-			submit: function() {
-				alert("11");
-			}
-	}
+	$scope.test = function() {
+		$scope.apply();
+	};
+	
 }
 </script>
 
