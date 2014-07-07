@@ -161,23 +161,29 @@ public class BoardFreeService {
 	 */
 	public Model getFreeView(Model model, int seq, BoardListInfo boardListInfo, Boolean isAddCookie) {
 		
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-		BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(boardFree.getCategoryId());
-		
-		ObjectId objId = new ObjectId(boardFree.getId());
-		Date createDate = objId.getDate();
-		
-		if (isAddCookie == true) {
-			int views = boardFree.getViews();
-			boardFree.setViews(++views);
-			logger.debug("post=" + boardFree);
-			boardFreeRepository.save(boardFree);
+		try {
+			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+			BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(boardFree.getCategoryId());
+			
+			ObjectId objId = new ObjectId(boardFree.getId());
+			Date createDate = objId.getDate();
+			
+			if (isAddCookie == true) {
+				int views = boardFree.getViews();
+				boardFree.setViews(++views);
+				logger.debug("post=" + boardFree);
+				boardFreeRepository.save(boardFree);
+			}
+			
+			model.addAttribute("post", boardFree);
+			model.addAttribute("category", boardCategory);
+			model.addAttribute("createDate", createDate);
+			model.addAttribute("listInfo", boardListInfo);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.debug(e.getMessage());
 		}
-		
-		model.addAttribute("post", boardFree);
-		model.addAttribute("category", boardCategory);
-		model.addAttribute("createDate", createDate);
-		model.addAttribute("listInfo", boardListInfo);
 		
 		return model;
 	}
