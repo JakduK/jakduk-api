@@ -7,9 +7,9 @@
 <html ng-app>
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
-
 </head>
 <body>
+<div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 
@@ -29,7 +29,6 @@
 					ng-init="email='${userWrite.email}'" ng-model="email" 
 					ng-disabled="checkEmail === false" 
 					ng-required="true" ng-minlength="6" ng-maxlength="20" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
-					
 			      <span class="input-group-btn">
 			        <button type="button" class="btn btn-default" ng-click="onCheckEmail(userWrite)">
 			        	<spring:message code="common.button.redundancy.check"/>
@@ -49,7 +48,7 @@
 				<span class="text-danger" ng-show="checkEmail != null && checkEmail === true">
 					<spring:message code="user.msg.replicated.data"/>
 				</span>
-				<span class="text-danger" ng-show="checkEmail != null && checkEmail === false">
+				<span class="text-success" ng-show="checkEmail != null && checkEmail === false">
 					<spring:message code="user.msg.avaliable.data"/>
 				</span>
 				<span class="text-danger" ng-model="errorEmail" ng-show="errorEmail">{{errorEmail}}</span>
@@ -81,7 +80,7 @@
 				<span class="text-danger" ng-show="checkUsername != null && checkUsername === true">
 					<spring:message code="user.msg.replicated.data"/>
 				</span>
-				<span class="text-danger" ng-show="checkUsername != null && checkUsername === false">
+				<span class="text-success" ng-show="checkUsername != null && checkUsername === false">
 					<spring:message code="user.msg.avaliable.data"/>
 				</span>
 				<span class="text-danger" ng-model="errorUsername" ng-show="errorUsername">{{errorUsername}}</span>				
@@ -136,9 +135,10 @@
 	
 	<jsp:include page="../include/footer.jsp"/>
 </div>
+</div><!-- /.container -->
 	
-	<!-- Bootstrap core JavaScript
-  ================================================== -->
+<!-- Bootstrap core JavaScript
+ ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
