@@ -28,6 +28,9 @@ public class UserWrite {
 	private String passwordConfirm;
 	
 	private String about;
+	
+	private Boolean checkEmail;
+	private Boolean checkUsername;
 
 	public String getEmail() {
 		return email;
@@ -69,11 +72,28 @@ public class UserWrite {
 		this.about = about;
 	}
 
+	public Boolean getCheckEmail() {
+		return checkEmail;
+	}
+
+	public void setCheckEmail(Boolean checkEmail) {
+		this.checkEmail = checkEmail;
+	}
+
+	public Boolean getCheckUsername() {
+		return checkUsername;
+	}
+
+	public void setCheckUsername(Boolean checkUsername) {
+		this.checkUsername = checkUsername;
+	}
+
 	@Override
 	public String toString() {
 		return "UserWrite [email=" + email + ", username=" + username
 				+ ", password=" + password + ", passwordConfirm="
-				+ passwordConfirm + ", about=" + about + "]";
+				+ passwordConfirm + ", about=" + about + ", checkEmail="
+				+ checkEmail + ", checkUsername=" + checkUsername + "]";
 	}
 
 }

@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.jakduk.model.db.BoardWriter;
@@ -47,16 +48,14 @@ public class UserService {
 	
 	public void checkUserWrite(UserWrite userWrite, BindingResult result) {
 		
-		User userByEmail = userRepository.findOneByEmail(userWrite.getEmail());
-		User userByUsername = userRepository.findOneByUsername(userWrite.getUsername());
 		String pwd = userWrite.getPassword();
 		String pwdCfm = userWrite.getPasswordConfirm();
 		
-		if (userByEmail != null) {
+		if (this.existEmail(userWrite.getEmail())) {
 			result.rejectValue("email", "user.msg.already.email");
 		}
 		
-		if (userByUsername != null) {
+		if (this.existUsername(userWrite.getUsername())) {
 			result.rejectValue("username", "user.msg.already.username");
 		}
 		
@@ -75,6 +74,20 @@ public class UserService {
 		this.create(user);
 	}
 	
+	public Boolean existEmail(String email) {
+		Boolean result = false;
+		
+		if (userRepository.findOneByEmail(email) != null) result = true;
+		
+		return result;
+	}
 	
+	public Boolean existUsername(String username) {
+		Boolean result = false;
+		
+		if (userRepository.findOneByUsername(username) != null) result = true;
+		
+		return result;
+	}
 		
 }
