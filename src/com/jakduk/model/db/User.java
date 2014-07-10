@@ -20,15 +20,15 @@ public class User {
 	private String id;
 	
 	@NotNull
-	@Size(min = 6, max=30)
+	@Size(min = 6, max=20)
 	private String email;
 	
 	@NotNull
-	@Size(min = 4, max=30)
+	@Size(min = 2, max=20)
 	private String username;
 	
 	@NotNull
-	@Size(min = 6, max=20)
+	@Size(min = 4, max=20)
 	private String password;
 	
 	private List<String> rules;

@@ -26,11 +26,11 @@
 			<div class="col-sm-4">
 			    <div class="input-group">
 					<input type="email" name="email" class="form-control" size="50" placeholder="Email" 
-					ng-init="email='${userWrite.email}'" ng-model="email" 
-					ng-disabled="checkEmail === false" 
+					ng-init="email='${userWrite.email}'" ng-model="email" ng-readonly="checkEmail === false" 
 					ng-required="true" ng-minlength="6" ng-maxlength="20" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
 			      <span class="input-group-btn">
-			        <button type="button" class="btn btn-default" ng-click="onCheckEmail(userWrite)">
+			        <button type="button" class="btn btn-default" 
+			        ng-click="onCheckEmail(userWrite)" ng-disabled="checkEmail === false">
 			        	<spring:message code="common.button.redundancy.check"/>
 			        </button>
 			      </span>
@@ -61,10 +61,11 @@
 			<div class="col-sm-4">
 				<div class="input-group">
 					<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
-					ng-init="username='${userWrite.username}'" ng-model="username" ng-disabled="checkUsername === false"
+					ng-init="username='${userWrite.username}'" ng-model="username" ng-readonly="checkUsername === false"
 					ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 			      <span class="input-group-btn">
-			        <button type="button" class="btn btn-default" ng-click="onCheckUsername(userWrite)">
+			        <button type="button" class="btn btn-default" 
+			        ng-click="onCheckUsername(userWrite)" ng-disabled="checkUsername === false">
 			        	<spring:message code="common.button.redundancy.check"/>
 			        </button>
 			      </span>
@@ -149,8 +150,8 @@ function writeCtrl($scope, $http) {
 	$scope.usernameConn = 0;
 	
 	$scope.onSubmit = function(userWrite, event) {
-		
 		if (userWrite.$valid && $scope.checkEmail === false && $scope.checkUsername === false) {
+			submitData();
 		} else {
 			if ($scope.checkEmail !== false) {
 				$scope.errorEmail = '<spring:message code="common.msg.error.shoud.check.redudancy"/>';
