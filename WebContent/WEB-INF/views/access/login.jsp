@@ -8,9 +8,46 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
-<link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrapApp.css" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/signin.css" rel="stylesheet">
 </head>
 <body>
+
+
+<c:if test="${not empty message}">
+	<div class="span6 offset2 alert">${message}</div>
+</c:if>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><spring:message code="user.sign.in"/></h3>
+                    </div>
+                    <div class="panel-body">
+                        <form action="j_spring_security_check" method="post">
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" id="j_username" name="j_username" placeholder="E-mail" autofocus>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" id="j_password" name="j_password" placeholder="Password">
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input name="remember" type="checkbox" value="Remember Me">Remember Me
+                                    </label>
+                                </div>
+                                <!-- Change this to a button or input when using this as a form -->
+                                <button type="submit" class="btn btn-lg btn-success btn-block"><spring:message code="user.sign.in"/></button>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
   	<div class="container">
 		<c:if test="${not empty message}">
