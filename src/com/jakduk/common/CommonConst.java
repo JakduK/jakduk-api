@@ -40,4 +40,7 @@ public class CommonConst {
 	public final static Integer LANGUAGE_EN = 10;
 	public final static Integer LANGUAGE_KO = 11;
 	
+	public final static String COOKIE_EMAIL = "email";
+	public final static String COOKIE_REMEMBER = "remember";
+	
 }

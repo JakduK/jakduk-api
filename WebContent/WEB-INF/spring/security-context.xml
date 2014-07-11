@@ -24,8 +24,9 @@
 		<intercept-url pattern="/user/list" access="hasRole('ROLE_TEST_01')" />
 		<intercept-url pattern="/board/*/write" access="authenticated" />
 		
-		<form-login login-page="/login" authentication-failure-url="/login/failure"
-			default-target-url="/" />
+		<form-login login-page="/login"
+			authentication-success-handler-ref="loginSuccessHandler" 
+			authentication-failure-handler-ref="loginFailureHandler"/>
 			
 		<access-denied-handler error-page="/denied" />
 		
@@ -36,6 +37,8 @@
 		<logout invalidate-session="true" logout-url="/logout"/>					
 	</http>
 	
+	<beans:bean id="loginSuccessHandler" class="com.jakduk.authority.LoginSuccessHandler"/>
+	<beans:bean id="loginFailureHandler" class="com.jakduk.authority.LoginFailureHandler"/>
 	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
 	
 	<authentication-manager>

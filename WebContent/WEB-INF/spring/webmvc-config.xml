@@ -30,7 +30,6 @@
         <property name="defaultEncoding" value="UTF-8" />
         <property name="cacheSeconds" value="3"/>
 	</bean>
-
 	
 	<bean
 		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">

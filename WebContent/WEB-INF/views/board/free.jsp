@@ -4,6 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app>
@@ -11,6 +12,7 @@
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 <body>
+
 <div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
 <div class="container">
@@ -32,7 +34,12 @@
   </ul>
 </div>
 
-<a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a>
+<sec:authorize access="isAnonymous()">
+	<a href="javascript:needLogin();" class="btn btn-primary" role="button"><spring:message code="board.write"/></a>
+</sec:authorize>
+<sec:authorize access="isAuthenticated()">
+	<a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a>
+</sec:authorize>
 
 <hr/>
 <c:forEach items="${posts}" var="post">
@@ -111,7 +118,12 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
-<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/offcanvas.js"></script>
-
+<script type="text/javascript">
+function needLogin() {
+	if (confirm('<spring:message code="board.msg.need.login"/>') == true) {
+		location.href = "<c:url value="/board/free/write"/>";
+	}
+}
+</script>
 </body>
 </html>
