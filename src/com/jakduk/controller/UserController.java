@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.web.UserWrite;
@@ -52,7 +53,9 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public String writeSubmit(@Valid UserWrite userWrite, BindingResult result) {
+	public String writeSubmit(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
+		
+		logger.debug("userWrite=" + userWrite);
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
@@ -67,6 +70,7 @@ public class UserController {
 		}
 		
 		userService.userWrite(userWrite);
+		sessionStatus.setComplete();
 		
 		return "redirect:/user/list";
 	}

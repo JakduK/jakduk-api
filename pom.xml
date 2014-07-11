@@ -4,11 +4,11 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>jakduk</name>
-  <url>http://maven.apache.org</url>
+  <url>http://jakduk.com</url>
 
   <properties>
 	<spring.version>3.2.8.RELEASE</spring.version>

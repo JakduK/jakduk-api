@@ -29,8 +29,8 @@ public class UserWrite {
 	
 	private String about;
 	
-	private Boolean checkEmail;
-	private Boolean checkUsername;
+	private Integer existEmail;
+	private Integer existUsername;
 
 	public String getEmail() {
 		return email;
@@ -72,28 +72,28 @@ public class UserWrite {
 		this.about = about;
 	}
 
-	public Boolean getCheckEmail() {
-		return checkEmail;
+	public Integer getExistEmail() {
+		return existEmail;
 	}
 
-	public void setCheckEmail(Boolean checkEmail) {
-		this.checkEmail = checkEmail;
+	public void setExistEmail(Integer existEmail) {
+		this.existEmail = existEmail;
 	}
 
-	public Boolean getCheckUsername() {
-		return checkUsername;
+	public Integer getExistUsername() {
+		return existUsername;
 	}
 
-	public void setCheckUsername(Boolean checkUsername) {
-		this.checkUsername = checkUsername;
+	public void setExistUsername(Integer existUsername) {
+		this.existUsername = existUsername;
 	}
 
 	@Override
 	public String toString() {
 		return "UserWrite [email=" + email + ", username=" + username
 				+ ", password=" + password + ", passwordConfirm="
-				+ passwordConfirm + ", about=" + about + ", checkEmail="
-				+ checkEmail + ", checkUsername=" + checkUsername + "]";
+				+ passwordConfirm + ", about=" + about + ", existEmail="
+				+ existEmail + ", existUsername=" + existUsername + "]";
 	}
 
 }

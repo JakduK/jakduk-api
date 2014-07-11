@@ -60,7 +60,7 @@ public class UserService {
 		}
 		
 		if (!pwd.equals(pwdCfm)) {
-			result.rejectValue("passwordConfirm", "user.msg.not.equal.password");
+			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
 		}
 	}
 	
