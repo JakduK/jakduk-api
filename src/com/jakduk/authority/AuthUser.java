@@ -182,8 +182,8 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 		sb.append(super.toString()).append(": ");
 		sb.append("email: ").append(this.email).append("; ");
 		sb.append("userid: ").append(this.userid).append("; ");
-		sb.append("Password: [PROTECTED]; ");
-		sb.append("Username: ").append(this.username).append("; ");
+		sb.append("password: [PROTECTED]; ");
+		sb.append("username: ").append(this.username).append("; ");
 		sb.append("Enabled: ").append(this.enabled).append("; ");
 		sb.append("AccountNonExpired: ").append(this.accountNonExpired).append("; ");
 		sb.append("credentialsNonExpired: ").append(this.credentialsNonExpired).append("; ");

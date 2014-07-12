@@ -55,8 +55,6 @@ public class UserController {
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
 	public String writeSubmit(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
 		
-		logger.debug("userWrite=" + userWrite);
-		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
 			return "user/write";
@@ -72,7 +70,7 @@ public class UserController {
 		userService.userWrite(userWrite);
 		sessionStatus.setComplete();
 		
-		return "redirect:/user/list";
+		return "redirect:/login?status=2";
 	}
 	
 }

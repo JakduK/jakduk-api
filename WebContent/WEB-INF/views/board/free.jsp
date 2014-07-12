@@ -18,13 +18,13 @@
 <div class="container">
 
 <div class="page-header">
-  <h3><spring:message code="board.name.free"/> <small><spring:message code="board.name.free"/></small></h3>
+  <h4><spring:message code="board.name.free"/> <small><spring:message code="board.name.free.about"/></small></h4>
 </div>
 
 <!-- Single button -->
 <div class="btn-group">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-    <spring:message code="board.category"/> <span class="caret"></span>
+		<spring:message code="board.category"/> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
 	  <li><a href="?category=14"><spring:message code="board.category.all"/></a></li>	
@@ -33,16 +33,32 @@
 		</c:forEach>
   </ul>
 </div>
-
 <sec:authorize access="isAnonymous()">
-	<a href="javascript:needLogin();" class="btn btn-primary" role="button"><spring:message code="board.write"/></a>
+	<a href="javascript:needLogin();" class="btn btn-primary" role="button">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	</a>
 </sec:authorize>
 <sec:authorize access="isAuthenticated()">
-	<a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button"><spring:message code="board.write"/></a>
+	<a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	</a>
 </sec:authorize>
+<p></p>
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading visible-sm visible-md visible-lg">
+  	<div class="row">
+  		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
+  		<div class="col-sm-3"><spring:message code="board.subject"/></div>
+  		<div class="col-sm-2"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
+  		<div class="col-sm-4"><spring:message code="board.views"/> | <spring:message code="board.good"/> | <spring:message code="board.bad"/></div>
+  	</div>  	
+  </div> <!-- /panel-heading -->
 
-<hr/>
+  <!-- List group -->
+  <ul class="list-group">
 <c:forEach items="${posts}" var="post">
+	<li class="list-group-item">
 	<div class="row">
 	<div class="col-sm-2">
 		${post.seq}
@@ -52,9 +68,9 @@
 		</c:if>
 	</div>
 	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">
-		<div class="col-sm-2"><strong>${post.subject}</strong></div>
+		<div class="col-sm-3"><strong>${post.subject}</strong></div>
 	</a>			
-	<div class="col-sm-4">
+	<div class="col-sm-2">
 		${post.writer.username}
 		|
 		<%@page import="java.util.Date"%>
@@ -72,13 +88,15 @@
 		</c:choose>
 	</div>
 	<div class="col-sm-4">
-		<spring:message code="board.views"/> ${post.views}
-		| <spring:message code="board.good"/> ${fn:length(post.goodUsers)}
-		| <spring:message code="board.bad"/> ${fn:length(post.goodUsers)}
+		<spring:message code="board.views"/><strong> ${post.views}</strong>
+		| <span class="text-primary"><spring:message code="board.good"/><strong> ${fn:length(post.goodUsers)}</strong></span>
+		| <span class="text-danger"><spring:message code="board.bad"/><strong> ${fn:length(post.goodUsers)}</strong></span>
 	</div>
-	</div>
-<hr/>
+	</div> <!-- /row -->
+	</li>
 </c:forEach>
+</ul>
+</div>
 
 <ul class="pagination">
  <c:choose>

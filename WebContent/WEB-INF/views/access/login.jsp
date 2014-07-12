@@ -22,9 +22,12 @@
                 </div>
                 <div class="panel-body">
                 	<c:choose>
-                		<c:when test="${error == 1}">
-                		<p class="bg-danger"><spring:message code="user.msg.login.faulure"/></p>
+                		<c:when test="${status == 1}">
+                			<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.faulure"/></div>
                 		</c:when>
+                		<c:when test="${status == 2}">
+                			<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
+                		</c:when>                		
                 	</c:choose>
                     <form action="j_spring_security_check" name="loginForm" method="post" ng-submit="onSubmit(loginForm, $event)">
                         <fieldset>

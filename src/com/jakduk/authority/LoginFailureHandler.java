@@ -50,7 +50,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 			response.addCookie(cookie2);
 		}
 		
-		response.sendRedirect(request.getContextPath() + "/login?error=1");
+		response.sendRedirect(request.getContextPath() + "/login?status=1");
 		
 		
 	}

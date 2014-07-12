@@ -61,7 +61,7 @@
 			<div class="col-sm-3">
 				<form:password path="passwordConfirm" cssClass="form-control" size="50" placeholder="Confirm password"
 				ng-model="passwordConfirm" ng-blur="checkPasswordConfirm(userWrite)" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
-				<form:errors path="passwordConfirm" cssClass="text-danger" element="span" ng-hide="passwordConfirmAlert.msg"/>
+				<form:errors path="passwordConfirm" cssClass="text-danger" element="span" ng-hide="passwordConfirmAlert.msg || (passwordConfirm.length > 0 && password == passwordConfirm)"/>
 				<span class="{{passwordConfirmAlert.classType}}" ng-show="passwordConfirmAlert.msg">{{passwordConfirmAlert.msg}}</span>								
 			</div>
 		</div>			

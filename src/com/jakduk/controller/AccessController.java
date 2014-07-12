@@ -14,9 +14,9 @@ public class AccessController {
 	
 	@RequestMapping("/login")
 	public String login(Model model,
-			@RequestParam(required = false) Integer error) {
+			@RequestParam(required = false) Integer status) {
 		
-		model.addAttribute("error", error);
+		model.addAttribute("status", status);
 		return "access/login";
 	}
 
