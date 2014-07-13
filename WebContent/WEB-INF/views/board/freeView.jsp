@@ -72,6 +72,7 @@
 			<span ng-init="numberOfBad=${fn:length(post.badUsers)}">{{numberOfBad}}</span>
 			<span class="glyphicon glyphicon-thumbs-down"></span>
 		</button>
+		<p></p>
 		<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
 	</div>
 </div> <!-- /panel -->
@@ -134,7 +135,7 @@ function AlertCtrl($scope, $http) {
 			
 	function error(data, status, headers, config) {
 		$scope.result = 0;
-		$scope.error = "로드실패"
+		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 	}
 	
 }

@@ -21,11 +21,13 @@ import com.jakduk.authority.AuthUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.db.BoardUser;
-import com.jakduk.model.db.BoardWriter;
+import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.simple.BoardUser;
+import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.BoardFreeOnListRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.SequenceRepository;
 import com.jakduk.repository.UserRepository;
@@ -35,6 +37,9 @@ public class BoardFreeService {
 	
 	@Autowired
 	private BoardFreeRepository boardFreeRepository;
+	
+	@Autowired
+	private BoardFreeOnListRepository boardFreeOnListRepository;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -100,7 +105,7 @@ public class BoardFreeService {
 
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		Map<Integer, String> categoryName = new HashMap<Integer, String>();
-		List<BoardFree> posts = new ArrayList<BoardFree>();
+		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
 		Long numberPosts = (long) 0;
 		
 		Integer page = boardListInfo.getPage();
@@ -115,18 +120,18 @@ public class BoardFreeService {
 		Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_LINE_NUMBER, sort);
 		
 		if (categoryId == CommonConst.BOARD_CATEGORY_NONE || categoryId == CommonConst.BOARD_CATEGORY_ALL) {
-			posts = boardFreeRepository.findAll(pageable).getContent();
-			numberPosts = boardFreeRepository.count();
+			posts = boardFreeOnListRepository.findAll(pageable).getContent();
+			numberPosts = boardFreeOnListRepository.count();
 		} else {
-			posts = boardFreeRepository.findByCategoryId(categoryId, pageable).getContent();
-			numberPosts = boardFreeRepository.countByCategoryId(categoryId);
+			posts = boardFreeOnListRepository.findByCategoryId(categoryId, pageable).getContent();
+			numberPosts = boardFreeOnListRepository.countByCategoryId(categoryId);
 		}
 		
 		BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
 		
 //		logger.debug("countAll=" + boardPageInfo);
 		
-		for (BoardFree tempPost : posts) {
+		for (BoardFreeOnList tempPost : posts) {
 			String tempId = tempPost.getId();
 			Integer tempCategoryId = tempPost.getCategoryId();
 			ObjectId objId = new ObjectId(tempId);

@@ -11,6 +11,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.simple.BoardUser;
+import com.jakduk.model.simple.BoardWriter;
+
 /**
  * 자유게시판 모델
  * @author pyohwan

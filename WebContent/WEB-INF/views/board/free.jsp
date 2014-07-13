@@ -15,7 +15,6 @@
 
 <div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
-<div class="container">
 
 <div class="page-header">
   <h4><spring:message code="board.name.free"/> <small><spring:message code="board.name.free.about"/></small></h4>
@@ -128,7 +127,6 @@
 </ul>
  
 <jsp:include page="../include/footer.jsp"/>
-</div>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript

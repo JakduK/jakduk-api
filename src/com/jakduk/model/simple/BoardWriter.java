@@ -1,4 +1,4 @@
-package com.jakduk.model.db;
+package com.jakduk.model.simple;
 
 import javax.validation.constraints.NotNull;
 

@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-import com.jakduk.model.db.BoardWriter;
 import com.jakduk.model.db.User;
+import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.UserRepository;
 

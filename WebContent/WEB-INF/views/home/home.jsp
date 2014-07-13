@@ -81,7 +81,7 @@ function homeCtrl($scope, $http) {
 	
 	function error(data, status, headers, config) {
 		$scope.result = 0;
-		$scope.error = "로드실패"
+		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 	}
 }
 </script>
