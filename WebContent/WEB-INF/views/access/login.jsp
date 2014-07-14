@@ -99,7 +99,6 @@ angular.module("loginApp", ["ngCookies"])
 			}
 			event.preventDefault();
 		}
-		
 	};
 }]);
 </script>

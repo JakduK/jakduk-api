@@ -51,6 +51,14 @@ public class HomeController {
 		return "home/sample";
 	}
 	
+	@RequestMapping(value = "/sample02")
+	public String sample02(Model model) {
+		
+//		logger.debug("home");
+		
+		return "home/sample02";
+	}
+	
 	@RequestMapping(value = "/check/user/email")
 	public void checkEmail(Model model,
 			@RequestParam(required = true) String email) {
