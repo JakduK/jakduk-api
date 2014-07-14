@@ -495,6 +495,18 @@
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/daumeditor/js/editor_loader.js"></script>
 <script type="text/javascript">
+window.onresize = function test() {
+	if (innerWidth > 1768) {
+		Editor.getCanvas().changeMode("html");
+		document.getElementById('tx_sidebar').style.display = '';
+		document.getElementById('tx_toolbar_basic').style.display = '';
+	} else {
+		Editor.getCanvas().changeMode("text");
+		document.getElementById('tx_sidebar').style.display = 'none';
+		document.getElementById('tx_toolbar_basic').style.display = 'none';
+	}
+}
+
 var config = {
 		txHost: '', /* 런타임 시 리소스들을 로딩할 때 필요한 부분으로, 경로가 변경되면 이 부분 수정이 필요. ex) http://xxx.xxx.com */
 		txPath: '', /* 런타임 시 리소스들을 로딩할 때 필요한 부분으로, 경로가 변경되면 이 부분 수정이 필요. ex) /xxx/xxx/ */
