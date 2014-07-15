@@ -1,21 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="summernoteDemo">
+<html ng-app="summernoteDemo">
 <head>
   <title>Angular-summernote Demo</title>
 
-  <!--summernote dependencies-->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
   <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrap.css" rel="stylesheet">
-  <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
+  
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
   <!--summernote-->
   <link href="<%=request.getContextPath()%>/web-resources/summernote/css/summernote.css" rel="stylesheet">
-  <script src="<%=request.getContextPath()%>/web-resources/summernote/js/summernote.min.js"></script>
 
-  <!--angular-summernote dependencies -->
-  <script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
-  <script src="<%=request.getContextPath()%>/web-resources/summernote/js/angular-summernote.min.js"></script>
 
   <style>
     body {
@@ -38,7 +33,7 @@
   <h2>summernote options</h2>
 
   <h4>height</h4>
-  <summernote height="300"></summernote>
+  <summernote height="300" lang="en-US"></summernote>
 
   <h4>focus</h4>
   <summernote focus></summernote>
@@ -63,6 +58,15 @@
                 on-blur="blur(evt)" on-paste="paste()" on-keyup="keyup(evt)" on-keydown="keydown(evt)"
                 on-image-upload="imageUpload(files, editor, welEditable);"></summernote>
   </div>
+  <!--summernote dependencies-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
+  <script src="<%=request.getContextPath()%>/web-resources/summernote/js/summernote.min.js"></script>
+  <script src="<%=request.getContextPath()%>/web-resources/summernote/lang/summernote-ko-KR.js"></script>
+
+  <!--angular-summernote dependencies -->
+  <script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
+  <script src="<%=request.getContextPath()%>/web-resources/angular-summernote/js/angular-summernote.min.js"></script>
 
   <script>
     angular.module('summernoteDemo', ['summernote'])

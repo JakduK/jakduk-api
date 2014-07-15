@@ -38,14 +38,14 @@ public class BoardFree {
 	 * 글 제목
 	 */
 	@NotNull
-	@Size(min = 1, message="Input subject")
+	@Size(min = 1, max = 50)
 	private String subject;
 	
 	/**
 	 * 글 내용
 	 */
 	@NotNull
-	@Size(min = 1, message="Input contents")
+	@Size(min = 1)
 	private String content;
 	
 	/**
@@ -56,7 +56,7 @@ public class BoardFree {
 	/**
 	 * 분류 ID
 	 */
-	@NotNull(message = "Input category")
+	@NotNull
 	private Integer categoryId;
 	
 	/**

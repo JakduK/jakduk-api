@@ -85,7 +85,7 @@ angular.module("loginApp", ["ngCookies"])
 		if (loginForm.$valid) {
 		} else {
 			if (loginForm.j_username.$error.required) {
-				$scope.errorEmail = '<spring:message code="user.msg.required"/>'; 
+				$scope.errorEmail = '<spring:message code="common.msg.required"/>'; 
 			} else if (loginForm.j_username.$error.minlength || loginForm.j_username.$error.maxlength) {
 				$scope.errorEmail = '<spring:message code="Size.userWrite.email"/>';
 			} else if (loginForm.j_username.$error.pattern) {
@@ -93,7 +93,7 @@ angular.module("loginApp", ["ngCookies"])
 			}
 			
 			if (loginForm.j_password.$error.required) {
-				$scope.errorPassword = '<spring:message code="user.msg.required"/>'; 
+				$scope.errorPassword = '<spring:message code="common.msg.required"/>'; 
 			} else if (loginForm.j_password.$error.minlength || loginForm.j_password.$error.maxlength) {
 				$scope.errorPassword = '<spring:message code="Size.userWrite.password"/>';
 			}

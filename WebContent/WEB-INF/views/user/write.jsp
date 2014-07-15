@@ -20,7 +20,7 @@
 		<legend><spring:message code="user.register"/> </legend>
 		<div class="form-group" ng-class="{'has-success':userWrite.email.$valid, 'has-error':userWrite.email.$invalid || existEmail != 2}">
 			<label class="col-sm-2 control-label" for="email">
-				<abbr title='<spring:message code="user.msg.required"/>'>*</abbr> <spring:message code="user.email"/>
+				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.email"/>
 			</label>
 			<div class="col-sm-3">
 					<input type="email" name="email" class="form-control" size="50" placeholder="Email" 
@@ -32,7 +32,7 @@
 		</div>
 		<div class="form-group" ng-class="{'has-success':userWrite.username.$valid, 'has-error':userWrite.username.$invalid || existUsername != 2}">
 			<label class="col-sm-2 control-label" for="username">
-				<abbr title='<spring:message code="user.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
+				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
 			<div class="col-sm-3">
 					<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
@@ -44,7 +44,7 @@
 		</div>
 		<div class="form-group" ng-class="{'has-success':userWrite.password.$valid, 'has-error':userWrite.password.$invalid}">
 			<label class="col-sm-2 control-label" for="password">
-				<abbr title='<spring:message code="user.msg.required"/>'>*</abbr> <spring:message code="user.password"/>
+				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.password"/>
 			</label>
 			<div class="col-sm-3">
 				<form:password path="password" cssClass="form-control" size="50" placeholder="Password"
@@ -56,7 +56,7 @@
 		<div class="form-group" 
 		ng-class="{'has-success':userWrite.passwordConfirm.$valid, 'has-error':userWrite.passwordConfirm.$invalid || passwordConfirm.length > 0 && password != passwordConfirm}">
 			<label class="col-sm-2 control-label" for="passwordConfirm">
-				<abbr title='<spring:message code="user.msg.required"/>'>*</abbr> <spring:message code="user.password.confirm"/>
+				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.password.confirm"/>
 			</label>
 			<div class="col-sm-3">
 				<form:password path="passwordConfirm" cssClass="form-control" size="50" placeholder="Confirm password"
@@ -183,7 +183,7 @@ function writeCtrl($scope, $http) {
 	
 	function checkEmail(userWrite) {
 		if (userWrite.email.$error.required) {
-			$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.required"/>'};
+			$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
 		} else if (userWrite.email.$error.minlength || userWrite.email.$error.maxlength) {
 			$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.email"/>'};
 		} else if (userWrite.email.$error.pattern) {
@@ -193,7 +193,7 @@ function writeCtrl($scope, $http) {
 		
 	function checkUsername(userWrite) {
 		if (userWrite.username.$error.required) {
-			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.required"/>'};
+			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
 		} else if (userWrite.username.$error.minlength || userWrite.username.$error.maxlength) {
 			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
 		}
@@ -202,7 +202,7 @@ function writeCtrl($scope, $http) {
 	$scope.checkPassword = function(userWrite) {
 		if (userWrite.password.$invalid) {
 			if (userWrite.password.$error.required) {
-				$scope.passwordAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.required"/>'};
+				$scope.passwordAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
 			} else if (userWrite.password.$error.minlength || userWrite.password.$error.maxlength) {
 				$scope.passwordAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.password"/>'};
 			}
@@ -214,7 +214,7 @@ function writeCtrl($scope, $http) {
 	$scope.checkPasswordConfirm = function(userWrite) {
 		if (userWrite.passwordConfirm.$invalid || $scope.password != $scope.passwordConfirm) {
 			if (userWrite.passwordConfirm.$error.required) {
-				$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.required"/>'};
+				$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
 			} else if (userWrite.passwordConfirm.$error.minlength || userWrite.passwordConfirm.$error.maxlength) {
 				$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.password"/>'};
 			} else if ($scope.password != $scope.passwordConfirm) {
