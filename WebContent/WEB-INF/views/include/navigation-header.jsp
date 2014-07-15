@@ -27,7 +27,7 @@
           <li ng-class="{active:isActive('<c:url value="/board"/>')}">
           	<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
           </li>
-          
+          <!--  
           <li class="dropdown" ng-class="{active:isActive('<c:url value="/admin|/user"/>')}">
           	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><spring:message code="common.admin"/><b class="caret"></b></a>
           	<ul class="dropdown-menu">
@@ -35,6 +35,7 @@
           		<li><a href="<c:url value="/user"/>"><spring:message code="common.userlist"/></a></li>
           	</ul>            	
           </li>
+          -->
         </ul>
         
 	<ul class="nav navbar-nav navbar-right">
