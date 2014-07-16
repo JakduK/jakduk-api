@@ -89,7 +89,7 @@
 	<div class="col-sm-4">
 		<spring:message code="board.views"/><strong> ${post.views}</strong>
 		| <span class="text-primary"><spring:message code="board.good"/><strong> ${fn:length(post.goodUsers)}</strong></span>
-		| <span class="text-danger"><spring:message code="board.bad"/><strong> ${fn:length(post.goodUsers)}</strong></span>
+		| <span class="text-danger"><spring:message code="board.bad"/><strong> ${fn:length(post.badUsers)}</strong></span>
 	</div>
 	</div> <!-- /row -->
 	</li>

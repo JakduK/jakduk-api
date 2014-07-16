@@ -60,7 +60,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
-				<summernote config="options" ng-model="content" on-blur="onContent(boardFree)"></summernote>
+				<summernote config="options" ng-model="content"></summernote>
 				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="errorContent"/>
 				<span class="text-danger" ng-model="errorContent" ng-show="errorContent">{{errorContent}}</span>
 			</div>
@@ -93,11 +93,15 @@ angular.module('freeWriteApp', ['summernote'])
 		$scope.options = {
 			height: 150,
 			toolbar: [
-				['style', ['bold', 'italic', 'underline', 'clear']],
+				['fontname', ['fontname']],
 				['fontsize', ['fontsize']],
+				['height', ['height']],
+				['style', ['bold', 'underline', 'italic', 'strikethrough', 'clear']],
 				['color', ['color']],
-				['para', ['ul', 'ol', 'paragraph']],
-				['height', ['height']]
+				['para', ['paragraph']],
+				['dot', ['ul', 'ol']],
+				['insert', ['link', 'table', 'hr']],
+				['misc', ['codeview', 'help']]
 				]
 		};
 		$scope.onSubmit = function(boardFree, event) {
@@ -138,10 +142,6 @@ angular.module('freeWriteApp', ['summernote'])
 				$scope.errorContent = "";
 			}
 		};	
-		
-		function chkeckCategoryId(boardFree) {
-			
-		}
 	});
 </script>
 </body>
