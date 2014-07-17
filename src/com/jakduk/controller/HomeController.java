@@ -59,6 +59,16 @@ public class HomeController {
 		return "home/sample02";
 	}
 	
+	@RequestMapping(value = "/oauth01")
+	public String oauth01(Model model) {
+		
+//		logger.debug("home");
+		
+		model.addAttribute("returnUrl", "http://localhost:8080/jakduk/oauth/daum/callback");
+		
+		return "home/oauth01";
+	}
+	
 	@RequestMapping(value = "/check/user/email")
 	public void checkEmail(Model model,
 			@RequestParam(required = true) String email) {
