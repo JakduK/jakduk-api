@@ -15,8 +15,10 @@
 	<http pattern="/web-resources/**" security="none" />
 	
 	<http auto-config="true" use-expressions="true">
-		<intercept-url pattern="/login" access="permitAll" requires-channel="http"/>
-		<intercept-url pattern="/admin" access="permitAll" requires-channel="http"/>
+		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="https"/>
+		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="https"/>
+		<intercept-url pattern="/**" requires-channel="http"/>
+		<intercept-url pattern="/admin" access="permitAll" />
 		<intercept-url pattern="/logout" access="permitAll" />
 		<intercept-url pattern="/home" access="permitAll" />
 		<intercept-url pattern="/about" access="permitAll" />
