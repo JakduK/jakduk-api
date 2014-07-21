@@ -55,14 +55,16 @@
                         </fieldset>
                     </form>
 
-<p>
- <div class="control-group">
-   <div class="controls">
+<p/>
+<p class="bg-info">
      <spring:message code="user.msg.not.user"/> 
-     <a href="<c:url value="/user/write"/>"><spring:message code="user.msg.register.here"/></a>
-   </div>
- </div>
+     <a href="<c:url value="/user/write"/>"><strong><spring:message code="user.msg.register.here"/></strong></a>
 </p>
+<p class="text-info">
+<a href="https://apis.daum.net/oauth2/authorize?client_id=1234567890&redirect_uri=${domainPath}<c:url value="/daum/callback"/>&response_type=code">login as DAUM</a>
+</p>
+
+<!-- Usage as a class -->
                 </div>
             </div>
         </div>
