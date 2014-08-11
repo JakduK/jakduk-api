@@ -1,4 +1,4 @@
-package com.jakduk.authority;
+package com.jakduk.authentication.common;
 
 import java.io.IOException;
 
@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
+import com.jakduk.authentication.jakduk.AuthUser;
 import com.jakduk.common.CommonConst;
 
 /**

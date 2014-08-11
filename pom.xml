@@ -4,7 +4,7 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk</artifactId>
-  <version>0.0.6-SNAPSHOT</version>
+  <version>0.0.7-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>jakduk</name>
@@ -161,6 +161,13 @@
 			<artifactId>spring-security-taglibs</artifactId>
 			<version>${spring.security.core.version}</version>
 		</dependency>
+		
+<dependency>
+	<groupId>org.springframework.security.oauth</groupId>
+	<artifactId>spring-security-oauth2</artifactId>
+	<version>2.0.2.RELEASE</version>
+</dependency>
+
 				
 		<dependency>
 			<groupId>org.hibernate</groupId>

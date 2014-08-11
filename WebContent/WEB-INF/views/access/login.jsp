@@ -61,7 +61,8 @@
      <a href="<c:url value="/user/write"/>"><strong><spring:message code="user.msg.register.here"/></strong></a>
 </p>
 <p class="text-info">
-<a href="https://apis.daum.net/oauth2/authorize?client_id=1234567890&redirect_uri=${domainPath}<c:url value="/daum/callback"/>&response_type=code">login as DAUM</a>
+<a href="https://apis.daum.net/oauth2/authorize?client_id=1234567890&redirect_uri=${domainPath}<c:url value="/oauth/daum/callback"/>&response_type=code">login as DAUM</a>
+<a href="<c:url value="/facebook_login"/>">login as facebook</a>
 </p>
 
 <!-- Usage as a class -->

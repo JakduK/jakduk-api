@@ -1,4 +1,4 @@
-package com.jakduk.service;
+package com.jakduk.authentication.jakduk;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.jakduk.authority.AuthUser;
 import com.jakduk.model.db.User;
 import com.jakduk.repository.UserRepository;
 
@@ -26,8 +25,7 @@ public class AuthUserDetailsService implements UserDetailsService {
 	private Logger logger = Logger.getLogger(this.getClass());
 
 	@Override
-	public UserDetails loadUserByUsername(String email)
-			throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		try {
 			AuthUser authUser;
 			

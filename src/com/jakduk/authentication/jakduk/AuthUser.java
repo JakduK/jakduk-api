@@ -1,4 +1,4 @@
-package com.jakduk.authority;
+package com.jakduk.authentication.jakduk;
 
 import java.io.Serializable;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package com.jakduk.authority;
+package com.jakduk.authentication.common;
 
 import java.io.IOException;
 

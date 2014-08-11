@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.jakduk.authority.AuthUser;
+import com.jakduk.authentication.jakduk.AuthUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;

@@ -26,7 +26,7 @@ public class AccessController {
 		String domainPath;
 		try {
 			url = new URL(request.getRequestURL().toString());
-			domainPath = String.format("%s://%s", url.getProtocol(), url.getAuthority());
+			domainPath = String.format("http://%s", url.getAuthority());
 			
 			model.addAttribute("domainPath", domainPath);
 		} catch (MalformedURLException e) {

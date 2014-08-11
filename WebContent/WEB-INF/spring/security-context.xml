@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/security"
-    xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
-    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+    xmlns:beans="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-           http://www.springframework.org/schema/jdbc
-           http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
            http://www.springframework.org/schema/security
            http://www.springframework.org/schema/security/spring-security-3.2.xsd
-           http://www.springframework.org/schema/context 
-           http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util-3.2.xsd
+           http://www.springframework.org/schema/security/oauth2 
+           http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd">
        
+  <beans:bean class="com.jakduk.common.FilterModifiy"/>
 	<http pattern="/web-resources/**" security="none" />
 	
 	<http auto-config="true" use-expressions="true">
+  	<custom-filter ref="facebookAuthenticationFilter" before="FILTER_SECURITY_INTERCEPTOR" />
+  	<!-- OAuth 2.0 로직을 적용 시키기 위한 Filter 설정 -->
+  	<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
+
 		<!-- if localhost, change https to http from requires-channel -->
 		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="http"/>
 		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="http"/>
@@ -42,43 +48,56 @@
 		<logout invalidate-session="true" logout-url="/logout"/>					
 	</http>
 	
-	<beans:bean id="loginSuccessHandler" class="com.jakduk.authority.LoginSuccessHandler"/>
-	<beans:bean id="loginFailureHandler" class="com.jakduk.authority.LoginFailureHandler"/>
+	<beans:bean id="loginSuccessHandler" class="com.jakduk.authentication.common.LoginSuccessHandler"/>
+	<beans:bean id="loginFailureHandler" class="com.jakduk.authentication.common.LoginFailureHandler"/>
 	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
+	<beans:bean id="authUserDetailsService" class="com.jakduk.authentication.jakduk.AuthUserDetailsService"/>
 	
-	<authentication-manager>
+	<authentication-manager alias="authenticationManager">
 		<authentication-provider user-service-ref="authUserDetailsService">
 			<password-encoder ref="encoder" />
 		</authentication-provider>
+		<authentication-provider ref="facebookAuthenticationProvider"/>
 	</authentication-manager>
 	
-	<!--  
-	<authentication-manager>
-		<authentication-provider>
-			<user-service>
-				<user name="guest" password="guest" authorities="ROLE_USER"/>
-			</user-service>
-		</authentication-provider>
-	</authentication-manager>
--->
+    <!-- Facebook OAuth 2.0 정보 -->                   	
+	<util:properties id="facebookProp">
+		<beans:prop key="facebook.user-authorization-uri">https://www.facebook.com/dialog/oauth</beans:prop>
+		<beans:prop key="facebook.access-token-uri">https://graph.facebook.com/oauth/access_token</beans:prop>
+		<beans:prop key="facebook.client-id">259029247575988</beans:prop>
+		<beans:prop key="facebook.client-secret">21ddd987ade4a61411e7a3863e0ebe8f</beans:prop>
+		<beans:prop key="facebook.profile-uri">https://graph.facebook.com/me</beans:prop>
+	</util:properties>
+	
+	<!-- Facebook OAuth 2.0 Client Setup -->
+	<oauth:resource id="facebook" type="authorization_code"
+		client-id="#{facebookProp['facebook.client-id']}" 
+		client-secret="#{facebookProp['facebook.client-secret']}"
+		access-token-uri="#{facebookProp['facebook.access-token-uri']}"
+		user-authorization-uri="#{facebookProp['facebook.user-authorization-uri']}"
+		authentication-scheme="query" 
+		token-name="oauth_token" 
+		pre-established-redirect-uri="/"
+		client-authentication-scheme="form" />
 
-<!--  
-	<http pattern="/web-resources/**" security="none" />
-	<http auto-config="true" use-expressions="true">
-		<intercept-url pattern="/login" access="permitAll" />
-		<intercept-url pattern="/logout" access="permitAll" />
-		<intercept-url pattern="/users/add" access="permitAll" />
-		<intercept-url pattern="/denied" access="hasRole('ROLE_USER')" />
-		<intercept-url pattern="/**" access="isAuthenticated()" />
+	<!-- Facebook 서버에 접속하기 위한 RestTemplate -->	
+	<oauth:rest-template resource="facebook" id="facebookRestTemplate" />
+	
+	<!-- OAuth 2.0 Client를 연동 시키기 위한 Filter 생성 -->
+	<oauth:client id="oauth2ClientFilter" />
+	
+	<!-- Facebook 에서 데이터를 가져 오기 위한 Service -->
+	<beans:bean id="facebookService" class="com.jakduk.authentication.facebook.FacebookService">
+		<beans:property name="facebookRestTemplate" ref="facebookRestTemplate" />
+		<beans:property name="profileUri" value="#{facebookProp['facebook.profile-uri']}" />
+	</beans:bean>
+	
+	<beans:bean id="facebookAuthenticationFilter" class="com.jakduk.authentication.facebook.FacebookAuthenticationFilter">
+		<beans:property name="authenticationManager" ref="authenticationManager"/>
+	</beans:bean>
 
-		<form-login login-page="/login" authentication-failure-url="/login/failure"
-			default-target-url="/" />
-
-		<access-denied-handler error-page="/denied" />
-
-		<logout invalidate-session="true" logout-success-url="/logout/success"
-			logout-url="/logout" />
-	</http>
-	-->
+	<beans:bean id="facebookAuthenticationProvider" class="com.jakduk.authentication.facebook.FacebookAuthenticationProvider">
+		<beans:property name="facebookService" ref="facebookService"/>
+	</beans:bean> 	
 
 </beans:beans>

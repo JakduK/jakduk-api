@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns="http://java.sun.com/xml/ns/javaee" 
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
 	<display-name>JakduK-Sample</display-name>
 	<description>JakduK Sample Web Application</description>
-
+	
 <filter>
 		<filter-name>httpsCookieFilter</filter-name>
-		<filter-class>com.jakduk.authority.HttpsCookieFilter</filter-class>
+		<filter-class>com.jakduk.authentication.common.HttpsCookieFilter</filter-class>
 	</filter>
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
@@ -23,6 +25,10 @@
 	
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
 	
 	<context-param>

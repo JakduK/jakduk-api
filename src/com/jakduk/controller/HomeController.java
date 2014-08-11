@@ -59,6 +59,12 @@ public class HomeController {
 		return "home/sample02";
 	}
 	
+	@RequestMapping(value = "/unipaper")
+	public String unipaper(Model model) {
+		
+		return "home/unipaper";
+	}
+	
 	@RequestMapping(value = "/oauth01")
 	public String oauth01(Model model) {
 		

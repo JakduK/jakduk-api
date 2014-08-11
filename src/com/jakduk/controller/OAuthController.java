@@ -52,6 +52,8 @@ public class OAuthController {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> accessToken = (Map<String, Object>) restTemplate.postForObject(url, params, Map.class);
 		
+		logger.debug("accessToken=" + accessToken);
+		
 		String atk = (String) accessToken.get("access_token");
 		Integer exp = (Integer) accessToken.get("expires_in");
 		
