@@ -21,6 +21,8 @@
 	<!-- Mongo DB driver & Spring Data MongoDB -->
 	<spring.data.mongodb.version>1.4.2.RELEASE</spring.data.mongodb.version>
 	<mongodb.driver.version>2.12.0</mongodb.driver.version>
+	
+	<org.slf4j-version>1.7.2</org.slf4j-version>
   </properties>
 	  
  	<repositories>
@@ -135,8 +137,24 @@
 			<version>1.4.2</version>
 		</dependency>
 		
-		
 		<!-- Logger -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${org.slf4j-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>		
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>

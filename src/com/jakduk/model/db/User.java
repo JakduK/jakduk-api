@@ -7,8 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,16 +17,10 @@ public class User {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	@NotNull
-	@Size(min = 6, max=20)
 	private String email;
 	
-	@NotNull
-	@Size(min = 2, max=20)
 	private String username;
 	
-	@NotNull
-	@Size(min = 4, max=20)
 	private String password;
 	
 	private List<String> rules;
@@ -38,6 +30,8 @@ public class User {
 	
 	private String about;
 	
+	private String oauthId;
+
 	public String getId() {
 		return id;
 	}
@@ -45,7 +39,7 @@ public class User {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -62,14 +56,6 @@ public class User {
 		this.username = username;
 	}
 
-	public Date getJoined() {
-		return joined;
-	}
-
-	public void setJoined(Date joined) {
-		this.joined = joined;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -77,13 +63,21 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	public List<String> getRules() {
 		return rules;
 	}
 
 	public void setRules(List<String> rules) {
 		this.rules = rules;
+	}
+
+	public Date getJoined() {
+		return joined;
+	}
+
+	public void setJoined(Date joined) {
+		this.joined = joined;
 	}
 
 	public String getAbout() {
@@ -94,11 +88,19 @@ public class User {
 		this.about = about;
 	}
 
+	public String getOauthId() {
+		return oauthId;
+	}
+
+	public void setOauthId(String oauthId) {
+		this.oauthId = oauthId;
+	}
+
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", email=" + email + ", username=" + username
 				+ ", password=" + password + ", rules=" + rules + ", joined="
-				+ joined + ", about=" + about + "]";
+				+ joined + ", about=" + about + ", oauthId=" + oauthId + "]";
 	}
 	
 }
