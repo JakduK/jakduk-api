@@ -1,4 +1,4 @@
-package com.jakduk.model.web;
+package com.jakduk.model.simple;
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
