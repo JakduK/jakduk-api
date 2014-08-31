@@ -43,4 +43,7 @@ public class CommonConst {
 	public final static String COOKIE_EMAIL = "email";
 	public final static String COOKIE_REMEMBER = "remember";
 	
+	public final static Integer OAUTH_TYPE_FACEBOOK = 10;
+	public final static Integer OAUTH_TYPE_DAUM = 11;
+	
 }

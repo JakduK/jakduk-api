@@ -13,6 +13,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.simple.OAuthUser;
+import com.jakduk.model.simple.OAuthUserWrite;
+import com.jakduk.repository.UserRepository;
+import com.jakduk.service.UserService;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -26,6 +32,12 @@ public class FacebookUserDetailService implements UserDetailsService {
 
 	@Autowired
 	private FacebookService facebookService;
+	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private UserService userService;
 
 	@Override
 	public UserDetails loadUserByUsername(String username)
@@ -33,6 +45,21 @@ public class FacebookUserDetailService implements UserDetailsService {
 		// TODO Auto-generated method stub
 		
 		FacebookUser fUser = facebookService.findUser();
+		
+		OAuthUser oauthUser = new OAuthUser();
+		oauthUser.setOauthId(fUser.getId());
+		oauthUser.setType(CommonConst.OAUTH_TYPE_FACEBOOK);
+		
+		OAuthUserWrite oauthUserWrite = userRepository.findByOauthUser(oauthUser);
+		
+		if (oauthUserWrite == null) {
+			oauthUserWrite = new OAuthUserWrite();
+			oauthUserWrite.setOauthUser(oauthUser);
+			if (logger.isDebugEnabled()) {
+				logger.debug("new oauthuser of facebook=" + oauthUserWrite);
+			}
+			userService.oauthUserWrite(oauthUserWrite);
+		}
 		
 		logger.debug("phjang02=" + fUser);
 		

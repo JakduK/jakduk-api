@@ -9,11 +9,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
+import com.jakduk.model.simple.OAuthUserWrite;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.UserRepository;
 
@@ -72,6 +72,12 @@ public class UserService {
 		user.setAbout(userWrite.getAbout());
 		
 		this.create(user);
+	}
+	
+	public void oauthUserWrite(OAuthUserWrite oauthUserWrite) {
+		User user = new User();
+		user.setOauthUser(oauthUserWrite.getOauthUser());
+		userRepository.save(user);
 	}
 	
 	public Boolean existEmail(String email) {

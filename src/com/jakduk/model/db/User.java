@@ -11,6 +11,8 @@ import javax.persistence.TemporalType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.simple.OAuthUser;
+
 @Document
 public class User {
 
@@ -30,7 +32,7 @@ public class User {
 	
 	private String about;
 	
-	private String oauthId;
+	private OAuthUser oauthUser;
 
 	public String getId() {
 		return id;
@@ -87,20 +89,21 @@ public class User {
 	public void setAbout(String about) {
 		this.about = about;
 	}
-
-	public String getOauthId() {
-		return oauthId;
+	
+	public OAuthUser getOauthUser() {
+		return oauthUser;
 	}
 
-	public void setOauthId(String oauthId) {
-		this.oauthId = oauthId;
+	public void setOauthUser(OAuthUser oauthUser) {
+		this.oauthUser = oauthUser;
 	}
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", email=" + email + ", username=" + username
 				+ ", password=" + password + ", rules=" + rules + ", joined="
-				+ joined + ", about=" + about + ", oauthId=" + oauthId + "]";
+				+ joined + ", about=" + about + ", oauthUser=" + oauthUser
+				+ "]";
 	}
 	
 }

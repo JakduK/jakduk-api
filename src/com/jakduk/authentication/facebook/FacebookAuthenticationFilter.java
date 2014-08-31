@@ -2,11 +2,13 @@ package com.jakduk.authentication.facebook;
 
 import java.io.IOException;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,16 +34,28 @@ public class FacebookAuthenticationFilter extends AbstractAuthenticationProcessi
 	}
 
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-		logger.debug("phjang1");
-		FacebookAuthenticationToken authRequest = new FacebookAuthenticationToken("facebook", null);
+		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("facebook", null);
 		SecurityContextHolder.getContext().setAuthentication(authRequest);
 		return this.getAuthenticationManager().authenticate(authRequest);
 	}
+	
+	@Override
+	protected void successfulAuthentication(HttpServletRequest request,
+			HttpServletResponse response, FilterChain chain,
+			Authentication authResult) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		
+		logger.debug("phjang3" + "/about");
+		
+		response.sendRedirect(request.getContextPath() + "/about");
+		
+		super.successfulAuthentication(request, response, chain, authResult);
+	}
+
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request,
 			HttpServletResponse response, AuthenticationException failed)
 					throws IOException, ServletException {
-		logger.debug("phjang2 unsuccess");
 		if (failed instanceof AccessTokenRequiredException
 				|| failed instanceof AccessTokenRequiredException) {
 			// Need to force a redirect via the OAuth client filter, so rethrow

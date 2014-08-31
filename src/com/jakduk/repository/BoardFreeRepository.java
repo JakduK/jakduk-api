@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.simple.BoardFreeOnList;
 
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String> {
 

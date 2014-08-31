@@ -3,6 +3,7 @@ package com.jakduk.authentication.facebook;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.Assert;
@@ -22,7 +23,7 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		Assert.isInstanceOf(FacebookAuthenticationToken.class, authentication, "Only FacebookAuthenticationProvider is supported");
+		Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication, "Only FacebookAuthenticationProvider is supported");
 		
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 		
@@ -31,13 +32,16 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 		logger.debug("phjang=" + authentication);
 //		logger.debug("phjang=" + facebookUser);
 		FacebookUserDetails fUser = (FacebookUserDetails) facebookUserDetailService.loadUserByUsername(username);
-		FacebookAuthenticationToken token = new FacebookAuthenticationToken(fUser, authentication.getCredentials(), fUser.getAuthorities());
+		UsernamePasswordAuthenticationToken token = 
+				new UsernamePasswordAuthenticationToken(fUser, authentication.getCredentials(), fUser.getAuthorities());
+		
+//		FacebookAuthenticationToken token = new FacebookAuthenticationToken(fUser, authentication.getCredentials(), fUser.getAuthorities());
 		token.setDetails(fUser);
 		return token;
 	}
 
 	@Override
     public boolean supports(Class<?> authentication) {
-        return (FacebookAuthenticationToken.class.isAssignableFrom(authentication));
+        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
 }

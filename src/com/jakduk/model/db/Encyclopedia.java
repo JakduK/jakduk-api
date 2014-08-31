@@ -20,6 +20,9 @@ public class Encyclopedia {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
+	/**
+	 *  종류. 1이면 최고의 선수, 2이면 추천 책
+	 */
 	private Integer kind;
 	
 	private Integer language;

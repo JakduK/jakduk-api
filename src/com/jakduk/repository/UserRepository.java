@@ -4,6 +4,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import com.jakduk.model.db.User;
+import com.jakduk.model.simple.OAuthUser;
+import com.jakduk.model.simple.OAuthUserWrite;
 
 public interface UserRepository extends MongoRepository<User, String> {
 	
@@ -12,6 +14,8 @@ public interface UserRepository extends MongoRepository<User, String> {
 	User findByEmail(String email);
 	User findOneByEmail(String email);
 	User findById(String id);
+	
+	OAuthUserWrite findByOauthUser(OAuthUser oauthUser);
 	
 	@Query(value="{ 'id' : ?0 }", fields="{ 'username' : 1}")
 	User writerFindById(String id);
