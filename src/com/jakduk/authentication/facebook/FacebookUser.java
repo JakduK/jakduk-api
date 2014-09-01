@@ -13,16 +13,20 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 @JsonDeserialize(using = FacebookUserDeserializer.class)
 public class FacebookUser implements Serializable {
-	
-    private static final long serialVersionUID = 1L;
-    private String id;
-    private String name;
-    private String username;
-    private String email;
-    private String gender;
-    private String birthday;
-    private String link;
-    private String locale;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6305019112068022215L;
+	private String id;
+	private String name;
+	private String username;
+	private String email;
+	private String gender;
+	private String birthday;
+	private String link;
+	private String locale;
+
 	public String getId() {
 		return id;
 	}
@@ -71,6 +75,7 @@ public class FacebookUser implements Serializable {
 	public void setLocale(String locale) {
 		this.locale = locale;
 	}
+	
 	@Override
 	public String toString() {
 		return "FacebookUser [id=" + id + ", name=" + name + ", username="

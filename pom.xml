@@ -22,8 +22,8 @@
 		<org.slf4j-version>1.7.2</org.slf4j-version>
 			
 		<!-- Mongo DB driver & Spring Data MongoDB -->
-		<spring.data.mongodb.version>1.4.2.RELEASE</spring.data.mongodb.version>
-		<mongodb.driver.version>2.12.0</mongodb.driver.version>
+		<spring.data.mongodb.version>1.5.4.RELEASE</spring.data.mongodb.version>
+		<mongodb.driver.version>2.12.3</mongodb.driver.version>
   </properties>
 	  
  	<repositories>

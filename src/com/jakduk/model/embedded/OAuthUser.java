@@ -1,4 +1,4 @@
-package com.jakduk.model.simple;
+package com.jakduk.model.embedded;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 

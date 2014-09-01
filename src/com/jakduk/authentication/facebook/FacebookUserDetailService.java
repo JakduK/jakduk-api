@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.simple.OAuthUser;
+import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.OAuthUserWrite;
 import com.jakduk.repository.UserRepository;
 import com.jakduk.service.UserService;
@@ -44,16 +44,15 @@ public class FacebookUserDetailService implements UserDetailsService {
 			throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
 		
-		FacebookUser fUser = facebookService.findUser();
+		FacebookUser facebookUser = facebookService.findUser();
 		
-		OAuthUser oauthUser = new OAuthUser();
-		oauthUser.setOauthId(fUser.getId());
-		oauthUser.setType(CommonConst.OAUTH_TYPE_FACEBOOK);
-		
-		OAuthUserWrite oauthUserWrite = userRepository.findByOauthUser(oauthUser);
+		OAuthUserWrite oauthUserWrite = userRepository.findByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, facebookUser.getId());
 		
 		if (oauthUserWrite == null) {
 			oauthUserWrite = new OAuthUserWrite();
+			OAuthUser oauthUser = new OAuthUser();
+			oauthUser.setOauthId(facebookUser.getId());
+			oauthUser.setType(CommonConst.OAUTH_TYPE_FACEBOOK);
 			oauthUserWrite.setOauthUser(oauthUser);
 			if (logger.isDebugEnabled()) {
 				logger.debug("new oauthuser of facebook=" + oauthUserWrite);
@@ -61,12 +60,12 @@ public class FacebookUserDetailService implements UserDetailsService {
 			userService.oauthUserWrite(oauthUserWrite);
 		}
 		
-		logger.debug("phjang02=" + fUser);
+		logger.debug("phjang02=" + facebookUser);
 		
-		FacebookUserDetails facebookUser02 = new FacebookUserDetails(fUser.getId(), fUser.getName(), fUser.getUsername()
-				, "", true, true, true, true, getAuthorities(2));
+		FacebookUserDetails facebookUserDetails = new FacebookUserDetails(facebookUser.getId(), facebookUser.getName(), facebookUser.getUsername()
+				, facebookUser.getEmail(), oauthUserWrite.getOauthUser().getAddInfoStatus(), true, true, true, true, getAuthorities(2));
 		
-		return facebookUser02;
+		return facebookUserDetails;
 	}
 	
 	public Collection<? extends GrantedAuthority> getAuthorities(Integer role) {

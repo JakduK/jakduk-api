@@ -11,7 +11,7 @@ import javax.persistence.TemporalType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.jakduk.model.simple.OAuthUser;
+import com.jakduk.model.embedded.OAuthUser;
 
 @Document
 public class User {

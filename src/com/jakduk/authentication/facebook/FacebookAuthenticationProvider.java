@@ -15,33 +15,32 @@ import org.springframework.util.Assert;
  * @desc     :
  */
 public class FacebookAuthenticationProvider implements AuthenticationProvider {
+
+	@Autowired
+	private FacebookUserDetailService facebookUserDetailService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
-    
-    @Autowired
-    private FacebookUserDetailService facebookUserDetailService;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication, "Only FacebookAuthenticationProvider is supported");
-		
+
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
-		
-//		FacebookUser facebookUser = facebookService.findUser();
-		
+
 		logger.debug("phjang=" + authentication);
-//		logger.debug("phjang=" + facebookUser);
-		FacebookUserDetails fUser = (FacebookUserDetails) facebookUserDetailService.loadUserByUsername(username);
+		//		logger.debug("phjang=" + facebookUser);
+		FacebookUserDetails facebookUserDetails = (FacebookUserDetails) facebookUserDetailService.loadUserByUsername(username);
 		UsernamePasswordAuthenticationToken token = 
-				new UsernamePasswordAuthenticationToken(fUser, authentication.getCredentials(), fUser.getAuthorities());
-		
-//		FacebookAuthenticationToken token = new FacebookAuthenticationToken(fUser, authentication.getCredentials(), fUser.getAuthorities());
-		token.setDetails(fUser);
+				new UsernamePasswordAuthenticationToken(facebookUserDetails, authentication.getCredentials(), facebookUserDetails.getAuthorities());
+
+		//token.setDetails(facebookUserDetails);
 		return token;
 	}
 
 	@Override
-    public boolean supports(Class<?> authentication) {
-        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
-    }
+	public boolean supports(Class<?> authentication) {
+		return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+	}
 }
+
+

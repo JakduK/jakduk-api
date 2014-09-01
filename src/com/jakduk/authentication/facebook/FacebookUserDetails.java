@@ -30,12 +30,12 @@ public class FacebookUserDetails implements UserDetails {
 	private String id;
 	private String name;
 	private String username;
-	private String password;
 	private String email;
 	private String gender;
 	private String birthday;
 	private String link;
 	private String locale;
+	private Integer addInfoStatus;
 	
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -103,13 +103,14 @@ public class FacebookUserDetails implements UserDetails {
 		return sortedAuthorities;
 	}
 	
-	public FacebookUserDetails(String id, String name, String username, String password, boolean enabled, boolean accountNonExpired,
+	public FacebookUserDetails(String id, String name, String username, String email, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 		
 		this.id = id;
 		this.name = name;
 		this.username = username;
-		this.password = password;
+		this.email = email;
+		this.addInfoStatus = addInfoStatus;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
@@ -150,7 +151,7 @@ public class FacebookUserDetails implements UserDetails {
 	@Override
 	public String getPassword() {
 		// TODO Auto-generated method stub
-		return password;
+		return null;
 	}
 
 	@Override
@@ -161,12 +162,12 @@ public class FacebookUserDetails implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "FacebookUser02 [id=" + id + ", name=" + name + ", username="
-				+ username + ", password=" + password + ", email=" + email
-				+ ", gender=" + gender + ", birthday=" + birthday + ", link="
-				+ link + ", locale=" + locale + ", authorities=" + authorities
-				+ ", accountNonExpired=" + accountNonExpired
-				+ ", accountNonLocked=" + accountNonLocked
+		return "FacebookUserDetails [id=" + id + ", name=" + name
+				+ ", username=" + username + ", email=" + email + ", gender="
+				+ gender + ", birthday=" + birthday + ", link=" + link
+				+ ", locale=" + locale + ", addInfoStatus=" + addInfoStatus
+				+ ", authorities=" + authorities + ", accountNonExpired="
+				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked
 				+ ", credentialsNonExpired=" + credentialsNonExpired
 				+ ", enabled=" + enabled + "]";
 	}
