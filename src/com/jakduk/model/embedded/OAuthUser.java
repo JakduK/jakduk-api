@@ -2,6 +2,8 @@ package com.jakduk.model.embedded;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.common.CommonConst;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -16,7 +18,7 @@ public class OAuthUser {
 	
 	private String oauthId;
 	
-	private Integer addInfoStatus = 0;
+	private Integer addInfoStatus = CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_UNUSE;
 
 	public Integer getType() {
 		return type;

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
+import com.jakduk.model.web.OAuthUserWrite;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -72,5 +74,10 @@ public class OAuthController {
 		logger.debug("model=" + model);
 		
 		return "home/oauth03";
+	}
+	
+	@RequestMapping(value = "/write")
+	public void write(Model model) {
+		model.addAttribute("userWrite", new OAuthUserWrite());
 	}
 }

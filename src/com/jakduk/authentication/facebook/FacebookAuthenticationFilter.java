@@ -15,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.http.AccessTokenRequiredException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
+import com.jakduk.common.CommonConst;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -45,9 +47,11 @@ public class FacebookAuthenticationFilter extends AbstractAuthenticationProcessi
 			Authentication authResult) throws IOException, ServletException {
 		// TODO Auto-generated method stub
 		
-		logger.debug("phjang3" + "/about");
+		Integer addInfoStatus = ((FacebookUserDetails)authResult.getPrincipal()).getAddInfoStatus();
 		
-		response.sendRedirect(request.getContextPath() + "/about");
+		if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
+			response.sendRedirect(request.getContextPath() + "/oauth/write");
+		}
 		
 		super.successfulAuthentication(request, response, chain, authResult);
 	}

@@ -71,6 +71,10 @@ public class FacebookUserDetails implements UserDetails {
 		return locale;
 	}
 
+	public Integer getAddInfoStatus() {
+		return addInfoStatus;
+	}
+
 	private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
 		private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.embedded.OAuthUser;
-import com.jakduk.model.simple.OAuthUserWrite;
+import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.repository.UserRepository;
 import com.jakduk.service.UserService;
 
@@ -46,24 +46,24 @@ public class FacebookUserDetailService implements UserDetailsService {
 		
 		FacebookUser facebookUser = facebookService.findUser();
 		
-		OAuthUserWrite oauthUserWrite = userRepository.findByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, facebookUser.getId());
+		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, facebookUser.getId());
 		
-		if (oauthUserWrite == null) {
-			oauthUserWrite = new OAuthUserWrite();
+		if (oauthUserOnLogin == null) {
+			oauthUserOnLogin = new OAuthUserOnLogin();
 			OAuthUser oauthUser = new OAuthUser();
 			oauthUser.setOauthId(facebookUser.getId());
 			oauthUser.setType(CommonConst.OAUTH_TYPE_FACEBOOK);
-			oauthUserWrite.setOauthUser(oauthUser);
+			oauthUser.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK);
+			oauthUserOnLogin.setOauthUser(oauthUser);
+			
 			if (logger.isDebugEnabled()) {
-				logger.debug("new oauthuser of facebook=" + oauthUserWrite);
+				logger.debug("new oauthuser of facebook=" + oauthUserOnLogin);
 			}
-			userService.oauthUserWrite(oauthUserWrite);
+			userService.oauthUserWrite(oauthUserOnLogin);
 		}
 		
-		logger.debug("phjang02=" + facebookUser);
-		
 		FacebookUserDetails facebookUserDetails = new FacebookUserDetails(facebookUser.getId(), facebookUser.getName(), facebookUser.getUsername()
-				, facebookUser.getEmail(), oauthUserWrite.getOauthUser().getAddInfoStatus(), true, true, true, true, getAuthorities(2));
+				, facebookUser.getEmail(), oauthUserOnLogin.getOauthUser().getAddInfoStatus(), true, true, true, true, getAuthorities(2));
 		
 		return facebookUserDetails;
 	}

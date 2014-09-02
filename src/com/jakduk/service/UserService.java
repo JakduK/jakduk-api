@@ -13,7 +13,7 @@ import org.springframework.validation.BindingResult;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
-import com.jakduk.model.simple.OAuthUserWrite;
+import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.UserRepository;
 
@@ -74,9 +74,9 @@ public class UserService {
 		this.create(user);
 	}
 	
-	public void oauthUserWrite(OAuthUserWrite oauthUserWrite) {
+	public void oauthUserWrite(OAuthUserOnLogin oauthUserOnLogin) {
 		User user = new User();
-		user.setOauthUser(oauthUserWrite.getOauthUser());
+		user.setOauthUser(oauthUserOnLogin.getOauthUser());
 		userRepository.save(user);
 	}
 	

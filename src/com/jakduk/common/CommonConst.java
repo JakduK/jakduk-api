@@ -40,10 +40,21 @@ public class CommonConst {
 	public final static Integer LANGUAGE_EN = 10;
 	public final static Integer LANGUAGE_KO = 11;
 	
+	/**
+	 * 사용자 쿠키
+	 */
 	public final static String COOKIE_EMAIL = "email";
 	public final static String COOKIE_REMEMBER = "remember";
 	
+	/**
+	 * OAuth 종류
+	 */
 	public final static Integer OAUTH_TYPE_FACEBOOK = 10;
 	public final static Integer OAUTH_TYPE_DAUM = 11;
+	
+	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_NONE = 10;
+	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_UNUSE = 11;
+	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_BLANK = 12;
+	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_OK = 13;
 	
 }

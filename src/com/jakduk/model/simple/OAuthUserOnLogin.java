@@ -13,7 +13,7 @@ import com.jakduk.model.embedded.OAuthUser;
  */
 
 @Document(collection = "user")
-public class OAuthUserWrite {
+public class OAuthUserOnLogin {
 	
 	@Id
 	private String id;
