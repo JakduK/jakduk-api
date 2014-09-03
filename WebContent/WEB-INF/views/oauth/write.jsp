@@ -3,14 +3,49 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html ng-app>
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 <body>
 <div class="container">
 	<jsp:include page="../include/navigation-header.jsp"/>
+	<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
+	<div class="container" ng-controller="writeCtrl">
+	<form:form commandName="userWrite" action="${contextPath}/oauth/write" method="POST" cssClass="form-horizontal">
+		<legend><spring:message code="oauth.register"/> </legend>
+		
+		<div class="form-group" ng-class="{'has-success':userWrite.username.$valid, 'has-error':userWrite.username.$invalid || existUsername != 2}">
+			<label class="col-sm-2 control-label" for="username">
+				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
+			</label>
+			<sec:authorize access="isAuthenticated()">
+			<sec:authentication property="principal.username" var="userName"/>
+			<div class="col-sm-3">
+				<input type="text" class="form-control" size="50" value="${userName}" disabled="disabled">
+			</div>
+			</sec:authorize>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-2 control-label" for="supportFC">
+				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.support.football.club"/>
+			</label>
+			<div class="col-sm-3">
+				<form:input path="supportFC" cssClass="form-control" size="50" placeholder="Support football club"/>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label" for="about"> <spring:message code="user.comment"/></label>
+			<div class="col-sm-4">
+				<form:textarea path="about" cssClass="form-control" cols="40" rows="5" placeholder="About"/>
+			</div>
+		</div>
+	</form:form>
+	</div>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript
