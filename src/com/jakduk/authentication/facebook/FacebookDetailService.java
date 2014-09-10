@@ -27,31 +27,40 @@ import com.jakduk.service.UserService;
  */
 
 @Service
-public class FacebookUserDetailService implements UserDetailsService {
-	private Logger logger = Logger.getLogger(this.getClass());
+public class FacebookDetailService implements UserDetailsService {
 
-	@Autowired
-	private FacebookService facebookService;
-	
 	@Autowired
 	private UserRepository userRepository;
 	
 	@Autowired
 	private UserService userService;
+	
+	private String username;
+	
+	private Logger logger = Logger.getLogger(this.getClass());
+	
+	public String getUsername() {
+		return username;
+	}
 
+	public UserDetails loadUser(String oauthId, String username) {
+		this.username = username;
+		return loadUserByUsername(oauthId);
+	}
+	
 	@Override
-	public UserDetails loadUserByUsername(String username)
+	public UserDetails loadUserByUsername(String oauthId)
 			throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
 		
-		FacebookUser facebookUser = facebookService.findUser();
+//		FacebookUser facebookUser = facebookService.findUser();
 		
-		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, facebookUser.getId());
+		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, oauthId);
 		
 		if (oauthUserOnLogin == null) {
 			oauthUserOnLogin = new OAuthUserOnLogin();
 			OAuthUser oauthUser = new OAuthUser();
-			oauthUser.setOauthId(facebookUser.getId());
+			oauthUser.setOauthId(oauthId);
 			oauthUser.setType(CommonConst.OAUTH_TYPE_FACEBOOK);
 			oauthUser.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK);
 			oauthUserOnLogin.setOauthUser(oauthUser);
@@ -62,8 +71,8 @@ public class FacebookUserDetailService implements UserDetailsService {
 			userService.oauthUserWrite(oauthUserOnLogin);
 		}
 		
-		FacebookUserDetails facebookUserDetails = new FacebookUserDetails(facebookUser.getId(), facebookUser.getName(), facebookUser.getUsername()
-				, facebookUser.getEmail(), oauthUserOnLogin.getOauthUser().getAddInfoStatus(), true, true, true, true, getAuthorities(2));
+		FacebookDetails facebookUserDetails = new FacebookDetails(oauthId, this.username, oauthUserOnLogin.getOauthUser().getAddInfoStatus()
+				, true, true, true, true, getAuthorities(2));
 		
 		return facebookUserDetails;
 	}

@@ -36,6 +36,7 @@ public class AuthUserDetailsService implements UserDetailsService {
 			boolean credentialsNonExpired = true;
 			boolean accountNonLocked = true;
 			
+			logger.debug("email=" + email);
 			logger.debug("domainUser=" + domainUser);
 			
 			if (domainUser != null) {

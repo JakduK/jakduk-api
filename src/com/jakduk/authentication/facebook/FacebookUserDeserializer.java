@@ -30,6 +30,7 @@ public class FacebookUserDeserializer extends JsonDeserializer<FacebookUser>{
         user.setGender(getNodeString(node.get("gender")));
         user.setLink(getNodeString(node.get("link")));
         user.setLocale(getNodeString(node.get("locale")));
+        user.setBio(getNodeString(node.get("bio")));
         return user;
 	}
 	

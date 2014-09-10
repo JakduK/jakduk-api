@@ -97,6 +97,7 @@
 	</beans:bean>
 
 	<beans:bean id="facebookAuthenticationProvider" class="com.jakduk.authentication.facebook.FacebookAuthenticationProvider">
+		<beans:property name="facebookService" ref="facebookService"/>
 	</beans:bean> 	
 
 </beans:beans>

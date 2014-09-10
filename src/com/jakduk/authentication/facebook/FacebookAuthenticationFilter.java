@@ -47,7 +47,7 @@ public class FacebookAuthenticationFilter extends AbstractAuthenticationProcessi
 			Authentication authResult) throws IOException, ServletException {
 		// TODO Auto-generated method stub
 		
-		Integer addInfoStatus = ((FacebookUserDetails)authResult.getPrincipal()).getAddInfoStatus();
+		Integer addInfoStatus = ((FacebookDetails)authResult.getPrincipal()).getAddInfoStatus();
 		
 		if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
 			response.sendRedirect(request.getContextPath() + "/oauth/write");

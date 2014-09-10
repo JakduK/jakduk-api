@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
  * @desc     :
  */
 
-public class FacebookUserDetails implements UserDetails {
+public class FacebookDetails implements UserDetails {
 
 	/**
 	 * 
@@ -28,51 +28,21 @@ public class FacebookUserDetails implements UserDetails {
 	private static final long serialVersionUID = 8207029289879890348L;
 
 	private String id;
-	private String name;
 	private String username;
-	private String email;
-	private String gender;
-	private String birthday;
-	private String link;
-	private String locale;
 	private Integer addInfoStatus;
-	
+
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
 	private final boolean accountNonLocked;
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
 
-	public String getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public String getGender() {
-		return gender;
-	}
-
-	public String getBirthday() {
-		return birthday;
-	}
-
-	public String getLink() {
-		return link;
-	}
-
-	public String getLocale() {
-		return locale;
-	}
-
 	public Integer getAddInfoStatus() {
 		return addInfoStatus;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
@@ -92,7 +62,7 @@ public class FacebookUserDetails implements UserDetails {
 			return g1.getAuthority().compareTo(g2.getAuthority());
 		}
 	}
-	
+
 	private static SortedSet<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
 		Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
 		// Ensure array iteration order is predictable (as per UserDetails.getAuthorities() contract and SEC-717)
@@ -106,14 +76,12 @@ public class FacebookUserDetails implements UserDetails {
 
 		return sortedAuthorities;
 	}
-	
-	public FacebookUserDetails(String id, String name, String username, String email, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
+
+	public FacebookDetails(String id, String username, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-		
+
 		this.id = id;
-		this.name = name;
 		this.username = username;
-		this.email = email;
 		this.addInfoStatus = addInfoStatus;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
@@ -157,7 +125,7 @@ public class FacebookUserDetails implements UserDetails {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
@@ -166,14 +134,11 @@ public class FacebookUserDetails implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "FacebookUserDetails [id=" + id + ", name=" + name
-				+ ", username=" + username + ", email=" + email + ", gender="
-				+ gender + ", birthday=" + birthday + ", link=" + link
-				+ ", locale=" + locale + ", addInfoStatus=" + addInfoStatus
-				+ ", authorities=" + authorities + ", accountNonExpired="
-				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked
+		return "FacebookDetails [id=" + id + ", username=" + username
+				+ ", addInfoStatus=" + addInfoStatus + ", authorities="
+				+ authorities + ", accountNonExpired=" + accountNonExpired
+				+ ", accountNonLocked=" + accountNonLocked
 				+ ", credentialsNonExpired=" + credentialsNonExpired
 				+ ", enabled=" + enabled + "]";
 	}
-
 }

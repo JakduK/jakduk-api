@@ -23,6 +23,7 @@
 			</label>
 			<sec:authorize access="isAuthenticated()">
 			<sec:authentication property="principal.username" var="userName"/>
+			<sec:authentication property="Details.bio" var="about"/>
 			<div class="col-sm-3">
 				<input type="text" class="form-control" size="50" value="${userName}" disabled="disabled">
 			</div>
