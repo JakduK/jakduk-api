@@ -12,13 +12,14 @@
 <body>
 	<jsp:include page="../include/navigation-header.jsp"/>
 	<div class="container">
-		Init Data
 		<p><a href="<c:url value="/admin/init"/>" class="btn btn-primary" role="button">Init Data</a></p>
 		<c:if test="${not empty message}">
 			<div class="span6 offset2 alert">${message}</div>
 		</c:if>
 		
 		<p><a href="<c:url value="/admin/encyclopedia/write"/>" class="btn btn-primary" role="button">Encyclopedia Write</a></p>
+
+		<p><a href="<c:url value="/admin/footballclub/write"/>" class="btn btn-primary" role="button">Football Club Write</a></p>
 		
 		<jsp:include page="../include/footer.jsp"/>
 	</div>

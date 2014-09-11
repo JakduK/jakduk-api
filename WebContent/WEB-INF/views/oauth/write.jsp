@@ -32,10 +32,16 @@
 
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="supportFC">
-				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.support.football.club"/>
+				<spring:message code="user.support.football.club"/>
 			</label>
 			<div class="col-sm-3">
-				<form:input path="supportFC" cssClass="form-control" size="50" placeholder="Support football club"/>
+				<form:select path="supportFC" cssClass="form-control">
+				  <option>1</option>
+  <option>2</option>
+  <option>3</option>
+  <option>4</option>
+  <option>5</option>
+				</form:select>
 			</div>
 		</div>
 		

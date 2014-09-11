@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.AdminService;
 import com.jakduk.service.HomeService;
@@ -72,6 +73,13 @@ public class AdminController {
 		adminService.shortHistoryWrite(encyclopedia);
 		
 		return "redirect:/encyclopedia/list";
+	}
+	
+	@RequestMapping(value = "/footballclub/write")
+	public String footballClubWrite(Model model) {
+		model.addAttribute("footballClub", new FootballClub());
+		
+		return "admin/footballClubWrite";
 	}
 
 }
