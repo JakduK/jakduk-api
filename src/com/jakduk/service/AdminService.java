@@ -10,7 +10,11 @@ import org.springframework.stereotype.Service;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.embedded.FootballClubName;
+import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
 import com.jakduk.repository.EncyclopediaRepository;
 
@@ -35,6 +39,9 @@ public class AdminService {
 	
 	@Autowired
 	private EncyclopediaRepository encyclopediaRepository;
+	
+	@Autowired
+	private FootballClubRepository footballClubRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -83,5 +90,26 @@ public class AdminService {
 		}
 		
 		encyclopediaRepository.save(shortHistory);
+	}
+	
+	public void footballClubWrite(FootballClubWrite footballClubWrite) {
+		FootballClub footballClub = new FootballClub();
+		footballClub.setActive(footballClubWrite.getActive());
+		footballClub.setFCId(footballClubWrite.getFCId());
+		
+		ArrayList<FootballClubName> names = new ArrayList<FootballClubName>();
+		FootballClubName footballClubNameKr = new FootballClubName();
+		FootballClubName footballClubNameEn = new FootballClubName();
+		footballClubNameKr.setLanguage(CommonConst.LANGUAGE_KO);
+		footballClubNameKr.setShortName(footballClubWrite.getShortNameKr());
+		footballClubNameKr.setFullName(footballClubWrite.getFullNameKr());
+		footballClubNameEn.setLanguage(CommonConst.LANGUAGE_EN);
+		footballClubNameEn.setShortName(footballClubWrite.getShortNameEn());
+		footballClubNameEn.setFullName(footballClubWrite.getFullNameEn());
+		names.add(footballClubNameKr);
+		names.add(footballClubNameEn);
+		footballClub.setNames(names);
+		
+		footballClubRepository.save(footballClub);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.jakduk.model.web.OAuthUserWrite;
+import com.jakduk.service.UserService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -25,6 +27,9 @@ import com.jakduk.model.web.OAuthUserWrite;
 @Controller
 @RequestMapping("/oauth")
 public class OAuthController {
+	
+	@Autowired
+	private UserService userService;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -78,6 +83,9 @@ public class OAuthController {
 	
 	@RequestMapping(value = "/write")
 	public void write(Model model) {
-		model.addAttribute("userWrite", new OAuthUserWrite());
+		
+		userService.getOAuthWrite(model);
+		
+		logger.debug("model=" + model);
 	}
 }

@@ -53,7 +53,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public String writeSubmit(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
+	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);

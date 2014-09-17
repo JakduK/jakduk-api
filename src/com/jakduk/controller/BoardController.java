@@ -69,7 +69,7 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/write", method = RequestMethod.POST)
-	public String freeWriteSubmit(@Valid BoardFree boardFree, BindingResult result, SessionStatus sessionStatus) {
+	public String freeWrite(@Valid BoardFree boardFree, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
 			return "board/freeWrite";

@@ -10,12 +10,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.jakduk.model.db.Encyclopedia;
-import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.AdminService;
-import com.jakduk.service.HomeService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -77,9 +77,22 @@ public class AdminController {
 	
 	@RequestMapping(value = "/footballclub/write")
 	public String footballClubWrite(Model model) {
-		model.addAttribute("footballClub", new FootballClub());
+		model.addAttribute("footballClubWrite", new FootballClubWrite());
 		
 		return "admin/footballClubWrite";
+	}
+	
+	@RequestMapping(value = "/footballclub/write", method = RequestMethod.POST)
+	public String footballClubWrite(@Valid FootballClubWrite footballClubWrite, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/footballClubWrite";
+		}
+		
+		adminService.footballClubWrite(footballClubWrite);
+
+		return "redirect:/admin";
 	}
 
 }

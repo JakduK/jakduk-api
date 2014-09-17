@@ -1,10 +1,14 @@
 package com.jakduk.model.db;
 
+import java.util.List;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.jakduk.model.embedded.FootballClubName;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -19,11 +23,11 @@ public class FootballClub {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	private Integer language;
+	private String FCId;
+
+	private Integer active;
 	
-	private String fullName;
-	
-	private String shortName;
+	private List<FootballClubName> names;
 
 	public String getId() {
 		return id;
@@ -33,33 +37,34 @@ public class FootballClub {
 		this.id = id;
 	}
 
-	public Integer getLanguage() {
-		return language;
+	public String getFCId() {
+		return FCId;
 	}
 
-	public void setLanguage(Integer language) {
-		this.language = language;
+	public void setFCId(String fCId) {
+		FCId = fCId;
 	}
 
-	public String getFullName() {
-		return fullName;
+	public Integer getActive() {
+		return active;
 	}
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
+	public void setActive(Integer active) {
+		this.active = active;
 	}
 
-	public String getShortName() {
-		return shortName;
+	public List<FootballClubName> getNames() {
+		return names;
 	}
 
-	public void setShortName(String shortName) {
-		this.shortName = shortName;
+	public void setNames(List<FootballClubName> names) {
+		this.names = names;
 	}
 
 	@Override
 	public String toString() {
-		return "FootballClub [id=" + id + ", language=" + language
-				+ ", fullName=" + fullName + ", shortName=" + shortName + "]";
+		return "FootballClub [id=" + id + ", FCId=" + FCId + ", active="
+				+ active + ", names=" + names + "]";
 	}
+
 }

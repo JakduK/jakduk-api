@@ -11,19 +11,30 @@
 </head>
 <body>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-<form:form commandName="footballClub" action="${contextPath}/admin/footballclub/write" method="POST">
+<form:form commandName="footballClubWrite" action="${contextPath}/admin/footballclub/write" method="POST">
 <p>
-LANGUAGE :
-<form:select path="language" cssClass="form-control">
-	<form:option value="10">En</form:option>
-	<form:option value="11">Kr</form:option>
+FOOTBALL ID : <form:input path="FCId" cssClass="form-control" placeholder="football club ID"/>
+</p>
+<p>
+ACTIVE :
+<form:select path="active" cssClass="form-control">
+	<form:option value="10">None</form:option>
+	<form:option value="11">Active</form:option>
+	<form:option value="12">Past</form:option>
 </form:select> 	
 </p>
 <p>
-FULLNAME : 	<form:input path="fullName" cssClass="form-control" placeholder="fullName"/>
+<p>
+KOR SHORTNAME : 	<form:input path="shortNameKr" cssClass="form-control" placeholder="KOR shortName"/>
 </p>
 <p>
-SHORTNAME : 	<form:input path="shortName" cssClass="form-control" placeholder="shortName"/>
+KOR FULLNAME : 	<form:input path="fullNameKr" cssClass="form-control" placeholder="KOR fullName"/>
+</p>
+<p>
+ENG SHORTNAME : 	<form:input path="shortNameEn" cssClass="form-control" placeholder="ENG shortName"/>
+</p>
+<p>
+ENG FULLNAME : 	<form:input path="fullNameEn" cssClass="form-control" placeholder="ENG fullName"/>
 </p>
 <p>
 <input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>

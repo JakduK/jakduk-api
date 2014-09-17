@@ -57,4 +57,8 @@ public class CommonConst {
 	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_BLANK = 12;
 	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_OK = 13;
 	
+	public final static Integer FOOTBALL_CLUB_STATUS_NONE = 10;
+	public final static Integer FOOTBALL_CLUB_STATUS_ACTIVE = 11;
+	public final static Integer FOOTBALL_CLUB_STATUS_PAST = 12;
+	
 }

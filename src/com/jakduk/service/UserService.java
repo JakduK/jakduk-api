@@ -9,12 +9,16 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.model.web.UserWrite;
+import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
 
 @Service
@@ -22,6 +26,9 @@ public class UserService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private FootballClubRepository footballClubRepository;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -94,6 +101,15 @@ public class UserService {
 		if (userRepository.findOneByUsername(username) != null) result = true;
 		
 		return result;
+	}
+	
+	public Model getOAuthWrite(Model model) {
+		List<FootballClub> footballClubs = footballClubRepository.findAll();
+		
+		model.addAttribute("userWrite", new OAuthUserWrite());
+		model.addAttribute("footballClubs", footballClubs);
+		
+		return model;
 	}
 		
 }

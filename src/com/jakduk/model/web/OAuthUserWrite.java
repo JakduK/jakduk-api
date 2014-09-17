@@ -1,4 +1,9 @@
 package com.jakduk.model.web;
+
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
+import com.jakduk.model.db.FootballClub;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -8,24 +13,30 @@ package com.jakduk.model.web;
 public class OAuthUserWrite {
 
 	private String about;
-	private String supportFC;
 	
+	@DBRef
+	private FootballClub footballClub;
+
 	public String getAbout() {
 		return about;
 	}
+
 	public void setAbout(String about) {
 		this.about = about;
 	}
-	public String getSupportFC() {
-		return supportFC;
+
+	public FootballClub getFootballClub() {
+		return footballClub;
 	}
-	public void setSupportFC(String supportFC) {
-		this.supportFC = supportFC;
+
+	public void setFootballClub(FootballClub footballClub) {
+		this.footballClub = footballClub;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "OAuthUserWrite [about=" + about + ", supportFC=" + supportFC
-				+ "]";
+		return "OAuthUserWrite [about=" + about + ", footballClub="
+				+ footballClub + "]";
 	}
+
 }
