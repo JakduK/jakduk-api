@@ -23,7 +23,7 @@ public class FootballClub {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	private String FCId;
+	private String fcId;
 
 	private Integer active;
 	
@@ -37,12 +37,12 @@ public class FootballClub {
 		this.id = id;
 	}
 
-	public String getFCId() {
-		return FCId;
+	public String getFcId() {
+		return fcId;
 	}
 
-	public void setFCId(String fCId) {
-		FCId = fCId;
+	public void setFcId(String fcId) {
+		this.fcId = fcId;
 	}
 
 	public Integer getActive() {
@@ -63,7 +63,7 @@ public class FootballClub {
 
 	@Override
 	public String toString() {
-		return "FootballClub [id=" + id + ", FCId=" + FCId + ", active="
+		return "FootballClub [id=" + id + ", fcId=" + fcId + ", active="
 				+ active + ", names=" + names + "]";
 	}
 

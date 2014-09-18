@@ -38,7 +38,9 @@
 			<div class="col-sm-3">
 				<form:select path="footballClub" cssClass="form-control">
 				<c:forEach items="${footballClubs}" var="club">
-					<form:option value="${club.FCId}"><fmt:message key="${club.names[0].shortName}"/></form:option>
+					<c:forEach items="${club.names}" var="name">
+						<form:option value="${club.fcId}"><fmt:message key="${name.shortName}"/></form:option>
+					</c:forEach>
 				</c:forEach>
 				
 				  <option>1</option>

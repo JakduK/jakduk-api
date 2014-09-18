@@ -95,7 +95,7 @@ public class AdminService {
 	public void footballClubWrite(FootballClubWrite footballClubWrite) {
 		FootballClub footballClub = new FootballClub();
 		footballClub.setActive(footballClubWrite.getActive());
-		footballClub.setFCId(footballClubWrite.getFCId());
+		footballClub.setFcId(footballClubWrite.getFCId());
 		
 		ArrayList<FootballClubName> names = new ArrayList<FootballClubName>();
 		FootballClubName footballClubNameKr = new FootballClubName();

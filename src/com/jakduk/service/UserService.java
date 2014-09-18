@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
@@ -104,7 +105,7 @@ public class UserService {
 	}
 	
 	public Model getOAuthWrite(Model model) {
-		List<FootballClub> footballClubs = footballClubRepository.findAll();
+		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(CommonConst.LANGUAGE_KO);
 		
 		model.addAttribute("userWrite", new OAuthUserWrite());
 		model.addAttribute("footballClubs", footballClubs);
