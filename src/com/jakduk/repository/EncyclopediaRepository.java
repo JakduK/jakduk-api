@@ -12,7 +12,7 @@ import com.jakduk.model.db.Encyclopedia;
  */
 public interface EncyclopediaRepository extends MongoRepository<Encyclopedia, String> {
 	
-	Encyclopedia findOneBySeqAndLanguage(Integer seq, Integer language);
-	Integer countByLanguage(Integer language);
+	Encyclopedia findOneBySeqAndLanguage(Integer seq, String language);
+	Integer countByLanguage(String language);
 
 }

@@ -14,9 +14,8 @@ public class OAuthUserWrite {
 
 	private String about;
 	
-	@DBRef
-	private FootballClub footballClub;
-
+	private String footballClub;
+	
 	public String getAbout() {
 		return about;
 	}
@@ -25,11 +24,11 @@ public class OAuthUserWrite {
 		this.about = about;
 	}
 
-	public FootballClub getFootballClub() {
+	public String getFootballClub() {
 		return footballClub;
 	}
 
-	public void setFootballClub(FootballClub footballClub) {
+	public void setFootballClub(String footballClub) {
 		this.footballClub = footballClub;
 	}
 

@@ -1,5 +1,7 @@
 package com.jakduk.service;
 
+import java.util.Locale;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -161,4 +163,22 @@ public class CommonService {
 			return false;
 		}
 	}
+	
+	public String getLanguageCode(HttpServletRequest request, HttpServletResponse response, String lang) {
+		
+		String getLanguage = Locale.ENGLISH.getLanguage();
+		
+		if (lang == null || lang.isEmpty()) {
+			lang = response.getLocale().getLanguage();
+		}
+		
+		if (lang != null) {
+			if (lang.contains(Locale.KOREAN.getLanguage())) {
+				getLanguage = Locale.KOREAN.getLanguage();
+			}		
+		}
+		
+		return getLanguage;
+	}
+	
 }

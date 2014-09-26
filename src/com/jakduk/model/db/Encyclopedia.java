@@ -25,7 +25,7 @@ public class Encyclopedia {
 	 */
 	private Integer kind;
 	
-	private Integer language;
+	private String language;
 	
 	@NotNull
 	private String subject;
@@ -51,11 +51,11 @@ public class Encyclopedia {
 		this.kind = kind;
 	}
 
-	public Integer getLanguage() {
+	public String getLanguage() {
 		return language;
 	}
 
-	public void setLanguage(Integer language) {
+	public void setLanguage(String language) {
 		this.language = language;
 	}
 

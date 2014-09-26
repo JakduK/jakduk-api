@@ -13,10 +13,13 @@ public interface UserRepository extends MongoRepository<User, String> {
 	User findByEmail(String email);
 	User findOneByEmail(String email);
 	User findById(String id);
+
+	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
+	User userFindByOauthUser(Integer type, String oauthId);
 	
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
 	OAuthUserOnLogin findByOauthUser(Integer type, String oauthId);
 	
-	@Query(value="{ 'id' : ?0 }", fields="{ 'username' : 1}")
+	@Query(value="{'id' : ?0}", fields="{'username' : 1}")
 	User writerFindById(String id);
 }

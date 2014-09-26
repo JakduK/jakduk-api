@@ -5,16 +5,25 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.RestTemplate;
 
 import com.jakduk.model.web.OAuthUserWrite;
+import com.jakduk.model.web.UserWrite;
+import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
 /**
@@ -26,7 +35,11 @@ import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/oauth")
+@SessionAttributes("userWrite")
 public class OAuthController {
+	
+	@Autowired
+	private CommonService commonService;
 	
 	@Autowired
 	private UserService userService;
@@ -82,10 +95,30 @@ public class OAuthController {
 	}
 	
 	@RequestMapping(value = "/write")
-	public void write(Model model) {
+	public String write(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(required = false) String lang,
+			Model model) {
 		
-		userService.getOAuthWrite(model);
+		String language = commonService.getLanguageCode(request, response, lang);
 		
-		logger.debug("model=" + model);
+		userService.getOAuthWriteDetails(model, language);
+		
+//		logger.debug("model=" + model);
+		
+		return "oauth/write";
+	}
+	
+	@RequestMapping(value = "/write", method = RequestMethod.POST)
+	public String write(@Valid OAuthUserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "user/write";
+		}
+		
+		userService.oAuthWriteDetails(userWrite);
+		sessionStatus.setComplete();
+		
+		return "redirect:/home";
 	}
 }

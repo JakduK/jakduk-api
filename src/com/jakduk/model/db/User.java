@@ -9,9 +9,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.OAuthUser;
+import com.jakduk.model.simple.SupportFC;
 
 @Document
 public class User {
@@ -25,6 +27,8 @@ public class User {
 	
 	private String password;
 	
+	private OAuthUser oauthUser;
+	
 	private List<String> rules;
 	
 	@Temporal(TemporalType.DATE)
@@ -32,7 +36,8 @@ public class User {
 	
 	private String about;
 	
-	private OAuthUser oauthUser;
+	@DBRef
+	private SupportFC supportFC;
 
 	public String getId() {
 		return id;
@@ -40,6 +45,14 @@ public class User {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public SupportFC getSupportFC() {
+		return supportFC;
+	}
+
+	public void setSupportFC(SupportFC supportFC) {
+		this.supportFC = supportFC;
 	}
 
 	public String getEmail() {
@@ -101,9 +114,9 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", email=" + email + ", username=" + username
-				+ ", password=" + password + ", rules=" + rules + ", joined="
-				+ joined + ", about=" + about + ", oauthUser=" + oauthUser
-				+ "]";
+				+ ", password=" + password + ", oauthUser=" + oauthUser
+				+ ", rules=" + rules + ", joined=" + joined + ", about="
+				+ about + ", supportFC=" + supportFC + "]";
 	}
 	
 }

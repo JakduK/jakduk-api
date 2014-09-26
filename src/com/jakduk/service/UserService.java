@@ -1,22 +1,31 @@
 package com.jakduk.service;
 
 import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+import com.jakduk.authentication.common.CommonUserDetails;
+import com.jakduk.authentication.facebook.FacebookDetails;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.OAuthUserOnRegister;
+import com.jakduk.model.simple.SupportFC;
 import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.FootballClubRepository;
@@ -24,6 +33,9 @@ import com.jakduk.repository.UserRepository;
 
 @Service
 public class UserService {
+	
+	@Autowired
+	private CommonService commonService;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -104,13 +116,35 @@ public class UserService {
 		return result;
 	}
 	
-	public Model getOAuthWrite(Model model) {
-		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(CommonConst.LANGUAGE_KO);
+	public Model getOAuthWriteDetails(Model model, String language) {
 		
-		model.addAttribute("userWrite", new OAuthUserWrite());
+		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language);
+		
+		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+		
+		OAuthUserWrite oauthUserWrite = new OAuthUserWrite();
+		oauthUserWrite.setAbout(userDetails.getBio());
+		
+		model.addAttribute("userWrite", oauthUserWrite);
 		model.addAttribute("footballClubs", footballClubs);
 		
 		return model;
+	}
+	
+	public void oAuthWriteDetails(OAuthUserWrite userWrite) {
+		
+		FacebookDetails userDetails = (FacebookDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getId());
+		
+		SupportFC supportFC = footballClubRepository.supportFCFindById(userWrite.getFootballClub());
+		
+		user.setSupportFC(supportFC);
+		user.setAbout(userWrite.getAbout());
+		
+		logger.debug("user=" + user);
+		
+		userRepository.save(user);
 	}
 		
 }

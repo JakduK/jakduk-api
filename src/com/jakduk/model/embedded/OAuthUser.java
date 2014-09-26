@@ -14,6 +14,9 @@ import com.jakduk.common.CommonConst;
 @Document
 public class OAuthUser {
 	
+	/**
+	 * OAuth 프로바이더 종류이다. CommonConst클래스의 OAUTH_TYPE_xxx 와 대응된다.
+	 */
 	private Integer type;
 	
 	private String oauthId;

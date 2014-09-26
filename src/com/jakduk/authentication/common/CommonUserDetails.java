@@ -5,7 +5,7 @@ package com.jakduk.authentication.common;
  * @date     : 2014. 9. 10.
  * @desc     :
  */
-public class UserDetails {
+public class CommonUserDetails {
 	
 	private String email;
 	private String gender;
@@ -53,7 +53,7 @@ public class UserDetails {
 	
 	@Override
 	public String toString() {
-		return "UserDetails [email=" + email + ", gender=" + gender
+		return "CommonUserDetails [email=" + email + ", gender=" + gender
 				+ ", birthday=" + birthday + ", link=" + link + ", locale="
 				+ locale + ", bio=" + bio + "]";
 	}

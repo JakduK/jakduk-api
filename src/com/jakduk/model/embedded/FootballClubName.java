@@ -12,17 +12,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class FootballClubName {
 
-	private Integer language;
+	private String language;
 	
 	private String fullName;
 	
 	private String shortName;
 
-	public Integer getLanguage() {
+	public String getLanguage() {
 		return language;
 	}
 
-	public void setLanguage(Integer language) {
+	public void setLanguage(String language) {
 		this.language = language;
 	}
 

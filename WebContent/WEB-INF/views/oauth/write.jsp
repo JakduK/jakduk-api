@@ -11,6 +11,10 @@
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 <body>
+<sec:authorize access="isAuthenticated()">
+	<sec:authentication property="principal.username" var="userName"/>
+	<sec:authentication property="Details.bio" var="about"/>
+</sec:authorize>
 <div class="container">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
@@ -22,13 +26,9 @@
 			<label class="col-sm-2 control-label" for="username">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
-			<sec:authorize access="isAuthenticated()">
-			<sec:authentication property="principal.username" var="userName"/>
-			<sec:authentication property="Details.bio" var="about"/>
 			<div class="col-sm-3">
 				<input type="text" class="form-control" size="50" value="${userName}" disabled="disabled">
 			</div>
-			</sec:authorize>
 		</div>
 
 		<div class="form-group">
@@ -39,25 +39,24 @@
 				<form:select path="footballClub" cssClass="form-control">
 				<c:forEach items="${footballClubs}" var="club">
 					<c:forEach items="${club.names}" var="name">
-						<form:option value="${club.fcId}"><fmt:message key="${name.shortName}"/></form:option>
+						<form:option value="${club.id}" label="${name.fullName}"/>
 					</c:forEach>
 				</c:forEach>
-				
-				  <option>1</option>
-  <option>2</option>
-  <option>3</option>
-  <option>4</option>
-  <option>5</option>
 				</form:select>
 			</div>
 		</div>
-		
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="about"> <spring:message code="user.comment"/></label>
 			<div class="col-sm-4">
 				<form:textarea path="about" cssClass="form-control" cols="40" rows="5" placeholder="About"/>
 			</div>
 		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-4">
+				<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+				<a class="btn btn-danger" href="<c:url value="/"/>"><spring:message code="common.button.cancel"/></a>
+			</div> 
+		</div>		
 	</form:form>
 	</div>
 </div><!-- /.container -->

@@ -1,5 +1,8 @@
 package com.jakduk.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -7,12 +10,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.jakduk.service.CommonService;
 import com.jakduk.service.HomeService;
 import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/")
 public class HomeController {
+	
+	@Autowired
+	private CommonService commonService;
 	
 	@Autowired
 	private HomeService homeService;
@@ -37,10 +44,15 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/home/jumbotron")
-	public void jumbotron(Model model,
-			@RequestParam(required = false) String lang) {
+	public String jumbotron(HttpServletRequest request, HttpServletResponse response,			
+			@RequestParam(required = false) String lang,
+			Model model) {
 		
-		homeService.getJumbotron(model, lang);
+		String language = commonService.getLanguageCode(request, response, lang);
+		
+		homeService.getJumbotron(model, language);
+		
+		return "home/jumbotron";
 	}
 	
 	@RequestMapping(value = "/sample")

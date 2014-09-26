@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.Assert;
 
-import com.jakduk.authentication.common.UserDetails;
+import com.jakduk.authentication.common.CommonUserDetails;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -37,8 +37,7 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 		
 		FacebookUser facebookUser = facebookService.findUser();
 
-		logger.debug("phjang=" + authentication);
-		logger.debug("phjang=" + facebookUser);
+//		logger.debug("phjang=" + facebookUser);
 //		FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUserByUsername(facebookUser.getId());
 		FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getUsername());
 		UsernamePasswordAuthenticationToken token = 
@@ -53,8 +52,8 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 		return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
 	}
 	
-	public UserDetails getUserDetails(FacebookUser facebookUser) {
-		UserDetails userDetails = new UserDetails();
+	public CommonUserDetails getUserDetails(FacebookUser facebookUser) {
+		CommonUserDetails userDetails = new CommonUserDetails();
 		
 		if (facebookUser.getEmail() != null) {
 			userDetails.setEmail(facebookUser.getEmail());

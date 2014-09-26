@@ -2,6 +2,7 @@ package com.jakduk.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,10 +84,10 @@ public class AdminService {
 	
 	public void shortHistoryWrite(Encyclopedia shortHistory) {
 		
-		if (shortHistory.getLanguage().equals(CommonConst.LANGUAGE_EN)) {
-			shortHistory.setSeq(commonService.getNextSequence(CommonConst.SHORT_HISTORY_EN));			
-		} else if (shortHistory.getLanguage().equals(CommonConst.LANGUAGE_KO)) {
-			shortHistory.setSeq(commonService.getNextSequence(CommonConst.SHORT_HISTORY_KO));
+		if (shortHistory.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+			shortHistory.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));			
+		} else if (shortHistory.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+			shortHistory.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
 		}
 		
 		encyclopediaRepository.save(shortHistory);
@@ -100,10 +101,10 @@ public class AdminService {
 		ArrayList<FootballClubName> names = new ArrayList<FootballClubName>();
 		FootballClubName footballClubNameKr = new FootballClubName();
 		FootballClubName footballClubNameEn = new FootballClubName();
-		footballClubNameKr.setLanguage(CommonConst.LANGUAGE_KO);
+		footballClubNameKr.setLanguage(Locale.KOREAN.getLanguage());
 		footballClubNameKr.setShortName(footballClubWrite.getShortNameKr());
 		footballClubNameKr.setFullName(footballClubWrite.getFullNameKr());
-		footballClubNameEn.setLanguage(CommonConst.LANGUAGE_EN);
+		footballClubNameEn.setLanguage(Locale.ENGLISH.getLanguage());
 		footballClubNameEn.setShortName(footballClubWrite.getShortNameEn());
 		footballClubNameEn.setFullName(footballClubWrite.getFullNameEn());
 		names.add(footballClubNameKr);

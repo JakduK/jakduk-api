@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.repository.EncyclopediaRepository;
 
@@ -20,23 +19,14 @@ import com.jakduk.repository.EncyclopediaRepository;
 public class HomeService {
 	
 	@Autowired
+	private CommonService commonService;
+	
+	@Autowired
 	private EncyclopediaRepository encyclopediaRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	public void getJumbotron(Model model, String lang) {
-		
-		Integer language = -1;
-		
-		if (lang == null) {
-			language = CommonConst.LANGUAGE_EN;
-		} else if (lang.contains("en")) {
-			language = CommonConst.LANGUAGE_EN;
-		} else if (lang.contains("ko")) {
-			language = CommonConst.LANGUAGE_KO;
-		} else {
-			language = CommonConst.LANGUAGE_EN;
-		}
+	public void getJumbotron(Model model, String language) {
 		
 		Integer count = encyclopediaRepository.countByLanguage(language);
 		int random = (int)(Math.random() * count) + 1;
