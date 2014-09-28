@@ -22,10 +22,10 @@
   	<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
 
 		<!-- if localhost, change https to http from requires-channel -->
-		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="http"/>
-		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="http"/>
-		<intercept-url pattern="/user/write*" access="isAnonymous()" requires-channel="http"/>
-		<intercept-url pattern="/check/user/*" access="permitAll" requires-channel="http"/>
+		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="https"/>
+		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="https"/>
+		<intercept-url pattern="/user/write*" access="isAnonymous()" requires-channel="https"/>
+		<intercept-url pattern="/check/user/*" access="permitAll" requires-channel="https"/>
 		<intercept-url pattern="/**" requires-channel="http"/>
 		<intercept-url pattern="/admin" access="permitAll" />
 		<intercept-url pattern="/logout" access="permitAll" />
@@ -59,15 +59,6 @@
 		</authentication-provider>
 		<authentication-provider ref="facebookAuthenticationProvider"/>
 	</authentication-manager>
-	
-    <!-- Facebook OAuth 2.0 정보 -->                   	
-	<util:properties id="facebookProp">
-		<beans:prop key="facebook.user-authorization-uri">https://www.facebook.com/dialog/oauth</beans:prop>
-		<beans:prop key="facebook.access-token-uri">https://graph.facebook.com/oauth/access_token</beans:prop>
-		<beans:prop key="facebook.client-id">259029247575988</beans:prop>
-		<beans:prop key="facebook.client-secret">21ddd987ade4a61411e7a3863e0ebe8f</beans:prop>
-		<beans:prop key="facebook.profile-uri">https://graph.facebook.com/me</beans:prop>
-	</util:properties>
 	
 	<!-- Facebook OAuth 2.0 Client Setup -->
 	<oauth:resource id="facebook" type="authorization_code"

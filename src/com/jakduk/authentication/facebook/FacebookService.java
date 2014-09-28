@@ -21,9 +21,11 @@ public class FacebookService {
 	public void setProfileUri(String profileUri) {
 		this.profileUri = profileUri;
 	} 
+	
 	public void setFacebookRestTemplate(RestOperations facebookRestTemplate) {
 		this.facebookRestTemplate = facebookRestTemplate;
 	}
+	
 	public FacebookUser findUser() {
 		
 		LOGGER.debug("phjang=" + facebookRestTemplate.getForObject(profileUri, Map.class));

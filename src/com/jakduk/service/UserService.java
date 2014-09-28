@@ -1,10 +1,6 @@
 package com.jakduk.service;
 
 import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +20,6 @@ import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
-import com.jakduk.model.simple.OAuthUserOnRegister;
-import com.jakduk.model.simple.SupportFC;
 import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.FootballClubRepository;
@@ -137,7 +131,7 @@ public class UserService {
 		
 		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getId());
 		
-		SupportFC supportFC = footballClubRepository.supportFCFindById(userWrite.getFootballClub());
+		FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
 		
 		user.setSupportFC(supportFC);
 		user.setAbout(userWrite.getAbout());

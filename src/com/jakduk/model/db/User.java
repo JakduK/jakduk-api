@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.OAuthUser;
-import com.jakduk.model.simple.SupportFC;
 
 @Document
 public class User {
@@ -37,7 +36,7 @@ public class User {
 	private String about;
 	
 	@DBRef
-	private SupportFC supportFC;
+	private FootballClub supportFC;
 
 	public String getId() {
 		return id;
@@ -47,11 +46,11 @@ public class User {
 		this.id = id;
 	}
 
-	public SupportFC getSupportFC() {
+	public FootballClub getSupportFC() {
 		return supportFC;
 	}
 
-	public void setSupportFC(SupportFC supportFC) {
+	public void setSupportFC(FootballClub supportFC) {
 		this.supportFC = supportFC;
 	}
 

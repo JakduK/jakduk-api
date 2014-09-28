@@ -4,7 +4,7 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk</artifactId>
-  <version>0.0.7-SNAPSHOT</version>
+  <version>0.0.8-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>jakduk</name>
@@ -226,7 +226,7 @@
 		<testSourceDirectory>${project.basedir}/test</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>${project.basedir}/src</directory>
+				<directory>${project.basedir}/resources</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
 				</excludes>

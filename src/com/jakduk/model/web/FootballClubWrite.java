@@ -12,7 +12,7 @@ import com.jakduk.model.embedded.FootballClubName;
  */
 public class FootballClubWrite {
 	
-	private String FCId;
+	private String origin;
 
 	private Integer active;
 	
@@ -24,12 +24,13 @@ public class FootballClubWrite {
 	
 	private String fullNameEn;
 
-	public String getFCId() {
-		return FCId;
+
+	public String getOrigin() {
+		return origin;
 	}
 
-	public void setFCId(String fCId) {
-		FCId = fCId;
+	public void setOrigin(String origin) {
+		this.origin = origin;
 	}
 
 	public Integer getActive() {
@@ -74,7 +75,7 @@ public class FootballClubWrite {
 
 	@Override
 	public String toString() {
-		return "FootballClubWrite [FCId=" + FCId + ", active=" + active
+		return "FootballClubWrite [origin=" + origin + ", active=" + active
 				+ ", shortNameKr=" + shortNameKr + ", fullNameKr=" + fullNameKr
 				+ ", shortNameEn=" + shortNameEn + ", fullNameEn=" + fullNameEn
 				+ "]";

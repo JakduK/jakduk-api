@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.FootballClubName;
@@ -23,7 +24,8 @@ public class FootballClub {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	private String fcId;
+	@DBRef
+	private FootballClubOrigin origin;
 
 	private Integer active;
 	
@@ -36,13 +38,13 @@ public class FootballClub {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	public String getFcId() {
-		return fcId;
+	
+	public FootballClubOrigin getOrigin() {
+		return origin;
 	}
 
-	public void setFcId(String fcId) {
-		this.fcId = fcId;
+	public void setOrigin(FootballClubOrigin origin) {
+		this.origin = origin;
 	}
 
 	public Integer getActive() {
@@ -63,7 +65,7 @@ public class FootballClub {
 
 	@Override
 	public String toString() {
-		return "FootballClub [id=" + id + ", fcId=" + fcId + ", active="
+		return "FootballClub [id=" + id + ", origin=" + origin + ", active="
 				+ active + ", names=" + names + "]";
 	}
 

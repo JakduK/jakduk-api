@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>     
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>   
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>  
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -10,10 +10,16 @@
 <title>Insert title here</title>
 </head>
 <body>
+<h4>Write FootballClub.</h4>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="footballClubWrite" action="${contextPath}/admin/footballclub/write" method="POST">
 <p>
-FOOTBALL ID : <form:input path="FCId" cssClass="form-control" placeholder="football club ID"/>
+ORIGIN : 
+				<form:select path="origin" cssClass="form-control">
+				<c:forEach items="${footballClubs}" var="club">
+					<form:option value="${club.id}" label="${club.name}"/>
+				</c:forEach>
+				</form:select>
 </p>
 <p>
 ACTIVE :

@@ -10,11 +10,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.support.SessionStatus;
 
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.web.FootballClubWrite;
-import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.AdminService;
 
 /**
@@ -70,14 +69,15 @@ public class AdminController {
 			return "encyclopedia/write";
 		}
 		
-		adminService.shortHistoryWrite(encyclopedia);
+		adminService.encyclopediaWrite(encyclopedia);
 		
 		return "redirect:/encyclopedia/list";
 	}
 	
 	@RequestMapping(value = "/footballclub/write")
 	public String footballClubWrite(Model model) {
-		model.addAttribute("footballClubWrite", new FootballClubWrite());
+		
+		adminService.getFootballClubWrite(model);
 		
 		return "admin/footballClubWrite";
 	}
@@ -91,6 +91,26 @@ public class AdminController {
 		}
 		
 		adminService.footballClubWrite(footballClubWrite);
+
+		return "redirect:/admin";
+	}
+	
+	@RequestMapping(value = "/footballclub/origin/write")
+	public String footballClubOriginWrite(Model model) {
+		model.addAttribute("footballClubOriginWrite", new FootballClubOrigin());
+		
+		return "admin/footballClubOriginWrite";
+	}
+	
+	@RequestMapping(value = "/footballclub/origin/write", method = RequestMethod.POST)
+	public String footballClubOriginWrite(@Valid FootballClubOrigin footballClubOrigin, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/footballClubOriginWrite";
+		}
+		
+		adminService.footballClubOriginWrite(footballClubOrigin);
 
 		return "redirect:/admin";
 	}

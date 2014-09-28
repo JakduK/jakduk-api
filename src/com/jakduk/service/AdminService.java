@@ -6,18 +6,24 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
+import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.FootballClubWrite;
+import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.EncyclopediaRepository;
+import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
-import com.jakduk.repository.EncyclopediaRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -43,6 +49,9 @@ public class AdminService {
 	
 	@Autowired
 	private FootballClubRepository footballClubRepository;
+	
+	@Autowired
+	private FootballClubOriginRepository footballClubOriginRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -82,7 +91,7 @@ public class AdminService {
 		return result;
 	}
 	
-	public void shortHistoryWrite(Encyclopedia shortHistory) {
+	public void encyclopediaWrite(Encyclopedia shortHistory) {
 		
 		if (shortHistory.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
 			shortHistory.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));			
@@ -93,10 +102,23 @@ public class AdminService {
 		encyclopediaRepository.save(shortHistory);
 	}
 	
+	public Model getFootballClubWrite(Model model) {
+		
+		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+		
+		model.addAttribute("footballClubs", footballClubs);
+		model.addAttribute("footballClubWrite", new FootballClubWrite());
+		
+		return model;
+	}
+	
 	public void footballClubWrite(FootballClubWrite footballClubWrite) {
 		FootballClub footballClub = new FootballClub();
+		
+		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOne(footballClubWrite.getOrigin());
+		
+		footballClub.setOrigin(footballClubOrigin);
 		footballClub.setActive(footballClubWrite.getActive());
-		footballClub.setFcId(footballClubWrite.getFCId());
 		
 		ArrayList<FootballClubName> names = new ArrayList<FootballClubName>();
 		FootballClubName footballClubNameKr = new FootballClubName();
@@ -112,5 +134,9 @@ public class AdminService {
 		footballClub.setNames(names);
 		
 		footballClubRepository.save(footballClub);
+	}
+	
+	public void footballClubOriginWrite(FootballClubOrigin footballClubOrigin) {
+		footballClubOriginRepository.save(footballClubOrigin);
 	}
 }

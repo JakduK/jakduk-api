@@ -39,7 +39,8 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 
 //		logger.debug("phjang=" + facebookUser);
 //		FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUserByUsername(facebookUser.getId());
-		FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getUsername());
+		FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getName());
+		
 		UsernamePasswordAuthenticationToken token = 
 				new UsernamePasswordAuthenticationToken(facebookUserDetails, authentication.getCredentials(), facebookUserDetails.getAuthorities());
 

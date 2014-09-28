@@ -18,6 +18,8 @@
 		</c:if>
 		
 		<p><a href="<c:url value="/admin/encyclopedia/write"/>" class="btn btn-primary" role="button">Encyclopedia Write</a></p>
+		
+		<p><a href="<c:url value="/admin/footballclub/origin/write"/>" class="btn btn-primary" role="button">Football Club Origin Write</a></p>
 
 		<p><a href="<c:url value="/admin/footballclub/write"/>" class="btn btn-primary" role="button">Football Club Write</a></p>
 		

@@ -22,7 +22,7 @@ public class OAuthUserOnRegister {
 	private String about;
 	
 	@DBRef
-	private SupportFC supportFC;
+	private FootballClub supportFC;
 
 	public String getId() {
 		return id;
@@ -39,12 +39,12 @@ public class OAuthUserOnRegister {
 	public void setAbout(String about) {
 		this.about = about;
 	}
-	
-	public SupportFC getSupportFC() {
+
+	public FootballClub getSupportFC() {
 		return supportFC;
 	}
 
-	public void setSupportFC(SupportFC supportFC) {
+	public void setSupportFC(FootballClub supportFC) {
 		this.supportFC = supportFC;
 	}
 
