@@ -8,6 +8,8 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
 <!-- Custom styles for this template -->
 <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/signin.css" rel="stylesheet">
 </head>
@@ -56,14 +58,15 @@
                     </form>
 
 <p/>
-<p class="bg-info">
-     <spring:message code="user.msg.not.user"/> 
-     <a href="<c:url value="/user/write"/>"><strong><spring:message code="user.msg.register.here"/></strong></a>
-</p>
-<p class="text-info">
-<a href="https://apis.daum.net/oauth2/authorize?client_id=1234567890&redirect_uri=${domainPath}<c:url value="/oauth/daum/callback"/>&response_type=code">login as DAUM</a>
-<a href="<c:url value="/facebook_login"/>">login as facebook</a>
-</p>
+			<p class="bg-info">
+				<spring:message code="user.msg.not.user"/> 
+				<a href="<c:url value="/user/write"/>"><strong><spring:message code="user.msg.register.here"/></strong></a>
+			</p>
+			<p class="text-info">
+				<spring:message code="user.msg.register.oauth"/>
+				<a href="<c:url value="/facebook_login"/>"><i class="fa fa-facebook-square fa-2x"></i></a>
+				<a href="https://apis.daum.net/oauth2/authorize?client_id=1234567890&redirect_uri=${domainPath}<c:url value="/oauth/daum/callback"/>&response_type=code">login as DAUM</a>
+			</p>
 
 <!-- Usage as a class -->
                 </div>
