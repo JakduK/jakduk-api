@@ -77,6 +77,12 @@ public class HomeController {
 		return "home/unipaper";
 	}
 	
+	@RequestMapping(value = "/angular01")
+	public String angular01(Model model) {
+		
+		return "home/angular01";
+	}
+	
 	@RequestMapping(value = "/oauth01")
 	public String oauth01(Model model) {
 		

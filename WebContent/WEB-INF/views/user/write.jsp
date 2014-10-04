@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app>
+<html ng-app="jakdukApp">
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
@@ -89,7 +89,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
 <script type="text/javascript">
-function writeCtrl($scope, $http) {
+
+var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.emailConn = 0;
 	$scope.usernameConn = 0;
 	$scope.emailAlert = {};
@@ -223,9 +226,12 @@ function writeCtrl($scope, $http) {
 		} else {
 			$scope.passwordConfirmAlert = {};
 		}
-	};
-}
+	};	
+});
 </script>
+
+<!-- This script should be under the AngularJS which is creating jakdukApp module. -->
+<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>
 
 </body>
 </html>

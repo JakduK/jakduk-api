@@ -6,7 +6,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app="freeWriteApp">
+<html ng-app="jakdukApp">
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
@@ -88,8 +88,9 @@
 <script src="<%=request.getContextPath()%>/web-resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script type="text/javascript">
 
-angular.module('freeWriteApp', ['summernote'])
-	.controller('FreeWriteCtrl', function($scope) {
+var jakdukApp = angular.module("jakdukApp", ["summernote"]);
+
+jakdukApp.controller('FreeWriteCtrl', function($scope) {
 		$scope.options = {
 			height: 150,
 			toolbar: [
@@ -144,5 +145,9 @@ angular.module('freeWriteApp', ['summernote'])
 		};	
 	});
 </script>
+
+<!-- This script should be under the AngularJS which is creating jakdukApp module. -->
+<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>
+
 </body>
 </html>

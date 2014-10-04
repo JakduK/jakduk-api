@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app>
+<html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
@@ -36,6 +36,13 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>    
+
+<script type="text/javascript">
+var jakdukApp = angular.module("jakdukApp", []);
+</script>
+
+<!-- This script should be under the AngularJS which is creating jakdukApp module. -->
+<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>
 
 </body>
 </html>

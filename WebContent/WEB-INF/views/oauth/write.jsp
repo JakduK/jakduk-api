@@ -6,7 +6,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app>
+<html ng-app="jakdukApp">
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
@@ -65,6 +65,17 @@
  ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>   
+<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("writeCtrl", function($scope) {
+});
+</script>
+
+<!-- This script should be under the AngularJS which is creating jakdukApp module. -->
+<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>   
+
 </body>
 </html>

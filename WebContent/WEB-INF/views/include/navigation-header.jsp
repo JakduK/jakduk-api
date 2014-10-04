@@ -70,9 +70,5 @@
 
 <script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
 <script type="text/javascript">
-function headerCtrl($scope, $location) {
-	$scope.isActive = function(viewLocation) {
-		return $location.absUrl().match(viewLocation);
-	}
-}
+
 </script>

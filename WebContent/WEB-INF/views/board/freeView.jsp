@@ -6,7 +6,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app>
+<html ng-app="jakdukApp">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
@@ -93,7 +93,10 @@
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
-function AlertCtrl($scope, $http) {
+
+var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("AlertCtrl", function($scope, $http) {
 	$scope.alert = {};
 	$scope.result = 0;
 	$scope.btnGoodOrBad = function(status) {
@@ -137,9 +140,11 @@ function AlertCtrl($scope, $http) {
 		$scope.result = 0;
 		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 	}
-	
-}
+});
 </script>
+
+<!-- This script should be under the AngularJS which is creating jakdukApp module. -->
+<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>
 
 </body>
 </html>

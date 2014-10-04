@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app>
+<html ng-app="jakdukApp">
 <head>  	
 	<jsp:include page="../include/html-header.jsp"/>
 </head>
@@ -22,7 +22,7 @@
  		<span class="glyphicon glyphicon-refresh"></span>
  	</button>
  </p>
-  </div>
+</div>  
           
  <div class="row">
    <div class="col-6 col-sm-6 col-lg-4">
@@ -48,7 +48,9 @@
 <script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 
-function homeCtrl($scope, $http) {
+var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.encyclopedia = {};
 	$scope.result = 0;
 	
@@ -84,7 +86,8 @@ function homeCtrl($scope, $http) {
 		$scope.result = 0;
 		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 	}
-}
+});
 </script>
+<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>
 </body>
 </html>
