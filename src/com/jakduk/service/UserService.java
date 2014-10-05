@@ -1,9 +1,13 @@
 package com.jakduk.service;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -78,11 +82,33 @@ public class UserService {
 		}
 	}
 	
+	public Model getUserWrite(Model model, String language) {
+		
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("names"));
+		Pageable pageable = new PageRequest(0, 100, sort);
+		
+		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language, pageable);
+		
+		model.addAttribute("userWrite", new UserWrite());
+		model.addAttribute("footballClubs", footballClubs);
+		
+		return model;
+	}
+	
 	public void userWrite(UserWrite userWrite) {
 		User user = new User();
 		user.setEmail(userWrite.getEmail());
 		user.setUsername(userWrite.getUsername());
 		user.setPassword(userWrite.getPassword());
+		
+		String footballClub = userWrite.getFootballClub();
+		
+		if (footballClub != null && footballClub != "-1") {
+			FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
+			
+			user.setSupportFC(supportFC);
+		}
+		
 		user.setAbout(userWrite.getAbout());
 		
 		this.create(user);
@@ -112,7 +138,10 @@ public class UserService {
 	
 	public Model getOAuthWriteDetails(Model model, String language) {
 		
-		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language);
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("names"));
+		Pageable pageable = new PageRequest(0, 100, sort);
+		
+		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language, pageable);
 		
 		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 		
@@ -131,9 +160,14 @@ public class UserService {
 		
 		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getId());
 		
-		FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
+		String footballClub = userWrite.getFootballClub();
 		
-		user.setSupportFC(supportFC);
+		if (footballClub != null && footballClub != "-1") {
+			FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
+			
+			user.setSupportFC(supportFC);
+		}
+		
 		user.setAbout(userWrite.getAbout());
 		
 		logger.debug("user=" + user);

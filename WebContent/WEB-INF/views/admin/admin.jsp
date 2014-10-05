@@ -5,12 +5,11 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
  
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app>
+<html>
 <head>
 	<jsp:include page="../include/html-header.jsp"/>
 </head>
 <body>
-	<jsp:include page="../include/navigation-header.jsp"/>
 	<div class="container">
 		<p><a href="<c:url value="/admin/init"/>" class="btn btn-primary" role="button">Init Data</a></p>
 		<c:if test="${not empty message}">

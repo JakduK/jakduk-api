@@ -27,6 +27,8 @@ public class UserWrite {
 	@Size(min = 4, max=20)
 	private String passwordConfirm;
 	
+	private String footballClub;
+	
 	private String about;
 	
 	private Integer existEmail;
@@ -64,6 +66,14 @@ public class UserWrite {
 		this.passwordConfirm = passwordConfirm;
 	}
 	
+	public String getFootballClub() {
+		return footballClub;
+	}
+
+	public void setFootballClub(String footballClub) {
+		this.footballClub = footballClub;
+	}
+
 	public String getAbout() {
 		return about;
 	}
@@ -92,8 +102,9 @@ public class UserWrite {
 	public String toString() {
 		return "UserWrite [email=" + email + ", username=" + username
 				+ ", password=" + password + ", passwordConfirm="
-				+ passwordConfirm + ", about=" + about + ", existEmail="
-				+ existEmail + ", existUsername=" + existUsername + "]";
+				+ passwordConfirm + ", footballClub=" + footballClub
+				+ ", about=" + about + ", existEmail=" + existEmail
+				+ ", existUsername=" + existUsername + "]";
 	}
 
 }

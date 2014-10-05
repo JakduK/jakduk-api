@@ -1,8 +1,5 @@
 package com.jakduk.model.web;
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
-
-import com.jakduk.model.db.FootballClub;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>

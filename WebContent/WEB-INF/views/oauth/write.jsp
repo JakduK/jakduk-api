@@ -22,7 +22,7 @@
 	<form:form commandName="userWrite" action="${contextPath}/oauth/write" method="POST" cssClass="form-horizontal">
 		<legend><spring:message code="oauth.register"/> </legend>
 		
-		<div class="form-group" ng-class="{'has-success':userWrite.username.$valid, 'has-error':userWrite.username.$invalid || existUsername != 2}">
+		<div class="form-group">
 			<label class="col-sm-2 control-label" for="username">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
@@ -37,9 +37,11 @@
 			</label>
 			<div class="col-sm-3">
 				<form:select path="footballClub" cssClass="form-control">
+					<form:option value="-1"><spring:message code="common.none"/></form:option>
 				<c:forEach items="${footballClubs}" var="club">
 					<c:forEach items="${club.names}" var="name">
-						<form:option value="${club.id}" label="${name.fullName}"/>
+						<form:option value="${club.id}" label="${name.shortName}" class="visible-xs"/>
+						<form:option value="${club.id}" label="${name.fullName}" class="visible-sm visible-md visible-lg"/>
 					</c:forEach>
 				</c:forEach>
 				</form:select>

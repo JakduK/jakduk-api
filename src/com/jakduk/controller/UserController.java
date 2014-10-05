@@ -2,6 +2,8 @@ package com.jakduk.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -11,17 +13,22 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.web.UserWrite;
+import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/user")
 @SessionAttributes("userWrite")
 public class UserController {
+	
+	@Autowired
+	private CommonService commonService;
 	
 	@Autowired
 	private UserService userService;
@@ -48,8 +55,15 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/write")
-	public void write(Model model) {
-		model.addAttribute("userWrite", new UserWrite());
+	public String write(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(required = false) String lang,
+			Model model) {
+		
+		String language = commonService.getLanguageCode(request, response, lang);
+		
+		userService.getUserWrite(model, language);
+		
+		return "user/write";
 	}
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
