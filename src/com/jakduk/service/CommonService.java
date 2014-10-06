@@ -1,5 +1,7 @@
 package com.jakduk.service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.Cookie;
@@ -8,6 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,8 +21,10 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Sequence;
 import com.jakduk.model.web.BoardPageInfo;
+import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
 
 /**
@@ -35,6 +42,9 @@ public class CommonService {
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private FootballClubRepository footballClubRepository;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -179,6 +189,15 @@ public class CommonService {
 		}
 		
 		return getLanguage;
+	}
+	
+	public List<FootballClub> getFootballClubs(String language) {
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("names"));
+		Pageable pageable = new PageRequest(0, 100, sort);
+		
+		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language, pageable);
+		
+		return footballClubs;
 	}
 	
 }

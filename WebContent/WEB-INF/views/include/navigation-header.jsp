@@ -41,15 +41,15 @@
 	<ul class="nav navbar-nav navbar-right">
 	  <sec:authorize access="isAnonymous()">
 	  	<li><a href="<c:url value="/login"/>"><span class="glyphicon glyphicon-log-in"></span> <spring:message code="common.login"/></a></li>
-	  	<li><a href="<c:url value="/user/write"/>"><spring:message code="user.register"/></a></li>
 	  </sec:authorize>
 		<sec:authorize access="isAuthenticated()">
 			<sec:authentication property="principal.username" var="userName"/>
-			<li class="dropdown">
+			<li class="dropdown" ng-class="{active:isActive('<c:url value="/user"/>')}">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 					<span class="glyphicon glyphicon-user"></span> ${userName} <span class="caret"></span>
 				</a>
 				<ul class="dropdown-menu" role="menu">
+					<li><a href="<c:url value="/user/profile"/>"><span class="glyphicon glyphicon-wrench"></span> <spring:message code="user.profile"/></a></li>
 					<li><a href="<c:url value="/logout"/>"><span class="glyphicon glyphicon-log-out"></span> <spring:message code="common.logout"/></a></li>
 				</ul>
 			</li>           

@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.UserProfile;
 
 public interface UserRepository extends MongoRepository<User, String> {
 	
@@ -12,7 +13,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	User findOneByUsername(String username);
 	User findByEmail(String email);
 	User findOneByEmail(String email);
-	User findById(String id);
+	UserProfile findById(String id);
 
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
 	User userFindByOauthUser(Integer type, String oauthId);

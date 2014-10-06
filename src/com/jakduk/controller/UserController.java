@@ -54,7 +54,7 @@ public class UserController {
 //		return "user/list";
 	}
 	
-	@RequestMapping(value = "/write")
+	@RequestMapping(value = "/write", method = RequestMethod.GET)
 	public String write(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {
@@ -85,6 +85,18 @@ public class UserController {
 		sessionStatus.setComplete();
 		
 		return "redirect:/login?status=2";
+	}
+	
+	@RequestMapping(value = "/profile")
+	public String profile(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(required = false) String lang,
+			Model model) {
+		
+		String language = commonService.getLanguageCode(request, response, lang);
+		
+		userService.getUserProfile(model, language);
+		
+		return "user/profile";
 	}
 	
 }

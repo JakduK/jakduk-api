@@ -19,11 +19,13 @@ import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.facebook.FacebookDetails;
+import com.jakduk.authentication.jakduk.AuthUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.FootballClubRepository;
@@ -84,10 +86,7 @@ public class UserService {
 	
 	public Model getUserWrite(Model model, String language) {
 		
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("names"));
-		Pageable pageable = new PageRequest(0, 100, sort);
-		
-		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language, pageable);
+		List<FootballClub> footballClubs = commonService.getFootballClubs(language);
 		
 		model.addAttribute("userWrite", new UserWrite());
 		model.addAttribute("footballClubs", footballClubs);
@@ -138,10 +137,7 @@ public class UserService {
 	
 	public Model getOAuthWriteDetails(Model model, String language) {
 		
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("names"));
-		Pageable pageable = new PageRequest(0, 100, sort);
-		
-		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language, pageable);
+		List<FootballClub> footballClubs = commonService.getFootballClubs(language);
 		
 		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 		
@@ -156,6 +152,7 @@ public class UserService {
 	
 	public void oAuthWriteDetails(OAuthUserWrite userWrite) {
 		
+		//  그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 		FacebookDetails userDetails = (FacebookDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getId());
@@ -173,6 +170,17 @@ public class UserService {
 		logger.debug("user=" + user);
 		
 		userRepository.save(user);
+	}
+	
+	public Model getUserProfile(Model model, String language) {
+
+		// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
+		AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		UserProfile user = userRepository.findById(authUser.getUserid());
+		
+		model.addAttribute("user", user);
+		
+		return model;
 	}
 		
 }
