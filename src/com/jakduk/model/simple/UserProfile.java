@@ -3,17 +3,10 @@ package com.jakduk.model.simple;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.embedded.OAuthUser;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -30,8 +23,6 @@ public class UserProfile {
 	private String email;
 	
 	private String username;
-	
-	private OAuthUser oauthUser;
 	
 	private List<String> rules;
 	
@@ -64,14 +55,6 @@ public class UserProfile {
 
 	public void setUsername(String username) {
 		this.username = username;
-	}
-
-	public OAuthUser getOauthUser() {
-		return oauthUser;
-	}
-
-	public void setOauthUser(OAuthUser oauthUser) {
-		this.oauthUser = oauthUser;
 	}
 
 	public List<String> getRules() {
@@ -109,9 +92,8 @@ public class UserProfile {
 	@Override
 	public String toString() {
 		return "UserProfile [id=" + id + ", email=" + email + ", username="
-				+ username + ", oauthUser=" + oauthUser + ", rules=" + rules
-				+ ", joined=" + joined + ", about=" + about + ", supportFC="
-				+ supportFC + "]";
+				+ username + ", rules=" + rules + ", joined=" + joined
+				+ ", about=" + about + ", supportFC=" + supportFC + "]";
 	}
 
 }

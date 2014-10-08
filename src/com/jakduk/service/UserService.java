@@ -1,13 +1,9 @@
 package com.jakduk.service;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -179,6 +175,25 @@ public class UserService {
 		UserProfile user = userRepository.findById(authUser.getUserid());
 		
 		model.addAttribute("user", user);
+		
+		return model;
+	}
+	
+	public Model getUserProfileUpdate(Model model, String language) {
+
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language);
+			
+			// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
+			AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			UserProfile userWrite = userRepository.findById(authUser.getUserid());
+			
+			model.addAttribute("userWrite", userWrite);
+			model.addAttribute("footballClubs", footballClubs);
+			
+		} else {
+		}
 		
 		return model;
 	}

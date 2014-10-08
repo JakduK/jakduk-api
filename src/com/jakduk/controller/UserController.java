@@ -99,4 +99,16 @@ public class UserController {
 		return "user/profile";
 	}
 	
+	@RequestMapping(value = "/profile/update")
+	public String profileUpdate(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(required = false) String lang,
+			Model model) {
+		
+		String language = commonService.getLanguageCode(request, response, lang);
+		
+		userService.getUserProfileUpdate(model, language);
+		
+		return "user/profileUpdate";
+	}
+	
 }

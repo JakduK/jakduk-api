@@ -16,7 +16,7 @@ import com.jakduk.model.db.FootballClub;
  */
 public interface FootballClubRepository extends MongoRepository<FootballClub, String> {
 	
-	@Query(value="{'names.language' : ?0}", fields="{'origin' : 1, 'names.$' : 1}")
+	@Query(value="{'names.language' : ?0}", fields="{'active' : 1, 'origin' : 1, 'names.$' : 1}")
 	List<FootballClub> findByNamesLanguage(String language, Pageable pageable);
 	
 	FootballClub findById(String id);

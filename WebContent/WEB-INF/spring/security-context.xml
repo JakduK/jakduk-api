@@ -24,7 +24,7 @@
 		<!-- if localhost, change https to http from requires-channel -->
 		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="https"/>
 		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="https"/>
-		<intercept-url pattern="/user/write*" access="isAnonymous()" requires-channel="https"/>
+		<intercept-url pattern="/user/**" access="authenticated" requires-channel="https"/>
 		<intercept-url pattern="/check/user/*" access="permitAll" requires-channel="https"/>
 		<intercept-url pattern="/**" requires-channel="http"/>
 		<intercept-url pattern="/admin" access="permitAll" />

@@ -40,7 +40,8 @@
 	<hr>  
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
-				<a class="btn btn-info" href="<c:url value="/"/>"><spring:message code="common.button.edit"/></a>
+				<a class="btn btn-info" href="<c:url value="/user/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>
+				<a class="btn btn-default" href="<c:url value="/user/profile/update"/>"><spring:message code="common.button.user.password.update"/></a>
 			</div> 
 		</div>  
 </form>

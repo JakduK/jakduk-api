@@ -88,8 +88,8 @@
 	</div>
 	<div class="col-sm-4">
 		<spring:message code="board.views"/><strong> ${post.views}</strong>
-		| <span class="text-primary"><spring:message code="board.good"/><strong> ${fn:length(post.goodUsers)}</strong></span>
-		| <span class="text-danger"><spring:message code="board.bad"/><strong> ${fn:length(post.badUsers)}</strong></span>
+		| <span class="text-primary"><span class="glyphicon glyphicon-thumbs-up"></span><strong> ${fn:length(post.goodUsers)}</strong></span>
+		| <span class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span><strong> ${fn:length(post.badUsers)}</strong></span>
 	</div>
 	</div> <!-- /row -->
 	</li>
