@@ -33,19 +33,25 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication, "Only FacebookAuthenticationProvider is supported");
 
-//		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
-		
-		FacebookUser facebookUser = facebookService.findUser();
+		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 
-//		logger.debug("phjang=" + facebookUser);
-//		FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUserByUsername(facebookUser.getId());
-		FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getName());
-		
-		UsernamePasswordAuthenticationToken token = 
-				new UsernamePasswordAuthenticationToken(facebookUserDetails, authentication.getCredentials(), facebookUserDetails.getAuthorities());
+		if (username.equals("facebook")) {
+			FacebookUser facebookUser = facebookService.findUser();
 
-		token.setDetails(getUserDetails(facebookUser));
-		return token;
+//			logger.debug("phjang=" + facebookUser);
+//			FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUserByUsername(facebookUser.getId());
+			FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getName());
+			
+			UsernamePasswordAuthenticationToken token = 
+					new UsernamePasswordAuthenticationToken(facebookUserDetails, authentication.getCredentials(), facebookUserDetails.getAuthorities());
+
+			token.setDetails(getUserDetails(facebookUser));
+			
+			return token;			
+		} else {
+			return null;
+		}
+
 	}
 
 	@Override

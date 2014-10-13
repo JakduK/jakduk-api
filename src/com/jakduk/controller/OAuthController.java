@@ -46,7 +46,7 @@ public class OAuthController {
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	@RequestMapping(value = "/daum/callback", method = RequestMethod.GET)
+	@RequestMapping(value = "/daum/callback2", method = RequestMethod.GET)
 	public String daumCallback(Model model,
 			@RequestParam(value = "code") String authCode) {
 		

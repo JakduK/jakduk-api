@@ -64,7 +64,8 @@
 			</p>
 			<p class="text-info">
 				<spring:message code="user.msg.register.oauth"/>
-				<a href="<c:url value="/facebook_login"/>"><i class="fa fa-facebook-square fa-2x"></i></a>
+				<a href="<c:url value="/oauth/daum/callback?type=facebook"/>"><i class="fa fa-facebook-square fa-2x"></i></a>
+				<a href="<c:url value="/oauth/daum/callback?type=daum"/>">login as DAUM</a>
 				<a href="https://apis.daum.net/oauth2/authorize?client_id=1234567890&redirect_uri=${domainPath}<c:url value="/oauth/daum/callback"/>&response_type=code">login as DAUM</a>
 			</p>
 

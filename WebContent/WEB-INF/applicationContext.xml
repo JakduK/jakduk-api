@@ -26,8 +26,10 @@
 	
 	<!-- Imports datasource configuration -->
 	<import resource="spring-data.xml" />
-	<import resource="spring/oauth-data.xml" />
-
+	<import resource="spring/oauth-data-local.xml"/> 
+	<!-- 
+	<import resource="spring/oauth-data.xml"/>
+ 	-->
 	<bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"
 		p:location="/WEB-INF/spring.properties" />
 

@@ -17,9 +17,9 @@
 	<http pattern="/web-resources/**" security="none" />
 	
 	<http auto-config="true" use-expressions="true">
-  	<custom-filter ref="facebookAuthenticationFilter" before="FILTER_SECURITY_INTERCEPTOR" />
   	<!-- OAuth 2.0 로직을 적용 시키기 위한 Filter 설정 -->
-  	<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
+  	<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+  	<custom-filter ref="oauthFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
 
 		<!-- if localhost, change https to http from requires-channel -->
 		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="http"/>
@@ -58,6 +58,7 @@
 			<password-encoder ref="encoder" />
 		</authentication-provider>
 		<authentication-provider ref="facebookAuthenticationProvider"/>
+		<authentication-provider ref="daumAuthenticationProvider"/>
 	</authentication-manager>
 	
 	<!-- Facebook OAuth 2.0 Client Setup -->
@@ -67,12 +68,24 @@
 		access-token-uri="#{facebookProp['facebook.access-token-uri']}"
 		user-authorization-uri="#{facebookProp['facebook.user-authorization-uri']}"
 		authentication-scheme="query" 
-		token-name="oauth_token" 
+		token-name="oauth_token"		
 		pre-established-redirect-uri="/"
-		client-authentication-scheme="form" />
+		client-authentication-scheme="form"/>
+		
+	<oauth:resource id="daum" type="authorization_code"
+		client-id="#{daumProp['daum.client-id']}" 
+		client-secret="#{daumProp['daum.client-secret']}"
+		access-token-uri="#{daumProp['daum.access-token-uri']}"
+		user-authorization-uri="#{daumProp['daum.user-authorization-uri']}"
+		authentication-scheme="query"
+		token-name="access_token" 
+		pre-established-redirect-uri="/"
+		client-authentication-scheme="form"/>		
 
 	<!-- Facebook 서버에 접속하기 위한 RestTemplate -->	
-	<oauth:rest-template resource="facebook" id="facebookRestTemplate" />
+	<oauth:rest-template id="facebookRestTemplate" resource="facebook"/>
+	
+	<oauth:rest-template id="daumRestTemplate" resource="daum"/>
 	
 	<!-- OAuth 2.0 Client를 연동 시키기 위한 Filter 생성 -->
 	<oauth:client id="oauth2ClientFilter" />
@@ -83,12 +96,21 @@
 		<beans:property name="profileUri" value="#{facebookProp['facebook.profile-uri']}" />
 	</beans:bean>
 	
-	<beans:bean id="facebookAuthenticationFilter" class="com.jakduk.authentication.facebook.FacebookAuthenticationFilter">
-		<beans:property name="authenticationManager" ref="authenticationManager"/>
+	<beans:bean id="daumService" class="com.jakduk.authentication.daum.DaumService">
+		<beans:property name="daumRestTemplate" ref="daumRestTemplate"/>
+		<beans:property name="profileUri" value="#{daumProp['daum.profile-uri']}"/>
 	</beans:bean>
+	
+	<beans:bean id="oauthFilter" class="com.jakduk.authentication.common.OAuthProcessingFilter">
+		<beans:property name="authenticationManager" ref="authenticationManager"/>
+	</beans:bean>	
 
 	<beans:bean id="facebookAuthenticationProvider" class="com.jakduk.authentication.facebook.FacebookAuthenticationProvider">
 		<beans:property name="facebookService" ref="facebookService"/>
+	</beans:bean>
+	
+	<beans:bean id="daumAuthenticationProvider" class="com.jakduk.authentication.daum.DaumAuthenticationProvider">
+		<beans:property name="daumService" ref="daumService"/>
 	</beans:bean> 	
 
 </beans:beans>

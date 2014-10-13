@@ -1,4 +1,4 @@
-package com.jakduk.authentication.facebook;
+package com.jakduk.authentication.common;
 
 import java.io.IOException;
 
@@ -14,31 +14,50 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.http.AccessTokenRequiredException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.jakduk.authentication.facebook.FacebookDetails;
 import com.jakduk.common.CommonConst;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2014. 7. 27.
+ * @date     : 2014. 10. 11.
  * @desc     :
  */
-public class FacebookAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
 	private Logger logger = Logger.getLogger(this.getClass());
-
-	public FacebookAuthenticationFilter(String defaultFilterProcessesUrl) {
+	
+	protected OAuthProcessingFilter(String defaultFilterProcessesUrl) {
 		super(defaultFilterProcessesUrl);
 	}
-
-	public FacebookAuthenticationFilter() {
-		super("/facebook_login");
+	
+	public OAuthProcessingFilter() {
+		super("/oauth/daum/callback");
 	}
 
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("facebook", null);
-		SecurityContextHolder.getContext().setAuthentication(authRequest);
-		return this.getAuthenticationManager().authenticate(authRequest);
+	@Override
+	public Authentication attemptAuthentication(HttpServletRequest request,
+			HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+		
+		String type = request.getParameter("type");
+		
+		if (type!= null && type.equals("daum")) {
+			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("daum", null);
+			SecurityContextHolder.getContext().setAuthentication(authRequest);
+			
+			return this.getAuthenticationManager().authenticate(authRequest);
+			
+		} else if (type!= null && type.equals("facebook")) {
+			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("facebook", null);
+			SecurityContextHolder.getContext().setAuthentication(authRequest);
+			
+			return this.getAuthenticationManager().authenticate(authRequest);
+			
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
@@ -71,5 +90,4 @@ public class FacebookAuthenticationFilter extends AbstractAuthenticationProcessi
 			super.unsuccessfulAuthentication(request, response, failed);
 		}
 	} 
-
 }
