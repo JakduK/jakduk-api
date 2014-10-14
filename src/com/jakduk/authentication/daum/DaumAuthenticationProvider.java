@@ -8,6 +8,7 @@ import org.springframework.security.core.AuthenticationException;
 
 import com.jakduk.authentication.facebook.FacebookDetails;
 import com.jakduk.authentication.facebook.FacebookUser;
+import com.jakduk.common.CommonConst;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -30,10 +31,12 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 		
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 		
-		daumService.findUser();
-		
-		if (username.equals("daum")) {
+		if (username.equals(CommonConst.OAUTH_TYPE_DAUM)) {
 			daumService.findUser();
+			
+			DaumUser user = daumService.findUser();
+			
+			logger.debug("phjang user=" + user);
 
 //			FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getName());
 			

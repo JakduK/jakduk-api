@@ -43,8 +43,8 @@ public class CommonConst {
 	/**
 	 * OAuth 종류
 	 */
-	public final static Integer OAUTH_TYPE_FACEBOOK = 10;
-	public final static Integer OAUTH_TYPE_DAUM = 11;
+	public final static String OAUTH_TYPE_FACEBOOK = "facebook";
+	public final static String OAUTH_TYPE_DAUM = "daum";
 	
 	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_NONE = 10;
 	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_UNUSE = 11;

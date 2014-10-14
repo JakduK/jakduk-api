@@ -16,10 +16,10 @@ public interface UserRepository extends MongoRepository<User, String> {
 	UserProfile findById(String id);
 
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
-	User userFindByOauthUser(Integer type, String oauthId);
+	User userFindByOauthUser(String type, String oauthId);
 	
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
-	OAuthUserOnLogin findByOauthUser(Integer type, String oauthId);
+	OAuthUserOnLogin findByOauthUser(String type, String oauthId);
 	
 	@Query(value="{'id' : ?0}", fields="{'username' : 1}")
 	User writerFindById(String id);

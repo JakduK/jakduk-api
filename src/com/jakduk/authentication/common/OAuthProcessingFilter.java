@@ -43,14 +43,14 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 		
 		String type = request.getParameter("type");
 		
-		if (type!= null && type.equals("daum")) {
-			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("daum", null);
+		if (type!= null && type.equals(CommonConst.OAUTH_TYPE_DAUM)) {
+			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(CommonConst.OAUTH_TYPE_DAUM, null);
 			SecurityContextHolder.getContext().setAuthentication(authRequest);
 			
 			return this.getAuthenticationManager().authenticate(authRequest);
 			
-		} else if (type!= null && type.equals("facebook")) {
-			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("facebook", null);
+		} else if (type!= null && type.equals(CommonConst.OAUTH_TYPE_FACEBOOK)) {
+			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(CommonConst.OAUTH_TYPE_FACEBOOK, null);
 			SecurityContextHolder.getContext().setAuthentication(authRequest);
 			
 			return this.getAuthenticationManager().authenticate(authRequest);

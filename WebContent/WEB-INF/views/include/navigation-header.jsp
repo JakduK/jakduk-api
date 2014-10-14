@@ -17,7 +17,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a>
+        <a class="navbar-brand" href="<c:url value="/home"/>"><small><spring:message code="common.jakduk"/></small></a>
       </div>
       <div class="collapse navbar-collapse" ng-controller="headerCtrl">
         <ul class="nav navbar-nav">

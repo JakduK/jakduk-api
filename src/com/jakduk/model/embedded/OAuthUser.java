@@ -17,17 +17,17 @@ public class OAuthUser {
 	/**
 	 * OAuth 프로바이더 종류이다. CommonConst클래스의 OAUTH_TYPE_xxx 와 대응된다.
 	 */
-	private Integer type;
+	private String type;
 	
 	private String oauthId;
 	
 	private Integer addInfoStatus = CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_UNUSE;
-
-	public Integer getType() {
+	
+	public String getType() {
 		return type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

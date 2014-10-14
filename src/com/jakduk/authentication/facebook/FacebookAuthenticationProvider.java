@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.Assert;
 
 import com.jakduk.authentication.common.CommonUserDetails;
+import com.jakduk.common.CommonConst;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -35,7 +36,7 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 
-		if (username.equals("facebook")) {
+		if (username.equals(CommonConst.OAUTH_TYPE_FACEBOOK)) {
 			FacebookUser facebookUser = facebookService.findUser();
 
 //			logger.debug("phjang=" + facebookUser);

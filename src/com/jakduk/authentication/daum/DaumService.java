@@ -28,9 +28,16 @@ public class DaumService {
 		this.daumRestTemplate = daumRestTemplate;
 	}
 	
-	public void findUser() {
+	public DaumUser findUser() {
 		
-		logger.debug("phjang=" + daumRestTemplate.getForObject(profileUri, Map.class));
+//		logger.debug("phjang user=" + daumRestTemplate.getForObject(profileUri, Map.class));
+		DaumUser user = daumRestTemplate.getForObject(profileUri, DaumUser.class);
+		
+		if (logger.isInfoEnabled()) {
+			logger.info(user);
+		}
+		
+		return user;
 	}
 	
 
