@@ -13,6 +13,7 @@ public class CommonUserDetails {
 	private String link;
 	private String locale;
 	private String bio;
+	private String imagePath;
 	
 	public String getEmail() {
 		return email;
@@ -50,11 +51,17 @@ public class CommonUserDetails {
 	public void setBio(String bio) {
 		this.bio = bio;
 	}
+	public String getImagePath() {
+		return imagePath;
+	}
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
 	
 	@Override
 	public String toString() {
 		return "CommonUserDetails [email=" + email + ", gender=" + gender
 				+ ", birthday=" + birthday + ", link=" + link + ", locale="
-				+ locale + ", bio=" + bio + "]";
+				+ locale + ", bio=" + bio + ", imagePath=" + imagePath + "]";
 	}
 }

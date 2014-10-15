@@ -145,8 +145,7 @@ function needLogin() {
 }
 </script>
 
-<!-- This script should be under the AngularJS which is creating jakdukApp module. -->
-<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>
+<jsp:include page="../include/body-footer.jsp"/>
 
 </body>
 </html>

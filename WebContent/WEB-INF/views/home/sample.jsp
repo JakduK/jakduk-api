@@ -54,6 +54,6 @@ jakdukApp.controller("sampleCtrl", function($scope) {
           };
 });
 </script>
-<script src="<%=request.getContextPath()%>/web-resources/jakduk/navigation-header.js"></script>
+<jsp:include page="../include/body-footer.jsp"/>
 </body>
 </html>

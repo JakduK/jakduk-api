@@ -1,4 +1,4 @@
-package com.jakduk.authentication.facebook;
+package com.jakduk.authentication.common;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
  * @desc     :
  */
 
-public class FacebookDetails implements UserDetails {
+public class OAuthPrincipal implements UserDetails {
 
 	/**
 	 * 
@@ -77,7 +77,7 @@ public class FacebookDetails implements UserDetails {
 		return sortedAuthorities;
 	}
 
-	public FacebookDetails(String id, String username, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
+	public OAuthPrincipal(String id, String username, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		this.id = id;

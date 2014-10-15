@@ -1,4 +1,4 @@
-package com.jakduk.authentication.facebook;
+package com.jakduk.authentication.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,12 +22,12 @@ import com.jakduk.service.UserService;
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2014. 8. 7.
+ * @date     : 2014. 10. 15.
  * @desc     :
  */
 
 @Service
-public class FacebookDetailService implements UserDetailsService {
+public class OAuthDetailService implements UserDetailsService {
 
 	@Autowired
 	private UserRepository userRepository;
@@ -37,31 +37,31 @@ public class FacebookDetailService implements UserDetailsService {
 	
 	private String username;
 	
+	private String type;
+	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	public String getUsername() {
 		return username;
 	}
-
-	public UserDetails loadUser(String oauthId, String username) {
+	
+	public UserDetails loadUser(String oauthId, String username, String type) {
 		this.username = username;
+		this.type = type;
 		return loadUserByUsername(oauthId);
 	}
 	
 	@Override
 	public UserDetails loadUserByUsername(String oauthId)
 			throws UsernameNotFoundException {
-		// TODO Auto-generated method stub
 		
-//		FacebookUser facebookUser = facebookService.findUser();
-		
-		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, oauthId);
+		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(type, oauthId);
 		
 		if (oauthUserOnLogin == null) {
 			oauthUserOnLogin = new OAuthUserOnLogin();
 			OAuthUser oauthUser = new OAuthUser();
 			oauthUser.setOauthId(oauthId);
-			oauthUser.setType(CommonConst.OAUTH_TYPE_FACEBOOK);
+			oauthUser.setType(type);
 			oauthUser.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK);
 			oauthUserOnLogin.setOauthUser(oauthUser);
 			
@@ -71,10 +71,10 @@ public class FacebookDetailService implements UserDetailsService {
 			userService.oauthUserWrite(oauthUserOnLogin);
 		}
 		
-		FacebookDetails facebookUserDetails = new FacebookDetails(oauthId, this.username, oauthUserOnLogin.getOauthUser().getAddInfoStatus()
+		OAuthPrincipal principal = new OAuthPrincipal(oauthId, username, oauthUserOnLogin.getOauthUser().getAddInfoStatus()
 				, true, true, true, true, getAuthorities(2));
 		
-		return facebookUserDetails;
+		return principal;
 	}
 	
 	public Collection<? extends GrantedAuthority> getAuthorities(Integer role) {
@@ -103,5 +103,4 @@ public class FacebookDetailService implements UserDetailsService {
 		}
 		return authorities;
 	}
-
 }

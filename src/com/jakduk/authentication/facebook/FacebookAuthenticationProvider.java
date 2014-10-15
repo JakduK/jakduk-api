@@ -9,6 +9,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.Assert;
 
 import com.jakduk.authentication.common.CommonUserDetails;
+import com.jakduk.authentication.common.OAuthDetailService;
+import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.common.CommonConst;
 
 /**
@@ -20,7 +22,7 @@ import com.jakduk.common.CommonConst;
 public class FacebookAuthenticationProvider implements AuthenticationProvider {
 
 	@Autowired
-	private FacebookDetailService facebookUserDetailService;
+	private OAuthDetailService oauthDetailService;
 	
 	private FacebookService facebookService;
 	
@@ -37,16 +39,15 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 
 		if (username.equals(CommonConst.OAUTH_TYPE_FACEBOOK)) {
-			FacebookUser facebookUser = facebookService.findUser();
+			FacebookUser user = facebookService.findUser();
 
 //			logger.debug("phjang=" + facebookUser);
-//			FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUserByUsername(facebookUser.getId());
-			FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getName());
+			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getId(), user.getName(), CommonConst.OAUTH_TYPE_FACEBOOK);
 			
 			UsernamePasswordAuthenticationToken token = 
-					new UsernamePasswordAuthenticationToken(facebookUserDetails, authentication.getCredentials(), facebookUserDetails.getAuthorities());
+					new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
 
-			token.setDetails(getUserDetails(facebookUser));
+			token.setDetails(getUserDetails(user));
 			
 			return token;			
 		} else {
@@ -60,31 +61,31 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 		return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
 	}
 	
-	public CommonUserDetails getUserDetails(FacebookUser facebookUser) {
+	public CommonUserDetails getUserDetails(FacebookUser user) {
 		CommonUserDetails userDetails = new CommonUserDetails();
 		
-		if (facebookUser.getEmail() != null) {
-			userDetails.setEmail(facebookUser.getEmail());
+		if (user.getEmail() != null) {
+			userDetails.setEmail(user.getEmail());
 		}
 		
-		if (facebookUser.getGender() != null) {
-			userDetails.setGender(facebookUser.getGender());
+		if (user.getGender() != null) {
+			userDetails.setGender(user.getGender());
 		}
 		
-		if (facebookUser.getBirthday() != null) {
-			userDetails.setBirthday(facebookUser.getBirthday());
+		if (user.getBirthday() != null) {
+			userDetails.setBirthday(user.getBirthday());
 		}
 		
-		if (facebookUser.getLink() != null) {
-			userDetails.setLink(facebookUser.getLink());
+		if (user.getLink() != null) {
+			userDetails.setLink(user.getLink());
 		}
 		
-		if (facebookUser.getLocale() != null) {
-			userDetails.setLocale(facebookUser.getLocale());
+		if (user.getLocale() != null) {
+			userDetails.setLocale(user.getLocale());
 		}
 		
-		if (facebookUser.getBio() != null) {
-			userDetails.setBio(facebookUser.getBio());
+		if (user.getBio() != null) {
+			userDetails.setBio(user.getBio());
 		}
 		
 		return userDetails;

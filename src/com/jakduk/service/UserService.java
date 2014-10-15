@@ -14,7 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonUserDetails;
-import com.jakduk.authentication.facebook.FacebookDetails;
+import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.AuthUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
@@ -135,10 +135,13 @@ public class UserService {
 		
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language);
 		
+		OAuthUserWrite oauthUserWrite = new OAuthUserWrite();
+		
 		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 		
-		OAuthUserWrite oauthUserWrite = new OAuthUserWrite();
-		oauthUserWrite.setAbout(userDetails.getBio());
+		if (userDetails != null && userDetails.getBio() != null) {
+			oauthUserWrite.setAbout(userDetails.getBio());
+		}
 		
 		model.addAttribute("userWrite", oauthUserWrite);
 		model.addAttribute("footballClubs", footballClubs);
@@ -149,7 +152,7 @@ public class UserService {
 	public void oAuthWriteDetails(OAuthUserWrite userWrite) {
 		
 		//  그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
-		FacebookDetails userDetails = (FacebookDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		OAuthPrincipal userDetails = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getId());
 		

@@ -1,12 +1,15 @@
 package com.jakduk.authentication.daum;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import com.jakduk.authentication.facebook.FacebookDetails;
+import com.jakduk.authentication.common.CommonUserDetails;
+import com.jakduk.authentication.common.OAuthDetailService;
+import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.facebook.FacebookUser;
 import com.jakduk.common.CommonConst;
 
@@ -18,9 +21,12 @@ import com.jakduk.common.CommonConst;
  */
 public class DaumAuthenticationProvider implements AuthenticationProvider {
 	
-	private Logger logger = Logger.getLogger(this.getClass());
+	@Autowired
+	private OAuthDetailService oauthDetailService;
 	
 	private DaumService daumService;
+	
+	private Logger logger = Logger.getLogger(this.getClass());
 
 	public void setDaumService(DaumService daumService) {
 		this.daumService = daumService;
@@ -32,20 +38,18 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 		
 		if (username.equals(CommonConst.OAUTH_TYPE_DAUM)) {
-			daumService.findUser();
 			
 			DaumUser user = daumService.findUser();
 			
 			logger.debug("phjang user=" + user);
 
-//			FacebookDetails facebookUserDetails = (FacebookDetails) facebookUserDetailService.loadUser(facebookUser.getId(), facebookUser.getName());
+			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getUserid(), user.getNickname(), CommonConst.OAUTH_TYPE_DAUM);
 			
-//			UsernamePasswordAuthenticationToken token = 	new UsernamePasswordAuthenticationToken(facebookUserDetails, authentication.getCredentials(), facebookUserDetails.getAuthorities());
+			UsernamePasswordAuthenticationToken token = 	new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
 
-//			token.setDetails(getUserDetails(facebookUser));
+			token.setDetails(getUserDetails(user));
 			
-//			return token;
-			return null;
+			return token;
 		} else {
 			return null;
 		}
@@ -54,6 +58,16 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public boolean supports(Class<?> authentication) {
 		return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+	}
+	
+	public CommonUserDetails getUserDetails(DaumUser user) {
+		CommonUserDetails userDetails = new CommonUserDetails();
+		
+		if (user.getImagePath() != null) {
+			userDetails.setImagePath(user.getImagePath());
+		}	
+		
+		return userDetails;
 	}
 
 }

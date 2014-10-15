@@ -16,7 +16,6 @@ import org.springframework.security.oauth2.client.http.AccessTokenRequiredExcept
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.jakduk.authentication.facebook.FacebookDetails;
 import com.jakduk.common.CommonConst;
 
 /**
@@ -40,21 +39,14 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
 			HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-		
+
 		String type = request.getParameter("type");
-		
-		if (type!= null && type.equals(CommonConst.OAUTH_TYPE_DAUM)) {
-			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(CommonConst.OAUTH_TYPE_DAUM, null);
+
+		if (type!= null && (type.equals(CommonConst.OAUTH_TYPE_DAUM) || type.equals(CommonConst.OAUTH_TYPE_FACEBOOK))) {
+			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(type, null);
 			SecurityContextHolder.getContext().setAuthentication(authRequest);
-			
+
 			return this.getAuthenticationManager().authenticate(authRequest);
-			
-		} else if (type!= null && type.equals(CommonConst.OAUTH_TYPE_FACEBOOK)) {
-			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(CommonConst.OAUTH_TYPE_FACEBOOK, null);
-			SecurityContextHolder.getContext().setAuthentication(authRequest);
-			
-			return this.getAuthenticationManager().authenticate(authRequest);
-			
 		} else {
 			return null;
 		}
@@ -66,7 +58,7 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 			Authentication authResult) throws IOException, ServletException {
 		// TODO Auto-generated method stub
 		
-		Integer addInfoStatus = ((FacebookDetails)authResult.getPrincipal()).getAddInfoStatus();
+		Integer addInfoStatus = ((OAuthPrincipal)authResult.getPrincipal()).getAddInfoStatus();
 		
 		if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
 			response.sendRedirect(request.getContextPath() + "/oauth/write");
