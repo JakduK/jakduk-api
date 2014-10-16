@@ -68,7 +68,7 @@
     </div><!-- /.container -->
 </div><!-- /.navbar -->
 
-<script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/js/angular.js"></script>
 <script type="text/javascript">
 
 </script>

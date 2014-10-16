@@ -8,6 +8,7 @@
            http://www.springframework.org/schema/util 
            http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 		
+	<!-- Daum OAuth 2.0 Client Setup -->
 	<util:properties id="daumProp">
 		<beans:prop key="daum.user-authorization-uri">https://apis.daum.net/oauth2/authorize</beans:prop>
 		<beans:prop key="daum.access-token-uri">https://apis.daum.net/oauth2/token</beans:prop>

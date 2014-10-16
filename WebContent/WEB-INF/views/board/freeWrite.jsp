@@ -13,7 +13,7 @@
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
   <!--summernote-->
-  <link href="<%=request.getContextPath()%>/web-resources/summernote/css/summernote.css" rel="stylesheet">
+  <link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 
@@ -81,11 +81,11 @@
 <!-- Bootstrap core JavaScript
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script> 
-<script src="<%=request.getContextPath()%>/web-resources/summernote/js/summernote.min.js"></script>
-<script src="<%=request.getContextPath()%>/web-resources/summernote/lang/summernote-ko-KR.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script> 
+<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 <!--angular-summernote dependencies -->
-<script src="<%=request.getContextPath()%>/web-resources/angular-summernote/js/angular-summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);

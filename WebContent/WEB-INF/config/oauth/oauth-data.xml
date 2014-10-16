@@ -8,7 +8,16 @@
            http://www.springframework.org/schema/util 
            http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
-  <!-- Facebook OAuth 2.0 정보 -->                   	
+	<!-- Daum OAuth 2.0 Client Setup -->
+	<util:properties id="daumProp">
+		<beans:prop key="daum.user-authorization-uri">https://apis.daum.net/oauth2/authorize</beans:prop>
+		<beans:prop key="daum.access-token-uri">https://apis.daum.net/oauth2/token</beans:prop>
+		<beans:prop key="daum.client-id">1234567890</beans:prop>
+		<beans:prop key="daum.client-secret">75fba1</beans:prop>
+		<beans:prop key="daum.profile-uri">https://apis.daum.net/user/v1/show.json</beans:prop>
+	</util:properties>		
+	 
+	<!-- Facebook OAuth 2.0 Client Setup -->	 
 	<util:properties id="facebookProp">
 		<beans:prop key="facebook.user-authorization-uri">https://www.facebook.com/dialog/oauth</beans:prop>
 		<beans:prop key="facebook.access-token-uri">https://graph.facebook.com/oauth/access_token</beans:prop>

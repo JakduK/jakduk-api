@@ -4,12 +4,12 @@
   <title>Angular-summernote Demo</title>
 
 
-  <link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/bootstrap.css" rel="stylesheet">
+  <link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap.css" rel="stylesheet">
   
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
   <!--summernote-->
-  <link href="<%=request.getContextPath()%>/web-resources/summernote/css/summernote.css" rel="stylesheet">
+  <link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
 
 
   <style>
@@ -60,13 +60,13 @@
   </div>
   <!--summernote dependencies-->
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/web-resources/bootstrap/js/bootstrap.min.js"></script>
-  <script src="<%=request.getContextPath()%>/web-resources/summernote/js/summernote.min.js"></script>
-  <script src="<%=request.getContextPath()%>/web-resources/summernote/lang/summernote-ko-KR.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
+  <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
+  <script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 
   <!--angular-summernote dependencies -->
-  <script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
-  <script src="<%=request.getContextPath()%>/web-resources/angular-summernote/js/angular-summernote.min.js"></script>
+  <script src="<%=request.getContextPath()%>/resources/angular/js/angular.js"></script>
+  <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 
   <script>
     angular.module('summernoteDemo', ['summernote'])

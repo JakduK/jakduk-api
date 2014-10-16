@@ -11,7 +11,7 @@
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
 <!-- Custom styles for this template -->
-<link href="<%=request.getContextPath()%>/web-resources/bootstrap/css/signin.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/bootstrap/css/signin.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" ng-controller="loginCtrl">
@@ -65,7 +65,7 @@
 			<p class="text-info">
 				<spring:message code="user.msg.register.oauth"/>
 				<a href="<c:url value="/oauth/daum/callback?type=facebook"/>"><i class="fa fa-facebook-square fa-2x"></i></a>
-				<a href="<c:url value="/oauth/daum/callback?type=daum"/>"><img src="/image/icon/daum_bt.png"></a>
+				<a href="<c:url value="/oauth/daum/callback?type=daum"/>"><img src="<%=request.getContextPath()%>/resources/icon/daum_bt.png"></a>
 			</p>
 
 <!-- Usage as a class -->
@@ -74,8 +74,8 @@
         </div>
     </div>
 </div>
-<script src="<%=request.getContextPath()%>/web-resources/angular/js/angular.js"></script>
-<script src="<%=request.getContextPath()%>/web-resources/angular/js/angular-cookies.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/js/angular.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/js/angular-cookies.min.js"></script>
 <script type="text/javascript">
 angular.module("loginApp", ["ngCookies"])
 .controller("loginCtrl", ["$scope", "$cookieStore", function($scope, $cookieStore) {
