@@ -10,7 +10,7 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
-  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+  <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
   <!--summernote-->
   <link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">

@@ -9,7 +9,7 @@
 <!-- include summernote css/js-->
 <link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
 
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   </head>
 

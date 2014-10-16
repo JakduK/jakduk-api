@@ -8,7 +8,7 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
 <!-- Custom styles for this template -->
 <link href="<%=request.getContextPath()%>/resources/bootstrap/css/signin.css" rel="stylesheet">
@@ -58,15 +58,30 @@
                     </form>
 
 <p/>
-			<p class="bg-info">
+
+<div class="list-group">
+  <div class="list-group-item">
 				<spring:message code="user.msg.not.user"/> 
 				<a href="<c:url value="/user/write"/>"><strong><spring:message code="user.msg.register.here"/></strong></a>
-			</p>
-			<p class="text-info">
-				<spring:message code="user.msg.register.oauth"/>
-				<a href="<c:url value="/oauth/daum/callback?type=facebook"/>"><i class="fa fa-facebook-square fa-2x"></i></a>
-				<a href="<c:url value="/oauth/daum/callback?type=daum"/>"><img src="<%=request.getContextPath()%>/resources/icon/daum_bt.png"></a>
-			</p>
+  </div>
+  <div class="list-group-item">
+		<h5 class="list-group-item-heading"><spring:message code="user.msg.register.oauth"/></h5>
+		<div class="list-group-item-text">
+			<div class="row">
+			  <div class="col-xs-3 col-md-3">
+			    <a href="<c:url value="/oauth/daum/callback?type=facebook"/>">
+			    	<i class="fa fa-facebook-square fa-3x"></i>
+			    </a>
+			  </div>
+			  <div class="col-xs-3 col-md-3">
+			    <a href="<c:url value="/oauth/daum/callback?type=daum"/>">
+			      <img src="<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png" style="width: 40px; height: 40px;"  alt="Daum">
+			    </a>
+			  </div>  
+			</div> 	    
+		</div>  
+  </div>
+</div>
 
 <!-- Usage as a class -->
                 </div>
