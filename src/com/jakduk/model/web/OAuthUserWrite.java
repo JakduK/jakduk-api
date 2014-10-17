@@ -1,5 +1,8 @@
 package com.jakduk.model.web;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -9,10 +12,24 @@ package com.jakduk.model.web;
  */
 public class OAuthUserWrite {
 
+	@NotNull
+	@Size(min = 2, max=20)
+	private String username;
+	
 	private String about;
 	
 	private String footballClub;
 	
+	private Integer existUsername;
+	
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public String getAbout() {
 		return about;
 	}
@@ -29,10 +46,19 @@ public class OAuthUserWrite {
 		this.footballClub = footballClub;
 	}
 
+	public Integer getExistUsername() {
+		return existUsername;
+	}
+
+	public void setExistUsername(Integer existUsername) {
+		this.existUsername = existUsername;
+	}
+
 	@Override
 	public String toString() {
-		return "OAuthUserWrite [about=" + about + ", footballClub="
-				+ footballClub + "]";
+		return "OAuthUserWrite [username=" + username + ", about=" + about
+				+ ", footballClub=" + footballClub + ", existUsername="
+				+ existUsername + "]";
 	}
 
 }

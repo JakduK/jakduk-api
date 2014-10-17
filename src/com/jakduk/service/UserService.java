@@ -111,7 +111,9 @@ public class UserService {
 	
 	public void oauthUserWrite(OAuthUserOnLogin oauthUserOnLogin) {
 		User user = new User();
+		user.setUsername(oauthUserOnLogin.getUsername());
 		user.setOauthUser(oauthUserOnLogin.getOauthUser());
+		
 		userRepository.save(user);
 	}
 	
@@ -135,9 +137,16 @@ public class UserService {
 		
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language);
 		
+		OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+		
+		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(principal.getType(), principal.getOauthId());
+		
 		OAuthUserWrite oauthUserWrite = new OAuthUserWrite();
 		
-		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+		if (oauthUserOnLogin != null && oauthUserOnLogin.getUsername() != null) {
+			oauthUserWrite.setUsername(oauthUserOnLogin.getUsername());
+		}
 		
 		if (userDetails != null && userDetails.getBio() != null) {
 			oauthUserWrite.setAbout(userDetails.getBio());
@@ -154,7 +163,7 @@ public class UserService {
 		//  그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 		OAuthPrincipal userDetails = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getId());
+		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getOauthId());
 		
 		String footballClub = userWrite.getFootballClub();
 		
@@ -175,7 +184,7 @@ public class UserService {
 
 		// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 		AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		UserProfile user = userRepository.findById(authUser.getUserid());
+		UserProfile user = userRepository.findById(authUser.getId());
 		
 		model.addAttribute("user", user);
 		
@@ -190,7 +199,7 @@ public class UserService {
 			
 			// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 			AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile userWrite = userRepository.findById(authUser.getUserid());
+			UserProfile userWrite = userRepository.findById(authUser.getId());
 			
 			model.addAttribute("userWrite", userWrite);
 			model.addAttribute("footballClubs", footballClubs);

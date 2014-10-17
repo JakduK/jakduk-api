@@ -79,7 +79,7 @@ public class BoardFreeService {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		if (principal instanceof AuthUser) {
-			String userid = ((AuthUser) principal).getUserid();
+			String userid = ((AuthUser) principal).getId();
 			String username = ((AuthUser) principal).getUsername();
 			
 			BoardWriter writer = new BoardWriter();
@@ -218,7 +218,7 @@ public class BoardFreeService {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		if (principal instanceof AuthUser) {
-			String userid = ((AuthUser) principal).getUserid();
+			String userid = ((AuthUser) principal).getId();
 			String username = ((AuthUser) principal).getUsername();
 			
 			Boolean isSameUser = false;

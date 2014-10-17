@@ -27,8 +27,9 @@ public class OAuthPrincipal implements UserDetails {
 	 */
 	private static final long serialVersionUID = 8207029289879890348L;
 
-	private String id;
+	private String oauthId;
 	private String username;
+	private String type;
 	private Integer addInfoStatus;
 
 	private final Set<GrantedAuthority> authorities;
@@ -41,8 +42,12 @@ public class OAuthPrincipal implements UserDetails {
 		return addInfoStatus;
 	}
 
-	public String getId() {
-		return id;
+	public String getOauthId() {
+		return oauthId;
+	}
+
+	public String getType() {
+		return type;
 	}
 
 	private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
@@ -77,11 +82,12 @@ public class OAuthPrincipal implements UserDetails {
 		return sortedAuthorities;
 	}
 
-	public OAuthPrincipal(String id, String username, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
+	public OAuthPrincipal(String oauthId, String username, String type, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
-		this.id = id;
+		this.oauthId = oauthId;
 		this.username = username;
+		this.type = type;
 		this.addInfoStatus = addInfoStatus;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
@@ -134,10 +140,10 @@ public class OAuthPrincipal implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "FacebookDetails [id=" + id + ", username=" + username
-				+ ", addInfoStatus=" + addInfoStatus + ", authorities="
-				+ authorities + ", accountNonExpired=" + accountNonExpired
-				+ ", accountNonLocked=" + accountNonLocked
+		return "OAuthPrincipal [oauthId=" + oauthId + ", username=" + username
+				+ ", type=" + type + ", addInfoStatus=" + addInfoStatus
+				+ ", authorities=" + authorities + ", accountNonExpired="
+				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked
 				+ ", credentialsNonExpired=" + credentialsNonExpired
 				+ ", enabled=" + enabled + "]";
 	}

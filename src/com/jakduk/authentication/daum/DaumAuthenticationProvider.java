@@ -3,6 +3,7 @@ package com.jakduk.authentication.daum;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -45,13 +46,13 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 
 			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getUserid(), user.getNickname(), CommonConst.OAUTH_TYPE_DAUM);
 			
-			UsernamePasswordAuthenticationToken token = 	new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
+			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
 
 			token.setDetails(getUserDetails(user));
 			
 			return token;
 		} else {
-			return null;
+			throw new BadCredentialsException("fail to authenticate Daum");
 		}
 	}
 

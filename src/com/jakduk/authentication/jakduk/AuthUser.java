@@ -22,7 +22,7 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 	private String password;
 	private String username;
 	private final String email;
-	private final String userid;
+	private final String id;
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
 	private final boolean accountNonLocked;
@@ -34,8 +34,8 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 	/**
 	 * Calls the more complex constructor with all boolean arguments set to {@code true}.
 	 */
-	public AuthUser(String email, String userid, String password, String username, Collection<? extends GrantedAuthority> authorities) {
-		this(email, userid, password, username, true, true, true, true, authorities);
+	public AuthUser(String email, String id, String password, String username, Collection<? extends GrantedAuthority> authorities) {
+		this(email, id, password, username, true, true, true, true, authorities);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 	 *         either as a parameter or as an element in the
 	 *         <code>GrantedAuthority</code> collection
 	 */
-	public AuthUser(String email, String userid, String password, String username, boolean enabled, boolean accountNonExpired,
+	public AuthUser(String email, String id, String password, String username, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		if (((email == null) || "".equals(email)) || (password == null)) {
@@ -69,7 +69,7 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 		}
 
 		this.email = email;
-		this.userid = userid;
+		this.id = id;
 		this.password = password;
 		this.username = username;
 		this.enabled = enabled;
@@ -93,8 +93,8 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 		return username;
 	}
 
-	public String getUserid() {
-		return userid;
+	public String getId() {
+		return id;
 	}
 
 	public String getEmail() {
@@ -181,7 +181,7 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 		StringBuilder sb = new StringBuilder();
 		sb.append(super.toString()).append(": ");
 		sb.append("email: ").append(this.email).append("; ");
-		sb.append("userid: ").append(this.userid).append("; ");
+		sb.append("userid: ").append(this.id).append("; ");
 		sb.append("password: [PROTECTED]; ");
 		sb.append("username: ").append(this.username).append("; ");
 		sb.append("Enabled: ").append(this.enabled).append("; ");

@@ -18,6 +18,8 @@ public class OAuthUserOnLogin {
 	@Id
 	private String id;
 	
+	private String username;
+	
 	private OAuthUser oauthUser;
 
 	public String getId() {
@@ -26,6 +28,14 @@ public class OAuthUserOnLogin {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public OAuthUser getOauthUser() {
@@ -38,7 +48,8 @@ public class OAuthUserOnLogin {
 
 	@Override
 	public String toString() {
-		return "OAuthUserWrite [id=" + id + ", oauthUser=" + oauthUser + "]";
+		return "OAuthUserOnLogin [id=" + id + ", username=" + username
+				+ ", oauthUser=" + oauthUser + "]";
 	}
 
 }

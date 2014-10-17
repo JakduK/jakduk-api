@@ -86,14 +86,6 @@ public class OAuthController {
 		return "home/oauth02";
 	}
 	
-	@RequestMapping(value = "/daum/callback03")
-	public String daumCallback03(Model model) {
-		
-		logger.debug("model=" + model);
-		
-		return "home/oauth03";
-	}
-	
 	@RequestMapping(value = "/write")
 	public String write(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,

@@ -45,6 +45,10 @@ public class OAuthDetailService implements UserDetailsService {
 		return username;
 	}
 	
+	public String getType() {
+		return type;
+	}
+
 	public UserDetails loadUser(String oauthId, String username, String type) {
 		this.username = username;
 		this.type = type;
@@ -52,13 +56,13 @@ public class OAuthDetailService implements UserDetailsService {
 	}
 	
 	@Override
-	public UserDetails loadUserByUsername(String oauthId)
-			throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String oauthId)	throws UsernameNotFoundException {
 		
 		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(type, oauthId);
 		
 		if (oauthUserOnLogin == null) {
 			oauthUserOnLogin = new OAuthUserOnLogin();
+			oauthUserOnLogin.setUsername(username);			
 			OAuthUser oauthUser = new OAuthUser();
 			oauthUser.setOauthId(oauthId);
 			oauthUser.setType(type);
@@ -66,12 +70,12 @@ public class OAuthDetailService implements UserDetailsService {
 			oauthUserOnLogin.setOauthUser(oauthUser);
 			
 			if (logger.isDebugEnabled()) {
-				logger.debug("new oauthuser of facebook=" + oauthUserOnLogin);
+				logger.debug("new oauthuser info =" + oauthUserOnLogin);
 			}
 			userService.oauthUserWrite(oauthUserOnLogin);
 		}
 		
-		OAuthPrincipal principal = new OAuthPrincipal(oauthId, username, oauthUserOnLogin.getOauthUser().getAddInfoStatus()
+		OAuthPrincipal principal = new OAuthPrincipal(oauthId, oauthUserOnLogin.getUsername(), type, oauthUserOnLogin.getOauthUser().getAddInfoStatus()
 				, true, true, true, true, getAuthorities(2));
 		
 		return principal;

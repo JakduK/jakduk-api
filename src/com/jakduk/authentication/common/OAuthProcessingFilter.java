@@ -4,17 +4,20 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.http.AccessTokenRequiredException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.jakduk.common.CommonConst;
 
@@ -31,16 +34,38 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 	protected OAuthProcessingFilter(String defaultFilterProcessesUrl) {
 		super(defaultFilterProcessesUrl);
 	}
-	
+
+	@Override
+	public void doFilter(ServletRequest req, ServletResponse res,	FilterChain chain) throws IOException, ServletException {
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+		HttpServletRequest httpRequest = (HttpServletRequest) req;
+		
+		if (!authentication.isAuthenticated() && !httpRequest.getServletPath().equals("/oauth/daum/callback")) {
+			SecurityContextHolder.getContext().setAuthentication(null);
+			
+			if (logger.isDebugEnabled()) {
+				logger.debug("oauth were cancled. Authentication object was deleted.");
+			}
+		}
+		
+		super.doFilter(req, res, chain);
+	}
+
 	public OAuthProcessingFilter() {
 		super("/oauth/daum/callback");
 	}
 
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request,
-			HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
 
 		String type = request.getParameter("type");
+		String error = request.getParameter("error");
+		
+		if (error != null) {
+			throw new BadCredentialsException(error);
+		}
 
 		if (type!= null && (type.equals(CommonConst.OAUTH_TYPE_DAUM) || type.equals(CommonConst.OAUTH_TYPE_FACEBOOK))) {
 			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(type, null);
@@ -48,7 +73,7 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 
 			return this.getAuthenticationManager().authenticate(authRequest);
 		} else {
-			return null;
+			throw new AuthenticationCredentialsNotFoundException("not found OAuth account");
 		}
 	}
 	

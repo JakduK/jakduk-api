@@ -11,22 +11,24 @@
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 <body>
-<sec:authorize access="isAuthenticated()">
-	<sec:authentication property="principal.username" var="userName"/>
-</sec:authorize>
 <div class="container">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 	<div class="container" ng-controller="writeCtrl">
-	<form:form commandName="userWrite" action="${contextPath}/oauth/write" method="POST" cssClass="form-horizontal">
+	<form:form commandName="userWrite" name="userWrite" action="${contextPath}/oauth/write" method="POST" cssClass="form-horizontal">
+		<form:input path="existUsername" cssClass="hidden" size="0" ng-init="existUsername='${userWrite.existUsername}'" ng-model="existUsername"/>
 		<legend><spring:message code="oauth.register"/> </legend>
 		
-		<div class="form-group">
+		<div class="form-group" ng-class="{'has-success':userWrite.username.$valid, 'has-error':userWrite.username.$invalid || existUsername != 2}">
 			<label class="col-sm-2 control-label" for="username">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
 			<div class="col-sm-3">
-				<input type="text" class="form-control" size="50" value="${userName}" disabled="disabled">
+					<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
+					ng-init="username='${userWrite.username}'" ng-model="username" ng-blur="onUsername(userWrite)"
+					ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
+				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>
 			</div>
 		</div>
 
@@ -71,7 +73,41 @@
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", []);
 
-jakdukApp.controller("writeCtrl", function($scope) {
+jakdukApp.controller("writeCtrl", function($scope, $http) {
+	$scope.usernameConn = 0;
+	$scope.usernameAlert = {};
+	
+	$scope.onUsername = function(userWrite) {
+		if (userWrite.username.$valid) {
+			var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';
+			if ($scope.usernameConn == 0) {
+				var reqPromise = $http.get(bUrl);
+				$scope.usernameConn = 1;
+				reqPromise.success(function(data, status, headers, config) {
+					if (data.existUsername != null) {
+						if (data.existUsername == false) {
+							$scope.existUsername = 2;
+							$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+						} else {
+							$scope.existUsername = 1;
+							$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
+						}
+					}
+					$scope.usernameConn = 0;
+				});
+				reqPromise.error(usernameError);
+			}
+		} else {
+			$scope.existUsername = 1;
+			checkUsername(userWrite);
+		}
+	};
+	
+	function usernameError(data, status, headers, config) {
+		$scope.usernameConn = 0;
+		$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
+	}
+	
 });
 </script>
 
