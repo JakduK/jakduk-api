@@ -22,7 +22,6 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.RestTemplate;
 
 import com.jakduk.model.web.OAuthUserWrite;
-import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
@@ -35,7 +34,7 @@ import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/oauth")
-@SessionAttributes("userWrite")
+@SessionAttributes({"OAuthUserWrite", "footballClubs"})
 public class OAuthController {
 	
 	@Autowired
@@ -86,7 +85,7 @@ public class OAuthController {
 		return "home/oauth02";
 	}
 	
-	@RequestMapping(value = "/write")
+	@RequestMapping(value = "/write", method = RequestMethod.GET)
 	public String write(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {
@@ -101,14 +100,17 @@ public class OAuthController {
 	}
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public String write(@Valid OAuthUserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
+	public String write(@Valid OAuthUserWrite oAuthUserWrite, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
-			return "user/write";
+			if (logger.isDebugEnabled()) {
+				logger.debug("result=" + result);	
+			}
+			
+			return "oauth/write";
 		}
 		
-		userService.oAuthWriteDetails(userWrite);
+		userService.oAuthWriteDetails(oAuthUserWrite);
 		sessionStatus.setComplete();
 		
 		return "redirect:/home";

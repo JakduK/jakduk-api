@@ -152,7 +152,7 @@ public class UserService {
 			oauthUserWrite.setAbout(userDetails.getBio());
 		}
 		
-		model.addAttribute("userWrite", oauthUserWrite);
+		model.addAttribute("OAuthUserWrite", oauthUserWrite);
 		model.addAttribute("footballClubs", footballClubs);
 		
 		return model;

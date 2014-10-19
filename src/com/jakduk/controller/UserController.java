@@ -24,7 +24,7 @@ import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/user")
-@SessionAttributes("userWrite")
+@SessionAttributes({"userWrite", "footballClubs"})
 public class UserController {
 	
 	@Autowired

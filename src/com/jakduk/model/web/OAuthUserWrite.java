@@ -3,6 +3,8 @@ package com.jakduk.model.web;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
