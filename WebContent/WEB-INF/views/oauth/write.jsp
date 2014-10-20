@@ -42,7 +42,7 @@
 			</label>
 			<div class="col-sm-3">
 				<form:select path="footballClub" cssClass="form-control">
-					<form:option value="-1"><spring:message code="common.none"/></form:option>
+					<form:option value=""><spring:message code="common.none"/></form:option>
 				<c:forEach items="${footballClubs}" var="club">
 					<c:forEach items="${club.names}" var="name">
 						<form:option value="${club.id}" label="${name.shortName}" class="visible-xs"/>

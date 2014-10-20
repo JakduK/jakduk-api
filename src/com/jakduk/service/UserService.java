@@ -163,19 +163,20 @@ public class UserService {
 		//  그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 		OAuthPrincipal userDetails = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		User user = userRepository.userFindByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, userDetails.getOauthId());
+		User user = userRepository.userFindByOauthUser(userDetails.getType(), userDetails.getOauthId());
 		
 		String footballClub = userWrite.getFootballClub();
+		String about = userWrite.getAbout();
 		
-		if (footballClub != null && footballClub != "-1") {
+		if (footballClub != null && !footballClub.isEmpty()) {
 			FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
 			
 			user.setSupportFC(supportFC);
 		}
 		
-		user.setAbout(userWrite.getAbout());
-		
-		logger.debug("user=" + user);
+		if (about != null && !about.isEmpty()) {
+			user.setAbout(userWrite.getAbout());
+		}
 		
 		userRepository.save(user);
 	}
