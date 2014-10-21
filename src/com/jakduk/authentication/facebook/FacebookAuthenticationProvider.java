@@ -48,7 +48,7 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 			UsernamePasswordAuthenticationToken token = 
 					new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
 
-			token.setDetails(getUserDetails(user));
+			token.setDetails(oauthDetailService.getUserDetails(user));
 			
 			return token;			
 		} else {
@@ -60,36 +60,6 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public boolean supports(Class<?> authentication) {
 		return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
-	}
-	
-	public CommonUserDetails getUserDetails(FacebookUser user) {
-		CommonUserDetails userDetails = new CommonUserDetails();
-		
-		if (user.getEmail() != null) {
-			userDetails.setEmail(user.getEmail());
-		}
-		
-		if (user.getGender() != null) {
-			userDetails.setGender(user.getGender());
-		}
-		
-		if (user.getBirthday() != null) {
-			userDetails.setBirthday(user.getBirthday());
-		}
-		
-		if (user.getLink() != null) {
-			userDetails.setLink(user.getLink());
-		}
-		
-		if (user.getLocale() != null) {
-			userDetails.setLocale(user.getLocale());
-		}
-		
-		if (user.getBio() != null) {
-			userDetails.setBio(user.getBio());
-		}
-		
-		return userDetails;
 	}
 }
 

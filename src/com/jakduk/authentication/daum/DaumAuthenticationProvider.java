@@ -8,10 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthDetailService;
 import com.jakduk.authentication.common.OAuthPrincipal;
-import com.jakduk.authentication.facebook.FacebookUser;
 import com.jakduk.common.CommonConst;
 
 /**
@@ -33,7 +31,7 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 		this.daumService = daumService;
 	}
 
-	@Override
+	@Override	
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
@@ -48,7 +46,7 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 			
 			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
 
-			token.setDetails(getUserDetails(user));
+			token.setDetails(oauthDetailService.getUserDetails(user));
 			
 			return token;
 		} else {
@@ -59,16 +57,6 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public boolean supports(Class<?> authentication) {
 		return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
-	}
-	
-	public CommonUserDetails getUserDetails(DaumUser user) {
-		CommonUserDetails userDetails = new CommonUserDetails();
-		
-		if (user.getImagePath() != null) {
-			userDetails.setImagePath(user.getImagePath());
-		}	
-		
-		return userDetails;
 	}
 
 }

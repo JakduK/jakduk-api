@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.jakduk.authentication.daum.DaumUser;
+import com.jakduk.authentication.facebook.FacebookUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.OAuthUserOnLogin;
@@ -106,5 +108,45 @@ public class OAuthDetailService implements UserDetailsService {
 			authorities.add(new SimpleGrantedAuthority(role));
 		}
 		return authorities;
+	}
+	
+	public CommonUserDetails getUserDetails(DaumUser user) {
+		CommonUserDetails userDetails = new CommonUserDetails();
+		
+		if (user.getImagePath() != null) {
+			userDetails.setImagePath(user.getImagePath());
+		}	
+		
+		return userDetails;
+	}
+	
+	public CommonUserDetails getUserDetails(FacebookUser user) {
+		CommonUserDetails userDetails = new CommonUserDetails();
+		
+		if (user.getEmail() != null) {
+			userDetails.setEmail(user.getEmail());
+		}
+		
+		if (user.getGender() != null) {
+			userDetails.setGender(user.getGender());
+		}
+		
+		if (user.getBirthday() != null) {
+			userDetails.setBirthday(user.getBirthday());
+		}
+		
+		if (user.getLink() != null) {
+			userDetails.setLink(user.getLink());
+		}
+		
+		if (user.getLocale() != null) {
+			userDetails.setLocale(user.getLocale());
+		}
+		
+		if (user.getBio() != null) {
+			userDetails.setBio(user.getBio());
+		}
+		
+		return userDetails;
 	}
 }

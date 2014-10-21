@@ -18,11 +18,16 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.jakduk.authentication.common.CommonUserDetails;
+import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Sequence;
+import com.jakduk.model.db.User;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
@@ -198,6 +203,15 @@ public class CommonService {
 		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language, pageable);
 		
 		return footballClubs;
+	}
+	
+	public void doAutoLogin(OAuthPrincipal principal, Object credentials, CommonUserDetails userDetails) {
+		
+		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());
+		token.setDetails(userDetails);
+
+		logger.debug("phjang=" + token);
+		SecurityContextHolder.getContext().setAuthentication(token);
 	}
 	
 }

@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.AuthUser;
-import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.BoardWriter;
@@ -160,13 +159,19 @@ public class UserService {
 	
 	public void oAuthWriteDetails(OAuthUserWrite userWrite) {
 		
-		//  그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
-		OAuthPrincipal userDetails = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 		
-		User user = userRepository.userFindByOauthUser(userDetails.getType(), userDetails.getOauthId());
-		
+		User user = userRepository.userFindByOauthUser(principal.getType(), principal.getOauthId());
+
+		String username = userWrite.getUsername();
 		String footballClub = userWrite.getFootballClub();
 		String about = userWrite.getAbout();
+		
+		if (username != null && !username.isEmpty()) {
+			user.setUsername(userWrite.getUsername());
+		}
 		
 		if (footballClub != null && !footballClub.isEmpty()) {
 			FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
@@ -179,6 +184,11 @@ public class UserService {
 		}
 		
 		userRepository.save(user);
+
+		// 인증 갱신을 해줘야 한다. 일단 사용자이름만 테스트.
+		principal.setUsername(userWrite.getUsername());
+		
+		commonService.doAutoLogin(principal, credentials, userDetails);
 	}
 	
 	public Model getUserProfile(Model model, String language) {
