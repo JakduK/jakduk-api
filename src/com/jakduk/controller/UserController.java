@@ -99,7 +99,7 @@ public class UserController {
 		return "user/profile";
 	}
 	
-	@RequestMapping(value = "/profile/update")
+	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
 	public String profileUpdate(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {

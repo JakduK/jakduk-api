@@ -16,8 +16,10 @@ import org.springframework.validation.BindingResult;
 import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.AuthUser;
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
+import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.model.simple.UserProfile;
@@ -164,6 +166,7 @@ public class UserService {
 		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 		
 		User user = userRepository.userFindByOauthUser(principal.getType(), principal.getOauthId());
+		OAuthUser oAuthUser = user.getOauthUser();
 
 		String username = userWrite.getUsername();
 		String footballClub = userWrite.getFootballClub();
@@ -183,10 +186,14 @@ public class UserService {
 			user.setAbout(userWrite.getAbout());
 		}
 		
+		oAuthUser.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_OK);
+		
+		user.setOauthUser(oAuthUser);
+		
 		userRepository.save(user);
 
-		// 인증 갱신을 해줘야 한다. 일단 사용자이름만 테스트.
 		principal.setUsername(userWrite.getUsername());
+		principal.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_OK);
 		
 		commonService.doAutoLogin(principal, credentials, userDetails);
 	}

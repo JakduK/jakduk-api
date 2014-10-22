@@ -40,8 +40,6 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 			
 			DaumUser user = daumService.findUser();
 			
-			logger.debug("phjang user=" + user);
-
 			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getUserid(), user.getNickname(), CommonConst.OAUTH_TYPE_DAUM);
 			
 			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
