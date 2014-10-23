@@ -1,7 +1,5 @@
 package com.jakduk.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -17,15 +15,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
-import com.jakduk.model.db.User;
-import com.jakduk.model.web.UserWrite;
+import com.jakduk.model.web.UserProfileWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
+/**
+ * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
+ * @company  : http://jakduk.com
+ * @date     : 2014. 10. 23.
+ * @desc     :
+ */
+
 @Controller
-@RequestMapping("/user")
-@SessionAttributes({"userWrite", "footballClubs"})
-public class UserController {
+@RequestMapping("/user/profile")
+@SessionAttributes({"userProfileWrite", "footballClubs"})
+public class UserProfileController {
 	
 	@Autowired
 	private CommonService commonService;
@@ -36,55 +40,41 @@ public class UserController {
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	@RequestMapping
-	public String root() {
-		
-		return "redirect:/user/list";
-	}
-	
-	@RequestMapping(value = "/list")
-	public void list(Model model) {
-		
-		logger.debug("/test : " + userService.testFindId("test02"));
-		
-		List<User> users = userService.findAll();
-		logger.debug("/list : " + users);
-		
-		model.addAttribute("list", users);
-		
-//		return "user/list";
-	}
-	
-	@RequestMapping(value = "/write", method = RequestMethod.GET)
-	public String write(HttpServletRequest request, HttpServletResponse response,
+	public String profile(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {
 		
 		String language = commonService.getLanguageCode(request, response, lang);
 		
-		userService.getUserWrite(model, language);
+		userService.getUserProfile(model, language);
 		
-		return "user/write";
+		return "user/profile";
 	}
 	
-	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
+	@RequestMapping(value = "/update", method = RequestMethod.GET)
+	public String profileUpdate(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(required = false) String lang,
+			Model model) {
+		
+		String language = commonService.getLanguageCode(request, response, lang);
+		
+		userService.getUserProfileUpdate(model, language);
+		
+		return "user/profileUpdate";
+	}
+	
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public String profileUpdate(@Valid UserProfileWrite userProfileWrite, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
-			return "user/write";
+			return "user/profileUpdate";
 		}
 		
-		userService.checkUserWrite(userWrite, result);
-		
-		if (result.hasErrors()) {
-			logger.debug("result=" + result);
-			return "user/write";
-		}
-		
-		userService.userWrite(userWrite);
+		userService.userProfileUpdate(userProfileWrite);
 		sessionStatus.setComplete();
 		
-		return "redirect:/login?status=2";
+		return "redirect:/user/profile";
 	}
-	
+
 }

@@ -24,6 +24,7 @@ import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.OAuthUserWrite;
+import com.jakduk.model.web.UserProfileWrite;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
@@ -217,15 +218,30 @@ public class UserService {
 			
 			// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 			AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile userWrite = userRepository.findById(authUser.getId());
+			UserProfile userProfile = userRepository.findById(authUser.getId());
 			
-			model.addAttribute("userWrite", userWrite);
+			FootballClub footballClub = userProfile.getSupportFC();
+			
+			UserProfileWrite userProfileWrite = new UserProfileWrite();
+			
+			userProfileWrite.setEmail(userProfile.getEmail());
+			userProfileWrite.setUsername(userProfile.getUsername());
+
+			if (footballClub != null) {
+				userProfileWrite.setFootballClub(footballClub.getId());
+			}
+			
+			model.addAttribute("userProfileWrite", userProfileWrite);
 			model.addAttribute("footballClubs", footballClubs);
 			
 		} else {
 		}
 		
 		return model;
+	}
+	
+	public void userProfileUpdate(UserProfileWrite userProfileWrite) {
+		
 	}
 		
 }

@@ -3,33 +3,50 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>    
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="jakdukApp">
 <head>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
+
+<sec:authorize access="isAuthenticated()">
+	<sec:authentication property="principal.username" var="principalUsername"/>
+</sec:authorize>
+    
 <div class="container" ng-controller="writeCtrl">
-<form:form commandName="userWrite" name="userWrite" action="${contextPath}/user/profile/update" method="POST" cssClass="form-horizontal">
+<form:form commandName="userProfileWrite" name="userProfileWrite" action="${contextPath}/user/profile/update" method="POST" cssClass="form-horizontal"
+ng-submit="onSubmit(userProfileWrite, $event)">
+	<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userProfileWrite.usernameStatus}'" ng-model="usernameStatus"/>
 	<legend><spring:message code="user.profile.update"/> </legend>
   <div class="form-group">
 			<label class="col-sm-2 control-label" for="email">
 				<spring:message code="user.email"/>
 			</label>
     <div class="col-sm-3">
-    		<input type="email" name="email" class="form-control" size="50" placeholder="Email" disabled="disabled"/>
+    		<input type="email" name="email" class="form-control" size="50" placeholder="Email"
+    		ng-init="email='${userProfileWrite.email}'" ng-model="email" disabled="disabled"/>
     </div>
   </div>
-	<div class="form-group">
+	<div class="form-group has-feedback" ng-class="{'has-success':userProfileWrite.username.$valid || usernameStatus == 'original', 'has-error':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}">
 		<label class="col-sm-2 control-label" for="username">
 			<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 		</label>
 		<div class="col-sm-3">
-			<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname"/>
+			<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
+				ng-model="username" ng-init="username='${userProfileWrite.username}'" ng-blur="onUsername(userProfileWrite)"
+				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+			<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userProfileWrite.username.$valid || usernameStatus == 'original', 'glyphicon-remove form':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
+			<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
+			<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
+			<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>		
 		</div>
 	</div>
 	<div class="form-group">
@@ -37,7 +54,7 @@
 			<spring:message code="user.support.football.club"/>
 		</label>
 		<div class="col-sm-3">
-			<form:select path="supportFC" cssClass="form-control">
+			<form:select path="footballClub" cssClass="form-control">
 				<form:option value="-1"><spring:message code="common.none"/></form:option>
 				<c:forEach items="${footballClubs}" var="club">
 					<c:forEach items="${club.names}" var="name">
@@ -73,6 +90,72 @@
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("writeCtrl", function($scope, $http) {
+	$scope.usernameConn = 0;
+	$scope.usernameAlert = {};
+	
+	$scope.onSubmit = function(userProfileWrite, event) {
+		if (userProfileWrite.$valid && ($scope.usernameStatus == "ok" || $scope.usernameStatus == "original")) {
+		} else {			
+			if (userProfileWrite.username.$invalid) {
+				checkUsername(userProfileWrite);
+			} else if ($scope.usernameStatus == "duplication") {
+				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
+			} else {
+				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
+			}
+
+			event.preventDefault();
+		}
+	};
+	
+	$scope.onUsername = function(userProfileWrite) {
+		if ("${principalUsername}" == $scope.username) {
+			$scope.usernameStatus = "original";
+		} else {
+			if (userProfileWrite.username.$valid) {
+				var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';
+				if ($scope.usernameConn == 0) {
+					var reqPromise = $http.get(bUrl);
+					$scope.usernameConn = 1;
+					reqPromise.success(function(data, status, headers, config) {
+						if (data.existUsername != null) {
+							if (data.existUsername == false) {
+								$scope.usernameStatus = "ok";
+								$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+							} else {
+								$scope.usernameStatus = "duplication";
+								$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
+							}
+						}
+						$scope.usernameConn = 0;
+					});
+					reqPromise.error(usernameError);
+				}
+			} else {
+				//$scope.existUsername = 1;
+				checkUsername(userProfileWrite);
+			}
+		}
+
+	};
+	
+	function usernameError(data, status, headers, config) {
+		$scope.usernameConn = 0;
+		$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
+	}
+	
+	function checkUsername(userProfileWrite) {
+		
+		if (userProfileWrite.username.$error.required) {
+			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
+		} else if (userProfileWrite.username.$error.minlength || userProfileWrite.username.$error.maxlength) {
+			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
+		}
+	}
+	
+});
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
