@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//LOGGER" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+ 
+    <!-- Appenders -->
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%5p] [%t %d{hh:mm:ss}] (%F:%M:%L) %m%n" />
+        </layout>
+    </appender>
+    
+    <appender name="dailyRollingFile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/home/pyohwan/log/sample.log"/>
+		<param name="MaxBackupIndex" value="5"/> <!-- Max 5 files -->
+        <param name="MaxFileSize" value="5KB"/>
+        <param name="Append" value="true"/>
+		<param name="DatePattern" value=".yyyy-MM-ww"/>
+	    <layout class="org.apache.log4j.PatternLayout">
+	        <param name="ConversionPattern" value="[%5p] [%t %d{hh:mm:ss}] (%F:%M:%L) %m%n" />
+	    </layout>   
+	</appender>
+    
+	<appender name="default" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="/home/pyohwan/log/default.log"/>
+        <param name="MaxBackupIndex" value="5"/> <!-- Max 5 files -->
+        <param name="MaxFileSize" value="5KB"/>
+        <param name="Append" value="true"/>
+
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%5p] [%t %d{hh:mm:ss}] (%F:%M:%L) %m%n"/>
+        </layout>
+    </appender>
+ 
+    <!-- 3rdparty Loggers -->
+    <logger name="org.springframework.core">
+        <level value="WARN" />
+    </logger>
+ 
+    <logger name="org.springframework.beans">
+        <level value="WARN" />
+    </logger>
+     
+    <logger name="org.springframework.context">
+        <level value="WARN" />
+    </logger>
+ 
+    <logger name="org.springframework.web">
+        <level value="WARN" />
+    </logger>
+    
+	<logger name="trace">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	 
+    <logger name="com.jakduk">
+        <level value="DEBUG" />
+    </logger>    
+ 
+    <!-- Root Logger -->
+    <root>
+        <priority value="DEBUG" />
+        <appender-ref ref="console" />
+        <appender-ref ref="default" />
+        <appender-ref ref="dailyRollingFile" />
+    </root>
+     
+</log4j:configuration>
