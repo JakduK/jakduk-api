@@ -53,10 +53,10 @@
 	<beans:bean id="loginSuccessHandler" class="com.jakduk.authentication.common.LoginSuccessHandler"/>
 	<beans:bean id="loginFailureHandler" class="com.jakduk.authentication.common.LoginFailureHandler"/>
 	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
-	<beans:bean id="authUserDetailsService" class="com.jakduk.authentication.jakduk.AuthUserDetailsService"/>
+	<beans:bean id="jakdukDetailsService" class="com.jakduk.authentication.jakduk.JakdukDetailsService"/>
 	
 	<authentication-manager alias="authenticationManager">
-		<authentication-provider user-service-ref="authUserDetailsService">
+		<authentication-provider user-service-ref="jakdukDetailsService">
 			<password-encoder ref="encoder" />
 		</authentication-provider>
 		<authentication-provider ref="facebookAuthenticationProvider"/>

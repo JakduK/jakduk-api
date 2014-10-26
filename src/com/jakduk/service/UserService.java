@@ -15,7 +15,7 @@ import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
-import com.jakduk.authentication.jakduk.AuthUser;
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
@@ -202,7 +202,7 @@ public class UserService {
 	public Model getUserProfile(Model model, String language) {
 
 		// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
-		AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		UserProfile user = userRepository.findById(authUser.getId());
 		
 		model.addAttribute("user", user);
@@ -217,7 +217,7 @@ public class UserService {
 			List<FootballClub> footballClubs = commonService.getFootballClubs(language);
 			
 			// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
-			AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			UserProfile userProfile = userRepository.findById(authUser.getId());
 			
 			FootballClub footballClub = userProfile.getSupportFC();

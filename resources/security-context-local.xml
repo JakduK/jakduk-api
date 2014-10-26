@@ -53,11 +53,11 @@
 	<beans:bean id="loginSuccessHandler" class="com.jakduk.authentication.common.LoginSuccessHandler"/>
 	<beans:bean id="loginFailureHandler" class="com.jakduk.authentication.common.LoginFailureHandler"/>
 	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
-	<beans:bean id="authUserDetailsService" class="com.jakduk.authentication.jakduk.AuthUserDetailsService"/>
+	<beans:bean id="jakdukDetailsService" class="com.jakduk.authentication.jakduk.JakdukDetailsService"/>
 	
 	<authentication-manager alias="authenticationManager">
-		<authentication-provider user-service-ref="authUserDetailsService">
-			<password-encoder ref="encoder" />
+		<authentication-provider user-service-ref="jakdukDetailsService">
+			<password-encoder ref="encoder"/>
 		</authentication-provider>
 		<authentication-provider ref="facebookAuthenticationProvider"/>
 		<authentication-provider ref="daumAuthenticationProvider"/>
@@ -113,6 +113,6 @@
 	
 	<beans:bean id="daumAuthenticationProvider" class="com.jakduk.authentication.daum.DaumAuthenticationProvider">
 		<beans:property name="daumService" ref="daumService"/>
-	</beans:bean> 	
+	</beans:bean>
 
 </beans:beans>

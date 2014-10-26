@@ -34,8 +34,8 @@
 	<import resource="config/oauth/oauth-data-local.xml"/>
 <!-- 
 	<import resource="config/oauth/oauth-data.xml"/>
- -->
+ -->	
 	<bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"
-		p:location="/WEB-INF/config/db/mongo.properties" />
+		p:location="classpath:/config/db/mongo.properties" />
 
 </beans>

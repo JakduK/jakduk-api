@@ -45,6 +45,7 @@ public class CommonConst {
 	 */
 	public final static String OAUTH_TYPE_FACEBOOK = "facebook";
 	public final static String OAUTH_TYPE_DAUM = "daum";
+	public final static String AUTH_TYPE_JAKDUK = "jakduk";
 	
 	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_NONE = 10;
 	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_UNUSE = 11;

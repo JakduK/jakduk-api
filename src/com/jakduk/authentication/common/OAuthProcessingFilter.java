@@ -46,8 +46,8 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 				!httpRequest.getServletPath().equals("/oauth/write"))) {
 			SecurityContextHolder.getContext().setAuthentication(null);
 			
-			if (logger.isDebugEnabled()) {
-				logger.debug("oauth were cancled. Authentication object was deleted.");
+			if (logger.isInfoEnabled()) {
+				logger.info("oauth were cancled. Authentication object was deleted.");
 			}
 		}
 		

@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.jakduk.authentication.jakduk.AuthUser;
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
@@ -78,9 +78,9 @@ public class BoardFreeService {
 		
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		if (principal instanceof AuthUser) {
-			String userid = ((AuthUser) principal).getId();
-			String username = ((AuthUser) principal).getUsername();
+		if (principal instanceof JakdukPrincipal) {
+			String userid = ((JakdukPrincipal) principal).getId();
+			String username = ((JakdukPrincipal) principal).getUsername();
 			
 			BoardWriter writer = new BoardWriter();
 			writer.setId(userid);
@@ -217,9 +217,9 @@ public class BoardFreeService {
 		
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		if (principal instanceof AuthUser) {
-			String userid = ((AuthUser) principal).getId();
-			String username = ((AuthUser) principal).getUsername();
+		if (principal instanceof JakdukPrincipal) {
+			String userid = ((JakdukPrincipal) principal).getId();
+			String username = ((JakdukPrincipal) principal).getUsername();
 			
 			Boolean isSameUser = false;
 			

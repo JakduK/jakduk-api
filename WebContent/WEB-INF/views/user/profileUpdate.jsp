@@ -113,6 +113,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.onUsername = function(userProfileWrite) {
 		if ("${principalUsername}" == $scope.username) {
 			$scope.usernameStatus = "original";
+			$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 		} else {
 			if (userProfileWrite.username.$valid) {
 				var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';

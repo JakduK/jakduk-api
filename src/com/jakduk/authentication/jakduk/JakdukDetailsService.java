@@ -13,11 +13,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.User;
 import com.jakduk.repository.UserRepository;
 
 @Service
-public class AuthUserDetailsService implements UserDetailsService {
+public class JakdukDetailsService implements UserDetailsService {
 	
 	@Autowired
 	UserRepository userRepository;
@@ -26,33 +27,32 @@ public class AuthUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		try {
-			AuthUser authUser;
-			
+		
+		if (email != null && (email.equals(CommonConst.OAUTH_TYPE_FACEBOOK) 
+				|| email.equals(CommonConst.OAUTH_TYPE_DAUM))) {
+			throw new UsernameNotFoundException("not found email=" + email);
+		} else {
 			User domainUser = userRepository.findByEmail(email);
-			
-			boolean enabled = true;
-			boolean accountNonExpired = true;
-			boolean credentialsNonExpired = true;
-			boolean accountNonLocked = true;
-			
-			logger.debug("email=" + email);
-			logger.debug("domainUser=" + domainUser);
-			
+
 			if (domainUser != null) {
-				authUser = new AuthUser(domainUser.getEmail(), domainUser.getId(), domainUser.getPassword(), domainUser.getUsername(),
-						enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(2));
+				boolean enabled = true;
+				boolean accountNonExpired = true;
+				boolean credentialsNonExpired = true;
+				boolean accountNonLocked = true;
+
+				JakdukPrincipal	jakdukPrincipal = new JakdukPrincipal(domainUser.getEmail(), domainUser.getId(), domainUser.getPassword(), domainUser.getUsername(),
+						CommonConst.AUTH_TYPE_JAKDUK, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(2));
+				
+				if (logger.isInfoEnabled()) {
+					logger.info("load user JakdukPrincipal=" + jakdukPrincipal);
+				}
+
+				return jakdukPrincipal;
 			} else {
-				authUser = new AuthUser("admin", "admin", "21232f297a57a5a743894a0e4a801fc3", "admin", true, true, true, true, getAuthorities(1));
+				throw new UsernameNotFoundException("not found email=" + email);
 			}
-			
-			logger.debug("authUser=" + authUser);
-			
-			return authUser;
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
+		
 	}
 	
 	public Collection<? extends GrantedAuthority> getAuthorities(Integer role) {

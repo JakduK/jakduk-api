@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
-import com.jakduk.authentication.jakduk.AuthUser;
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 
 /**
@@ -33,8 +33,8 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 		String remember = request.getParameter("remember");
 		
 		if (remember != null && remember.equals("on")) {
-			if (authentication.getPrincipal() instanceof AuthUser) {
-				AuthUser authUser = (AuthUser) authentication.getPrincipal();
+			if (authentication.getPrincipal() instanceof JakdukPrincipal) {
+				JakdukPrincipal authUser = (JakdukPrincipal) authentication.getPrincipal();
 				String email = authUser.getEmail();
 				
 				Cookie cookie1 = new Cookie(CommonConst.COOKIE_EMAIL, email);

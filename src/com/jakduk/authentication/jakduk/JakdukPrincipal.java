@@ -14,13 +14,14 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
-public class AuthUser implements UserDetails, CredentialsContainer {
+public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
 	//~ Instance fields ================================================================================================
 	private String password;
 	private String username;
+	private String type;
 	private final String email;
 	private final String id;
 	private final Set<GrantedAuthority> authorities;
@@ -30,13 +31,6 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 	private final boolean enabled;
 
 	//~ Constructors ===================================================================================================
-
-	/**
-	 * Calls the more complex constructor with all boolean arguments set to {@code true}.
-	 */
-	public AuthUser(String email, String id, String password, String username, Collection<? extends GrantedAuthority> authorities) {
-		this(email, id, password, username, true, true, true, true, authorities);
-	}
 
 	/**
 	 * Construct the <code>User</code> with the details required by
@@ -61,7 +55,7 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 	 *         either as a parameter or as an element in the
 	 *         <code>GrantedAuthority</code> collection
 	 */
-	public AuthUser(String email, String id, String password, String username, boolean enabled, boolean accountNonExpired,
+	public JakdukPrincipal(String email, String id, String password, String username, String type, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		if (((email == null) || "".equals(email)) || (password == null)) {
@@ -72,6 +66,7 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 		this.id = id;
 		this.password = password;
 		this.username = username;
+		this.type = type;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
@@ -91,6 +86,10 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 
 	public String getUsername() {
 		return username;
+	}
+	
+	public String getType() {
+		return type;
 	}
 
 	public String getId() {
@@ -162,8 +161,8 @@ public class AuthUser implements UserDetails, CredentialsContainer {
 	 */
 	@Override
 	public boolean equals(Object rhs) {
-		if (rhs instanceof AuthUser) {
-			return email.equals(((AuthUser) rhs).email);
+		if (rhs instanceof JakdukPrincipal) {
+			return email.equals(((JakdukPrincipal) rhs).email);
 		}
 		return false;
 	}

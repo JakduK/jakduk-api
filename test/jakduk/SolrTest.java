@@ -19,12 +19,12 @@ import org.apache.solr.common.SolrInputDocument;
  * @date     : 2014. 7. 16.
  * @desc     :
  */
-public class Test {
+public class SolrTest {
     private static int fetchSize = 1000;
     private static String url = "http://localhost:8983/solr/core1/";
     private static HttpSolrServer solrCore;
 
-    public Test() throws MalformedURLException
+    public SolrTest() throws MalformedURLException
     {
          solrCore = new HttpSolrServer(url);
     }
