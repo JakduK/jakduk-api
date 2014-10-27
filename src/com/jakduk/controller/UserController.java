@@ -1,30 +1,27 @@
 package com.jakduk.controller;
 
 import java.util.List;
+import java.util.Locale;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.model.db.User;
-import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/user")
-@SessionAttributes({"userWrite", "footballClubs"})
 public class UserController {
 	
 	@Autowired
@@ -32,6 +29,9 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Resource
+	LocaleResolver localeResolver;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -50,41 +50,26 @@ public class UserController {
 		logger.debug("/list : " + users);
 		
 		model.addAttribute("list", users);
-		
-//		return "user/list";
 	}
 	
-	@RequestMapping(value = "/write", method = RequestMethod.GET)
-	public String write(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(value = "/profile", method = RequestMethod.GET)
+	public String profile(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {
 		
-		String language = commonService.getLanguageCode(request, response, lang);
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
 		
-		userService.getUserWrite(model, language);
+		userService.getUserProfile(model, language);
 		
-		return "user/write";
+		return "user/profile";
 	}
 	
-	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
+	@RequestMapping(value = "/password/update", method = RequestMethod.GET)
+	public String passwordUpdate(Model model) {
 		
-		if (result.hasErrors()) {
-			logger.debug("result=" + result);
-			return "user/write";
-		}
+		userService.getUserPasswordUpdate(model);
 		
-		userService.checkUserWrite(userWrite, result);
-		
-		if (result.hasErrors()) {
-			logger.debug("result=" + result);
-			return "user/write";
-		}
-		
-		userService.userWrite(userWrite);
-		sessionStatus.setComplete();
-		
-		return "redirect:/login?status=2";
+		return "user/passwordUpdate";
 	}
-	
 }

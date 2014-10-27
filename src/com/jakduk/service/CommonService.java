@@ -27,7 +27,6 @@ import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Sequence;
-import com.jakduk.model.db.User;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
@@ -179,12 +178,12 @@ public class CommonService {
 		}
 	}
 	
-	public String getLanguageCode(HttpServletRequest request, HttpServletResponse response, String lang) {
+	public String getLanguageCode(Locale locale, String lang) {
 		
 		String getLanguage = Locale.ENGLISH.getLanguage();
 		
 		if (lang == null || lang.isEmpty()) {
-			lang = response.getLocale().getLanguage();
+			lang = locale.getLanguage();
 		}
 		
 		if (lang != null) {

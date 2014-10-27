@@ -16,32 +16,40 @@
   <div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.email"/></label>
     <div class="col-sm-3">
-      <p class="form-control-static">${user.email}</p>
+      <p class="form-control-static">${userProfile.email}</p>
     </div>
   </div>
   <div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.nickname"/></label>
     <div class="col-sm-3">
-      <p class="form-control-static">${user.username}</p>
+      <p class="form-control-static">${userProfile.username}</p>
     </div>
   </div>
   <div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.support.football.club"/></label>
     <div class="col-sm-3">
-      <p class="form-control-static">${user.supportFC}</p>
+			<c:choose>
+				<c:when test="${not empty userProfile.footballClubName}">
+					<p class="form-control-static visible-sm visible-md visible-lg">${userProfile.footballClubName.fullName}</p>
+					<p class="form-control-static visible-xs">${userProfile.footballClubName.shortName}</p>
+				</c:when>
+				<c:otherwise>
+					<p class="form-control-static"><spring:message code="common.none"/></p>
+				</c:otherwise>
+			</c:choose>
     </div>
   </div>
 	<div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.comment"/></label>
     <div class="col-sm-3">
-      <p class="form-control-static">${user.about}</p>
+      <p class="form-control-static">${userProfile.about}</p>
     </div>
   </div>    
 	<hr>  
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
 				<a class="btn btn-info" href="<c:url value="/user/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>
-				<a class="btn btn-default" href="<c:url value="/user/profile/update"/>"><spring:message code="common.button.user.password.update"/></a>
+				<a class="btn btn-default" href="<c:url value="/user/password/update"/>"><spring:message code="common.button.user.password.update"/></a>
 			</div> 
 		</div>  
 </form>

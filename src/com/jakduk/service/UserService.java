@@ -19,11 +19,14 @@ import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
+import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.OAuthUserWrite;
+import com.jakduk.model.web.UserPasswordUpdate;
+import com.jakduk.model.web.UserProfileInfo;
 import com.jakduk.model.web.UserProfileWrite;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.FootballClubRepository;
@@ -100,7 +103,7 @@ public class UserService {
 		
 		String footballClub = userWrite.getFootballClub();
 		
-		if (footballClub != null && footballClub != "-1") {
+		if (footballClub != null && !footballClub.isEmpty()) {
 			FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
 			
 			user.setSupportFC(supportFC);
@@ -203,9 +206,23 @@ public class UserService {
 
 		// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 		JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		UserProfile user = userRepository.findById(authUser.getId());
+		UserProfile user = userRepository.userProfileFindById(authUser.getId());
 		
-		model.addAttribute("user", user);
+		UserProfileInfo userProfileInfo = new UserProfileInfo();
+		userProfileInfo.setEmail(user.getEmail());
+		userProfileInfo.setUsername(user.getUsername());
+		userProfileInfo.setAbout(user.getAbout());
+		
+		FootballClub footballClub = user.getSupportFC();
+		List<FootballClubName> names = footballClub.getNames();
+		
+		for (FootballClubName name : names) {
+			if (name.getLanguage().equals(language)) {
+				userProfileInfo.setFootballClubName(name);
+			}		
+		}
+				
+		model.addAttribute("userProfile", userProfileInfo);
 		
 		return model;
 	}
@@ -218,7 +235,7 @@ public class UserService {
 			
 			// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile userProfile = userRepository.findById(authUser.getId());
+			UserProfile userProfile = userRepository.userProfileFindById(authUser.getId());
 			
 			FootballClub footballClub = userProfile.getSupportFC();
 			
@@ -226,6 +243,7 @@ public class UserService {
 			
 			userProfileWrite.setEmail(userProfile.getEmail());
 			userProfileWrite.setUsername(userProfile.getUsername());
+			userProfileWrite.setAbout(userProfile.getAbout());
 
 			if (footballClub != null) {
 				userProfileWrite.setFootballClub(footballClub.getId());
@@ -240,8 +258,50 @@ public class UserService {
 		return model;
 	}
 	
+	public void checkProfileUpdate(UserProfileWrite userProfileWrite, BindingResult result) {
+		
+		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = jakdukPrincipal.getId();
+		
+		String username = userProfileWrite.getUsername();
+		
+		if (id != null && username != null) {
+			UserProfile userProfle = userRepository.userFindByNEIdAndUsername(id, username);
+			if (userProfle != null) {
+				result.rejectValue("username", "user.msg.already.username");
+			}
+		}		
+	}
+	
 	public void userProfileUpdate(UserProfileWrite userProfileWrite) {
 		
+		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = jakdukPrincipal.getId();
+		
+		User user = userRepository.findById(id);
+		user.setUsername(userProfileWrite.getUsername());
+		user.setAbout(userProfileWrite.getAbout());
+		
+		String footballClub = userProfileWrite.getFootballClub();
+		
+		if (footballClub != null && !footballClub.isEmpty()) {
+			FootballClub supportFC = footballClubRepository.findById(userProfileWrite.getFootballClub());
+			
+			user.setSupportFC(supportFC);
+		}
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("jakduk user update = " + user);
+		}
+		
+		userRepository.save(user);
+	}
+	
+	public Model getUserPasswordUpdate(Model model) {
+
+		model.addAttribute("userPasswordUpdate", new UserPasswordUpdate());
+		
+		return model;
 	}
 		
 }

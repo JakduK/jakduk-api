@@ -20,7 +20,7 @@
 	<mvc:default-servlet-handler/>
 	
 	<mvc:interceptors>  
-	  <bean  id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+	  <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
 	      <property name="paramName" value="lang"></property>
 	  </bean>
 	</mvc:interceptors>

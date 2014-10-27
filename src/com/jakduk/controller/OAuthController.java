@@ -3,8 +3,10 @@ package com.jakduk.controller;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.service.CommonService;
@@ -42,6 +45,9 @@ public class OAuthController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Resource
+	LocaleResolver localeResolver;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -90,7 +96,8 @@ public class OAuthController {
 			@RequestParam(required = false) String lang,
 			Model model) {
 		
-		String language = commonService.getLanguageCode(request, response, lang);
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
 		
 		userService.getOAuthWriteDetails(model, language);
 		

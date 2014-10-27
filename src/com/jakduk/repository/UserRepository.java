@@ -9,11 +9,17 @@ import com.jakduk.model.simple.UserProfile;
 
 public interface UserRepository extends MongoRepository<User, String> {
 	
+	User findById(String id);
 	User findByUsername(String username);
 	User findOneByUsername(String username);
 	User findByEmail(String email);
 	User findOneByEmail(String email);
-	UserProfile findById(String id);
+	
+	@Query(value="{'id' : ?0}")
+	UserProfile userProfileFindById(String id);
+	
+	@Query(value="{$and : [ {'id' : {$ne : ?0}}, {'username' : ?1} ]}", fields="{'id' : 1, 'username' : 1}")
+	UserProfile userFindByNEIdAndUsername(String id, String username);
 
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
 	User userFindByOauthUser(String type, String oauthId);

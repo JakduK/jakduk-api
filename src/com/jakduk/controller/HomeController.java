@@ -1,5 +1,8 @@
 package com.jakduk.controller;
 
+import java.util.Locale;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.service.CommonService;
 import com.jakduk.service.HomeService;
@@ -26,6 +30,9 @@ public class HomeController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Resource
+	LocaleResolver localeResolver;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -48,7 +55,8 @@ public class HomeController {
 			@RequestParam(required = false) String lang,
 			Model model) {
 		
-		String language = commonService.getLanguageCode(request, response, lang);
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
 		
 		homeService.getJumbotron(model, language);
 		

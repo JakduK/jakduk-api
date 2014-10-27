@@ -1,5 +1,8 @@
 package com.jakduk.controller;
 
+import java.util.Locale;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.model.web.UserProfileWrite;
 import com.jakduk.service.CommonService;
@@ -27,9 +31,9 @@ import com.jakduk.service.UserService;
  */
 
 @Controller
-@RequestMapping("/user/profile")
+@RequestMapping("/user")
 @SessionAttributes({"userProfileWrite", "footballClubs"})
-public class UserProfileController {
+public class UserProfileUpdateController {
 	
 	@Autowired
 	private CommonService commonService;
@@ -37,34 +41,33 @@ public class UserProfileController {
 	@Autowired
 	private UserService userService;
 	
+	@Resource
+	LocaleResolver localeResolver;
+	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	@RequestMapping
-	public String profile(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(required = false) String lang,
-			Model model) {
-		
-		String language = commonService.getLanguageCode(request, response, lang);
-		
-		userService.getUserProfile(model, language);
-		
-		return "user/profile";
-	}
-	
-	@RequestMapping(value = "/update", method = RequestMethod.GET)
+	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
 	public String profileUpdate(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {
 		
-		String language = commonService.getLanguageCode(request, response, lang);
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
 		
 		userService.getUserProfileUpdate(model, language);
 		
 		return "user/profileUpdate";
 	}
 	
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
 	public String profileUpdate(@Valid UserProfileWrite userProfileWrite, BindingResult result, SessionStatus sessionStatus) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "user/profileUpdate";
+		}
+		
+		userService.checkProfileUpdate(userProfileWrite, result);
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);

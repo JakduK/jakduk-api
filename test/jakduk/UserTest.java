@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.UserRepository;
 
 
@@ -26,7 +27,8 @@ public class UserTest {
 	@Test
 	public void test01() {
 		
-		System.out.println("aaaa=" + userRepository.findAll());
+		UserProfile user = userRepository.userFindByNEIdAndUsername("544dd2a13d9648d912a339c7", "test05");		
+		System.out.println("aaaa=" + user);
 	}
 
 }
