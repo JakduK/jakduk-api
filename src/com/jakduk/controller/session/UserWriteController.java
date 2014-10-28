@@ -1,4 +1,4 @@
-package com.jakduk.controller;
+package com.jakduk.controller.session;
 
 import java.util.Locale;
 
@@ -19,21 +19,21 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.model.web.UserProfileWrite;
+import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2014. 10. 23.
+ * @date     : 2014. 10. 27.
  * @desc     :
  */
 
 @Controller
 @RequestMapping("/user")
-@SessionAttributes({"userProfileWrite", "footballClubs"})
-public class UserProfileUpdateController {
+@SessionAttributes({"userWrite", "footballClubs"})
+public class UserWriteController {
 	
 	@Autowired
 	private CommonService commonService;
@@ -46,38 +46,38 @@ public class UserProfileUpdateController {
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
-	public String profileUpdate(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(value = "/write", method = RequestMethod.GET)
+	public String write(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
 		
-		userService.getUserProfileUpdate(model, language);
+		userService.getUserWrite(model, language);
 		
-		return "user/profileUpdate";
+		return "user/write";
 	}
 	
-	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
-	public String profileUpdate(@Valid UserProfileWrite userProfileWrite, BindingResult result, SessionStatus sessionStatus) {
+	@RequestMapping(value = "/write", method = RequestMethod.POST)
+	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
-			return "user/profileUpdate";
+			return "user/write";
 		}
 		
-		userService.checkProfileUpdate(userProfileWrite, result);
+		userService.checkUserWrite(userWrite, result);
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
-			return "user/profileUpdate";
+			return "user/write";
 		}
 		
-		userService.userProfileUpdate(userProfileWrite);
+		userService.userWrite(userWrite);
 		sessionStatus.setComplete();
 		
-		return "redirect:/user/profile";
+		return "redirect:/login?status=2";
 	}
 
 }

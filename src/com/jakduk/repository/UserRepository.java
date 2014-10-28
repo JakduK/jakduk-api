@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
 
 public interface UserRepository extends MongoRepository<User, String> {
@@ -17,6 +18,9 @@ public interface UserRepository extends MongoRepository<User, String> {
 	
 	@Query(value="{'id' : ?0}")
 	UserProfile userProfileFindById(String id);
+	
+	@Query(value="{'id' : ?0}")
+	UserOnPasswordUpdate UserOnPasswordUpdateFindById(String id);
 	
 	@Query(value="{$and : [ {'id' : {$ne : ?0}}, {'username' : ?1} ]}", fields="{'id' : 1, 'username' : 1}")
 	UserProfile userFindByNEIdAndUsername(String id, String username);

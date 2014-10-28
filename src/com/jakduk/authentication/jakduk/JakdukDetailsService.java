@@ -55,6 +55,8 @@ public class JakdukDetailsService implements UserDetailsService {
 		
 	}
 	
+	
+	
 	public Collection<? extends GrantedAuthority> getAuthorities(Integer role) {
 		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(role));
 		return authList;

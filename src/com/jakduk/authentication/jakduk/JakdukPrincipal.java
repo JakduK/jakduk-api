@@ -120,6 +120,10 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		password = null;
 	}
 
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	private static SortedSet<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
 		Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
 		// Ensure array iteration order is predictable (as per UserDetails.getAuthorities() contract and SEC-717)

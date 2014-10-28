@@ -23,6 +23,7 @@ import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.model.web.UserPasswordUpdate;
@@ -199,7 +200,7 @@ public class UserService {
 		principal.setUsername(userWrite.getUsername());
 		principal.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_OK);
 		
-		commonService.doAutoLogin(principal, credentials, userDetails);
+		commonService.doOAuthAutoLogin(principal, credentials, userDetails);
 	}
 	
 	public Model getUserProfile(Model model, String language) {
@@ -275,8 +276,9 @@ public class UserService {
 	
 	public void userProfileUpdate(UserProfileWrite userProfileWrite) {
 		
-		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = jakdukPrincipal.getId();
+		JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+		String id = principal.getId();
 		
 		User user = userRepository.findById(id);
 		user.setUsername(userProfileWrite.getUsername());
@@ -290,11 +292,16 @@ public class UserService {
 			user.setSupportFC(supportFC);
 		}
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("jakduk user update = " + user);
+		if (logger.isInfoEnabled()) {
+			logger.info("jakduk user update. id=" + user.getId() + ", username=" + user.getUsername());
 		}
 		
 		userRepository.save(user);
+		
+		principal.setUsername(userProfileWrite.getUsername());
+		
+		commonService.doJakdukAutoLogin(principal, credentials);
+		
 	}
 	
 	public Model getUserPasswordUpdate(Model model) {
@@ -302,6 +309,45 @@ public class UserService {
 		model.addAttribute("userPasswordUpdate", new UserPasswordUpdate());
 		
 		return model;
+	}
+	
+	public void checkUserPasswordUpdate(UserPasswordUpdate userPasswordUpdate, BindingResult result) {
+		
+		String oldPwd = userPasswordUpdate.getOldPassword();
+		String newPwd = userPasswordUpdate.getNewPassword();
+		String newPwdCfm = userPasswordUpdate.getNewPasswordConfirm();
+		
+		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = jakdukPrincipal.getId();
+		
+		UserOnPasswordUpdate user = userRepository.UserOnPasswordUpdateFindById(id);
+		String pwd = user.getPassword();
+		
+		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
+		
+		if (!encoder.encode(oldPwd).equals(pwd)) {
+			result.rejectValue("oldPassword", "user.msg.old.password.is.not.vaild");
+		}
+		
+		if (!newPwd.equals(newPwdCfm)) {
+			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
+		}
+	}
+	
+	public void userPasswordUpdate(UserPasswordUpdate userPasswordUpdate) {
+		
+		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = jakdukPrincipal.getId();
+		
+		User user = userRepository.findById(id);
+		
+		user.setPassword(userPasswordUpdate.getNewPassword());
+		
+		this.create(user);
+		
+		if (logger.isInfoEnabled()) {
+			logger.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
+		}
 	}
 		
 }

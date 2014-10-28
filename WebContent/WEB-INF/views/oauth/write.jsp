@@ -26,9 +26,9 @@
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
 			<div class="col-sm-3">
-					<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
-					ng-model="username" ng-init="username='${OAuthUserWrite.username}'" ng-blur="onUsername(OAuthUserWrite)"
-					ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+				<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
+				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" ng-blur="onUsername(OAuthUserWrite)"
+				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 'glyphicon-remove form':OAuthUserWrite.username.$invalid || existUsername != 2}"></span>
 				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>

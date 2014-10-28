@@ -198,34 +198,34 @@
 		</dependency>
 		
 		<!-- Test -->				
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-	<dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-test</artifactId>
-		<version>${spring.version}</version>
-	</dependency>    
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>    
 
-    	<!-- solr -->
-        <dependency>
-               <artifactId>solr-solrj</artifactId>
-               <groupId>org.apache.solr</groupId>
-               <version>4.9.0</version>
-               <type>jar</type>
-               <scope>compile</scope>
-        </dependency>    
-        <dependency>
-               <artifactId>solr-core</artifactId>
-               <groupId>org.apache.solr</groupId>
-               <version>4.9.0</version>
-               <type>jar</type>
-               <scope>compile</scope>
-        </dependency>         
-    
+		<!-- solr -->
+		<dependency>
+			<artifactId>solr-solrj</artifactId>
+			<groupId>org.apache.solr</groupId>
+			<version>4.9.0</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>    
+		<dependency>
+			<artifactId>solr-core</artifactId>
+			<groupId>org.apache.solr</groupId>
+			<version>4.9.0</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>         
   </dependencies>
   
  	<build>
@@ -287,22 +287,21 @@
 					<warSourceDirectory>WebContent</warSourceDirectory>
 				</configuration>
 			</plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>WebContent/WEB-INF/lib</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>WebContent/WEB-INF/classes</directory>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>WebContent/WEB-INF/lib</directory>
+						</fileset>
+						<fileset>
+							<directory>WebContent/WEB-INF/classes</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
- 	<description>K League Community Web Application
-</description>
+ 	<description>K League Community Web Application</description>
 </project>

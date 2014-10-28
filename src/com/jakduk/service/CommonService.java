@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Sequence;
@@ -204,12 +205,23 @@ public class CommonService {
 		return footballClubs;
 	}
 	
-	public void doAutoLogin(OAuthPrincipal principal, Object credentials, CommonUserDetails userDetails) {
+	public void doOAuthAutoLogin(OAuthPrincipal principal, Object credentials, CommonUserDetails userDetails) {
 		
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());
-		token.setDetails(userDetails);
-
+		
+		if (userDetails != null) {
+			token.setDetails(userDetails);
+		}
+		
+		SecurityContextHolder.getContext().setAuthentication(token);
+	}
+	
+	public void doJakdukAutoLogin(JakdukPrincipal principal, Object credentials) {
+		
+		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());
+		
 		logger.debug("phjang=" + token);
+		
 		SecurityContextHolder.getContext().setAuthentication(token);
 	}
 	
