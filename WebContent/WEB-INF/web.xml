@@ -5,7 +5,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	<display-name>JakduK-Sample</display-name>
 	<description>JakduK Sample Web Application</description>
 	
-<filter>
+	<filter>
 		<filter-name>httpsCookieFilter</filter-name>
 		<filter-class>com.jakduk.authentication.common.HttpsCookieFilter</filter-class>
 	</filter>
