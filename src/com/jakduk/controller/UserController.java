@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.model.db.User;
@@ -59,12 +58,13 @@ public class UserController {
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)
 	public String profile(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
+			@RequestParam(required = false) Integer status,
 			Model model) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
 		
-		userService.getUserProfile(model, language);
+		userService.getUserProfile(model, language, status);
 		
 		return "user/profile";
 	}
@@ -88,12 +88,14 @@ public class UserController {
 		userService.checkUserPasswordUpdate(userPasswordUpdate, result);
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			if (logger.isDebugEnabled()) {
+				logger.debug("result=" + result);
+			}
 			return "user/passwordUpdate";
 		}
 		
 		userService.userPasswordUpdate(userPasswordUpdate);
 		
-		return "redirect:/user/profile";
+		return "redirect:/user/profile?status=2";
 	}
 }

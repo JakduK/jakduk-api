@@ -27,6 +27,8 @@
 		<context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation" />
 	</context:component-scan>
 	
+	<import resource="security-context-local.xml" />
+	
 	<!-- Imports datasource configuration -->
 	<import resource="config/db/mongo-data.xml" />
 	

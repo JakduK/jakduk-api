@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>    
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="jakdukApp">
 <head>
@@ -35,7 +35,9 @@ ng-submit="onSubmit(userProfileWrite, $event)">
     		ng-init="email='${userProfileWrite.email}'" ng-model="email" disabled="disabled"/>
     </div>
   </div>
-	<div class="form-group has-feedback" ng-class="{'has-success':userProfileWrite.username.$valid || usernameStatus == 'original', 'has-error':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}">
+	<div class="form-group has-feedback" 
+	ng-class="{'has-success':userProfileWrite.username.$valid || usernameStatus == 'original', 
+	'has-error':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}">
 		<label class="col-sm-2 control-label" for="username">
 			<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 		</label>
@@ -43,7 +45,9 @@ ng-submit="onSubmit(userProfileWrite, $event)">
 			<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
 				ng-model="username" ng-init="username='${userProfileWrite.username}'" ng-blur="onUsername(userProfileWrite)"
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
-			<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userProfileWrite.username.$valid || usernameStatus == 'original', 'glyphicon-remove form':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
+			<span class="glyphicon form-control-feedback" 
+			ng-class="{'glyphicon-ok':userProfileWrite.username.$valid || usernameStatus == 'original', 
+			'glyphicon-remove form':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
 			<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
 			<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 			<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>		
@@ -135,7 +139,6 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 					reqPromise.error(usernameError);
 				}
 			} else {
-				//$scope.existUsername = 1;
 				checkUsername(userProfileWrite);
 			}
 		}

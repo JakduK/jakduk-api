@@ -22,9 +22,11 @@ import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.BoardWriter;
+import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.model.web.OAuthProfileInfo;
 import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.model.web.UserPasswordUpdate;
 import com.jakduk.model.web.UserProfileInfo;
@@ -35,6 +37,9 @@ import com.jakduk.repository.UserRepository;
 
 @Service
 public class UserService {
+	
+	@Autowired
+	private StandardPasswordEncoder encoder;
 	
 	@Autowired
 	private CommonService commonService;
@@ -143,25 +148,43 @@ public class UserService {
 		
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language);
 		
-		OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
-		
-		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(principal.getType(), principal.getOauthId());
-		
-		OAuthUserWrite oauthUserWrite = new OAuthUserWrite();
-		
-		if (oauthUserOnLogin != null && oauthUserOnLogin.getUsername() != null) {
-			oauthUserWrite.setUsername(oauthUserOnLogin.getUsername());
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
+			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+			
+			OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(principal.getType(), principal.getOauthId());
+			
+			OAuthUserWrite oauthUserWrite = new OAuthUserWrite();
+			
+			if (oauthUserOnLogin != null && oauthUserOnLogin.getUsername() != null) {
+				oauthUserWrite.setUsername(oauthUserOnLogin.getUsername());
+			}
+			
+			if (userDetails != null && userDetails.getBio() != null) {
+				oauthUserWrite.setAbout(userDetails.getBio());
+			}
+			
+			model.addAttribute("OAuthUserWrite", oauthUserWrite);
 		}
-		
-		if (userDetails != null && userDetails.getBio() != null) {
-			oauthUserWrite.setAbout(userDetails.getBio());
-		}
-		
-		model.addAttribute("OAuthUserWrite", oauthUserWrite);
+
 		model.addAttribute("footballClubs", footballClubs);
 		
 		return model;
+	}
+	
+	public void checkOAuthProfileUpdate(OAuthUserWrite oAuthUserWrite, BindingResult result) {
+		
+		OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String oauthId = principal.getOauthId();
+		
+		String username = principal.getUsername();
+		
+		if (oauthId != null && username != null) {
+			OAuthProfile profile = userRepository.userFindByNEOauthIdAndUsername(oauthId, username);
+			if (profile != null) {
+				result.rejectValue("username", "user.msg.already.username");
+			}
+		}		
 	}
 	
 	public void oAuthWriteDetails(OAuthUserWrite userWrite) {
@@ -203,7 +226,7 @@ public class UserService {
 		commonService.doOAuthAutoLogin(principal, credentials, userDetails);
 	}
 	
-	public Model getUserProfile(Model model, String language) {
+	public Model getUserProfile(Model model, String language, Integer status) {
 
 		// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 		JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -223,6 +246,7 @@ public class UserService {
 			}		
 		}
 				
+		model.addAttribute("status", status);
 		model.addAttribute("userProfile", userProfileInfo);
 		
 		return model;
@@ -234,7 +258,6 @@ public class UserService {
 			
 			List<FootballClub> footballClubs = commonService.getFootballClubs(language);
 			
-			// OAuth 회원이 아닌, 작두왕 회원일 경우다. 그냥 이거는 테스트 용이고 나중에는 OAuth 전체 (페이스북, 다음)과 작두왕 회원에 대한 통합 Principal이 필요.
 			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			UserProfile userProfile = userRepository.userProfileFindById(authUser.getId());
 			
@@ -320,12 +343,10 @@ public class UserService {
 		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String id = jakdukPrincipal.getId();
 		
-		UserOnPasswordUpdate user = userRepository.UserOnPasswordUpdateFindById(id);
+		UserOnPasswordUpdate user = userRepository.userOnPasswordUpdateFindById(id);
 		String pwd = user.getPassword();
 		
-		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
-		
-		if (!encoder.encode(oldPwd).equals(pwd)) {
+		if (!encoder.matches(oldPwd, pwd)) {
 			result.rejectValue("oldPassword", "user.msg.old.password.is.not.vaild");
 		}
 		
@@ -348,6 +369,65 @@ public class UserService {
 		if (logger.isInfoEnabled()) {
 			logger.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
 		}
+	}
+	
+	public Model getOAuthProfile(Model model, String language, Integer status) {
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
+			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			OAuthProfile profile = userRepository.userfindByOauthUser(principal.getType(), principal.getOauthId());
+			
+			OAuthProfileInfo profileInfo = new OAuthProfileInfo();
+			profileInfo.setUsername(profile.getUsername());
+			profileInfo.setAbout(profile.getAbout());
+			
+			FootballClub footballClub = profile.getSupportFC();
+			List<FootballClubName> names = footballClub.getNames();
+			
+			for (FootballClubName name : names) {
+				if (name.getLanguage().equals(language)) {
+					profileInfo.setFootballClubName(name);
+				}		
+			}
+					
+			model.addAttribute("oauthProfile", profileInfo);
+		}
+		
+		model.addAttribute("status", status);
+		
+		return model;
+	}
+	
+	public Model getOAuthProfileUpdate(Model model, String language) {
+		
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language);
+			
+			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
+				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+				OAuthProfile profile = userRepository.userfindByOauthUser(principal.getType(), principal.getOauthId());
+				
+				FootballClub footballClub = profile.getSupportFC();
+				
+				OAuthUserWrite oAuthUserWrite = new OAuthUserWrite();
+				
+				oAuthUserWrite.setUsername(profile.getUsername());
+				oAuthUserWrite.setAbout(profile.getAbout());
+
+				if (footballClub != null) {
+					oAuthUserWrite.setFootballClub(footballClub.getId());
+				}
+				
+				model.addAttribute("OAuthUserWrite", oAuthUserWrite);
+			}
+			
+			model.addAttribute("footballClubs", footballClubs);
+			
+		} else {
+		}
+		
+		return model;
 	}
 		
 }

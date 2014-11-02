@@ -19,21 +19,21 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.model.web.UserProfileWrite;
+import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2014. 10. 23.
+ * @date     : 2014. 11. 2.
  * @desc     :
  */
 
 @Controller
-@RequestMapping("/user")
-@SessionAttributes({"userProfileWrite", "footballClubs"})
-public class UserProfileUpdateController {
+@RequestMapping("/oauth")
+@SessionAttributes({"OAuthUserWrite", "footballClubs"})
+public class OAuthWriteController {
 	
 	@Autowired
 	private CommonService commonService;
@@ -43,45 +43,47 @@ public class UserProfileUpdateController {
 	
 	@Resource
 	LocaleResolver localeResolver;
-	
+
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
-	public String profileUpdate(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(value = "/write", method = RequestMethod.GET)
+	public String write(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
 			Model model) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
 		
-		userService.getUserProfileUpdate(model, language);
+		userService.getOAuthWriteDetails(model, language);
 		
-		return "user/profileUpdate";
+//		logger.debug("model=" + model);
+		
+		return "oauth/write";
 	}
 	
-	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
-	public String profileUpdate(@Valid UserProfileWrite userProfileWrite, BindingResult result, SessionStatus sessionStatus) {
+	@RequestMapping(value = "/write", method = RequestMethod.POST)
+	public String write(@Valid OAuthUserWrite oAuthUserWrite, BindingResult result, SessionStatus sessionStatus) {
+		
+		if (result.hasErrors()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("result=" + result);	
+			}
+			return "oauth/write";
+		}
+		
+		userService.checkOAuthProfileUpdate(oAuthUserWrite, result);
 		
 		if (result.hasErrors()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("result=" + result);
 			}
-			return "user/profileUpdate";
+			return "oauth/write";
 		}
 		
-		userService.checkProfileUpdate(userProfileWrite, result);
-		
-		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);
-			}
-			return "user/profileUpdate";
-		}
-		
-		userService.userProfileUpdate(userProfileWrite);
+		userService.oAuthWriteDetails(oAuthUserWrite);
 		sessionStatus.setComplete();
 		
-		return "redirect:/user/profile?status=1";
+		return "redirect:/home";
 	}
 
 }

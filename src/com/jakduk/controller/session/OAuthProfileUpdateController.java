@@ -5,35 +5,29 @@ import java.util.Locale;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.model.web.UserProfileWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2014. 10. 23.
+ * @date     : 2014. 11. 2.
  * @desc     :
  */
 
 @Controller
-@RequestMapping("/user")
-@SessionAttributes({"userProfileWrite", "footballClubs"})
-public class UserProfileUpdateController {
+@RequestMapping("/oauth")
+public class OAuthProfileUpdateController {
 	
 	@Autowired
 	private CommonService commonService;
@@ -54,34 +48,9 @@ public class UserProfileUpdateController {
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
 		
-		userService.getUserProfileUpdate(model, language);
+		userService.getOAuthProfileUpdate(model, language);
 		
-		return "user/profileUpdate";
-	}
-	
-	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
-	public String profileUpdate(@Valid UserProfileWrite userProfileWrite, BindingResult result, SessionStatus sessionStatus) {
-		
-		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);
-			}
-			return "user/profileUpdate";
-		}
-		
-		userService.checkProfileUpdate(userProfileWrite, result);
-		
-		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);
-			}
-			return "user/profileUpdate";
-		}
-		
-		userService.userProfileUpdate(userProfileWrite);
-		sessionStatus.setComplete();
-		
-		return "redirect:/user/profile?status=1";
+		return "oauth/profileUpdate";
 	}
 
 }

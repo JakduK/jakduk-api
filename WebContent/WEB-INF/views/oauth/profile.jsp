@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>  
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>  
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="jakdukApp">
 <head>
@@ -12,34 +12,21 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <legend><spring:message code="user.profile"/></legend>
-<c:choose>
-	<c:when test="${status == 1}">
-		<div class="alert alert-success" role="alert"><spring:message code="user.msg.success.update.profile"/></div>
-	</c:when>
-	<c:when test="${status == 2}">
-		<div class="alert alert-success" role="alert"><spring:message code="user.mgs.success.change.password"/></div>
-	</c:when>                		
-</c:choose>
+
 <form class="form-horizontal" role="form">
-  <div class="form-group">
-    <label class="col-sm-2 control-label"><spring:message code="user.email"/></label>
-    <div class="col-sm-3">
-      <p class="form-control-static">${userProfile.email}</p>
-    </div>
-  </div>
   <div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.nickname"/></label>
     <div class="col-sm-3">
-      <p class="form-control-static">${userProfile.username}</p>
+      <p class="form-control-static">${oauthProfile.username}</p>
     </div>
   </div>
   <div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.support.football.club"/></label>
     <div class="col-sm-3">
 			<c:choose>
-				<c:when test="${not empty userProfile.footballClubName}">
-					<p class="form-control-static visible-sm visible-md visible-lg">${userProfile.footballClubName.fullName}</p>
-					<p class="form-control-static visible-xs">${userProfile.footballClubName.shortName}</p>
+				<c:when test="${not empty oauthProfile.footballClubName}">
+					<p class="form-control-static visible-sm visible-md visible-lg">${oauthProfile.footballClubName.fullName}</p>
+					<p class="form-control-static visible-xs">${oauthProfile.footballClubName.shortName}</p>
 				</c:when>
 				<c:otherwise>
 					<p class="form-control-static"><spring:message code="common.none"/></p>
@@ -50,14 +37,13 @@
 	<div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.comment"/></label>
     <div class="col-sm-3">
-      <p class="form-control-static">${userProfile.about}</p>
+      <p class="form-control-static">${oauthProfile.about}</p>
     </div>
   </div>    
 	<hr>  
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
-				<a class="btn btn-info" href="<c:url value="/user/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>
-				<a class="btn btn-default" href="<c:url value="/user/password/update"/>"><spring:message code="common.button.user.password.update"/></a>
+				<a class="btn btn-info" href="<c:url value="/oauth/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>				
 			</div> 
 		</div>  
 </form>

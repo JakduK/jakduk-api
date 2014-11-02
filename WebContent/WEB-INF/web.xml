@@ -34,7 +34,6 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-			classpath:/security-context-local.xml
 			classpath:/applicationContext.xml
 		</param-value>
 	</context-param>

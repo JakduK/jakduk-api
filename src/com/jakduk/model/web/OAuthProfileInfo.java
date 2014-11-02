@@ -5,26 +5,16 @@ import com.jakduk.model.embedded.FootballClubName;
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2014. 10. 27.
+ * @date     : 2014. 11. 2.
  * @desc     :
  */
-public class UserProfileInfo {
-
-	private String email;
+public class OAuthProfileInfo {
 	
 	private String username;
 	
 	private String about;
 	
 	private FootballClubName footballClubName;
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
 
 	public String getUsername() {
 		return username;
@@ -52,8 +42,8 @@ public class UserProfileInfo {
 
 	@Override
 	public String toString() {
-		return "UserProfileInfo [email=" + email + ", username=" + username
-				+ ", about=" + about + ", footballClubName=" + footballClubName
-				+ "]";
-	}	
+		return "OAuthProfileInfo [username=" + username + ", about=" + about
+				+ ", footballClubName=" + footballClubName + "]";
+	}
+
 }

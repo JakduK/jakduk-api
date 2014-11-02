@@ -1,8 +1,5 @@
 package com.jakduk.controller;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -22,22 +19,14 @@ public class AccessController {
 			Model model,
 			@RequestParam(required = false) Integer status) {
 		
-		URL url;
-		String domainPath;
-		try {
-			url = new URL(request.getRequestURL().toString());
-			domainPath = String.format("http://%s", url.getAuthority());
-			
-			model.addAttribute("domainPath", domainPath);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		model.addAttribute("status", status);
 		return "access/login";
 	}
 
+	/**
+	 * 손안댄지 한참.
+	 * @return
+	 */
 	@RequestMapping(value = "/logout/success")
 	public String logoutSuccess() {
 		String message = "Logout Success!";

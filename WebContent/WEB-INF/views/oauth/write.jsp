@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="jakdukApp">
 <head>
@@ -14,14 +15,22 @@
 <body>
 <div class="container">
 	<jsp:include page="../include/navigation-header.jsp"/>
+	
 	<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
+	
+	<sec:authorize access="isAuthenticated()">
+		<sec:authentication property="principal.username" var="principalUsername"/>
+	</sec:authorize>
+
 	<div class="container" ng-controller="writeCtrl">
 	<form:form commandName="OAuthUserWrite" name="OAuthUserWrite" action="${contextPath}/oauth/write" method="POST" cssClass="form-horizontal"
 	ng-submit="onSubmit(OAuthUserWrite, $event)">
-		<form:input path="existUsername" cssClass="hidden" size="0" ng-init="existUsername='${OAuthUserWrite.existUsername}'" ng-model="existUsername"/>
+		<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${OAuthUserWrite.usernameStatus}'" ng-model="usernameStatus"/>
 		<legend><spring:message code="oauth.register"/> </legend>
 
-		<div class="form-group has-feedback" ng-class="{'has-success':OAuthUserWrite.username.$valid, 'has-error':OAuthUserWrite.username.$invalid || existUsername != 2}">
+		<div class="form-group has-feedback" 
+		ng-class="{'has-success':OAuthUserWrite.username.$valid || usernameStatus == 'original', 
+		'has-error':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}">
 			<label class="col-sm-2 control-label" for="username">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
@@ -29,7 +38,9 @@
 				<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
 				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" ng-blur="onUsername(OAuthUserWrite)"
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
-				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 'glyphicon-remove form':OAuthUserWrite.username.$invalid || existUsername != 2}"></span>
+				<span class="glyphicon form-control-feedback" 
+				ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid || usernameStatus == 'original', 
+				'glyphicon-remove form':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
 				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername(OAuthUserWrite)">{{usernameAlert.msg}}</span>
@@ -83,7 +94,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.usernameAlert = {};
 	
 	$scope.onSubmit = function(OAuthUserWrite, event) {
-		if (OAuthUserWrite.$valid && $scope.existUsername == 2) {
+		if (OAuthUserWrite.$valid && ($scope.usernameStatus == "ok" || $scope.usernameStatus == "original")) {
 		} else {			
 			if (OAuthUserWrite.username.$invalid) {
 				checkUsername(OAuthUserWrite);
@@ -96,28 +107,32 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	};
 	
 	$scope.onUsername = function(OAuthUserWrite) {
-		if (OAuthUserWrite.username.$valid) {
-			var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';
-			if ($scope.usernameConn == 0) {
-				var reqPromise = $http.get(bUrl);
-				$scope.usernameConn = 1;
-				reqPromise.success(function(data, status, headers, config) {
-					if (data.existUsername != null) {
-						if (data.existUsername == false) {
-							$scope.existUsername = 2;
-							$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
-						} else {
-							$scope.existUsername = 1;
-							$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
-						}
-					}
-					$scope.usernameConn = 0;
-				});
-				reqPromise.error(usernameError);
-			}
+		if ("${principalUsername}" == $scope.username) {
+			$scope.usernameStatus = "original";
+			$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 		} else {
-			$scope.existUsername = 1;
-			checkUsername(OAuthUserWrite);
+			if (OAuthUserWrite.username.$valid) {
+				var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';
+				if ($scope.usernameConn == 0) {
+					var reqPromise = $http.get(bUrl);
+					$scope.usernameConn = 1;
+					reqPromise.success(function(data, status, headers, config) {
+						if (data.existUsername != null) {
+							if (data.existUsername == false) {
+								$scope.usernameStatus = "ok";
+								$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+							} else {
+								$scope.usernameStatus = "duplication";
+								$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
+							}
+						}
+						$scope.usernameConn = 0;
+					});
+					reqPromise.error(usernameError);
+				}
+			} else {
+				checkUsername(OAuthUserWrite);
+			}
 		}
 	};
 	

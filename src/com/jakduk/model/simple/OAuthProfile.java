@@ -3,26 +3,30 @@ package com.jakduk.model.simple;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.embedded.OAuthUser;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2014. 10. 6.
+ * @date     : 2014. 11. 2.
  * @desc     :
  */
 
 @Document(collection = "user")
-public class UserProfile {
+public class OAuthProfile {
 	
 	private String id;
 	
-	private String email;
-	
 	private String username;
+	
+	private OAuthUser oauthUser;
 	
 	private List<String> rules;
 	
@@ -39,20 +43,20 @@ public class UserProfile {
 		this.id = id;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public String getUsername() {
 		return username;
 	}
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public OAuthUser getOauthUser() {
+		return oauthUser;
+	}
+
+	public void setOauthUser(OAuthUser oauthUser) {
+		this.oauthUser = oauthUser;
 	}
 
 	public List<String> getRules() {
@@ -81,9 +85,9 @@ public class UserProfile {
 
 	@Override
 	public String toString() {
-		return "UserProfile [id=" + id + ", email=" + email + ", username="
-				+ username + ", rules=" + rules + ", about=" + about
-				+ ", supportFC=" + supportFC + "]";
+		return "OAuthProfile [id=" + id + ", username=" + username
+				+ ", oauthUser=" + oauthUser + ", rules=" + rules + ", about="
+				+ about + ", supportFC=" + supportFC + "]";
 	}
 
 }

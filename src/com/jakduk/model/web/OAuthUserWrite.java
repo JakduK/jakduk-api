@@ -3,8 +3,6 @@ package com.jakduk.model.web;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -22,7 +20,7 @@ public class OAuthUserWrite {
 	
 	private String footballClub;
 	
-	private Integer existUsername;
+	private String usernameStatus = "original";
 	
 	public String getUsername() {
 		return username;
@@ -48,19 +46,19 @@ public class OAuthUserWrite {
 		this.footballClub = footballClub;
 	}
 
-	public Integer getExistUsername() {
-		return existUsername;
+	public String getUsernameStatus() {
+		return usernameStatus;
 	}
 
-	public void setExistUsername(Integer existUsername) {
-		this.existUsername = existUsername;
+	public void setUsernameStatus(String usernameStatus) {
+		this.usernameStatus = usernameStatus;
 	}
 
 	@Override
 	public String toString() {
 		return "OAuthUserWrite [username=" + username + ", about=" + about
-				+ ", footballClub=" + footballClub + ", existUsername="
-				+ existUsername + "]";
+				+ ", footballClub=" + footballClub + ", usernameStatus="
+				+ usernameStatus + "]";
 	}
 
 }

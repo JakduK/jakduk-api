@@ -1,11 +1,18 @@
 package jakduk;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.jakduk.model.db.User;
+import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.UserRepository;
 
@@ -22,13 +29,43 @@ import com.jakduk.repository.UserRepository;
 public class UserTest {
 	
 	@Autowired
+	private ApplicationContext applicationContext;
+	
+	@Autowired
+	private StandardPasswordEncoder encoder;
+	
+	@Autowired
 	UserRepository userRepository;
-
+	
+	@Before
+	public void setUp() {
+	}
+	
 	@Test
 	public void test01() {
 		
 		UserProfile user = userRepository.userFindByNEIdAndUsername("544dd2a13d9648d912a339c7", "test05");		
-		System.out.println("aaaa=" + user);
+		System.out.println("UserProfile=" + user);
+	}
+	
+	@Test
+	public void test02() {
+						
+		User user = userRepository.findByUsername("test01");		
+		String pwd = user.getPassword();
+		System.out.println("user pwd=" + pwd);
+		
+		String result = encoder.encode("1111");
+//		System.out.println("result=" + result);
+		
+		System.out.println(encoder.matches("1112", result));
+		assertTrue(encoder.matches("1111", result));
+	}
+	
+	@Test
+	public void test03() {
+		OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");		
+		System.out.println("OAuthProfile=" + user);
 	}
 
 }
