@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,10 +40,13 @@ import com.jakduk.repository.UserRepository;
 public class UserService {
 	
 	@Autowired
+	private CommonService commonService;
+	
+	@Autowired
 	private StandardPasswordEncoder encoder;
 	
 	@Autowired
-	private CommonService commonService;
+	private UserDetailsManager userDetailsManager;
 	
 	@Autowired
 	private UserRepository userRepository;

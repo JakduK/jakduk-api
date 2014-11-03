@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
@@ -18,7 +18,7 @@ import com.jakduk.model.db.User;
 import com.jakduk.repository.UserRepository;
 
 @Service
-public class JakdukDetailsService implements UserDetailsService {
+public class JakdukDetailsService implements UserDetailsManager {
 	
 	@Autowired
 	UserRepository userRepository;
@@ -40,8 +40,9 @@ public class JakdukDetailsService implements UserDetailsService {
 				boolean credentialsNonExpired = true;
 				boolean accountNonLocked = true;
 
-				JakdukPrincipal	jakdukPrincipal = new JakdukPrincipal(domainUser.getEmail(), domainUser.getId(), domainUser.getPassword(), domainUser.getUsername(),
-						CommonConst.AUTH_TYPE_JAKDUK, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(2));
+				JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(domainUser.getEmail(), domainUser.getId()
+						, domainUser.getPassword(), domainUser.getUsername(), CommonConst.AUTH_TYPE_JAKDUK
+						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(2));
 				
 				if (logger.isInfoEnabled()) {
 					logger.info("load user JakdukPrincipal=" + jakdukPrincipal);
@@ -54,8 +55,6 @@ public class JakdukDetailsService implements UserDetailsService {
 		}
 		
 	}
-	
-	
 	
 	public Collection<? extends GrantedAuthority> getAuthorities(Integer role) {
 		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(role));
@@ -82,6 +81,46 @@ public class JakdukDetailsService implements UserDetailsService {
 			authorities.add(new SimpleGrantedAuthority(role));
 		}
 		return authorities;
+	}
+
+
+
+	@Override
+	public void createUser(UserDetails user) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void updateUser(UserDetails user) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void deleteUser(String username) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void changePassword(String oldPassword, String newPassword) {
+		
+		logger.debug("aaaaaaaaaaaa");
+	}
+
+
+
+	@Override
+	public boolean userExists(String username) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
