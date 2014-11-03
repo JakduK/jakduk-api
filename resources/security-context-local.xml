@@ -26,7 +26,7 @@
 		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="http"/>
 		<intercept-url pattern="/user/write" access="isAnonymous()" requires-channel="http"/>
 		<intercept-url pattern="/user/**" access="authenticated" requires-channel="http"/>
-		<intercept-url pattern="/oauth/write" access="authenticated" requires-channel="http"/>
+		<intercept-url pattern="/oauth/**" access="authenticated" requires-channel="http"/>
 		<intercept-url pattern="/check/user/*" access="permitAll" requires-channel="http"/>
 		<intercept-url pattern="/**" requires-channel="http"/>
 		<intercept-url pattern="/admin" access="permitAll" />

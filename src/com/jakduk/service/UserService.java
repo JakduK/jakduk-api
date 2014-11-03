@@ -433,5 +433,43 @@ public class UserService {
 		
 		return model;
 	}
+	
+	public void oAuthProfileUpdate(OAuthUserWrite userWrite) {
+		
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+			CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+			
+			User user = userRepository.userFindByOauthUser(principal.getType(), principal.getOauthId());
+			OAuthUser oAuthUser = user.getOauthUser();
+			
+			String username = userWrite.getUsername();
+			String footballClub = userWrite.getFootballClub();
+			String about = userWrite.getAbout();
+			
+			if (username != null && !username.isEmpty()) {
+				user.setUsername(userWrite.getUsername());
+			}
+			
+			if (footballClub != null && !footballClub.isEmpty()) {
+				FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
+				
+				user.setSupportFC(supportFC);
+			}
+			
+			if (about != null && !about.isEmpty()) {
+				user.setAbout(userWrite.getAbout());
+			}
+			
+			user.setOauthUser(oAuthUser);
+			
+			userRepository.save(user);
+			
+			principal.setUsername(userWrite.getUsername());
+			
+			commonService.doOAuthAutoLogin(principal, credentials, userDetails);
+		}
+	}
 		
 }

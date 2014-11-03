@@ -12,7 +12,11 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <legend><spring:message code="user.profile"/></legend>
-
+<c:choose>
+	<c:when test="${status == 1}">
+		<div class="alert alert-success" role="alert"><spring:message code="user.msg.success.update.profile"/></div>
+	</c:when>
+</c:choose>
 <form class="form-horizontal" role="form">
   <div class="form-group">
     <label class="col-sm-2 control-label"><spring:message code="user.nickname"/></label>

@@ -111,8 +111,6 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 	@Override
 	public void changePassword(String oldPassword, String newPassword) {
-		
-		logger.debug("aaaaaaaaaaaa");
 	}
 
 

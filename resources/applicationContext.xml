@@ -26,17 +26,18 @@
 	<context:component-scan base-package="com.jakduk">
 		<context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation" />
 	</context:component-scan>
-	
+
+	<!-- Imports oauth configuration -->
 	<import resource="security-context-local.xml" />
-	
+	<import resource="config/oauth/oauth-data-local.xml"/>	
+	<!-- 
+	<import resource="security-context.xml" />
+	<import resource="config/oauth/oauth-data.xml"/>
+	 -->
+	 
 	<!-- Imports datasource configuration -->
 	<import resource="config/db/mongo-data.xml" />
 	
-	<!-- Imports oauth configuration -->
-	<import resource="config/oauth/oauth-data-local.xml"/>
-<!-- 
-	<import resource="config/oauth/oauth-data.xml"/>
- -->	
 	<bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"
 		p:location="classpath:/config/db/mongo.properties" />
 
