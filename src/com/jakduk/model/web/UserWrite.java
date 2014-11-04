@@ -31,8 +31,9 @@ public class UserWrite {
 	
 	private String about;
 	
-	private Integer existEmail;
-	private Integer existUsername;
+	private String emailStatus = "none";
+	
+	private String usernameStatus = "none";
 
 	public String getEmail() {
 		return email;
@@ -82,20 +83,20 @@ public class UserWrite {
 		this.about = about;
 	}
 
-	public Integer getExistEmail() {
-		return existEmail;
+	public String getEmailStatus() {
+		return emailStatus;
 	}
 
-	public void setExistEmail(Integer existEmail) {
-		this.existEmail = existEmail;
+	public void setEmailStatus(String emailStatus) {
+		this.emailStatus = emailStatus;
 	}
 
-	public Integer getExistUsername() {
-		return existUsername;
+	public String getUsernameStatus() {
+		return usernameStatus;
 	}
 
-	public void setExistUsername(Integer existUsername) {
-		this.existUsername = existUsername;
+	public void setUsernameStatus(String usernameStatus) {
+		this.usernameStatus = usernameStatus;
 	}
 
 	@Override
@@ -103,8 +104,8 @@ public class UserWrite {
 		return "UserWrite [email=" + email + ", username=" + username
 				+ ", password=" + password + ", passwordConfirm="
 				+ passwordConfirm + ", footballClub=" + footballClub
-				+ ", about=" + about + ", existEmail=" + existEmail
-				+ ", existUsername=" + existUsername + "]";
+				+ ", about=" + about + ", emailStatus=" + emailStatus
+				+ ", usernameStatus=" + usernameStatus + "]";
 	}
 
 }

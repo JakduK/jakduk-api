@@ -38,7 +38,7 @@
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" 
 				ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid || usernameStatus == 'original', 
-				'glyphicon-remove form':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
+				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
 				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'loading'"></i>					
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername(OAuthUserWrite)">{{usernameAlert.msg}}</span>

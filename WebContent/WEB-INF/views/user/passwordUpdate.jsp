@@ -28,7 +28,7 @@ ng-submit="onSubmit(userPasswordUpdate, $event)">
 			<form:password path="oldPassword" cssClass="form-control" size="50" placeholder="Old password"
 			ng-model="oldPassword" ng-blur="checkOldPassword(userPasswordUpdate)" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
 			<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userPasswordUpdate.oldPassword.$valid, 
-			'glyphicon-remove form':userPasswordUpdate.oldPassword.$invalid}"></span>
+			'glyphicon-remove':userPasswordUpdate.oldPassword.$invalid}"></span>
 			<form:errors path="oldPassword" cssClass="text-danger" element="span" ng-hide="oldPasswordAlert.msg"/>
 			<span class="{{oldPasswordAlert.classType}}" ng-show="oldPasswordAlert.msg">{{oldPasswordAlert.msg}}</span>	
 		</div>
@@ -42,7 +42,7 @@ ng-submit="onSubmit(userPasswordUpdate, $event)">
 			<form:password path="newPassword" cssClass="form-control" size="50" placeholder="New password"
 			ng-model="newPassword" ng-blur="checkNewPassword(userPasswordUpdate)" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
 			<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userPasswordUpdate.newPassword.$valid, 
-			'glyphicon-remove form':userPasswordUpdate.newPassword.$invalid}"></span>
+			'glyphicon-remove':userPasswordUpdate.newPassword.$invalid}"></span>
 			<form:errors path="newPassword" cssClass="text-danger" element="span" ng-hide="newPasswordAlert.msg"/>
 			<span class="{{newPasswordAlert.classType}}" ng-show="newPasswordAlert.msg">{{newPasswordAlert.msg}}</span>	
 		</div>
@@ -56,7 +56,7 @@ ng-submit="onSubmit(userPasswordUpdate, $event)">
 			<form:password path="newPasswordConfirm" cssClass="form-control" size="50" placeholder="Confirm new password"
 			ng-model="newPasswordConfirm" ng-blur="checkNewPasswordConfirm(userPasswordUpdate)" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
 			<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userPasswordUpdate.newPasswordConfirm.$valid, 
-			'glyphicon-remove form':userPasswordUpdate.newPasswordConfirm.$invalid || newPasswordConfirm.length > 0 && newPassword != newPasswordConfirm}"></span>
+			'glyphicon-remove':userPasswordUpdate.newPasswordConfirm.$invalid || newPasswordConfirm.length > 0 && newPassword != newPasswordConfirm}"></span>
 			<form:errors path="newPasswordConfirm" cssClass="text-danger" element="span" 
 			ng-hide="newPasswordConfirmAlert.msg || (newPasswordConfirm.length > 0 && newPassword == newPasswordConfirm)"/>
 			<span class="{{newPasswordConfirmAlert.classType}}" ng-show="newPasswordConfirmAlert.msg">{{newPasswordConfirmAlert.msg}}</span>								

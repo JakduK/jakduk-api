@@ -47,7 +47,7 @@ ng-submit="onSubmit(userProfileWrite, $event)">
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 			<span class="glyphicon form-control-feedback" 
 			ng-class="{'glyphicon-ok':userProfileWrite.username.$valid || usernameStatus == 'original', 
-			'glyphicon-remove form':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
+			'glyphicon-remove':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
 			<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
 			<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 			<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>		
