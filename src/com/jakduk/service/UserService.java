@@ -242,12 +242,15 @@ public class UserService {
 		userProfileInfo.setAbout(user.getAbout());
 		
 		FootballClub footballClub = user.getSupportFC();
-		List<FootballClubName> names = footballClub.getNames();
 		
-		for (FootballClubName name : names) {
-			if (name.getLanguage().equals(language)) {
-				userProfileInfo.setFootballClubName(name);
-			}		
+		if (footballClub != null) {
+			List<FootballClubName> names = footballClub.getNames();
+			
+			for (FootballClubName name : names) {
+				if (name.getLanguage().equals(language)) {
+					userProfileInfo.setFootballClubName(name);
+				}		
+			}
 		}
 				
 		model.addAttribute("status", status);
@@ -386,12 +389,15 @@ public class UserService {
 			profileInfo.setAbout(profile.getAbout());
 			
 			FootballClub footballClub = profile.getSupportFC();
-			List<FootballClubName> names = footballClub.getNames();
-			
-			for (FootballClubName name : names) {
-				if (name.getLanguage().equals(language)) {
-					profileInfo.setFootballClubName(name);
-				}		
+
+			if (footballClub != null) {
+				List<FootballClubName> names = footballClub.getNames();
+				
+				for (FootballClubName name : names) {
+					if (name.getLanguage().equals(language)) {
+						profileInfo.setFootballClubName(name);
+					}		
+				}
 			}
 					
 			model.addAttribute("oauthProfile", profileInfo);

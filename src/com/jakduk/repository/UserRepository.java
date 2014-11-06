@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
 
@@ -40,4 +41,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
 	OAuthProfile userfindByOauthUser(String type, String oauthId);
+	
+	@Query(value="{'email' : ?0}")
+	UserOnAuthentication userFindByEmail(String email);
 }

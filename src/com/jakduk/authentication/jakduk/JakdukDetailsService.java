@@ -14,7 +14,8 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.User;
+import com.jakduk.common.CommonRole;
+import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.repository.UserRepository;
 
 @Service
@@ -32,17 +33,17 @@ public class JakdukDetailsService implements UserDetailsManager {
 				|| email.equals(CommonConst.OAUTH_TYPE_DAUM))) {
 			throw new UsernameNotFoundException("not found email=" + email);
 		} else {
-			User domainUser = userRepository.findByEmail(email);
+			UserOnAuthentication user = userRepository.userFindByEmail(email);
 
-			if (domainUser != null) {
+			if (user != null) {
 				boolean enabled = true;
 				boolean accountNonExpired = true;
 				boolean credentialsNonExpired = true;
 				boolean accountNonLocked = true;
 
-				JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(domainUser.getEmail(), domainUser.getId()
-						, domainUser.getPassword(), domainUser.getUsername(), CommonConst.AUTH_TYPE_JAKDUK
-						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(2));
+				JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
+						, user.getPassword(), user.getUsername(), CommonConst.AUTH_TYPE_JAKDUK
+						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRules()));
 				
 				if (logger.isInfoEnabled()) {
 					logger.info("load user JakdukPrincipal=" + jakdukPrincipal);
@@ -56,30 +57,35 @@ public class JakdukDetailsService implements UserDetailsManager {
 		
 	}
 	
-	public Collection<? extends GrantedAuthority> getAuthorities(Integer role) {
-		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(role));
+	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
+		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));
 		return authList;
 	}
 	
-	public List<String> getRoles(Integer role) {
-		List<String> roles = new ArrayList<String>();
-
-		if (role.intValue() == 1) {
-			roles.add("ROLE_USER");
-			roles.add("ROLE_ADMIN");
-
-		} else if (role.intValue() == 2) {
-			roles.add("ROLE_TEST_01");
+	public List<String> getRoles(List<Integer> roles) {
+		List<String> newRoles = new ArrayList<String>();
+		
+		if (roles != null) {
+			for (Integer roleNumber : roles) {
+				String roleName = CommonRole.getRoleName(roleNumber);
+				if (!roleName.isEmpty()) {
+					newRoles.add(roleName);
+				}
+			}
 		}
+		
+		logger.debug("newRoles=" + newRoles);
 
-		return roles;
+		return newRoles;
 	}
 	
 	public static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		
 		for (String role : roles) {
 			authorities.add(new SimpleGrantedAuthority(role));
 		}
+		
 		return authorities;
 	}
 

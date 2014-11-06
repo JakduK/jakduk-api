@@ -2,6 +2,9 @@ package jakduk;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +14,8 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.UserProfile;
@@ -66,6 +71,16 @@ public class UserTest {
 	public void test03() {
 		OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");		
 		System.out.println("OAuthProfile=" + user);
+	}
+	
+	@Test
+	public void roleTest01() {
+		
+		String roleName = CommonRole.getRoleName(10);
+		
+		System.out.println("roleName=" + roleName);
+		System.out.println("roleNumber=" + CommonRole.getRoleNumber(roleName));
+			
 	}
 
 }

@@ -28,7 +28,7 @@ public class User {
 	
 	private OAuthUser oauthUser;
 	
-	private List<String> rules;
+	private List<Integer> rules;
 	
 	@Temporal(TemporalType.DATE)
 	private Date joined;
@@ -78,11 +78,11 @@ public class User {
 		this.password = password;
 	}
 
-	public List<String> getRules() {
+	public List<Integer> getRules() {
 		return rules;
 	}
 
-	public void setRules(List<String> rules) {
+	public void setRules(List<Integer> rules) {
 		this.rules = rules;
 	}
 
