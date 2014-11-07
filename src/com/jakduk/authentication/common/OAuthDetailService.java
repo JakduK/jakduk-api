@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.jakduk.authentication.daum.DaumUser;
 import com.jakduk.authentication.facebook.FacebookUser;
 import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
 import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.repository.UserRepository;
@@ -71,42 +72,52 @@ public class OAuthDetailService implements UserDetailsService {
 			oauthUser.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK);
 			oauthUserOnLogin.setOauthUser(oauthUser);
 			
+			ArrayList<Integer> roles = new ArrayList<Integer>();
+			roles.add(CommonRole.ROLE_NUMBER_USER_02);
+			
+			oauthUserOnLogin.setRoles(roles);
+			
 			if (logger.isDebugEnabled()) {
 				logger.debug("new oauthuser info =" + oauthUserOnLogin);
 			}
+			
 			userService.oauthUserWrite(oauthUserOnLogin);
 		}
 		
 		OAuthPrincipal principal = new OAuthPrincipal(oauthId, oauthUserOnLogin.getUsername(), type, oauthUserOnLogin.getOauthUser().getAddInfoStatus()
-				, true, true, true, true, getAuthorities(2));
+				, true, true, true, true, getAuthorities(oauthUserOnLogin.getRoles()));
 		
 		return principal;
 	}
 	
-	public Collection<? extends GrantedAuthority> getAuthorities(Integer role) {
-		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(role));
+	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
+		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));
+		
 		return authList;
 	}
 	
-	public List<String> getRoles(Integer role) {
-		List<String> roles = new ArrayList<String>();
-
-		if (role.intValue() == 1) {
-			roles.add("ROLE_USER");
-			roles.add("ROLE_ADMIN");
-
-		} else if (role.intValue() == 2) {
-			roles.add("ROLE_TEST_01");
+	public List<String> getRoles(List<Integer> roles) {
+		List<String> newRoles = new ArrayList<String>();
+		
+		if (roles != null) {
+			for (Integer roleNumber : roles) {
+				String roleName = CommonRole.getRoleName(roleNumber);
+				if (!roleName.isEmpty()) {
+					newRoles.add(roleName);
+				}
+			}
 		}
 
-		return roles;
+		return newRoles;
 	}
 	
 	public static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		
 		for (String role : roles) {
 			authorities.add(new SimpleGrantedAuthority(role));
 		}
+		
 		return authorities;
 	}
 	

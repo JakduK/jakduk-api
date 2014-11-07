@@ -43,7 +43,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 				JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
 						, user.getPassword(), user.getUsername(), CommonConst.AUTH_TYPE_JAKDUK
-						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRules()));
+						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 				
 				if (logger.isInfoEnabled()) {
 					logger.info("load user JakdukPrincipal=" + jakdukPrincipal);
@@ -59,6 +59,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 	
 	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
 		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));
+		
 		return authList;
 	}
 	
@@ -73,8 +74,6 @@ public class JakdukDetailsService implements UserDetailsManager {
 				}
 			}
 		}
-		
-		logger.debug("newRoles=" + newRoles);
 
 		return newRoles;
 	}

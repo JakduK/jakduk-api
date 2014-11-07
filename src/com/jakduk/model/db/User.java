@@ -28,7 +28,7 @@ public class User {
 	
 	private OAuthUser oauthUser;
 	
-	private List<Integer> rules;
+	private List<Integer> roles;
 	
 	@Temporal(TemporalType.DATE)
 	private Date joined;
@@ -77,13 +77,13 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	public List<Integer> getRules() {
-		return rules;
+	
+	public List<Integer> getRoles() {
+		return roles;
 	}
 
-	public void setRules(List<Integer> rules) {
-		this.rules = rules;
+	public void setRoles(List<Integer> roles) {
+		this.roles = roles;
 	}
 
 	public Date getJoined() {
@@ -114,7 +114,7 @@ public class User {
 	public String toString() {
 		return "User [id=" + id + ", email=" + email + ", username=" + username
 				+ ", password=" + password + ", oauthUser=" + oauthUser
-				+ ", rules=" + rules + ", joined=" + joined + ", about="
+				+ ", roles=" + roles + ", joined=" + joined + ", about="
 				+ about + ", supportFC=" + supportFC + "]";
 	}
 	

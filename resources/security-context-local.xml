@@ -27,9 +27,9 @@
 		<intercept-url pattern="/user/write" access="isAnonymous()" requires-channel="http"/>		
 		<intercept-url pattern="/user/**" access="authenticated" requires-channel="http"/>
 		<intercept-url pattern="/oauth/**" access="authenticated" requires-channel="http"/>
-		<intercept-url pattern="/check/user/*" access="permitAll" requires-channel="http"/>
+		<intercept-url pattern="/check/**" access="permitAll" requires-channel="http"/>
 		<intercept-url pattern="/**" requires-channel="http"/>
-		<intercept-url pattern="/admin" access="hasRole('ROLE_ROOT')" />
+		<intercept-url pattern="/admin" access="hasRole('ROLE_ROOT')"/>
 		<intercept-url pattern="/logout" access="permitAll" />
 		<intercept-url pattern="/home" access="permitAll" />
 		<intercept-url pattern="/about" access="permitAll" />

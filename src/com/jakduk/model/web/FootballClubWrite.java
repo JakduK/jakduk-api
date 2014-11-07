@@ -14,7 +14,7 @@ public class FootballClubWrite {
 	
 	private String origin;
 
-	private Integer active;
+	private String active;
 	
 	private String shortNameKr;
 	
@@ -32,12 +32,12 @@ public class FootballClubWrite {
 	public void setOrigin(String origin) {
 		this.origin = origin;
 	}
-
-	public Integer getActive() {
+	
+	public String getActive() {
 		return active;
 	}
 
-	public void setActive(Integer active) {
+	public void setActive(String active) {
 		this.active = active;
 	}
 

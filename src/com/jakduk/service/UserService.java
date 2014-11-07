@@ -1,5 +1,6 @@
 package com.jakduk.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -18,6 +19,7 @@ import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.FootballClubName;
@@ -121,13 +123,20 @@ public class UserService {
 		
 		user.setAbout(userWrite.getAbout());
 		
+		ArrayList<Integer> roles = new ArrayList<Integer>();
+		roles.add(CommonRole.ROLE_NUMBER_USER_01);
+		
+		user.setRoles(roles);
+		
 		this.create(user);
 	}
 	
 	public void oauthUserWrite(OAuthUserOnLogin oauthUserOnLogin) {
 		User user = new User();
+		
 		user.setUsername(oauthUserOnLogin.getUsername());
 		user.setOauthUser(oauthUserOnLogin.getOauthUser());
+		user.setRoles(oauthUserOnLogin.getRoles());
 		
 		userRepository.save(user);
 	}
@@ -144,6 +153,21 @@ public class UserService {
 		Boolean result = false;
 		
 		if (userRepository.findOneByUsername(username) != null) result = true;
+		
+		return result;
+	}
+	
+	public Boolean existOAuthUsername(String username) {
+		Boolean result = false;
+		
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
+			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String oauthId = principal.getOauthId();
+			
+			OAuthProfile oauthProfile = userRepository.userFindByNEOauthIdAndUsername(oauthId, username);
+			
+			if (oauthProfile != null) result = true;
+		} 
 		
 		return result;
 	}
@@ -181,7 +205,7 @@ public class UserService {
 		OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String oauthId = principal.getOauthId();
 		
-		String username = principal.getUsername();
+		String username = oAuthUserWrite.getUsername();
 		
 		if (oauthId != null && username != null) {
 			OAuthProfile profile = userRepository.userFindByNEOauthIdAndUsername(oauthId, username);

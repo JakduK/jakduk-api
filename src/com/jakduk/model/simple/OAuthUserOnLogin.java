@@ -1,5 +1,7 @@
 package com.jakduk.model.simple;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,6 +23,8 @@ public class OAuthUserOnLogin {
 	private String username;
 	
 	private OAuthUser oauthUser;
+	
+	private List<Integer> roles;
 
 	public String getId() {
 		return id;
@@ -46,10 +50,18 @@ public class OAuthUserOnLogin {
 		this.oauthUser = oauthUser;
 	}
 
+	public List<Integer> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Integer> roles) {
+		this.roles = roles;
+	}
+
 	@Override
 	public String toString() {
 		return "OAuthUserOnLogin [id=" + id + ", username=" + username
-				+ ", oauthUser=" + oauthUser + "]";
+				+ ", oauthUser=" + oauthUser + ", roles=" + roles + "]";
 	}
 
 }

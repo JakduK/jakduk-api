@@ -30,7 +30,7 @@ public class OAuthPrincipal implements UserDetails {
 	private String oauthId;
 	private String username;
 	private String type;
-	private Integer addInfoStatus;
+	private String addInfoStatus;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -38,7 +38,7 @@ public class OAuthPrincipal implements UserDetails {
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
 
-	public Integer getAddInfoStatus() {
+	public String getAddInfoStatus() {
 		return addInfoStatus;
 	}
 
@@ -96,7 +96,7 @@ public class OAuthPrincipal implements UserDetails {
 		this.username = username;
 	}
 
-	public void setAddInfoStatus(Integer addInfoStatus) {
+	public void setAddInfoStatus(String addInfoStatus) {
 		this.addInfoStatus = addInfoStatus;
 	}
 
@@ -132,7 +132,7 @@ public class OAuthPrincipal implements UserDetails {
 		return sortedAuthorities;
 	}
 
-	public OAuthPrincipal(String oauthId, String username, String type, Integer addInfoStatus, boolean enabled, boolean accountNonExpired,
+	public OAuthPrincipal(String oauthId, String username, String type, String addInfoStatus, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		this.oauthId = oauthId;

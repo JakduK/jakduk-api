@@ -47,13 +47,13 @@ public class CommonConst {
 	public final static String OAUTH_TYPE_DAUM = "daum";
 	public final static String AUTH_TYPE_JAKDUK = "jakduk";
 	
-	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_NONE = 10;
-	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_UNUSE = 11;
-	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_BLANK = 12;
-	public final static Integer OAUTH_ADDITIONAL_INFO_STATUS_OK = 13;
+	public final static String OAUTH_ADDITIONAL_INFO_STATUS_NONE = "none";
+	public final static String OAUTH_ADDITIONAL_INFO_STATUS_UNUSE = "unuse";
+	public final static String OAUTH_ADDITIONAL_INFO_STATUS_BLANK = "blank";
+	public final static String OAUTH_ADDITIONAL_INFO_STATUS_OK = "ok";
 	
-	public final static Integer FOOTBALL_CLUB_STATUS_NONE = 10;
-	public final static Integer FOOTBALL_CLUB_STATUS_ACTIVE = 11;
-	public final static Integer FOOTBALL_CLUB_STATUS_PAST = 12;
+	public final static String FOOTBALL_CLUB_STATUS_NONE = "none";
+	public final static String FOOTBALL_CLUB_STATUS_ACTIVE = "active";
+	public final static String FOOTBALL_CLUB_STATUS_INACTIVE = "inactive";
 	
 }

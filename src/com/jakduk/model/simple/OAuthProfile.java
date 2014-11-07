@@ -28,7 +28,7 @@ public class OAuthProfile {
 	
 	private OAuthUser oauthUser;
 	
-	private List<String> rules;
+	private List<Integer> roles;
 	
 	private String about;
 	
@@ -58,13 +58,13 @@ public class OAuthProfile {
 	public void setOauthUser(OAuthUser oauthUser) {
 		this.oauthUser = oauthUser;
 	}
-
-	public List<String> getRules() {
-		return rules;
+	
+	public List<Integer> getRoles() {
+		return roles;
 	}
 
-	public void setRules(List<String> rules) {
-		this.rules = rules;
+	public void setRoles(List<Integer> roles) {
+		this.roles = roles;
 	}
 
 	public String getAbout() {
@@ -86,7 +86,7 @@ public class OAuthProfile {
 	@Override
 	public String toString() {
 		return "OAuthProfile [id=" + id + ", username=" + username
-				+ ", oauthUser=" + oauthUser + ", rules=" + rules + ", about="
+				+ ", oauthUser=" + oauthUser + ", roles=" + roles + ", about="
 				+ about + ", supportFC=" + supportFC + "]";
 	}
 

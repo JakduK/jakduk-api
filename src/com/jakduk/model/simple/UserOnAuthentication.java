@@ -18,7 +18,7 @@ public class UserOnAuthentication {
 	
 	private String password;
 	
-	private List<Integer> rules;
+	private List<Integer> roles;
 
 	public String getId() {
 		return id;
@@ -52,19 +52,19 @@ public class UserOnAuthentication {
 		this.password = password;
 	}
 
-	public List<Integer> getRules() {
-		return rules;
+	public List<Integer> getRoles() {
+		return roles;
 	}
 
-	public void setRules(List<Integer> rules) {
-		this.rules = rules;
+	public void setRoles(List<Integer> roles) {
+		this.roles = roles;
 	}
 
 	@Override
 	public String toString() {
 		return "UserOnAuthentication [id=" + id + ", email=" + email
 				+ ", username=" + username + ", password=" + password
-				+ ", rules=" + rules + "]";
+				+ ", roles=" + roles + "]";
 	}
 
 }

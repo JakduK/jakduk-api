@@ -27,7 +27,7 @@ public class FootballClub {
 	@DBRef
 	private FootballClubOrigin origin;
 
-	private Integer active;
+	private String active;
 	
 	private List<FootballClubName> names;
 
@@ -46,12 +46,12 @@ public class FootballClub {
 	public void setOrigin(FootballClubOrigin origin) {
 		this.origin = origin;
 	}
-
-	public Integer getActive() {
+	
+	public String getActive() {
 		return active;
 	}
 
-	public void setActive(Integer active) {
+	public void setActive(String active) {
 		this.active = active;
 	}
 

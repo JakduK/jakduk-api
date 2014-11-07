@@ -24,9 +24,9 @@ ORIGIN :
 <p>
 ACTIVE :
 <form:select path="active" cssClass="form-control">
-	<form:option value="10">None</form:option>
-	<form:option value="11">Active</form:option>
-	<form:option value="12">Past</form:option>
+	<form:option value="none">None</form:option>
+	<form:option value="active">Active</form:option>
+	<form:option value="inactive">Inactive</form:option>
 </form:select> 	
 </p>
 <p>

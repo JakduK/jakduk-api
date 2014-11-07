@@ -106,6 +106,7 @@ public class HomeController {
 			@RequestParam(required = true) String email) {
 		
 		Boolean existEmail = userService.existEmail(email);
+		
 		model.addAttribute("existEmail", existEmail);
 	}
 	
@@ -114,6 +115,16 @@ public class HomeController {
 			@RequestParam(required = true) String username) {
 		
 		Boolean existUsername = userService.existUsername(username);
+		
+		model.addAttribute("existUsername", existUsername);
+	}
+	
+	@RequestMapping(value = "/check/oauth/username")
+	public void checkOAuthUsername(Model model,
+			@RequestParam(required = true) String username) {
+		
+		Boolean existUsername = userService.existOAuthUsername(username);
+		
 		model.addAttribute("existUsername", existUsername);
 	}
 

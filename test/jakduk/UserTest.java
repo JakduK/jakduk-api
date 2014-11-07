@@ -71,6 +71,9 @@ public class UserTest {
 	public void test03() {
 		OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");		
 		System.out.println("OAuthProfile=" + user);
+		
+		UserProfile userProfile = userRepository.userFindByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
+		System.out.println("userProfile=" + userProfile);
 	}
 	
 	@Test

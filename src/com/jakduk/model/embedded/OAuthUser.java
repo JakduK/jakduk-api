@@ -21,7 +21,7 @@ public class OAuthUser {
 	
 	private String oauthId;
 	
-	private Integer addInfoStatus = CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_UNUSE;
+	private String addInfoStatus = CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_UNUSE;
 	
 	public String getType() {
 		return type;
@@ -38,12 +38,12 @@ public class OAuthUser {
 	public void setOauthId(String oauthId) {
 		this.oauthId = oauthId;
 	}
-
-	public Integer getAddInfoStatus() {
+	
+	public String getAddInfoStatus() {
 		return addInfoStatus;
 	}
 
-	public void setAddInfoStatus(Integer addInfoStatus) {
+	public void setAddInfoStatus(String addInfoStatus) {
 		this.addInfoStatus = addInfoStatus;
 	}
 

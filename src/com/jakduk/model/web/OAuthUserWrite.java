@@ -20,7 +20,7 @@ public class OAuthUserWrite {
 	
 	private String footballClub;
 	
-	private String usernameStatus = "original";
+	private String usernameStatus = "none";
 	
 	public String getUsername() {
 		return username;

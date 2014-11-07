@@ -27,7 +27,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	@Query(value="{'id' : ?0}")
 	UserOnPasswordUpdate userOnPasswordUpdateFindById(String id);
 	
-	@Query(value="{$and : [ {'id' : {$ne : ?0}}, {'username' : ?1} ]}", fields="{'id' : 1, 'username' : 1}")
+	@Query(value="{'id' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1}")
 	UserProfile userFindByNEIdAndUsername(String id, String username);
 
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
@@ -36,7 +36,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
 	OAuthUserOnLogin findByOauthUser(String type, String oauthId);
 	
-	@Query(value="{$and : [ {'oauthUser.oauthId' : {$ne : ?0}}, {'username' : ?1} ]}", fields="{'id' : 1, 'username' : 1, 'oauthUser' : 1}")
+	@Query(value="{'oauthUser.oauthId' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1, 'oauthUser' : 1}")
 	OAuthProfile userFindByNEOauthIdAndUsername(String oauthId, String username);
 	
 	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")

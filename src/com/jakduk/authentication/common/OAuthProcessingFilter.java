@@ -84,7 +84,7 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 			Authentication authResult) throws IOException, ServletException {
 		// TODO Auto-generated method stub
 		
-		Integer addInfoStatus = ((OAuthPrincipal)authResult.getPrincipal()).getAddInfoStatus();
+		String addInfoStatus = ((OAuthPrincipal)authResult.getPrincipal()).getAddInfoStatus();
 		
 		if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
 			response.sendRedirect(request.getContextPath() + "/oauth/write");
