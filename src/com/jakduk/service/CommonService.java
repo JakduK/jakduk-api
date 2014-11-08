@@ -58,7 +58,7 @@ public class CommonService {
 	 * @param name 게시판 ID
 	 * @return 다음 글번호
 	 */
-	public Integer getNextSequence(Integer name) {
+	public Integer getNextSequence(String name) {
 		
 		Integer nextSeq = 1;
 		
@@ -150,7 +150,7 @@ public class CommonService {
 	 * @param seq 게시물 번호
 	 * @return 쿠키를 새로 저장했다면 true, 아니면 false. 
 	 */
-	public Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, int boardName, int seq) {
+	public Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, String boardName, int seq) {
 		
 		Boolean findSameCookie = false;
 		String cookieName = boardName + "_" + seq;

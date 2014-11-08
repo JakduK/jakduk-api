@@ -61,10 +61,10 @@ public class OAuthDetailService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String oauthId)	throws UsernameNotFoundException {
 		
-		OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(type, oauthId);
+		OAuthUserOnLogin user = userRepository.findByOauthUser(type, oauthId);
 		
-		if (oauthUserOnLogin == null) {
-			oauthUserOnLogin = new OAuthUserOnLogin();
+		if (user == null) {
+			OAuthUserOnLogin oauthUserOnLogin = new OAuthUserOnLogin();
 			oauthUserOnLogin.setUsername(username);			
 			OAuthUser oauthUser = new OAuthUser();
 			oauthUser.setOauthId(oauthId);
@@ -77,15 +77,17 @@ public class OAuthDetailService implements UserDetailsService {
 			
 			oauthUserOnLogin.setRoles(roles);
 			
-			if (logger.isDebugEnabled()) {
-				logger.debug("new oauthuser info =" + oauthUserOnLogin);
-			}
-			
 			userService.oauthUserWrite(oauthUserOnLogin);
+			
+			user = userRepository.findByOauthUser(type, oauthId);
+			
+			if (logger.isDebugEnabled()) {
+				logger.debug("new oauthuser info =" + user);
+			}
 		}
 		
-		OAuthPrincipal principal = new OAuthPrincipal(oauthId, oauthUserOnLogin.getUsername(), type, oauthUserOnLogin.getOauthUser().getAddInfoStatus()
-				, true, true, true, true, getAuthorities(oauthUserOnLogin.getRoles()));
+		OAuthPrincipal principal = new OAuthPrincipal(user.getId(), oauthId, user.getUsername(), type, 
+				true, true, true, true, getAuthorities(user.getRoles()));
 		
 		return principal;
 	}

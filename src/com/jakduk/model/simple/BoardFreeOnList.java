@@ -56,9 +56,9 @@ public class BoardFreeOnList {
 	 */
 	private int views = 0;
 	
-	private List<BoardUser> goodUsers;
+	private List<BoardUser> usersLiking;
 	
-	private List<BoardUser> badUsers;
+	private List<BoardUser> usersDisliking;
 
 	public String getId() {
 		return id;
@@ -108,28 +108,28 @@ public class BoardFreeOnList {
 		this.views = views;
 	}
 
-	public List<BoardUser> getGoodUsers() {
-		return goodUsers;
+	public List<BoardUser> getUsersLiking() {
+		return usersLiking;
 	}
 
-	public void setGoodUsers(List<BoardUser> goodUsers) {
-		this.goodUsers = goodUsers;
+	public void setUsersLiking(List<BoardUser> usersLiking) {
+		this.usersLiking = usersLiking;
 	}
 
-	public List<BoardUser> getBadUsers() {
-		return badUsers;
+	public List<BoardUser> getUsersDisliking() {
+		return usersDisliking;
 	}
 
-	public void setBadUsers(List<BoardUser> badUsers) {
-		this.badUsers = badUsers;
+	public void setUsersDisliking(List<BoardUser> usersDisliking) {
+		this.usersDisliking = usersDisliking;
 	}
 
 	@Override
 	public String toString() {
 		return "BoardFreeOnList [id=" + id + ", writer=" + writer
 				+ ", subject=" + subject + ", seq=" + seq + ", categoryId="
-				+ categoryId + ", views=" + views + ", goodUsers=" + goodUsers
-				+ ", badUsers=" + badUsers + "]";
+				+ categoryId + ", views=" + views + ", usersLiking="
+				+ usersLiking + ", usersDisliking=" + usersDisliking + "]";
 	}
 
 }

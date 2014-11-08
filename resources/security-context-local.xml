@@ -29,12 +29,12 @@
 		<intercept-url pattern="/oauth/**" access="authenticated" requires-channel="http"/>
 		<intercept-url pattern="/check/**" access="permitAll" requires-channel="http"/>
 		<intercept-url pattern="/**" requires-channel="http"/>
+		<intercept-url pattern="/board/*/write" access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')"/>
 		<intercept-url pattern="/admin" access="hasRole('ROLE_ROOT')"/>
 		<intercept-url pattern="/logout" access="permitAll" />
 		<intercept-url pattern="/home" access="permitAll" />
 		<intercept-url pattern="/about" access="permitAll" />
 		<intercept-url pattern="/sample" access="hasRole('ROLE_ROOT')" />		
-		<intercept-url pattern="/board/*/write" access="authenticated" />
 		
 		<form-login login-page="/login"
 			authentication-success-handler-ref="loginSuccessHandler" 

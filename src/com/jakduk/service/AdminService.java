@@ -61,7 +61,7 @@ public class AdminService {
 		
 		if (boardCategoryRepository.count() == 0) {
 			BoardCategory boardCategory01 = new BoardCategory();
-			List<Integer> usingBoard = new ArrayList<Integer>();
+			List<String> usingBoard = new ArrayList<String>();
 			usingBoard.add(CommonConst.BOARD_NAME_FREE);
 			boardCategory01.setName("board.category.free");
 			boardCategory01.setCategoryId(CommonConst.BOARD_CATEGORY_FREE);

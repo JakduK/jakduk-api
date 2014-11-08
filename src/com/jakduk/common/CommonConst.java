@@ -10,10 +10,10 @@ public class CommonConst {
 	/**
 	 * 게시판 종류. SEQUNCE 생성에도 쓰임.
 	 */
-	public final static Integer BOARD_NAME_FREE = 10;
+	public final static String BOARD_NAME_FREE = "freeBoard";
 	
-	public final static Integer ENCYCLOPEDIA_EN = 50;
-	public final static Integer ENCYCLOPEDIA_KO = 51;
+	public final static String ENCYCLOPEDIA_EN = "encyclopediaEn";
+	public final static String ENCYCLOPEDIA_KO = "encyclopediaKo";
 	
 	/**
 	 * 게시물 목록에서 보여지는 게시물 갯수
@@ -47,13 +47,31 @@ public class CommonConst {
 	public final static String OAUTH_TYPE_DAUM = "daum";
 	public final static String AUTH_TYPE_JAKDUK = "jakduk";
 	
+	/**
+	 * OAuth 추가 정보 입력 여부
+	 */
 	public final static String OAUTH_ADDITIONAL_INFO_STATUS_NONE = "none";
 	public final static String OAUTH_ADDITIONAL_INFO_STATUS_UNUSE = "unuse";
 	public final static String OAUTH_ADDITIONAL_INFO_STATUS_BLANK = "blank";
 	public final static String OAUTH_ADDITIONAL_INFO_STATUS_OK = "ok";
 	
+	/**
+	 * 축구단 상태
+	 */
 	public final static String FOOTBALL_CLUB_STATUS_NONE = "none";
 	public final static String FOOTBALL_CLUB_STATUS_ACTIVE = "active";
 	public final static String FOOTBALL_CLUB_STATUS_INACTIVE = "inactive";
+	
+	public final static String BOARD_USERS_FEELINGS_STATUS_NONE = "none";
+	public final static String BOARD_USERS_FEELINGS_STATUS_ALREADY = "already";
+	public final static String BOARD_USERS_FEELINGS_STATUS_LIKE = "like";
+	public final static String BOARD_USERS_FEELINGS_STATUS_DISLIKE = "dislike";
+	public final static String BOARD_USERS_FEELINGS_STATUS_WRITER = "writer";
+	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
+	
+	public final static String BOARD_USERS_FEELINGS_TYPE_LIKE = "like";
+	public final static String BOARD_USERS_FEELINGS_TYPE_DISLIKE = "dislike";
+	
+	public final static String PRINCIPAL_ANONYMOUSUSER = "anonymousUser";
 	
 }

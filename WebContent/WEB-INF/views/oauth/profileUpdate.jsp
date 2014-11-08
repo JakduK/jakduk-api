@@ -47,8 +47,7 @@
 					<form:option value=""><spring:message code="common.none"/></form:option>
 				<c:forEach items="${footballClubs}" var="club">
 					<c:forEach items="${club.names}" var="name">
-						<form:option value="${club.id}" label="${name.shortName}" class="visible-xs"/>
-						<form:option value="${club.id}" label="${name.fullName}" class="visible-sm visible-md visible-lg"/>
+						<form:option value="${club.id}" label="${name.fullName}"/>
 					</c:forEach>
 				</c:forEach>
 				</form:select>
@@ -98,7 +97,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	
 	$scope.onUsername = function(OAuthUserWrite) {
 		if (OAuthUserWrite.username.$valid) {
-			var bUrl = '<c:url value="/check/oauth/username.json?username=' + $scope.username + '"/>';
+			var bUrl = '<c:url value="/check/oauth/update/username.json?username=' + $scope.username + '"/>';
 			if ($scope.usernameConn == "none") {
 				var reqPromise = $http.get(bUrl);
 				$scope.usernameConn = "loading";

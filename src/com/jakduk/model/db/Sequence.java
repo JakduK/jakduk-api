@@ -26,7 +26,7 @@ public class Sequence {
 	 * CommonConst 의 게시판 ID 참고
 	 */
 	@NotNull
-	private Integer name;
+	private String name;
 
 	public String getId() {
 		return id;
@@ -44,11 +44,11 @@ public class Sequence {
 		this.seq = seq;
 	}
 
-	public Integer getName() {
+	public String getName() {
 		return name;
 	}
 
-	public void setName(Integer name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 

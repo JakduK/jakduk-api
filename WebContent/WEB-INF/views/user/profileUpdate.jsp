@@ -3,7 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>    
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="jakdukApp">
 <head>
@@ -16,10 +15,6 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-
-<sec:authorize access="isAuthenticated()">
-	<sec:authentication property="principal.username" var="principalUsername"/>
-</sec:authorize>
     
 <div class="container" ng-controller="writeCtrl">
 <form:form commandName="userProfileWrite" name="userProfileWrite" action="${contextPath}/user/profile/update" method="POST" cssClass="form-horizontal"
@@ -36,7 +31,7 @@ ng-submit="onSubmit(userProfileWrite, $event)">
     </div>
   </div>
 	<div class="form-group has-feedback" 
-	ng-class="{'has-success':userProfileWrite.username.$valid || usernameStatus == 'original', 
+	ng-class="{'has-success':userProfileWrite.username.$valid, 
 	'has-error':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}">
 		<label class="col-sm-2 control-label" for="username">
 			<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
@@ -46,7 +41,7 @@ ng-submit="onSubmit(userProfileWrite, $event)">
 				ng-model="username" ng-init="username='${userProfileWrite.username}'" ng-blur="onUsername(userProfileWrite)"
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 			<span class="glyphicon form-control-feedback" 
-			ng-class="{'glyphicon-ok':userProfileWrite.username.$valid || usernameStatus == 'original', 
+			ng-class="{'glyphicon-ok':userProfileWrite.username.$valid, 
 			'glyphicon-remove':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
 			<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
 			<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
@@ -62,8 +57,7 @@ ng-submit="onSubmit(userProfileWrite, $event)">
 				<form:option value=""><spring:message code="common.none"/></form:option>
 				<c:forEach items="${footballClubs}" var="club">
 					<c:forEach items="${club.names}" var="name">
-						<form:option value="${club.id}" label="${name.shortName}" class="visible-xs"/>
-						<form:option value="${club.id}" label="${name.fullName}" class="visible-sm visible-md visible-lg"/>
+						<form:option value="${club.id}" label="${name.fullName}"/>
 					</c:forEach>
 				</c:forEach>
 			</form:select>
@@ -100,7 +94,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.usernameAlert = {};
 	
 	$scope.onSubmit = function(userProfileWrite, event) {
-		if (userProfileWrite.$valid && ($scope.usernameStatus == "ok" || $scope.usernameStatus == "original")) {
+		if (userProfileWrite.$valid && $scope.usernameStatus == "ok") {
 		} else {			
 			if (userProfileWrite.username.$invalid) {
 				checkUsername(userProfileWrite);
@@ -115,34 +109,28 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	};
 	
 	$scope.onUsername = function(userProfileWrite) {
-		if ("${principalUsername}" == $scope.username) {
-			$scope.usernameStatus = "original";
-			$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
-		} else {
-			if (userProfileWrite.username.$valid) {
-				var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';
-				if ($scope.usernameConn == 0) {
-					var reqPromise = $http.get(bUrl);
-					$scope.usernameConn = 1;
-					reqPromise.success(function(data, status, headers, config) {
-						if (data.existUsername != null) {
-							if (data.existUsername == false) {
-								$scope.usernameStatus = "ok";
-								$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
-							} else {
-								$scope.usernameStatus = "duplication";
-								$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
-							}
+		if (userProfileWrite.username.$valid) {
+			var bUrl = '<c:url value="/check/user/update/username.json?username=' + $scope.username + '"/>';
+			if ($scope.usernameConn == 0) {
+				var reqPromise = $http.get(bUrl);
+				$scope.usernameConn = 1;
+				reqPromise.success(function(data, status, headers, config) {
+					if (data.existUsername != null) {
+						if (data.existUsername == false) {
+							$scope.usernameStatus = "ok";
+							$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+						} else {
+							$scope.usernameStatus = "duplication";
+							$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
 						}
-						$scope.usernameConn = 0;
-					});
-					reqPromise.error(usernameError);
-				}
-			} else {
-				checkUsername(userProfileWrite);
+					}
+					$scope.usernameConn = 0;
+				});
+				reqPromise.error(usernameError);
 			}
+		} else {
+			checkUsername(userProfileWrite);
 		}
-
 	};
 	
 	function usernameError(data, status, headers, config) {

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
@@ -88,7 +89,7 @@ public class UserService {
 			result.rejectValue("email", "user.msg.already.email");
 		}
 		
-		if (this.existUsername(userWrite.getUsername())) {
+		if (this.existUsernameOnWrite(userWrite.getUsername())) {
 			result.rejectValue("username", "user.msg.already.username");
 		}
 		
@@ -149,7 +150,7 @@ public class UserService {
 		return result;
 	}
 	
-	public Boolean existUsername(String username) {
+	public Boolean existUsernameOnWrite(String username) {
 		Boolean result = false;
 		
 		if (userRepository.findOneByUsername(username) != null) result = true;
@@ -157,7 +158,22 @@ public class UserService {
 		return result;
 	}
 	
-	public Boolean existOAuthUsername(String username) {
+	public Boolean existUsernameOnUpdate(String username) {
+		Boolean result = false;
+		
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+			JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String id = principal.getId();
+			
+			UserProfile userProfile = userRepository.userFindByNEIdAndUsername(id, username);
+			
+			if (userProfile != null) result = true;
+		} 
+		
+		return result;
+	}
+	
+	public Boolean existOAuthUsernameOnUpdate(String username) {
 		Boolean result = false;
 		
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
@@ -249,7 +265,6 @@ public class UserService {
 		userRepository.save(user);
 
 		principal.setUsername(userWrite.getUsername());
-		principal.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_OK);
 		
 		commonService.doOAuthAutoLogin(principal, credentials, userDetails);
 	}
@@ -500,6 +515,25 @@ public class UserService {
 			
 			commonService.doOAuthAutoLogin(principal, credentials, userDetails);
 		}
+	}
+	
+	public CommonPrincipal getCommonPrincipal() {
+		CommonPrincipal commonPrincipal = new CommonPrincipal();
+		
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			
+			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
+				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+				commonPrincipal.setId(principal.getId());
+				commonPrincipal.setUsername(principal.getUsername());
+			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+				commonPrincipal.setId(principal.getId());
+				commonPrincipal.setUsername(principal.getUsername());
+			}
+		}
+		
+		return commonPrincipal;
 	}
 		
 }

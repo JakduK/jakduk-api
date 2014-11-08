@@ -114,16 +114,25 @@ public class HomeController {
 	public void checkUsername(Model model,
 			@RequestParam(required = true) String username) {
 		
-		Boolean existUsername = userService.existUsername(username);
+		Boolean existUsername = userService.existUsernameOnWrite(username);
 		
 		model.addAttribute("existUsername", existUsername);
 	}
 	
-	@RequestMapping(value = "/check/oauth/username")
-	public void checkOAuthUsername(Model model,
+	@RequestMapping(value = "/check/user/update/username")
+	public void checkUpdateUsername(Model model,
 			@RequestParam(required = true) String username) {
 		
-		Boolean existUsername = userService.existOAuthUsername(username);
+		Boolean existUsername = userService.existUsernameOnUpdate(username);
+		
+		model.addAttribute("existUsername", existUsername);
+	}
+	
+	@RequestMapping(value = "/check/oauth/update/username")
+	public void checkOAuthUpdateUsername(Model model,
+			@RequestParam(required = true) String username) {
+		
+		Boolean existUsername = userService.existOAuthUsernameOnUpdate(username);
 		
 		model.addAttribute("existUsername", existUsername);
 	}

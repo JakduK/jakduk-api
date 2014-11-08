@@ -4,7 +4,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="jakdukApp">
 <head>
@@ -26,7 +25,7 @@
   		<c:if test="${!empty category}">&nbsp;<small><fmt:message key="${category.name}"/></small></c:if>
   	</h4>
   	<div class="row">
-  		<div class="col-sm-1">
+  		<div class="col-sm-2">
 	  		<small>${post.writer.username}</small>
   		</div>
   		
@@ -62,14 +61,14 @@
   </div>
   
 	<div class="panel-footer text-center" ng-controller="AlertCtrl">
-		<button type="button" class="btn btn-primary" ng-click="btnGoodOrBad('good')">
-			<spring:message code="board.good"/>
-			<span ng-init="numberOfGood=${fn:length(post.goodUsers)}">{{numberOfGood}}</span>
+		<button type="button" class="btn btn-primary" ng-click="btnFeeling('like')">
+			<spring:message code="board.like"/>
+			<span ng-init="numberOfLike=${fn:length(post.usersLiking)}">{{numberOfLike}}</span>
 			<span class="glyphicon glyphicon-thumbs-up"></span>
 		</button>
-		<button type="button" class="btn btn-danger" ng-click="btnGoodOrBad('bad')">		
-			<spring:message code="board.bad"/>
-			<span ng-init="numberOfBad=${fn:length(post.badUsers)}">{{numberOfBad}}</span>
+		<button type="button" class="btn btn-danger" ng-click="btnFeeling('dislike')">		
+			<spring:message code="board.dislike"/>
+			<span ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">{{numberOfDislike}}</span>
 			<span class="glyphicon glyphicon-thumbs-down"></span>
 		</button>
 		<p></p>
@@ -99,7 +98,8 @@ var jakdukApp = angular.module("jakdukApp", []);
 jakdukApp.controller("AlertCtrl", function($scope, $http) {
 	$scope.alert = {};
 	$scope.result = 0;
-	$scope.btnGoodOrBad = function(status) {
+	
+	$scope.btnFeeling = function(status) {
 		
 		var bUrl = '<c:url value="/board/' + status + '/${post.seq}.json"/>';
 		
@@ -110,25 +110,30 @@ jakdukApp.controller("AlertCtrl", function($scope, $http) {
 			$scope.result = 1;
 			
 			reqPromise.success(function(data, status, headers, config) {
+				var message = "";
+				var mType = "";
 				
-				if (data.errorCode == 1) {
-					message = '<spring:message code="board.msg.select.good"/>';
+				if (data.errorCode == "like") {
+					message = '<spring:message code="board.msg.select.like"/>';
 					mType = "alert-success";
-				} else if (data.errorCode == 2) {
-					message = '<spring:message code="board.msg.select.bad"/>';
+					$scope.numberOfLike = data.numberOfLike;
+				} else if (data.errorCode == "dislike") {
+					message = '<spring:message code="board.msg.select.dislike"/>';
 					mType = "alert-success";
-				} else if (data.errorCode == 3) {
-					message = '<spring:message code="board.msg.select.already.good"/>';
+					$scope.numberOfDislike = data.numberOfDislike;
+				} else if (data.errorCode == "already") {
+					message = '<spring:message code="board.msg.select.already.like"/>';
 					mType = "alert-warning";
-				} else if (data.errorCode == 4) {
+				} else if (data.errorCode == "anonymous") {
 					message = '<spring:message code="board.msg.need.login"/>';
+					mType = "alert-warning";
+				} else if (data.errorCode == "writer") {
+					message = '<spring:message code="board.msg.you.are.writer"/>';
 					mType = "alert-warning";
 				}
 				
 				$scope.alert.msg = message;
 				$scope.alert.classType = mType;
-				$scope.numberOfGood = data.numberOfGood;
-				$scope.numberOfBad = data.numberOfBad;
 				$scope.result = 2;
 				
 			});

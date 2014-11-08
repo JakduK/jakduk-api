@@ -2,6 +2,7 @@ package com.jakduk.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
@@ -30,7 +32,6 @@ import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.SequenceRepository;
-import com.jakduk.repository.UserRepository;
 
 @Service
 public class BoardFreeService {
@@ -42,9 +43,6 @@ public class BoardFreeService {
 	private BoardFreeOnListRepository boardFreeOnListRepository;
 	
 	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
 	private SequenceRepository boardSequenceRepository;
 	
 	@Autowired
@@ -52,6 +50,9 @@ public class BoardFreeService {
 	
 	@Autowired
 	private CommonService commonService;
+	
+	@Autowired
+	private UserService userService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 
@@ -76,11 +77,9 @@ public class BoardFreeService {
 	 */
 	public void write(BoardFree boardFree) {
 		
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		if (principal instanceof JakdukPrincipal) {
-			String userid = ((JakdukPrincipal) principal).getId();
-			String username = ((JakdukPrincipal) principal).getUsername();
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String userid = principal.getId();
+		String username = principal.getUsername();
 			
 			BoardWriter writer = new BoardWriter();
 			writer.setId(userid);
@@ -89,10 +88,15 @@ public class BoardFreeService {
 			boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
 			
 			boardFreeRepository.save(boardFree);
-			logger.debug("boardFree=" + boardFree);
-		} else {
-			logger.error("no writer.");
-		}		
+			
+			if (logger.isInfoEnabled()) {
+				logger.info("new post created. user id=" + userid + ", username=" + username);
+			}
+			
+			if (logger.isDebugEnabled()) {
+				logger.debug("boardFree=" + boardFree);
+			}
+		
 	}
 	
 	/**
@@ -145,8 +149,6 @@ public class BoardFreeService {
 		
 		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
 		
-		logger.debug("posts=" + posts);
-		
 		model.addAttribute("posts", posts);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("categorys", categorys);
@@ -176,7 +178,6 @@ public class BoardFreeService {
 			if (isAddCookie == true) {
 				int views = boardFree.getViews();
 				boardFree.setViews(++views);
-				logger.debug("post=" + boardFree);
 				boardFreeRepository.save(boardFree);
 			}
 			
@@ -187,7 +188,7 @@ public class BoardFreeService {
 			
 		} catch (Exception e) {
 			// TODO: handle exception
-			logger.debug(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return model;
@@ -200,72 +201,83 @@ public class BoardFreeService {
 	 * @param status
 	 * @return
 	 */
-	public Model getGoodOrBad(Model model, int seq, int status) {
-		Integer errCode = -1;
+	public Model setUsersFeelings(Model model, int seq, String feeling) {
+		
+		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
+
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String userid = principal.getId();
+		String username = principal.getUsername();
+		
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-		
-		List<BoardUser> goodUsers = boardFree.getGoodUsers();
-		List<BoardUser> badUsers = boardFree.getBadUsers();
-		
-		if (goodUsers == null) {
-			goodUsers = new ArrayList<BoardUser>(); 
+		BoardWriter writer = boardFree.getWriter();
+
+		List<BoardUser> usersLiking = boardFree.getUsersLiking();
+		List<BoardUser> usersDisliking = boardFree.getUsersDisliking();
+
+		if (usersLiking == null) {
+			usersLiking = new ArrayList<BoardUser>(); 
 		}
 		
-		if (badUsers == null) {
-			badUsers = new ArrayList<BoardUser>(); 
+		if (usersDisliking == null) {
+			usersDisliking = new ArrayList<BoardUser>(); 
 		}
 		
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		if (principal instanceof JakdukPrincipal) {
-			String userid = ((JakdukPrincipal) principal).getId();
-			String username = ((JakdukPrincipal) principal).getUsername();
+		if (userid != null && username != null) {
 			
-			Boolean isSameUser = false;
-			
-			for (BoardUser boardUser : goodUsers) {
-				if (boardUser != null && userid.equals(boardUser.getUserid())) {
-					isSameUser = true;
-					errCode = 3; // 이미 좋아요 누름 
-					break;
-				}
+			if (userid.equals(writer.getId())) {
+				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
 			}
-			
-			if (isSameUser == false) {
-				for (BoardUser boardUser : badUsers) {
+
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				for (BoardUser boardUser : usersLiking) {
 					if (boardUser != null && userid.equals(boardUser.getUserid())) {
-						isSameUser = true;
-						errCode = 3; // 이미 싫어요 누름
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 						break;
 					}
 				}
 			}
 			
-			if (isSameUser == false) {
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				for (BoardUser boardUser : usersDisliking) {
+					if (boardUser != null && userid.equals(boardUser.getUserid())) {
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+						break;
+					}
+				}
+			}
+
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				BoardUser boardUser = new BoardUser();
 				boardUser.setUserid(userid);
 				boardUser.setUsername(username);
 				boardUser.setId(new ObjectId().toString());
+
+				switch (feeling) {
+				case CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE:
+					usersLiking.add(boardUser);
+					boardFree.setUsersLiking(usersLiking);
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
+					break;
+				case CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE:
+					usersDisliking.add(boardUser);
+					boardFree.setUsersDisliking(usersDisliking);
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
+					break;
+				default:
+					break;
+				}
 				
-				if (status == 1) {
-					goodUsers.add(boardUser);
-					boardFree.setGoodUsers(goodUsers);
-					boardFreeRepository.save(boardFree);
-					errCode = 1; // 좋아요
-				} else if (status == 2) {
-					badUsers.add(boardUser);
-					boardFree.setBadUsers(badUsers);
-					boardFreeRepository.save(boardFree);
-					errCode = 2; // 싫어요
-				} 
+				boardFreeRepository.save(boardFree);
 			}
-		} else if (principal.equals("anonymousUser")) {
-			errCode = 4; // 로그인 안했음
-		}	
+		} else {
+			errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ANONYMOUS;
+		}
 		
 		model.addAttribute("errorCode", errCode);
-		model.addAttribute("numberOfGood", goodUsers.size());
-		model.addAttribute("numberOfBad", badUsers.size());
+		model.addAttribute("numberOfLike", usersLiking.size());
+		model.addAttribute("numberOfDislike", usersDisliking.size());
+		
 		return model;
 	}
 }

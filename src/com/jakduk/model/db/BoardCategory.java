@@ -22,7 +22,7 @@ public class BoardCategory {
 	
 	private Integer categoryId;
 	
-	private List<Integer> usingBoard;
+	private List<String> usingBoard;
 
 	public String getId() {
 		return id;
@@ -47,15 +47,15 @@ public class BoardCategory {
 	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
 	}
-
-	public List<Integer> getUsingBoard() {
+	
+	public List<String> getUsingBoard() {
 		return usingBoard;
 	}
 
-	public void setUsingBoard(List<Integer> usingBoard) {
+	public void setUsingBoard(List<String> usingBoard) {
 		this.usingBoard = usingBoard;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "BoardCategory [id=" + id + ", name=" + name + ", categoryId=" + categoryId + ", usingBoard=" + usingBoard+ "]";

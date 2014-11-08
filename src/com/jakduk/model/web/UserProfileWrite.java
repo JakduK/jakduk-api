@@ -23,7 +23,7 @@ public class UserProfileWrite {
 	
 	private String footballClub;
 	
-	private String usernameStatus = "original";
+	private String usernameStatus = "none";
 
 	public String getEmail() {
 		return email;

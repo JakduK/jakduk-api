@@ -28,11 +28,12 @@ public class FacebookService {
 	
 	public FacebookUser findUser() {
 		
-		LOGGER.debug("phjang=" + facebookRestTemplate.getForObject(profileUri, Map.class));
 		FacebookUser facebookUser = 	facebookRestTemplate.getForObject(profileUri, FacebookUser.class);
+		
 		if(LOGGER.isInfoEnabled()) {
 			LOGGER.info(facebookUser.toString());
 		}
+		
 		return facebookUser;
 	}
 

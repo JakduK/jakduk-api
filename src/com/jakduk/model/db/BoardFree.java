@@ -64,9 +64,9 @@ public class BoardFree {
 	 */
 	private int views = 0;
 	
-	private List<BoardUser> goodUsers;
+	private List<BoardUser> usersLiking;
 	
-	private List<BoardUser> badUsers;
+	private List<BoardUser> usersDisliking;
 	
 	public int getViews() {
 		return views;
@@ -123,21 +123,21 @@ public class BoardFree {
 	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
 	}
-	
-	public List<BoardUser> getGoodUsers() {
-		return goodUsers;
+
+	public List<BoardUser> getUsersLiking() {
+		return usersLiking;
 	}
 
-	public void setGoodUsers(List<BoardUser> goodUsers) {
-		this.goodUsers = goodUsers;
-	}
-	
-	public List<BoardUser> getBadUsers() {
-		return badUsers;
+	public void setUsersLiking(List<BoardUser> usersLiking) {
+		this.usersLiking = usersLiking;
 	}
 
-	public void setBadUsers(List<BoardUser> badUsers) {
-		this.badUsers = badUsers;
+	public List<BoardUser> getUsersDisliking() {
+		return usersDisliking;
+	}
+
+	public void setUsersDisliking(List<BoardUser> usersDisliking) {
+		this.usersDisliking = usersDisliking;
 	}
 
 	@Override
@@ -145,7 +145,8 @@ public class BoardFree {
 		return "BoardFree [id=" + id + ", writer=" + writer + ", subject="
 				+ subject + ", content=" + content + ", seq=" + seq
 				+ ", categoryId=" + categoryId + ", views=" + views
-				+ ", goodUsers=" + goodUsers + ", badUsers=" + badUsers + "]";
+				+ ", usersLiking=" + usersLiking + ", usersDisliking="
+				+ usersDisliking + "]";
 	}
 
 }

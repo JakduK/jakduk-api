@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.aspectj.weaver.ast.Instanceof;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +22,8 @@ import org.springframework.security.oauth2.client.http.AccessTokenRequiredExcept
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.repository.UserRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -29,6 +33,9 @@ import com.jakduk.common.CommonConst;
  */
 public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
+	@Autowired
+	UserRepository userRepository;
+	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	protected OAuthProcessingFilter(String defaultFilterProcessesUrl) {
@@ -47,7 +54,7 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 			SecurityContextHolder.getContext().setAuthentication(null);
 			
 			if (logger.isInfoEnabled()) {
-				logger.info("oauth were cancled. Authentication object was deleted.");
+				logger.info("oauth was cancled. Authentication object was deleted.");
 			}
 		}
 		
@@ -84,13 +91,21 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 			Authentication authResult) throws IOException, ServletException {
 		// TODO Auto-generated method stub
 		
-		String addInfoStatus = ((OAuthPrincipal)authResult.getPrincipal()).getAddInfoStatus();
-		
-		if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
-			response.sendRedirect(request.getContextPath() + "/oauth/write");
+		if (authResult.getPrincipal() instanceof OAuthPrincipal) {
+			OAuthPrincipal principal = (OAuthPrincipal) authResult.getPrincipal();
+			OAuthUserOnLogin oauthUser = userRepository.findByOauthUser(principal.getType(), principal.getOauthId());
+			
+			if (oauthUser != null) {
+				String addInfoStatus = oauthUser.getOauthUser().getAddInfoStatus();
+				
+				if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
+					response.sendRedirect(request.getContextPath() + "/oauth/write");
+				}
+			}
+			super.successfulAuthentication(request, response, chain, authResult);
+		} else {
+			// faild
 		}
-		
-		super.successfulAuthentication(request, response, chain, authResult);
 	}
 
 	@Override

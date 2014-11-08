@@ -32,12 +32,13 @@
 		</c:forEach>
   </ul>
 </div>
+
 <sec:authorize access="isAnonymous()">
 	<a href="javascript:needLogin();" class="btn btn-primary" role="button">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</a>
 </sec:authorize>
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
 	<a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</a>
@@ -49,8 +50,8 @@
   	<div class="row">
   		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
   		<div class="col-sm-3"><spring:message code="board.subject"/></div>
-  		<div class="col-sm-2"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
-  		<div class="col-sm-4"><spring:message code="board.views"/> | <spring:message code="board.good"/> | <spring:message code="board.bad"/></div>
+  		<div class="col-sm-3"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
+  		<div class="col-sm-4"><spring:message code="board.views"/> | <spring:message code="board.like"/> | <spring:message code="board.dislike"/></div>
   	</div>  	
   </div> <!-- /panel-heading -->
 
@@ -69,7 +70,7 @@
 	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">
 		<div class="col-sm-3"><strong>${post.subject}</strong></div>
 	</a>			
-	<div class="col-sm-2">
+	<div class="col-sm-3">
 		${post.writer.username}
 		|
 		<%@page import="java.util.Date"%>
@@ -88,8 +89,8 @@
 	</div>
 	<div class="col-sm-4">
 		<spring:message code="board.views"/><strong> ${post.views}</strong>
-		| <span class="text-primary"><span class="glyphicon glyphicon-thumbs-up"></span><strong> ${fn:length(post.goodUsers)}</strong></span>
-		| <span class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span><strong> ${fn:length(post.badUsers)}</strong></span>
+		| <span class="text-primary"><span class="glyphicon glyphicon-thumbs-up"></span><strong> ${fn:length(post.usersLiking)}</strong></span>
+		| <span class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span><strong> ${fn:length(post.usersDisliking)}</strong></span>
 	</div>
 	</div> <!-- /row -->
 	</li>

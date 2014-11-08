@@ -23,7 +23,7 @@ public class BoardUser {
 	
 	@NotNull
 	private String username;
-
+	
 	public String getId() {
 		return id;
 	}
