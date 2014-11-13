@@ -21,11 +21,11 @@
   	<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
   	<custom-filter ref="oauthFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
 
-		<!-- if localhost, change https to http from requires-channel -->
 		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="http"/>
 		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="http"/>
 		<intercept-url pattern="/user/write" access="isAnonymous()" requires-channel="http"/>		
 		<intercept-url pattern="/user/**" access="authenticated" requires-channel="http"/>
+		<intercept-url pattern="/oauth/daum/callback" access="authenticated" requires-channel="http"/>
 		<intercept-url pattern="/oauth/**" access="authenticated" requires-channel="http"/>
 		<intercept-url pattern="/check/**" access="permitAll" requires-channel="http"/>
 		<intercept-url pattern="/**" requires-channel="http"/>
@@ -37,8 +37,8 @@
 		<intercept-url pattern="/sample" access="hasRole('ROLE_ROOT')" />		
 		
 		<form-login login-page="/login"
-			authentication-success-handler-ref="loginSuccessHandler" 
-			authentication-failure-handler-ref="loginFailureHandler"/>
+			authentication-success-handler-ref="jakdukSuccessHandler" 
+			authentication-failure-handler-ref="jakdukFailureHandler"/>
 			
 		<access-denied-handler error-page="/denied" />
 		
@@ -49,8 +49,12 @@
 		<logout invalidate-session="true" logout-url="/logout"/>					
 	</http>
 	
-	<beans:bean id="loginSuccessHandler" class="com.jakduk.authentication.common.LoginSuccessHandler"/>
-	<beans:bean id="loginFailureHandler" class="com.jakduk.authentication.common.LoginFailureHandler"/>
+	<beans:bean id="jakdukSuccessHandler" class="com.jakduk.authentication.jakduk.JakdukSuccessHandler"/>
+	<beans:bean id="jakdukFailureHandler" class="com.jakduk.authentication.jakduk.JakdukFailureHandler"/>
+	
+	<beans:bean id="oauthSuccessHandler" class="com.jakduk.authentication.common.OAuthSuccessHandler"/>
+	<beans:bean id="oauthFailureHandler" class="com.jakduk.authentication.common.OAuthFailureHandler"/>
+	
 	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
 	<beans:bean id="jakdukDetailsService" class="com.jakduk.authentication.jakduk.JakdukDetailsService"/>
 	
@@ -104,6 +108,8 @@
 	
 	<beans:bean id="oauthFilter" class="com.jakduk.authentication.common.OAuthProcessingFilter">
 		<beans:property name="authenticationManager" ref="authenticationManager"/>
+		<beans:property name="authenticationSuccessHandler" ref="oauthSuccessHandler"/>
+		<beans:property name="authenticationFailureHandler" ref="oauthFailureHandler"/>
 	</beans:bean>	
 
 	<beans:bean id="facebookAuthenticationProvider" class="com.jakduk.authentication.facebook.FacebookAuthenticationProvider">

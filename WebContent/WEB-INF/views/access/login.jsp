@@ -94,7 +94,7 @@
 	</div>
 </div><!-- /.container -->
 
-<script src="<%=request.getContextPath()%>/resources/angular/js/angular.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular/js/angular-cookies.min.js"></script>
 <script type="text/javascript">
 

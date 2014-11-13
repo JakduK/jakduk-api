@@ -4,17 +4,20 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk</artifactId>
-  <version>0.0.18-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>jakduk</name>
   <url>http://jakduk.com</url>
 
   <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>3.2.8.RELEASE</spring.version>
 		<spring.security.core.version>3.2.5.RELEASE</spring.security.core.version>   	
 		<spring.security.oauth.version>2.0.2.RELEASE</spring.security.oauth.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jstl.version>1.2</jstl.version>
+		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+		<javax.servlet.jsp-api.version>2.3.1</javax.servlet.jsp-api.version>
 	
 		<!-- Miscellaneous Dependencies -->
 		<log4j.version>1.2.14</log4j.version>
@@ -92,20 +95,20 @@
 		
 		<!-- Web -->
 		<dependency>
-			<groupId>jstl</groupId>
+			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
-			<version>1.2</version>
+			<version>${jstl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${javax.servlet-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>2.1</version>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+			<version>${javax.servlet.jsp-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 

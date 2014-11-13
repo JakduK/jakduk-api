@@ -31,6 +31,7 @@ public class OAuthPrincipal implements UserDetails {
 	private String oauthId;
 	private String username;
 	private String type;
+	private String addInfoStatus;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -50,6 +51,14 @@ public class OAuthPrincipal implements UserDetails {
 		return type;
 	}
 	
+	public String getAddInfoStatus() {
+		return addInfoStatus;
+	}
+
+	public void setAddInfoStatus(String addInfoStatus) {
+		this.addInfoStatus = addInfoStatus;
+	}
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
@@ -132,13 +141,14 @@ public class OAuthPrincipal implements UserDetails {
 		return sortedAuthorities;
 	}
 
-	public OAuthPrincipal(String id, String oauthId, String username, String type, boolean enabled, boolean accountNonExpired,
+	public OAuthPrincipal(String id, String oauthId, String username, String type, String addInfoStatus, boolean enabled, boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		this.id = id;
 		this.oauthId = oauthId;
 		this.username = username;
 		this.type = type;
+		this.addInfoStatus = addInfoStatus;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
@@ -150,8 +160,9 @@ public class OAuthPrincipal implements UserDetails {
 	public String toString() {
 		return "OAuthPrincipal [id=" + id + ", oauthId=" + oauthId
 				+ ", username=" + username + ", type=" + type
-				+ ", authorities=" + authorities + ", accountNonExpired="
-				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked
+				+ ", addInfoStatus=" + addInfoStatus + ", authorities="
+				+ authorities + ", accountNonExpired=" + accountNonExpired
+				+ ", accountNonLocked=" + accountNonLocked
 				+ ", credentialsNonExpired=" + credentialsNonExpired
 				+ ", enabled=" + enabled + "]";
 	}

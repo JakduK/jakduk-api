@@ -4,6 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="jakdukApp">
 <head>
@@ -15,6 +16,32 @@
 <body>
 <div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
+
+<c:url var="listUrl" value="/board/free">
+	<c:if test="${!empty listInfo.page}">
+		<c:param name="page" value="${listInfo.page}"/>
+	</c:if>
+	<c:if test="${!empty listInfo.category}">
+		<c:param name="category" value="${listInfo.category}"/>
+	</c:if>
+</c:url>
+
+<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
+	<spring:message code="board.list"/>
+</button>
+
+<sec:authorize access="isAnonymous()">
+	<button type="button" class="btn btn-primary" onclick="needLogin();">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	</button>
+</sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+	<button type="button" class="btn btn-primary" onclick="location.href='<c:url value="/board/free/write"/>'">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	</button>
+</sec:authorize>
+
+<p></p>
 
 <!-- Begin page content -->
 <div class="panel panel-default">
@@ -76,15 +103,20 @@
 	</div>
 </div> <!-- /panel -->
 
-<c:url var="listUrl" value="/board/free">
-	<c:if test="${!empty listInfo.page}">
-		<c:param name="page" value="${listInfo.page}"/>
-	</c:if>
-	<c:if test="${!empty listInfo.category}">
-		<c:param name="category" value="${listInfo.category}"/>
-	</c:if>
-</c:url>
-<a href="${listUrl}" class="btn btn-default" role="button"><spring:message code="board.list"/></a>
+<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
+	<spring:message code="board.list"/>
+</button>
+
+<sec:authorize access="isAnonymous()">
+	<button type="button" class="btn btn-primary" onclick="needLogin();">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	</button>
+</sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+	<button type="button" class="btn btn-primary" onclick="location.href='<c:url value="/board/free/write"/>'">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	</button>
+</sec:authorize>
 
 </div> <!-- /.container -->
 

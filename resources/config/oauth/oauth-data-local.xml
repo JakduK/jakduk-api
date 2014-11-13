@@ -25,4 +25,5 @@
 		<beans:prop key="facebook.client-secret">21ddd987ade4a61411e7a3863e0ebe8f</beans:prop>
 		<beans:prop key="facebook.profile-uri">https://graph.facebook.com/me</beans:prop>
 	</util:properties>
+	
 </beans:beans>

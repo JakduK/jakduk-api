@@ -24,7 +24,7 @@ public class FilterModifiy implements BeanDefinitionRegistryPostProcessor {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		logger.debug(Arrays.toString(registry.getBeanDefinitionNames()));
+		//logger.debug(Arrays.toString(registry.getBeanDefinitionNames()));
 	}
 
 }

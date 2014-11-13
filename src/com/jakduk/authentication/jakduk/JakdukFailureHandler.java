@@ -1,4 +1,4 @@
-package com.jakduk.authentication.common;
+package com.jakduk.authentication.jakduk;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import com.jakduk.common.CommonConst;
  * @date     : 2014. 7. 11.
  * @desc     :
  */
-public class LoginFailureHandler implements AuthenticationFailureHandler {
+public class JakdukFailureHandler implements AuthenticationFailureHandler {
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 
@@ -51,7 +51,6 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 		}
 		
 		response.sendRedirect(request.getContextPath() + "/login?status=1");
-		
 		
 	}
 

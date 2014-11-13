@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 public class UserProfileWrite {
 	
 	@NotNull
-	@Size(min = 6, max=20)
+	@Size(min = 6, max=30)
 	private String email;
 	
 	@NotNull

@@ -262,9 +262,18 @@ public class UserService {
 		
 		user.setOauthUser(oAuthUser);
 		
+		if (logger.isInfoEnabled()) {
+			logger.info("OAuth user =" + user.getUsername() + "'s additional infomation are update.");
+		}
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("OAuth user=" + user);
+		}
+		
 		userRepository.save(user);
 
 		principal.setUsername(userWrite.getUsername());
+		principal.setAddInfoStatus(oAuthUser.getAddInfoStatus());
 		
 		commonService.doOAuthAutoLogin(principal, credentials, userDetails);
 	}

@@ -1,4 +1,4 @@
-package com.jakduk.authentication.common;
+package com.jakduk.authentication.jakduk;
 
 import java.io.IOException;
 
@@ -8,12 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.repository.UserRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -21,8 +22,11 @@ import com.jakduk.common.CommonConst;
  * @date     : 2014. 7. 11.
  * @desc     :
  */
-public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler 
+public class JakdukSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler 
 	implements AuthenticationSuccessHandler {
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 

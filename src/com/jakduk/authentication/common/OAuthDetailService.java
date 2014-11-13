@@ -82,11 +82,11 @@ public class OAuthDetailService implements UserDetailsService {
 			user = userRepository.findByOauthUser(type, oauthId);
 			
 			if (logger.isDebugEnabled()) {
-				logger.debug("new oauthuser info =" + user);
+				logger.debug("new oauthuser user=" + user);
 			}
 		}
 		
-		OAuthPrincipal principal = new OAuthPrincipal(user.getId(), oauthId, user.getUsername(), type, 
+		OAuthPrincipal principal = new OAuthPrincipal(user.getId(), oauthId, user.getUsername(), type, user.getOauthUser().getAddInfoStatus(),
 				true, true, true, true, getAuthorities(user.getRoles()));
 		
 		return principal;

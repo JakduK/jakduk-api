@@ -30,7 +30,7 @@
 				<div class="col-sm-3">
 					<input type="email" name="email" class="form-control" size="50" placeholder="Email" 
 					ng-init="email='${userWrite.email}'" ng-model="email" ng-blur="onEmail(userWrite)" 
-					ng-required="true" ng-minlength="6" ng-maxlength="20" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
+					ng-required="true" ng-minlength="6" ng-maxlength="30" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
 					<span class="glyphicon form-control-feedback" 
 					ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'ok'}"></span>					
 					<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'loading'"></i>
