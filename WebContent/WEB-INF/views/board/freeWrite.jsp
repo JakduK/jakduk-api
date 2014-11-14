@@ -5,7 +5,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
@@ -92,17 +92,19 @@ var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope) {
 		$scope.options = {
-			height: 150,
+			height: 200,
 			toolbar: [
-				['fontname', ['fontname']],
-				['fontsize', ['fontsize']],
-				['height', ['height']],
-				['style', ['bold', 'underline', 'italic', 'strikethrough', 'clear']],
-				['color', ['color']],
-				['para', ['paragraph']],
-				['dot', ['ul', 'ol']],
-				['insert', ['link', 'table', 'hr']],
-				['misc', ['codeview', 'help']]
+	      ['style', ['style']],
+	      ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+	      ['fontname', ['fontname']],
+	      // ['fontsize', ['fontsize']], // Still buggy
+	      ['color', ['color']],
+	      ['para', ['ul', 'ol', 'paragraph']],
+	      ['height', ['height']],
+	      ['table', ['table']],
+	      ['insert', ['link',/* 'picture', 'video',*/ 'hr']],
+	      ['view', ['fullscreen', 'codeview']],
+	      ['help', ['help']]			          
 				]
 		};
 		$scope.onSubmit = function(boardFree, event) {

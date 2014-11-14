@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html ng-app="jakdukApp">
   <head>
     <title>Starter Template for Bootstrap</title>
@@ -10,7 +10,7 @@
 <link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
 
 <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
   </head>
 
 <body>
@@ -27,7 +27,7 @@
 <!-- 
 <div id="summernote">Hello Summernote</div>
  -->
- <summernote height="300"></summernote>
+ <summernote></summernote>
 </div>	
 	
 <jsp:include page="../include/footer.jsp"/>
