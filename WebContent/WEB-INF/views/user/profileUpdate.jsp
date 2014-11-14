@@ -45,7 +45,7 @@ ng-submit="onSubmit(userProfileWrite, $event)">
 			'glyphicon-remove':userProfileWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
 			<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
 			<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
-			<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>		
+			<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername(userProfileWrite)">{{usernameAlert.msg}}</span>		
 		</div>
 	</div>
 	<div class="form-group">

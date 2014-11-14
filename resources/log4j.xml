@@ -76,24 +76,24 @@
 		<level value="DEBUG" />
 	</logger>
 
-	<logger name="com.jakduk.authentication">
+	<logger name="com.jakduk.authentication" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="authDailyRollingFile" />
 	</logger>
 
-	<logger name="com.jakduk.service.UserService">
+	<logger name="com.jakduk.service.UserService" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="authDailyRollingFile" />
 	</logger>
 
-	<logger name="com.jakduk.service.BoardFreeService">
+	<logger name="com.jakduk.service.BoardFreeService" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="boardDailyRollingFile" />
 	</logger>
 
 	<!-- Root Logger -->
 	<root>
-		<priority value="INFO" />
+		<level value="INFO" />
 		<appender-ref ref="console" />
 		<appender-ref ref="default" />
 		<appender-ref ref="authDailyRollingFile" />

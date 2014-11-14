@@ -81,8 +81,12 @@ public class OAuthDetailService implements UserDetailsService {
 			
 			user = userRepository.findByOauthUser(type, oauthId);
 			
+			if (logger.isInfoEnabled()) {
+				logger.info("new oauth user joined. username=" + username);
+			}
+			
 			if (logger.isDebugEnabled()) {
-				logger.debug("new oauthuser user=" + user);
+				logger.debug("oauth user=" + user);
 			}
 		}
 		

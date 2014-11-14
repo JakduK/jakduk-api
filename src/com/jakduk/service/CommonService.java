@@ -225,4 +225,18 @@ public class CommonService {
 		SecurityContextHolder.getContext().setAuthentication(token);
 	}
 	
+	public void setCookie(HttpServletResponse response, String name, String value, String path) {
+		Cookie cookie = new Cookie(name, value);
+		cookie.setMaxAge(60 * 60 * 24); // a day
+		cookie.setPath(path);
+		response.addCookie(cookie);		
+	}
+	
+	public void releaseCookie(HttpServletResponse response, String name, String path) {
+		Cookie cookie = new Cookie(name, null);
+		cookie.setMaxAge(0); // remove
+		cookie.setPath(path);
+		response.addCookie(cookie);		
+	}
+	
 }

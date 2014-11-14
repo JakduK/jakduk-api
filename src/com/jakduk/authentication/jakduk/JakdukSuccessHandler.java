@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.repository.UserRepository;
+import com.jakduk.service.CommonService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -26,6 +27,9 @@ public class JakdukSuccessHandler extends SavedRequestAwareAuthenticationSuccess
 	implements AuthenticationSuccessHandler {
 	
 	@Autowired
+	CommonService commonService;
+	
+	@Autowired
 	UserRepository userRepository;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
@@ -35,28 +39,21 @@ public class JakdukSuccessHandler extends SavedRequestAwareAuthenticationSuccess
 			Authentication authentication) throws IOException, ServletException {
 		
 		String remember = request.getParameter("remember");
+		String path = String.format("%s/", request.getContextPath());
 		
 		if (remember != null && remember.equals("on")) {
 			if (authentication.getPrincipal() instanceof JakdukPrincipal) {
 				JakdukPrincipal authUser = (JakdukPrincipal) authentication.getPrincipal();
 				String email = authUser.getEmail();
 				
-				Cookie cookie1 = new Cookie(CommonConst.COOKIE_EMAIL, email);
-				cookie1.setMaxAge(60 * 60 * 24); // a day
-				response.addCookie(cookie1);
+				commonService.setCookie(response, CommonConst.COOKIE_EMAIL, email, path);
 				
-				Cookie cookie2 = new Cookie(CommonConst.COOKIE_REMEMBER, "1");
-				cookie2.setMaxAge(60 * 60 * 24); // a day
-				response.addCookie(cookie2);
+				commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
 			}
 		} else {
-			Cookie cookie1 = new Cookie(CommonConst.COOKIE_EMAIL, null);
-			cookie1.setMaxAge(0); // remove
-			response.addCookie(cookie1);
+			commonService.releaseCookie(response, CommonConst.COOKIE_EMAIL, path);
 			
-			Cookie cookie2 = new Cookie(CommonConst.COOKIE_REMEMBER, null);
-			cookie2.setMaxAge(0); // a day
-			response.addCookie(cookie2);
+			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
 		}
 		
 		super.onAuthenticationSuccess(request, response, authentication);

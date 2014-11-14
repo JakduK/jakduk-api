@@ -21,7 +21,7 @@
 				<div class="panel-heading">
 					<h3 class="panel-title"><spring:message code="user.sign.in"/></h3>
 				</div>
-		  <div class="panel-body">
+		  	<div class="panel-body">
 				<c:choose>
 					<c:when test="${status == 1}">
 						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.faulure"/></div>
@@ -33,8 +33,8 @@
 				<form action="j_spring_security_check" name="loginForm" method="post" ng-submit="onSubmit(loginForm, $event)">
 			
 					<fieldset>
-						<div class="form-group has-feedback" 
-						ng-class="{'has-success':loginForm.j_username.$valid, 'has-error':loginForm.j_username.$invalid}">
+						<div class="form-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
+						'has-error':loginForm.j_username.$invalid}">
 							<label class="control-label sr-only" for="j_username">Hidden label</label>
 							<input type="email" class="form-control" id="j_username" name="j_username" placeholder="E-mail" autofocus
 							ng-model="email" ng-required="true" ng-minlength="6" ng-maxlength="20" 

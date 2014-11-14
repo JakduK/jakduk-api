@@ -20,7 +20,7 @@
 		<javax.servlet.jsp-api.version>2.3.1</javax.servlet.jsp-api.version>
 	
 		<!-- Miscellaneous Dependencies -->
-		<log4j.version>1.2.14</log4j.version>
+		<log4j-core.version>2.1</log4j-core.version>
 		
 		<org.slf4j-version>1.7.2</org.slf4j-version>
 			
@@ -158,13 +158,12 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${org.slf4j-version}</version>
 			<scope>runtime</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${log4j.version}</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
 			<type>jar</type>
-			<scope>compile</scope>
+			<version>${log4j-core.version}</version>
 		</dependency>
 		
 		<!-- Spring Security -->

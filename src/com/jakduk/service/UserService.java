@@ -130,6 +130,14 @@ public class UserService {
 		user.setRoles(roles);
 		
 		this.create(user);
+		
+		if (logger.isInfoEnabled()) {
+			logger.info("new user joined. email=" + user.getEmail() + ", username=" + user.getUsername());
+		}
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("user=" + user);
+		}
 	}
 	
 	public void oauthUserWrite(OAuthUserOnLogin oauthUserOnLogin) {

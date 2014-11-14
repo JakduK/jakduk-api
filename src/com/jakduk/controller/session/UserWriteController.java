@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.web.UserWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
@@ -60,7 +61,8 @@ public class UserWriteController {
 	}
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
-	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus) {
+	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus,
+			HttpServletRequest request, HttpServletResponse response) {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
@@ -76,6 +78,12 @@ public class UserWriteController {
 		
 		userService.userWrite(userWrite);
 		sessionStatus.setComplete();
+		
+		String path = String.format("%s/", request.getContextPath());
+		
+		commonService.setCookie(response, CommonConst.COOKIE_EMAIL, userWrite.getEmail(), path);
+		
+		commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
 		
 		return "redirect:/login?status=2";
 	}
