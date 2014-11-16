@@ -32,12 +32,12 @@
 </button>
 
 <sec:authorize access="isAnonymous()">
-	<button type="button" class="btn btn-primary" onclick="needLogin();">
+	<button type="button" class="btn btn-default" onclick="needLogin();">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</button>
 </sec:authorize>
 <sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-	<button type="button" class="btn btn-primary" onclick="location.href='<c:url value="/board/free/write"/>'">
+	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</button>
 </sec:authorize>
@@ -45,12 +45,12 @@
 <p></p>
 
 <!-- Begin page content -->
-<div class="panel panel-default">
+<div class="panel panel-info">
   <!-- Default panel contents -->
   <div class="panel-heading">
   	<h4 class="panel-title">
   		${post.subject}
-  		<c:if test="${!empty category}">&nbsp;<small><fmt:message key="${category.name}"/></small></c:if>
+  		<c:if test="${!empty category}">&nbsp;<small><fmt:message key="${category.resName}"/></small></c:if>
   	</h4>
   	<div class="row">
   		<div class="col-sm-2">
@@ -104,17 +104,36 @@
 	</div>
 </div> <!-- /panel -->
 
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">댓글 10개</div>
+
+  <!-- List group -->
+  <ul class="list-group">
+    <li class="list-group-item">
+    			<div class="row">
+    					<div class="col-xs-12"><strong>test01</strong> | 2014-11-16 19:52</div>
+    					<div class="col-xs-12">comment 1</div>
+    			</div>    
+    </li>
+    <li class="list-group-item">Dapibus ac facilisis in</li>
+    <li class="list-group-item">Morbi leo risus</li>
+    <li class="list-group-item">Porta ac consectetur ac</li>
+    <li class="list-group-item">Vestibulum at eros</li>
+  </ul>
+</div>
+
 <button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
 	<spring:message code="board.list"/>
 </button>
 
 <sec:authorize access="isAnonymous()">
-	<button type="button" class="btn btn-primary" onclick="needLogin();">
+	<button type="button" class="btn btn-default" onclick="needLogin();">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</button>
 </sec:authorize>
 <sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-	<button type="button" class="btn btn-primary" onclick="location.href='<c:url value="/board/free/write"/>'">
+	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</button>
 </sec:authorize>

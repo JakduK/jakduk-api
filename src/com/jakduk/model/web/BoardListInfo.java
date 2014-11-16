@@ -10,7 +10,7 @@ import com.jakduk.common.CommonConst;
 public class BoardListInfo {
 
 	private int page = 1;
-	private int category = CommonConst.BOARD_CATEGORY_NONE;
+	private String category = CommonConst.BOARD_CATEGORY_NONE;
 
 	public Integer getPage() {
 		return page;
@@ -20,11 +20,11 @@ public class BoardListInfo {
 		this.page = page;
 	}
 
-	public int getCategory() {
+	public String getCategory() {
 		return category;
 	}
 
-	public void setCategory(int category) {
+	public void setCategory(String category) {
 		this.category = category;
 	}
 

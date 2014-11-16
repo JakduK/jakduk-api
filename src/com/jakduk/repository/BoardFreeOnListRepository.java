@@ -15,7 +15,4 @@ import com.jakduk.model.simple.BoardFreeOnList;
 public interface BoardFreeOnListRepository extends MongoRepository<BoardFreeOnList, String> {
 	
 	Page<BoardFreeOnList> findAll(Pageable pageable);
-	Page<BoardFreeOnList> findByCategoryId(Integer categoryId, Pageable pageable);
-	long countByCategoryId(Integer categoryId);
-	long count();
 }

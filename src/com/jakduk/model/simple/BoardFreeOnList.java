@@ -36,8 +36,6 @@ public class BoardFreeOnList {
 	/**
 	 * 글 제목
 	 */
-	@NotNull
-	@Size(min = 1, message="Input subject")
 	private String subject;
 	
 	/**
@@ -48,8 +46,7 @@ public class BoardFreeOnList {
 	/**
 	 * 분류 ID
 	 */
-	@NotNull(message = "Input category")
-	private Integer categoryId;
+	private String categoryName;
 	
 	/**
 	 * 조회
@@ -92,12 +89,12 @@ public class BoardFreeOnList {
 		this.seq = seq;
 	}
 
-	public Integer getCategoryId() {
-		return categoryId;
+	public String getCategoryName() {
+		return categoryName;
 	}
 
-	public void setCategoryId(Integer categoryId) {
-		this.categoryId = categoryId;
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
 	}
 
 	public int getViews() {
@@ -127,8 +124,8 @@ public class BoardFreeOnList {
 	@Override
 	public String toString() {
 		return "BoardFreeOnList [id=" + id + ", writer=" + writer
-				+ ", subject=" + subject + ", seq=" + seq + ", categoryId="
-				+ categoryId + ", views=" + views + ", usersLiking="
+				+ ", subject=" + subject + ", seq=" + seq + ", categoryName="
+				+ categoryName + ", views=" + views + ", usersLiking="
 				+ usersLiking + ", usersDisliking=" + usersDisliking + "]";
 	}
 

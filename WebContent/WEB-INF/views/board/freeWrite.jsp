@@ -26,19 +26,19 @@
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit(boardFree, $event)">
 	<legend><spring:message code="board.write"/></legend>
-	<div class="form-group" ng-class="{'has-success':boardFree.categoryId.$valid, 'has-error':boardFree.categoryId.$invalid}">
+	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
 			<div class="col-sm-3">
-			<label for="categoryId" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.category"/></label>
-			<form:select path="categoryId" cssClass="form-control" 
-			ng-model="categoryId" ng-init="categoryId='${boardFree.categoryId}'" ng-blur="onCategoryId(boardFree)" ng-required="true">
+			<label for="categoryName" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.category"/></label>
+			<form:select path="categoryName" cssClass="form-control" 
+			ng-model="categoryName" ng-init="categoryName='${boardFree.categoryName}'" ng-blur="onCategoryName(boardFree)" ng-required="true">
 				<form:option value=""><fmt:message key="board.category.init"/></form:option>
 				<c:forEach items="${boardCategorys}" var="category">
-					<form:option value="${category.categoryId}"><fmt:message key="${category.name}"/></form:option>
+					<form:option value="${category.name}"><fmt:message key="${category.resName}"/></form:option>
 				</c:forEach>
 			</form:select>
-			<form:errors path="categoryId" cssClass="text-danger" element="span" ng-hide="errorCategoryId"/>
-			<span class="text-danger" ng-model="errorCategoryId" ng-show="errorCategoryId">{{errorCategoryId}}</span>
+			<form:errors path="categoryName" cssClass="text-danger" element="span" ng-hide="errorCategoryName"/>
+			<span class="text-danger" ng-model="errorCategoryName" ng-show="errorCategoryName">{{errorCategoryName}}</span>
 			</div>
 		</div>
 	</div>
@@ -111,18 +111,18 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 			if (boardFree.$valid && $scope.content.length > 0) {
 				
 			} else {
-				$scope.onCategoryId(boardFree);
+				$scope.onCategoryName(boardFree);
 				$scope.onSubject(boardFree);
 				$scope.onContent(boardFree);
 				event.preventDefault();
 			}
 		};
 		
-		$scope.onCategoryId = function(boardFree) {
-			if (boardFree.categoryId.$invalid) {
-				$scope.errorCategoryId = '<spring:message code="common.msg.required"/>';
+		$scope.onCategoryName = function(boardFree) {
+			if (boardFree.categoryName.$invalid) {
+				$scope.errorCategoryName = '<spring:message code="common.msg.required"/>';
 			} else {
-				$scope.errorCategoryId = "";
+				$scope.errorCategoryName = "";
 			}
 		};
 		

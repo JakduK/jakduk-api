@@ -105,12 +105,12 @@ public class BoardFreeService {
 	public Model getFree(Model model, BoardListInfo boardListInfo) {
 
 		Map<String, Date> createDate = new HashMap<String, Date>();
-		Map<Integer, String> categoryName = new HashMap<Integer, String>();
+		Map<String, String> categoryResName = new HashMap<String, String>();
 		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
 		Long numberPosts = (long) 0;
 		
 		Integer page = boardListInfo.getPage();
-		Integer categoryId = boardListInfo.getCategory();
+		String categoryName = boardListInfo.getCategory();
 		
 		if (page < 1) {
 			page = 1;
@@ -120,12 +120,13 @@ public class BoardFreeService {
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_LINE_NUMBER, sort);
 		
-		if (categoryId == CommonConst.BOARD_CATEGORY_NONE || categoryId == CommonConst.BOARD_CATEGORY_ALL) {
+		if (categoryName != null && 
+				(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
 			posts = boardFreeOnListRepository.findAll(pageable).getContent();
 			numberPosts = boardFreeOnListRepository.count();
 		} else {
-			posts = boardFreeOnListRepository.findByCategoryId(categoryId, pageable).getContent();
-			numberPosts = boardFreeOnListRepository.countByCategoryId(categoryId);
+			posts = boardFreeRepository.findByCategoryName(categoryName, pageable).getContent();
+			numberPosts = boardFreeRepository.countByCategoryName(categoryName);
 		}
 		
 		BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
@@ -134,13 +135,13 @@ public class BoardFreeService {
 		
 		for (BoardFreeOnList tempPost : posts) {
 			String tempId = tempPost.getId();
-			Integer tempCategoryId = tempPost.getCategoryId();
+			String tempCategoryName = tempPost.getCategoryName();
 			ObjectId objId = new ObjectId(tempId);
 			createDate.put(tempId, objId.getDate());
 			
-			if (tempCategoryId != null && !categoryName.containsKey(tempCategoryId)) {
-				BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(tempCategoryId);
-				categoryName.put(tempCategoryId, boardCategory.getName());
+			if (tempCategoryName != null && !categoryResName.containsKey(tempCategoryName)) {
+				BoardCategory boardCategory = boardCategoryRepository.findByName(tempCategoryName);
+				categoryResName.put(tempCategoryName, boardCategory.getResName());
 			}
 		}
 		
@@ -149,7 +150,7 @@ public class BoardFreeService {
 		model.addAttribute("posts", posts);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("categorys", categorys);
-		model.addAttribute("usingCategoryNames", categoryName);
+		model.addAttribute("usingCategoryResNames", categoryResName);
 		model.addAttribute("pageInfo", boardPageInfo);
 		model.addAttribute("listInfo", boardListInfo);
 		
@@ -167,7 +168,7 @@ public class BoardFreeService {
 		
 		try {
 			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-			BoardCategory boardCategory = boardCategoryRepository.findByCategoryId(boardFree.getCategoryId());
+			BoardCategory boardCategory = boardCategoryRepository.findByName(boardFree.getCategoryName());
 			
 			ObjectId objId = new ObjectId(boardFree.getId());
 			Date createDate = objId.getDate();

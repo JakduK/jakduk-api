@@ -28,11 +28,11 @@ public class CommonConst {
 	/**
 	 * 게시판 말머리.
 	 */
-	public final static Integer BOARD_CATEGORY_NONE = 10;
-	public final static Integer BOARD_CATEGORY_FREE = 11;
-	public final static Integer BOARD_CATEGORY_FOOTBALL = 12;
-	public final static Integer BOARD_CATEGORY_DEVELOP = 13;
-	public final static Integer BOARD_CATEGORY_ALL = 14;
+	public final static String BOARD_CATEGORY_NONE = "none";
+	public final static String BOARD_CATEGORY_FREE = "free";
+	public final static String BOARD_CATEGORY_FOOTBALL = "football";
+	public final static String BOARD_CATEGORY_DEVELOP = "develop";
+	public final static String BOARD_CATEGORY_ALL = "all";
 	
 	/**
 	 * 사용자 쿠키

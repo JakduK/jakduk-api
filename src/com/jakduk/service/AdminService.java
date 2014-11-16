@@ -17,6 +17,7 @@ import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.embedded.FootballClubName;
+import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.repository.BoardCategoryRepository;
@@ -63,21 +64,21 @@ public class AdminService {
 			BoardCategory boardCategory01 = new BoardCategory();
 			List<String> usingBoard = new ArrayList<String>();
 			usingBoard.add(CommonConst.BOARD_NAME_FREE);
-			boardCategory01.setName("board.category.free");
-			boardCategory01.setCategoryId(CommonConst.BOARD_CATEGORY_FREE);
+			boardCategory01.setName(CommonConst.BOARD_CATEGORY_FREE);
+			boardCategory01.setResName("board.category.free");
 			boardCategory01.setUsingBoard(usingBoard);
 			boardCategoryRepository.save(boardCategory01);
 			
 			BoardCategory boardCategory02 = new BoardCategory();
-			boardCategory02.setName("board.category.football");
-			boardCategory02.setCategoryId(CommonConst.BOARD_CATEGORY_FOOTBALL);
+			boardCategory02.setResName("board.category.football");
+			boardCategory02.setName(CommonConst.BOARD_CATEGORY_FOOTBALL);
 			usingBoard.add(CommonConst.BOARD_NAME_FREE);
 			boardCategory02.setUsingBoard(usingBoard);
 			boardCategoryRepository.save(boardCategory02);
 			
 			BoardCategory boardCategory03 = new BoardCategory();
-			boardCategory03.setName("board.category.develop");
-			boardCategory03.setCategoryId(CommonConst.BOARD_CATEGORY_DEVELOP);
+			boardCategory03.setResName("board.category.develop");
+			boardCategory03.setName(CommonConst.BOARD_CATEGORY_DEVELOP);
 			usingBoard.add(CommonConst.BOARD_NAME_FREE);
 			boardCategory03.setUsingBoard(usingBoard);
 			boardCategoryRepository.save(boardCategory03);
@@ -138,5 +139,31 @@ public class AdminService {
 	
 	public void footballClubOriginWrite(FootballClubOrigin footballClubOrigin) {
 		footballClubOriginRepository.save(footballClubOrigin);
+	}
+	
+	public void boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
+		BoardCategory boardCategory = new BoardCategory();
+		boardCategory.setName(boardCategoryWrite.getName());
+		boardCategory.setResName(boardCategoryWrite.getResName());
+		
+		String originUsingBoard = boardCategoryWrite.getUsingBoard();
+		
+		if (originUsingBoard != null) {
+			ArrayList<String> usingBoard = new ArrayList<String>();
+			String splitUsingBoard[] = originUsingBoard.split(",");
+			
+			for (int index = 0 ; index < splitUsingBoard.length ; index++) {
+				String temp = splitUsingBoard[index];
+				usingBoard.add(temp);
+			}
+			
+			boardCategory.setUsingBoard(usingBoard);
+		}
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("boardCategory=" + boardCategory);
+		}
+		
+		boardCategoryRepository.save(boardCategory);
 	}
 }

@@ -57,7 +57,7 @@ public class BoardFree {
 	 * 분류 ID
 	 */
 	@NotNull
-	private Integer categoryId;
+	private String categoryName;
 	
 	/**
 	 * 조회
@@ -115,13 +115,13 @@ public class BoardFree {
 	public long getSeq() {
 		return seq;
 	}
-	
-	public Integer getCategoryId() {
-		return categoryId;
+
+	public String getCategoryName() {
+		return categoryName;
 	}
 
-	public void setCategoryId(Integer categoryId) {
-		this.categoryId = categoryId;
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
 	}
 
 	public List<BoardUser> getUsersLiking() {
@@ -144,7 +144,7 @@ public class BoardFree {
 	public String toString() {
 		return "BoardFree [id=" + id + ", writer=" + writer + ", subject="
 				+ subject + ", content=" + content + ", seq=" + seq
-				+ ", categoryId=" + categoryId + ", views=" + views
+				+ ", categoryName=" + categoryName + ", views=" + views
 				+ ", usersLiking=" + usersLiking + ", usersDisliking="
 				+ usersDisliking + "]";
 	}

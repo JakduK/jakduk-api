@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.service.AdminService;
 
@@ -54,7 +55,7 @@ public class AdminController {
 		return "redirect:/admin?message=" + message;
 	}
 	
-	@RequestMapping(value = "/encyclopedia/write")
+	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.GET)
 	public String shortHistoryWrite(Model model) {
 		model.addAttribute("encyclopedia", new Encyclopedia());
 		
@@ -74,7 +75,7 @@ public class AdminController {
 		return "redirect:/encyclopedia/list";
 	}
 	
-	@RequestMapping(value = "/footballclub/write")
+	@RequestMapping(value = "/footballclub/write", method = RequestMethod.GET)
 	public String footballClubWrite(Model model) {
 		
 		adminService.getFootballClubWrite(model);
@@ -95,7 +96,7 @@ public class AdminController {
 		return "redirect:/admin";
 	}
 	
-	@RequestMapping(value = "/footballclub/origin/write")
+	@RequestMapping(value = "/footballclub/origin/write", method = RequestMethod.GET)
 	public String footballClubOriginWrite(Model model) {
 		model.addAttribute("footballClubOriginWrite", new FootballClubOrigin());
 		
@@ -111,6 +112,26 @@ public class AdminController {
 		}
 		
 		adminService.footballClubOriginWrite(footballClubOrigin);
+
+		return "redirect:/admin";
+	}
+	
+	@RequestMapping(value = "/board/category/write", method = RequestMethod.GET)
+	public String boardCategoryWrite(Model model) {
+		model.addAttribute("boardCategoryWrite", new BoardCategoryWrite());
+		
+		return "admin/boardCategoryWrite";
+	}
+	
+	@RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
+	public String boardCategoryWrite(@Valid BoardCategoryWrite boardCategoryWtite, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/boardCategoryWrite";
+		}
+		
+		adminService.boardCategoryWrite(boardCategoryWtite);
 
 		return "redirect:/admin";
 	}

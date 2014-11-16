@@ -28,23 +28,23 @@
   <ul class="dropdown-menu" role="menu">
 	  <li><a href="?category=14"><spring:message code="board.category.all"/></a></li>	
 	  <c:forEach items="${categorys}" var="category">
-	   <li><a href="?category=${category.categoryId}"><spring:message code="${category.name}"/></a></li>	
+	   <li><a href="?category=${category.name}"><spring:message code="${category.resName}"/></a></li>	
 		</c:forEach>
   </ul>
 </div>
 
 <sec:authorize access="isAnonymous()">
-	<a href="javascript:needLogin();" class="btn btn-primary" role="button">
+	<a href="javascript:needLogin();" class="btn btn-default" role="button">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</a>
 </sec:authorize>
 <sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-	<a href="<c:url value="/board/free/write"/>" class="btn btn-primary" role="button">
+	<a href="<c:url value="/board/free/write"/>" class="btn btn-default" role="button">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</a>
 </sec:authorize>
 <p></p>
-<div class="panel panel-default">
+<div class="panel panel-info">
   <!-- Default panel contents -->
   <div class="panel-heading visible-sm visible-md visible-lg">
   	<div class="row">
@@ -63,8 +63,8 @@
 	<div class="col-sm-2">
 		${post.seq}
 		|
-		<c:if test="${!empty post.categoryId}">
-			<fmt:message key="${usingCategoryNames[post.categoryId]}"/>
+		<c:if test="${!empty post.categoryName}">
+			<fmt:message key="${usingCategoryResNames[post.categoryName]}"/>
 		</c:if>
 	</div>
 	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">

@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,11 +14,9 @@ public class BoardCategory {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	@NotNull
-	@Size(min = 1, message="Input Name")
 	private String name;
 	
-	private Integer categoryId;
+	private String resName;
 	
 	private List<String> usingBoard;
 
@@ -31,7 +27,7 @@ public class BoardCategory {
 	public void setId(String id) {
 		this.id = id;
 	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -39,15 +35,15 @@ public class BoardCategory {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public Integer getCategoryId() {
-		return categoryId;
+
+	public String getResName() {
+		return resName;
 	}
 
-	public void setCategoryId(Integer categoryId) {
-		this.categoryId = categoryId;
+	public void setResName(String resName) {
+		this.resName = resName;
 	}
-	
+
 	public List<String> getUsingBoard() {
 		return usingBoard;
 	}
@@ -58,7 +54,8 @@ public class BoardCategory {
 
 	@Override
 	public String toString() {
-		return "BoardCategory [id=" + id + ", name=" + name + ", categoryId=" + categoryId + ", usingBoard=" + usingBoard+ "]";
+		return "BoardCategory [id=" + id + ", name=" + name + ", resName="
+				+ resName + ", usingBoard=" + usingBoard + "]";
 	}
 	
 }

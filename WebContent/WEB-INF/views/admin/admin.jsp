@@ -22,6 +22,8 @@
 
 		<p><a href="<c:url value="/admin/footballclub/write"/>" class="btn btn-primary" role="button">Football Club Write</a></p>
 		
+		<p><a href="<c:url value="/admin/board/category/write"/>" class="btn btn-primary" role="button">Board Category Write</a></p>
+		
 		<jsp:include page="../include/footer.jsp"/>
 	</div>
 <!-- Bootstrap core JavaScript================================================== -->
