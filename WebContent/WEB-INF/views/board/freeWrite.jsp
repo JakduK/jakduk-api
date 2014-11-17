@@ -10,12 +10,12 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
-  <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
-  <!--summernote-->
-  <link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+<!--summernote-->
+<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
 
-	<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
 
 </head>
 <body>

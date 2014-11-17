@@ -13,6 +13,13 @@
 
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
+<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+<!--summernote-->
+<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+
+<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+
 </head>
 <body>
 <div class="container">
@@ -123,6 +130,8 @@
   </ul>
 </div>
 
+<summernote config="options" airMode></summernote>
+
 <button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
 	<spring:message code="board.list"/>
 </button>
@@ -140,12 +149,15 @@
 
 </div> <!-- /.container -->
 
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
+<!--angular-summernote dependencies -->
+<script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", []);
+var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
 jakdukApp.controller("AlertCtrl", function($scope, $http) {
 	$scope.alert = {};
@@ -197,6 +209,24 @@ jakdukApp.controller("AlertCtrl", function($scope, $http) {
 		$scope.result = 0;
 		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 	}
+	
+	$scope.options = {
+			height: 300,
+			airMode: true,			
+			toolbar: [
+	      ['style', ['style']],
+	      ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+	      ['fontname', ['fontname']],
+	      // ['fontsize', ['fontsize']], // Still buggy
+	      ['color', ['color']],
+	      ['para', ['ul', 'ol', 'paragraph']],
+	      ['height', ['height']],
+	      ['table', ['table']],
+	      ['insert', ['link',/* 'picture', 'video',*/ 'hr']],
+	      ['view', ['fullscreen', 'codeview']],
+	      ['help', ['help']]			          
+				]
+		};
 });
 
 function needLogin() {

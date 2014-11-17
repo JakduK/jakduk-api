@@ -26,7 +26,7 @@
 		<spring:message code="board.category"/> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
-	  <li><a href="?category=14"><spring:message code="board.category.all"/></a></li>	
+	  <li><a href="?category=all"><spring:message code="board.category.all"/></a></li>	
 	  <c:forEach items="${categorys}" var="category">
 	   <li><a href="?category=${category.name}"><spring:message code="${category.resName}"/></a></li>	
 		</c:forEach>

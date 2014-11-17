@@ -36,13 +36,8 @@ public class BoardTest {
 	
 	@Test
 	public void test02() {
-		String temp = "freeboard;ddd";
 
-		String temps[] = temp.split(";");
-		
-		System.out.println("temp=" + temps.length);
-		System.out.println("temp val=" + temps[0]);
-		
+		System.out.println(boardFreeRepository.findOne("5460cfe9e4b06faf36d26efc"));
 	}
 	
 }
