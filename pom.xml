@@ -219,14 +219,14 @@
 			<groupId>org.apache.solr</groupId>
 			<version>4.9.0</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>    
 		<dependency>
 			<artifactId>solr-core</artifactId>
 			<groupId>org.apache.solr</groupId>
 			<version>4.9.0</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>         
   </dependencies>
   

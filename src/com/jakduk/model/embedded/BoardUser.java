@@ -2,7 +2,6 @@ package com.jakduk.model.embedded;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,15 +12,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @date     : 2014. 6. 16.
  * @desc     : 게시판의 좋아요, 싫어요 등을 사용하는 사용자
  */
+
 @Document
 public class BoardUser {
 	
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	private String userid;
+	private String userId;
 	
-	@NotNull
 	private String username;
 	
 	public String getId() {
@@ -32,12 +31,12 @@ public class BoardUser {
 		this.id = id;
 	}
 
-	public String getUserid() {
-		return userid;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setUserid(String userid) {
-		this.userid = userid;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getUsername() {
@@ -50,7 +49,7 @@ public class BoardUser {
 
 	@Override
 	public String toString() {
-		return "BoardUser [id=" + id + ", userid=" + userid + ", username="
+		return "BoardUser [id=" + id + ", userId=" + userId + ", username="
 				+ username + "]";
 	}
 }

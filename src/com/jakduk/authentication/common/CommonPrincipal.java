@@ -10,6 +10,8 @@ public class CommonPrincipal {
 	private String id;
 	
 	private String username;
+	
+	private String type;
 
 	public String getId() {
 		return id;
@@ -27,9 +29,18 @@ public class CommonPrincipal {
 		this.username = username;
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	@Override
 	public String toString() {
-		return "CommonPrincipal [id=" + id + ", username=" + username + "]";
+		return "CommonPrincipal [id=" + id + ", username=" + username
+				+ ", type=" + type + "]";
 	}
 
 }

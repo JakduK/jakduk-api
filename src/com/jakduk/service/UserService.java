@@ -23,9 +23,9 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
+import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.embedded.OAuthUser;
-import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
@@ -543,10 +543,12 @@ public class UserService {
 				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				commonPrincipal.setId(principal.getId());
 				commonPrincipal.setUsername(principal.getUsername());
+				commonPrincipal.setType(principal.getType());
 			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
 				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				commonPrincipal.setId(principal.getId());
 				commonPrincipal.setUsername(principal.getUsername());
+				commonPrincipal.setType(principal.getType());
 			}
 		}
 		

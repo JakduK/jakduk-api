@@ -1,5 +1,6 @@
 package jakduk;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,8 +37,16 @@ public class BoardTest {
 	
 	@Test
 	public void test02() {
-
 		System.out.println(boardFreeRepository.findOne("5460cfe9e4b06faf36d26efc"));
+		
+		List<String> usingBoard = new ArrayList<String>();
+		usingBoard.add(CommonConst.BOARD_NAME_FREE);
+		System.out.println("usingBoard=" + usingBoard);
+		
+		usingBoard = Collections.emptyList();
+		System.out.println("usingBoard=" + usingBoard);
+//		usingBoard.add(CommonConst.BOARD_NAME_FREE);
+		System.out.println("usingBoard=" + usingBoard);
 	}
 	
 }

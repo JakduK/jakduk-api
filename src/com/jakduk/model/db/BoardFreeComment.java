@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardUser;
+import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.model.simple.BoardFreeOnComment;
-import com.jakduk.model.simple.BoardWriter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -29,7 +29,6 @@ public class BoardFreeComment {
 	@DBRef
 	private BoardFreeOnComment boardFree;
 	
-	@DBRef
 	private BoardWriter writer;
 	
 	private String content;

@@ -21,8 +21,8 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.embedded.BoardUser;
+import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.model.simple.BoardWriter;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.BoardCategoryRepository;
@@ -77,22 +77,24 @@ public class BoardFreeService {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String userid = principal.getId();
 		String username = principal.getUsername();
-			
-			BoardWriter writer = new BoardWriter();
-			writer.setId(userid);
-			writer.setUsername(username);
-			boardFree.setWriter(writer);
-			boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
-			
-			boardFreeRepository.save(boardFree);
-			
-			if (logger.isInfoEnabled()) {
-				logger.info("new post created. user id=" + userid + ", username=" + username);
-			}
-			
-			if (logger.isDebugEnabled()) {
-				logger.debug("boardFree=" + boardFree);
-			}
+		String type = principal.getType();
+
+		BoardWriter writer = new BoardWriter();
+		writer.setUserId(userid);
+		writer.setUsername(username);
+		writer.setType(type);
+		boardFree.setWriter(writer);
+		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
+
+		boardFreeRepository.save(boardFree);
+
+		if (logger.isInfoEnabled()) {
+			logger.info("new post created. user id=" + userid + ", username=" + username);
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("boardFree=" + boardFree);
+		}
 		
 	}
 	
@@ -223,13 +225,13 @@ public class BoardFreeService {
 		
 		if (userid != null && username != null) {
 			
-			if (userid.equals(writer.getId())) {
+			if (userid.equals(writer.getUserId())) {
 				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
 			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				for (BoardUser boardUser : usersLiking) {
-					if (boardUser != null && userid.equals(boardUser.getUserid())) {
+					if (boardUser != null && userid.equals(boardUser.getUserId())) {
 						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 						break;
 					}
@@ -238,7 +240,7 @@ public class BoardFreeService {
 			
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				for (BoardUser boardUser : usersDisliking) {
-					if (boardUser != null && userid.equals(boardUser.getUserid())) {
+					if (boardUser != null && userid.equals(boardUser.getUserId())) {
 						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 						break;
 					}
@@ -247,7 +249,7 @@ public class BoardFreeService {
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				BoardUser boardUser = new BoardUser();
-				boardUser.setUserid(userid);
+				boardUser.setUserId(userid);
 				boardUser.setUsername(username);
 				boardUser.setId(new ObjectId().toString());
 

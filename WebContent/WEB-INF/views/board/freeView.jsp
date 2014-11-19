@@ -130,7 +130,14 @@
   </ul>
 </div>
 
-<summernote config="options" airMode></summernote>
+<div class="panel panel-default">
+<div class="panel-body">
+<summernote config="options"></summernote>
+</div>
+<div class="panel-footer">
+<a class="btn btn-primary btn-lg" href="#" role="button">Submit</a>
+</div>
+</div>	
 
 <button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
 	<spring:message code="board.list"/>

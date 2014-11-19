@@ -1,16 +1,15 @@
 package com.jakduk.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.Encyclopedia;
@@ -19,7 +18,6 @@ import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
-import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
@@ -69,12 +67,16 @@ public class AdminService {
 			boardCategory01.setUsingBoard(usingBoard);
 			boardCategoryRepository.save(boardCategory01);
 			
+			usingBoard.clear();
+			
 			BoardCategory boardCategory02 = new BoardCategory();
 			boardCategory02.setResName("board.category.football");
 			boardCategory02.setName(CommonConst.BOARD_CATEGORY_FOOTBALL);
 			usingBoard.add(CommonConst.BOARD_NAME_FREE);
 			boardCategory02.setUsingBoard(usingBoard);
 			boardCategoryRepository.save(boardCategory02);
+			
+			usingBoard.clear();
 			
 			BoardCategory boardCategory03 = new BoardCategory();
 			boardCategory03.setResName("board.category.develop");
