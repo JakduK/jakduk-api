@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.web.BoardListInfo;
@@ -63,6 +64,15 @@ public class BoardController {
 	public void setDislike(@PathVariable int seq, Model model) {
 		
 		boardFreeService.setUsersFeelings(model, seq, CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE);
+	}
+	
+	@RequestMapping(value = "/free/comment/write", method = RequestMethod.POST)
+	public void freeCommentWrite(Model model,
+			@RequestParam(required = false) String comment) {
+		
+		
+		logger.debug("phjang msg=" + comment);
+		
 	}
 
 }

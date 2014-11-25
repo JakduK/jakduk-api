@@ -130,12 +130,12 @@
   </ul>
 </div>
 
-<div class="panel panel-default">
+<div class="panel panel-default" ng-controller="CommentCtrl">
 <div class="panel-body">
-<summernote config="options"></summernote>
+<summernote config="options" data-ng-model="data.comment"></summernote>
 </div>
 <div class="panel-footer">
-<a class="btn btn-primary btn-lg" href="#" role="button">Submit</a>
+<a class="btn btn-primary btn-lg" href="#" role="button" ng-click="btnWriteComment()">Submit</a>
 </div>
 </div>	
 
@@ -210,7 +210,7 @@ jakdukApp.controller("AlertCtrl", function($scope, $http) {
 			});
 			reqPromise.error(error);
 		}
-	};
+	};	
 			
 	function error(data, status, headers, config) {
 		$scope.result = 0;
@@ -234,6 +234,40 @@ jakdukApp.controller("AlertCtrl", function($scope, $http) {
 	      ['help', ['help']]			          
 				]
 		};
+});
+
+jakdukApp.controller("CommentCtrl", function($scope, $http) {
+
+	var headers = {
+			"Content-Type" : "application/x-www-form-urlencoded"
+	};
+	
+	var config = {
+			headers:headers,
+			transformRequest: function(obj) {
+		        var str = [];
+		        for(var p in obj)
+		        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+		        return str.join("&");
+		    }
+	};
+	
+	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+	
+	$scope.btnWriteComment = function(status) {
+		var bUrl = '<c:url value="/board/free/comment/write"/>';
+		
+		
+		var reqPromise = $http.post(bUrl, $scope.data, config);
+		
+		reqPromise.success(function(data, status, headers, config) {
+
+			
+		});
+		//reqPromise.error(error);
+		
+	};
+
 });
 
 function needLogin() {
