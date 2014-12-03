@@ -132,7 +132,7 @@
 
 <div class="panel panel-default" ng-controller="CommentCtrl">
 <div class="panel-body">
-<summernote config="options" data-ng-model="data.comment"></summernote>
+<summernote config="options" ng-model="comment.content"></summernote>
 </div>
 <div class="panel-footer">
 <a class="btn btn-primary btn-lg" href="#" role="button" ng-click="btnWriteComment()">Submit</a>
@@ -256,15 +256,16 @@ jakdukApp.controller("CommentCtrl", function($scope, $http) {
 	
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
+		$scope.comment.seq = "${post.seq}";
 		
-		
-		var reqPromise = $http.post(bUrl, $scope.data, config);
+		var reqPromise = $http.post(bUrl, $scope.comment, config);
 		
 		reqPromise.success(function(data, status, headers, config) {
-
+		
+		});
+		reqPromise.error(function(data, status, headers, config) {
 			
 		});
-		//reqPromise.error(error);
 		
 	};
 

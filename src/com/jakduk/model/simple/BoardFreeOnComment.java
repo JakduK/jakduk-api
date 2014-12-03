@@ -15,6 +15,8 @@ public class BoardFreeOnComment {
 	
 	@Id
 	private String id;
+	
+	private int seq;
 
 	public String getId() {
 		return id;
@@ -24,9 +26,17 @@ public class BoardFreeOnComment {
 		this.id = id;
 	}
 
+	public int getSeq() {
+		return seq;
+	}
+
+	public void setSeq(int seq) {
+		this.seq = seq;
+	}
+
 	@Override
 	public String toString() {
-		return "BoardFreeOnComment [id=" + id + "]";
+		return "BoardFreeOnComment [id=" + id + ", seq=" + seq + "]";
 	}
 
 }

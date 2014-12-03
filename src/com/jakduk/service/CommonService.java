@@ -1,6 +1,8 @@
 package com.jakduk.service;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -19,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -237,6 +240,27 @@ public class CommonService {
 		cookie.setMaxAge(0); // remove
 		cookie.setPath(path);
 		response.addCookie(cookie);		
+	}
+	
+	public Boolean isAnonymousUser() {
+		Boolean result = false;
+		
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			result = true;
+		}
+		
+		if (result == false) {
+			Collection<? extends GrantedAuthority> authoritys = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			
+			for (GrantedAuthority authority : authoritys) {
+				if (authority.getAuthority().equals("ROLE_ANONYMOUS")) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 }

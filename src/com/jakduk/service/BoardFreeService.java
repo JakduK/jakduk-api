@@ -20,12 +20,15 @@ import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.SequenceRepository;
@@ -43,7 +46,10 @@ public class BoardFreeService {
 	private SequenceRepository boardSequenceRepository;
 	
 	@Autowired
-	private BoardCategoryRepository boardCategoryRepository;
+	private BoardCategoryRepository boardCategoryRepository;	
+	
+	@Autowired
+	private BoardFreeCommentRepository boardFreeCommentRepository;
 	
 	@Autowired
 	private CommonService commonService;
@@ -279,5 +285,28 @@ public class BoardFreeService {
 		model.addAttribute("numberOfDislike", usersDisliking.size());
 		
 		return model;
+	}
+	
+	public void freeCommentWrite(Integer seq, String content) {
+		BoardFreeComment boardFreeComment = new BoardFreeComment();
+		
+		if (!commonService.isAnonymousUser()) {
+			BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
+			boardFreeComment.setBoardFree(boardFreeOnComment);
+			
+			CommonPrincipal principal = userService.getCommonPrincipal();
+			BoardWriter writer = new BoardWriter();
+			writer.setUserId(principal.getId());
+			writer.setUsername(principal.getUsername());
+			writer.setType(principal.getType());
+			boardFreeComment.setWriter(writer);
+			
+			boardFreeComment.setContent(content);
+			
+			boardFreeCommentRepository.save(boardFreeComment);
+		} else {
+			
+		}
+		
 	}
 }

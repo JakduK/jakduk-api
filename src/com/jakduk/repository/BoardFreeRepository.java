@@ -3,8 +3,10 @@ package com.jakduk.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String> {
@@ -15,5 +17,6 @@ public interface BoardFreeRepository extends MongoRepository<BoardFree, String> 
 	long countByCategoryName(String categoryName);
 	long count();
 	
-	
+	@Query(value="{'seq' : ?0}")
+	BoardFreeOnComment boardFreeOnCommentFindBySeq(Integer seq);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -31,6 +32,7 @@ public class BoardFreeComment {
 	
 	private BoardWriter writer;
 	
+	@NotEmpty
 	private String content;
 	
 	private List<BoardUser> usersLiking;
