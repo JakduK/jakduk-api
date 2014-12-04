@@ -111,7 +111,7 @@
 	</div>
 </div> <!-- /panel -->
 
-<div class="panel panel-default">
+<div class="panel panel-default" ng-controller="commentListCtrl" ng-init="loadComments()">
   <!-- Default panel contents -->
   <div class="panel-heading">댓글 10개</div>
 
@@ -123,16 +123,18 @@
     					<div class="col-xs-12">comment 1</div>
     			</div>    
     </li>
-    <li class="list-group-item">Dapibus ac facilisis in</li>
-    <li class="list-group-item">Morbi leo risus</li>
-    <li class="list-group-item">Porta ac consectetur ac</li>
-    <li class="list-group-item">Vestibulum at eros</li>
+			<li class="list-group-item" ng-repeat="comment in commentList">
+    			<div class="row">
+    					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 2014-11-16 19:52</div>
+    					<div class="col-xs-12">{{comment.content}}</div>
+    			</div>			
+			</li>
   </ul>
 </div>
 
-<div class="panel panel-default" ng-controller="CommentCtrl">
+<div class="panel panel-default" ng-controller="writeCommentCtrl">
 <div class="panel-body">
-<summernote config="options" ng-model="comment.content"></summernote>
+<summernote ng-model="commentWrite.content" ng-init="commentWrite.content='Input here.'" airmode></summernote>
 </div>
 <div class="panel-footer">
 <a class="btn btn-primary btn-lg" href="#" role="button" ng-click="btnWriteComment()">Submit</a>
@@ -216,27 +218,31 @@ jakdukApp.controller("AlertCtrl", function($scope, $http) {
 		$scope.result = 0;
 		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 	}
-	
-	$scope.options = {
-			height: 300,
-			airMode: true,			
-			toolbar: [
-	      ['style', ['style']],
-	      ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
-	      ['fontname', ['fontname']],
-	      // ['fontsize', ['fontsize']], // Still buggy
-	      ['color', ['color']],
-	      ['para', ['ul', 'ol', 'paragraph']],
-	      ['height', ['height']],
-	      ['table', ['table']],
-	      ['insert', ['link',/* 'picture', 'video',*/ 'hr']],
-	      ['view', ['fullscreen', 'codeview']],
-	      ['help', ['help']]			          
-				]
-		};
 });
 
-jakdukApp.controller("CommentCtrl", function($scope, $http) {
+jakdukApp.controller("commentListCtrl", function($scope, $http) {
+	$scope.commentList = [];
+	
+	$scope.loadComments = function() {
+		var bUrl = '<c:url value="/board/free/comment/${post.seq}"/>';
+		
+		var reqPromise = $http.get(bUrl);
+		
+		reqPromise.success(function(data, status, headers, config) {
+			
+			$scope.commentList = data.comments;
+			
+		});
+		reqPromise.error(function(data, status, headers, config) {
+			
+		});
+		
+	};
+
+});
+
+
+jakdukApp.controller("writeCommentCtrl", function($scope, $http) {
 
 	var headers = {
 			"Content-Type" : "application/x-www-form-urlencoded"
@@ -253,12 +259,12 @@ jakdukApp.controller("CommentCtrl", function($scope, $http) {
 	};
 	
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-	
+
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
-		$scope.comment.seq = "${post.seq}";
+		$scope.commentWrite.seq = "${post.seq}";
 		
-		var reqPromise = $http.post(bUrl, $scope.comment, config);
+		var reqPromise = $http.post(bUrl, $scope.commentWrite, config);
 		
 		reqPromise.success(function(data, status, headers, config) {
 		

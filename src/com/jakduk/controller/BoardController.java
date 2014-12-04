@@ -74,5 +74,13 @@ public class BoardController {
 		
 		boardFreeService.freeCommentWrite(seq, content);
 	}
+	
+	@RequestMapping(value = "/free/comment/{seq}", method = RequestMethod.GET)
+	public void freeComment(@PathVariable int seq, Model model) {
+		
+		boardFreeService.getFreeComment(model, seq);
+		
+//		return "board/free/comment";
+	}
 
 }

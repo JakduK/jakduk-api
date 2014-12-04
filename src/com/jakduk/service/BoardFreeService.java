@@ -307,6 +307,17 @@ public class BoardFreeService {
 		} else {
 			
 		}
+	}
+	
+	public void getFreeComment(Model model, int seq) {
+		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
+		Integer page = 1; // temp
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Pageable pageable = new PageRequest(page - 1, 5, sort);
+		
+		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardFree(boardFreeOnComment, pageable).getContent();
+		
+		model.addAttribute("comments", comments);
 	}
 }
