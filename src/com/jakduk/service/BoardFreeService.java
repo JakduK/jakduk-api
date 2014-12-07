@@ -309,11 +309,12 @@ public class BoardFreeService {
 		}
 	}
 	
-	public void getFreeComment(Model model, int seq) {
+	public void getFreeComment(Model model, int seq, Integer page) {
 		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
-		Integer page = 1; // temp
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		if (page == null) page = 1;
+		
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(page - 1, 5, sort);
 		
 		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardFree(boardFreeOnComment, pageable).getContent();

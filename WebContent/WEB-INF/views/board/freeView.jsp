@@ -95,9 +95,9 @@
     <p>${post.content}</p>
   </div>
   
-	<div class="panel-footer text-center" ng-controller="AlertCtrl">
+	<div class="panel-footer text-center" ng-controller="boardFreeCtrl">
 		<button type="button" class="btn btn-primary" ng-click="btnFeeling('like')">
-			<spring:message code="board.like"/>
+			<spring:message code="board.like" />
 			<span ng-init="numberOfLike=${fn:length(post.usersLiking)}">{{numberOfLike}}</span>
 			<span class="glyphicon glyphicon-thumbs-up"></span>
 		</button>
@@ -111,35 +111,43 @@
 	</div>
 </div> <!-- /panel -->
 
-<div class="panel panel-default" ng-controller="commentListCtrl" ng-init="loadComments()">
-  <!-- Default panel contents -->
-  <div class="panel-heading">댓글 10개</div>
-
-  <!-- List group -->
-  <ul class="list-group">
-    <li class="list-group-item">
-    			<div class="row">
-    					<div class="col-xs-12"><strong>test01</strong> | 2014-11-16 19:52</div>
-    					<div class="col-xs-12">comment 1</div>
-    			</div>    
-    </li>
-			<li class="list-group-item" ng-repeat="comment in commentList">
-    			<div class="row">
-    					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 2014-11-16 19:52</div>
-    					<div class="col-xs-12">{{comment.content}}</div>
-    			</div>			
-			</li>
-  </ul>
+<div ng-controller="commentCtrl">
+	<div class="panel panel-default" ng-init="loadComments(commentPage)">
+	  <!-- Default panel contents -->
+	  <div class="panel-heading">댓글 {{commentList.length}}개</div>
+	
+	  <!-- List group -->
+	  <ul class="list-group">
+	    <li class="list-group-item">
+	    			<div class="row">
+	    					<div class="col-xs-12"><strong>test01</strong> | 2014-11-16 19:52</div>
+	    					<div class="col-xs-12">comment 1</div>
+	    			</div>    
+	    </li>
+				<li class="list-group-item" ng-repeat="comment in commentList">
+	    			<div class="row">
+	    					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 2014-11-16 19:52</div>
+	    					<div class="col-xs-12">{{comment.content}}</div>
+	    			</div>			
+				</li>
+	  </ul>
+	  
+		<div class="panel-footer text-center">
+			<button type="button" class="btn btn-default btn-lg btn-block" ng-click="btnMoreComment()"><spring:message code="common.button.load.comment"/></button>
+			<p></p>
+			<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
+		</div>
+	</div>
+	
+	<div class="panel panel-default">
+	<div class="panel-body">
+	<summernote config="options" ng-model="commentWrite.content" ng-init="commentWrite.seq=${post.seq}"></summernote>
+	</div>
+	<div class="panel-footer">
+	<a class="btn btn-primary btn-lg" href="#" role="button" ng-click="btnWriteComment()"><spring:message code="common.button.write.comment"/></a>
+	</div>
+	</div>	
 </div>
-
-<div class="panel panel-default" ng-controller="writeCommentCtrl">
-<div class="panel-body">
-<summernote ng-model="commentWrite.content" ng-init="commentWrite.content='Input here.'" airmode></summernote>
-</div>
-<div class="panel-footer">
-<a class="btn btn-primary btn-lg" href="#" role="button" ng-click="btnWriteComment()">Submit</a>
-</div>
-</div>	
 
 <button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
 	<spring:message code="board.list"/>
@@ -168,19 +176,19 @@
 
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
-jakdukApp.controller("AlertCtrl", function($scope, $http) {
+jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
-	$scope.result = 0;
+	$scope.conn = "none";
 	
 	$scope.btnFeeling = function(status) {
 		
 		var bUrl = '<c:url value="/board/' + status + '/${post.seq}.json"/>';
 		
-		if ($scope.result == 0) {
+		if ($scope.conn == "none") {
 			
 			var reqPromise = $http.get(bUrl);
 			
-			$scope.result = 1;
+			$scope.conn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
 				var message = "";
@@ -207,7 +215,7 @@ jakdukApp.controller("AlertCtrl", function($scope, $http) {
 				
 				$scope.alert.msg = message;
 				$scope.alert.classType = mType;
-				$scope.result = 2;
+				$scope.conn = "ok";
 				
 			});
 			reqPromise.error(error);
@@ -215,34 +223,33 @@ jakdukApp.controller("AlertCtrl", function($scope, $http) {
 	};	
 			
 	function error(data, status, headers, config) {
-		$scope.result = 0;
+		$scope.conn = "none";
 		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 	}
 });
 
-jakdukApp.controller("commentListCtrl", function($scope, $http) {
+
+jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.commentList = [];
+	$scope.commentAlert = {};
+	$scope.commentPage = 1;
 	
-	$scope.loadComments = function() {
-		var bUrl = '<c:url value="/board/free/comment/${post.seq}"/>';
-		
-		var reqPromise = $http.get(bUrl);
-		
-		reqPromise.success(function(data, status, headers, config) {
-			
-			$scope.commentList = data.comments;
-			
-		});
-		reqPromise.error(function(data, status, headers, config) {
-			
-		});
-		
-	};
-
-});
-
-
-jakdukApp.controller("writeCommentCtrl", function($scope, $http) {
+	$scope.options = {
+			height: 100,
+			toolbar: [
+	      ['style', ['style']],
+	      ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+	      ['fontname', ['fontname']],
+	      // ['fontsize', ['fontsize']], // Still buggy
+	      ['color', ['color']],
+	      ['para', ['ul', 'ol', 'paragraph']],
+	      ['height', ['height']],
+	      ['table', ['table']],
+	      ['insert', ['link',/* 'picture', 'video',*/ 'hr']],
+	      ['view', ['fullscreen', 'codeview']],
+	      ['help', ['help']]			          
+				]
+		};	
 
 	var headers = {
 			"Content-Type" : "application/x-www-form-urlencoded"
@@ -262,17 +269,45 @@ jakdukApp.controller("writeCommentCtrl", function($scope, $http) {
 
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
-		$scope.commentWrite.seq = "${post.seq}";
 		
 		var reqPromise = $http.post(bUrl, $scope.commentWrite, config);
 		
 		reqPromise.success(function(data, status, headers, config) {
-		
+			$scope.commentWrite.content = "";
+			$scope.loadComments($scope.commentPage + 1);
 		});
 		reqPromise.error(function(data, status, headers, config) {
 			
 		});
 		
+	};
+	
+	$scope.loadComments = function(page) {
+		var bUrl = '<c:url value="/board/free/comment/${post.seq}?page=' + page + '"/>';
+		
+		var reqPromise = $http.get(bUrl);
+		
+		reqPromise.success(function(data, status, headers, config) {
+			
+			if (data.comments.length < 1) {
+				$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
+				$scope.commentAlert.classType = "alert-info";				
+			} else {
+				if ($scope.commentPage == page) {
+					$scope.commentList = data.comments;
+				} else if ($scope.commentPage < page) {
+					$scope.commentList = $scope.commentList.concat(data.comments);
+					$scope.commentPage++;
+				}
+			}			
+		});
+		reqPromise.error(function(data, status, headers, config) {
+			
+		});
+	};
+	
+	$scope.btnMoreComment = function() {
+		$scope.loadComments($scope.commentPage + 1);
 	};
 
 });

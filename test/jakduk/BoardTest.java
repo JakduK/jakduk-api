@@ -66,8 +66,8 @@ public class BoardTest {
 		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(22);
 		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
 		
-		Integer page = 1; // temp
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Integer page = 3; // temp
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(page - 1, 5, sort);
 		
 		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardFree(boardFreeOnComment, pageable).getContent();
