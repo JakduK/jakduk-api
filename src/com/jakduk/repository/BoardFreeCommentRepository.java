@@ -16,4 +16,5 @@ import com.jakduk.model.simple.BoardFreeOnComment;
 public interface BoardFreeCommentRepository extends MongoRepository<BoardFreeComment, String>{
 
 	Page<BoardFreeComment> findByBoardFree(BoardFreeOnComment boardFree, Pageable pageable);
+	Integer countByBoardFree(BoardFreeOnComment boardFree);
 }

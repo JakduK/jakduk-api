@@ -83,5 +83,12 @@ public class BoardController {
 		
 //		return "board/free/comment";
 	}
+	
+	@RequestMapping(value = "/free/comment/count/{seq}", method = RequestMethod.GET)
+	public void freeCommentCount(@PathVariable int seq, Model model) {
+		
+		boardFreeService.getFreeCommentCount(model, seq);
+		
+	}
 
 }

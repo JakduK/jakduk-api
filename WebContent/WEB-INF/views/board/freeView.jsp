@@ -112,21 +112,17 @@
 </div> <!-- /panel -->
 
 <div ng-controller="commentCtrl">
-	<div class="panel panel-default" ng-init="loadComments(commentPage)">
-	  <!-- Default panel contents -->
-	  <div class="panel-heading">댓글 {{commentList.length}}개</div>
+	<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
+	  <!-- Default panel contents -->	  
+	  <div class="panel-heading"><spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/></div>
 	
 	  <!-- List group -->
 	  <ul class="list-group">
-	    <li class="list-group-item">
-	    			<div class="row">
-	    					<div class="col-xs-12"><strong>test01</strong> | 2014-11-16 19:52</div>
-	    					<div class="col-xs-12">comment 1</div>
-	    			</div>    
-	    </li>
 				<li class="list-group-item" ng-repeat="comment in commentList">
 	    			<div class="row">
-	    					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 2014-11-16 19:52</div>
+	    					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 
+	    					
+	    					{{dateFromObjectId(comment.id) | date:'yyyy-MM-dd hh:mm (a)'}}</div>
 	    					<div class="col-xs-12">{{comment.content}}</div>
 	    			</div>			
 				</li>
@@ -171,10 +167,11 @@
 <script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["summernote"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll"]);
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
@@ -233,20 +230,17 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.commentList = [];
 	$scope.commentAlert = {};
 	$scope.commentPage = 1;
+	$scope.infiniteDisabled = false;
 	
 	$scope.options = {
 			height: 100,
 			toolbar: [
-	      ['style', ['style']],
-	      ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+	      ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
 	      ['fontname', ['fontname']],
 	      // ['fontsize', ['fontsize']], // Still buggy
 	      ['color', ['color']],
-	      ['para', ['ul', 'ol', 'paragraph']],
-	      ['height', ['height']],
-	      ['table', ['table']],
-	      ['insert', ['link',/* 'picture', 'video',*/ 'hr']],
-	      ['view', ['fullscreen', 'codeview']],
+	      ['para', ['ul', 'ol']],
+	      ['insert', ['link']],
 	      ['help', ['help']]			          
 				]
 		};	
@@ -274,7 +268,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		
 		reqPromise.success(function(data, status, headers, config) {
 			$scope.commentWrite.content = "";
-			$scope.loadComments($scope.commentPage + 1);
+			$scope.loadComments("writeComment", $scope.commentPage + 1);
+			$scope.loadCommentCount();
 		});
 		reqPromise.error(function(data, status, headers, config) {
 			
@@ -282,7 +277,35 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		
 	};
 	
-	$scope.loadComments = function(page) {
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	};
+	
+	$scope.initComment = function() {
+		
+		$scope.loadComments("init", $scope.commentPage);
+		$scope.loadCommentCount();
+		$scope.infiniteDisabled = true;
+	}
+	
+	$scope.loadCommentCount = function() {
+		var bUrl = '<c:url value="/board/free/comment/count/${post.seq}"/>';
+		
+		var reqPromise = $http.get(bUrl);
+		
+		reqPromise.success(function(data, status, headers, config) {
+			$scope.commentCount = data.count;
+		});
+		reqPromise.error(function(data, status, headers, config) {
+			
+		});
+	};
+	
+	$scope.loadComments = function(type, page) {
 		var bUrl = '<c:url value="/board/free/comment/${post.seq}?page=' + page + '"/>';
 		
 		var reqPromise = $http.get(bUrl);
@@ -290,8 +313,14 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		reqPromise.success(function(data, status, headers, config) {
 			
 			if (data.comments.length < 1) {
-				$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-				$scope.commentAlert.classType = "alert-info";				
+				$scope.aaa1 = "aaa";
+				if (type == "init") {
+					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.comment"/>';
+					$scope.commentAlert.classType = "alert-info";
+				} else {
+					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
+					$scope.commentAlert.classType = "alert-info";				
+				}
 			} else {
 				if ($scope.commentPage == page) {
 					$scope.commentList = data.comments;
@@ -307,7 +336,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnMoreComment = function() {
-		$scope.loadComments($scope.commentPage + 1);
+		$scope.loadComments("btnMoreComment", $scope.commentPage + 1);
+		$scope.loadCommentCount();
 	};
 
 });

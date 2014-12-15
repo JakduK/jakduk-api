@@ -321,4 +321,12 @@ public class BoardFreeService {
 		
 		model.addAttribute("comments", comments);
 	}
+	
+	public void getFreeCommentCount(Model model, int seq) {
+		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
+		
+		Integer count = boardFreeCommentRepository.countByBoardFree(boardFreeOnComment);
+		
+		model.addAttribute("count", count);
+	}
 }

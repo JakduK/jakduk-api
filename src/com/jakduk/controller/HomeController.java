@@ -91,6 +91,12 @@ public class HomeController {
 		return "home/angular01";
 	}
 	
+	@RequestMapping(value = "/angular02")
+	public String angular02(Model model) {
+		
+		return "home/angular02";
+	}
+	
 	@RequestMapping(value = "/oauth01")
 	public String oauth01(Model model) {
 		
