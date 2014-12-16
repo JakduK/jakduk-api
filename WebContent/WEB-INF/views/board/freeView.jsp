@@ -39,15 +39,24 @@
 </button>
 
 <sec:authorize access="isAnonymous()">
-	<button type="button" class="btn btn-default" onclick="needLogin();">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>
+	<c:set var="authRole" value="ANNONYMOUS"/>
 </sec:authorize>
 <sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+	<c:set var="authRole" value="USER"/>
+</sec:authorize>
+
+<c:choose>
+	<c:when test="${authRole == 'ANNONYMOUS'}">
+	<button type="button" class="btn btn-default" onclick="needLogin();">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	</button>	
+	</c:when>
+	<c:when test="${authRole == 'USER'}">
 	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>
-</sec:authorize>
+	</button>	
+	</c:when>	
+</c:choose>
 
 <p></p>
 
@@ -129,7 +138,7 @@
 	  </ul>
 	  
 		<div class="panel-footer text-center">
-			<button type="button" class="btn btn-default btn-lg btn-block" ng-click="btnMoreComment()"><spring:message code="common.button.load.comment"/></button>
+			<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-hide="commentCount < 1"><spring:message code="common.button.load.comment"/></button>
 			<p></p>
 			<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
 		</div>
@@ -137,10 +146,12 @@
 	
 	<div class="panel panel-default">
 	<div class="panel-body">
-	<summernote config="options" ng-model="commentWrite.content" ng-init="commentWrite.seq=${post.seq}"></summernote>
+	<summernote config="options" on-focus="focus(evt)" 
+	ng-model="commentWrite.content" ng-init="commentWrite.seq=${post.seq}"></summernote>
+	<span class="{{commentWriteAlert.classType}}" ng-show="commentWriteAlert.msg">{{commentWriteAlert.msg}}</span>
 	</div>
 	<div class="panel-footer">
-	<a class="btn btn-primary btn-lg" href="#" role="button" ng-click="btnWriteComment()"><spring:message code="common.button.write.comment"/></a>
+	<a class="btn btn-primary" href="#" role="button" ng-click="btnWriteComment()"><spring:message code="common.button.write.comment"/></a>
 	</div>
 	</div>	
 </div>
@@ -231,20 +242,33 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.commentAlert = {};
 	$scope.commentPage = 1;
 	$scope.infiniteDisabled = false;
-	
+	$scope.btnWriteCommentHide = false;
+	$scope.commentWriteAlert = {};
+
+	// summernote config
 	$scope.options = {
 			height: 100,
 			toolbar: [
-	      ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
-	      ['fontname', ['fontname']],
+	      ['font', ['bold']],
 	      // ['fontsize', ['fontsize']], // Still buggy
 	      ['color', ['color']],
-	      ['para', ['ul', 'ol']],
-	      ['insert', ['link']],
 	      ['help', ['help']]			          
 				]
 		};	
+	
+	$scope.focus = function(e) { 
+		if ("${authRole}" == "ANNONYMOUS") {
+			if (confirm('<spring:message code="board.msg.need.login"/>') == true) {
+				location.href = "<c:url value="/login"/>";
+			}
+		}	
+	}
+	
+	if ("${authRole}" == "ANNONYMOUS") {
+		$scope.commentWriteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login"/>'};
+	}
 
+	// http config
 	var headers = {
 			"Content-Type" : "application/x-www-form-urlencoded"
 	};
@@ -270,6 +294,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			$scope.commentWrite.content = "";
 			$scope.loadComments("writeComment", $scope.commentPage + 1);
 			$scope.loadCommentCount();
+			
+			$scope.commentAlert = {};
 		});
 		reqPromise.error(function(data, status, headers, config) {
 			
@@ -313,20 +339,32 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		reqPromise.success(function(data, status, headers, config) {
 			
 			if (data.comments.length < 1) {
-				$scope.aaa1 = "aaa";
 				if (type == "init") {
-					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.comment"/>';
-					$scope.commentAlert.classType = "alert-info";
+
 				} else {
 					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
 					$scope.commentAlert.classType = "alert-info";				
 				}
 			} else {
+				
 				if ($scope.commentPage == page) {
 					$scope.commentList = data.comments;
 				} else if ($scope.commentPage < page) {
-					$scope.commentList = $scope.commentList.concat(data.comments);
-					$scope.commentPage++;
+					
+					if (data.comments.length == 5) {
+						$scope.commentList = $scope.commentList.concat(data.comments);
+						$scope.commentPage++;
+					} else {
+						var remainder = $scope.commentList.length % 5;
+						var newComments = data.comments.slice(remainder, 5 - 1);
+						
+						if (newComments.length < 1) {
+							$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
+							$scope.commentAlert.classType = "alert-info";
+						} else {
+							$scope.commentList = $scope.commentList.concat(newComments);
+						}
+					}
 				}
 			}			
 		});
