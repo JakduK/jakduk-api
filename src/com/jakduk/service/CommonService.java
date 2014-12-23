@@ -1,5 +1,7 @@
 package com.jakduk.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -197,6 +199,15 @@ public class CommonService {
 		}
 		
 		return getLanguage;
+	}
+	
+	public String getDateTimePattern(Locale locale) {
+		
+		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, locale);
+		SimpleDateFormat sf = (SimpleDateFormat) df;
+		String getPattern = sf.toPattern();
+		
+		return getPattern;
 	}
 	
 	public List<FootballClub> getFootballClubs(String language) {

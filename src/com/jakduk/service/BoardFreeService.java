@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -172,7 +173,7 @@ public class BoardFreeService {
 	 * @param boardListInfo
 	 * @return
 	 */
-	public Model getFreeView(Model model, int seq, BoardListInfo boardListInfo, Boolean isAddCookie) {
+	public Model getFreeView(Model model, Locale locale, int seq, BoardListInfo boardListInfo, Boolean isAddCookie) {
 		
 		try {
 			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
@@ -191,6 +192,7 @@ public class BoardFreeService {
 			model.addAttribute("category", boardCategory);
 			model.addAttribute("createDate", createDate);
 			model.addAttribute("listInfo", boardListInfo);
+			model.addAttribute("datePattern", commonService.getDateTimePattern(locale));
 			
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -309,17 +311,17 @@ public class BoardFreeService {
 		}
 	}
 	
-	public void getFreeComment(Model model, int seq, Integer page) {
+	public void getFreeComment(Model model, int seq, Integer page, Integer size) {
 		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
 		if (page == null) page = 1;
 		
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(page - 1, 5, sort);
+		Pageable pageable = new PageRequest(page - 1, size, sort);
 		
 		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardFree(boardFreeOnComment, pageable).getContent();
 		
-		model.addAttribute("comments", comments);
+		model.addAttribute("comments", comments);		
 	}
 	
 	public void getFreeCommentCount(Model model, int seq) {

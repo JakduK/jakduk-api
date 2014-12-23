@@ -61,7 +61,7 @@
 <p></p>
 
 <!-- Begin page content -->
-<div class="panel panel-info">
+<div class="panel panel-info" ng-controller="boardFreeCtrl">
   <!-- Default panel contents -->
   <div class="panel-heading">
   	<h4 class="panel-title">
@@ -73,28 +73,16 @@
 	  		<small>${post.writer.username}</small>
   		</div>
   		
-	<%@page import="java.util.Date"%>
-	<%Date CurrentDate = new Date();%>
-	<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
-	<fmt:formatDate var="postDate" value="${createDate}" pattern="yyyy-MM-dd" />
-  		
   		<div class="col-md-5 visible-xs">
 	  		<small>
-			<c:choose>
-				<c:when test="${postDate < nowDate}">
-					<fmt:formatDate value="${createDate}" pattern="yyyy-MM-dd" />
-				</c:when>
-				<c:otherwise>
-					<fmt:formatDate value="${createDate}" pattern="hh:mm (a)" />
-				</c:otherwise>
-			</c:choose> 
-	    	| <spring:message code="board.views"/> ${post.views} 
+				{{dateFromObjectId("${post.id}") | date:"${datePattern}"}}
+	    		| <spring:message code="board.views"/> ${post.views} 
 	    	</small>
   		</div>
   		<div class="col-md-5 visible-sm visible-md visible-lg">
 	  		<small>
-	    	<fmt:formatDate value="${createDate}" pattern="yyyy-MM-dd hh:mm (a)" />
-	    	| <spring:message code="board.views"/> ${post.views}
+	    		{{dateFromObjectId("${post.id}") | date:"${datePattern}"}}
+	    		| <spring:message code="board.views"/> ${post.views}
 	    	</small>
   		</div>  		
   	</div>
@@ -104,7 +92,7 @@
     <p>${post.content}</p>
   </div>
   
-	<div class="panel-footer text-center" ng-controller="boardFreeCtrl">
+	<div class="panel-footer text-center">
 		<button type="button" class="btn btn-primary" ng-click="btnFeeling('like')">
 			<spring:message code="board.like" />
 			<span ng-init="numberOfLike=${fn:length(post.usersLiking)}">{{numberOfLike}}</span>
@@ -123,25 +111,32 @@
 <div ng-controller="commentCtrl">
 	<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
 	  <!-- Default panel contents -->	  
-	  <div class="panel-heading"><spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/></div>
-	
-	  <!-- List group -->
-	  <ul class="list-group">
-				<li class="list-group-item" ng-repeat="comment in commentList">
-	    			<div class="row">
-	    					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 
-	    					
-	    					{{dateFromObjectId(comment.id) | date:'yyyy-MM-dd hh:mm (a)'}}</div>
-	    					<div class="col-xs-12">{{comment.content}}</div>
-	    			</div>			
-				</li>
-	  </ul>
+	  <div class="panel-heading">
+	  	<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+	  	&nbsp;
+		<button type="button" class="btn btn-default" ng-click="btnRefreshComment()">
+		  <span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
+		</button>	  	
+	  </div>
+		<!-- List group -->
+		<ul class="list-group">
+			<li class="list-group-item" ng-repeat="comment in commentList">
+	 			<div class="row">
+ 					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 
+ 					
+ 					{{dateFromObjectId(comment.id) | date:"${datePattern}"}}</div>
+ 					<div class="col-xs-12">{{comment.content}}</div>
+	 			</div>			
+			</li>
+		</ul>
 	  
-		<div class="panel-footer text-center">
-			<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-hide="commentCount < 1"><spring:message code="common.button.load.comment"/></button>
-			<p></p>
-			<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
-		</div>
+	<div class="panel-footer text-center" ng-show="commentCount">
+		<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-show="commentCount">
+			<spring:message code="common.button.load.comment"/> <span class="glyphicon glyphicon-chevron-down"></span>
+		</button>
+		<p></p>
+		<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
+	</div>
 	</div>
 	
 	<div class="panel panel-default">
@@ -151,7 +146,9 @@
 	<span class="{{commentWriteAlert.classType}}" ng-show="commentWriteAlert.msg">{{commentWriteAlert.msg}}</span>
 	</div>
 	<div class="panel-footer">
-	<a class="btn btn-primary" href="#" role="button" ng-click="btnWriteComment()"><spring:message code="common.button.write.comment"/></a>
+	<a class="btn btn-primary" href="#" role="button" ng-click="btnWriteComment()">
+		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
+	</a>
 	</div>
 	</div>	
 </div>
@@ -160,16 +157,18 @@
 	<spring:message code="board.list"/>
 </button>
 
-<sec:authorize access="isAnonymous()">
+<c:choose>
+	<c:when test="${authRole == 'ANNONYMOUS'}">
 	<button type="button" class="btn btn-default" onclick="needLogin();">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>
-</sec:authorize>
-<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+	</button>	
+	</c:when>
+	<c:when test="${authRole == 'USER'}">
 	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>
-</sec:authorize>
+	</button>	
+	</c:when>	
+</c:choose>
 
 </div> <!-- /.container -->
 
@@ -187,6 +186,14 @@ var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll"]);
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
 	$scope.conn = "none";
+	
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	};
 	
 	$scope.btnFeeling = function(status) {
 		
@@ -253,8 +260,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	      // ['fontsize', ['fontsize']], // Still buggy
 	      ['color', ['color']],
 	      ['help', ['help']]			          
-				]
-		};	
+				]};	
 	
 	$scope.focus = function(e) { 
 		if ("${authRole}" == "ANNONYMOUS") {
@@ -292,9 +298,15 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		
 		reqPromise.success(function(data, status, headers, config) {
 			$scope.commentWrite.content = "";
-			$scope.loadComments("writeComment", $scope.commentPage + 1);
+			$scope.loadComments("btnWriteComment", 1, 100);
 			$scope.loadCommentCount();
 			
+			var page = parseInt($scope.commentCount / 5);
+			if ($scope.commentCount % 5 > 0) {
+				page++;
+			}
+			
+			$scope.commentPage = page;			
 			$scope.commentAlert = {};
 		});
 		reqPromise.error(function(data, status, headers, config) {
@@ -313,7 +325,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	
 	$scope.initComment = function() {
 		
-		$scope.loadComments("init", $scope.commentPage);
+		$scope.loadComments("init", $scope.commentPage, 5);
 		$scope.loadCommentCount();
 		$scope.infiniteDisabled = true;
 	}
@@ -331,41 +343,46 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		});
 	};
 	
-	$scope.loadComments = function(type, page) {
-		var bUrl = '<c:url value="/board/free/comment/${post.seq}?page=' + page + '"/>';
+	$scope.loadComments = function(type, page, size) {
+		var bUrl = '<c:url value="/board/free/comment/${post.seq}?page=' + page + '&size=' + size + '"/>';
 		
 		var reqPromise = $http.get(bUrl);
 		
 		reqPromise.success(function(data, status, headers, config) {
-			
-			if (data.comments.length < 1) {
-				if (type == "init") {
-
+						
+			if (data.comments.length < 1) { // 댓글이 1개 미만일때
+				if (type == "init") {					
+				} else if (type =="btnRefreshComment") {
 				} else {
 					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
 					$scope.commentAlert.classType = "alert-info";				
-				}
-			} else {
+				}				
+			} else { // 댓글이 1개 이상일때
 				
-				if ($scope.commentPage == page) {
-					$scope.commentList = data.comments;
-				} else if ($scope.commentPage < page) {
-					
-					if (data.comments.length == 5) {
-						$scope.commentList = $scope.commentList.concat(data.comments);
-						$scope.commentPage++;
-					} else {
-						var remainder = $scope.commentList.length % 5;
-						var newComments = data.comments.slice(remainder, 5 - 1);
+				if (type == "btnWriteComment") {
+					$scope.commentList = data.comments;	
+				} else {
+					if ($scope.commentPage == page) { // 
+						$scope.commentList = data.comments;					
+					} else if ($scope.commentPage < page) { // 기존 댓글이 있고, 로드한 데이터는 추가
 						
-						if (newComments.length < 1) {
-							$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-							$scope.commentAlert.classType = "alert-info";
-						} else {
-							$scope.commentList = $scope.commentList.concat(newComments);
+						if (data.comments.length == size) { // 로드한 데이터가 size에 딱 맞을때
+							$scope.commentList = $scope.commentList.concat(data.comments);
+							$scope.commentPage++;
+						} else { // 로드한 데이터가 size보다 작을때에는 기존 추가되지 않은 data만 추가한다.
+							var remainder = $scope.commentList.length % size;
+							var newComments = data.comments.slice(remainder, size - 1);
+							
+							if (newComments.length < 1) {
+								$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
+								$scope.commentAlert.classType = "alert-info";
+							} else {
+								$scope.commentList = $scope.commentList.concat(newComments);
+							}
 						}
 					}
 				}
+				
 			}			
 		});
 		reqPromise.error(function(data, status, headers, config) {
@@ -374,9 +391,17 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnMoreComment = function() {
-		$scope.loadComments("btnMoreComment", $scope.commentPage + 1);
+		$scope.loadComments("btnMoreComment", $scope.commentPage + 1, 5);
 		$scope.loadCommentCount();
 	};
+	
+	$scope.btnRefreshComment = function() {
+		$scope.commentAlert = {};
+		$scope.commentList = [];
+		$scope.commentPage = 1;
+		$scope.loadComments("btnRefreshComment", $scope.commentPage, 5);
+		$scope.loadCommentCount();
+	}
 
 });
 

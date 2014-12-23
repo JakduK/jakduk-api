@@ -17,7 +17,7 @@ public class AccessController {
 	@RequestMapping("/login")
 	public String login(HttpServletRequest request,
 			Model model,
-			@RequestParam(required = false) Integer status) {
+			@RequestParam(required = false) Integer status){
 		
 		model.addAttribute("status", status);
 		return "access/login";

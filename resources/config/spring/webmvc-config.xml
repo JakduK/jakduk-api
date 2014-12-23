@@ -62,9 +62,11 @@
 		</property>
 		<property name="defaultViews">
 			<list>
-				<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
 			</list>
 		</property>
 	</bean>
+	
+	<mvc:resources location="/resources/" mapping="/resources/**"/>
 	
 </beans>

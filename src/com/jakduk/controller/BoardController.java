@@ -1,11 +1,15 @@
 package com.jakduk.controller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.web.BoardListInfo;
@@ -28,6 +33,9 @@ public class BoardController {
 	
 	@Autowired
 	private CommonService commonService;
+	
+	@Resource
+	LocaleResolver localeResolver;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -49,8 +57,9 @@ public class BoardController {
 	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo boardListInfo, Model model
 			, HttpServletRequest request, HttpServletResponse response) {
 		
+		Locale locale = localeResolver.resolveLocale(request);	
 		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.BOARD_NAME_FREE, seq);
-		boardFreeService.getFreeView(model, seq, boardListInfo, isAddCookie);
+		boardFreeService.getFreeView(model, locale, seq, boardListInfo, isAddCookie);
 		
 		return "board/freeView";
 	}
@@ -76,10 +85,14 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/comment/{seq}", method = RequestMethod.GET)
-	public void freeComment(@PathVariable int seq, Model model,
-			@RequestParam(required = false) Integer page) {
+	public void freeComment(@PathVariable int seq,
+			Model model,			
+			@RequestParam(required = false) Integer page,
+			@RequestParam(required = false) Integer size) {
 		
-		boardFreeService.getFreeComment(model, seq, page);
+		
+		
+		boardFreeService.getFreeComment(model, seq, page, size);
 		
 //		return "board/free/comment";
 	}
