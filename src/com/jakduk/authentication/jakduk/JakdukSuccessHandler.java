@@ -1,9 +1,10 @@
 package com.jakduk.authentication.jakduk;
 
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,7 +33,7 @@ public class JakdukSuccessHandler extends SavedRequestAwareAuthenticationSuccess
 	@Autowired
 	UserRepository userRepository;
 	
-	private Logger logger = Logger.getLogger(this.getClass());
+	private Logger logger = Logger.getLogger(this.getClass());	
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, 
@@ -54,6 +55,12 @@ public class JakdukSuccessHandler extends SavedRequestAwareAuthenticationSuccess
 			commonService.releaseCookie(response, CommonConst.COOKIE_EMAIL, path);
 			
 			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
+		}
+		
+		String loginRedirect = request.getParameter("loginRedirect");
+		
+		if (loginRedirect != null) {
+			this.setDefaultTargetUrl(URLDecoder.decode(loginRedirect, "UTF-8"));
 		}
 		
 		super.onAuthenticationSuccess(request, response, authentication);

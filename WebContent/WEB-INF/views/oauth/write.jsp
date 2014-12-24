@@ -20,7 +20,7 @@
 	
 	<div class="container" ng-controller="writeCtrl">
 	<form:form commandName="OAuthUserWrite" name="OAuthUserWrite" action="${contextPath}/oauth/write" method="POST" cssClass="form-horizontal"
-	ng-submit="onSubmit(OAuthUserWrite, $event)">
+	ng-submit="onSubmit($event)">
 		<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${OAuthUserWrite.usernameStatus}'" ng-model="usernameStatus"/>
 		<legend><spring:message code="oauth.register"/> </legend>
 
@@ -31,13 +31,13 @@
 			</label>
 			<div class="col-sm-3">
 				<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
-				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" ng-blur="onUsername(OAuthUserWrite)"
+				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" ng-blur="onUsername()"
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
 				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
-				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 1"></i>					
+				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'loading'"></i>					
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
-				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername(OAuthUserWrite)">{{usernameAlert.msg}}</span>
+				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername()">{{usernameAlert.msg}}</span>
 			</div>
 		</div>
 
@@ -83,14 +83,14 @@
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
-	$scope.usernameConn = 0;
+	$scope.usernameConn = "none";
 	$scope.usernameAlert = {};
 	
-	$scope.onSubmit = function(OAuthUserWrite, event) {
-		if (OAuthUserWrite.$valid && $scope.usernameStatus == "ok") {
+	$scope.onSubmit = function(event) {
+		if ($scope.OAuthUserWrite.$valid && $scope.usernameStatus == "ok") {
 		} else {			
-			if (OAuthUserWrite.username.$invalid) {
-				checkUsername(OAuthUserWrite);
+			if ($scope.OAuthUserWrite.username.$invalid) {
+				checkUsername();
 			} else if ($scope.existUsername != 2) {
 				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
 			}
@@ -99,12 +99,15 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 		}
 	};
 	
-	$scope.onUsername = function(OAuthUserWrite) {
-		if (OAuthUserWrite.username.$valid) {
+	$scope.onUsername = function() {	
+		console.log($scope.OAuthUserWrite.username.$error);
+		console.log($scope.OAuthUserWrite.username.$valid);
+		
+		if ($scope.OAuthUserWrite.username.$valid) {
 			var bUrl = '<c:url value="/check/oauth/update/username.json?username=' + $scope.username + '"/>';
-			if ($scope.usernameConn == 0) {
+			if ($scope.usernameConn == "none") {
 				var reqPromise = $http.get(bUrl);
-				$scope.usernameConn = 1;
+				$scope.usernameConn = "loading";
 				reqPromise.success(function(data, status, headers, config) {
 					if (data.existUsername != null) {
 						if (data.existUsername == false) {
@@ -115,25 +118,25 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 							$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
 						}
 					}
-					$scope.usernameConn = 0;
+					$scope.usernameConn = "none";
 				});
 				reqPromise.error(usernameError);
 			}
 		} else {
-			checkUsername(OAuthUserWrite);
+			checkUsername();
 		}
 	};
 	
 	function usernameError(data, status, headers, config) {
-		$scope.usernameConn = 0;
+		$scope.usernameConn = "none";
 		$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
 	}
 	
-	function checkUsername(OAuthUserWrite) {
+	function checkUsername() {
 		
-		if (OAuthUserWrite.username.$error.required) {
+		if ($scope.OAuthUserWrite.username.$error.required) {
 			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-		} else if (OAuthUserWrite.username.$error.minlength || OAuthUserWrite.username.$error.maxlength) {
+		} else if ($scope.OAuthUserWrite.username.$error.minlength || $scope.OAuthUserWrite.username.$error.maxlength) {
 			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
 		}
 	}

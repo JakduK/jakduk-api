@@ -5,8 +5,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.web.client.RestOperations;
 
-import com.jakduk.authentication.facebook.FacebookUser;
-
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com

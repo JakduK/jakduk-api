@@ -2,7 +2,8 @@ package com.jakduk.authentication.facebook;
 
 import java.io.Serializable;
 
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>

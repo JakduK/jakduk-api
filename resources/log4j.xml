@@ -69,7 +69,6 @@
 
 	<logger name="trace">
 		<level value="DEBUG" />
-		<appender-ref ref="console" />
 	</logger>
 
 	<logger name="com.jakduk">
@@ -79,16 +78,19 @@
 	<logger name="com.jakduk.authentication" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="authDailyRollingFile" />
+		<appender-ref ref="console" />
 	</logger>
 
 	<logger name="com.jakduk.service.UserService" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="authDailyRollingFile" />
+		<appender-ref ref="console" />
 	</logger>
 
 	<logger name="com.jakduk.service.BoardFreeService" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="boardDailyRollingFile" />
+		<appender-ref ref="console" />
 	</logger>
 
 	<!-- Root Logger -->

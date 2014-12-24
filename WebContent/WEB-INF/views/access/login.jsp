@@ -32,7 +32,7 @@
 					</c:when>                		
 				</c:choose>
 				<form action="j_spring_security_check" name="loginForm" method="post" ng-submit="onSubmit(loginForm, $event)">
-			
+				<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
 					<fieldset>
 						<div class="form-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
 						'has-error':loginForm.j_username.$invalid}">
@@ -76,12 +76,12 @@
 						<div class="list-group-item-text">
 							<div class="row">
 								<div class="col-xs-3 col-md-3">
-									<a href="<c:url value="/oauth/daum/callback?type=facebook"/>">
+									<a href="<c:url value="/oauth/daum/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
 										<i class="fa fa-facebook-square fa-3x"></i>
 									</a>
 								</div>
 								<div class="col-xs-3 col-md-3">
-									<a href="<c:url value="/oauth/daum/callback?type=daum"/>">
+									<a href="<c:url value="/oauth/daum/callback?type=daum&loginRedirect=${loginRedirect}"/>">
 										<img src="<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png" style="width: 40px; height: 40px;"  alt="Daum">
 									</a>
 									</div>  

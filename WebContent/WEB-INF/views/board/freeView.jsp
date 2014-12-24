@@ -118,6 +118,7 @@
 		  <span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
 		</button>	  	
 	  </div>
+	  <p ng-bind-html="myHTML"></p>
 		<!-- List group -->
 		<ul class="list-group">
 			<li class="list-group-item" ng-repeat="comment in commentList">
@@ -125,7 +126,7 @@
  					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 
  					
  					{{dateFromObjectId(comment.id) | date:"${datePattern}"}}</div>
- 					<div class="col-xs-12">{{comment.content}}</div>
+ 					<div class="col-xs-12" ng-bind-html="comment.content"></div>
 	 			</div>			
 			</li>
 		</ul>
@@ -178,10 +179,12 @@
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-sanitize.js"></script>
 
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize"]);
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
@@ -262,10 +265,11 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	      ['help', ['help']]			          
 				]};	
 	
+	
 	$scope.focus = function(e) { 
 		if ("${authRole}" == "ANNONYMOUS") {
 			if (confirm('<spring:message code="board.msg.need.login"/>') == true) {
-				location.href = "<c:url value="/login"/>";
+				location.href = "<c:url value='/login'/>";
 			}
 		}	
 	}

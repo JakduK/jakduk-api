@@ -12,7 +12,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
-import org.springframework.util.StringUtils;
 
 import com.jakduk.common.CommonConst;
 
@@ -31,49 +30,52 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws ServletException, IOException {
-		SavedRequest savedRequest = requestCache.getRequest(request, response);
-
-		if (savedRequest == null) {
-			super.onAuthenticationSuccess(request, response, authentication);
-
-			return;
-		}
-		String targetUrlParameter = getTargetUrlParameter();
-		if (isAlwaysUseDefaultTargetUrl() || (targetUrlParameter != null && StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
-			requestCache.removeRequest(request, response);
-			super.onAuthenticationSuccess(request, response, authentication);
-
-			return;
-		}
-
-		clearAuthenticationAttributes(request);
-
-		// Use the DefaultSavedRequest URL
 		
-		String targetUrl = "/";
+		SavedRequest savedRequest = requestCache.getRequest(request, response);
+		String loginRedirect = request.getParameter("loginRedirect");
 		
 		if (authentication.getPrincipal() instanceof OAuthPrincipal) {
 			OAuthPrincipal principal = (OAuthPrincipal) authentication.getPrincipal();
-			String addInfoStatus = principal.getAddInfoStatus();
+			String addInfoStatus = principal.getAddInfoStatus();	
 			
-			this.setDefaultTargetUrl("/oauth/write");
-
 			if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Didn't input your additional infomation. Redrict input form.");
 				}
 				
-				targetUrl = "/oauth/write";
-			} else {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
-				}
-				
-				targetUrl = savedRequest.getRedirectUrl();
-			}
+				String targetUrl = "/oauth/write";
+				getRedirectStrategy().sendRedirect(request, response, targetUrl);
+				return;
+			} 
 		}
-		getRedirectStrategy().sendRedirect(request, response, targetUrl);
 		
+		clearAuthenticationAttributes(request);
+		
+		if (savedRequest != null) {
+			String targetUrl = savedRequest.getRedirectUrl();
+			
+			if (logger.isDebugEnabled()) {
+				logger.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
+			}
+			
+			getRedirectStrategy().sendRedirect(request, response, targetUrl);
+			return;
+		}
+		
+		if (loginRedirect != null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Redirecting to this Url: " + loginRedirect);
+			}
+			
+			getRedirectStrategy().sendRedirect(request, response, loginRedirect);
+			return;
+		}
+		
+        if (savedRequest == null) {
+            super.onAuthenticationSuccess(request, response, authentication);
+
+            return;
+        }        
 	}
 
 	public void setRequestCache(RequestCache requestCache) {
