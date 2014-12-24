@@ -4,9 +4,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -201,13 +202,26 @@ public class CommonService {
 		return getLanguage;
 	}
 	
-	public String getDateTimePattern(Locale locale) {
+	public Map<String, String> getDateTimeFormat(Locale locale) {
+		
+		HashMap<String, String> dateTimeFormat = new HashMap<String, String>();
 		
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, locale);
 		SimpleDateFormat sf = (SimpleDateFormat) df;
-		String getPattern = sf.toPattern();
 		
-		return getPattern;
+		dateTimeFormat.put("dateTime", sf.toPattern());
+		
+		df = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+		sf = (SimpleDateFormat) df;
+		
+		dateTimeFormat.put("date", sf.toPattern());
+		
+		df = DateFormat.getTimeInstance(DateFormat.SHORT, locale);
+		sf = (SimpleDateFormat) df;
+		
+		dateTimeFormat.put("time", sf.toPattern());
+		
+		return dateTimeFormat;
 	}
 	
 	public List<FootballClub> getFootballClubs(String language) {

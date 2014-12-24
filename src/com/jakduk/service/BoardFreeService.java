@@ -1,5 +1,8 @@
 package com.jakduk.service;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -179,20 +182,23 @@ public class BoardFreeService {
 			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
 			BoardCategory boardCategory = boardCategoryRepository.findByName(boardFree.getCategoryName());
 			
-			ObjectId objId = new ObjectId(boardFree.getId());
-			Date createDate = objId.getDate();
-			
 			if (isAddCookie == true) {
 				int views = boardFree.getViews();
 				boardFree.setViews(++views);
 				boardFreeRepository.save(boardFree);
 			}
 			
+			LocalDate date = LocalDate.now();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			DateTimeFormatter format = DateTimeFormatter.ISO_DATE;
+			
+			Long timeNow = sdf.parse(date.format(format)).getTime();
+			
 			model.addAttribute("post", boardFree);
 			model.addAttribute("category", boardCategory);
-			model.addAttribute("createDate", createDate);
+			model.addAttribute("timeNow", timeNow);
 			model.addAttribute("listInfo", boardListInfo);
-			model.addAttribute("datePattern", commonService.getDateTimePattern(locale));
+			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 			
 		} catch (Exception e) {
 			// TODO: handle exception

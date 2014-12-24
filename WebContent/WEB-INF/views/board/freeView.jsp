@@ -72,19 +72,12 @@
   		<div class="col-sm-2">
 	  		<small>${post.writer.username}</small>
   		</div>
-  		
-  		<div class="col-md-5 visible-xs">
+  		<div class="col-md-5">
 	  		<small>
-				{{dateFromObjectId("${post.id}") | date:"${datePattern}"}}
+				{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
 	    		| <spring:message code="board.views"/> ${post.views} 
 	    	</small>
-  		</div>
-  		<div class="col-md-5 visible-sm visible-md visible-lg">
-	  		<small>
-	    		{{dateFromObjectId("${post.id}") | date:"${datePattern}"}}
-	    		| <spring:message code="board.views"/> ${post.views}
-	    	</small>
-  		</div>  		
+  		</div>	
   	</div>
   </div>
   
@@ -118,14 +111,18 @@
 		  <span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
 		</button>	  	
 	  </div>
-	  <p ng-bind-html="myHTML"></p>
+			
 		<!-- List group -->
 		<ul class="list-group">
 			<li class="list-group-item" ng-repeat="comment in commentList">
-	 			<div class="row">
- 					<div class="col-xs-12"><strong>{{comment.writer.username}}</strong> | 
- 					
- 					{{dateFromObjectId(comment.id) | date:"${datePattern}"}}</div>
+	 			<div class="row">			
+ 					<div class="col-xs-12 visible-xs">
+ 						<strong>{{comment.writer.username}}</strong> |
+ 						<span ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span> 
+ 						<span ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>
+ 					</div>
+ 					<div class="col-xs-12 visible-sm visible-md visible-lg"><strong>{{comment.writer.username}}</strong> | 
+ 					{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</div>
  					<div class="col-xs-12" ng-bind-html="comment.content"></div>
 	 			</div>			
 			</li>
@@ -325,6 +322,10 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	
 	$scope.dateFromObjectId = function(objectId) {
 		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	};
+	
+	$scope.intFromObjectId = function(objectId) {
+		return parseInt(objectId.substring(0, 8), 16) * 1000;
 	};
 	
 	$scope.initComment = function() {

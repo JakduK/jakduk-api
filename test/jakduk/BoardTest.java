@@ -1,7 +1,9 @@
 package jakduk;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -48,7 +50,7 @@ public class BoardTest {
 	BoardFreeCommentRepository boardFreeCommentRepository;
 	
 	@Test
-	public void test01() {
+	public void test01() throws ParseException {
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(11);
 		
 		System.out.println("date=" + Locale.ENGLISH.getDisplayName());
@@ -57,18 +59,29 @@ public class BoardTest {
 		String p1 = sf.toPattern();
 		String p2 = sf.toLocalizedPattern();
 		
-				
 		System.out.println("p1=" + p1);
 		System.out.println("p2=" + p2);
 		
-		DateTimeFormatter date = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
+		DateTimeFormatter date = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 		DateTime dt = new DateTime();
-		org.joda.time.format.DateTimeFormatter fmt = DateTimeFormat.forPattern("MMMM, yyyy");
+		org.joda.time.format.DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
 		String str = fmt.print(dt);
+		System.out.println("str=" + str);
 		
 		LocalDateTime dateTime1 = LocalDateTime.parse("Thu, 5 Jun 2014 05:10:40 GMT", DateTimeFormatter.RFC_1123_DATE_TIME);
 		System.out.println(dateTime1);
 		
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat ff = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.KOREA);
+				
+		LocalDate ld = LocalDate.now();
+		DateTimeFormatter df02 = DateTimeFormatter.ISO_DATE;
+		System.out.println("ld=" + ld.format(df02));
+		
+	
+		
+		Date date2 = f.parse(ld.format(df02));
+		System.out.println("date2=" + date2.getTime());
 
 		
 	}
