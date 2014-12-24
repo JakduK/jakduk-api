@@ -25,7 +25,7 @@ public class DaumUserDeserializer extends JsonDeserializer<DaumUser>{
 		JsonNode node2 = node.get("result");
 		DaumUser user = new DaumUser();
 		user.setUserid(getNodeString(node2.get("userid")));
-		user.setId(getNodeString(node.get("code")));
+		user.setId(node2.get("id").asText());
 		user.setNickname(getNodeString(node2.get("nickname")));
 		user.setImagePath(getNodeString(node2.get("imagePath")));
 		user.setBigImagePath(getNodeString(node2.get("bigImagePath")));
