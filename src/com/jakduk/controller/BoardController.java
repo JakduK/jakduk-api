@@ -90,8 +90,6 @@ public class BoardController {
 			@RequestParam(required = false) Integer page,
 			@RequestParam(required = false) Integer size) {
 		
-		
-		
 		boardFreeService.getFreeComment(model, seq, page, size);
 		
 //		return "board/free/comment";

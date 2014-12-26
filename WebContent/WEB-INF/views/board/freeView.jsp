@@ -75,7 +75,7 @@
   		<div class="col-md-5">
 	  		<small>
 				{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
-	    		| <spring:message code="board.views"/> ${post.views} 
+	    		| <spring:message code="board.view"/> ${post.views} 
 	    	</small>
   		</div>	
   	</div>
@@ -103,13 +103,13 @@
 
 <div ng-controller="commentCtrl">
 	<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
-	  <!-- Default panel contents -->	  
-	  <div class="panel-heading">
+		<!-- Default panel contents -->	  
+		<div class="panel-heading">
 	  	<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
 	  	&nbsp;
-		<button type="button" class="btn btn-default" ng-click="btnRefreshComment()">
-		  <span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
-		</button>	  	
+			<button type="button" class="btn btn-default" ng-click="btnRefreshComment()">
+		  	<span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
+			</button>	  	
 	  </div>
 			
 		<!-- List group -->
@@ -128,7 +128,7 @@
 			</li>
 		</ul>
 	  
-	<div class="panel-footer text-center" ng-show="commentCount">
+	<div class="panel-footer text-center" ng-show="commentCount || commentAlert.msg">
 		<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-show="commentCount">
 			<spring:message code="common.button.load.comment"/> <span class="glyphicon glyphicon-chevron-down"></span>
 		</button>
@@ -138,16 +138,25 @@
 	</div>
 	
 	<div class="panel panel-default">
-	<div class="panel-body">
-	<summernote config="options" on-focus="focus(evt)" 
-	ng-model="commentWrite.content" ng-init="commentWrite.seq=${post.seq}"></summernote>
-	<span class="{{commentWriteAlert.classType}}" ng-show="commentWriteAlert.msg">{{commentWriteAlert.msg}}</span>
-	</div>
-	<div class="panel-footer">
-	<a class="btn btn-primary" href="#" role="button" ng-click="btnWriteComment()">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
-	</a>
-	</div>
+		<div class="panel-body">
+			<summernote config="options" on-focus="focus(evt)" 
+			ng-model="summernote.content" ng-init="summernote={content:'', seq:'${post.seq}'}"></summernote>
+			<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
+		</div>
+		<div class="panel-footer">
+			<c:choose>
+				<c:when test="${authRole == 'ANNONYMOUS'}">
+					<button type="button" class="btn btn-primary" disabled="disabled">
+						<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
+					</button>	
+				</c:when>
+				<c:when test="${authRole == 'USER'}">
+					<button type="button" class="btn btn-primary" ng-click="btnWriteComment()">
+						<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
+					</button>				
+				</c:when>
+			</c:choose>
+		</div>
 	</div>	
 </div>
 
@@ -250,7 +259,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.commentPage = 1;
 	$scope.infiniteDisabled = false;
 	$scope.btnWriteCommentHide = false;
-	$scope.commentWriteAlert = {};
+	$scope.summernoteAlert = {};
 
 	// summernote config
 	$scope.options = {
@@ -272,7 +281,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	}
 	
 	if ("${authRole}" == "ANNONYMOUS") {
-		$scope.commentWriteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login"/>'};
+		$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login"/>'};
 	}
 
 	// http config
@@ -295,12 +304,16 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
 		
-		var reqPromise = $http.post(bUrl, $scope.commentWrite, config);
+		if ($scope.summernote.content.length < 2 || $scope.summernote.content.length > 800) {
+			$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.board.comment.content"/>'};
+			return;
+		}
+		
+		var reqPromise = $http.post(bUrl, $scope.summernote, config);
 		
 		reqPromise.success(function(data, status, headers, config) {
-			$scope.commentWrite.content = "";
+			$scope.summernote.content = "";
 			$scope.loadComments("btnWriteComment", 1, 100);
-			$scope.loadCommentCount();
 			
 			var page = parseInt($scope.commentCount / 5);
 			if ($scope.commentCount % 5 > 0) {
@@ -309,11 +322,11 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			
 			$scope.commentPage = page;			
 			$scope.commentAlert = {};
+			$scope.summernoteAlert = {};
 		});
 		reqPromise.error(function(data, status, headers, config) {
 			
 		});
-		
 	};
 	
 	$scope.objectIdFromDate = function(date) {
@@ -331,10 +344,10 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.initComment = function() {
 		
 		$scope.loadComments("init", $scope.commentPage, 5);
-		$scope.loadCommentCount();
 		$scope.infiniteDisabled = true;
 	}
 	
+	// 현재 안씀.
 	$scope.loadCommentCount = function() {
 		var bUrl = '<c:url value="/board/free/comment/count/${post.seq}"/>';
 		
@@ -354,10 +367,11 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		var reqPromise = $http.get(bUrl);
 		
 		reqPromise.success(function(data, status, headers, config) {
+			
+			$scope.commentCount = data.count;
 						
-			if (data.comments.length < 1) { // 댓글이 1개 미만일때
+			if (data.comments.length < 1) { // 댓글이 없을때
 				if (type == "init") {					
-				} else if (type =="btnRefreshComment") {
 				} else {
 					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
 					$scope.commentAlert.classType = "alert-info";				
@@ -397,7 +411,6 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	
 	$scope.btnMoreComment = function() {
 		$scope.loadComments("btnMoreComment", $scope.commentPage + 1, 5);
-		$scope.loadCommentCount();
 	};
 	
 	$scope.btnRefreshComment = function() {
@@ -405,7 +418,6 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		$scope.commentList = [];
 		$scope.commentPage = 1;
 		$scope.loadComments("btnRefreshComment", $scope.commentPage, 5);
-		$scope.loadCommentCount();
 	}
 
 });

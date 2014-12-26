@@ -1,12 +1,14 @@
 package com.jakduk.authentication.common;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -14,6 +16,7 @@ import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.service.CommonService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -22,6 +25,9 @@ import com.jakduk.common.CommonConst;
  * @desc     :
  */
 public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+	
+	@Autowired
+	CommonService commonService;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 
@@ -63,19 +69,24 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 		}
 		
 		if (loginRedirect != null) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Redirecting to this Url: " + loginRedirect);
+			if (commonService.isRedirectUrl(loginRedirect)) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Redirecting to this Url: " + loginRedirect);
+				}
+				getRedirectStrategy().sendRedirect(request, response, loginRedirect);
+				return;
+			} else {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Don't redirect to this Url" + loginRedirect);
+				}
 			}
-			
-			getRedirectStrategy().sendRedirect(request, response, loginRedirect);
-			return;
 		}
 		
-        if (savedRequest == null) {
-            super.onAuthenticationSuccess(request, response, authentication);
+		if (savedRequest == null) {
+			super.onAuthenticationSuccess(request, response, authentication);
 
-            return;
-        }        
+			return;
+		}        
 	}
 
 	public void setRequestCache(RequestCache requestCache) {

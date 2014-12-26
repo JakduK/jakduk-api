@@ -326,8 +326,10 @@ public class BoardFreeService {
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 		
 		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardFree(boardFreeOnComment, pageable).getContent();
+		Integer count = boardFreeCommentRepository.countByBoardFree(boardFreeOnComment);
 		
-		model.addAttribute("comments", comments);		
+		model.addAttribute("comments", comments);
+		model.addAttribute("count", count);		
 	}
 	
 	public void getFreeCommentCount(Model model, int seq) {

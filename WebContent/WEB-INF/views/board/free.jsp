@@ -49,9 +49,9 @@
   <div class="panel-heading visible-sm visible-md visible-lg">
   	<div class="row">
   		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
-  		<div class="col-sm-3"><spring:message code="board.subject"/></div>
+  		<div class="col-sm-4"><spring:message code="board.subject"/></div>
   		<div class="col-sm-3"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
-  		<div class="col-sm-4"><spring:message code="board.views"/> | <spring:message code="board.like"/> | <spring:message code="board.dislike"/></div>
+  		<div class="col-sm-3"><spring:message code="board.view"/> | <spring:message code="board.like"/> | <spring:message code="board.dislike"/></div>
   	</div>  	
   </div> <!-- /panel-heading -->
 
@@ -68,7 +68,7 @@
 		</c:if>
 	</div>
 	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">
-		<div class="col-sm-3"><strong>${post.subject}</strong></div>
+		<div class="col-sm-4"><strong>${post.subject}</strong></div>
 	</a>			
 	<div class="col-sm-3">
 		${post.writer.username}
@@ -87,8 +87,8 @@
 			</c:otherwise>
 		</c:choose>
 	</div>
-	<div class="col-sm-4">
-		<spring:message code="board.views"/><strong> ${post.views}</strong>
+	<div class="col-sm-3">
+		<spring:message code="board.view"/><strong> ${post.views}</strong>
 		| <span class="text-primary"><span class="glyphicon glyphicon-thumbs-up"></span><strong> ${fn:length(post.usersLiking)}</strong></span>
 		| <span class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span><strong> ${fn:length(post.usersDisliking)}</strong></span>
 	</div>
