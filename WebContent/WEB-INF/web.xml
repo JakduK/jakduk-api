@@ -3,41 +3,17 @@
 xmlns="http://java.sun.com/xml/ns/javaee" 
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
 	<display-name>JakduK-Sample</display-name>
-	<description>JakduK Sample Web Application</description>
-	
-	<filter>
-		<filter-name>httpsCookieFilter</filter-name>
-		<filter-class>com.jakduk.authentication.common.HttpsCookieFilter</filter-class>
-	</filter>
+	<description>JakduK Web Application</description>
+
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 	</filter>
-
-	<filter-mapping>
-		<filter-name>httpsCookieFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
 	<filter-mapping>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-	
-	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
-	
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			classpath:/applicationContext.xml
-		</param-value>
-	</context-param>
-
 	<filter>
 		<filter-name>CharacterEncodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -51,6 +27,23 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 		</init-param>
 	</filter>
 	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+	</listener>
+	
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:/applicationContext.xml
+		</param-value>
+	</context-param>
+
 	<!-- 
 	<filter>
 		<filter-name>Spring OpenSessionInViewFilter</filter-name>

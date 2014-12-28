@@ -46,9 +46,11 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free", method = RequestMethod.GET)
-	public String free(@ModelAttribute BoardListInfo boardListInfo, Model model) {
+	public String free(@ModelAttribute BoardListInfo boardListInfo, Model model
+			, HttpServletRequest request) {
 		
-		boardFreeService.getFree(model, boardListInfo);
+		Locale locale = localeResolver.resolveLocale(request);
+		boardFreeService.getFree(model, locale, boardListInfo);
 		
 		return "board/free";
 	}
@@ -100,6 +102,20 @@ public class BoardController {
 		
 		boardFreeService.getFreeCommentCount(model, seq);
 		
+	}
+	
+	@RequestMapping(value = "/comment/like/{seq}")
+	public void setCommentLike(@PathVariable int seq, Model model,
+			@RequestParam(required = true) String id) {
+		
+		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE);
+	}
+	
+	@RequestMapping(value = "/comment/dislike/{seq}")
+	public void setCommentDislike(@PathVariable int seq, Model model,
+			@RequestParam(required = true) String id) {
+		
+		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE);
 	}
 
 }

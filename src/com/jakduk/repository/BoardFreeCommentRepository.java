@@ -1,7 +1,5 @@
 package com.jakduk.repository;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -17,6 +15,7 @@ import com.jakduk.model.simple.BoardFreeOnComment;
  */
 public interface BoardFreeCommentRepository extends MongoRepository<BoardFreeComment, String>{
 
-	Page<BoardFreeComment> findByBoardFree(BoardFreeOnComment boardFree, Pageable pageable);
+	Page<BoardFreeComment> findByBoardFree(BoardFreeOnComment boardFree, Pageable pageable);	
 	Integer countByBoardFree(BoardFreeOnComment boardFree);
+	BoardFreeComment findById(String id);
 }

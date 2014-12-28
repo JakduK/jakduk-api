@@ -114,59 +114,64 @@ public class BoardFreeService {
 	 * @param boardListInfo
 	 * @return
 	 */
-	public Model getFree(Model model, BoardListInfo boardListInfo) {
+	public Model getFree(Model model, Locale locale, BoardListInfo boardListInfo) {
 
-		Map<String, Date> createDate = new HashMap<String, Date>();
-		Map<String, String> categoryResName = new HashMap<String, String>();
-		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
-		Long numberPosts = (long) 0;
-		
-		Integer page = boardListInfo.getPage();
-		String categoryName = boardListInfo.getCategory();
-		
-		if (page < 1) {
-			page = 1;
-			boardListInfo.setPage(page);
-		}
-		
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_LINE_NUMBER, sort);
-		
-		if (categoryName != null && 
-				(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
-			posts = boardFreeOnListRepository.findAll(pageable).getContent();
-			numberPosts = boardFreeOnListRepository.count();
-		} else {
-			posts = boardFreeRepository.findByCategoryName(categoryName, pageable).getContent();
-			numberPosts = boardFreeRepository.countByCategoryName(categoryName);
-		}
-		
-		BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
-		
-//		logger.debug("countAll=" + boardPageInfo);
-		
-		for (BoardFreeOnList tempPost : posts) {
-			String tempId = tempPost.getId();
-			String tempCategoryName = tempPost.getCategoryName();
-			ObjectId objId = new ObjectId(tempId);
-			createDate.put(tempId, objId.getDate());
+		try {
+			Map<String, Date> createDate = new HashMap<String, Date>();
+			Map<String, String> categoryResName = new HashMap<String, String>();
+			List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
+			Long numberPosts = (long) 0;
 			
-			if (tempCategoryName != null && !categoryResName.containsKey(tempCategoryName)) {
-				BoardCategory boardCategory = boardCategoryRepository.findByName(tempCategoryName);
-				categoryResName.put(tempCategoryName, boardCategory.getResName());
+			Integer page = boardListInfo.getPage();
+			String categoryName = boardListInfo.getCategory();
+			
+			if (page < 1) {
+				page = 1;
+				boardListInfo.setPage(page);
 			}
+			
+			Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+			Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_LINE_NUMBER, sort);
+			
+			if (categoryName != null && 
+					(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
+				posts = boardFreeOnListRepository.findAll(pageable).getContent();
+				numberPosts = boardFreeOnListRepository.count();
+			} else {
+				posts = boardFreeRepository.findByCategoryName(categoryName, pageable).getContent();
+				numberPosts = boardFreeRepository.countByCategoryName(categoryName);
+			}
+			
+			BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
+			
+//			logger.debug("countAll=" + boardPageInfo);
+			
+			for (BoardFreeOnList tempPost : posts) {
+				String tempId = tempPost.getId();
+				String tempCategoryName = tempPost.getCategoryName();
+				ObjectId objId = new ObjectId(tempId);
+				createDate.put(tempId, objId.getDate());
+				
+				if (tempCategoryName != null && !categoryResName.containsKey(tempCategoryName)) {
+					BoardCategory boardCategory = boardCategoryRepository.findByName(tempCategoryName);
+					categoryResName.put(tempCategoryName, boardCategory.getResName());
+				}
+			}
+			
+			List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+			
+			model.addAttribute("posts", posts);
+			model.addAttribute("categorys", categorys);
+			model.addAttribute("usingCategoryResNames", categoryResName);
+			model.addAttribute("pageInfo", boardPageInfo);
+			model.addAttribute("listInfo", boardListInfo);
+			model.addAttribute("createDate", createDate);
+			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
-		
-		model.addAttribute("posts", posts);
-		model.addAttribute("createDate", createDate);
-		model.addAttribute("categorys", categorys);
-		model.addAttribute("usingCategoryResNames", categoryResName);
-		model.addAttribute("pageInfo", boardPageInfo);
-		model.addAttribute("listInfo", boardListInfo);
-		
 		return model;
+
 	}
 	
 	/**
@@ -338,5 +343,85 @@ public class BoardFreeService {
 		Integer count = boardFreeCommentRepository.countByBoardFree(boardFreeOnComment);
 		
 		model.addAttribute("count", count);
+	}
+	
+	public Model setUsersCommentFeelings(Model model, int seq, String id, String feeling) {
+		
+		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
+
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String userid = principal.getId();
+		String username = principal.getUsername();
+		
+		BoardFreeComment boardComment = boardFreeCommentRepository.findById(id);
+		BoardWriter writer = boardComment.getWriter();
+
+		List<BoardUser> usersLiking = boardComment.getUsersLiking();
+		List<BoardUser> usersDisliking = boardComment.getUsersDisliking();
+
+		if (usersLiking == null) {
+			usersLiking = new ArrayList<BoardUser>(); 
+		}
+		
+		if (usersDisliking == null) {
+			usersDisliking = new ArrayList<BoardUser>(); 
+		}
+		
+		if (userid != null && username != null) {
+			
+			if (userid.equals(writer.getUserId())) {
+				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
+			}
+
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				for (BoardUser boardUser : usersLiking) {
+					if (boardUser != null && userid.equals(boardUser.getUserId())) {
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+						break;
+					}
+				}
+			}
+			
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				for (BoardUser boardUser : usersDisliking) {
+					if (boardUser != null && userid.equals(boardUser.getUserId())) {
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+						break;
+					}
+				}
+			}
+
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				BoardUser boardUser = new BoardUser();
+				boardUser.setUserId(userid);
+				boardUser.setUsername(username);
+				boardUser.setId(new ObjectId().toString());
+
+				switch (feeling) {
+				case CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE:
+					usersLiking.add(boardUser);
+					boardComment.setUsersLiking(usersLiking);
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
+					break;
+				case CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE:
+					usersDisliking.add(boardUser);
+					boardComment.setUsersDisliking(usersDisliking);
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
+					break;
+				default:
+					break;
+				}
+				
+				boardFreeCommentRepository.save(boardComment);
+			}
+		} else {
+			errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ANONYMOUS;
+		}
+		
+		model.addAttribute("errorCode", errCode);
+		model.addAttribute("numberOfLike", usersLiking.size());
+		model.addAttribute("numberOfDislike", usersDisliking.size());
+		
+		return model;
 	}
 }

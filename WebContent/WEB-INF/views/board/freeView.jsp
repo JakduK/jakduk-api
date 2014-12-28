@@ -86,15 +86,20 @@
   </div>
   
 	<div class="panel-footer text-center">
-		<button type="button" class="btn btn-primary" ng-click="btnFeeling('like')">
-			<spring:message code="board.like" />
-			<span ng-init="numberOfLike=${fn:length(post.usersLiking)}">{{numberOfLike}}</span>
-			<span class="glyphicon glyphicon-thumbs-up"></span>
+		<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
+			<spring:message code="board.like"/>			
+			<span class="text-primary" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
+				{{numberOfLike}}
+				<i class="fa fa-thumbs-o-up fa-lg"></i>
+			</span>
+			
 		</button>
-		<button type="button" class="btn btn-danger" ng-click="btnFeeling('dislike')">		
+		<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
 			<spring:message code="board.dislike"/>
-			<span ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">{{numberOfDislike}}</span>
-			<span class="glyphicon glyphicon-thumbs-down"></span>
+			<span class="text-danger" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
+				{{numberOfDislike}}
+				<i class="fa fa-thumbs-o-down fa-lg"></i>
+			</span>
 		</button>
 		<p></p>
 		<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
@@ -118,12 +123,31 @@
 	 			<div class="row">			
  					<div class="col-xs-12 visible-xs">
  						<strong>{{comment.writer.username}}</strong> |
- 						<span ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span> 
- 						<span ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>
+						<small ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</small>
+						<small ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</small>
  					</div>
- 					<div class="col-xs-12 visible-sm visible-md visible-lg"><strong>{{comment.writer.username}}</strong> | 
- 					{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</div>
+ 					<div class="col-xs-12 visible-sm visible-md visible-lg">
+ 						<strong>{{comment.writer.username}}</strong> | 
+ 						<small>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</small>
+ 					</div>
  					<div class="col-xs-12" ng-bind-html="comment.content"></div>
+ 					<div class="col-xs-12">
+						<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
+						  <span class="text-primary" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
+							  <i class="fa fa-thumbs-o-up fa-lg"></i>
+							  {{numberOfCommentLike[comment.id]}}
+						  </span>
+						</button> 					
+						<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
+							<span class="text-danger" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
+						  	<i class="fa fa-thumbs-o-down fa-lg"></i>
+						  	{{numberOfCommentDislike[comment.id]}}
+						  </span>
+						</button>
+						<div>
+						<span class="text-danger" ng-show="commentFeelingConn[comment.id]"><small>{{commentFeelingAlert[comment.id]}}</small></span>
+						</div>
+ 					</div>
 	 			</div>			
 			</li>
 		</ul>
@@ -171,7 +195,7 @@
 	</button>	
 	</c:when>
 	<c:when test="${authRole == 'USER'}">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
+	<button type="button" class="btn btn-default" onclick="location.href='<c:url value='/board/free/write'/>">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
 	</button>	
 	</c:when>	
@@ -180,6 +204,7 @@
 </div> <!-- /.container -->
 
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
+<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.0.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 <!--angular-summernote dependencies -->
@@ -190,7 +215,7 @@
 
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize", "ui.bootstrap"]);
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
@@ -242,14 +267,13 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 				$scope.conn = "ok";
 				
 			});
-			reqPromise.error(error);
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.conn = "none";
+				$scope.alert.msg = '<spring:message code="common.msg.error.network.unstable"/>';
+				$scope.alert.classType = "alert-danger";
+			});
 		}
 	};	
-			
-	function error(data, status, headers, config) {
-		$scope.conn = "none";
-		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
-	}
 });
 
 
@@ -260,6 +284,10 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.infiniteDisabled = false;
 	$scope.btnWriteCommentHide = false;
 	$scope.summernoteAlert = {};
+	$scope.commentFeelingConn = {};
+	$scope.commentFeelingAlert = {};
+	$scope.numberOfCommentLike = {};
+	$scope.numberOfCommentDislike = {};
 
 	// summernote config
 	$scope.options = {
@@ -374,7 +402,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 				if (type == "init") {					
 				} else {
 					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-					$scope.commentAlert.classType = "alert-info";				
+					$scope.commentAlert.classType = "alert-warning";				
 				}				
 			} else { // 댓글이 1개 이상일때
 				
@@ -418,8 +446,43 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		$scope.commentList = [];
 		$scope.commentPage = 1;
 		$scope.loadComments("btnRefreshComment", $scope.commentPage, 5);
-	}
-
+	};
+	
+	$scope.btnCommentFeeling = function(commentId, status) {
+		
+		var bUrl = '<c:url value="/board/comment/' + status + '/${post.seq}.json?id=' + commentId + '"/>';
+		var conn = $scope.commentFeelingConn[commentId];
+		
+		if (conn == "none" || conn == null) {
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.commentFeelingConn[commentId] = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+				var message = "";
+				
+				if (data.errorCode == "like") {
+					$scope.numberOfCommentLike[commentId] = data.numberOfLike;
+				} else if (data.errorCode == "dislike") {
+					$scope.numberOfCommentDislike[commentId] = data.numberOfDislike;
+				} else if (data.errorCode == "already") {
+					message = '<spring:message code="board.msg.select.already.like"/>';
+				} else if (data.errorCode == "anonymous") {
+					message = '<spring:message code="board.msg.need.login"/>';
+				} else if (data.errorCode == "writer") {
+					message = '<spring:message code="board.msg.you.are.writer"/>';
+				}
+				
+				$scope.commentFeelingAlert[commentId] = message;
+				$scope.commentFeelingConn[commentId] = "ok";
+				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.commentFeelingConn[commentId] = "none";
+				$scope.commentFeelingAlert[commentId] = '<spring:message code="common.msg.error.network.unstable"/>';				
+			});
+		}
+	};
 });
 
 function needLogin() {

@@ -16,6 +16,13 @@
 <div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
 
+<sec:authorize access="isAnonymous()">
+	<c:set var="authRole" value="ANNONYMOUS"/>
+</sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+	<c:set var="authRole" value="USER"/>
+</sec:authorize>
+
 <div class="page-header">
   <h4><spring:message code="board.name.free"/> <small><spring:message code="board.name.free.about"/></small></h4>
 </div>
@@ -33,18 +40,21 @@
   </ul>
 </div>
 
-<sec:authorize access="isAnonymous()">
-	<a href="javascript:needLogin();" class="btn btn-default" role="button">
+<c:choose>
+	<c:when test="${authRole == 'ANNONYMOUS'}">
+	<button type="button" class="btn btn-default" onclick="needLogin();">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</a>
-</sec:authorize>
-<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-	<a href="<c:url value="/board/free/write"/>" class="btn btn-default" role="button">
+	</button>	
+	</c:when>
+	<c:when test="${authRole == 'USER'}">
+	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
 		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</a>
-</sec:authorize>
+	</button>	
+	</c:when>	
+</c:choose>
+
 <p></p>
-<div class="panel panel-info">
+<div class="panel panel-info" ng-controller="boardCtrl">
   <!-- Default panel contents -->
   <div class="panel-heading visible-sm visible-md visible-lg">
   	<div class="row">
@@ -80,10 +90,10 @@
 	
 		<c:choose>
 			<c:when test="${postDate < nowDate}">
-				<fmt:formatDate value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+				<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
 			</c:when>
 			<c:otherwise>
-				<fmt:formatDate value="${createDate[post.id]}" pattern="hh:mm (a)" />
+				<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.time}" />
 			</c:otherwise>
 		</c:choose>
 	</div>
@@ -138,6 +148,9 @@
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("boardCtrl", function($scope) {
+});
 
 function needLogin() {
 	if (confirm('<spring:message code="board.msg.need.login"/>') == true) {
