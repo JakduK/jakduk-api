@@ -54,6 +54,7 @@
 </c:choose>
 
 <p></p>
+
 <div class="panel panel-info" ng-controller="boardCtrl">
   <!-- Default panel contents -->
   <div class="panel-heading visible-sm visible-md visible-lg">
@@ -77,9 +78,15 @@
 			<fmt:message key="${usingCategoryResNames[post.categoryName]}"/>
 		</c:if>
 	</div>
+	<div class="col-sm-4">
 	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">
-		<div class="col-sm-4"><strong>${post.subject}</strong></div>
-	</a>			
+		<strong>${post.subject}</strong>
+		<c:if test="${!empty commentCount[post.id]}">
+			<span class="text-success">&nbsp;[${commentCount[post.id]}]</span>
+		</c:if>		
+	</a>
+	</div>
+	
 	<div class="col-sm-3">
 		${post.writer.username}
 		|

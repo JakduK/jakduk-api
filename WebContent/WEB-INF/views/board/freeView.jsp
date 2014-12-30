@@ -89,16 +89,16 @@
 		<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
 			<spring:message code="board.like"/>			
 			<span class="text-primary" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
-				{{numberOfLike}}
 				<i class="fa fa-thumbs-o-up fa-lg"></i>
+				{{numberOfLike}}
 			</span>
 			
 		</button>
 		<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
 			<spring:message code="board.dislike"/>
 			<span class="text-danger" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
-				{{numberOfDislike}}
 				<i class="fa fa-thumbs-o-down fa-lg"></i>
+				{{numberOfDislike}}
 			</span>
 		</button>
 		<p></p>

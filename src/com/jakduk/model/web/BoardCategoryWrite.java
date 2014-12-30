@@ -1,7 +1,5 @@
 package com.jakduk.model.web;
 
-import javax.validation.constraints.Size;
-
 import org.hibernate.validator.constraints.NotEmpty;
 
 

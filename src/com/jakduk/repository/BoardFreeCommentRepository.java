@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.simple.BoardFreeOnComment;
+import com.jakduk.model.embedded.BoardItem;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -15,7 +15,7 @@ import com.jakduk.model.simple.BoardFreeOnComment;
  */
 public interface BoardFreeCommentRepository extends MongoRepository<BoardFreeComment, String>{
 
-	Page<BoardFreeComment> findByBoardFree(BoardFreeOnComment boardFree, Pageable pageable);	
-	Integer countByBoardFree(BoardFreeOnComment boardFree);
+	Page<BoardFreeComment> findByBoardItem(BoardItem boardItem, Pageable pageable);	
+	Integer countByBoardItem(BoardItem boardItem);
 	BoardFreeComment findById(String id);
 }

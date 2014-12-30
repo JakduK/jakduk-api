@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.model.simple.BoardFreeOnComment;
@@ -27,8 +28,7 @@ public class BoardFreeComment {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	@DBRef
-	private BoardFreeOnComment boardFree;
+	private BoardItem boardItem;
 	
 	private BoardWriter writer;
 	
@@ -47,12 +47,12 @@ public class BoardFreeComment {
 		this.id = id;
 	}
 
-	public BoardFreeOnComment getBoardFree() {
-		return boardFree;
+	public BoardItem getBoardItem() {
+		return boardItem;
 	}
 
-	public void setBoardFree(BoardFreeOnComment boardFree) {
-		this.boardFree = boardFree;
+	public void setBoardItem(BoardItem boardItem) {
+		this.boardItem = boardItem;
 	}
 
 	public BoardWriter getWriter() {
@@ -89,7 +89,7 @@ public class BoardFreeComment {
 
 	@Override
 	public String toString() {
-		return "BoardFreeComment [id=" + id + ", boardFree=" + boardFree
+		return "BoardFreeComment [id=" + id + ", boardItem=" + boardItem
 				+ ", writer=" + writer + ", content=" + content
 				+ ", usersLiking=" + usersLiking + ", usersDisliking="
 				+ usersDisliking + "]";

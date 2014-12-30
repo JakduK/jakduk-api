@@ -58,6 +58,7 @@ public class UserTest {
 						
 		User user = userRepository.findByUsername("test05");		
 		String pwd = user.getPassword();
+		System.out.println("user =" + user);
 		System.out.println("user pwd=" + pwd);
 		
 		String result = encoder.encode("1111");

@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -22,12 +23,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeDAO;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
@@ -48,6 +52,12 @@ public class BoardTest {
 	
 	@Autowired
 	BoardFreeCommentRepository boardFreeCommentRepository;
+	
+	@Autowired
+	BoardFreeDAO boardFreeDAO;
+	
+	@Autowired
+	private MongoTemplate mongoTemplate;
 	
 	@Test
 	public void test01() throws ParseException {
@@ -103,15 +113,32 @@ public class BoardTest {
 	@Test
 	public void test03() {
 		
-		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(4);
-		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
+		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(23);
+//		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
+		
+		BoardItem boardItem = new BoardItem();
+		boardItem.setId(boardFreeOnComment.getId());
+		boardItem.setSeq(boardFreeOnComment.getSeq());
 		
 		Integer page = 1; // temp
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(page - 1, 100, sort);
 		
-		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardFree(boardFreeOnComment, pageable).getContent();
-		System.out.println("comments=" + comments);
+		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardItem(boardItem, pageable).getContent();
+		System.out.println("test03 comments=" + comments);
+	}
+	
+	@Test
+	public void mongoAggregationTest01() {
+		
+		ArrayList<Integer> arrTemp = new ArrayList<Integer>();
+		arrTemp.add(21);
+		arrTemp.add(22);
+		arrTemp.add(23);
+		
+		Map<String, Integer> map = boardFreeDAO.getBoardFreeCommentCount(arrTemp);
+		
+		System.out.println("mongoAggregationTest01=" + map);
 	}
 	
 }

@@ -22,9 +22,11 @@ import org.springframework.ui.Model;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.model.simple.BoardFreeOnComment;
@@ -54,6 +56,9 @@ public class BoardFreeService {
 	
 	@Autowired
 	private BoardFreeCommentRepository boardFreeCommentRepository;
+	
+	@Autowired
+	private BoardFreeDAO boardFreeDAO;
 	
 	@Autowired
 	private CommonService commonService;
@@ -120,6 +125,7 @@ public class BoardFreeService {
 			Map<String, Date> createDate = new HashMap<String, Date>();
 			Map<String, String> categoryResName = new HashMap<String, String>();
 			List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
+			ArrayList<Integer> seqs = new ArrayList<Integer>();
 			Long numberPosts = (long) 0;
 			
 			Integer page = boardListInfo.getPage();
@@ -149,8 +155,12 @@ public class BoardFreeService {
 			for (BoardFreeOnList tempPost : posts) {
 				String tempId = tempPost.getId();
 				String tempCategoryName = tempPost.getCategoryName();
+				Integer tempSeq = tempPost.getSeq();
+				
 				ObjectId objId = new ObjectId(tempId);
 				createDate.put(tempId, objId.getDate());
+				
+				seqs.add(tempSeq);
 				
 				if (tempCategoryName != null && !categoryResName.containsKey(tempCategoryName)) {
 					BoardCategory boardCategory = boardCategoryRepository.findByName(tempCategoryName);
@@ -159,12 +169,14 @@ public class BoardFreeService {
 			}
 			
 			List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+			HashMap<String, Integer> commentCount = boardFreeDAO.getBoardFreeCommentCount(seqs);
 			
 			model.addAttribute("posts", posts);
 			model.addAttribute("categorys", categorys);
 			model.addAttribute("usingCategoryResNames", categoryResName);
 			model.addAttribute("pageInfo", boardPageInfo);
 			model.addAttribute("listInfo", boardListInfo);
+			model.addAttribute("commentCount", commentCount);
 			model.addAttribute("createDate", createDate);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 		} catch (Exception e) {
@@ -305,7 +317,12 @@ public class BoardFreeService {
 		
 		if (!commonService.isAnonymousUser()) {
 			BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
-			boardFreeComment.setBoardFree(boardFreeOnComment);
+			
+			BoardItem boardItem = new BoardItem();
+			boardItem.setId(boardFreeOnComment.getId());
+			boardItem.setSeq(boardFreeOnComment.getSeq());
+			
+			boardFreeComment.setBoardItem(boardItem);
 			
 			CommonPrincipal principal = userService.getCommonPrincipal();
 			BoardWriter writer = new BoardWriter();
@@ -325,13 +342,17 @@ public class BoardFreeService {
 	public void getFreeComment(Model model, int seq, Integer page, Integer size) {
 		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
+		BoardItem boardItem = new BoardItem();
+		boardItem.setId(boardFreeOnComment.getId());
+		boardItem.setSeq(boardFreeOnComment.getSeq());
+		
 		if (page == null) page = 1;
 		
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 		
-		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardFree(boardFreeOnComment, pageable).getContent();
-		Integer count = boardFreeCommentRepository.countByBoardFree(boardFreeOnComment);
+		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardItem(boardItem, pageable).getContent();
+		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 		
 		model.addAttribute("comments", comments);
 		model.addAttribute("count", count);		
@@ -340,7 +361,11 @@ public class BoardFreeService {
 	public void getFreeCommentCount(Model model, int seq) {
 		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
-		Integer count = boardFreeCommentRepository.countByBoardFree(boardFreeOnComment);
+		BoardItem boardItem = new BoardItem();
+		boardItem.setId(boardFreeOnComment.getId());
+		boardItem.setSeq(boardFreeOnComment.getSeq());
+		
+		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 		
 		model.addAttribute("count", count);
 	}

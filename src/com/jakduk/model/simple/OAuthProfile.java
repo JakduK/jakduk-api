@@ -1,10 +1,6 @@
 package com.jakduk.model.simple;
 
-import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
