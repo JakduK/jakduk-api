@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeCommentCount;
 import com.jakduk.dao.BoardFreeDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
@@ -168,14 +169,22 @@ public class BoardFreeService {
 				}
 			}
 			
-			List<BoardCategory> categorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+			List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+			
+			HashMap<String, String> categorys = new HashMap<String, String>();
+			categorys.put("all", "board.category.all");
+			
+			for (BoardCategory category : boardCategorys) {
+				categorys.put(category.getName(), category.getResName());
+			}
+			
 			HashMap<String, Integer> commentCount = boardFreeDAO.getBoardFreeCommentCount(seqs);
 			
 			model.addAttribute("posts", posts);
 			model.addAttribute("categorys", categorys);
 			model.addAttribute("usingCategoryResNames", categoryResName);
 			model.addAttribute("pageInfo", boardPageInfo);
-			model.addAttribute("listInfo", boardListInfo);
+			model.addAttribute("boardListInfo", boardListInfo);
 			model.addAttribute("commentCount", commentCount);
 			model.addAttribute("createDate", createDate);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));

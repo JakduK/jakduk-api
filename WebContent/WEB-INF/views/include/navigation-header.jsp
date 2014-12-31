@@ -7,6 +7,12 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
+
+
+<div class="masthead">
+	<h3><a class="text-muted" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a></h3>
+</div>
+
 <div class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -17,7 +23,6 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="<c:url value="/home"/>"><small><spring:message code="common.jakduk"/></small></a>
       </div>
       <div class="collapse navbar-collapse" ng-controller="headerCtrl">
         <ul class="nav navbar-nav">

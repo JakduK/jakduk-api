@@ -1,7 +1,5 @@
 package com.jakduk.controller;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import javax.annotation.Resource;
@@ -56,12 +54,12 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
-	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo boardListInfo, Model model
+	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo listInfo, Model model
 			, HttpServletRequest request, HttpServletResponse response) {
 		
 		Locale locale = localeResolver.resolveLocale(request);	
 		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.BOARD_NAME_FREE, seq);
-		boardFreeService.getFreeView(model, locale, seq, boardListInfo, isAddCookie);
+		boardFreeService.getFreeView(model, locale, seq, listInfo, isAddCookie);
 		
 		return "board/freeView";
 	}

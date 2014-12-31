@@ -201,6 +201,7 @@
 	</c:when>	
 </c:choose>
 
+<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
 
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>

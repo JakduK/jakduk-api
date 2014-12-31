@@ -24,20 +24,29 @@
 </sec:authorize>
 
 <div class="page-header">
-  <h4><spring:message code="board.name.free"/> <small><spring:message code="board.name.free.about"/></small></h4>
+  <h4>
+	  <a href="<c:url value="/board/free"/>"><spring:message code="board.name.free"/></a>
+	  <small><spring:message code="board.name.free.about"/></small>
+  </h4>
 </div>
 
-<!-- Single button -->
 <div class="btn-group">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-		<spring:message code="board.category"/> <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" role="menu">
-	  <li><a href="?category=all"><spring:message code="board.category.all"/></a></li>	
-	  <c:forEach items="${categorys}" var="category">
-	   <li><a href="?category=${category.name}"><spring:message code="${category.resName}"/></a></li>	
+	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+		<c:choose>
+			<c:when test="${boardListInfo.category != 'none'}">
+				<spring:message code="${categorys[boardListInfo.category]}"/>
+				<span class="caret"></span>
+			</c:when>
+			<c:otherwise>
+				<spring:message code="board.category"/> <span class="caret"></span>
+			</c:otherwise>
+		</c:choose>		
+	</button>
+	<ul class="dropdown-menu" role="menu">
+		<c:forEach items="${categorys}" var="category">
+			<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>	
 		</c:forEach>
-  </ul>
+	</ul>
 </div>
 
 <c:choose>
@@ -75,11 +84,11 @@
 		${post.seq}
 		|
 		<c:if test="${!empty post.categoryName}">
-			<fmt:message key="${usingCategoryResNames[post.categoryName]}"/>
+			<fmt:message key="${categorys[post.categoryName]}"/>
 		</c:if>
 	</div>
 	<div class="col-sm-4">
-	<a href="<c:url value="/board/free/${post.seq}?page=${listInfo.page}&category=${listInfo.category}"/>">
+	<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 		<strong>${post.subject}</strong>
 		<c:if test="${!empty commentCount[post.id]}">
 			<span class="text-success">&nbsp;[${commentCount[post.id]}]</span>
@@ -121,16 +130,16 @@
  		<li class="disabled"><a href="#">&laquo;</a></li>
  	</c:when>
  	<c:otherwise>
- 		<li><a href="?page=${pageInfo.prevPage}&category=${listInfo.category}">&laquo;</a></li>
+ 		<li><a href="?page=${pageInfo.prevPage}&category=${boardListInfo.category}">&laquo;</a></li>
  	</c:otherwise>
  </c:choose>
  <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="pageIdx">
  	<c:choose>
- 		<c:when test="${listInfo.page == pageIdx}">
- 			<li class="active"><a href="?page=${pageIdx}&category=${listInfo.category}">${pageIdx}</a></li>
+ 		<c:when test="${boardListInfo.page == pageIdx}">
+ 			<li class="active"><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
  		</c:when>
  		<c:otherwise>
- 			<li><a href="?page=${pageIdx}&category=${listInfo.category}">${pageIdx}</a></li>
+ 			<li><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
  		</c:otherwise>
  	</c:choose>
  </c:forEach>

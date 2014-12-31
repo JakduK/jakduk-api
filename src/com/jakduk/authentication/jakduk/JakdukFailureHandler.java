@@ -33,6 +33,7 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 			throws IOException, ServletException {
 		
 		String remember = request.getParameter("remember");
+		String loginRedirect = request.getParameter("loginRedirect");
 		String path = String.format("%s/", request.getContextPath());
 		
 		if (remember != null && remember.equals("on")) {
@@ -47,7 +48,7 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
 		}
 		
-		response.sendRedirect(request.getContextPath() + "/login?status=1");
+		response.sendRedirect(request.getContextPath() + "/login?status=1&loginRedirect=" + loginRedirect);
 		
 	}
 

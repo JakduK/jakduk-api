@@ -12,6 +12,8 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 
+import com.jakduk.common.CommonConst;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -29,9 +31,9 @@ public class BoardFreeDAO {
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("boardItem.seq").in(arrSeq));
 		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(20);
-		Aggregation aggregation = Aggregation.newAggregation(match, group, sort, limit);
+		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
+		Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
 		AggregationResults<BoardFreeCommentCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", BoardFreeCommentCount.class);
 		
 		List<BoardFreeCommentCount> boardCommentCount = results.getMappedResults();

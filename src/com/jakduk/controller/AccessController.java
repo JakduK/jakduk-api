@@ -26,12 +26,15 @@ public class AccessController {
 	@RequestMapping("/login")
 	public String login(HttpServletRequest request,
 			Model model,
-			@RequestParam(required = false) Integer status) throws UnsupportedEncodingException {
+			@RequestParam(required = false) Integer status,
+			@RequestParam(required = false) String loginRedirect) throws UnsupportedEncodingException {
 		
-		String referer = request.getHeader("REFERER");
+		if (loginRedirect == null) {
+			loginRedirect = request.getHeader("REFERER");
+		}
 		
-		if (referer != null) {
-			model.addAttribute("loginRedirect", URLEncoder.encode(referer, "UTF-8"));
+		if (loginRedirect != null) {
+			model.addAttribute("loginRedirect", URLEncoder.encode(loginRedirect, "UTF-8"));
 		}
 		
 		model.addAttribute("status", status);
