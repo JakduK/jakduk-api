@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 @Document
-public class BoardFreeCommentCount {
+public class BoardFreeCount {
 
 	@Id
 	private String id;

@@ -53,10 +53,6 @@ public class BoardFreeOnList {
 	 */
 	private int views = 0;
 	
-	private List<BoardUser> usersLiking;
-	
-	private List<BoardUser> usersDisliking;
-
 	public String getId() {
 		return id;
 	}
@@ -105,28 +101,11 @@ public class BoardFreeOnList {
 		this.views = views;
 	}
 
-	public List<BoardUser> getUsersLiking() {
-		return usersLiking;
-	}
-
-	public void setUsersLiking(List<BoardUser> usersLiking) {
-		this.usersLiking = usersLiking;
-	}
-
-	public List<BoardUser> getUsersDisliking() {
-		return usersDisliking;
-	}
-
-	public void setUsersDisliking(List<BoardUser> usersDisliking) {
-		this.usersDisliking = usersDisliking;
-	}
-
 	@Override
 	public String toString() {
 		return "BoardFreeOnList [id=" + id + ", writer=" + writer
 				+ ", subject=" + subject + ", seq=" + seq + ", categoryName="
-				+ categoryName + ", views=" + views + ", usersLiking="
-				+ usersLiking + ", usersDisliking=" + usersDisliking + "]";
+				+ categoryName + ", views=" + views + "]";
 	}
 
 }

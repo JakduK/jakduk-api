@@ -141,4 +141,17 @@ public class BoardTest {
 		System.out.println("mongoAggregationTest01=" + map);
 	}
 	
+	@Test
+	public void mongoAggregationTest02() {
+		
+		ArrayList<Integer> arrTemp = new ArrayList<Integer>();
+		arrTemp.add(21);
+		arrTemp.add(22);
+		arrTemp.add(23);
+		
+		Map<String, Integer> map = boardFreeDAO.getBoardFreeUsersLikingCount(arrTemp);
+		
+		System.out.println("mongoAggregationTest02=" + map);
+	}
+	
 }

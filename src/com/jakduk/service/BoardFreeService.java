@@ -22,7 +22,7 @@ import org.springframework.ui.Model;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeCommentCount;
+import com.jakduk.dao.BoardFreeCount;
 import com.jakduk.dao.BoardFreeDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
@@ -124,7 +124,6 @@ public class BoardFreeService {
 
 		try {
 			Map<String, Date> createDate = new HashMap<String, Date>();
-			Map<String, String> categoryResName = new HashMap<String, String>();
 			List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
 			ArrayList<Integer> seqs = new ArrayList<Integer>();
 			Long numberPosts = (long) 0;
@@ -155,18 +154,12 @@ public class BoardFreeService {
 			
 			for (BoardFreeOnList tempPost : posts) {
 				String tempId = tempPost.getId();
-				String tempCategoryName = tempPost.getCategoryName();
 				Integer tempSeq = tempPost.getSeq();
 				
 				ObjectId objId = new ObjectId(tempId);
 				createDate.put(tempId, objId.getDate());
 				
 				seqs.add(tempSeq);
-				
-				if (tempCategoryName != null && !categoryResName.containsKey(tempCategoryName)) {
-					BoardCategory boardCategory = boardCategoryRepository.findByName(tempCategoryName);
-					categoryResName.put(tempCategoryName, boardCategory.getResName());
-				}
 			}
 			
 			List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
@@ -179,15 +172,19 @@ public class BoardFreeService {
 			}
 			
 			HashMap<String, Integer> commentCount = boardFreeDAO.getBoardFreeCommentCount(seqs);
+			HashMap<String, Integer> usersLikingCount = boardFreeDAO.getBoardFreeUsersLikingCount(seqs);
+			HashMap<String, Integer> usersDislikingCount = boardFreeDAO.getBoardFreeUsersDislikingCount(seqs);
 			
 			model.addAttribute("posts", posts);
 			model.addAttribute("categorys", categorys);
-			model.addAttribute("usingCategoryResNames", categoryResName);
 			model.addAttribute("pageInfo", boardPageInfo);
 			model.addAttribute("boardListInfo", boardListInfo);
 			model.addAttribute("commentCount", commentCount);
+			model.addAttribute("usersLikingCount", usersLikingCount);
+			model.addAttribute("usersDislikingCount", usersDislikingCount);
 			model.addAttribute("createDate", createDate);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

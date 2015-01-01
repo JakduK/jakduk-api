@@ -34,16 +34,59 @@ public class BoardFreeDAO {
 		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
 		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
-		AggregationResults<BoardFreeCommentCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", BoardFreeCommentCount.class);
+		AggregationResults<BoardFreeCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", BoardFreeCount.class);
 		
-		List<BoardFreeCommentCount> boardCommentCount = results.getMappedResults();
+		List<BoardFreeCount> boardCommentCount = results.getMappedResults();
 
 		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
 		
-		for (BoardFreeCommentCount item : boardCommentCount) {
+		for (BoardFreeCount item : boardCommentCount) {
 			commentCount.put(item.getId(), item.getCount());
 		}
 		
 		return commentCount;
 	}
+	
+	public HashMap<String, Integer> getBoardFreeUsersLikingCount(List<Integer> arrSeq) {
+		
+		AggregationOperation unwind = Aggregation.unwind("usersLiking");
+		AggregationOperation match = Aggregation.match(Criteria.where("seq").in(arrSeq));
+		AggregationOperation group = Aggregation.group("_id").count().as("count");
+		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
+		Aggregation aggregation = Aggregation.newAggregation(unwind, match, group);
+		AggregationResults<BoardFreeCount> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeCount.class);
+		
+		List<BoardFreeCount> boardCommentCount = results.getMappedResults();
+
+		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
+		
+		for (BoardFreeCount item : boardCommentCount) {
+			commentCount.put(item.getId(), item.getCount());
+		}
+		
+		return commentCount;
+	}
+	
+	public HashMap<String, Integer> getBoardFreeUsersDislikingCount(List<Integer> arrSeq) {
+		
+		AggregationOperation unwind = Aggregation.unwind("usersDisliking");
+		AggregationOperation match = Aggregation.match(Criteria.where("seq").in(arrSeq));
+		AggregationOperation group = Aggregation.group("_id").count().as("count");
+		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
+		Aggregation aggregation = Aggregation.newAggregation(unwind, match, group);
+		AggregationResults<BoardFreeCount> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeCount.class);
+		
+		List<BoardFreeCount> boardCommentCount = results.getMappedResults();
+
+		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
+		
+		for (BoardFreeCount item : boardCommentCount) {
+			commentCount.put(item.getId(), item.getCount());
+		}
+		
+		return commentCount;
+	}
+	
 }

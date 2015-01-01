@@ -114,9 +114,25 @@
 		</c:choose>
 	</div>
 	<div class="col-sm-3">
-		<spring:message code="board.view"/><strong> ${post.views}</strong>
-		| <span class="text-primary"><span class="glyphicon glyphicon-thumbs-up"></span><strong> ${fn:length(post.usersLiking)}</strong></span>
-		| <span class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span><strong> ${fn:length(post.usersDisliking)}</strong></span>
+		<spring:message code="board.view"/><strong> ${post.views}</strong> |
+		<span class="text-primary">
+			<span class="glyphicon glyphicon-thumbs-up"></span>
+			<strong>
+				<c:choose>
+					<c:when test="${!empty usersLikingCount[post.id]}">${usersLikingCount[post.id]}</c:when>
+					<c:otherwise>0</c:otherwise>
+				</c:choose>
+			</strong>
+		</span> |
+		<span class="text-danger">
+			<span class="glyphicon glyphicon-thumbs-down"></span>
+			<strong>
+				<c:choose>
+					<c:when test="${!empty usersDislikingCount[post.id]}">${usersDislikingCount[post.id]}</c:when>
+					<c:otherwise>0</c:otherwise>
+				</c:choose>
+			</strong>
+		</span>
 	</div>
 	</div> <!-- /row -->
 	</li>
