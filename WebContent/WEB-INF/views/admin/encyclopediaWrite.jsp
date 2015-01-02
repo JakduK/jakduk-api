@@ -13,11 +13,17 @@
 <body>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="encyclopedia" action="${contextPath}/admin/encyclopedia/write" method="POST">
+<form:hidden path="id"/>
+<form:hidden path="seq"/>
 <p>
 LANGUAGE : 	<form:input path="language" cssClass="form-control" placeholder="language"/>
 </p>
 <p>
-KIND : 	<form:input path="kind" cssClass="form-control" placeholder="kind"/>
+KIND :
+<form:select path="kind" cssClass="form-control">
+	<form:option value="player">Player</form:option>
+	<form:option value="book">Book</form:option>
+</form:select> 	
 </p>
 <p>
 SUBJECT : 	<form:input path="subject" cssClass="form-control" placeholder="subject"/>

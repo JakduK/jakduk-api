@@ -1,5 +1,8 @@
 package com.jakduk.controller;
 
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -7,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.web.BoardCategoryWrite;
+import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.service.AdminService;
 
@@ -41,9 +47,15 @@ public class AdminController {
 	
 	@RequestMapping("/settings")
 	public String root(Model model,
-			@RequestParam(required = false) String message) {
+			@RequestParam(required = false) String message,
+			@RequestParam(required = false) String open) {
 		
 		model.addAttribute("message", message);
+		
+		if (open != null) {
+			model.addAttribute("open", open);
+		}
+		
 		return "admin/admin";
 	}
 	
@@ -56,14 +68,23 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.GET)
-	public String shortHistoryWrite(Model model) {
+	public String encyclopediaWrite(Model model) {
 		model.addAttribute("encyclopedia", new Encyclopedia());
 		
 		return "admin/encyclopediaWrite";
 	}
 	
+	@RequestMapping(value = "/encyclopedia/write/{seq}", method = RequestMethod.GET)
+	public String encyclopediaWrite(@PathVariable int seq, Model model,
+			@RequestParam(required = true) String lang) {
+		
+		adminService.getEncyclopedia(model, seq, lang);
+		
+		return "admin/encyclopediaWrite";
+	}
+	
 	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.POST)
-	public String shortHistoryWriteSubmit(@Valid Encyclopedia encyclopedia, BindingResult result) {
+	public String encyclopediaWriteSubmit(@Valid Encyclopedia encyclopedia, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
@@ -72,7 +93,7 @@ public class AdminController {
 		
 		adminService.encyclopediaWrite(encyclopedia);
 		
-		return "redirect:/encyclopedia/list";
+		return "redirect:/admin/settings?open=encyclopedia";
 	}
 	
 	@RequestMapping(value = "/footballclub/write", method = RequestMethod.GET)
@@ -134,6 +155,14 @@ public class AdminController {
 		adminService.boardCategoryWrite(boardCategoryWtite);
 
 		return "redirect:/admin";
+	}
+	
+	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
+	public String encyclopedia(Model model) {
+		
+		adminService.getEncyclopediaList(model);
+		
+		return "board/free";
 	}
 
 }

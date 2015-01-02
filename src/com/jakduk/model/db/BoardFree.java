@@ -37,14 +37,14 @@ public class BoardFree {
 	 * 글 제목
 	 */
 	@NotNull
-	@Size(min = 1, max = 50)
+	@Size(min = 3, max = 60)
 	private String subject;
 	
 	/**
 	 * 글 내용
 	 */
 	@NotNull
-	@Size(min = 1)
+	@Size(min = 5)
 	private String content;
 	
 	/**

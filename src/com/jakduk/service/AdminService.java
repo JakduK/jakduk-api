@@ -1,11 +1,11 @@
 package com.jakduk.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.util.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -94,15 +94,17 @@ public class AdminService {
 		return result;
 	}
 	
-	public void encyclopediaWrite(Encyclopedia shortHistory) {
+	public void encyclopediaWrite(Encyclopedia encyclopedia) {
 		
-		if (shortHistory.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-			shortHistory.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));			
-		} else if (shortHistory.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-			shortHistory.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
+		if (encyclopedia.getId() == null) {
+			if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+				encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));			
+			} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+				encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
+			}
 		}
 		
-		encyclopediaRepository.save(shortHistory);
+		encyclopediaRepository.save(encyclopedia);
 	}
 	
 	public Model getFootballClubWrite(Model model) {
@@ -168,4 +170,21 @@ public class AdminService {
 		
 		boardCategoryRepository.save(boardCategory);
 	}
+	
+	public Model getEncyclopediaList(Model model) {
+		List<Encyclopedia> encyclopedias = encyclopediaRepository.findAll();
+		
+		model.addAttribute("encyclopedias", encyclopedias);
+		
+		return model;
+	}
+	
+	public Model getEncyclopedia(Model model, int seq, String language) {
+		Encyclopedia encyclopedia = encyclopediaRepository.findOneBySeqAndLanguage(seq, language);
+		
+		model.addAttribute("encyclopedia", encyclopedia);
+		
+		return model;
+	}
+	
 }

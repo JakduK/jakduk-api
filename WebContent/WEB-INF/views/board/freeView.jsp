@@ -213,6 +213,7 @@
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-sanitize.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
 
@@ -292,7 +293,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 
 	// summernote config
 	$scope.options = {
-			height: 100,
+			height: 80,
 			toolbar: [
 	      ['font', ['bold']],
 	      // ['fontsize', ['fontsize']], // Still buggy
@@ -333,7 +334,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
 		
-		if ($scope.summernote.content.length < 2 || $scope.summernote.content.length > 800) {
+		if ($scope.summernote.content.length < 3 || $scope.summernote.content.length > 800) {
 			$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.board.comment.content"/>'};
 			return;
 		}
@@ -344,8 +345,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			$scope.summernote.content = "";
 			$scope.loadComments("btnWriteComment", 1, 100);
 			
-			var page = parseInt($scope.commentCount / 5);
-			if ($scope.commentCount % 5 > 0) {
+			var page = parseInt($scope.commentCount / Jakduk.BoardCommentSize);
+			if ($scope.commentCount % Jakduk.BoardCommentSize > 0) {
 				page++;
 			}
 			
@@ -372,7 +373,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	
 	$scope.initComment = function() {
 		
-		$scope.loadComments("init", $scope.commentPage, 5);
+		$scope.loadComments("init", $scope.commentPage, Jakduk.BoardCommentSize);
 		$scope.infiniteDisabled = true;
 	}
 	
@@ -439,14 +440,14 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnMoreComment = function() {
-		$scope.loadComments("btnMoreComment", $scope.commentPage + 1, 5);
+		$scope.loadComments("btnMoreComment", $scope.commentPage + 1, Jakduk.BoardCommentSize);
 	};
 	
 	$scope.btnRefreshComment = function() {
 		$scope.commentAlert = {};
 		$scope.commentList = [];
 		$scope.commentPage = 1;
-		$scope.loadComments("btnRefreshComment", $scope.commentPage, 5);
+		$scope.loadComments("btnRefreshComment", $scope.commentPage, Jakduk.BoardCommentSize);
 	};
 	
 	$scope.btnCommentFeeling = function(commentId, status) {

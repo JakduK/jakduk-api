@@ -12,11 +12,10 @@
 	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
+<div class="container" ng-controller="writeCtrl">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-<div class="container" ng-controller="writeCtrl">
 <form:form commandName="userPasswordUpdate" name="userPasswordUpdate" action="${contextPath}/user/password/update" method="POST" cssClass="form-horizontal"
 ng-submit="onSubmit(userPasswordUpdate, $event)">
 	<legend><spring:message code="user.password.change"/> </legend>
@@ -72,7 +71,6 @@ ng-submit="onSubmit(userPasswordUpdate, $event)">
 </form:form>
 
 <jsp:include page="../include/footer.jsp"/>
-</div>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript

@@ -136,8 +136,8 @@ public class BoardFreeService {
 				boardListInfo.setPage(page);
 			}
 			
-			Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-			Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_LINE_NUMBER, sort);
+			Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
+			Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
 			
 			if (categoryName != null && 
 					(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {

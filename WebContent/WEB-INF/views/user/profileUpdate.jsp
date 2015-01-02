@@ -12,12 +12,11 @@
 	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
+<div class="container ng-controller="writeCtrl"">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-    
-<div class="container" ng-controller="writeCtrl">
+
 <form:form commandName="userProfileWrite" name="userProfileWrite" action="${contextPath}/user/profile/update" method="POST" cssClass="form-horizontal"
 ng-submit="onSubmit(userProfileWrite, $event)">
 	<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userProfileWrite.usernameStatus}'" ng-model="usernameStatus"/>
@@ -80,7 +79,6 @@ ng-submit="onSubmit(userProfileWrite, $event)">
 </form:form>
 
 <jsp:include page="../include/footer.jsp"/>
-</div>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript ================================================== -->

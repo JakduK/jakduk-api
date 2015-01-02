@@ -11,7 +11,6 @@
 <body>
 <div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
-<div class="container">
 
 <h4>K리그 작두왕</h4>
 <p>K리그 작두왕은 'K리그', '작두', '왕' 세단어의 조합어이며 K리그의 경기결과를 신들린 것처럼 잘 맞추는 사람을 뜻합니다.</p>
@@ -29,7 +28,6 @@
 <p><a href="https://github.com/Pyohwan/JakduK">https://github.com/Pyohwan/JakduK</a></p>
 
 <jsp:include page="../include/footer.jsp"/>
-</div>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript

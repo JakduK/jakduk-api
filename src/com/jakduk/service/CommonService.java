@@ -108,10 +108,10 @@ public class CommonService {
 		Long prevPage = (long) 1;
 		Long nextPage = (long) 1;
 		
-		if((numberPosts - CommonConst.BOARD_LINE_NUMBER) > 0) {
-			tmpVal = (long) (numberPosts / CommonConst.BOARD_LINE_NUMBER);
+		if((numberPosts - CommonConst.BOARD_SIZE_LINE_NUMBER) > 0) {
+			tmpVal = (long) (numberPosts / CommonConst.BOARD_SIZE_LINE_NUMBER);
 			
-			if((numberPosts % CommonConst.BOARD_LINE_NUMBER) == 0) {
+			if((numberPosts % CommonConst.BOARD_SIZE_LINE_NUMBER) == 0) {
 				totalPages = tmpVal;
 			} else {
 				totalPages = tmpVal + 1;

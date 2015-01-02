@@ -7,38 +7,58 @@
 <html ng-app="jakdukApp">
 <head>  	
 	<jsp:include page="../include/html-header.jsp"/>
+	
 </head>
 
 <body>
-<div class="container">
+<div class="container" ng-controller="homeCtrl">
 
 <jsp:include page="../include/navigation-header.jsp"/>
-  <div class="jumbotron" ng-controller="homeCtrl" ng-init="refreshEncyclopedia()">
-    <h2>{{encyclopedia.subject}} <span class="label label-default">{{encyclopedia.kind}}</span></h2>
-    <p>
-    {{encyclopedia.content}}
-    </p>
- <p>
- 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
- 		<span class="glyphicon glyphicon-refresh"></span>
- 	</button>
+
+<div class="jumbotron">
+	<h3>{{encyclopedia.subject}} <span class="label label-default">{{encyclopedia.kind}}</span></h3>
+	<p>{{encyclopedia.content}}</p>
+	<p>
+	 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
+ 			<span class="glyphicon glyphicon-refresh"></span>
+ 		</button>
  </p>
 </div>  
-          
- <div class="row">
-   <div class="col-6 col-sm-6 col-lg-4">
-     <h3>최신 게시물</h3>
-     <p>안녕하세요.   2014-07-05(토) 성남팬</p>
-     <p>월드컵 예상 성적   2014-07-05(토) 수원팬</p>
-     <p><a class="btn btn-default" href="<c:url value="/board"/>" role="button">View details &raquo;</a></p>
-   </div><!--/span-->
-   <div class="col-6 col-sm-6 col-lg-4">
-     <h3>가입 회원</h3>
-     <p>성남팬</p>
-     <p>수원팬</p>
-     <p><a class="btn btn-default" href="<c:url value="/about"/>" role="button">View details &raquo;</a></p>
-   </div><!--/span-->
- </div><!--/row-->
+
+<div class="row">
+	<div class="col-6 col-sm-6 col-lg-4">
+		<div class="table-responsive panel panel-info">
+			<div class="panel-heading"><strong><a href="<c:url value="/board/free"/>"><spring:message code="home.posts.latest"/></a></strong></div>		
+			<table class="table table-hover table-condensed">
+				<tr>
+					<th><spring:message code="board.subject"/></th>
+					<th><spring:message code="board.date"/></th>
+				</tr>		
+				<tr ng-repeat="post in postsLatest">
+					<td><a href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a></td>
+					<td ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</td>
+					<td ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	
+	<div class="col-6 col-sm-6 col-lg-4">
+		<div class="table-responsive panel panel-info">
+			<div class="panel-heading"><strong><spring:message code="home.members.registered.latest"/></strong></div>
+			<table class="table table-hover table-condensed">
+				<tr>
+					<th><spring:message code="user.nickname"/></th>
+					<th><spring:message code="user.comment"/></th>
+				</tr>
+				<tr ng-repeat="user in usersLatest">
+					<td>{{user.username}}</td>
+					<td>{{user.about}}</td>
+				</tr>				
+			</table>				
+		</div>
+	</div><!--/span-->
+</div><!--/row-->
 
 <jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
@@ -53,16 +73,19 @@ var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.encyclopedia = {};
-	$scope.result = 0;
+	$scope.encyclopediaConn = "none";
+	$scope.dataLatestConn = "none";
+	$scope.postsLatest = [];
+	$scope.usersLatest = [];
 	
 	$scope.refreshEncyclopedia = function() {
 		var bUrl = '<c:url value="/home/jumbotron.json?lang=${pageContext.response.locale}"/>';
 		
-		if ($scope.result == 0) {
+		if ($scope.encyclopediaConn == "none") {
 			
 			var reqPromise = $http.get(bUrl);
 			
-			$scope.result = 1;
+			$scope.encyclopediaConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
 				if (data.encyclopedia != null) {
@@ -76,17 +99,55 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 					$scope.encyclopedia.content = data.encyclopedia.content;
 				}
 				
-				$scope.result = 0;
+				$scope.encyclopediaConn = "none";
 				
 			});
-			reqPromise.error(error);
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.encyclopediaConn = "none";
+				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+			});
 		}
 	};
 	
-	function error(data, status, headers, config) {
-		$scope.result = 0;
-		$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
-	}
+	$scope.getDataLatest = function() {
+		var bUrl = '<c:url value="/home/data/latest.json"/>';
+		
+		if ($scope.dataLatestConn == "none") {
+			
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.dataLatestConn = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+				
+				$scope.postsLatest = data.posts;
+				$scope.usersLatest = data.users;
+				
+				$scope.dataLatestConn = "none";
+				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.dataLatestConn = "none";
+				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+			});
+		}
+	};	
+	
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	};
+	
+	$scope.intFromObjectId = function(objectId) {
+		return parseInt(objectId.substring(0, 8), 16) * 1000;
+	};
+	
+	$scope.refreshEncyclopedia();
+	$scope.getDataLatest();
+
 });
 </script>
 

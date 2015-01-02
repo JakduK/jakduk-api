@@ -23,7 +23,7 @@ public class Encyclopedia {
 	/**
 	 *  종류. 1이면 최고의 선수, 2이면 추천 책
 	 */
-	private Integer kind;
+	private String kind;
 	
 	private String language;
 	
@@ -43,16 +43,16 @@ public class Encyclopedia {
 		this.id = id;
 	}
 
-	public Integer getKind() {
+	public String getLanguage() {
+		return language;
+	}
+
+	public String getKind() {
 		return kind;
 	}
 
-	public void setKind(Integer kind) {
+	public void setKind(String kind) {
 		this.kind = kind;
-	}
-
-	public String getLanguage() {
-		return language;
 	}
 
 	public void setLanguage(String language) {

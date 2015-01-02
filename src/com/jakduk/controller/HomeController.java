@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -43,14 +44,16 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/home")
-	public String home(Model model) {
+	public String home(Model model,
+			HttpServletRequest request) {
 		
-//		logger.debug("home");
+		Locale locale = localeResolver.resolveLocale(request);
+		homeService.getHome(model, locale);
 		
 		return "home/home";
 	}
 	
-	@RequestMapping(value = "/home/jumbotron")
+	@RequestMapping(value = "/home/jumbotron", method = RequestMethod.GET)
 	public String jumbotron(HttpServletRequest request, HttpServletResponse response,			
 			@RequestParam(required = false) String lang,
 			Model model) {
@@ -141,6 +144,31 @@ public class HomeController {
 		Boolean existUsername = userService.existOAuthUsernameOnUpdate(username);
 		
 		model.addAttribute("existUsername", existUsername);
+	}
+	
+	@RequestMapping(value = "/home/board/latest", method = RequestMethod.GET)
+	public String boardLatest(Model model) {
+		
+		homeService.getBoardLatest(model);
+		
+		return "home/board/latest";
+	}
+	
+	@RequestMapping(value = "/home/user/latest", method = RequestMethod.GET)
+	public String userLatest(Model model) {
+		
+		homeService.getUserLatest(model);
+		
+		return "home/user/latest";
+	}
+	
+	@RequestMapping(value = "/home/data/latest", method = RequestMethod.GET)
+	public String dataLatest(Model model) {
+		
+		homeService.getBoardLatest(model);
+		homeService.getUserLatest(model);
+		
+		return "home/user/latest";
 	}
 
 }
