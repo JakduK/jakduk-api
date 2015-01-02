@@ -1,8 +1,5 @@
 package com.jakduk.controller;
 
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -10,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.web.BoardCategoryWrite;
-import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.service.AdminService;
 
@@ -104,6 +99,14 @@ public class AdminController {
 		return "admin/footballClubWrite";
 	}
 	
+	@RequestMapping(value = "/footballclub/write/{id}", method = RequestMethod.GET)
+	public String footballClubWrite(@PathVariable String id, Model model) {
+		
+		adminService.getFootballClubWrite(model, id);
+		
+		return "admin/footballClubWrite";
+	}
+	
 	@RequestMapping(value = "/footballclub/write", method = RequestMethod.POST)
 	public String footballClubWrite(@Valid FootballClubWrite footballClubWrite, BindingResult result) {
 		
@@ -114,12 +117,20 @@ public class AdminController {
 		
 		adminService.footballClubWrite(footballClubWrite);
 
-		return "redirect:/admin";
+		return "redirect:/admin/settings?open=fc";
 	}
 	
 	@RequestMapping(value = "/footballclub/origin/write", method = RequestMethod.GET)
 	public String footballClubOriginWrite(Model model) {
-		model.addAttribute("footballClubOriginWrite", new FootballClubOrigin());
+		model.addAttribute("footballClubOrigin", new FootballClubOrigin());
+		
+		return "admin/footballClubOriginWrite";
+	}
+	
+	@RequestMapping(value = "/footballclub/origin/write/{id}", method = RequestMethod.GET)
+	public String footballClubOriginWrite(@PathVariable String id, Model model) {
+		
+		adminService.getFootballClubOrigin(model, id);
 		
 		return "admin/footballClubOriginWrite";
 	}
@@ -134,7 +145,7 @@ public class AdminController {
 		
 		adminService.footballClubOriginWrite(footballClubOrigin);
 
-		return "redirect:/admin";
+		return "redirect:/admin/settings?open=fcOrigin";
 	}
 	
 	@RequestMapping(value = "/board/category/write", method = RequestMethod.GET)
@@ -158,11 +169,21 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
-	public String encyclopedia(Model model) {
+	public void encyclopedia(Model model) {
 		
 		adminService.getEncyclopediaList(model);
+	}
+	
+	@RequestMapping(value = "/footballclub/origin", method = RequestMethod.GET)
+	public void footballClubOrigin(Model model) {
 		
-		return "board/free";
+		adminService.getFootballClubOriginList(model);
+	}
+	
+	@RequestMapping(value = "/footballclub", method = RequestMethod.GET)
+	public void footballClub(Model model) {
+		
+		adminService.getFootballClubList(model);
 	}
 
 }

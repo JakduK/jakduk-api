@@ -17,7 +17,7 @@
 
 <div class="jumbotron">
 	<h3>{{encyclopedia.subject}} <span class="label label-default">{{encyclopedia.kind}}</span></h3>
-	<p>{{encyclopedia.content}}</p>
+	<p><h3><small>{{encyclopedia.content}}</small></h3></p>
 	<p>
 	 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
  			<span class="glyphicon glyphicon-refresh"></span>
@@ -27,7 +27,7 @@
 
 <div class="row">
 	<div class="col-6 col-sm-6 col-lg-4">
-		<div class="table-responsive panel panel-info">
+		<div class="panel panel-info">
 			<div class="panel-heading"><strong><a href="<c:url value="/board/free"/>"><spring:message code="home.posts.latest"/></a></strong></div>		
 			<table class="table table-hover table-condensed">
 				<tr>
@@ -44,7 +44,7 @@
 	</div>
 	
 	<div class="col-6 col-sm-6 col-lg-4">
-		<div class="table-responsive panel panel-info">
+		<div class="panel panel-info">
 			<div class="panel-heading"><strong><spring:message code="home.members.registered.latest"/></strong></div>
 			<table class="table table-hover table-condensed">
 				<tr>
@@ -89,9 +89,9 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 			
 			reqPromise.success(function(data, status, headers, config) {
 				if (data.encyclopedia != null) {
-					if (data.encyclopedia.kind == 1) {
+					if (data.encyclopedia.kind == "player") {
 						$scope.encyclopedia.kind = '<spring:message code="home.kind.best.player"/>';
-					} else if (data.encyclopedia.kind == 2) {
+					} else if (data.encyclopedia.kind == "book") {
 						$scope.encyclopedia.kind = '<spring:message code="home.kind.recommend.book"/>';
 					}
 					

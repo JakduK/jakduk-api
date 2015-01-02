@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.util.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -16,6 +16,7 @@ import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.embedded.FootballClubName;
+import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.repository.BoardCategoryRepository;
@@ -23,6 +24,8 @@ import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
+
+
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -117,6 +120,31 @@ public class AdminService {
 		return model;
 	}
 	
+	public Model getFootballClubWrite(Model model, String id) {
+		
+		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+		FootballClub fc = footballClubRepository.findById(id);
+		FootballClubWrite fcWrite = new FootballClubWrite();
+		fcWrite.setId(fc.getId());
+		fcWrite.setActive(fc.getActive());
+		fcWrite.setOrigin(fc.getOrigin().getName());
+		
+		for (FootballClubName fcName : fc.getNames()) {
+			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+				fcWrite.setFullNameKr(fcName.getFullName());
+				fcWrite.setShortNameKr(fcName.getShortName());
+			} else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+				fcWrite.setFullNameEn(fcName.getFullName());
+				fcWrite.setShortNameEn(fcName.getShortName());
+			}
+		}
+		
+		model.addAttribute("footballClubs", footballClubs);
+		model.addAttribute("footballClubWrite", fcWrite);
+		
+		return model;
+	}
+	
 	public void footballClubWrite(FootballClubWrite footballClubWrite) {
 		FootballClub footballClub = new FootballClub();
 		
@@ -125,6 +153,9 @@ public class AdminService {
 		footballClub.setOrigin(footballClubOrigin);
 		footballClub.setActive(footballClubWrite.getActive());
 		
+		if (footballClubWrite.getId() != null) {
+			footballClub.setId(footballClubWrite.getId());
+		}
 		ArrayList<FootballClubName> names = new ArrayList<FootballClubName>();
 		FootballClubName footballClubNameKr = new FootballClubName();
 		FootballClubName footballClubNameEn = new FootballClubName();
@@ -183,6 +214,30 @@ public class AdminService {
 		Encyclopedia encyclopedia = encyclopediaRepository.findOneBySeqAndLanguage(seq, language);
 		
 		model.addAttribute("encyclopedia", encyclopedia);
+		
+		return model;
+	}
+	
+	public Model getFootballClubOriginList(Model model) {
+		List<FootballClubOrigin> fcOrigins = footballClubOriginRepository.findAll();
+		
+		model.addAttribute("fcOrigins", fcOrigins);
+		
+		return model;
+	}
+	
+	public Model getFootballClubOrigin(Model model, String id) {
+		FootballClubOrigin fcOrigin = footballClubOriginRepository.findOne(id);
+		
+		model.addAttribute("footballClubOrigin", fcOrigin);
+		
+		return model;
+	}
+	
+	public Model getFootballClubList(Model model) {
+		List<FootballClub> fcs = footballClubRepository.findAll();
+		
+		model.addAttribute("fcs", fcs);
 		
 		return model;
 	}

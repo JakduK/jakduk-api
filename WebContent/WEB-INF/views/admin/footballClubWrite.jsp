@@ -14,6 +14,7 @@
 <h4>Write FootballClub.</h4>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="footballClubWrite" action="${contextPath}/admin/footballclub/write" method="POST">
+<form:hidden path="id"/>
 <p>
 ORIGIN : 
 				<form:select path="origin" cssClass="form-control">
@@ -32,16 +33,16 @@ ACTIVE :
 </p>
 <p>
 <p>
-KOR SHORTNAME : 	<form:input path="shortNameKr" cssClass="form-control" placeholder="KOR shortName"/>
+KOR SHORTNAME : 	<form:input path="shortNameKr" cssClass="form-control" placeholder="KOR shortName" size="30"/>
 </p>
 <p>
-KOR FULLNAME : 	<form:input path="fullNameKr" cssClass="form-control" placeholder="KOR fullName"/>
+KOR FULLNAME : 	<form:input path="fullNameKr" cssClass="form-control" placeholder="KOR fullName" size="30"/>
 </p>
 <p>
-ENG SHORTNAME : 	<form:input path="shortNameEn" cssClass="form-control" placeholder="ENG shortName"/>
+ENG SHORTNAME : 	<form:input path="shortNameEn" cssClass="form-control" placeholder="ENG shortName" size="30"/>
 </p>
 <p>
-ENG FULLNAME : 	<form:input path="fullNameEn" cssClass="form-control" placeholder="ENG fullName"/>
+ENG FULLNAME : 	<form:input path="fullNameEn" cssClass="form-control" placeholder="ENG fullName" size="30"/>
 </p>
 <p>
 <input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>

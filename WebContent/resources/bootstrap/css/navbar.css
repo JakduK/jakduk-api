@@ -4,6 +4,11 @@
  .navbar .navbar-toggle {  margin-top: 3px; margin-bottom: 0px; padding: 8px 9px; }
  .navbar .navbar-form { margin-top: 2px; margin-bottom: 0px }
  .navbar .navbar-collapse {border-color: #A40303;}
- .navbar-nav {
-  margin: 2.0px -12px;
+ .navbar-nav { margin: 2.0px -12px;}
+ .container .jumbotron { padding-left:10px; padding-right:10px;}
+ .jumbotron { padding: 5px;}
+ 
+ body {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

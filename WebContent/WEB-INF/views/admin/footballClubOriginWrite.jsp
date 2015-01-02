@@ -13,7 +13,8 @@
 <body>
 <h4>Write FootballClub Origin.</h4>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-<form:form commandName="footballClubOriginWrite" action="${contextPath}/admin/footballclub/origin/write" method="POST">
+<form:form commandName="footballClubOrigin" action="${contextPath}/admin/footballclub/origin/write" method="POST">
+<form:hidden path="id"/>
 <p>
 NAME : <form:input path="name" cssClass="form-control" placeholder="football club origin name"/>
 </p>

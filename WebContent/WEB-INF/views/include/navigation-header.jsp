@@ -23,7 +23,8 @@
 			<ul class="nav nav-pills navbar-nav navbar-right">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<span class="glyphicon glyphicon-globe"></span> <spring:message code="common.language"/> <span class="caret"></span>
+						<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-globe"></span> <spring:message code="common.language"/> <span class="caret"></span></span>
+						<span class="visible-xs"><spring:message code="common.language"/> <span class="caret"></span></span>						
 					</a>
 					<ul class="dropdown-menu" role="menu">
 						<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
@@ -31,19 +32,26 @@
 					</ul>
 				</li>
 				<sec:authorize access="isAnonymous()">
-					<li><a href="<c:url value="/login"/>"><span class="glyphicon glyphicon-log-in"></span> <spring:message code="common.login"/></a></li>
+					<li>
+						<a href="<c:url value="/login"/>">
+							<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-log-in"></span> <spring:message code="common.login"/></span>
+							<span class="visible-xs"><spring:message code="common.login"/></span>
+						</a>
+					</li>
 	  		</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
 					<sec:authentication property="principal.username" var="userName"/>
 					<sec:authentication property="principal.type" var="userType"/>
-					<li class="dropdown" ng-class="{active:isActive('<c:url value="/user"/>')}">
+					<li class="dropdown" ng-class="{active:isActive('<c:url value="/user"/>') || isActive('<c:url value="/oauth"/>')}">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<span class="glyphicon glyphicon-user"></span> ${userName} <span class="caret"></span>
+							<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-user"></span> ${userName} <span class="caret"></span></span>
+							<span class="visible-xs">${userName} <span class="caret"></span></span>							
 						</a>
 						<ul class="dropdown-menu" role="menu">
 							<c:choose>
 								<c:when test="${userType == 'jakduk'}">
-									<li><a href="<c:url value="/user/profile"/>"><span class="glyphicon glyphicon-wrench"></span> <spring:message code="user.profile"/></a></li>
+									<li>
+										<a href="<c:url value="/user/profile"/>"><span class="glyphicon glyphicon-wrench"></span> <spring:message code="user.profile"/></a></li>
 								</c:when>
 								<c:when test="${userType == 'facebook' || userType == 'daum'}">
 									<li><a href="<c:url value="/oauth/profile"/>"><span class="glyphicon glyphicon-wrench"></span> <spring:message code="user.profile"/></a></li>

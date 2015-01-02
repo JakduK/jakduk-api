@@ -1,8 +1,7 @@
 package com.jakduk.model.web;
 
-import java.util.List;
+import org.springframework.data.annotation.Id;
 
-import com.jakduk.model.embedded.FootballClubName;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -11,6 +10,9 @@ import com.jakduk.model.embedded.FootballClubName;
  * @desc     :
  */
 public class FootballClubWrite {
+	
+	@Id
+	private String id;
 	
 	private String origin;
 
@@ -24,6 +26,13 @@ public class FootballClubWrite {
 	
 	private String fullNameEn;
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getOrigin() {
 		return origin;
@@ -75,10 +84,10 @@ public class FootballClubWrite {
 
 	@Override
 	public String toString() {
-		return "FootballClubWrite [origin=" + origin + ", active=" + active
-				+ ", shortNameKr=" + shortNameKr + ", fullNameKr=" + fullNameKr
-				+ ", shortNameEn=" + shortNameEn + ", fullNameEn=" + fullNameEn
-				+ "]";
+		return "FootballClubWrite [id=" + id + ", origin=" + origin
+				+ ", active=" + active + ", shortNameKr=" + shortNameKr
+				+ ", fullNameKr=" + fullNameKr + ", shortNameEn=" + shortNameEn
+				+ ", fullNameEn=" + fullNameEn + "]";
 	}
 
 }

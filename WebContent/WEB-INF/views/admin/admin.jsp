@@ -40,8 +40,8 @@
   </button>  
   <ul class="dropdown-menu" role="menu">
     <li><a ng-click="getEncyclopedia()">Get Encyclopedia</a></li>
-    <li><a href="<c:url value="/admin/footballclub/origin/write"/>">Football Club Origin Write</a></li>
-    <li><a href="<c:url value="/admin/footballclub/write"/>">Football Club Write</a></li>
+    <li><a ng-click="getfcOrigin()"/>Get Football Club Origin</a></li>
+    <li><a ng-click="getfc()">Get Football Club</a></li>
     <li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
   </ul>
 </div>
@@ -61,6 +61,33 @@
 </tr>
 </table>
 </div>
+
+<div ng-show="fcOrigins.length > 0">
+<h4>Football Club Origin</h4>
+<table class="table">
+<tr>
+	<th>Name</th>
+</tr>
+<tr ng-repeat="fcOrigin in fcOrigins">
+	<td><a href="<c:url value="/admin/footballclub/origin/write/{{fcOrigin.id}}"/>">{{fcOrigin.name}}</a></td>
+</tr>
+</table>
+</div>
+
+<div ng-show="fcs.length > 0">
+<h4>Football Club</h4>
+<table class="table">
+<tr>
+	<th>Origin</th><th>Active</th><th>Names</th>
+</tr>
+<tr ng-repeat="fc in fcs">
+	<td><a href="<c:url value="/admin/footballclub/write/{{fc.id}}"/>">{{fc.origin.name}}</a></td>
+	<td>{{fc.active}}</td>
+	<td><div ng-repeat="name in fc.names">Lang={{name.language}} F.N.={{name.fullName}} S.N.={{name.shortName}}</div>
+	</td>
+</tr>
+</table>
+</div>
 		
 		<jsp:include page="../include/footer.jsp"/>
 	</div>
@@ -75,7 +102,11 @@ var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.encyclopediaConn = "none";
+	$scope.fcOriginConn = "none";
+	$scope.fcConn = "none";
 	$scope.encyclopedias = [];
+	$scope.fcOrigins = [];
+	$scope.fcs = [];
 	
 	$scope.getEncyclopedia = function() {
 		var bUrl = '<c:url value="/admin/encyclopedia.json"/>';
@@ -100,9 +131,59 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		}
 	};
 	
+	$scope.getfcOrigin = function() {
+		var bUrl = '<c:url value="/admin/footballclub/origin.json"/>';
+		
+		if ($scope.fcOriginConn == "none") {
+			
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.fcOriginConn = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+
+				$scope.fcOrigins = data.fcOrigins;
+				
+				$scope.fcOriginConn = "none";
+				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.fcOriginConn = "none";
+				alert("football club orgin error");
+			});
+		}
+	};
+	
+	$scope.getfc = function() {
+		var bUrl = '<c:url value="/admin/footballclub.json"/>';
+		
+		if ($scope.fcConn == "none") {
+			
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.fcConn = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+
+				$scope.fcs = data.fcs;
+				
+				$scope.fcConn = "none";
+				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.fcConn = "none";
+				alert("football club orgin error");
+			});
+		}
+	};
+	
 	if ("${open}" != null) {
 		if ("${open}" == "encyclopedia") {
 			$scope.getEncyclopedia();
+		} else if ("${open}" == "fcOrigin") {
+			$scope.getfcOrigin();
+		} else if ("${open}" == "fc") {
+			$scope.getfc();
 		}
 	}
 	

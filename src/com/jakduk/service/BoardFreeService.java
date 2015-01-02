@@ -22,7 +22,6 @@ import org.springframework.ui.Model;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeCount;
 import com.jakduk.dao.BoardFreeDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
