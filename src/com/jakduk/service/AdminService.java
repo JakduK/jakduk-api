@@ -96,12 +96,15 @@ public class AdminService {
 	
 	public void encyclopediaWrite(Encyclopedia encyclopedia) {
 		
-		if (encyclopedia.getId() == null) {
+		if (encyclopedia.getId().isEmpty()) {
+			encyclopedia.setId(null);
 			if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
 				encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));			
 			} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
 				encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
 			}
+		} else {
+			encyclopedia.setId(encyclopedia.getId());
 		}
 		
 		encyclopediaRepository.save(encyclopedia);
@@ -150,9 +153,12 @@ public class AdminService {
 		footballClub.setOrigin(footballClubOrigin);
 		footballClub.setActive(footballClubWrite.getActive());
 		
-		if (footballClubWrite.getId() != null) {
+		if (footballClubWrite.getId().isEmpty()) {
+			footballClub.setId(null);
+		} else {
 			footballClub.setId(footballClubWrite.getId());
 		}
+		
 		ArrayList<FootballClubName> names = new ArrayList<FootballClubName>();
 		FootballClubName footballClubNameKr = new FootballClubName();
 		FootballClubName footballClubNameEn = new FootballClubName();
@@ -170,6 +176,11 @@ public class AdminService {
 	}
 	
 	public void footballClubOriginWrite(FootballClubOrigin footballClubOrigin) {
+
+		if (footballClubOrigin.getId().isEmpty()) {
+			footballClubOrigin.setId(null);
+		}
+		
 		footballClubOriginRepository.save(footballClubOrigin);
 	}
 	

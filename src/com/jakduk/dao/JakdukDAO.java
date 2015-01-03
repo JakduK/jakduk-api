@@ -1,18 +1,22 @@
 package com.jakduk.dao;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.FootballClub;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -22,7 +26,7 @@ import com.jakduk.common.CommonConst;
  */
 
 @Repository
-public class BoardFreeDAO {
+public class JakdukDAO {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -87,6 +91,34 @@ public class BoardFreeDAO {
 		}
 		
 		return commentCount;
+	}
+	
+	/**
+	 * 축구단 목록 정렬해서 가져온다. 허나 정렬이 제대로 지원이 안되는 모양인지 결국 이모양이 됐다.
+	 * @param language
+	 * @return
+	 */
+	public List<FootballClub> getFootballClubList(String language) {
+		
+		Sort.Direction sort;
+		
+		if (language.equals("ko")) {
+			sort = Sort.Direction.DESC;
+		} else {
+			sort = Sort.Direction.ASC;
+		}
+		
+		Query query = new Query();
+		query.addCriteria(Criteria.where("names.language").is(language));
+		query.fields().include("active").include("origin").include("names.$");
+		query.with(new Sort(sort, "names.fullName"));
+		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
+		
+		if (language.equals("ko")) {
+			Collections.reverse(footballClubs);
+		}
+
+		return footballClubs;
 	}
 	
 }

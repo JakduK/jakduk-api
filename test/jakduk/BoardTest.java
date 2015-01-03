@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeDAO;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardItem;
@@ -54,7 +54,7 @@ public class BoardTest {
 	BoardFreeCommentRepository boardFreeCommentRepository;
 	
 	@Autowired
-	BoardFreeDAO boardFreeDAO;
+	JakdukDAO boardFreeDAO;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -153,5 +153,4 @@ public class BoardTest {
 		
 		System.out.println("mongoAggregationTest02=" + map);
 	}
-	
 }

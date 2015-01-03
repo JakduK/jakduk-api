@@ -22,7 +22,7 @@ import org.springframework.ui.Model;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeDAO;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
@@ -58,7 +58,7 @@ public class BoardFreeService {
 	private BoardFreeCommentRepository boardFreeCommentRepository;
 	
 	@Autowired
-	private BoardFreeDAO boardFreeDAO;
+	private JakdukDAO boardFreeDAO;
 	
 	@Autowired
 	private CommonService commonService;

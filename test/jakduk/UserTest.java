@@ -2,23 +2,29 @@ package jakduk;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
 
 
@@ -41,6 +47,15 @@ public class UserTest {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	FootballClubRepository footballClubRepository;
+	
+	@Autowired
+	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	JakdukDAO jakdukDAO;
 	
 	@Before
 	public void setUp() {
@@ -85,6 +100,13 @@ public class UserTest {
 		System.out.println("roleName=" + roleName);
 		System.out.println("roleNumber=" + CommonRole.getRoleNumber(roleName));
 			
+	}
+	
+	@Test
+	public void getFootballClubList() {
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList("en");
+		System.out.println("getFootballClubList=" + footballClubs);
+		
 	}
 
 }

@@ -21,6 +21,7 @@ import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.BoardWriter;
@@ -56,6 +57,9 @@ public class UserService {
 	
 	@Autowired
 	private FootballClubRepository footballClubRepository;
+	
+	@Autowired
+	private JakdukDAO jakdukDAO;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -319,7 +323,7 @@ public class UserService {
 
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			
-			List<FootballClub> footballClubs = commonService.getFootballClubs(language);
+			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
 			
 			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			UserProfile userProfile = userRepository.userProfileFindById(authUser.getId());
@@ -468,7 +472,7 @@ public class UserService {
 		
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			
-			List<FootballClub> footballClubs = commonService.getFootballClubs(language);
+			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
 			
 			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
