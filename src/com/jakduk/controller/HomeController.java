@@ -69,24 +69,26 @@ public class HomeController {
 	@RequestMapping(value = "/sample")
 	public String sample(Model model) {
 		
-//		logger.debug("home");
-		
 		return "home/sample";
 	}
 	
 	@RequestMapping(value = "/sample02")
 	public String sample02(Model model) {
 		
-//		logger.debug("home");
-		
 		return "home/sample02";
 	}
 	
-	@RequestMapping(value = "/unipaper")
-	public String unipaper(Model model) {
+	@RequestMapping(value = "/sample03")
+	public String sample03(Model model) {
 		
-		return "home/unipaper";
+		return "home/sample03";
 	}
+	
+	@RequestMapping(value = "/sample04")
+	public String sample04(Model model) {
+		
+		return "home/sample04";
+	}	
 	
 	@RequestMapping(value = "/angular01")
 	public String angular01(Model model) {

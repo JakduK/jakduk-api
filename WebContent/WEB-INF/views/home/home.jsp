@@ -17,7 +17,7 @@
 
 <div class="jumbotron">
 	<h3>{{encyclopedia.subject}} <span class="label label-default">{{encyclopedia.kind}}</span></h3>
-	<p><h3><small>{{encyclopedia.content}}</small></h3></p>
+	<h3><small>{{encyclopedia.content}}</small></h3>
 	<p>
 	 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
  			<span class="glyphicon glyphicon-refresh"></span>

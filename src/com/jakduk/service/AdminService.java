@@ -1,10 +1,10 @@
 package com.jakduk.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,6 @@ import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.embedded.FootballClubName;
-import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.repository.BoardCategoryRepository;
@@ -24,8 +23,6 @@ import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
-
-
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -178,21 +175,19 @@ public class AdminService {
 	
 	public void boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
 		BoardCategory boardCategory = new BoardCategory();
+		
+		if (boardCategoryWrite.getId() != null) {
+			boardCategory.setId(boardCategoryWrite.getId());
+		}
+		
 		boardCategory.setName(boardCategoryWrite.getName());
 		boardCategory.setResName(boardCategoryWrite.getResName());
 		
-		String originUsingBoard = boardCategoryWrite.getUsingBoard();
-		
+		String[] originUsingBoard = boardCategoryWrite.getUsingBoard();
+
 		if (originUsingBoard != null) {
-			ArrayList<String> usingBoard = new ArrayList<String>();
-			String splitUsingBoard[] = originUsingBoard.split(",");
-			
-			for (int index = 0 ; index < splitUsingBoard.length ; index++) {
-				String temp = splitUsingBoard[index];
-				usingBoard.add(temp);
-			}
-			
-			boardCategory.setUsingBoard(usingBoard);
+			ArrayList<String> usingBoard = new ArrayList<String>(Arrays.asList(originUsingBoard));
+			boardCategory.setUsingBoard(usingBoard);			
 		}
 		
 		if (logger.isDebugEnabled()) {
@@ -238,6 +233,29 @@ public class AdminService {
 		List<FootballClub> fcs = footballClubRepository.findAll();
 		
 		model.addAttribute("fcs", fcs);
+		
+		return model;
+	}
+	
+	public Model getBoardCategoryList(Model model) {
+		List<BoardCategory> boardCategorys = boardCategoryRepository.findAll();
+		
+		model.addAttribute("boardCategorys", boardCategorys);
+		
+		return model;
+	}
+	
+	public Model getBoardCategory(Model model, String id) {
+		BoardCategory boardCategory = boardCategoryRepository.findOne(id);
+		
+		BoardCategoryWrite boardCategoryWrite = new BoardCategoryWrite();
+		boardCategoryWrite.setId(boardCategory.getId());
+		boardCategoryWrite.setName(boardCategory.getName());
+		boardCategoryWrite.setResName(boardCategory.getResName());
+		String[] usingBoard = boardCategory.getUsingBoard().toArray(new String[boardCategory.getUsingBoard().size()]);
+		boardCategoryWrite.setUsingBoard(usingBoard);
+		
+		model.addAttribute("boardCategoryWrite", boardCategoryWrite);
 		
 		return model;
 	}

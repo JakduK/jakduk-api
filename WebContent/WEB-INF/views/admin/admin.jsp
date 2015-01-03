@@ -39,10 +39,10 @@
     <span class="caret"></span>
   </button>  
   <ul class="dropdown-menu" role="menu">
-    <li><a ng-click="getEncyclopedia()">Get Encyclopedia</a></li>
-    <li><a ng-click="getfcOrigin()"/>Get Football Club Origin</a></li>
-    <li><a ng-click="getfc()">Get Football Club</a></li>
-    <li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
+    <li><a ng-click="getData('encyclopedia')">Get Encyclopedia</a></li>
+    <li><a ng-click="getData('fcOrigin')"/>Get Football Club Origin</a></li>
+    <li><a ng-click="getData('fc')">Get Football Club</a></li>
+    <li><a ng-click="getData('boardCategory')">Get Board Category</a></li>
   </ul>
 </div>
 
@@ -88,6 +88,21 @@
 </tr>
 </table>
 </div>
+
+<div ng-show="boardCategorys.length > 0">
+<h4>Board Category</h4>
+<table class="table">
+<tr>
+	<th>Name</th><th>ResName</th><th>UsingBoard</th>
+</tr>
+<tr ng-repeat="boardCategory in boardCategorys">
+	<td><a href="<c:url value="/admin/board/category/write/{{boardCategory.id}}"/>">{{boardCategory.name}}</a></td>
+	<td>{{boardCategory.resName}}</td>
+	<td><div ng-repeat="usingBoard in boardCategory.usingBoard">{{usingBoard}}</div>
+	</td>
+</tr>
+</table>
+</div>
 		
 		<jsp:include page="../include/footer.jsp"/>
 	</div>
@@ -101,91 +116,65 @@
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("adminCtrl", function($scope, $http) {
-	$scope.encyclopediaConn = "none";
-	$scope.fcOriginConn = "none";
-	$scope.fcConn = "none";
+	$scope.dataConn = "none";
 	$scope.encyclopedias = [];
 	$scope.fcOrigins = [];
 	$scope.fcs = [];
+	$scope.boardCategorys = [];
 	
-	$scope.getEncyclopedia = function() {
-		var bUrl = '<c:url value="/admin/encyclopedia.json"/>';
+	$scope.getData = function(type) {
+		var bUrl;
 		
-		if ($scope.encyclopediaConn == "none") {
+		if (type == "encyclopedia") {
+			bUrl = '<c:url value="/admin/encyclopedia.json"/>';
+		} else if (type == "fcOrigin") {
+			bUrl = '<c:url value="/admin/footballclub/origin.json"/>';
+		} else if (type == "fc") {
+			bUrl = '<c:url value="/admin/footballclub.json"/>';
+		} else if (type == "boardCategory") {
+			bUrl = '<c:url value="/admin/board/category.json"/>';
+		}
+		
+		if ($scope.dataConn == "none") {
 			
 			var reqPromise = $http.get(bUrl);
 			
-			$scope.encyclopediaConn = "loading";
+			$scope.dataConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
 
-				$scope.encyclopedias = data.encyclopedias;
+				$scope.clearData();
 				
-				$scope.encyclopediaConn = "none";
+				if (type == "encyclopedia") {
+					$scope.encyclopedias = data.encyclopedias;
+				} else if (type == "fcOrigin") {
+					$scope.fcOrigins = data.fcOrigins;
+				} else if (type == "fc") {
+					$scope.fcs = data.fcs;
+				} else if (type == "boardCategory") {
+					$scope.boardCategorys = data.boardCategorys;
+				}
+				
+				$scope.dataConn = "none";
 				
 			});
 			reqPromise.error(function(data, status, headers, config) {
-				$scope.encyclopediaConn = "none";
-				alert("encyclopedia error");
+				$scope.dataConn = "none";
+				alert("get data error");
 			});
 		}
 	};
 	
-	$scope.getfcOrigin = function() {
-		var bUrl = '<c:url value="/admin/footballclub/origin.json"/>';
-		
-		if ($scope.fcOriginConn == "none") {
-			
-			var reqPromise = $http.get(bUrl);
-			
-			$scope.fcOriginConn = "loading";
-			
-			reqPromise.success(function(data, status, headers, config) {
-
-				$scope.fcOrigins = data.fcOrigins;
-				
-				$scope.fcOriginConn = "none";
-				
-			});
-			reqPromise.error(function(data, status, headers, config) {
-				$scope.fcOriginConn = "none";
-				alert("football club orgin error");
-			});
-		}
-	};
-	
-	$scope.getfc = function() {
-		var bUrl = '<c:url value="/admin/footballclub.json"/>';
-		
-		if ($scope.fcConn == "none") {
-			
-			var reqPromise = $http.get(bUrl);
-			
-			$scope.fcConn = "loading";
-			
-			reqPromise.success(function(data, status, headers, config) {
-
-				$scope.fcs = data.fcs;
-				
-				$scope.fcConn = "none";
-				
-			});
-			reqPromise.error(function(data, status, headers, config) {
-				$scope.fcConn = "none";
-				alert("football club orgin error");
-			});
-		}
-	};
-	
-	if ("${open}" != null) {
-		if ("${open}" == "encyclopedia") {
-			$scope.getEncyclopedia();
-		} else if ("${open}" == "fcOrigin") {
-			$scope.getfcOrigin();
-		} else if ("${open}" == "fc") {
-			$scope.getfc();
-		}
+	if ("${open}" != null && "${open}" != "") {
+		$scope.getData("${open}");
 	}
+	
+	$scope.clearData = function() {
+		$scope.encyclopedias = [];
+		$scope.fcOrigins = [];
+		$scope.fcs = [];
+		$scope.boardCategorys = [];
+	};
 	
 });
 

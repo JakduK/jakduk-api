@@ -14,6 +14,7 @@
 <h4>Write BoardCategory.</h4>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="boardCategoryWrite" action="${contextPath}/admin/board/category/write" method="POST">
+<form:hidden path="id"/>
 <p>ex) free</p>
 <p>
 NAME : 	<form:input path="name" cssClass="form-control" placeholder="name"/>

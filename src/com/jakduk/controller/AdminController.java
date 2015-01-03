@@ -155,6 +155,15 @@ public class AdminController {
 		return "admin/boardCategoryWrite";
 	}
 	
+	@RequestMapping(value = "/board/category/write/{id}", method = RequestMethod.GET)
+	public String boardCategoryWrite(Model model,
+			@PathVariable String id) {
+		
+		adminService.getBoardCategory(model, id);
+		
+		return "admin/boardCategoryWrite";
+	}
+	
 	@RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
 	public String boardCategoryWrite(@Valid BoardCategoryWrite boardCategoryWtite, BindingResult result) {
 		
@@ -165,7 +174,7 @@ public class AdminController {
 		
 		adminService.boardCategoryWrite(boardCategoryWtite);
 
-		return "redirect:/admin";
+		return "redirect:/admin/settings?open=boardCategory";
 	}
 	
 	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
@@ -184,6 +193,12 @@ public class AdminController {
 	public void footballClub(Model model) {
 		
 		adminService.getFootballClubList(model);
+	}
+	
+	@RequestMapping(value = "/board/category", method = RequestMethod.GET)
+	public void boardCategory(Model model) {
+		
+		adminService.getBoardCategoryList(model);
 	}
 
 }

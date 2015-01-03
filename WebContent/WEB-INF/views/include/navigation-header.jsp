@@ -9,22 +9,19 @@
 
 <h4><a class="text-muted" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a></h4>
 
-<div class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default">
 	<div class="container-fluid" ng-controller="headerCtrl">
-		<nav>
-			<ul class="nav nav-pills navbar-nav">
+			<ul class="nav  nav-pills">
 				<li ng-class="{active:isActive('<c:url value="/about"/>')}">
 					<a href="<c:url value="/about"/>"><spring:message code="about"/></a>
 				</li>
 				<li ng-class="{active:isActive('<c:url value="/board"/>')}">
 					<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
 				</li>
-			</ul>
-			<ul class="nav nav-pills navbar-nav navbar-right">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-globe"></span> <spring:message code="common.language"/> <span class="caret"></span></span>
-						<span class="visible-xs"><spring:message code="common.language"/> <span class="caret"></span></span>						
+						<span class="visible-xs"> <spring:message code="common.language"/> <span class="caret"></span></span>						
 					</a>
 					<ul class="dropdown-menu" role="menu">
 						<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
@@ -62,9 +59,8 @@
 					</li>           
     		</sec:authorize>
 	    </ul>          
-	  </nav>
 	</div><!-- /.container -->
-</div><!-- /.navbar -->
+</nav><!-- /.navbar -->
 
 <script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
 <script type="text/javascript">

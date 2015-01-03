@@ -1,6 +1,7 @@
 package com.jakduk.model.web;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.annotation.Id;
 
 
 /**
@@ -11,6 +12,9 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class BoardCategoryWrite {
 	
+	@Id
+	private String id;
+	
 	@NotEmpty
 	private String name;
 	
@@ -18,7 +22,15 @@ public class BoardCategoryWrite {
 	private String resName;
 	
 	@NotEmpty
-	private String usingBoard;
+	private String[] usingBoard;
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -35,19 +47,19 @@ public class BoardCategoryWrite {
 	public void setResName(String resName) {
 		this.resName = resName;
 	}
-
-	public String getUsingBoard() {
+	
+	public String[] getUsingBoard() {
 		return usingBoard;
 	}
 
-	public void setUsingBoard(String usingBoard) {
+	public void setUsingBoard(String[] usingBoard) {
 		this.usingBoard = usingBoard;
 	}
 
 	@Override
 	public String toString() {
-		return "BoardCategoryWrite [name=" + name + ", resName=" + resName
-				+ ", usingBoard=" + usingBoard + "]";
+		return "BoardCategoryWrite [id=" + id + ", name=" + name + ", resName="
+				+ resName + ", usingBoard=" + usingBoard + "]";
 	}
 
 }
