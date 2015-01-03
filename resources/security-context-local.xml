@@ -43,7 +43,7 @@
 		<access-denied-handler error-page="/denied" />
 		
 		<session-management>
-			<concurrency-control max-sessions="1" expired-url="/login/duplicate"/>
+			<concurrency-control max-sessions="3" expired-url="/login/duplicate"/>
 		</session-management>
 		
 		<logout invalidate-session="true" logout-url="/logout" logout-success-url="/logout/success"/>					

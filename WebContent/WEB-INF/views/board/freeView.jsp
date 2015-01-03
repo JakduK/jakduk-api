@@ -130,7 +130,7 @@
  						<strong>{{comment.writer.username}}</strong> | 
  						<small>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</small>
  					</div>
- 					<div class="col-xs-12" ng-bind-html="comment.content"></div>
+ 					<div class="col-xs-12"><p ng-bind-html="comment.content"></p></div>
  					<div class="col-xs-12">
 						<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
 						  <span class="text-primary" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">

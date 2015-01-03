@@ -16,7 +16,7 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <div class="jumbotron">
-	<h3>{{encyclopedia.subject}} <span class="label label-default">{{encyclopedia.kind}}</span></h3>
+	<h3>{{encyclopedia.subject}} <small><span class="label label-primary">{{encyclopedia.kind}}</span></small></h3>
 	<h3><small>{{encyclopedia.content}}</small></h3>
 	<p>
 	 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
