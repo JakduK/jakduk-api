@@ -1,51 +1,44 @@
 K LEAGUE JAKDU KING
 ===================
 
-K리그 작두왕
+K LEAGUE JAKDU KING
 
-K League Community Web Application
+### What is K LEAGUE JAKDU KING?
+It's the name of K League Community Web Application.
+The word ‘K LEAGUE JAKDU KING’ is formed by combining ‘K LEAGUE’, ‘JAKDU’ and 'KING' to mean a person who is right about the result of the game like he was possessed.
 
-### How to set up developement environment
 
-1. Pre-requisite
-    * Git Client
-    * JDK 1.7.x
-    * [mongodb](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/)
-    * tomcat
-    * Maven
+### License
+There is no license yet, meaning that anyone can use and modify it at no cost.
 
-1. Checkout sources.
-```bash
-$ git clone git@github.com:<your_forked_repository>/JakduK.git
-```
+### IDE
+This project is based on Eclipse. You can import the project using git clone.
 
-SUMMARY
--------
+### Used technologies 
+popular open source
 
-#### IDE
-
-* Eclipse
+#### JAVA
+* JDK 1.8
 
 #### Dependency Management
-
 * Apache Maven
 
 #### Database
-
 * mongoDB
 
 #### WAS
+* Apache tmocat 8.x
 
-* Apache tmocat 7.x
+#### Spring Framework
+* Spring Core
+* Spring Security
 
-#### Core
+#### Front end (CSS, Javascript)
+* Bootstrap
+* AngularJS
+* [Summernote](https://github.com/HackerWins/summernote), [angular-summernote](https://github.com/outsideris/angular-summernote)
+* font-awesome
 
-* Spring framework
-⋅⋅Spring Security
-
-#### Front end
-
-* Bootstrap 3.1.1
-* AngularJS 1.3.0
-* [Summernode](https://github.com/HackerWins/summernote), [angular-summernode](https://github.com/outsideris/angular-summernote)
+### Finding contributors
+If you want to help to develop this project, anyone who wants to come is welcome.
 

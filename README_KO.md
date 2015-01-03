@@ -21,7 +21,7 @@ Eclipse 환경에서 개발했습니다. git clone 으로 프로젝트를 가져
 유명하고 유능한 수많은 오픈소스를 가져와서 활용을 했습니다.
 
 #### JAVA
-* JDK 1.6
+* JDK 1.8
 
 #### Dependency Management
 * Apache Maven
@@ -30,7 +30,7 @@ Eclipse 환경에서 개발했습니다. git clone 으로 프로젝트를 가져
 * mongoDB
 
 #### WAS
-* Apache tmocat 7.x
+* Apache tmocat 8.x
 
 #### Spring Framework
 * Spring Core
