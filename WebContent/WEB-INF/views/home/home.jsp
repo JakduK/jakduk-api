@@ -16,13 +16,11 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <div class="jumbotron">
-	<h3>{{encyclopedia.subject}} <small><span class="label label-primary">{{encyclopedia.kind}}</span></small></h3>
-	<h3><small>{{encyclopedia.content}}</small></h3>
-	<p>
-	 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
- 			<span class="glyphicon glyphicon-refresh"></span>
- 		</button>
- </p>
+	<h4>{{encyclopedia.subject}} <small><span class="label label-primary">{{encyclopedia.kind}}</span></small></h4>
+	<h5>{{encyclopedia.content}}</h5>
+ 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
+		<span class="glyphicon glyphicon-refresh"></span>
+	</button>
 </div>  
 
 <div class="row">

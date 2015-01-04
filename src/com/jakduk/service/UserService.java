@@ -202,7 +202,7 @@ public class UserService {
 	
 	public Model getOAuthWriteDetails(Model model, String language) {
 		
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language);
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
 		
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

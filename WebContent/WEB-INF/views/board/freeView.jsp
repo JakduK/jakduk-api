@@ -92,7 +92,6 @@
 				<i class="fa fa-thumbs-o-up fa-lg"></i>
 				{{numberOfLike}}
 			</span>
-			
 		</button>
 		<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
 			<spring:message code="board.dislike"/>
@@ -101,7 +100,6 @@
 				{{numberOfDislike}}
 			</span>
 		</button>
-		<p></p>
 		<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
 	</div>
 </div> <!-- /panel -->
@@ -156,7 +154,6 @@
 		<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-show="commentCount">
 			<spring:message code="common.button.load.comment"/> <span class="glyphicon glyphicon-chevron-down"></span>
 		</button>
-		<p></p>
 		<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
 	</div>
 	</div>
