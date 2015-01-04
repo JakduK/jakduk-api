@@ -46,7 +46,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 				
 				if (logger.isInfoEnabled()) {
-					logger.info("load user JakdukPrincipal=" + jakdukPrincipal);
+					logger.info("load Jakduk username=" + jakdukPrincipal.getUsername());
 				}
 
 				return jakdukPrincipal;

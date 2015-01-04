@@ -86,7 +86,7 @@ public class OAuthDetailService implements UserDetailsService {
 			}
 			
 			if (logger.isDebugEnabled()) {
-				logger.debug("oauth user=" + user);
+				logger.debug("oauth user info=" + user);
 			}
 		}
 		
