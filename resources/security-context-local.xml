@@ -55,13 +55,8 @@
 	<beans:bean id="oauthSuccessHandler" class="com.jakduk.authentication.common.OAuthSuccessHandler"/>
 	<beans:bean id="oauthFailureHandler" class="com.jakduk.authentication.common.OAuthFailureHandler"/>
 	
-	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
-	<beans:bean id="jakdukDetailsService" class="com.jakduk.authentication.jakduk.JakdukDetailsService"/>
-	
 	<authentication-manager alias="authenticationManager">
-		<authentication-provider user-service-ref="jakdukDetailsService">
-			<password-encoder ref="encoder"/>
-		</authentication-provider>
+		<authentication-provider ref="jakdukAuthenticationProvider"/>
 		<authentication-provider ref="facebookAuthenticationProvider"/>
 		<authentication-provider ref="daumAuthenticationProvider"/>
 	</authentication-manager>
@@ -106,6 +101,9 @@
 		<beans:property name="profileUri" value="#{daumProp['daum.profile-uri']}"/>
 	</beans:bean>
 	
+	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
+	<beans:bean id="jakdukDetailsService" class="com.jakduk.authentication.jakduk.JakdukDetailsService"/>	
+	
 	<beans:bean id="oauthFilter" class="com.jakduk.authentication.common.OAuthProcessingFilter">
 		<beans:property name="authenticationManager" ref="authenticationManager"/>
 		<beans:property name="authenticationSuccessHandler" ref="oauthSuccessHandler"/>
@@ -118,6 +116,11 @@
 	
 	<beans:bean id="daumAuthenticationProvider" class="com.jakduk.authentication.daum.DaumAuthenticationProvider">
 		<beans:property name="daumService" ref="daumService"/>
+	</beans:bean>
+	
+	<beans:bean id="jakdukAuthenticationProvider" class="com.jakduk.authentication.jakduk.JakdukAuthenticationProvider">
+		<beans:property name="passwordEncoder" ref="encoder"/>
+		<beans:property name="userDetailsService" ref="jakdukDetailsService"/>
 	</beans:bean>
 
 </beans:beans>

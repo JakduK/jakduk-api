@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
@@ -35,6 +36,11 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 		String remember = request.getParameter("remember");
 		String loginRedirect = request.getParameter("loginRedirect");
 		String path = String.format("%s/", request.getContextPath());
+		String result = "failure";
+		
+		if (exception.getClass().isAssignableFrom(LockedException.class)) {
+			result = "locked";
+		}
 		
 		if (remember != null && remember.equals("on")) {
 			String email = request.getParameter("j_username");
@@ -48,7 +54,7 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
 		}
 		
-		response.sendRedirect(request.getContextPath() + "/login?status=1&loginRedirect=" + loginRedirect);
+		response.sendRedirect(request.getContextPath() + "/login?result=" + result + "&loginRedirect=" + loginRedirect);
 		
 	}
 

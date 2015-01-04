@@ -85,7 +85,7 @@ public class UserWriteController {
 		
 		commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
 		
-		return "redirect:/login?status=2";
+		return "redirect:/login?result=sucess";
 	}
 
 }

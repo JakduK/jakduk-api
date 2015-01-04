@@ -24,10 +24,13 @@
 				</div>
 		  	<div class="panel-body">
 				<c:choose>
-					<c:when test="${status == 1}">
-						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.faulure"/></div>
+					<c:when test="${result == 'failure'}">
+						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure"/></div>
 					</c:when>
-					<c:when test="${status == 2}">
+					<c:when test="${result == 'locked'}">
+						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure.locked"/></div>
+					</c:when>					
+					<c:when test="${result == 'sucess'}">
 						<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
 					</c:when>                		
 				</c:choose>

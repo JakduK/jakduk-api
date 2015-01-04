@@ -113,7 +113,7 @@ public class BoardTest {
 	@Test
 	public void test03() {
 		
-		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(23);
+		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(1);
 //		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
 		
 		BoardItem boardItem = new BoardItem();

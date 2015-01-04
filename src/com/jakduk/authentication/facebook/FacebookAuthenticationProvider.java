@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.Assert;
 
-import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthDetailService;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.common.CommonConst;

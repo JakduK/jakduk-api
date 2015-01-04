@@ -26,7 +26,7 @@ public class AccessController {
 	@RequestMapping("/login")
 	public String login(HttpServletRequest request,
 			Model model,
-			@RequestParam(required = false) Integer status,
+			@RequestParam(required = false) String result,
 			@RequestParam(required = false) String loginRedirect) throws UnsupportedEncodingException {
 		
 		if (loginRedirect == null) {
@@ -37,7 +37,7 @@ public class AccessController {
 			model.addAttribute("loginRedirect", URLEncoder.encode(loginRedirect, "UTF-8"));
 		}
 		
-		model.addAttribute("status", status);
+		model.addAttribute("result", result);
 		
 		return "access/login";
 	}
