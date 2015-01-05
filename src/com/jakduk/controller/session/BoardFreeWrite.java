@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
@@ -35,7 +37,7 @@ public class BoardFreeWrite {
 	@RequestMapping(value = "/free/write", method = RequestMethod.GET)
 	public String freeWrite(Model model) {
 		
-		boardFreeService.getWrite(model);
+		boardFreeService.getFreeWrite(model);
 		
 		return "board/freeWrite";
 	}
@@ -50,6 +52,15 @@ public class BoardFreeWrite {
 		boardFreeService.write(boardFree);
 		sessionStatus.setComplete();
 		
+		return "redirect:/board/free";
+	}
+	
+	@RequestMapping(value = "/free/edit/{seq}", method = RequestMethod.GET)
+	public String freeEdit(@PathVariable int seq, Model model) {
+		
+		boardFreeService.getFreeEdit(model, seq);
+		
+//		return "board/freeWrite";
 		return "redirect:/board/free";
 	}
 	

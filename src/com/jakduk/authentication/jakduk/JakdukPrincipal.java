@@ -184,7 +184,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		StringBuilder sb = new StringBuilder();
 		sb.append(super.toString()).append(": ");
 		sb.append("email: ").append(this.email).append("; ");
-		sb.append("userid: ").append(this.id).append("; ");
+		sb.append("id: ").append(this.id).append("; ");
 		sb.append("password: [PROTECTED]; ");
 		sb.append("username: ").append(this.username).append("; ");
 		sb.append("Enabled: ").append(this.enabled).append("; ");

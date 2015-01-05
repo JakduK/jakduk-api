@@ -1,4 +1,7 @@
 body { padding-top: 10px; padding-bottom: 10px;}
+footer {
+  padding: 0px;
+  }
 
 	.container { padding-left:8px; padding-right:8px;}
  .container .jumbotron { padding-left:10px; padding-right:10px;}

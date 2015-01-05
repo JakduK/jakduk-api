@@ -43,6 +43,7 @@
 </sec:authorize>
 <sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
 	<c:set var="authRole" value="USER"/>
+	<sec:authentication property="principal.id" var="accountId"/>
 </sec:authorize>
 
 <c:choose>
@@ -57,6 +58,11 @@
 	</button>	
 	</c:when>	
 </c:choose>
+<c:if test="${accountId == post.writer.userId}">
+	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+		<spring:message code="common.button.edit"/>
+	</button>
+</c:if>
 
 <p></p>
 
@@ -202,19 +208,18 @@
 </div> <!-- /.container -->
 
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
-<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.0.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-sanitize.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/js/angular-sanitize.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize", "ui.bootstrap"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize"]);
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};

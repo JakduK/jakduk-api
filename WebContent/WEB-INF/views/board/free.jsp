@@ -25,7 +25,7 @@
 
 <div class="page-header">
   <h4>
-	  <a href="<c:url value="/board/free"/>"><spring:message code="board.name.free"/></a>
+	  <a href="<c:url value="/board"/>"><spring:message code="board.name.free"/></a>
 	  <small><spring:message code="board.name.free.about"/></small>
   </h4>
 </div>
@@ -80,7 +80,7 @@
 <c:forEach items="${posts}" var="post">
 	<li class="list-group-item">
 	<div class="row">
-	<div class="col-sm-2">
+	<div class="col-sm-2">	
 		${post.seq}
 		|
 		<c:if test="${!empty post.categoryName}">
@@ -111,7 +111,7 @@
 			<c:otherwise>
 				<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.time}" />
 			</c:otherwise>
-		</c:choose>
+		</c:choose>		
 	</div>
 	<div class="col-sm-3">
 		<spring:message code="board.view"/><strong> ${post.views}</strong> |
@@ -132,9 +132,9 @@
 					<c:otherwise>0</c:otherwise>
 				</c:choose>
 			</strong>
-		</span>
-	</div>
-	</div> <!-- /row -->
+		</span>		
+	</div>	
+	</div> <!-- /row -->	
 	</li>
 </c:forEach>
 </ul>

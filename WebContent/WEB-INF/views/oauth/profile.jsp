@@ -30,8 +30,7 @@
     <div class="col-sm-3">
 			<c:choose>
 				<c:when test="${not empty oauthProfile.footballClubName}">
-					<p class="form-control-static visible-sm visible-md visible-lg">${oauthProfile.footballClubName.fullName}</p>
-					<p class="form-control-static visible-xs">${oauthProfile.footballClubName.shortName}</p>
+					<p class="form-control-static">${oauthProfile.footballClubName.fullName}</p>
 				</c:when>
 				<c:otherwise>
 					<p class="form-control-static"><spring:message code="common.none"/></p>

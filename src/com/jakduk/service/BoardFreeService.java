@@ -73,11 +73,23 @@ public class BoardFreeService {
 	 * @param model
 	 * @return
 	 */
-	public Model getWrite(Model model) {
+	public Model getFreeWrite(Model model) {
 		
 		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
 		
 		model.addAttribute("boardFree", new BoardFree());
+		model.addAttribute("boardCategorys", boardCategorys);
+		
+		return model;
+	}
+	
+	public Model getFreeEdit(Model model, int seq) {
+		// 여기서 이 글을 수정할 수 있는지 권한 체크가 필요. 또한 수정 내역(히스토리)도 저장해야 한다.
+		
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+		
+		model.addAttribute("boardFree", boardFree);
 		model.addAttribute("boardCategorys", boardCategorys);
 		
 		return model;

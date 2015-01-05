@@ -7,11 +7,11 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
-<h4><a class="text-muted" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a></h4>
+<h4><a class="text-muted" href="<c:url value="/"/>"><spring:message code="common.jakduk"/></a></h4>
 
 <nav class="navbar navbar-default">
 	<div class="container-fluid" ng-controller="headerCtrl">
-			<ul class="nav  nav-pills">
+			<ul class="nav nav-pills">
 				<li ng-class="{active:isActive('<c:url value="/about"/>')}">
 					<a href="<c:url value="/about"/>"><spring:message code="about"/></a>
 				</li>

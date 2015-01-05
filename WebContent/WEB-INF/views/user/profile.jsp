@@ -39,8 +39,7 @@
     <div class="col-sm-3">
 			<c:choose>
 				<c:when test="${not empty userProfile.footballClubName}">
-					<p class="form-control-static visible-sm visible-md visible-lg">${userProfile.footballClubName.fullName}</p>
-					<p class="form-control-static visible-xs">${userProfile.footballClubName.shortName}</p>
+					<p class="form-control-static">${userProfile.footballClubName.fullName}</p>
 				</c:when>
 				<c:otherwise>
 					<p class="form-control-static"><spring:message code="common.none"/></p>
