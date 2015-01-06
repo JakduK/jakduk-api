@@ -295,7 +295,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 
 	// summernote config
 	$scope.options = {
-			height: 80,
+			height: 100,
 			toolbar: [
 	      ['font', ['bold']],
 	      // ['fontsize', ['fontsize']], // Still buggy

@@ -1,5 +1,6 @@
 package com.jakduk.service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
@@ -33,6 +38,7 @@ import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
+import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
@@ -83,16 +89,40 @@ public class BoardFreeService {
 		return model;
 	}
 	
-	public Model getFreeEdit(Model model, int seq) {
-		// 여기서 이 글을 수정할 수 있는지 권한 체크가 필요. 또한 수정 내역(히스토리)도 저장해야 한다.
+	public Integer getFreeEdit(Model model, int seq, HttpServletResponse response) {
+		
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String accountId = principal.getId();
+		
+		if (accountId == null) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
 		
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		
+		if (boardFree.getWriter() == null) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
+		if (!accountId.equals(boardFree.getWriter().getUserId())) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
 		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
 		
 		model.addAttribute("boardFree", boardFree);
 		model.addAttribute("boardCategorys", boardCategorys);
 		
-		return model;
+		return HttpServletResponse.SC_OK;
+	}
+
+	public void checkBoardFreeEdit(BoardFree boardFree, BindingResult result) {
+		
+		String id = boardFree.getId();
+		
+		if (id.isEmpty()) {
+			result.rejectValue("id", "board.msg.cannot.edit");
+		}
 	}
 	
 	/**
@@ -116,11 +146,30 @@ public class BoardFreeService {
 		boardFreeRepository.save(boardFree);
 
 		if (logger.isInfoEnabled()) {
-			logger.info("new post created. user id=" + userid + ", username=" + username);
+			logger.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("boardFree=" + boardFree);
+			logger.debug("boardFree(new) = " + boardFree);
+		}
+		
+	}
+	
+	public void freeEdit(BoardFree newBoardFree) {
+		
+		BoardFree getBoardFree = boardFreeRepository.findOne(newBoardFree.getId());
+		getBoardFree.setCategoryName(newBoardFree.getCategoryName());
+		getBoardFree.setSubject(newBoardFree.getSubject());
+		getBoardFree.setContent(newBoardFree.getContent());
+
+		boardFreeRepository.save(getBoardFree);
+
+		if (logger.isInfoEnabled()) {
+			logger.info("post was edited. post seq=" + getBoardFree.getSeq() + ", subject=" + getBoardFree.getSubject());
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("BoardFree(edit) = " + getBoardFree);
 		}
 		
 	}
@@ -210,10 +259,15 @@ public class BoardFreeService {
 	 * @param boardListInfo
 	 * @return
 	 */
-	public Model getFreeView(Model model, Locale locale, int seq, BoardListInfo boardListInfo, Boolean isAddCookie) {
+	public Integer getFreeView(Model model, Locale locale, int seq, BoardListInfo boardListInfo, Boolean isAddCookie) {
 		
 		try {
 			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+			
+			if (boardFree == null) {
+				return HttpServletResponse.SC_UNAUTHORIZED;
+			}
+			
 			BoardCategory boardCategory = boardCategoryRepository.findByName(boardFree.getCategoryName());
 			
 			if (isAddCookie == true) {
@@ -233,13 +287,12 @@ public class BoardFreeService {
 			model.addAttribute("timeNow", timeNow);
 			model.addAttribute("listInfo", boardListInfo);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-			
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
 		
-		return model;
+		return HttpServletResponse.SC_OK;
 	}
 	
 	/**

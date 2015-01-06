@@ -23,9 +23,10 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-<form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/write" method="POST"
+<form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/edit" method="POST"
 	ng-submit="onSubmit($event)">
-	<legend><spring:message code="board.write"/></legend>
+	<form:hidden path="id"/>
+	<legend><spring:message code="board.edit"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
 			<div class="col-sm-3">
@@ -70,7 +71,7 @@
 		<a class="btn btn-danger" href="<c:url value="/board"/>"><spring:message code="common.button.cancel"/></a>
   </div>
 
-<form:textarea path="content" class="hidden" ng-model="content" ng-init="content='${boardFree.content}'"/>  
+<form:textarea path="content" ng-model="content" ng-init="content='${boardFree.content}'" class="hidden"/>  
 </form:form>
     
 <jsp:include page="../include/footer.jsp"/>

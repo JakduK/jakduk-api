@@ -1,5 +1,6 @@
 package com.jakduk.controller;
 
+import java.io.IOException;
 import java.util.Locale;
 
 import javax.annotation.Resource;
@@ -55,11 +56,16 @@ public class BoardController {
 	
 	@RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
 	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo listInfo, Model model
-			, HttpServletRequest request, HttpServletResponse response) {
+			, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		Locale locale = localeResolver.resolveLocale(request);	
 		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.BOARD_NAME_FREE, seq);
-		boardFreeService.getFreeView(model, locale, seq, listInfo, isAddCookie);
+		Integer status = boardFreeService.getFreeView(model, locale, seq, listInfo, isAddCookie);
+		
+		if (!status.equals(HttpServletResponse.SC_OK)) {
+			response.sendError(status);
+			return null;
+		}
 		
 		return "board/freeView";
 	}

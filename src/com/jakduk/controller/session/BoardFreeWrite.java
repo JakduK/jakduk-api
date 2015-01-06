@@ -1,5 +1,8 @@
 package com.jakduk.controller.session;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -28,40 +31,73 @@ import com.jakduk.service.BoardFreeService;
 @RequestMapping("/board")
 @SessionAttributes({"boardFree","boardCategorys"})
 public class BoardFreeWrite {
-	
+
 	@Autowired
 	private BoardFreeService boardFreeService;
-	
+
 	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	@RequestMapping(value = "/free/write", method = RequestMethod.GET)
 	public String freeWrite(Model model) {
-		
+
 		boardFreeService.getFreeWrite(model);
-		
+
 		return "board/freeWrite";
 	}
-	
+
 	@RequestMapping(value = "/free/write", method = RequestMethod.POST)
 	public String freeWrite(@Valid BoardFree boardFree, BindingResult result, SessionStatus sessionStatus) {
-		
+
 		if (result.hasErrors()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("result=" + result);	
+			}
 			return "board/freeWrite";
 		}
-		
+
 		boardFreeService.write(boardFree);
+		sessionStatus.setComplete();
+
+		return "redirect:/board/free";
+	}
+
+	@RequestMapping(value = "/free/edit/{seq}", method = RequestMethod.GET)
+	public String freeEdit(@PathVariable int seq, Model model,
+			HttpServletResponse response) throws IOException {
+
+		Integer status = boardFreeService.getFreeEdit(model, seq, response);
+		
+		if (!status.equals(HttpServletResponse.SC_OK)) {
+			response.sendError(status);
+			return null;
+		}
+
+		return "board/freeEdit";
+	}
+
+	@RequestMapping(value = "/free/edit", method = RequestMethod.POST)
+	public String freeEdit(@Valid BoardFree boardFree, BindingResult result, SessionStatus sessionStatus) {
+
+		if (result.hasErrors()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("result=" + result);	
+			}
+			return "board/freeEdit";
+		}
+		
+		boardFreeService.checkBoardFreeEdit(boardFree, result);
+		
+		if (result.hasErrors()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("result=" + result);	
+			}
+			return "board/freeEdit";
+		}
+		
+		boardFreeService.freeEdit(boardFree);
 		sessionStatus.setComplete();
 		
 		return "redirect:/board/free";
 	}
-	
-	@RequestMapping(value = "/free/edit/{seq}", method = RequestMethod.GET)
-	public String freeEdit(@PathVariable int seq, Model model) {
-		
-		boardFreeService.getFreeEdit(model, seq);
-		
-//		return "board/freeWrite";
-		return "redirect:/board/free";
-	}
-	
+
 }
