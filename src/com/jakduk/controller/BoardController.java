@@ -45,7 +45,7 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free", method = RequestMethod.GET)
-	public String free(@ModelAttribute BoardListInfo boardListInfo, Model model
+	public String freeList(@ModelAttribute BoardListInfo boardListInfo, Model model
 			, HttpServletRequest request) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
@@ -55,8 +55,9 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
-	public String view(@PathVariable int seq, @ModelAttribute BoardListInfo listInfo, Model model
-			, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public String freeView(@PathVariable int seq, @ModelAttribute BoardListInfo listInfo, Model model
+			, HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(required = false) String result) throws IOException {
 		
 		Locale locale = localeResolver.resolveLocale(request);	
 		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.BOARD_NAME_FREE, seq);
@@ -67,17 +68,21 @@ public class BoardController {
 			return null;
 		}
 		
+		if (result != null && !result.isEmpty()) {
+			model.addAttribute("result", result);
+		}
+		
 		return "board/freeView";
 	}
 	
 	@RequestMapping(value = "/like/{seq}")
-	public void setLike(@PathVariable int seq, Model model) {
+	public void setFreeLike(@PathVariable int seq, Model model) {
 		
 		boardFreeService.setUsersFeelings(model, seq, CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE);
 	}
 	
 	@RequestMapping(value = "/dislike/{seq}")
-	public void setDislike(@PathVariable int seq, Model model) {
+	public void setFreeDislike(@PathVariable int seq, Model model) {
 		
 		boardFreeService.setUsersFeelings(model, seq, CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE);
 	}
@@ -109,17 +114,38 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/comment/like/{seq}")
-	public void setCommentLike(@PathVariable int seq, Model model,
+	public void setFreeCommentLike(@PathVariable int seq, Model model,
 			@RequestParam(required = true) String id) {
 		
 		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE);
 	}
 	
 	@RequestMapping(value = "/comment/dislike/{seq}")
-	public void setCommentDislike(@PathVariable int seq, Model model,
+	public void setFreeCommentDislike(@PathVariable int seq, Model model,
 			@RequestParam(required = true) String id) {
 		
 		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE);
+	}
+	
+	@RequestMapping(value = "/free/delete/{seq}", method = RequestMethod.GET)
+	public String deleteFree(@PathVariable int seq, Model model,
+			HttpServletResponse response,
+			@RequestParam(required = true) String type) throws IOException {
+		
+		Integer status = boardFreeService.deleteFree(model, seq, type);
+		
+		if (status.equals(HttpServletResponse.SC_UNAUTHORIZED)) {
+			response.sendError(status);
+			return null;	
+		} else if (status.equals(HttpServletResponse.SC_NOT_ACCEPTABLE)) {
+			if (type.equals(CommonConst.BOARD_DELETE_TYPE_ALL)) {
+				return "redirect:/board/free/" + seq + "?result=existComment";
+			} else if (type.equals(CommonConst.BOARD_DELETE_TYPE_POSTONLY)) {
+				return "redirect:/board/free/" + seq + "?result=emptyComment";
+			}
+		}
+
+		return "redirect:/board/free";
 	}
 
 }

@@ -68,7 +68,7 @@
   
   <div class="form-group">
 		<input class="btn btn-default" name="commit" type="submit" value="<spring:message code="common.button.submit"/>">
-		<a class="btn btn-danger" href="<c:url value="/board"/>"><spring:message code="common.button.cancel"/></a>
+		<a class="btn btn-danger" href="<c:url value="/board/free/${boardFree.seq}"/>"><spring:message code="common.button.cancel"/></a>
   </div>
 
 <form:textarea path="content" ng-model="content" ng-init="content='${boardFree.content}'" class="hidden"/>  

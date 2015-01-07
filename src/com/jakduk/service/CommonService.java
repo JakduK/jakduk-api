@@ -28,10 +28,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Sequence;
 import com.jakduk.model.web.BoardPageInfo;
@@ -303,5 +305,4 @@ public class CommonService {
 		return result;
 		
 	}
-	
 }

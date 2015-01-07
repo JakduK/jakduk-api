@@ -62,9 +62,21 @@
 	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
 		<spring:message code="common.button.edit"/>
 	</button>
+	<button type="button" class="btn btn-default" onclick="confirmDelete();">
+		<spring:message code="common.button.delete"/>
+	</button>	
 </c:if>
 
 <p></p>
+
+<c:choose>
+	<c:when test="${result == 'existComment'}">
+		<div class="alert alert-danger" role="alert"><spring:message code="common.msg.error.can.not.delete.post"/></div>
+	</c:when>
+	<c:when test="${result == 'emptyComment'}">
+		<div class="alert alert-danger" role="alert"><spring:message code="common.msg.error.can.not.delete.post.except.comment"/></div>
+	</c:when>					
+</c:choose>
 
 <!-- Begin page content -->
 <div class="panel panel-info" ng-controller="boardFreeCtrl">
@@ -111,6 +123,7 @@
 </div> <!-- /panel -->
 
 <div ng-controller="commentCtrl">
+	<input type="hidden" id="commentCount" value="{{commentCount}}">
 	<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
 		<!-- Default panel contents -->	  
 		<div class="panel-heading">
@@ -203,6 +216,14 @@
 	</button>	
 	</c:when>	
 </c:choose>
+<c:if test="${accountId == post.writer.userId}">
+	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+		<spring:message code="common.button.edit"/>
+	</button>
+	<button type="button" class="btn btn-default" onclick="confirmDelete();">
+		<spring:message code="common.button.delete"/>
+	</button>	
+</c:if>
 
 <jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
@@ -494,6 +515,20 @@ function needLogin() {
 		location.href = "<c:url value="/board/free/write"/>";
 	}
 }	
+
+function confirmDelete() {
+	var commentCount = document.getElementById("commentCount").value;
+	
+	if (commentCount > 0) {
+		if (confirm('<spring:message code="common.msg.confirm.delete.post.except.comment"/>') == true) {
+			location.href = "<c:url value="/board/free/delete/${post.seq}?type=postonly"/>";
+		}	
+	} else {
+		if (confirm('<spring:message code="common.msg.confirm.delete.post"/>') == true) {
+			location.href = "<c:url value="/board/free/delete/${post.seq}?type=all"/>";
+		}
+	}
+}
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>

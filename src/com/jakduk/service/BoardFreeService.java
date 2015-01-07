@@ -1,6 +1,5 @@
 package com.jakduk.service;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -38,7 +36,6 @@ import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
-import com.jakduk.model.web.UserWrite;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
@@ -518,5 +515,70 @@ public class BoardFreeService {
 		model.addAttribute("numberOfDislike", usersDisliking.size());
 		
 		return model;
+	}
+	
+	public Integer deleteFree(Model model, int seq, String type) {
+		
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String accountId = principal.getId();
+		
+		if (accountId == null) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		
+		if (boardFree.getWriter() == null) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
+		if (!accountId.equals(boardFree.getWriter().getUserId())) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
+		BoardItem boardItem = new BoardItem();
+		boardItem.setId(boardFree.getId());
+		boardItem.setSeq(boardFree.getSeq());
+		
+		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
+		
+		if (type.equals(CommonConst.BOARD_DELETE_TYPE_POSTONLY) && count < 1) {
+			return HttpServletResponse.SC_NOT_ACCEPTABLE;
+		} else if (type.equals(CommonConst.BOARD_DELETE_TYPE_ALL) && count > 0) {
+			return HttpServletResponse.SC_NOT_ACCEPTABLE;
+		}
+		
+		switch (type) {
+		case CommonConst.BOARD_DELETE_TYPE_POSTONLY:
+			boardFree.setContent(null);
+			boardFree.setSubject(null);
+			
+			boardFreeRepository.save(boardFree);
+
+			if (logger.isInfoEnabled()) {
+				logger.info("post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+			}
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("BoardFree(delete post only) = " + boardFree);
+			}
+			
+			break;
+			
+		case CommonConst.BOARD_DELETE_TYPE_ALL:
+			boardFreeRepository.delete(boardFree);
+
+			if (logger.isInfoEnabled()) {
+				logger.info("post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+			}
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("BoardFree(all) = " + boardFree);
+			}
+			
+			break;
+		}
+		
+		return HttpServletResponse.SC_OK;
 	}
 }

@@ -66,18 +66,6 @@ public class BoardFree {
 	private List<BoardUser> usersLiking;
 	
 	private List<BoardUser> usersDisliking;
-	
-	public int getViews() {
-		return views;
-	}
-
-	public void setViews(int views) {
-		this.views = views;
-	}
-
-	public void setSeq(int seq) {
-		this.seq = seq;
-	}
 
 	public String getId() {
 		return id;
@@ -111,8 +99,12 @@ public class BoardFree {
 		this.content = content;
 	}
 
-	public long getSeq() {
+	public int getSeq() {
 		return seq;
+	}
+
+	public void setSeq(int seq) {
+		this.seq = seq;
 	}
 
 	public String getCategoryName() {
@@ -121,6 +113,14 @@ public class BoardFree {
 
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
+	}
+
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
 	}
 
 	public List<BoardUser> getUsersLiking() {
@@ -147,5 +147,5 @@ public class BoardFree {
 				+ ", usersLiking=" + usersLiking + ", usersDisliking="
 				+ usersDisliking + "]";
 	}
-
+	
 }

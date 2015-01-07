@@ -71,7 +71,7 @@ public class UserTest {
 	@Test
 	public void test02() {
 						
-		User user = userRepository.findByUsername("pio.");		
+		User user = userRepository.findByUsername("test01");		
 		String pwd = user.getPassword();
 		System.out.println("user =" + user);
 		System.out.println("user pwd=" + pwd);

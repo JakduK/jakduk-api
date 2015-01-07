@@ -75,4 +75,7 @@ public class CommonConst {
 	
 	public final static String PRINCIPAL_ANONYMOUSUSER = "anonymousUser";
 	
+	public final static String BOARD_DELETE_TYPE_POSTONLY = "postonly";
+	public final static String BOARD_DELETE_TYPE_ALL = "all";
+	
 }
