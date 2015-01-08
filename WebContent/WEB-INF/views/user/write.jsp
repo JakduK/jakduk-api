@@ -18,7 +18,7 @@
 	<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 	
 		<form:form commandName="userWrite" name="userWrite" action="${contextPath}/user/write" method="POST" cssClass="form-horizontal" 
-		ng-submit="onSubmit(userWrite, $event)">
+		ng-submit="onSubmit($event)">
 			<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${userWrite.emailStatus}'" ng-model="emailStatus"/>
 			<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userWrite.usernameStatus}'" ng-model="usernameStatus"/>
 			<legend><spring:message code="user.register"/> </legend>
@@ -29,7 +29,8 @@
 				</label>
 				<div class="col-sm-3">
 					<input type="email" name="email" class="form-control" size="50" placeholder="Email" 
-					ng-init="email='${userWrite.email}'" ng-model="email" ng-blur="onEmail(userWrite)" 
+					ng-init="email='${userWrite.email}'" ng-model="email" 
+					ng-blur="onEmail()" ng-keyup="validationEmail()" 
 					ng-required="true" ng-minlength="6" ng-maxlength="30" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
 					<span class="glyphicon form-control-feedback" 
 					ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'ok'}"></span>					
@@ -45,7 +46,8 @@
 				</label>
 				<div class="col-sm-3">
 					<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
-					ng-init="username='${userWrite.username}'" ng-model="username" ng-blur="onUsername(userWrite)"
+					ng-init="username='${userWrite.username}'" ng-model="username" 
+					ng-blur="onUsername()" ng-keyup="validationUsername()"
 					ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.username.$valid, 
 					'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'ok'}"></span>
@@ -61,7 +63,8 @@
 				</label>
 				<div class="col-sm-3">
 					<form:password path="password" cssClass="form-control" size="50" placeholder="Password"
-					ng-model="password" ng-blur="checkPassword(userWrite)" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
+					ng-model="password" ng-keyup="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
+					ng-required="true" ng-minlength="4" ng-maxlength="20"/>
 					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.password.$valid, 
 					'glyphicon-remove':userWrite.password.$invalid}"></span>
 					<form:errors path="password" cssClass="text-danger" element="span" ng-hide="passwordAlert.msg"/>
@@ -69,15 +72,16 @@
 				</div>
 			</div>
 			<div class="form-group has-feedback" 	ng-class="{'has-success':userWrite.passwordConfirm.$valid, 
-			'has-error':userWrite.passwordConfirm.$invalid || passwordConfirm.length > 0 && password != passwordConfirm}">
+			'has-error':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}">
 				<label class="col-sm-2 control-label" for="passwordConfirm">
 					<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.password.confirm"/>
 				</label>
 				<div class="col-sm-3">
 					<form:password path="passwordConfirm" cssClass="form-control" size="50" placeholder="Confirm password"
-					ng-model="passwordConfirm" ng-blur="checkPasswordConfirm(userWrite)" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
+					ng-model="passwordConfirm" ng-keyup="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
+					ng-required="true" ng-minlength="4" ng-maxlength="20"/>
 					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.passwordConfirm.$valid, 
-					'glyphicon-remove':userWrite.passwordConfirm.$invalid || passwordConfirm.length > 0 && password != passwordConfirm}"></span>
+					'glyphicon-remove':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}"></span>
 					<form:errors path="passwordConfirm" cssClass="text-danger" element="span" ng-hide="passwordConfirmAlert.msg || (passwordConfirm.length > 0 && password == passwordConfirm)"/>
 					<span class="{{passwordConfirmAlert.classType}}" ng-show="passwordConfirmAlert.msg">{{passwordConfirmAlert.msg}}</span>								
 				</div>
@@ -132,32 +136,34 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.usernameAlert = {};
 	$scope.passwordAlert = {};
 	$scope.passwordConfirmAlert = {};
+	$scope.equalPasswordStatus = "false";
 	
-	$scope.onSubmit = function(userWrite, event) {
-		if (userWrite.$valid && $scope.emailStatus == 'ok' && $scope.usernameStatus == 'ok' 
-				&& $scope.password == $scope.passwordConfirm) {
+	$scope.onSubmit = function(event) {
+		if ($scope.userWrite.$valid && $scope.emailStatus == 'ok' && $scope.usernameStatus == 'ok' 
+				&& $scope.equalPasswordStatus == "true") {
 		} else {
-			if (userWrite.email.$invalid) {
-				checkEmail(userWrite);
+			if ($scope.userWrite.email.$invalid) {
+				$scope.validationEmail();				
 			} else if ($scope.emailStatus != 'ok') {
-				$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
+				//$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
+				document.userWrite.email.focus();
 			}
 			
-			if (userWrite.username.$invalid) {
-				checkUsername(userWrite);
+			if ($scope.userWrite.username.$invalid) {
+				$scope.validationUsername();
 			} else if ($scope.usernameStatus != 'ok') {
-				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
+				//$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
+				document.userWrite.username.focus();
 			}
 			
-			$scope.checkPassword(userWrite);
-			$scope.checkPasswordConfirm(userWrite);
+			$scope.eaualPasswordConfirm();
 
 			event.preventDefault();
 		}
 	};
 	
-	$scope.onEmail = function(userWrite) {
-		if (userWrite.email.$valid) {
+	$scope.onEmail = function() {		
+		if ($scope.userWrite.email.$valid) {
 			var bUrl = '<c:url value="/check/user/email.json?email=' + $scope.email + '"/>';
 			if ($scope.emailConn == "none") {
 				var reqPromise = $http.get(bUrl);
@@ -174,21 +180,19 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 					}
 					$scope.emailConn = "none";					
 				});
-				reqPromise.error(emailError);
+				reqPromise.error(function(data, status, headers, config) {
+					$scope.emailConn = "none";
+					$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};					
+				});
 			}
 		} else {
 			$scope.emailStatus = "invalid";
-			checkEmail(userWrite);
+			$scope.validationEmail();
 		}
 	};
 	
-	function emailError(data, status, headers, config) {
-		$scope.emailConn = "none";
-		$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
-	}
-	
-	$scope.onUsername = function(userWrite) {
-		if (userWrite.username.$valid) {
+	$scope.onUsername = function() {
+		if ($scope.userWrite.username.$valid) {
 			var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';
 			if ($scope.usernameConn == "none") {
 				var reqPromise = $http.get(bUrl);
@@ -205,60 +209,78 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 					}
 					$scope.usernameConn = "none";
 				});
-				reqPromise.error(usernameError);
+				reqPromise.error(function(data, status, headers, config) {
+					$scope.usernameConn = "none";
+					$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};					
+				});
 			}
 		} else {
 			$scope.usernameStatus = 'invalid';
-			checkUsername(userWrite);
+			$scope.validationUsername();
 		}
 	};
 	
-	function usernameError(data, status, headers, config) {
-		$scope.usernameConn = "none";
-		$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
-	}
-	
-	function checkEmail(userWrite) {
-		if (userWrite.email.$error.required) {
+	$scope.validationEmail = function() {
+		if ($scope.userWrite.email.$error.required) {
 			$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-		} else if (userWrite.email.$error.minlength || userWrite.email.$error.maxlength) {
+		} else if ($scope.userWrite.email.$error.minlength || $scope.userWrite.email.$error.maxlength) {
 			$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.email"/>'};
-		} else if (userWrite.email.$error.pattern) {
+		} else if ($scope.userWrite.email.$error.pattern) {
 			$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.check.mail.format"/>'};
 		}
 	}
 		
-	function checkUsername(userWrite) {
-		if (userWrite.username.$error.required) {
+	$scope.validationUsername = function () {
+		if ($scope.userWrite.username.$error.required) {
 			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-		} else if (userWrite.username.$error.minlength || userWrite.username.$error.maxlength) {
+		} else if ($scope.userWrite.username.$error.minlength || $scope.userWrite.username.$error.maxlength) {
 			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
 		}
 	}
 	
-	$scope.checkPassword = function(userWrite) {
-		if (userWrite.password.$invalid) {
-			if (userWrite.password.$error.required) {
+	$scope.vlidationPassword = function() {
+		$scope.equalPasswordStatus = "false";
+		$scope.passwordConfirmAlert = {};
+		
+		if ($scope.userWrite.password.$invalid) {
+			if ($scope.userWrite.password.$error.required) {
 				$scope.passwordAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-			} else if (userWrite.password.$error.minlength || userWrite.password.$error.maxlength) {
+			} else if ($scope.userWrite.password.$error.minlength || $scope.userWrite.password.$error.maxlength) {
 				$scope.passwordAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.password"/>'};
 			}
 		} else {
-			$scope.passwordAlert = {};
+			$scope.passwordAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 		}
 	};
 	
-	$scope.checkPasswordConfirm = function(userWrite) {
-		if (userWrite.passwordConfirm.$invalid || $scope.password != $scope.passwordConfirm) {
-			if (userWrite.passwordConfirm.$error.required) {
+	$scope.eaualPasswordConfirm = function() {
+		
+		if ($scope.userWrite.password.$invalid) {
+			$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.password.mismatch"/>'};
+		}
+		
+		if ($scope.userWrite.passwordConfirm.$invalid) return;
+		
+		if ($scope.password == $scope.passwordConfirm) {
+			$scope.equalPasswordStatus = "true";
+			$scope.passwordConfirmAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+		} else {
+			//$scope.equalPasswordStatus = "false";
+			$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.password.mismatch"/>'};
+		}
+	}
+	
+	$scope.validationPasswordConfirm = function() {
+		$scope.equalPasswordStatus = "false";
+		
+		if ($scope.userWrite.passwordConfirm.$invalid) {
+			if ($scope.userWrite.passwordConfirm.$error.required) {
 				$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-			} else if (userWrite.passwordConfirm.$error.minlength || userWrite.passwordConfirm.$error.maxlength) {
+			} else if ($scope.userWrite.passwordConfirm.$error.minlength || $scope.userWrite.passwordConfirm.$error.maxlength) {
 				$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.password"/>'};
-			} else if ($scope.password != $scope.passwordConfirm) {
-				$scope.passwordConfirmAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.password.mismatch"/>'};
 			}
 		} else {
-			$scope.passwordConfirmAlert = {};
+			$scope.passwordConfirmAlert = {"classType":"text-info", "msg":'<spring:message code="Size.userWrite.password"/>'};
 		}
 	};	
 });

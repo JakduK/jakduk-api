@@ -70,7 +70,7 @@ public class UserTest {
 	
 	@Test
 	public void test02() {
-						
+/*						
 		User user = userRepository.findByUsername("test01");		
 		String pwd = user.getPassword();
 		System.out.println("user =" + user);
@@ -81,6 +81,7 @@ public class UserTest {
 		
 		System.out.println(encoder.matches("1112", result));
 		assertTrue(encoder.matches("1111", result));
+		*/
 	}
 	
 	@Test
