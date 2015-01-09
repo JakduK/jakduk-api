@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.service.CommonService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -21,6 +22,14 @@ public class CommonTest {
 		System.out.println(commonService.isRedirectUrl("http://localhost:8080/jakduk/about/intro"));
 		System.out.println(commonService.isRedirectUrl("http://localhost:8080/jakduk/login"));
 		System.out.println(commonService.isRedirectUrl("http://localhost:8080/jakduk/board/free/write"));
+	}
+	
+	@Test
+	public void getCountPages() {
+		
+		BoardPageInfo boardPageInfo = commonService.getCountPages((long)5, (long)47, 5);
+		
+		System.out.println("getCountPages=" + boardPageInfo);
 	}
 
 }
