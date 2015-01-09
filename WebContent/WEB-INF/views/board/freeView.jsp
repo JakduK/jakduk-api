@@ -71,10 +71,10 @@
 
 <c:choose>
 	<c:when test="${result == 'existComment'}">
-		<div class="alert alert-danger" role="alert"><spring:message code="common.msg.error.can.not.delete.post"/></div>
+		<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post"/></div>
 	</c:when>
 	<c:when test="${result == 'emptyComment'}">
-		<div class="alert alert-danger" role="alert"><spring:message code="common.msg.error.can.not.delete.post.except.comment"/></div>
+		<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post.except.comment"/></div>
 	</c:when>					
 </c:choose>
 
@@ -280,7 +280,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 					message = '<spring:message code="board.msg.select.already.like"/>';
 					mType = "alert-warning";
 				} else if (data.errorCode == "anonymous") {
-					message = '<spring:message code="board.msg.need.login"/>';
+					message = '<spring:message code="board.msg.need.login.for.feel"/>';
 					mType = "alert-warning";
 				} else if (data.errorCode == "writer") {
 					message = '<spring:message code="board.msg.you.are.writer"/>';
@@ -327,14 +327,14 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	
 	$scope.focus = function(e) { 
 		if ("${authRole}" == "ANNONYMOUS") {
-			if (confirm('<spring:message code="board.msg.need.login"/>') == true) {
+			if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
 				location.href = "<c:url value='/login'/>";
 			}
 		}	
 	}
 	
 	if ("${authRole}" == "ANNONYMOUS") {
-		$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login"/>'};
+		$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login.for.write"/>'};
 	}
 
 	// http config
@@ -493,7 +493,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 				} else if (data.errorCode == "already") {
 					message = '<spring:message code="board.msg.select.already.like"/>';
 				} else if (data.errorCode == "anonymous") {
-					message = '<spring:message code="board.msg.need.login"/>';
+					message = '<spring:message code="board.msg.need.login.for.feel"/>';
 				} else if (data.errorCode == "writer") {
 					message = '<spring:message code="board.msg.you.are.writer"/>';
 				}
@@ -511,7 +511,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 });
 
 function needLogin() {
-	if (confirm('<spring:message code="board.msg.need.login"/>') == true) {
+	if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
 		location.href = "<c:url value="/board/free/write"/>";
 	}
 }	
@@ -520,11 +520,11 @@ function confirmDelete() {
 	var commentCount = document.getElementById("commentCount").value;
 	
 	if (commentCount > 0) {
-		if (confirm('<spring:message code="common.msg.confirm.delete.post.except.comment"/>') == true) {
+		if (confirm('<spring:message code="board.msg.confirm.delete.post.except.comment"/>') == true) {
 			location.href = "<c:url value="/board/free/delete/${post.seq}?type=postonly"/>";
 		}	
 	} else {
-		if (confirm('<spring:message code="common.msg.confirm.delete.post"/>') == true) {
+		if (confirm('<spring:message code="board.msg.confirm.delete.post"/>') == true) {
 			location.href = "<c:url value="/board/free/delete/${post.seq}?type=all"/>";
 		}
 	}

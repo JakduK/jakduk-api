@@ -185,7 +185,7 @@ jakdukApp.controller("boardCtrl", function($scope) {
 });
 
 function needLogin() {
-	if (confirm('<spring:message code="board.msg.need.login"/>') == true) {
+	if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
 		location.href = "<c:url value="/board/free/write"/>";
 	}
 }

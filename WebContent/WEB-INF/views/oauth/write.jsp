@@ -29,9 +29,10 @@
 			<label class="col-sm-2 control-label" for="username">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
-			<div class="col-sm-3">
-				<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
-				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" ng-blur="onUsername()"
+			<div class="col-sm-4">
+				<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>' 
+				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" 
+				ng-blur="onUsername()" ng-keyup="validationUsername()" ng-change="validationUsername()"
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
 				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
@@ -45,7 +46,7 @@
 			<label class="col-sm-2 control-label" for="supportFC">
 				<spring:message code="user.support.football.club"/>
 			</label>
-			<div class="col-sm-3">
+			<div class="col-sm-4">
 				<form:select path="footballClub" cssClass="form-control">
 					<form:option value=""><spring:message code="common.none"/></form:option>
 				<c:forEach items="${footballClubs}" var="club">
@@ -59,13 +60,17 @@
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="about"> <spring:message code="user.comment"/></label>
 			<div class="col-sm-4">
-				<form:textarea path="about" cssClass="form-control" cols="40" rows="5" placeholder="About"/>
+				<textarea name="about" class="form-control" cols="40" rows="5" placeholder='<spring:message code="user.placeholder.about"/>'></textarea>
 			</div>
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
 				<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
 				<a class="btn btn-danger" href="<c:url value="/"/>"><spring:message code="common.button.cancel"/></a>
+				<div>
+					<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
+					<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+				</div>
 			</div> 
 		</div>		
 	</form:form>
@@ -84,25 +89,28 @@ var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.usernameConn = "none";
+	$scope.submitConn = "none";
 	$scope.usernameAlert = {};
+	$scope.buttonAlert = {};
 	
 	$scope.onSubmit = function(event) {
 		if ($scope.OAuthUserWrite.$valid && $scope.usernameStatus == "ok") {
+			$scope.submitConn = "connecting";
+			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 		} else {			
 			if ($scope.OAuthUserWrite.username.$invalid) {
-				checkUsername();
-			} else if ($scope.existUsername != 2) {
-				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
+				$scope.validationUsername();
+			} else if ($scope.usernameStatus != 'ok') {
+				//document.OAuthUserWrite.username.focus();
 			}
 
+			$scope.submitConn = "none";
+			$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
 			event.preventDefault();
 		}
 	};
 	
 	$scope.onUsername = function() {	
-		console.log($scope.OAuthUserWrite.username.$error);
-		console.log($scope.OAuthUserWrite.username.$valid);
-		
 		if ($scope.OAuthUserWrite.username.$valid) {
 			var bUrl = '<c:url value="/check/oauth/update/username.json?username=' + $scope.username + '"/>';
 			if ($scope.usernameConn == "none") {
@@ -115,32 +123,33 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 							$scope.usernameAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 						} else {
 							$scope.usernameStatus = "duplication";
-							$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.replicated.data"/>'};
+							$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.already.username"/>'};
 						}
 					}
 					$scope.usernameConn = "none";
 				});
-				reqPromise.error(usernameError);
+				reqPromise.error(function(data, status, headers, config) {
+					$scope.usernameConn = "none";
+					$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};					
+				});
 			}
 		} else {
-			checkUsername();
+			$scope.usernameStatus = 'invalid';
+			$scope.validationUsername();
 		}
 	};
-	
-	function usernameError(data, status, headers, config) {
-		$scope.usernameConn = "none";
-		$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
-	}
-	
-	function checkUsername() {
-		
-		if ($scope.OAuthUserWrite.username.$error.required) {
-			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-		} else if ($scope.OAuthUserWrite.username.$error.minlength || $scope.OAuthUserWrite.username.$error.maxlength) {
-			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
+
+	$scope.validationUsername = function () {
+		if ($scope.OAuthUserWrite.username.$invalid) {
+			if ($scope.OAuthUserWrite.username.$error.required) {
+				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
+			} else if ($scope.OAuthUserWrite.$error.minlength || $scope.OAuthUserWrite.username.$error.maxlength) {
+				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
+			}
+		} else {
+			$scope.usernameAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
 		}
-	}
-	
+	};
 });
 
 </script>

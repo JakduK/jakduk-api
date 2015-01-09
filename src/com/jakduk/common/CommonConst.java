@@ -18,7 +18,7 @@ public class CommonConst {
 	/**
 	 * 게시물 목록에서 보여지는 게시물 갯수
 	 */
-	public final static Integer BOARD_SIZE_LINE_NUMBER = 10;
+	public final static Integer BOARD_SIZE_LINE_NUMBER = 15;
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
 
 	/**

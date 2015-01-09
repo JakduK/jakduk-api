@@ -17,7 +17,7 @@
 <div class="container" ng-controller="loginCtrl">
 	<div class="row">
 		<div class="col-md-4 col-md-offset-4">
-			<a href="<c:url value="/home"/>"><h4><spring:message code="common.jakduk"/></h4></a>
+			<h4><a class="text-muted" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a></h4>
 			<div class="login-panel panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title"><spring:message code="user.sign.in"/></h3>
@@ -34,15 +34,15 @@
 						<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
 					</c:when>                		
 				</c:choose>
-				<form action="j_spring_security_check" name="loginForm" method="post" ng-submit="onSubmit(loginForm, $event)">
+				<form action="j_spring_security_check" name="loginForm" method="post" ng-submit="onSubmit($event)">
 				<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
 					<fieldset>
 						<div class="form-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
 						'has-error':loginForm.j_username.$invalid}">
 							<label class="control-label sr-only" for="j_username">Hidden label</label>
-							<input type="email" class="form-control" id="j_username" name="j_username" placeholder="E-mail" autofocus
+							<input type="email" class="form-control" id="j_username" name="j_username" placeholder="E-mail"
 							ng-model="email" ng-required="true" ng-minlength="6" ng-maxlength="20" 
-							ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/">
+							ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/" autofocus>
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
 							<span class="text-danger" ng-model="errorEmail" ng-show="errorEmail">{{errorEmail}}</span>
@@ -113,25 +113,34 @@ jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
 		$scope.remember = true;
 	}
 	
-	$scope.onSubmit = function(loginForm, event){
-		if (loginForm.$valid) {
+	$scope.onSubmit = function(event){
+		if ($scope.loginForm.$valid) {
 		} else {
-			if (loginForm.j_username.$error.required) {
-				$scope.errorEmail = '<spring:message code="common.msg.required"/>'; 
-			} else if (loginForm.j_username.$error.minlength || loginForm.j_username.$error.maxlength) {
-				$scope.errorEmail = '<spring:message code="Size.userWrite.email"/>';
-			} else if (loginForm.j_username.$error.pattern) {
-				$scope.errorEmail = '<spring:message code="user.msg.check.mail.format"/>';
-			}
+			$scope.onEmail();
 			
-			if (loginForm.j_password.$error.required) {
+			if ($scope.loginForm.j_password.$error.required) {
 				$scope.errorPassword = '<spring:message code="common.msg.required"/>'; 
-			} else if (loginForm.j_password.$error.minlength || loginForm.j_password.$error.maxlength) {
+			} else if ($scope.loginForm.j_password.$error.minlength || $scope.loginForm.j_password.$error.maxlength) {
 				$scope.errorPassword = '<spring:message code="Size.userWrite.password"/>';
 			}
 			event.preventDefault();
 		}
 	};
+	
+	$scope.onEmail = function() {
+		if ($scope.loginForm.j_username.$invalid) {
+			if ($scope.loginForm.j_username.$error.required) {
+				$scope.errorEmail = '<spring:message code="common.msg.required"/>'; 
+			} else if ($scope.loginForm.j_username.$error.minlength || $scope.loginForm.j_username.$error.maxlength) {
+				$scope.errorEmail = '<spring:message code="Size.userWrite.email"/>';
+			} else if ($scope.loginForm.j_username.$error.pattern) {
+				$scope.errorEmail = '<spring:message code="user.msg.check.mail.format"/>';
+			}
+		} else {
+			$scope.errorEmail = "";
+		}
+	};
+	
 });
 </script>
 </body>
