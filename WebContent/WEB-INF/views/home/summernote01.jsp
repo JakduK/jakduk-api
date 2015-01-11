@@ -7,11 +7,19 @@
     <title>Starter Template for Bootstrap</title>
 <jsp:include page="../include/html-header.jsp"/>
 
-<!-- include summernote css/js-->
-<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
-
-<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <!--summernote dependencies-->
 <script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+<link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap.css" rel="stylesheet">
+<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
+<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  
+<!--summernote-->
+<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
+
+ <!--angular-summernote dependencies -->
+<script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
   </head>
 
 <body>
@@ -25,20 +33,12 @@
 		<p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
 	</div>
 
-<!-- 
-<div id="summernote">Hello Summernote</div>
- -->
  <summernote></summernote>
 </div>	
 	
 <jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
-<!-- Bootstrap core JavaScript ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 

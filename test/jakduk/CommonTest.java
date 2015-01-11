@@ -27,7 +27,7 @@ public class CommonTest {
 	@Test
 	public void getCountPages() {
 		
-		BoardPageInfo boardPageInfo = commonService.getCountPages((long)5, (long)47, 5);
+		BoardPageInfo boardPageInfo = commonService.getCountPages((long)11, (long)50, 5);
 		
 		System.out.println("getCountPages=" + boardPageInfo);
 	}

@@ -42,7 +42,7 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 		
 		HttpServletRequest httpRequest = (HttpServletRequest) req;
 		
-		if (!authentication.isAuthenticated() && (!httpRequest.getServletPath().equals("/oauth/daum/callback") || 
+		if (!authentication.isAuthenticated() && (!httpRequest.getServletPath().equals("/oauth/callback") || 
 				!httpRequest.getServletPath().equals("/oauth/write"))) {
 			SecurityContextHolder.getContext().setAuthentication(null);
 			
@@ -55,7 +55,7 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 	}
 
 	public OAuthProcessingFilter() {
-		super("/oauth/daum/callback");
+		super("/oauth/callback");
 	}
 
 	@Override

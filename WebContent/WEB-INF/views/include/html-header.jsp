@@ -13,8 +13,6 @@
     
 <!-- Bootstrap core CSS -->
 <link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap.css" rel="stylesheet">    
-<!-- Bootstrap theme -->
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
 <!-- Custom styles for this template -->
 <link href="<%=request.getContextPath()%>/resources/bootstrap/css/offcanvas.css" rel="stylesheet">
 <link href="<%=request.getContextPath()%>/resources/bootstrap/css/navbar.css" rel="stylesheet">

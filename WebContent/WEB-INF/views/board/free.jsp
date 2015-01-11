@@ -71,7 +71,7 @@
   		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
   		<div class="col-sm-4"><spring:message code="board.subject"/></div>
   		<div class="col-sm-3"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
-  		<div class="col-sm-3"><spring:message code="board.view"/> | <spring:message code="board.like"/> | <spring:message code="board.dislike"/></div>
+  		<div class="col-sm-3"><spring:message code="board.views"/> | <spring:message code="board.like"/> | <spring:message code="board.dislike"/></div>
   	</div>  	
   </div> <!-- /panel-heading -->
 
@@ -89,7 +89,14 @@
 	</div>
 	<div class="col-sm-4">
 	<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
-		<strong>${post.subject}</strong>
+		<c:choose>
+			<c:when test="${post.status.delete == 'delete'}">
+				<strong><spring:message code="board.msg.deleted"/></strong>
+			</c:when>
+			<c:otherwise>
+				<strong>${post.subject}</strong>
+			</c:otherwise>
+		</c:choose>
 		<c:if test="${!empty commentCount[post.id]}">
 			<span class="text-success">&nbsp;[${commentCount[post.id]}]</span>
 		</c:if>		
@@ -114,7 +121,7 @@
 		</c:choose>		
 	</div>
 	<div class="col-sm-3">
-		<spring:message code="board.view"/><strong> ${post.views}</strong> |
+		<spring:message code="board.views"/><strong> ${post.views}</strong> |
 		<span class="text-primary">
 			<span class="glyphicon glyphicon-thumbs-up"></span>
 			<strong>

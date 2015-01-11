@@ -63,6 +63,9 @@ public class CommonConst {
 	public final static String FOOTBALL_CLUB_STATUS_ACTIVE = "active";
 	public final static String FOOTBALL_CLUB_STATUS_INACTIVE = "inactive";
 	
+	/**
+	 * 글의 좋아요 싫어요에 대한 에러 코드
+	 */
 	public final static String BOARD_USERS_FEELINGS_STATUS_NONE = "none";
 	public final static String BOARD_USERS_FEELINGS_STATUS_ALREADY = "already";
 	public final static String BOARD_USERS_FEELINGS_STATUS_LIKE = "like";
@@ -70,12 +73,26 @@ public class CommonConst {
 	public final static String BOARD_USERS_FEELINGS_STATUS_WRITER = "writer";
 	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
 	
+	/**
+	 * 글의 좋아요, 싫어요
+	 */
 	public final static String BOARD_USERS_FEELINGS_TYPE_LIKE = "like";
 	public final static String BOARD_USERS_FEELINGS_TYPE_DISLIKE = "dislike";
 	
 	public final static String PRINCIPAL_ANONYMOUSUSER = "anonymousUser";
 	
+	/**
+	 * 글 지움 종류
+	 */
 	public final static String BOARD_DELETE_TYPE_POSTONLY = "postonly";
 	public final static String BOARD_DELETE_TYPE_ALL = "all";
+	
+	/**
+	 * 글 히스토리 상
+	 */
+	public final static String BOARD_HISTORY_TYPE_CREATE = "create";
+	public final static String BOARD_HISTORY_TYPE_EDIT = "edit";
+	public final static String BOARD_HISTORY_TYPE_DELETE = "delete";
+	public final static String BOARD_HISTORY_TYPE_NOTICE = "notice";
 	
 }

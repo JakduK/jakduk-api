@@ -10,6 +10,8 @@ import javax.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.embedded.BoardHistory;
+import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
 
@@ -66,6 +68,10 @@ public class BoardFree {
 	private List<BoardUser> usersLiking;
 	
 	private List<BoardUser> usersDisliking;
+	
+	private BoardStatus status;
+	
+	private List<BoardHistory> history;
 
 	public String getId() {
 		return id;
@@ -139,13 +145,30 @@ public class BoardFree {
 		this.usersDisliking = usersDisliking;
 	}
 
+	public BoardStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(BoardStatus status) {
+		this.status = status;
+	}
+
+	public List<BoardHistory> getHistory() {
+		return history;
+	}
+
+	public void setHistory(List<BoardHistory> history) {
+		this.history = history;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardFree [id=" + id + ", writer=" + writer + ", subject="
 				+ subject + ", content=" + content + ", seq=" + seq
 				+ ", categoryName=" + categoryName + ", views=" + views
 				+ ", usersLiking=" + usersLiking + ", usersDisliking="
-				+ usersDisliking + "]";
+				+ usersDisliking + ", status=" + status + ", history="
+				+ history + "]";
 	}
-	
+
 }

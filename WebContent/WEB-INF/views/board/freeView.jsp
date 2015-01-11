@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>    
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>    
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
@@ -23,209 +23,223 @@
 </head>
 <body>
 <div class="container">
-<jsp:include page="../include/navigation-header.jsp"/>
-
-<c:url var="listUrl" value="/board/free">
-	<c:if test="${!empty listInfo.page}">
-		<c:param name="page" value="${listInfo.page}"/>
-	</c:if>
-	<c:if test="${!empty listInfo.category}">
-		<c:param name="category" value="${listInfo.category}"/>
-	</c:if>
-</c:url>
-
-<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
-	<spring:message code="board.list"/>
-</button>
-
-<sec:authorize access="isAnonymous()">
-	<c:set var="authRole" value="ANNONYMOUS"/>
-</sec:authorize>
-<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-	<c:set var="authRole" value="USER"/>
-	<sec:authentication property="principal.id" var="accountId"/>
-</sec:authorize>
-
-<c:choose>
-	<c:when test="${authRole == 'ANNONYMOUS'}">
-	<button type="button" class="btn btn-default" onclick="needLogin();">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>	
-	</c:when>
-	<c:when test="${authRole == 'USER'}">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>	
-	</c:when>	
-</c:choose>
-<c:if test="${accountId == post.writer.userId}">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-		<spring:message code="common.button.edit"/>
-	</button>
-	<button type="button" class="btn btn-default" onclick="confirmDelete();">
-		<spring:message code="common.button.delete"/>
-	</button>	
-</c:if>
-
-<p></p>
-
-<c:choose>
-	<c:when test="${result == 'existComment'}">
-		<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post"/></div>
-	</c:when>
-	<c:when test="${result == 'emptyComment'}">
-		<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post.except.comment"/></div>
-	</c:when>					
-</c:choose>
-
-<!-- Begin page content -->
-<div class="panel panel-info" ng-controller="boardFreeCtrl">
-  <!-- Default panel contents -->
-  <div class="panel-heading">
-  	<h4 class="panel-title">
-  		${post.subject}
-  		<c:if test="${!empty category}">&nbsp;<small><fmt:message key="${category.resName}"/></small></c:if>
-  	</h4>
-  	<div class="row">
-  		<div class="col-sm-2">
-	  		<small>${post.writer.username}</small>
-  		</div>
-  		<div class="col-md-5">
-	  		<small>
-				{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
-	    		| <spring:message code="board.view"/> ${post.views} 
-	    	</small>
-  		</div>	
-  	</div>
-  </div>
-  
-  <div class="panel-body">
-    <p>${post.content}</p>
-  </div>
-  
-	<div class="panel-footer text-center">
-		<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
-			<spring:message code="board.like"/>			
-			<span class="text-primary" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
-				<i class="fa fa-thumbs-o-up fa-lg"></i>
-				{{numberOfLike}}
-			</span>
-		</button>
-		<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
-			<spring:message code="board.dislike"/>
-			<span class="text-danger" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
-				<i class="fa fa-thumbs-o-down fa-lg"></i>
-				{{numberOfDislike}}
-			</span>
-		</button>
-		<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
-	</div>
-</div> <!-- /panel -->
-
-<div ng-controller="commentCtrl">
-	<input type="hidden" id="commentCount" value="{{commentCount}}">
-	<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
-		<!-- Default panel contents -->	  
-		<div class="panel-heading">
-	  	<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
-	  	&nbsp;
-			<button type="button" class="btn btn-default" ng-click="btnRefreshComment()">
-		  	<span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
-			</button>	  	
-	  </div>
-			
-		<!-- List group -->
-		<ul class="list-group">
-			<li class="list-group-item" ng-repeat="comment in commentList">
-	 			<div class="row">			
- 					<div class="col-xs-12 visible-xs">
- 						<strong>{{comment.writer.username}}</strong> |
-						<small ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</small>
-						<small ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</small>
- 					</div>
- 					<div class="col-xs-12 visible-sm visible-md visible-lg">
- 						<strong>{{comment.writer.username}}</strong> | 
- 						<small>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</small>
- 					</div>
- 					<div class="col-xs-12"><p ng-bind-html="comment.content"></p></div>
- 					<div class="col-xs-12">
-						<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
-						  <span class="text-primary" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
-							  <i class="fa fa-thumbs-o-up fa-lg"></i>
-							  {{numberOfCommentLike[comment.id]}}
-						  </span>
-						</button> 					
-						<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
-							<span class="text-danger" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
-						  	<i class="fa fa-thumbs-o-down fa-lg"></i>
-						  	{{numberOfCommentDislike[comment.id]}}
-						  </span>
-						</button>
-						<div>
-						<span class="text-danger" ng-show="commentFeelingConn[comment.id]"><small>{{commentFeelingAlert[comment.id]}}</small></span>
-						</div>
- 					</div>
-	 			</div>			
-			</li>
-		</ul>
-	  
-	<div class="panel-footer text-center" ng-show="commentCount || commentAlert.msg">
-		<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-show="commentCount">
-			<spring:message code="common.button.load.comment"/> <span class="glyphicon glyphicon-chevron-down"></span>
-		</button>
-		<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
-	</div>
-	</div>
+	<jsp:include page="../include/navigation-header.jsp"/>
 	
-	<div class="panel panel-default">
+	<c:url var="listUrl" value="/board/free">
+		<c:if test="${!empty listInfo.page}">
+			<c:param name="page" value="${listInfo.page}"/>
+		</c:if>
+		<c:if test="${!empty listInfo.category}">
+			<c:param name="category" value="${listInfo.category}"/>
+		</c:if>
+	</c:url>
+	
+	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
+		<spring:message code="board.list"/>
+	</button>
+	
+	<sec:authorize access="isAnonymous()">
+		<c:set var="authRole" value="ANNONYMOUS"/>
+	</sec:authorize>
+	<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+		<c:set var="authRole" value="USER"/>
+		<sec:authentication property="principal.id" var="accountId"/>
+	</sec:authorize>
+	
+	<c:choose>
+		<c:when test="${authRole == 'ANNONYMOUS'}">
+		<button type="button" class="btn btn-default" onclick="needLogin();">
+			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		</button>	
+		</c:when>
+		<c:when test="${authRole == 'USER'}">
+		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
+			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		</button>	
+		</c:when>	
+	</c:choose>
+	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
+		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+			<spring:message code="common.button.edit"/>
+		</button>
+		<button type="button" class="btn btn-default" onclick="confirmDelete();">
+			<spring:message code="common.button.delete"/>
+		</button>	
+	</c:if>
+	
+	<p></p>
+	
+	<c:choose>
+		<c:when test="${result == 'existComment'}">
+			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post"/></div>
+		</c:when>
+		<c:when test="${result == 'emptyComment'}">
+			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post.except.comment"/></div>
+		</c:when>					
+	</c:choose>
+	
+	<!-- Begin page content -->
+	<div class="panel panel-info" ng-controller="boardFreeCtrl">
+	  <!-- Default panel contents -->
+	  <div class="panel-heading">
+	  	<h4 class="panel-title">
+				<c:choose>
+					<c:when test="${post.status.delete == 'delete'}">
+						<spring:message code="board.msg.deleted"/>
+					</c:when>
+					<c:otherwise>
+						${post.subject}
+					</c:otherwise>
+				</c:choose>
+	  		<c:if test="${!empty category}">&nbsp;<small><fmt:message key="${category.resName}"/></small></c:if>
+	  	</h4>
+	  	<div class="row">
+	  		<div class="col-sm-2">
+		  		<small>${post.writer.username}</small>
+	  		</div>
+	  		<div class="col-md-5">
+		  		<small>
+					{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
+		    		| <spring:message code="board.views"/> ${post.views} 
+		    	</small>
+	  		</div>	
+	  	</div>
+	  </div>
+	  
 		<div class="panel-body">
-			<summernote config="options" on-focus="focus(evt)" 
-			ng-model="summernote.content" ng-init="summernote={content:'', seq:'${post.seq}'}"></summernote>
-			<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
-		</div>
-		<div class="panel-footer">
 			<c:choose>
-				<c:when test="${authRole == 'ANNONYMOUS'}">
-					<button type="button" class="btn btn-primary" disabled="disabled">
-						<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
-					</button>	
+				<c:when test="${post.status.delete == 'delete'}">
+					<p><spring:message code="board.msg.deleted"/></p>
 				</c:when>
-				<c:when test="${authRole == 'USER'}">
-					<button type="button" class="btn btn-primary" ng-click="btnWriteComment()">
-						<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
-					</button>				
-				</c:when>
+				<c:otherwise>
+					<p>${post.content}</p>
+				</c:otherwise>
 			</c:choose>
 		</div>
-	</div>	
-</div>
-
-<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
-	<spring:message code="board.list"/>
-</button>
-
-<c:choose>
-	<c:when test="${authRole == 'ANNONYMOUS'}">
-	<button type="button" class="btn btn-default" onclick="needLogin();">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>	
-	</c:when>
-	<c:when test="${authRole == 'USER'}">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value='/board/free/write'/>">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
-	</button>	
-	</c:when>	
-</c:choose>
-<c:if test="${accountId == post.writer.userId}">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-		<spring:message code="common.button.edit"/>
+	  
+		<div class="panel-footer text-center">
+			<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
+				<spring:message code="board.like"/>			
+				<span class="text-primary" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
+					<i class="fa fa-thumbs-o-up fa-lg"></i>
+					{{numberOfLike}}
+				</span>
+			</button>
+			<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
+				<spring:message code="board.dislike"/>
+				<span class="text-danger" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
+					<i class="fa fa-thumbs-o-down fa-lg"></i>
+					{{numberOfDislike}}
+				</span>
+			</button>
+			<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
+		</div>
+	</div> <!-- /panel -->
+	
+	<div ng-controller="commentCtrl">
+		<input type="hidden" id="commentCount" value="{{commentCount}}">
+		<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
+			<!-- Default panel contents -->	  
+			<div class="panel-heading">
+		  	<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+		  	&nbsp;
+				<button type="button" class="btn btn-default" ng-click="btnRefreshComment()">
+			  	<span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
+				</button>	  	
+		  </div>
+				
+			<!-- List group -->
+			<ul class="list-group">
+				<li class="list-group-item" ng-repeat="comment in commentList">
+		 			<div class="row">			
+	 					<div class="col-xs-12 visible-xs">
+	 						<strong>{{comment.writer.username}}</strong> |
+							<small ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</small>
+							<small ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</small>
+	 					</div>
+	 					<div class="col-xs-12 visible-sm visible-md visible-lg">
+	 						<strong>{{comment.writer.username}}</strong> | 
+	 						<small>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</small>
+	 					</div>
+	 					<div class="col-xs-12"><p ng-bind-html="comment.content"></p></div>
+	 					<div class="col-xs-12">
+							<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
+							  <span class="text-primary" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
+								  <i class="fa fa-thumbs-o-up fa-lg"></i>
+								  {{numberOfCommentLike[comment.id]}}
+							  </span>
+							</button> 					
+							<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
+								<span class="text-danger" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
+							  	<i class="fa fa-thumbs-o-down fa-lg"></i>
+							  	{{numberOfCommentDislike[comment.id]}}
+							  </span>
+							</button>
+							<div>
+							<span class="text-danger" ng-show="commentFeelingConn[comment.id]"><small>{{commentFeelingAlert[comment.id]}}</small></span>
+							</div>
+	 					</div>
+		 			</div>			
+				</li>
+			</ul>
+		  
+		<div class="panel-footer text-center" ng-show="commentCount || commentAlert.msg">
+			<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-show="commentCount">
+				<spring:message code="common.button.load.comment"/> <span class="glyphicon glyphicon-chevron-down"></span>
+			</button>
+			<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
+		</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<summernote config="options" on-focus="focus(evt)" 
+				ng-model="summernote.content" ng-init="summernote={content:'.', seq:'${post.seq}'}"></summernote>
+				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
+			</div>
+			<div class="panel-footer">
+				<c:choose>
+					<c:when test="${authRole == 'ANNONYMOUS'}">
+						<button type="button" class="btn btn-primary" disabled="disabled">
+							<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
+						</button>	
+					</c:when>
+					<c:when test="${authRole == 'USER'}">
+						<button type="button" class="btn btn-primary" ng-click="btnWriteComment()">
+							<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
+						</button>				
+					</c:when>
+				</c:choose>
+			</div>
+		</div>	
+	</div>
+	
+	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
+		<spring:message code="board.list"/>
 	</button>
-	<button type="button" class="btn btn-default" onclick="confirmDelete();">
-		<spring:message code="common.button.delete"/>
-	</button>	
-</c:if>
-
-<jsp:include page="../include/footer.jsp"/>
+	
+	<c:choose>
+		<c:when test="${authRole == 'ANNONYMOUS'}">
+		<button type="button" class="btn btn-default" onclick="needLogin();">
+			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		</button>	
+		</c:when>
+		<c:when test="${authRole == 'USER'}">
+		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
+			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		</button>	
+		</c:when>	
+	</c:choose>
+	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
+		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+			<spring:message code="common.button.edit"/>
+		</button>
+		<button type="button" class="btn btn-default" onclick="confirmDelete();">
+			<spring:message code="common.button.delete"/>
+		</button>	
+	</c:if>
+	
+	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
 
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
@@ -316,7 +330,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 
 	// summernote config
 	$scope.options = {
-			height: 100,
+			height: 0,
 			toolbar: [
 	      ['font', ['bold']],
 	      // ['fontsize', ['fontsize']], // Still buggy
@@ -353,7 +367,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	};
 	
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-
+	
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
 		
@@ -365,7 +379,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		var reqPromise = $http.post(bUrl, $scope.summernote, config);
 		
 		reqPromise.success(function(data, status, headers, config) {
-			$scope.summernote.content = "";
+			$scope.summernote.content = ".";
 			$scope.loadComments("btnWriteComment", 1, 100);
 			
 			var page = parseInt($scope.commentCount / Jakduk.BoardCommentSize);

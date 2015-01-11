@@ -1,4 +1,4 @@
 var Jakduk = {
 	BoardCommentSize : 30,
-	SummernoteContentsSize : 5
+	SummernoteContentsMinSize : 5
 }

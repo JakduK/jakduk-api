@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
 
@@ -53,6 +54,8 @@ public class BoardFreeOnList {
 	 */
 	private int views = 0;
 	
+	private BoardStatus status;
+
 	public String getId() {
 		return id;
 	}
@@ -101,11 +104,20 @@ public class BoardFreeOnList {
 		this.views = views;
 	}
 
+	public BoardStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(BoardStatus status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardFreeOnList [id=" + id + ", writer=" + writer
 				+ ", subject=" + subject + ", seq=" + seq + ", categoryName="
-				+ categoryName + ", views=" + views + "]";
+				+ categoryName + ", views=" + views + ", status=" + status
+				+ "]";
 	}
 
 }

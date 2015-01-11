@@ -25,7 +25,7 @@
 		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="https"/>
 		<intercept-url pattern="/user/write" access="isAnonymous()" requires-channel="https"/>		
 		<intercept-url pattern="/user/**" access="authenticated" requires-channel="https"/>
-		<intercept-url pattern="/oauth/daum/callback" access="authenticated" requires-channel="https"/>
+		<intercept-url pattern="/oauth/callback" access="authenticated" requires-channel="https"/>
 		<intercept-url pattern="/oauth/**" access="authenticated" requires-channel="https"/>
 		<intercept-url pattern="/check/**" access="permitAll" requires-channel="https"/>
 		<intercept-url pattern="/**" requires-channel="https"/>
@@ -80,7 +80,7 @@
 		user-authorization-uri="#{daumProp['daum.user-authorization-uri']}"
 		authentication-scheme="query" 
 		token-name="access_token" 
-		pre-established-redirect-uri="oauth/daum/callback?type=daum"
+		pre-established-redirect-uri="oauth/callback?type=daum"
 		client-authentication-scheme="form"/>
 
 	<!-- Facebook 서버에 접속하기 위한 RestTemplate -->	

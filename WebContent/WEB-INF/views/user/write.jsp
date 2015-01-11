@@ -30,7 +30,7 @@
 			<div class="col-sm-4">
 				<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>' 
 				ng-init="email='${userWrite.email}'" ng-model="email" 
-				ng-blur="onEmail()" ng-keyup="validationEmail()" ng-change="validationEmail()"
+				ng-blur="onEmail()" ng-change="validationEmail()"
 				ng-required="true" ng-minlength="6" ng-maxlength="30" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
 				<span class="glyphicon form-control-feedback" 
 				ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'ok'}"></span>					
@@ -47,7 +47,7 @@
 			<div class="col-sm-4">
 				<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
 				ng-init="username='${userWrite.username}'" ng-model="username" 
-				ng-blur="onUsername()" ng-keyup="validationUsername()" ng-change="validationUsername()"
+				ng-blur="onUsername()" ng-change="validationUsername()"
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.username.$valid, 
 				'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'ok'}"></span>
@@ -63,7 +63,7 @@
 			</label>
 			<div class="col-sm-4">
 				<input type="password" name="password" class="form-control" placeholder='<spring:message code="user.placeholder.password"/>'
-				ng-model="password" ng-keyup="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
+				ng-model="password" ng-change="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
 				ng-required="true" ng-minlength="4" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.password.$valid, 
 				'glyphicon-remove':userWrite.password.$invalid}"></span>
@@ -78,7 +78,7 @@
 			</label>
 			<div class="col-sm-4">
 				<input type="password" name="passwordConfirm" class="form-control" placeholder='<spring:message code="user.placeholder.password.confirm"/>'
-				ng-model="passwordConfirm" ng-keyup="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
+				ng-model="passwordConfirm" ng-change="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
 				ng-required="true" ng-minlength="4" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.passwordConfirm.$valid, 
 				'glyphicon-remove':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}"></span>

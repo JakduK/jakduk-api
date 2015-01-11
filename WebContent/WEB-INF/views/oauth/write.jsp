@@ -32,7 +32,7 @@
 			<div class="col-sm-4">
 				<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>' 
 				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" 
-				ng-blur="onUsername()" ng-keyup="validationUsername()" ng-change="validationUsername()"
+				ng-blur="onUsername()" ng-change="validationUsername()"
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
 				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>

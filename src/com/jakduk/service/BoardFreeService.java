@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.util.stats.Histogram;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +30,9 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.embedded.BoardItem;
+import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.model.simple.BoardFreeOnComment;
@@ -139,6 +142,14 @@ public class BoardFreeService {
 		writer.setType(type);
 		boardFree.setWriter(writer);
 		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
+		
+		List<BoardHistory> historys = new ArrayList<BoardHistory>();
+		BoardHistory history = new BoardHistory();
+		history.setId(new ObjectId().toString());
+		history.setType(CommonConst.BOARD_HISTORY_TYPE_CREATE);
+		history.setWriter(writer);
+		historys.add(history);
+		boardFree.setHistory(historys);
 
 		boardFreeRepository.save(boardFree);
 
@@ -154,10 +165,33 @@ public class BoardFreeService {
 	
 	public void freeEdit(BoardFree newBoardFree) {
 		
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String userid = principal.getId();
+		String username = principal.getUsername();
+		String type = principal.getType();
+
+		BoardWriter writer = new BoardWriter();
+		writer.setUserId(userid);
+		writer.setUsername(username);
+		writer.setType(type);
+		
 		BoardFree getBoardFree = boardFreeRepository.findOne(newBoardFree.getId());
 		getBoardFree.setCategoryName(newBoardFree.getCategoryName());
 		getBoardFree.setSubject(newBoardFree.getSubject());
 		getBoardFree.setContent(newBoardFree.getContent());
+		
+		List<BoardHistory> historys = getBoardFree.getHistory();
+		
+		if (historys == null) {
+			historys = new ArrayList<BoardHistory>();
+		}
+		
+		BoardHistory history = new BoardHistory();
+		history.setId(new ObjectId().toString());
+		history.setType(CommonConst.BOARD_HISTORY_TYPE_EDIT);
+		history.setWriter(writer);
+		historys.add(history);
+		getBoardFree.setHistory(historys);
 
 		boardFreeRepository.save(getBoardFree);
 
@@ -322,8 +356,7 @@ public class BoardFreeService {
 		}
 		
 		if (userid != null && username != null) {
-			
-			if (userid.equals(writer.getUserId())) {
+			if (writer != null && userid.equals(writer.getUserId())) {
 				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
 			}
 
@@ -521,6 +554,13 @@ public class BoardFreeService {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
+		String accountUsername = principal.getUsername();
+		String accountType = principal.getType();
+
+		BoardWriter writer = new BoardWriter();
+		writer.setUserId(accountId);
+		writer.setUsername(accountUsername);
+		writer.setType(accountType);
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
@@ -550,8 +590,32 @@ public class BoardFreeService {
 		
 		switch (type) {
 		case CommonConst.BOARD_DELETE_TYPE_POSTONLY:
+			
 			boardFree.setContent(null);
 			boardFree.setSubject(null);
+			boardFree.setWriter(null);
+			
+			List<BoardHistory> historys = boardFree.getHistory();
+			
+			if (historys == null) {
+				historys = new ArrayList<BoardHistory>();
+			}
+			
+			BoardHistory history = new BoardHistory();
+			history.setId(new ObjectId().toString());
+			history.setType(CommonConst.BOARD_HISTORY_TYPE_DELETE);
+			history.setWriter(writer);
+			historys.add(history);
+			boardFree.setHistory(historys);
+			
+			BoardStatus boardStatus = boardFree.getStatus();
+			
+			if (boardStatus == null) {
+				boardStatus = new BoardStatus();
+			}
+			
+			boardStatus.setDelete("delete");
+			boardFree.setStatus(boardStatus);
 			
 			boardFreeRepository.save(boardFree);
 

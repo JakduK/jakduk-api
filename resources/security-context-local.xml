@@ -25,7 +25,7 @@
 		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="http"/>
 		<intercept-url pattern="/user/write" access="isAnonymous()" requires-channel="http"/>		
 		<intercept-url pattern="/user/**" access="authenticated" requires-channel="http"/>
-		<intercept-url pattern="/oauth/daum/callback" access="authenticated" requires-channel="http"/>
+		<intercept-url pattern="/oauth/callback" access="authenticated" requires-channel="http"/>
 		<intercept-url pattern="/oauth/**" access="authenticated" requires-channel="http"/>
 		<intercept-url pattern="/check/**" access="permitAll" requires-channel="http"/>
 		<intercept-url pattern="/**" requires-channel="http"/>

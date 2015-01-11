@@ -109,18 +109,29 @@ public class CommonService {
 		Long totalPages = (long) 1;		
 		Long prevPage = (long) 1;
 		Long nextPage = (long) 1;
+		Long numberPageLine = (long) 1;
 		
-		if((numberPosts - CommonConst.BOARD_SIZE_LINE_NUMBER) > 0) {
+		if ((numberPosts - CommonConst.BOARD_SIZE_LINE_NUMBER) > 0) {
 			tmpVal = (long) (numberPosts / CommonConst.BOARD_SIZE_LINE_NUMBER);
 			
-			if((numberPosts % CommonConst.BOARD_SIZE_LINE_NUMBER) == 0) {
+			if ((numberPosts % CommonConst.BOARD_SIZE_LINE_NUMBER) == 0) {
 				totalPages = tmpVal;
 			} else {
 				totalPages = tmpVal + 1;
 			}
 		}
 		
-		Long startPage = page - (page % numberPages) + 1;
+		if (totalPages - numberPages > 0) {
+			tmpVal = (long) (totalPages / numberPages);
+			
+			if ((totalPages % numberPages) == 0) {
+				numberPageLine = tmpVal;
+			} else {
+				numberPageLine = tmpVal + 1;
+			}
+		}
+		
+		Long startPage = (page % numberPages) == 0 ? page - numberPages + 1 : page - (page % numberPages) + 1;
 		
 		if (startPage <= 0) {
 			startPage ++;
@@ -134,6 +145,23 @@ public class CommonService {
 		
 		Long endPage = (long) 1;
 		
+		if (totalPages <= numberPages) {
+			endPage = totalPages;
+			nextPage = (long) -1;
+		} else {
+			
+			if (numberPageLine - 1 > 0) {
+				if (((numberPageLine - 1) * numberPages) >= page) {
+					endPage = startPage + numberPages - 1;
+					nextPage = startPage + numberPages;
+				} else {
+					endPage = totalPages;
+					nextPage = (long) -1;
+				}
+			}
+		}
+		
+		/*
 		if ((totalPages - page) > numberPages) {
 			endPage = startPage + numberPages - 1;
 			nextPage = startPage + numberPages;
@@ -141,6 +169,7 @@ public class CommonService {
 			endPage = totalPages;
 			nextPage = (long) -1;
 		}
+		*/
 		
 		boardPageInfo.setStartPage(startPage);
 		boardPageInfo.setEndPage(endPage);

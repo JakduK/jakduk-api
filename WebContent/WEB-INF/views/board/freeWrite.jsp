@@ -10,12 +10,10 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
-<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-
-<!--summernote-->
-<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
-
 <script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+
+<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
 
 </head>
 <body>
@@ -25,7 +23,7 @@
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit($event)">
-	<form:textarea path="content" class="hidden" ng-model="content" ng-init="content='${boardFree.content}'"/>
+	<form:textarea path="content" class="hidden" ng-model="content"/>
 	<legend><spring:message code="board.write"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
@@ -47,8 +45,8 @@
 	<div class="form-group has-feedback" ng-class="{'has-success':boardFree.subject.$valid, 'has-error':boardFree.subject.$invalid}">
 		<label for="subject" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.subject"/></label>
 		<input type="text" name="subject" class="form-control" placeholder='<spring:message code="board.placeholder.subject"/>'
-		ng-model="subject" ng-init="subject='${boardFree.subject}'" 
-		ng-keyup="validationSubject()"
+		ng-model="subject" ng-init="subject='${boardFree.subject}'"
+		ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
 		ng-required="true" ng-minlength="3" ng-maxlength="60"/>
 		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFree.subject.$valid, 
 		'glyphicon-remove':boardFree.subject.$invalid}"></span>
@@ -60,7 +58,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
-				<summernote config="options" ng-model="content"></summernote>
+				<summernote config="options" ng-model="content" ng-model-options="{ debounce: 400 }"></summernote>
 				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
 				<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
 			</div>
@@ -89,6 +87,7 @@
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);
@@ -101,12 +100,12 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	$scope.buttonAlert = {};
 	
 	$scope.options = {
-		height: 250,
+		height: 0,
 		toolbar: [
-      ['style', ['style']],
-      ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+//      ['style', ['style']],
+      ['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
       ['fontname', ['fontname']],
-      // ['fontsize', ['fontsize']], // Still buggy
+//      ['fontsize', ['fontsize']], // Still buggy
       ['color', ['color']],
       ['para', ['ul', 'ol', 'paragraph']],
       ['height', ['height']],
@@ -116,8 +115,17 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
       ['help', ['help']]			          
 			]
 	};
+	
+	var content = "${boardFree.content}";
+	
+	if (content.length < 1) {
+		$scope.content = ".";
+	} else {
+		$scope.content = content;
+	}
+	
 	$scope.onSubmit = function(event) {
-		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsSize) {
+		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
 			$scope.submitConn = "connecting";
 			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 		} else {
@@ -152,12 +160,13 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	};		
 	
 	$scope.validationContent = function() {
-		if ($scope.content.length < Jakduk.SummernoteContentsSize) {
+		if ($scope.content.length < Jakduk.SummernoteContentsMinSize) {
 			$scope.contentAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFree.content"/>'};
 		} else {
 			$scope.contentAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 		}
 	};	
+	
 });
 </script>
 

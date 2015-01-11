@@ -79,12 +79,12 @@
 						<div class="list-group-item-text">
 							<div class="row">
 								<div class="col-xs-3 col-md-3">
-									<a href="<c:url value="/oauth/daum/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
+									<a href="<c:url value="/oauth/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
 										<i class="fa fa-facebook-square fa-3x"></i>
 									</a>
 								</div>
 								<div class="col-xs-3 col-md-3">
-									<a href="<c:url value="/oauth/daum/callback?type=daum&loginRedirect=${loginRedirect}"/>">
+									<a href="<c:url value="/oauth/callback?type=daum&loginRedirect=${loginRedirect}"/>">
 										<img src="<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png" style="width: 40px; height: 40px;"  alt="Daum">
 									</a>
 									</div>  

@@ -66,10 +66,22 @@ public class HomeController {
 		return "home/jumbotron";
 	}
 	
-	@RequestMapping(value = "/sample")
-	public String sample(Model model) {
+	@RequestMapping(value = "/summernote01")
+	public String summernote01(Model model) {
 		
-		return "home/sample";
+		return "home/summernote01";
+	}
+	
+	@RequestMapping(value = "/summernote02")
+	public String summernote02(Model model) {
+		
+		return "home/summernote02";
+	}
+	
+	@RequestMapping(value = "/sample01")
+	public String sample01(Model model) {
+		
+		return "home/sample01";
 	}
 	
 	@RequestMapping(value = "/sample02")

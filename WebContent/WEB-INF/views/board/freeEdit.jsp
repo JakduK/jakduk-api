@@ -26,6 +26,7 @@
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/edit" method="POST"
 	ng-submit="onSubmit($event)">
 	<form:hidden path="id"/>
+	<form:textarea path="content" class="hidden" ng-model="content"/>
 	<legend><spring:message code="board.edit"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
@@ -38,40 +39,43 @@
 					<form:option value="${category.name}"><fmt:message key="${category.resName}"/></form:option>
 				</c:forEach>
 			</form:select>
-			<form:errors path="categoryName" cssClass="text-danger" element="span" ng-hide="errorCategoryName"/>
-			<span class="text-danger" ng-model="errorCategoryName" ng-show="errorCategoryName">{{errorCategoryName}}</span>
+			<form:errors path="categoryName" cssClass="text-danger" element="span" ng-hide="categoryAlert.msg"/>
+			<span class="{{categoryAlert.classType}}" ng-show="categoryAlert.msg">{{categoryAlert.msg}}</span>
 			</div>
 		</div>
 	</div>
 	
 	<div class="form-group has-feedback" ng-class="{'has-success':boardFree.subject.$valid, 'has-error':boardFree.subject.$invalid}">
 		<label for="subject" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.subject"/></label>
-		<form:input path="subject" cssClass="form-control" placeholder="Subject"
-		ng-model="subject" ng-init="subject='${boardFree.subject}'" ng-blur="onSubject()"
+		<input type="text" name="subject" class="form-control" placeholder='<spring:message code="board.placeholder.subject"/>'
+		ng-model="subject" ng-init="subject='${boardFree.subject}'" 
+		ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
 		ng-required="true" ng-minlength="3" ng-maxlength="60"/>
 		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFree.subject.$valid, 
 		'glyphicon-remove':boardFree.subject.$invalid}"></span>
-		<form:errors path="subject" cssClass="text-danger" element="span" ng-hide="errorSubject"/>
-		<span class="text-danger" ng-model="errorSubject" ng-show="errorSubject">{{errorSubject}}</span>				
+		<form:errors path="subject" cssClass="text-danger" element="span" ng-hide="subjectAlert.msg"/>
+		<span class="{{subjectAlert.classType}}" ng-show="subjectAlert.msg">{{subjectAlert.msg}}</span>		
 	</div>
   
   <div class="form-group" ng-class="{'has-success':content.length >= 5, 'has-error':content.length < 5}">
 		<div class="row">
 			<div class="col-sm-12">
 				<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
-				<summernote config="options" ng-model="content"></summernote>
-				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="errorContent"/>
-				<span class="text-danger" ng-model="errorContent" ng-show="errorContent">{{errorContent}}</span>
+				<summernote config="options" ng-model="content" ng-model-options="{ debounce: 400 }"></summernote>
+				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
+				<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
 			</div>
 		</div>	
   </div>
   
-  <div class="form-group">
+	<div class="form-group">
 		<input class="btn btn-default" name="commit" type="submit" value="<spring:message code="common.button.submit"/>">
 		<a class="btn btn-danger" href="<c:url value="/board/free/${boardFree.seq}"/>"><spring:message code="common.button.cancel"/></a>
-  </div>
-
-<form:textarea path="content" ng-model="content" ng-init="content='${boardFree.content}'" class="hidden"/>  
+	</div>
+	<div>
+		<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
+		<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+	</div>	  
 </form:form>
     
 <jsp:include page="../include/footer.jsp"/>
@@ -91,13 +95,19 @@
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope) {
-		$scope.options = {
-			height: 200,
+	$scope.submitConn = "none";
+	$scope.categoryAlert = {};
+	$scope.subjectAlert = {};
+	$scope.contentAlert = {};
+	$scope.buttonAlert = {};
+	
+	$scope.options = {
+			height: 0,
 			toolbar: [
-	      ['style', ['style']],
-	      ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+//	      ['style', ['style']],
+	      ['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
 	      ['fontname', ['fontname']],
-	      // ['fontsize', ['fontsize']], // Still buggy
+//	      ['fontsize', ['fontsize']], // Still buggy
 	      ['color', ['color']],
 	      ['para', ['ul', 'ol', 'paragraph']],
 	      ['height', ['height']],
@@ -107,45 +117,55 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	      ['help', ['help']]			          
 				]
 		};
-		$scope.onSubmit = function(event) {
-			if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsSize) {
-				
-			} else {
-				$scope.onCategoryName();
-				$scope.onSubject();
-				$scope.onContent();
-				event.preventDefault();
-			}
-		};
-		
-		$scope.onCategoryName = function() {
-			if ($scope.boardFree.categoryName.$invalid) {
-				$scope.errorCategoryName = '<spring:message code="common.msg.required"/>';
-			} else {
-				$scope.errorCategoryName = "";
-			}
-		};
-		
-		$scope.onSubject = function() {
-			if ($scope.boardFree.subject.$invalid) {
-				if ($scope.boardFree.subject.$error.required) {
-					$scope.errorSubject = '<spring:message code="common.msg.required"/>';
-				} else if ($scope.boardFree.subject.$error.minlength || $scope.boardFree.subject.$error.maxlength) {
-					$scope.errorSubject = '<spring:message code="Size.boardFree.subject"/>';
-				}				
-			} else {
-				$scope.errorSubject = "";
-			}
-		};		
-		
-		$scope.onContent = function() {
-			if ($scope.content.length < Jakduk.SummernoteContentsSize) {
-				$scope.errorContent = '<spring:message code="Size.boardFree.content"/>';
-			} else {
-				$scope.errorContent = "";
-			}
-		};	
-	});
+	
+	$scope.content = "${boardFree.content}";
+	
+	$scope.onSubmit = function(event) {
+		console.log($scope.content.length);
+		console.log(Jakduk.SummernoteContentsMinSize);
+		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+			$scope.submitConn = "connecting";
+			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};			
+		} else {
+			$scope.validationCategory();
+			$scope.validationSubject();
+			$scope.validationContent();
+			
+			$scope.submitConn = "none";
+			$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
+			event.preventDefault();
+		}
+	};
+	
+	$scope.validationCategory = function() {
+		if ($scope.boardFree.categoryName.$invalid) {
+			$scope.categoryAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
+		} else {
+			$scope.categoryAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+		}
+	};
+	
+	$scope.validationSubject = function() {
+		if ($scope.boardFree.subject.$invalid) {
+			if ($scope.boardFree.subject.$error.required) {
+				$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
+			} else if ($scope.boardFree.subject.$error.minlength || $scope.boardFree.subject.$error.maxlength) {
+				$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFree.subject"/>'};
+			}				
+		} else {
+			$scope.subjectAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+		}
+	};		
+	
+	$scope.validationContent = function() {
+		if ($scope.content.length < Jakduk.SummernoteContentsMinSize) {
+			$scope.contentAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFree.content"/>'};
+		} else {
+			$scope.contentAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+		}
+	};	
+	
+});
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
