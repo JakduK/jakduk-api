@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>    
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
@@ -23,7 +23,8 @@
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit($event)">
-	<form:textarea path="content" class="hidden" ng-model="content"/>
+	${fn:length(boardFree.content)}
+	<form:textarea path="content" class="hidden" ng-model="content" ng-init="content='${boardFree.content}' ? '${boardFree.content}' : '.'"/>
 	<legend><spring:message code="board.write"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
@@ -31,9 +32,9 @@
 			<label for="categoryName" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.category"/></label>
 			<form:select path="categoryName" cssClass="form-control" 
 			ng-model="categoryName" ng-init="categoryName='${boardFree.categoryName}'" ng-change="validationCategory()" ng-required="true">
-				<form:option value=""><fmt:message key="board.category.init"/></form:option>
+				<form:option value=""><spring:message code="board.category.init"/></form:option>
 				<c:forEach items="${boardCategorys}" var="category">
-					<form:option value="${category.name}"><fmt:message key="${category.resName}"/></form:option>
+					<form:option value="${category.name}"><spring:message code="${category.resName}"/></form:option>
 				</c:forEach>
 			</form:select>
 			<form:errors path="categoryName" cssClass="text-danger" element="span" ng-hide="categoryAlert.msg"/>
@@ -58,7 +59,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
-				<summernote config="options" ng-model="content" ng-model-options="{ debounce: 400 }"></summernote>
+				<summernote config="options" ng-model="content"></summernote>
 				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
 				<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
 			</div>
@@ -115,14 +116,6 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
       ['help', ['help']]			          
 			]
 	};
-	
-	var content = "${boardFree.content}";
-	
-	if (content.length < 1) {
-		$scope.content = ".";
-	} else {
-		$scope.content = content;
-	}
 	
 	$scope.onSubmit = function(event) {
 		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {

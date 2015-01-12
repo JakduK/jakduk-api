@@ -26,7 +26,7 @@
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/edit" method="POST"
 	ng-submit="onSubmit($event)">
 	<form:hidden path="id"/>
-	<form:textarea path="content" class="hidden" ng-model="content"/>
+	<form:textarea path="content" class="hidden" ng-model="content" ng-init="content='${boardFree.content}'"/>
 	<legend><spring:message code="board.edit"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
@@ -61,7 +61,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
-				<summernote config="options" ng-model="content" ng-model-options="{ debounce: 400 }"></summernote>
+				<summernote config="options" ng-model="content"></summernote>
 				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
 				<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
 			</div>
@@ -117,8 +117,6 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	      ['help', ['help']]			          
 				]
 		};
-	
-	$scope.content = "${boardFree.content}";
 	
 	$scope.onSubmit = function(event) {
 		console.log($scope.content.length);
