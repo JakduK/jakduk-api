@@ -45,6 +45,9 @@
 		<c:set var="authRole" value="USER"/>
 		<sec:authentication property="principal.id" var="accountId"/>
 	</sec:authorize>
+	<sec:authorize access="hasAnyRole('ROLE_ROOT')">
+		<c:set var="authAdminRole" value="ROOT"/>
+	</sec:authorize>	
 	
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
@@ -62,14 +65,38 @@
 		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
 			<spring:message code="common.button.edit"/>
 		</button>
-		<button type="button" class="btn btn-default" onclick="confirmDelete();">
-			<spring:message code="common.button.delete"/>
+		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
+			<span class="glyphicon glyphicon-trash"></span> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
-	
+	<c:choose>
+		<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
+			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
+				<spring:message code="common.button.set.as.notice"/>
+			</button>
+		</c:when>
+		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
+			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+				<spring:message code="common.button.cancel.notice"/>
+			</button>		
+		</c:when>
+	</c:choose>
+
 	<p></p>
 	
 	<c:choose>
+		<c:when test="${result == 'setNotice'}">
+			<div class="alert alert-success" role="alert"><spring:message code="board.msg.set.as.notice"/></div>
+		</c:when>	
+		<c:when test="${result == 'cancelNotice'}">
+			<div class="alert alert-success" role="alert"><spring:message code="board.msg.cancel.notice"/></div>
+		</c:when>
+		<c:when test="${result == 'alreadyNotice'}">
+			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.already.notice"/></div>
+		</c:when>
+		<c:when test="${result == 'alreadyNotNotice'}">
+			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.already.not.notice"/></div>
+		</c:when>		
 		<c:when test="${result == 'existComment'}">
 			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post"/></div>
 		</c:when>
@@ -234,10 +261,22 @@
 		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
 			<spring:message code="common.button.edit"/>
 		</button>
-		<button type="button" class="btn btn-default" onclick="confirmDelete();">
-			<spring:message code="common.button.delete"/>
+		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
+			<span class="glyphicon glyphicon-trash"></span> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
+	<c:choose>
+		<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
+			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
+				<spring:message code="common.button.set.as.notice"/>
+			</button>
+		</c:when>
+		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
+			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+				<spring:message code="common.button.cancel.notice"/>
+			</button>		
+		</c:when>
+	</c:choose>	
 	
 	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->

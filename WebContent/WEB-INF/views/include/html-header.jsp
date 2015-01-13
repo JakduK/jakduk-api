@@ -14,8 +14,7 @@
 <!-- Bootstrap core CSS -->
 <link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap.css" rel="stylesheet">    
 <!-- Custom styles for this template -->
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/offcanvas.css" rel="stylesheet">
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/navbar.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/jakduk/css/jakduk.css" rel="stylesheet">
 
 <!-- 
 <link href="//fonts.googleapis.com/earlyaccess/nanumgothic.css" rel="stylesheet">

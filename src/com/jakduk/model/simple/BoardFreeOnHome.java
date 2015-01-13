@@ -3,6 +3,7 @@ package com.jakduk.model.simple;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.BoardWriter;
 
 /**
@@ -32,6 +33,8 @@ public class BoardFreeOnHome {
 	 * 글 번호
 	 */
 	private int seq;
+	
+	private BoardStatus status;
 
 	public String getId() {
 		return id;
@@ -65,9 +68,19 @@ public class BoardFreeOnHome {
 		this.seq = seq;
 	}
 
+	public BoardStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(BoardStatus status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardFreeOnHome [id=" + id + ", writer=" + writer
-				+ ", subject=" + subject + ", seq=" + seq + "]";
+				+ ", subject=" + subject + ", seq=" + seq + ", status="
+				+ status + "]";
 	}
+	
 }

@@ -3,5 +3,5 @@
 
 <hr>
 <footer>
-	<p>&copy; JakduK 2014</p>
+	<p>&copy; JakduK. 2014. <a href="mailto:phjang1983@daum.net">Mail to administrator</a></p>
 </footer>

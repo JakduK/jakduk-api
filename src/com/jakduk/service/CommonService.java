@@ -319,6 +319,27 @@ public class CommonService {
 		return result;
 	}
 	
+	public Boolean isAdmin() {
+		Boolean result = false;
+		
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			result = true;
+		}
+		
+		if (result == false) {
+			Collection<? extends GrantedAuthority> authoritys = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			
+			for (GrantedAuthority authority : authoritys) {
+				if (authority.getAuthority().equals("ROLE_ROOT")) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}	
+	
 	public Boolean isRedirectUrl(String url) {
 		Boolean result = true;
 		

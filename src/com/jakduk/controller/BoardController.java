@@ -147,5 +147,43 @@ public class BoardController {
 
 		return "redirect:/board/free";
 	}
+	
+	@RequestMapping(value = "/notice/set/{seq}", method = RequestMethod.GET)
+	public String setFreeNotice(@PathVariable int seq, Model model,
+			HttpServletResponse response) throws IOException {
+		
+		Integer status = boardFreeService.setNotice(seq, CommonConst.COMMON_TYPE_SET);
+		
+		if (status.equals(HttpServletResponse.SC_OK)) {
+			return "redirect:/board/free/" + seq + "?result=setNotice";
+		} else if (status.equals(HttpServletResponse.SC_NOT_ACCEPTABLE)) {
+			return "redirect:/board/free/" + seq + "?result=alreadyNotice";
+		} else if (status.equals(HttpServletResponse.SC_UNAUTHORIZED)) {
+			response.sendError(status);
+		} else {
+			response.sendError(status);
+		}
+		
+		return null;	
+	}
+	
+	@RequestMapping(value = "/notice/cancel/{seq}", method = RequestMethod.GET)
+	public String releaseFreeNotice(@PathVariable int seq, Model model,
+			HttpServletResponse response) throws IOException {
+		
+		Integer status = boardFreeService.setNotice(seq, CommonConst.COMMON_TYPE_CANCEL);
+		
+		if (status.equals(HttpServletResponse.SC_OK)) {
+			return "redirect:/board/free/" + seq + "?result=cancelNotice";
+		} else if (status.equals(HttpServletResponse.SC_NOT_ACCEPTABLE)) {
+			return "redirect:/board/free/" + seq + "?result=alreadyNotNotice";
+		} else if (status.equals(HttpServletResponse.SC_UNAUTHORIZED)) {
+			response.sendError(status);
+		} else {
+			response.sendError(status);
+		}
+		
+		return null;	
+	}
 
 }

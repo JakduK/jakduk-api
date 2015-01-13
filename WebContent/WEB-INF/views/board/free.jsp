@@ -75,108 +75,185 @@
   	</div>  	
   </div> <!-- /panel-heading -->
 
-  <!-- List group -->
-  <ul class="list-group">
-<c:forEach items="${posts}" var="post">
-	<li class="list-group-item">
-	<div class="row">
-	<div class="col-sm-2">	
-		${post.seq}
-		|
-		<c:if test="${!empty post.categoryName}">
-			<fmt:message key="${categorys[post.categoryName]}"/>
-		</c:if>
-	</div>
-	<div class="col-sm-4">
-	<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
-		<c:choose>
-			<c:when test="${post.status.delete == 'delete'}">
-				<strong><spring:message code="board.msg.deleted"/></strong>
-			</c:when>
-			<c:otherwise>
-				<strong>${post.subject}</strong>
-			</c:otherwise>
-		</c:choose>
-		<c:if test="${!empty commentCount[post.id]}">
-			<span class="text-success">&nbsp;[${commentCount[post.id]}]</span>
-		</c:if>		
-	</a>
-	</div>
-	
-	<div class="col-sm-3">
-		${post.writer.username}
-		|
-		<%@page import="java.util.Date"%>
-		<%Date CurrentDate = new Date();%>
-		<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
-		<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
-	
-		<c:choose>
-			<c:when test="${postDate < nowDate}">
-				<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
-			</c:when>
-			<c:otherwise>
-				<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.time}" />
-			</c:otherwise>
-		</c:choose>		
-	</div>
-	<div class="col-sm-3">
-		<spring:message code="board.views"/><strong> ${post.views}</strong> |
-		<span class="text-primary">
-			<span class="glyphicon glyphicon-thumbs-up"></span>
-			<strong>
-				<c:choose>
-					<c:when test="${!empty usersLikingCount[post.id]}">${usersLikingCount[post.id]}</c:when>
-					<c:otherwise>0</c:otherwise>
-				</c:choose>
-			</strong>
-		</span> |
-		<span class="text-danger">
-			<span class="glyphicon glyphicon-thumbs-down"></span>
-			<strong>
-				<c:choose>
-					<c:when test="${!empty usersDislikingCount[post.id]}">${usersDislikingCount[post.id]}</c:when>
-					<c:otherwise>0</c:otherwise>
-				</c:choose>
-			</strong>
-		</span>		
-	</div>	
-	</div> <!-- /row -->	
-	</li>
-</c:forEach>
-</ul>
+	<!-- List group -->
+	<ul class="list-group">
+		<c:forEach items="${notices}" var="notice">
+			<li class="list-group-item list-group-item-warning">
+				<div class="row">
+					<div class="col-sm-2">
+						<spring:message code="board.notice"/>
+					</div>
+					<div class="col-sm-4">
+						<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
+							<c:choose>
+								<c:when test="${notice.status.delete == 'delete'}">
+									<strong><spring:message code="board.msg.deleted"/></strong>
+								</c:when>
+								<c:otherwise>
+									<strong>${notice.subject}</strong>
+								</c:otherwise>
+							</c:choose>
+							<c:if test="${!empty commentCount[notice.id]}">
+								<span class="text-success">&nbsp;[${commentCount[notice.id]}]</span>
+							</c:if>		
+						</a>
+					</div>
+					<div class="col-sm-3">
+						${notice.writer.username}
+						|
+						<%@page import="java.util.Date"%>
+						<%Date CurrentDate = new Date();%>
+						<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+						<fmt:formatDate var="postDate" value="${createDate[notice.id]}" pattern="yyyy-MM-dd" />
+					
+						<c:choose>
+							<c:when test="${postDate < nowDate}">
+								<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.date}" />
+							</c:when>
+							<c:otherwise>
+								<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.time}" />
+							</c:otherwise>
+						</c:choose>					
+					</div>
+					<div class="col-sm-3">
+						<spring:message code="board.views"/><strong> ${notice.views}</strong> |
+						<span class="text-primary">
+							<span class="glyphicon glyphicon-thumbs-up"></span>
+							<strong>
+								<c:choose>
+									<c:when test="${!empty usersLikingCount[notice.id]}">${usersLikingCount[notice.id]}</c:when>
+									<c:otherwise>0</c:otherwise>
+								</c:choose>
+							</strong>
+						</span> |
+						<span class="text-danger">
+							<span class="glyphicon glyphicon-thumbs-down"></span>
+							<strong>
+								<c:choose>
+									<c:when test="${!empty usersDislikingCount[notice.id]}">${usersDislikingCount[notice.id]}</c:when>
+									<c:otherwise>0</c:otherwise>
+								</c:choose>
+							</strong>
+						</span>						
+					</div>
+				</div>
+			</li>
+		</c:forEach>
+		<c:forEach items="${posts}" var="post">
+			<li class="list-group-item">
+				<div class="row">
+					<div class="col-sm-2">	
+						${post.seq}
+						|
+						<c:if test="${!empty post.categoryName}">
+							<fmt:message key="${categorys[post.categoryName]}"/>
+						</c:if>
+					</div>
+					<div class="col-sm-4">
+						<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
+							<c:choose>
+								<c:when test="${post.status.delete == 'delete'}">
+									<strong><spring:message code="board.msg.deleted"/></strong>
+								</c:when>
+								<c:otherwise>
+									<strong>${post.subject}</strong>
+								</c:otherwise>
+							</c:choose>
+							<c:if test="${!empty commentCount[post.id]}">
+								<span class="text-success">&nbsp;[${commentCount[post.id]}]</span>
+							</c:if>		
+						</a>
+					</div>
+					
+					<div class="col-sm-3">
+						${post.writer.username}
+						|
+						<%@page import="java.util.Date"%>
+						<%Date CurrentDate = new Date();%>
+						<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+						<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+					
+						<c:choose>
+							<c:when test="${postDate < nowDate}">
+								<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
+							</c:when>
+							<c:otherwise>
+								<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.time}" />
+							</c:otherwise>
+						</c:choose>		
+					</div>
+					<div class="col-sm-3">
+						<spring:message code="board.views"/><strong> ${post.views}</strong> |
+						<span class="text-primary">
+							<span class="glyphicon glyphicon-thumbs-up"></span>
+							<strong>
+								<c:choose>
+									<c:when test="${!empty usersLikingCount[post.id]}">${usersLikingCount[post.id]}</c:when>
+									<c:otherwise>0</c:otherwise>
+								</c:choose>
+							</strong>
+						</span> |
+						<span class="text-danger">
+							<span class="glyphicon glyphicon-thumbs-down"></span>
+							<strong>
+								<c:choose>
+									<c:when test="${!empty usersDislikingCount[post.id]}">${usersDislikingCount[post.id]}</c:when>
+									<c:otherwise>0</c:otherwise>
+								</c:choose>
+							</strong>
+						</span>		
+					</div>	
+				</div> <!-- /row -->	
+			</li>
+		</c:forEach>
+	</ul>
 </div>
 
-<ul class="pagination">
- <c:choose>
- 	<c:when test="${pageInfo.prevPage == -1}">
- 		<li class="disabled"><a href="#">&laquo;</a></li>
- 	</c:when>
- 	<c:otherwise>
- 		<li><a href="?page=${pageInfo.prevPage}&category=${boardListInfo.category}">&laquo;</a></li>
- 	</c:otherwise>
- </c:choose>
- <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="pageIdx">
- 	<c:choose>
- 		<c:when test="${boardListInfo.page == pageIdx}">
- 			<li class="active"><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
- 		</c:when>
- 		<c:otherwise>
- 			<li><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
- 		</c:otherwise>
- 	</c:choose>
- </c:forEach>
- <c:choose>
- 	<c:when test="${pageInfo.nextPage == -1}">
- 		<li class="disabled"><a href="#">&raquo;</a></li>
- 	</c:when>
- 	<c:otherwise>
- 		<li><a href="?page=0">&raquo;</a></li>
- 	</c:otherwise>
- </c:choose> 
-</ul>
+	<c:choose>
+		<c:when test="${authRole == 'ANNONYMOUS'}">
+		<button type="button" class="btn btn-default" onclick="needLogin();">
+			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		</button>	
+		</c:when>
+		<c:when test="${authRole == 'USER'}">
+		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
+			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		</button>	
+		</c:when>	
+	</c:choose>
+
+	<div>
+		<ul class="pagination">
+		 <c:choose>
+		 	<c:when test="${pageInfo.prevPage == -1}">
+		 		<li class="disabled"><a href="#">&laquo;</a></li>
+		 	</c:when>
+		 	<c:otherwise>
+		 		<li><a href="?page=${pageInfo.prevPage}&category=${boardListInfo.category}">&laquo;</a></li>
+		 	</c:otherwise>
+		 </c:choose>
+		 <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="pageIdx">
+		 	<c:choose>
+		 		<c:when test="${boardListInfo.page == pageIdx}">
+		 			<li class="active"><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
+		 		</c:when>
+		 		<c:otherwise>
+		 			<li><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
+		 		</c:otherwise>
+		 	</c:choose>
+		 </c:forEach>
+		 <c:choose>
+		 	<c:when test="${pageInfo.nextPage == -1}">
+		 		<li class="disabled"><a href="#">&raquo;</a></li>
+		 	</c:when>
+		 	<c:otherwise>
+		 		<li><a href="?page=0">&raquo;</a></li>
+		 	</c:otherwise>
+		 </c:choose> 
+		</ul>
+	</div>	
  
-<jsp:include page="../include/footer.jsp"/>
+	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript

@@ -7,6 +7,9 @@ package com.jakduk.common;
  */
 public class CommonConst {
 	
+	public final static String COMMON_TYPE_SET = "set";
+	public final static String COMMON_TYPE_CANCEL = "cancel";
+	
 	/**
 	 * 게시판 종류. SEQUNCE 생성에도 쓰임.
 	 */
@@ -94,5 +97,4 @@ public class CommonConst {
 	public final static String BOARD_HISTORY_TYPE_EDIT = "edit";
 	public final static String BOARD_HISTORY_TYPE_DELETE = "delete";
 	public final static String BOARD_HISTORY_TYPE_NOTICE = "notice";
-	
 }

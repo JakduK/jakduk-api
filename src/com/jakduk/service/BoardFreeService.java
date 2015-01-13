@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.util.stats.Histogram;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -239,6 +238,9 @@ public class BoardFreeService {
 				numberPosts = boardFreeRepository.countByCategoryName(categoryName);
 			}
 			
+			Pageable noticePageable = new PageRequest(0, 10, sort);
+			List<BoardFreeOnList> notices = boardFreeRepository.findByNotice(noticePageable).getContent();
+			
 			BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
 			
 //			logger.debug("countAll=" + boardPageInfo);
@@ -246,6 +248,16 @@ public class BoardFreeService {
 			for (BoardFreeOnList tempPost : posts) {
 				String tempId = tempPost.getId();
 				Integer tempSeq = tempPost.getSeq();
+				
+				ObjectId objId = new ObjectId(tempId);
+				createDate.put(tempId, objId.getDate());
+				
+				seqs.add(tempSeq);
+			}
+			
+			for (BoardFreeOnList tempNotice : notices) {
+				String tempId = tempNotice.getId();
+				Integer tempSeq = tempNotice.getSeq();
 				
 				ObjectId objId = new ObjectId(tempId);
 				createDate.put(tempId, objId.getDate());
@@ -267,6 +279,7 @@ public class BoardFreeService {
 			HashMap<String, Integer> usersDislikingCount = boardFreeDAO.getBoardFreeUsersDislikingCount(seqs);
 			
 			model.addAttribute("posts", posts);
+			model.addAttribute("notices", notices);
 			model.addAttribute("categorys", categorys);
 			model.addAttribute("pageInfo", boardPageInfo);
 			model.addAttribute("boardListInfo", boardListInfo);
@@ -620,11 +633,11 @@ public class BoardFreeService {
 			boardFreeRepository.save(boardFree);
 
 			if (logger.isInfoEnabled()) {
-				logger.info("post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+				logger.info("A post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 			}
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("BoardFree(delete post only) = " + boardFree);
+				logger.debug("Delete(post only) post. BoardFree = " + boardFree);
 			}
 			
 			break;
@@ -633,14 +646,61 @@ public class BoardFreeService {
 			boardFreeRepository.delete(boardFree);
 
 			if (logger.isInfoEnabled()) {
-				logger.info("post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+				logger.info("A post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 			}
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("BoardFree(all) = " + boardFree);
+				logger.debug("Delete(all) post. BoardFree = " + boardFree);
 			}
 			
 			break;
+		}
+		
+		return HttpServletResponse.SC_OK;
+	}
+	
+	public Integer setNotice(int seq, String type) {
+		
+		if (!commonService.isAdmin()) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		BoardStatus status = boardFree.getStatus();
+		
+		if (status == null) {
+			status = new BoardStatus();
+		}
+		
+		String notice = status.getNotice();
+		
+		switch (type) {
+		case CommonConst.COMMON_TYPE_SET:
+			if (notice != null && notice.equals(CommonConst.BOARD_HISTORY_TYPE_NOTICE)) {			
+				return HttpServletResponse.SC_NOT_ACCEPTABLE;
+			}
+			
+			status.setNotice(CommonConst.BOARD_HISTORY_TYPE_NOTICE);
+			break;
+			
+		case CommonConst.COMMON_TYPE_CANCEL:
+			if (notice == null) {
+				return HttpServletResponse.SC_NOT_ACCEPTABLE;
+			}
+			
+			status.setNotice(null);
+			break;
+		}
+		
+		boardFree.setStatus(status);
+		boardFreeRepository.save(boardFree);
+		
+		if (logger.isInfoEnabled()) {
+			logger.info("Set notice. post seq=" + boardFree.getSeq() + ", type=" + status.getNotice());
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Set notice. BoardFree = " + boardFree);
 		}
 		
 		return HttpServletResponse.SC_OK;

@@ -28,15 +28,22 @@
 		<div class="panel panel-info">
 			<div class="panel-heading"><strong><a href="<c:url value="/board/free"/>"><spring:message code="home.posts.latest"/></a></strong></div>		
 			<table class="table table-hover table-condensed">
+			<thead>
 				<tr>
-					<th><spring:message code="board.subject"/></th>
-					<th><spring:message code="board.date"/></th>
-				</tr>		
+					<th class="col-xs-4"><spring:message code="board.subject"/></th>
+					<th class="col-xs-2"><spring:message code="board.date"/></th>
+				</tr>	
+			</thead>
+			<tbody>
 				<tr ng-repeat="post in postsLatest">
-					<td><a href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a></td>
+					<td ng-switch="post.status.delete">
+						<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+						<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
+					</td>
 					<td ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</td>
 					<td ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</td>
 				</tr>
+			</tbody>				
 			</table>
 		</div>
 	</div>
@@ -45,14 +52,18 @@
 		<div class="panel panel-info">
 			<div class="panel-heading"><strong><spring:message code="home.members.registered.latest"/></strong></div>
 			<table class="table table-hover table-condensed">
+			<thead>
 				<tr>
-					<th><spring:message code="user.nickname"/></th>
-					<th><spring:message code="user.comment"/></th>
+					<th class="col-xs-1"><spring:message code="user.nickname"/></th>
+					<th class="col-xs-5"><spring:message code="user.comment"/></th>
 				</tr>
+			</thead>
+			<tbody>
 				<tr ng-repeat="user in usersLatest">
 					<td>{{user.username}}</td>
 					<td>{{user.about}}</td>
-				</tr>				
+				</tr>	
+			</tbody>
 			</table>				
 		</div>
 	</div><!--/span-->
