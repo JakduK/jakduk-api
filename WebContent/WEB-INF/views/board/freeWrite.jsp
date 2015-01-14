@@ -23,8 +23,7 @@
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit($event)">
-	${fn:length(boardFree.content)}
-	<form:textarea path="content" class="hidden" ng-model="content" ng-init="content='${boardFree.content}' ? '${boardFree.content}' : '.'"/>
+	<form:textarea path="content" class="hidden" ng-model="content" ng-init="content='${boardFree.content}' ? '${boardFree.content}' : '♪'"/>
 	<legend><spring:message code="board.write"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
@@ -109,9 +108,9 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 //      ['fontsize', ['fontsize']], // Still buggy
       ['color', ['color']],
       ['para', ['ul', 'ol', 'paragraph']],
-      ['height', ['height']],
+//      ['height', ['height']],
       ['table', ['table']],
-      ['insert', ['link',/* 'picture', 'video',*/ 'hr']],
+      ['insert', ['link', 'picture', 'video', 'hr']],
       ['view', ['fullscreen', 'codeview']],
       ['help', ['help']]			          
 			]

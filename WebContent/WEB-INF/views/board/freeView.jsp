@@ -221,7 +221,7 @@
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<summernote config="options" on-focus="focus(evt)" 
-				ng-model="summernote.content" ng-init="summernote={content:'.', seq:'${post.seq}'}"></summernote>
+				ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
 				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
 			</div>
 			<div class="panel-footer">
@@ -418,7 +418,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		var reqPromise = $http.post(bUrl, $scope.summernote, config);
 		
 		reqPromise.success(function(data, status, headers, config) {
-			$scope.summernote.content = ".";
+			$scope.summernote.content = "♪";
 			$scope.loadComments("btnWriteComment", 1, 100);
 			
 			var page = parseInt($scope.commentCount / Jakduk.BoardCommentSize);
@@ -565,7 +565,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 
 function needLogin() {
 	if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
-		location.href = "<c:url value="/board/free/write"/>";
+		location.href = '<c:url value="/board/free/write"/>';
 	}
 }	
 
@@ -574,11 +574,11 @@ function confirmDelete() {
 	
 	if (commentCount > 0) {
 		if (confirm('<spring:message code="board.msg.confirm.delete.post.except.comment"/>') == true) {
-			location.href = "<c:url value="/board/free/delete/${post.seq}?type=postonly"/>";
+			location.href = '<c:url value="/board/free/delete/${post.seq}?type=postonly"/>';
 		}	
 	} else {
 		if (confirm('<spring:message code="board.msg.confirm.delete.post"/>') == true) {
-			location.href = "<c:url value="/board/free/delete/${post.seq}?type=all"/>";
+			location.href = '<c:url value="/board/free/delete/${post.seq}?type=all"/>';
 		}
 	}
 }

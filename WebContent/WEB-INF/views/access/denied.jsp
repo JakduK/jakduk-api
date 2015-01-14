@@ -13,5 +13,6 @@
 	<hr/>
 	
 	<p class="message">Access denied!</p>
+	<jsp:include page="../include/footer.jsp"/>
 </body>
 </html>

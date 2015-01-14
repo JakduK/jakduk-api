@@ -3,5 +3,6 @@
 
 <hr>
 <footer>
-	<p>&copy; JakduK. 2014. <a href="mailto:phjang1983@daum.net">Mail to administrator</a></p>
+	<p class="text-muted">&copy; <a class="text-muted" href="https://github.com/Pyohwan">Project JakduK</a> 2014 | 
+	<a href="mailto:phjang1983@daum.net">Mail to administrator</a></p>
 </footer>

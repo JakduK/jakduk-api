@@ -40,10 +40,10 @@
 			authentication-success-handler-ref="jakdukSuccessHandler" 
 			authentication-failure-handler-ref="jakdukFailureHandler"/>
 			
-		<access-denied-handler error-page="/denied" />
+		<access-denied-handler error-page="/error/denied" />
 		
 		<session-management>
-			<concurrency-control max-sessions="3" expired-url="/login/duplicate"/>
+			<concurrency-control max-sessions="3" expired-url="/error/maxSession"/>
 		</session-management>
 		
 		<logout invalidate-session="true" logout-url="/logout" logout-success-url="/logout/success"/>					

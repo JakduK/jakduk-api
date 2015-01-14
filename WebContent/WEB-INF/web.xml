@@ -78,6 +78,22 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	<session-config>
 		<session-timeout>4320</session-timeout>
 	</session-config>
+	
+	<error-page>
+		<error-code>401</error-code>
+		<location>/error/401</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error/404</location>
+	</error-page>
+	<error-page>
+		<error-code>406</error-code>
+		<location>/error/406</location>
+	</error-page>
+	<error-page>
+		<location>/error/0</location>	
+	</error-page>
 
 <!--  
 	<welcome-file-list>

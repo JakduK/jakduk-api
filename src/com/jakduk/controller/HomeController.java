@@ -6,10 +6,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,8 +34,6 @@ public class HomeController {
 	
 	@Resource
 	LocaleResolver localeResolver;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
 	
 	@RequestMapping
 	public String root() {
@@ -183,6 +181,14 @@ public class HomeController {
 		homeService.getUserLatest(model);
 		
 		return "home/user/latest";
+	}
+	
+	@RequestMapping(value = "/error/{code}", method = RequestMethod.GET)
+	public String error(Model model, @PathVariable String code) {
+		
+		model.addAttribute("code", code);
+		
+		return "access/error";
 	}
 
 }

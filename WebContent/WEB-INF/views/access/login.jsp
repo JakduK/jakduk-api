@@ -40,7 +40,7 @@
 						<div class="form-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
 						'has-error':loginForm.j_username.$invalid}">
 							<label class="control-label sr-only" for="j_username">Hidden label</label>
-							<input type="email" class="form-control" id="j_username" name="j_username" placeholder="E-mail"
+							<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
 							ng-model="email" ng-required="true" ng-minlength="6" ng-maxlength="20" 
 							ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/" autofocus>
 							<span class="glyphicon form-control-feedback" 
@@ -51,7 +51,7 @@
 						<div class="form-group has-feedback"
 						ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
 							<label class="control-label sr-only" for="password">Hidden label</label>
-							<input type="password" class="form-control" id="j_password" name="j_password" placeholder="Password"
+							<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>'
 							ng-model="password" ng-required="true" ng-minlength="4" ng-maxlength="20">
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>							
@@ -88,14 +88,16 @@
 										<img src="<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png" style="width: 40px; height: 40px;"  alt="Daum">
 									</a>
 									</div>  
-								</div> 	    
-							</div>  
+								</div> 	
+							</div>
 						</div>
 					</div>
 				</div> <!-- /.panel-body -->
 			</div>
-		</div>
+			<jsp:include page="../include/footer.jsp"/>      
+		</div>		
 	</div>
+	
 </div><!-- /.container -->
 
 <script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
