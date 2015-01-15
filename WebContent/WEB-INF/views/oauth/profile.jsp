@@ -47,7 +47,7 @@
 	<hr>  
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
-				<a class="btn btn-info" href="<c:url value="/oauth/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>				
+				<a class="btn btn-default" href="<c:url value="/oauth/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>				
 			</div> 
 		</div>  
 </form>

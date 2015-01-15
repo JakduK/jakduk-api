@@ -247,7 +247,7 @@
 		 		<li class="disabled"><a href="#">&raquo;</a></li>
 		 	</c:when>
 		 	<c:otherwise>
-		 		<li><a href="?page=0">&raquo;</a></li>
+		 		<li><a href="?page=${pageInfo.nextPage}&category=${boardListInfo.category}">&raquo;</a></li>
 		 	</c:otherwise>
 		 </c:choose> 
 		</ul>
