@@ -22,9 +22,9 @@
 
 
 </div>
+
+<script src="<%=request.getContextPath()%>/resources/angular-beforeunload/js/angular-beforeunload.js"></script>
 <script type="text/javascript">
-
-
 
 var myApp = angular.module('spicyApp1', []);
 

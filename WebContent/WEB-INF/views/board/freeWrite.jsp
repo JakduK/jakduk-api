@@ -90,6 +90,16 @@
 
 <script type="text/javascript">
 
+/*
+window.onbeforeunload = function(e) {
+	(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+	return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+};
+
+$('boardFree').submit(function() {
+	$(window).unbind('beforeunload');
+});
+*/
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope) {
