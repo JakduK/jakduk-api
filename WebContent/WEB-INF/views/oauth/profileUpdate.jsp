@@ -33,7 +33,7 @@
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
 				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
-				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'loading'"></i>					
+				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>					
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername(OAuthUserWrite)">{{usernameAlert.msg}}</span>
 			</div>
@@ -101,7 +101,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 			var bUrl = '<c:url value="/check/oauth/update/username.json?username=' + $scope.username + '"/>';
 			if ($scope.usernameConn == "none") {
 				var reqPromise = $http.get(bUrl);
-				$scope.usernameConn = "loading";
+				$scope.usernameConn = "connecting";
 				reqPromise.success(function(data, status, headers, config) {
 					if (data.existUsername != null) {
 						if (data.existUsername == false) {
@@ -114,17 +114,15 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 					}
 					$scope.usernameConn = "none";
 				});
-				reqPromise.error(usernameError);
+				reqPromise.error(function(data, status, headers, config) {
+					$scope.usernameConn = "none";
+					$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};					
+				});
 			}
 		} else {
 			checkUsername(OAuthUserWrite);
 		}
 	};
-	
-	function usernameError(data, status, headers, config) {
-		$scope.usernameConn = "none";
-		$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
-	}
 	
 	function checkUsername(OAuthUserWrite) {
 		

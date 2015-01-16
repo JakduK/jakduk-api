@@ -66,7 +66,7 @@
 
 <div class="panel panel-info" ng-controller="boardCtrl">
   <!-- Default panel contents -->
-  <div class="panel-heading visible-sm visible-md visible-lg">
+  <div class="panel-heading hidden-xs">
   	<div class="row">
   		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
   		<div class="col-sm-4"><spring:message code="board.subject"/></div>

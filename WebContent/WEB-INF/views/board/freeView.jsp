@@ -149,20 +149,23 @@
 				<spring:message code="board.like"/>			
 				<span class="text-primary" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
 					<i class="fa fa-thumbs-o-up fa-lg"></i>
-					{{numberOfLike}}
 				</span>
+				<span class="text-primary" ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>
+				<span class="text-primary"><i class="fa fa-circle-o-notch fa-spin" ng-show="likeConn == 'connecting'"></i></span>
 			</button>
 			<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
 				<spring:message code="board.dislike"/>
 				<span class="text-danger" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
 					<i class="fa fa-thumbs-o-down fa-lg"></i>
-					{{numberOfDislike}}
 				</span>
+				<span class="text-danger" ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>
+				<span class="text-danger"><i class="fa fa-circle-o-notch fa-spin" ng-show="dislikeConn == 'connecting'"></i></span>				
 			</button>
 			<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
 		</div>
 	</div> <!-- /panel -->
 	
+	<!-- comment -->		
 	<div ng-controller="commentCtrl">
 		<input type="hidden" id="commentCount" value="{{commentCount}}">
 		<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
@@ -171,11 +174,11 @@
 		  	<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
 		  	&nbsp;
 				<button type="button" class="btn btn-default" ng-click="btnRefreshComment()">
-			  	<span class=" glyphicon glyphicon-refresh" aria-hidden="true"></span>
-				</button>	  	
+			  	<i class="fa fa-refresh" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
+				</button>					
 		  </div>
 				
-			<!-- List group -->
+			<!-- comment list -->
 			<ul class="list-group">
 				<li class="list-group-item" ng-repeat="comment in commentList">
 		 			<div class="row">			
@@ -213,6 +216,7 @@
 		<div class="panel-footer text-center" ng-show="commentCount || commentAlert.msg">
 			<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-show="commentCount">
 				<spring:message code="common.button.load.comment"/> <span class="glyphicon glyphicon-chevron-down"></span>
+				<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
 			</button>
 			<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
 		</div>
@@ -237,6 +241,10 @@
 						</button>				
 					</c:when>
 				</c:choose>
+				<div>
+					<i class="fa fa-circle-o-notch fa-spin" ng-show="writeCommentConn == 'connecting'"></i>
+					<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
+				</div>				
 			</div>
 		</div>	
 	</div>
@@ -297,7 +305,8 @@ var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "n
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
-	$scope.conn = "none";
+	$scope.likeConn = "none";
+	$scope.dislikeConn = "none";
 	
 	$scope.objectIdFromDate = function(date) {
 		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
@@ -307,15 +316,29 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
 	};
 	
-	$scope.btnFeeling = function(status) {
+	$scope.btnFeeling = function(type) {
 		
-		var bUrl = '<c:url value="/board/' + status + '/${post.seq}.json"/>';
+		if ("${authRole}" == "ANNONYMOUS") {
+			$scope.alert.msg = '<spring:message code="board.msg.need.login.for.feel"/>';
+			$scope.alert.classType = "alert-warning";
+			return;
+		} else if ("${accountId}" == "${post.writer.userId}") {
+			$scope.alert.msg = '<spring:message code="board.msg.you.are.writer"/>';
+			$scope.alert.classType = "alert-warning";
+			return;
+		}
 		
-		if ($scope.conn == "none") {
+		var bUrl = '<c:url value="/board/' + type + '/${post.seq}.json"/>';
+		
+		if ($scope.likeConn == "none" && $scope.dislikeConn == "none") {
 			
 			var reqPromise = $http.get(bUrl);
 			
-			$scope.conn = "loading";
+			if (type == "like") {
+				$scope.likeConn = "connecting";
+			} else if (type == "dislike") {
+				$scope.dislikeConn = "connecting";
+			}
 			
 			reqPromise.success(function(data, status, headers, config) {
 				var message = "";
@@ -342,13 +365,23 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 				
 				$scope.alert.msg = message;
 				$scope.alert.classType = mType;
-				$scope.conn = "ok";
+				
+				if (type == "like") {
+					$scope.likeConn = "success";
+				} else if (type == "dislike") {
+					$scope.dislikeConn = "success";
+				}
 				
 			});
-			reqPromise.error(function(data, status, headers, config) {
-				$scope.conn = "none";
+			reqPromise.error(function(data, status, headers, config) {				
 				$scope.alert.msg = '<spring:message code="common.msg.error.network.unstable"/>';
 				$scope.alert.classType = "alert-danger";
+				
+				if (type == "like") {
+					$scope.likeConn = "none";
+				} else if (type == "dislike") {
+					$scope.dislikeConn = "none";
+				}
 			});
 		}
 	};	
@@ -366,6 +399,9 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.commentFeelingAlert = {};
 	$scope.numberOfCommentLike = {};
 	$scope.numberOfCommentDislike = {};
+	$scope.loadCommentConn = "none";
+	$scope.writeCommentConn = "none";
+	$scope.writeCommentAlert = {};
 
 	// summernote config
 	$scope.options = {
@@ -415,24 +451,31 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			return;
 		}
 		
-		var reqPromise = $http.post(bUrl, $scope.summernote, config);
-		
-		reqPromise.success(function(data, status, headers, config) {
-			$scope.summernote.content = "♪";
-			$scope.loadComments("btnWriteComment", 1, 100);
+		if ($scope.writeCommentConn == "none") {
+			var reqPromise = $http.post(bUrl, $scope.summernote, config);
+			$scope.writeCommentConn = "connecting";
+			$scope.writeCommentAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 			
-			var page = parseInt($scope.commentCount / Jakduk.BoardCommentSize);
-			if ($scope.commentCount % Jakduk.BoardCommentSize > 0) {
-				page++;
-			}
-			
-			$scope.commentPage = page;			
-			$scope.commentAlert = {};
-			$scope.summernoteAlert = {};
-		});
-		reqPromise.error(function(data, status, headers, config) {
-			
-		});
+			reqPromise.success(function(data, status, headers, config) {
+				$scope.summernote.content = "♪";
+				$scope.loadComments("btnWriteComment", 1, 100);
+				
+				var page = parseInt($scope.commentCount / Jakduk.BoardCommentSize);
+				if ($scope.commentCount % Jakduk.BoardCommentSize > 0) {
+					page++;
+				}
+				
+				$scope.commentPage = page;			
+				$scope.commentAlert = {};
+				$scope.summernoteAlert = {};
+				$scope.writeCommentAlert = {};
+				$scope.writeCommentConn = "none";
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.writeCommentAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
+				$scope.writeCommentConn = "none";				
+			});			
+		}
 	};
 	
 	$scope.objectIdFromDate = function(date) {
@@ -470,49 +513,53 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.loadComments = function(type, page, size) {
 		var bUrl = '<c:url value="/board/free/comment/${post.seq}?page=' + page + '&size=' + size + '"/>';
 		
-		var reqPromise = $http.get(bUrl);
-		
-		reqPromise.success(function(data, status, headers, config) {
+		if ($scope.loadCommentConn == "none") {
+			var reqPromise = $http.get(bUrl);
 			
-			$scope.commentCount = data.count;
-						
-			if (data.comments.length < 1) { // 댓글이 없을때
-				if (type == "init") {					
-				} else {
-					$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-					$scope.commentAlert.classType = "alert-warning";				
-				}				
-			} else { // 댓글이 1개 이상일때
+			$scope.loadCommentConn = "connecting";
+			
+			reqPromise.success(function(data, status, headers, config) {
 				
-				if (type == "btnWriteComment") {
-					$scope.commentList = data.comments;	
-				} else {
-					if ($scope.commentPage == page) { // 
-						$scope.commentList = data.comments;					
-					} else if ($scope.commentPage < page) { // 기존 댓글이 있고, 로드한 데이터는 추가
-						
-						if (data.comments.length == size) { // 로드한 데이터가 size에 딱 맞을때
-							$scope.commentList = $scope.commentList.concat(data.comments);
-							$scope.commentPage++;
-						} else { // 로드한 데이터가 size보다 작을때에는 기존 추가되지 않은 data만 추가한다.
-							var remainder = $scope.commentList.length % size;
-							var newComments = data.comments.slice(remainder, size - 1);
+				$scope.commentCount = data.count;
 							
-							if (newComments.length < 1) {
-								$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-								$scope.commentAlert.classType = "alert-info";
-							} else {
-								$scope.commentList = $scope.commentList.concat(newComments);
+				if (data.comments.length < 1) { // 댓글이 없을때
+					if (type == "init") {					
+					} else {
+						$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
+						$scope.commentAlert.classType = "alert-warning";				
+					}				
+				} else { // 댓글이 1개 이상일때
+					
+					if (type == "btnWriteComment") {
+						$scope.commentList = data.comments;	
+					} else {
+						if ($scope.commentPage == page) { // 
+							$scope.commentList = data.comments;					
+						} else if ($scope.commentPage < page) { // 기존 댓글이 있고, 로드한 데이터는 추가
+							
+							if (data.comments.length == size) { // 로드한 데이터가 size에 딱 맞을때
+								$scope.commentList = $scope.commentList.concat(data.comments);
+								$scope.commentPage++;
+							} else { // 로드한 데이터가 size보다 작을때에는 기존 추가되지 않은 data만 추가한다.
+								var remainder = $scope.commentList.length % size;
+								var newComments = data.comments.slice(remainder, size - 1);
+								
+								if (newComments.length < 1) {
+									$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
+									$scope.commentAlert.classType = "alert-info";
+								} else {
+									$scope.commentList = $scope.commentList.concat(newComments);
+								}
 							}
 						}
 					}
 				}
-				
-			}			
-		});
-		reqPromise.error(function(data, status, headers, config) {
-			
-		});
+				$scope.loadCommentConn = "none";
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.loadCommentConn = "none";
+			});			
+		}
 	};
 	
 	$scope.btnMoreComment = function() {
