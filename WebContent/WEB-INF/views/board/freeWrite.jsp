@@ -21,6 +21,8 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
+<c:set var="summernoteLang" value="en-US"/>
+
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit($event)">
 	<form:textarea path="content" class="hidden" ng-model="content" ng-init="content='${boardFree.content}' ? '${boardFree.content}' : '♪'"/>
@@ -65,41 +67,45 @@
 		</div>	
   </div>
   
-  <div class="form-group">
-		<input class="btn btn-default" name="commit" type="submit" value="<spring:message code="common.button.submit"/>">
-		<a class="btn btn-danger" href="<c:url value="/board"/>"><spring:message code="common.button.cancel"/></a>
+	<div class="form-group">
+		<button type="submit" class="btn btn-success">
+			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+		</button>		
+		<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/board"/>'">
+			<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
+		</button>
 		<div>
-			<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
-			<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
-		</div>		
-  </div>	  
+		<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
+		<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+		</div>	
+	</div>	  
 </form:form>
     
 <jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
-
 <!-- Bootstrap core JavaScript
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script> 
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+<c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
+	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
+	<c:set var="summernoteLang" value="ko-KR"/>
+</c:if>
 
 <script type="text/javascript">
 
-/*
 window.onbeforeunload = function(e) {
-	(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
-	return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+	if (!submitted) {
+		(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+		return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+	}
 };
 
-$('boardFree').submit(function() {
-	$(window).unbind('beforeunload');
-});
-*/
+var submitted = false;
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope) {
@@ -111,6 +117,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	
 	$scope.options = {
 		height: 0,
+		lang : "${summernoteLang}",
 		toolbar: [
 //      ['style', ['style']],
       ['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
@@ -120,7 +127,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
       ['para', ['ul', 'ol', 'paragraph']],
 //      ['height', ['height']],
       ['table', ['table']],
-      ['insert', ['link', 'picture', 'video', 'hr']],
+      ['insert', ['link', /*'picture',*/ 'video', 'hr']],
       ['view', ['fullscreen', 'codeview']],
       ['help', ['help']]			          
 			]
@@ -128,8 +135,9 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	
 	$scope.onSubmit = function(event) {
 		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+			submitted = true;
 			$scope.submitConn = "connecting";
-			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
+			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};			
 		} else {
 			$scope.validationCategory();
 			$scope.validationSubject();

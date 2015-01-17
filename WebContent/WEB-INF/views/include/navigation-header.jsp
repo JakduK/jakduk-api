@@ -48,10 +48,10 @@
 							<c:choose>
 								<c:when test="${userType == 'jakduk'}">
 									<li>
-										<a href="<c:url value="/user/profile"/>"><span class="glyphicon glyphicon-wrench"></span> <spring:message code="user.profile"/></a></li>
+										<a href="<c:url value="/user/profile"/>"><span class="glyphicon glyphicon-cog"></span> <spring:message code="user.profile"/></a></li>
 								</c:when>
 								<c:when test="${userType == 'facebook' || userType == 'daum'}">
-									<li><a href="<c:url value="/oauth/profile"/>"><span class="glyphicon glyphicon-wrench"></span> <spring:message code="user.profile"/></a></li>
+									<li><a href="<c:url value="/oauth/profile"/>"><span class="glyphicon glyphicon-cog"></span> <spring:message code="user.profile"/></a></li>
 								</c:when>
 							</c:choose>
 							<li><a href="<c:url value="/logout"/>"><span class="glyphicon glyphicon-log-out"></span> <spring:message code="common.logout"/></a></li>

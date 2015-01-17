@@ -36,7 +36,7 @@
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
 				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
-				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'loading'"></i>					
+				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>					
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername()">{{usernameAlert.msg}}</span>
 			</div>
@@ -65,13 +65,15 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
-				<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
-				<a class="btn btn-danger" href="<c:url value="/"/>"><spring:message code="common.button.cancel"/></a>
-				<div>
-					<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
-					<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
-				</div>
-			</div> 
+				<button type="submit" class="btn btn-success">
+					<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+				</button>		
+				<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/"/>'">
+					<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
+				</button>
+				<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
+				<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+			</div>
 		</div>		
 	</form:form>
 	</div>
@@ -85,6 +87,14 @@
 
 <script type="text/javascript">
 
+window.onbeforeunload = function(e) {
+	if (!submitted) {
+		(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+		return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+	}
+};
+
+var submitted = false;
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
@@ -95,6 +105,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	
 	$scope.onSubmit = function(event) {
 		if ($scope.OAuthUserWrite.$valid && $scope.usernameStatus == "ok") {
+			submitted = true;
 			$scope.submitConn = "connecting";
 			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 		} else {			
@@ -115,7 +126,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 			var bUrl = '<c:url value="/check/oauth/update/username.json?username=' + $scope.username + '"/>';
 			if ($scope.usernameConn == "none") {
 				var reqPromise = $http.get(bUrl);
-				$scope.usernameConn = "loading";
+				$scope.usernameConn = "connecting";
 				reqPromise.success(function(data, status, headers, config) {
 					if (data.existUsername != null) {
 						if (data.existUsername == false) {

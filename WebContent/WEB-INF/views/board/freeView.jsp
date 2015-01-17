@@ -2,7 +2,6 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>    
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
@@ -14,16 +13,14 @@
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
 <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-
-<!--summernote-->
 <link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
 
 <script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
-
 </head>
 <body>
 <div class="container">
 	<jsp:include page="../include/navigation-header.jsp"/>
+	<c:set var="summernoteLang" value="en-US"/>
 	
 	<c:url var="listUrl" value="/board/free">
 		<c:if test="${!empty listInfo.page}">
@@ -62,8 +59,8 @@
 		</c:when>	
 	</c:choose>
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<spring:message code="common.button.edit"/>
+		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+			<span class="glyphicon glyphicon-edit"></span> <spring:message code="common.button.edit"/>
 		</button>
 		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
 			<span class="glyphicon glyphicon-trash"></span> <spring:message code="common.button.delete"/>
@@ -118,7 +115,7 @@
 						${post.subject}
 					</c:otherwise>
 				</c:choose>
-	  		<c:if test="${!empty category}">&nbsp;<small><fmt:message key="${category.resName}"/></small></c:if>
+	  		<c:if test="${!empty category}">&nbsp;<small><spring:message code="${category.resName}"/></small></c:if>
 	  	</h4>
 	  	<div class="row">
 	  		<div class="col-sm-2">
@@ -231,12 +228,12 @@
 			<div class="panel-footer">
 				<c:choose>
 					<c:when test="${authRole == 'ANNONYMOUS'}">
-						<button type="button" class="btn btn-primary" disabled="disabled">
+						<button type="button" class="btn btn-default" disabled="disabled">
 							<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
 						</button>	
 					</c:when>
 					<c:when test="${authRole == 'USER'}">
-						<button type="button" class="btn btn-primary" ng-click="btnWriteComment()">
+						<button type="button" class="btn btn-default" ng-click="btnWriteComment()">
 							<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
 						</button>				
 					</c:when>
@@ -266,8 +263,8 @@
 		</c:when>	
 	</c:choose>
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<spring:message code="common.button.edit"/>
+		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+			<span class="glyphicon glyphicon-edit"></span> <spring:message code="common.button.edit"/>
 		</button>
 		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
 			<span class="glyphicon glyphicon-trash"></span> <spring:message code="common.button.delete"/>
@@ -291,14 +288,16 @@
 
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular/js/angular-sanitize.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
-
+<c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
+	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
+	<c:set var="summernoteLang" value="ko-KR"/>
+</c:if>
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize"]);
@@ -406,6 +405,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	// summernote config
 	$scope.options = {
 			height: 0,
+			lang : "${summernoteLang}",
 			toolbar: [
 	      ['font', ['bold']],
 	      // ['fontsize', ['fontsize']], // Still buggy

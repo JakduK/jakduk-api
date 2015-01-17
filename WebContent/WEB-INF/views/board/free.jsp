@@ -3,7 +3,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>    
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <!DOCTYPE html>
@@ -146,7 +145,7 @@
 						${post.seq}
 						|
 						<c:if test="${!empty post.categoryName}">
-							<fmt:message key="${categorys[post.categoryName]}"/>
+							<spring:message code="${categorys[post.categoryName]}"/>
 						</c:if>
 					</div>
 					<div class="col-sm-4">

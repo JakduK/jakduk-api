@@ -34,7 +34,7 @@
 				ng-required="true" ng-minlength="6" ng-maxlength="30" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
 				<span class="glyphicon form-control-feedback" 
 				ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'ok'}"></span>					
-				<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'loading'"></i>
+				<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
 				<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
 				<span class="{{emailAlert.classType}}" ng-show="emailAlert.msg">{{emailAlert.msg}}</span>
 			</div>	
@@ -51,7 +51,7 @@
 				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.username.$valid, 
 				'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'ok'}"></span>
-				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'loading'"></i>
+				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>
 			</div>
@@ -111,13 +111,15 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
-				<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
-				<a class="btn btn-danger" href="<c:url value="/"/>"><spring:message code="common.button.cancel"/></a>
-				<div>
-					<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
-					<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
-				</div>					
-			</div> 
+				<button type="submit" class="btn btn-success">
+					<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+				</button>		
+				<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/"/>'">
+					<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
+				</button>
+				<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
+				<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+			</div>
 		</div>
 	</form:form>
 		
@@ -131,6 +133,14 @@
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>    
 <script type="text/javascript">
 
+window.onbeforeunload = function(e) {
+	if (!submitted) {
+		(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+		return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+	}
+};
+
+var submitted = false;
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
@@ -147,6 +157,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.onSubmit = function(event) {
 		if ($scope.userWrite.$valid && $scope.emailStatus == 'ok' && $scope.usernameStatus == 'ok' 
 				&& $scope.equalPasswordStatus == "true") {
+			submitted = true;
 			$scope.submitConn = "connecting";
 			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 		} else {
@@ -176,7 +187,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 			var bUrl = '<c:url value="/check/user/email.json?email=' + $scope.email + '"/>';
 			if ($scope.emailConn == "none") {
 				var reqPromise = $http.get(bUrl);
-				$scope.emailConn = "loading";
+				$scope.emailConn = "connecting";
 				reqPromise.success(function(data, status, headers, config) {
 					if (data.existEmail != null) {
 						if (data.existEmail == false) {
@@ -205,7 +216,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 			var bUrl = '<c:url value="/check/user/username.json?username=' + $scope.username + '"/>';
 			if ($scope.usernameConn == "none") {
 				var reqPromise = $http.get(bUrl);
-				$scope.usernameConn = "loading";
+				$scope.usernameConn = "connecting";
 				reqPromise.success(function(data, status, headers, config) {
 					if (data.existUsername != null) {
 						if (data.existUsername == false) {

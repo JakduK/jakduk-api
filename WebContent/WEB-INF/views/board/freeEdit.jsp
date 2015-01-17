@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>    
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
@@ -23,6 +23,8 @@
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
+<c:set var="summernoteLang" value="en-US"/>
+
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/edit" method="POST"
 	ng-submit="onSubmit($event)">
 	<form:hidden path="id"/>
@@ -34,9 +36,9 @@
 			<label for="categoryName" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.category"/></label>
 			<form:select path="categoryName" cssClass="form-control" 
 			ng-model="categoryName" ng-init="categoryName='${boardFree.categoryName}'" ng-blur="onCategoryName()" ng-required="true">
-				<form:option value=""><fmt:message key="board.category.init"/></form:option>
+				<form:option value=""><spring:message code="board.category.init"/></form:option>
 				<c:forEach items="${boardCategorys}" var="category">
-					<form:option value="${category.name}"><fmt:message key="${category.resName}"/></form:option>
+					<form:option value="${category.name}"><spring:message code="${category.resName}"/></form:option>
 				</c:forEach>
 			</form:select>
 			<form:errors path="categoryName" cssClass="text-danger" element="span" ng-hide="categoryAlert.msg"/>
@@ -69,8 +71,12 @@
   </div>
   
 	<div class="form-group">
-		<input class="btn btn-default" name="commit" type="submit" value="<spring:message code="common.button.submit"/>">
-		<a class="btn btn-danger" href="<c:url value="/board/free/${boardFree.seq}"/>"><spring:message code="common.button.cancel"/></a>
+		<button type="submit" class="btn btn-success">
+			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+		</button>		
+		<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/board/free/${boardFree.seq}"/>'">
+			<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
+		</button>	
 	</div>
 	<div>
 		<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
@@ -86,12 +92,23 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script> 
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+<c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
+	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
+	<c:set var="summernoteLang" value="ko-KR"/>
+</c:if>
 <script type="text/javascript">
 
+window.onbeforeunload = function(e) {
+	if (!submitted) {
+		(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+		return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+	}
+};
+
+var submitted = false;
 var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope) {
@@ -103,6 +120,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	
 	$scope.options = {
 			height: 0,
+			lang : "${summernoteLang}",
 			toolbar: [
 //	      ['style', ['style']],
 	      ['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
@@ -110,18 +128,17 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 //	      ['fontsize', ['fontsize']], // Still buggy
 	      ['color', ['color']],
 	      ['para', ['ul', 'ol', 'paragraph']],
-	      ['height', ['height']],
+//	      ['height', ['height']],
 	      ['table', ['table']],
-	      ['insert', ['link',/* 'picture', 'video',*/ 'hr']],
+	      ['insert', ['link', /*'picture'*/, 'video', 'hr']],
 	      ['view', ['fullscreen', 'codeview']],
 	      ['help', ['help']]			          
 				]
 		};
 	
 	$scope.onSubmit = function(event) {
-		console.log($scope.content.length);
-		console.log(Jakduk.SummernoteContentsMinSize);
 		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+			submitted = true;
 			$scope.submitConn = "connecting";
 			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};			
 		} else {
