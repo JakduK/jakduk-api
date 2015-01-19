@@ -27,17 +27,19 @@
 		<context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation" />
 	</context:component-scan>
 
-	<!-- Imports oauth configuration -->
 	<import resource="security-context.xml" />
 	<import resource="config/oauth/oauth-data.xml"/>
-<!-- 
-	<import resource="security-context.xml" />
-	<import resource="config/oauth/oauth-data.xml"/>
- -->	  
+
 	<!-- Imports datasource configuration -->
 	<import resource="config/db/mongo-data.xml" />
 	
-	<bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"
-		p:location="classpath:/config/db/mongo.properties" />
+	<bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:/config/db/mongo.properties</value>
+				<value>classpath:/config/storage/file.properties</value>
+			</list>
+    </property>	
+	</bean>
 
 </beans>

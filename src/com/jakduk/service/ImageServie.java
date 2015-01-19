@@ -2,11 +2,16 @@ package com.jakduk.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +30,9 @@ import com.jakduk.repository.ImageRepository;
 
 @Service
 public class ImageServie {
+	
+	@Value("${file.server.real.path}")
+	private String fileServerRealPath;
 
 	@Autowired
 	private UserService userService;
@@ -56,7 +64,11 @@ public class ImageServie {
 			
 			logger.debug("image=" + image);
 			
-			File uploadFile = new File("/home/Pyohwan/test/" + image.getId());
+			ObjectId objId = new ObjectId(image.getId());
+			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
+			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+			
+			File uploadFile = new File(fileServerRealPath + image.getId());
 			file.transferTo(uploadFile);
 			model.addAttribute("image", image);
 		} catch (IllegalStateException | IOException e) {

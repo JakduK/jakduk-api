@@ -76,7 +76,7 @@
   
 	 <bean id="uploadDirResource" class="org.springframework.core.io.FileSystemResource">
 			<constructor-arg>
-				<value>/home/pyohwan/tmp</value>
+				<value>${file.server.temp.path}</value>
 			</constructor-arg>
 	 </bean>  
 	
