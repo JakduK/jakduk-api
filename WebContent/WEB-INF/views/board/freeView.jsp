@@ -221,7 +221,7 @@
 		
 		<div class="panel panel-default">
 			<div class="panel-body">
-				<summernote config="options" on-focus="focus(evt)" 
+				<summernote config="options" on-keydown="keydown(evt)" 
 				ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
 				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
 			</div>
@@ -414,7 +414,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 				]};	
 	
 	
-	$scope.focus = function(e) { 
+	$scope.keydown = function(e) { 
 		if ("${authRole}" == "ANNONYMOUS") {
 			if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
 				location.href = "<c:url value='/login'/>";

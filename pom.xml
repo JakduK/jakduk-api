@@ -9,6 +9,7 @@
 
   <name>jakduk</name>
   <url>http://jakduk.com</url>
+  <description>K League Community Web Application</description>
 
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -264,6 +265,12 @@
 					<exclude>**/*.java</exclude>
 				</excludes>
 			</resource>
+           <resource>
+				<directory>${project.basedir}/resources-${env}</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>                
+            </resource>			
 		</resources>
 		<testResources>
 			<testResource>
@@ -329,5 +336,36 @@
 			</plugin>
 		</plugins>
 	</build>
- 	<description>K League Community Web Application</description>
+    <profiles>
+        <!-- Local server -->
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <env>local</env>
+            </properties>
+        </profile>
+        <!-- Development server -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <env>dev</env>
+            </properties>
+        </profile>
+        <!-- real server -->
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <env>release</env>
+            </properties>
+        </profile>
+    </profiles>		
 </project>

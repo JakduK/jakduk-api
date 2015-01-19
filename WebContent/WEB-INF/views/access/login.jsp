@@ -63,7 +63,9 @@
 								<spring:message code="user.email.remember"/>
 							</label>
 						</div>
-						<button type="submit" class="btn btn-lg btn-success btn-block"><spring:message code="user.sign.in"/></button>
+						<button type="submit" class="btn btn-lg btn-success btn-block">
+							<span class="glyphicon glyphicon-log-in"></span> <spring:message code="user.sign.in"/>
+						</button>
 					</fieldset>
 				</form>
 		

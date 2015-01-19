@@ -28,8 +28,8 @@
 	</context:component-scan>
 
 	<!-- Imports oauth configuration -->
-	<import resource="security-context-local.xml" />
-	<import resource="config/oauth/oauth-data-local.xml"/>
+	<import resource="security-context.xml" />
+	<import resource="config/oauth/oauth-data.xml"/>
 <!-- 
 	<import resource="security-context.xml" />
 	<import resource="config/oauth/oauth-data.xml"/>

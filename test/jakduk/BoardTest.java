@@ -116,18 +116,20 @@ public class BoardTest {
 	public void test03() {
 		
 		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(1);
-//		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
+		//System.out.println("boardFreeOnComment=" + boardFreeOnComment);
 		
-		BoardItem boardItem = new BoardItem();
-		boardItem.setId(boardFreeOnComment.getId());
-		boardItem.setSeq(boardFreeOnComment.getSeq());
-		
-		Integer page = 1; // temp
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(page - 1, 100, sort);
-		
-		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardItem(boardItem, pageable).getContent();
-		System.out.println("test03 comments=" + comments);
+		if (boardFreeOnComment != null) {
+			BoardItem boardItem = new BoardItem();
+			boardItem.setId(boardFreeOnComment.getId());
+			boardItem.setSeq(boardFreeOnComment.getSeq());
+			
+			Integer page = 1; // temp
+			Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+			Pageable pageable = new PageRequest(page - 1, 100, sort);
+			
+			List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardItem(boardItem, pageable).getContent();
+			System.out.println("test03 comments=" + comments);
+		}
 	}
 	
 	@Test
