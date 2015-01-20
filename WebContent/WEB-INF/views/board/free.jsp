@@ -74,8 +74,8 @@
   	</div>  	
   </div> <!-- /panel-heading -->
 
-	<!-- List group -->
 	<ul class="list-group">
+		<!-- posts as notice -->
 		<c:forEach items="${notices}" var="notice">
 			<li class="list-group-item list-group-item-warning">
 				<div class="row">
@@ -114,7 +114,7 @@
 							</c:otherwise>
 						</c:choose>					
 					</div>
-					<div class="col-sm-3">
+					<div class="col-sm-3 hidden-xs">
 						<spring:message code="board.views"/><strong> ${notice.views}</strong> |
 						<span class="text-primary">
 							<span class="glyphicon glyphicon-thumbs-up"></span>
@@ -138,6 +138,7 @@
 				</div>
 			</li>
 		</c:forEach>
+		<!-- posts -->
 		<c:forEach items="${posts}" var="post">
 			<li class="list-group-item">
 				<div class="row">

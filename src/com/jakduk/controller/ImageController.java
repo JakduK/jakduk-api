@@ -38,23 +38,10 @@ public class ImageController {
 	
 	@ResponseBody
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public void imageUpload(@PathVariable String id, Model model,
+	public void image(@PathVariable String id, Model model,
 			HttpServletResponse response) {
 
-		try{
-			BufferedInputStream in = new BufferedInputStream(new FileInputStream("/home/Pyohwan/test/" + id));
-			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
-			int imageByte;
-			while((imageByte = in.read()) != -1){
-				byteStream.write(imageByte);
-			}
-			in.close();
-			response.setContentType("image/*");
-			byteStream.writeTo(response.getOutputStream());
-		} catch(IOException ioe){
-		}
-		
-		//Integer status = imageService.getImage(model, id);
+		Integer status = imageService.getImage(response, model, id);
 	}	
 	
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)

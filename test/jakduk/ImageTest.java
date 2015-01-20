@@ -1,7 +1,11 @@
 package jakduk;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -46,15 +50,33 @@ public class ImageTest {
 	@Test
 	public void createDirectory01() {
 		
-		Path newDirectoryPath = Paths.get(fileServerRealPath + "/ddd/a/b/s");
-		 
-		if (!Files.exists(newDirectoryPath)) {
+		Path newDirectoryPath = Paths.get(fileServerRealPath, "ddd/a/b/s");
+		
+		if (Files.notExists(newDirectoryPath, LinkOption.NOFOLLOW_LINKS)) {
 		    try {
-		        Files.createDirectory(newDirectoryPath);
+		        Files.createDirectories(newDirectoryPath);
 		    } catch (IOException e) {
 		        System.err.println(e);
 		    }
 		}
+	}
+	
+	@Test
+	public void inputOutputFile01() {
+		
+		Path fromPath = Paths.get(fileServerRealPath, "54bbb8cc3d96aab3f4760acd");
+		Path toPath = Paths.get(fileServerRealPath, "phjang.jpg");
+		
+		if (Files.exists(fromPath)) {
+			try {
+				InputStream is = new FileInputStream(fromPath.toFile());
+				Files.copy(is, toPath);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		
 	}
 
