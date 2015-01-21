@@ -91,10 +91,11 @@ public class CommonConst {
 	public final static String BOARD_DELETE_TYPE_ALL = "all";
 	
 	/**
-	 * 글 히스토리 상
+	 * 글 히스토리 상태
 	 */
 	public final static String BOARD_HISTORY_TYPE_CREATE = "create";
 	public final static String BOARD_HISTORY_TYPE_EDIT = "edit";
 	public final static String BOARD_HISTORY_TYPE_DELETE = "delete";
 	public final static String BOARD_HISTORY_TYPE_NOTICE = "notice";
+	public final static String BOARD_HISTORY_TYPE_CANCEL_NOTICE = "c.notice";
 }

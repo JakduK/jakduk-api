@@ -36,6 +36,51 @@
     </li>
 </ul>
 
+<table class="table table-bordered">
+<tr><td class="col-xs-3">	Dapibus ac facilisis in</td><td class="col-xs-5">  	<div class="progress">
+  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    <span class="sr-only">40% Complete (success)</span>
+  </div>
+</div></td></tr>
+</table>
+
+<dl class="dl-horizontal">
+  <dt>.dddd.</dt>
+  <dd><div class="progress">    
+  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    <span class="sr-only">40% Complete (success)</span>
+  </div>
+</div></dd>
+</dl>
+
+<div class="row">
+  <div class="col-xs-3 col-md-1">
+    <a href="#" class="thumbnail">
+      <img src="<%=request.getContextPath()%>/image/54bfaad53d96ab5742dfb825" alt="...">
+    </a>
+  </div>
+  sdfsdfsdfsdfsdfsdfsdf
+  <div class="progress">    
+  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    <span class="sr-only">40% Complete (success)</span>
+  </div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col-xs-3 col-md-1">
+    <a href="#" class="thumbnail">
+      <img src="<%=request.getContextPath()%>/image/54bfb5dd3d96ab5742dfb826" alt="...">
+    </a>
+  </div>
+  sdfsdfsdfsdfsdfsdfsdf
+  <div class="progress">    
+  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    <span class="sr-only">40% Complete (success)</span>
+  </div>
+</div>
+</div>
+
 <form action="<c:url value="/image/upload"/>" name="login" method="post" enctype="multipart/form-data">
       <input type="file" name="file">
       <input type="submit">
@@ -103,7 +148,9 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
 		$scope.editor = editor;
 		var bUrl = '<c:url value="/image/upload"/>';
 	
-		$scope.uploader.addToQueue(files);
+		$scope.uploader.addToQueue(files, function() {
+			alert("aaa");
+		});
       };
     
 });

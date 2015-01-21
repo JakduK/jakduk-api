@@ -120,12 +120,15 @@ public class ImageServie {
 			if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
 				BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
 				ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
+				
 				int imageByte;
-				while((imageByte = in.read()) != -1){
+				
+				while ((imageByte = in.read()) != -1){
 					byteStream.write(imageByte);
 				}
+				
 				in.close();
-				response.setContentType("image/*");
+				response.setContentType(image.getContentType());
 				byteStream.writeTo(response.getOutputStream());
 			}
 			

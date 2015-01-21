@@ -665,6 +665,20 @@ public class BoardFreeService {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String accountId = principal.getId();
+		String accountUsername = principal.getUsername();
+		String accountType = principal.getType();
+
+		BoardWriter writer = new BoardWriter();
+		writer.setUserId(accountId);
+		writer.setUsername(accountUsername);
+		writer.setType(accountType);
+		
+		if (accountId == null) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
 		BoardStatus status = boardFree.getStatus();
 		
@@ -673,6 +687,7 @@ public class BoardFreeService {
 		}
 		
 		String notice = status.getNotice();
+		String noticeType = ""; 
 		
 		switch (type) {
 		case CommonConst.COMMON_TYPE_SET:
@@ -681,6 +696,7 @@ public class BoardFreeService {
 			}
 			
 			status.setNotice(CommonConst.BOARD_HISTORY_TYPE_NOTICE);
+			noticeType = CommonConst.BOARD_HISTORY_TYPE_NOTICE;
 			break;
 			
 		case CommonConst.COMMON_TYPE_CANCEL:
@@ -689,10 +705,27 @@ public class BoardFreeService {
 			}
 			
 			status.setNotice(null);
+			noticeType = CommonConst.BOARD_HISTORY_TYPE_CANCEL_NOTICE;
 			break;
 		}
 		
 		boardFree.setStatus(status);
+		
+		if (!noticeType.isEmpty()) {
+			List<BoardHistory> historys = boardFree.getHistory();
+			
+			if (historys == null) {
+				historys = new ArrayList<BoardHistory>();
+			}
+			
+			BoardHistory history = new BoardHistory();
+			history.setId(new ObjectId().toString());
+			history.setType(noticeType);
+			history.setWriter(writer);
+			historys.add(history);
+			boardFree.setHistory(historys);
+		}
+		
 		boardFreeRepository.save(boardFree);
 		
 		if (logger.isInfoEnabled()) {

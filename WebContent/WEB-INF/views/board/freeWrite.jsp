@@ -60,12 +60,23 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
-				<summernote config="options" ng-model="content"></summernote>
+				<summernote config="options" ng-model="content" on-image-upload="imageUpload(files, editor)" editable="editable"></summernote>
 				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
 				<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
 			</div>
 		</div>	
   </div>
+  
+<ul class="list-group" uploader="uploader" ng-show="uploader.queue.length > 0">
+  <li class="list-group-item list-group-item-warning"><spring:message code="board.upload.image"/></li>
+  <li class="list-group-item" ng-repeat="item in uploader.queue">
+	  {{item.file.name}} | {{item.file.size/1024|number:1}} KB
+	   <div class="progress" style="margin-bottom: 0;">
+<div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+</div>
+  </li>
+  
+</ul>
   
 	<div class="form-group">
 		<button type="submit" class="btn btn-success">
@@ -88,8 +99,8 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script> 
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
-<!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-file-upload/js/angular-file-upload.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
@@ -106,9 +117,9 @@ window.onbeforeunload = function(e) {
 };
 
 var submitted = false;
-var jakdukApp = angular.module("jakdukApp", ["summernote"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload"]);
 
-jakdukApp.controller('FreeWriteCtrl', function($scope) {
+jakdukApp.controller('FreeWriteCtrl', function($scope, FileUploader) {
 	$scope.submitConn = "none";
 	$scope.categoryAlert = {};
 	$scope.subjectAlert = {};
@@ -128,11 +139,41 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
       ['para', ['ul', 'ol', 'paragraph']],
 //      ['height', ['height']],
       ['table', ['table']],
-      ['insert', ['link', /*'picture',*/ 'video', 'hr']],
+      ['insert', ['link', 'picture', 'video', 'hr']],
       ['view', ['fullscreen', 'codeview']],
       ['help', ['help']]			          
 			]
 	};
+	
+	$scope.uploader = new FileUploader({
+    	url:'<c:url value="/image/upload.json"/>',
+    	autoUpload:true,
+    	method:"POST"
+	});
+
+	/*
+	$scope.uploader.onProgressItem = function(fileItem, progress) {
+		 console.info('onProgressItem', fileItem, progress);
+		 };
+
+ $scope.uploader.onProgressAll = function(progress) {
+		 console.info('onProgressAll', progress);
+		};	
+	*/
+	$scope.imageUpload = function(files, editor) {
+		 console.log('image upload:', files);
+		 console.log('image upload:', editor);
+		 console.log('image upload\'s editable:', $scope.editable);
+		 
+			//var url = "<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png";       	
+			//editor.insertImage($scope.editable, url);
+			$scope.editor = editor;
+			var bUrl = '<c:url value="/image/upload"/>';
+		
+			$scope.uploader.addToQueue(files, function() {
+				alert("aaa");
+			});
+	      };	
 	
 	$scope.onSubmit = function(event) {
 		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
