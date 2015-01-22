@@ -28,7 +28,7 @@
 <form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/edit" method="POST"
 	ng-submit="onSubmit($event)">
 	<form:hidden path="id"/>
-	<form:textarea path="content" class="hidden" ng-bind="content"/>
+	<form:textarea path="content" class="hidden" ng-bind="content" value="${boardFree.content}"/>
 	<legend><spring:message code="board.edit"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
 		<div class="row">	
@@ -117,7 +117,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope) {
 	$scope.subjectAlert = {};
 	$scope.contentAlert = {};
 	$scope.buttonAlert = {};
-	$scope.content = "${boardFree.content}";
+	$scope.content = document.getElementById("content").value;
 	
 	$scope.options = {
 			height: 0,
