@@ -53,32 +53,20 @@
 </div></dd>
 </dl>
 
-<div class="row">
-  <div class="col-xs-3 col-md-1">
-    <a href="#" class="thumbnail">
-      <img src="<%=request.getContextPath()%>/image/54bfaad53d96ab5742dfb825" alt="...">
-    </a>
+<div class="row" uploader="uploader">
+  <div class="col-xs-3 col-sm-2 col-md-2" ng-repeat="item in uploader.queue">
+    <div class="thumbnail">
+      <div class="caption">
+        <p><a href="#" class="btn btn-primary" role="button">Button</a></p>
+      </div>
+      {{imageList[item.test]}}
+      
+      			<small ng-if="item.test">{{item.test}}</small>
+      
+      
+      
+    </div>
   </div>
-  sdfsdfsdfsdfsdfsdfsdf
-  <div class="progress">    
-  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-    <span class="sr-only">40% Complete (success)</span>
-  </div>
-</div>
-</div>
-
-<div class="row">
-  <div class="col-xs-3 col-md-1">
-    <a href="#" class="thumbnail">
-      <img src="<%=request.getContextPath()%>/image/54bfb5dd3d96ab5742dfb826" alt="...">
-    </a>
-  </div>
-  sdfsdfsdfsdfsdfsdfsdf
-  <div class="progress">    
-  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-    <span class="sr-only">40% Complete (success)</span>
-  </div>
-</div>
 </div>
 
 <form action="<c:url value="/image/upload"/>" name="login" method="post" enctype="multipart/form-data">
@@ -95,11 +83,15 @@
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/js/angular-file-upload.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/js/angular-sanitize.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload", "ngSanitize"]);
 
 jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
+	$scope.count = 0;
+	$scope.imageList = {};
+	
     $scope.options = {
             height: 150,
             toolbar: [
@@ -125,15 +117,27 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
     		}
     	});
 	
-	$scope.uploader.onAfterAddingFile = function(fileItem) {
-		 console.info('onAfterAddingFile', fileItem);
-	};	
+	$scope.uploader.onBeforeUploadItem = function(item) {
+		 console.info('onBeforeUploadItem', item);
+		 item.test = $scope.count++;
+		 //item.url = "";
+		 
+		 //$scope.imageList[fileItem.test] = "/resources/jakduk/icon/daum_bt.png"; 
+		 
+		 };
 	
 	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-		 console.info('onCompleteItem', response);
+		console.log('onCompleteItem fileItem=', fileItem);
+		console.log('onCompleteItem status=', status);
+		console.log('onCompleteItem headers=', headers);
 
 		var url = "<%=request.getContextPath()%>/image/" + response.image.id;
-		alert(url);
+		//alert(url);
+		//$scope.imageList[fileItem.test] = url;
+		fileItem.test = "<img src='" + url + "'>";
+		
+		console.log("$scope.imageList" + $scope.imageList[fileItem.test]);
+		
 		$scope.editor.insertImage($scope.editable, url);		 
 		 
 		 };	
@@ -148,9 +152,7 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
 		$scope.editor = editor;
 		var bUrl = '<c:url value="/image/upload"/>';
 	
-		$scope.uploader.addToQueue(files, function() {
-			alert("aaa");
-		});
+		$scope.uploader.addToQueue(files);
       };
     
 });
