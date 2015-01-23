@@ -54,15 +54,14 @@
 </dl>
 
 <div class="row" uploader="uploader">
-  <div class="col-xs-3 col-sm-2 col-md-2" ng-repeat="item in uploader.queue">
+  <div class="col-xs-4 col-sm-2 col-md-2" ng-repeat="item in uploader.queue">
     <div class="thumbnail">
       <div class="caption">
         <p><a href="#" class="btn btn-primary" role="button">Button</a></p>
       </div>
       {{imageList[item.test]}}
       
-      			<small ng-if="item.test">{{item.test}}</small>
-      
+<img ng-src="{{item.test}}">      
       
       
     </div>
@@ -134,7 +133,8 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
 		var url = "<%=request.getContextPath()%>/image/" + response.image.id;
 		//alert(url);
 		//$scope.imageList[fileItem.test] = url;
-		fileItem.test = "<img src='" + url + "'>";
+		//fileItem.test = "<img src='" + url + "'>";
+		fileItem.test = url;
 		
 		console.log("$scope.imageList" + $scope.imageList[fileItem.test]);
 		
