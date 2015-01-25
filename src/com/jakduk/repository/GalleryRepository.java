@@ -2,7 +2,7 @@ package com.jakduk.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.jakduk.model.db.Image;
+import com.jakduk.model.db.Gallery;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,6 +10,6 @@ import com.jakduk.model.db.Image;
  * @date     : 2015. 1. 18.
  * @desc     :
  */
-public interface ImageRepository extends MongoRepository<Image, String>{
+public interface GalleryRepository extends MongoRepository<Gallery, String>{
 
 }

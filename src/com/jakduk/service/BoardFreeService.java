@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,19 +33,23 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.BoardHistory;
+import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
 import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.repository.GalleryRepository;
 import com.jakduk.repository.SequenceRepository;
 
 @Service
@@ -63,6 +71,9 @@ public class BoardFreeService {
 	private BoardFreeCommentRepository boardFreeCommentRepository;
 	
 	@Autowired
+	private GalleryRepository galleryRepository;
+	
+	@Autowired
 	private JakdukDAO boardFreeDAO;
 	
 	@Autowired
@@ -78,17 +89,17 @@ public class BoardFreeService {
 	 * @param model
 	 * @return
 	 */
-	public Model getFreeWrite(Model model) {
+	public Model getWrite(Model model) {
 		
 		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
 		
-		model.addAttribute("boardFree", new BoardFree());
+		model.addAttribute("boardFreeWrite", new BoardFreeWrite());
 		model.addAttribute("boardCategorys", boardCategorys);
 		
 		return model;
 	}
 	
-	public Integer getFreeEdit(Model model, int seq, HttpServletResponse response) {
+	public Integer getEdit(Model model, int seq, HttpServletResponse response) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
@@ -97,7 +108,12 @@ public class BoardFreeService {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
+		//BoardFreeWrite boardFreeWrite = boardFreeRepository.boardFreeWriteFindOneBySeq(seq);
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		
+		if (boardFree == null) {
+			return HttpServletResponse.SC_NOT_FOUND;
+		}
 		
 		if (boardFree.getWriter() == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
@@ -107,17 +123,52 @@ public class BoardFreeService {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
+		BoardFreeWrite boardFreeWrite = new BoardFreeWrite();
+		
+		logger.debug("boardFree=" + boardFree);
+		
+		if (boardFree.getGalleries() != null) {
+			List<String> images = new ArrayList<String>();
+			logger.debug("aaa");
+			
+			for (BoardImage gallery : boardFree.getGalleries()) {
+				Gallery tempGallery = galleryRepository.findOne(gallery.getId());
+				logger.debug("tempGallery=" + tempGallery);
+				
+				if (tempGallery != null) {
+					Map<String, String> image = new HashMap<String, String>();
+					
+					image.put("uid", tempGallery.getId());
+					image.put("name", tempGallery.getName());
+					image.put("size", String.valueOf(tempGallery.getSize()));
+					
+					images.add(JSONObject.toJSONString(image));
+				}
+			}
+			
+			logger.debug("images=" + images);
+			boardFreeWrite.setImages(images.toString());
+		}
+		
+		boardFreeWrite.setId(boardFree.getId());
+		boardFreeWrite.setSeq(boardFree.getSeq());
+		boardFreeWrite.setCategoryName(boardFree.getCategoryName());
+		boardFreeWrite.setSubject(boardFree.getSubject());
+		boardFreeWrite.setContent(boardFree.getContent());
+		boardFreeWrite.setViews(boardFree.getViews());
+		boardFreeWrite.setWriter(boardFree.getWriter());
+		
 		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
 		
-		model.addAttribute("boardFree", boardFree);
+		model.addAttribute("boardFreeWrite", boardFreeWrite);
 		model.addAttribute("boardCategorys", boardCategorys);
 		
 		return HttpServletResponse.SC_OK;
 	}
 
-	public void checkBoardFreeEdit(BoardFree boardFree, BindingResult result) {
+	public void checkBoardFreeEdit(BoardFreeWrite boardFreeWrite, BindingResult result) {
 		
-		String id = boardFree.getId();
+		String id = boardFreeWrite.getId();
 		
 		if (id.isEmpty()) {
 			result.rejectValue("id", "board.msg.cannot.edit");
@@ -128,7 +179,9 @@ public class BoardFreeService {
 	 * 자유게시판 글쓰기 데이터 DB에 삽입
 	 * @param boardFree
 	 */
-	public void write(BoardFree boardFree) {
+	public void write(BoardFreeWrite boardFreeWrite) {
+		
+		BoardFree boardFree = new BoardFree();
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String userid = principal.getId();
@@ -149,8 +202,61 @@ public class BoardFreeService {
 		history.setWriter(writer);
 		historys.add(history);
 		boardFree.setHistory(historys);
+		
+		JSONArray jsonArray = null;
+		
+		if (boardFreeWrite.getImages() != null) {
+			JSONParser jsonParser = new JSONParser();
+			try {			
+				jsonArray = (JSONArray) jsonParser.parse(boardFreeWrite.getImages());
+				List<BoardImage> galleries = new ArrayList<BoardImage>();
+				
+				for (int i = 0 ; i < jsonArray.size() ; i++) {
+					JSONObject obj = (JSONObject)jsonArray.get(i);
+					String id = (String) obj.get("uid");
+					
+					Gallery gallery = galleryRepository.findOne(id);
+					
+					if (gallery != null) {
+						BoardImage boardImage = new BoardImage();
+						boardImage.setId(gallery.getId());
+						galleries.add(boardImage);
+					}
+				}
+				
+				if (galleries.size() > 0) {
+					boardFree.setGalleries(galleries);
+				}
+				
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		boardFree.setCategoryName(boardFreeWrite.getCategoryName());
+		boardFree.setSubject(boardFreeWrite.getSubject());
+		boardFree.setContent(boardFreeWrite.getContent());
+		boardFree.setViews(boardFreeWrite.getViews());
 
 		boardFreeRepository.save(boardFree);
+		
+		if (jsonArray != null) {
+			BoardItem boardItem = new BoardItem();
+			boardItem.setId(boardFree.getId());
+			boardItem.setSeq(boardFree.getSeq());
+			
+			for (int i = 0 ; i < jsonArray.size() ; i++) {
+				JSONObject obj = (JSONObject)jsonArray.get(i);
+				String id = (String) obj.get("uid");
+
+				Gallery gallery = galleryRepository.findOne(id);
+
+				if (gallery != null) {
+					gallery.setBoardItem(boardItem);
+					galleryRepository.save(gallery);
+				}
+			}
+		}
 
 		if (logger.isInfoEnabled()) {
 			logger.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
@@ -162,7 +268,7 @@ public class BoardFreeService {
 		
 	}
 	
-	public void freeEdit(BoardFree newBoardFree) {
+	public void edit(BoardFreeWrite boardFreeWrite) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String userid = principal.getId();
@@ -174,12 +280,12 @@ public class BoardFreeService {
 		writer.setUsername(username);
 		writer.setType(type);
 		
-		BoardFree getBoardFree = boardFreeRepository.findOne(newBoardFree.getId());
-		getBoardFree.setCategoryName(newBoardFree.getCategoryName());
-		getBoardFree.setSubject(newBoardFree.getSubject());
-		getBoardFree.setContent(newBoardFree.getContent());
+		BoardFree boardFree = boardFreeRepository.findOne(boardFreeWrite.getId());
+		boardFree.setCategoryName(boardFreeWrite.getCategoryName());
+		boardFree.setSubject(boardFreeWrite.getSubject());
+		boardFree.setContent(boardFreeWrite.getContent());
 		
-		List<BoardHistory> historys = getBoardFree.getHistory();
+		List<BoardHistory> historys = boardFree.getHistory();
 		
 		if (historys == null) {
 			historys = new ArrayList<BoardHistory>();
@@ -190,16 +296,46 @@ public class BoardFreeService {
 		history.setType(CommonConst.BOARD_HISTORY_TYPE_EDIT);
 		history.setWriter(writer);
 		historys.add(history);
-		getBoardFree.setHistory(historys);
+		boardFree.setHistory(historys);
+		
+		JSONArray jsonArray = null;
 
-		boardFreeRepository.save(getBoardFree);
+		if (boardFreeWrite.getImages() != null) {
+			JSONParser jsonParser = new JSONParser();
+			try {			
+				jsonArray = (JSONArray) jsonParser.parse(boardFreeWrite.getImages());
+				List<BoardImage> galleries = new ArrayList<BoardImage>();
+
+				for (int i = 0 ; i < jsonArray.size() ; i++) {
+					JSONObject obj = (JSONObject)jsonArray.get(i);
+					String id = (String) obj.get("uid");
+
+					Gallery gallery = galleryRepository.findOne(id);
+
+					if (gallery != null) {
+						BoardImage boardImage = new BoardImage();
+						boardImage.setId(gallery.getId());
+						galleries.add(boardImage);
+					}
+				}
+
+				if (galleries.size() > 0) {
+					boardFree.setGalleries(galleries);
+				}
+
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+
+		boardFreeRepository.save(boardFree);
 
 		if (logger.isInfoEnabled()) {
-			logger.info("post was edited. post seq=" + getBoardFree.getSeq() + ", subject=" + getBoardFree.getSubject());
+			logger.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("BoardFree(edit) = " + getBoardFree);
+			logger.debug("BoardFree(edit) = " + boardFree);
 		}
 		
 	}
@@ -307,6 +443,7 @@ public class BoardFreeService {
 		
 		try {
 			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+			List<BoardImage> images = boardFree.getGalleries();
 			
 			if (boardFree == null) {
 				return HttpServletResponse.SC_UNAUTHORIZED;
@@ -325,6 +462,22 @@ public class BoardFreeService {
 			DateTimeFormatter format = DateTimeFormatter.ISO_DATE;
 			
 			Long timeNow = sdf.parse(date.format(format)).getTime();
+			
+			if (images != null) {
+				List<Gallery> galleries = new ArrayList<Gallery>();
+				
+				for(BoardImage image : images) {
+					Gallery gallery = galleryRepository.findOne(image.getId());
+					
+					if (gallery != null) {
+						galleries.add(gallery);
+					}
+				}
+				
+				if (galleries.size() > 0) {
+					model.addAttribute("galleries", galleries);
+				}
+			}
 			
 			model.addAttribute("post", boardFree);
 			model.addAttribute("category", boardCategory);

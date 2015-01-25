@@ -23,6 +23,9 @@ public class UserProfileWrite {
 	
 	private String footballClub;
 	
+	/**
+	 * 별명 겹침 검사 상태 값
+	 */
 	private String usernameStatus = "none";
 
 	public String getEmail() {

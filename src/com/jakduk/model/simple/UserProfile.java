@@ -1,6 +1,5 @@
 package com.jakduk.model.simple;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;

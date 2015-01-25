@@ -59,7 +59,7 @@
       <div class="caption">
         <p><a href="#" class="btn btn-primary" role="button">Button</a></p>
       </div>
-      {{imageList[item.test]}}
+      <small>{{item.file.name}}</small>
       
 <img ng-src="{{item.test}}">      
       
@@ -72,8 +72,11 @@
       <input type="file" name="file">
       <input type="submit">
 </form>  
+ <small>dfsdfsdfds</small>
+ <h4><small>dfsdfsdfds</small></h5>
  
-</div>	
+ 
+</div>
 	
 <jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
@@ -103,10 +106,23 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
           };
     
     $scope.uploader = new FileUploader({
-    	url:'<c:url value="/image/upload.json"/>',
+    	url:'<c:url value="/gallery/upload.json"/>',
     	autoUpload:true,
     	method:"POST"
     });
+   
+	var test1 = [];
+	var test2;
+	
+	test1.push("dddd");
+	test1.push("cccc");
+	
+	test2 = JSON.stringify(test1);
+	alert(test2);
+	
+	var test3 = JSON.parse(test2);
+	alert(test3);
+	
     
 	$scope.uploader.filters.push({
     	name: 'imageFilter',
@@ -130,15 +146,16 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
 		console.log('onCompleteItem status=', status);
 		console.log('onCompleteItem headers=', headers);
 
-		var url = "<%=request.getContextPath()%>/image/" + response.image.id;
+		var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.image.id;
+		var thumbnailUrl = "<%=request.getContextPath()%>/gallery/thumbnail/" + response.image.id;
 		//alert(url);
 		//$scope.imageList[fileItem.test] = url;
 		//fileItem.test = "<img src='" + url + "'>";
-		fileItem.test = url;
+		fileItem.test = thumbnailUrl;
 		
 		console.log("$scope.imageList" + $scope.imageList[fileItem.test]);
 		
-		$scope.editor.insertImage($scope.editable, url);		 
+		$scope.editor.insertImage($scope.editable, imageUrl);		 
 		 
 		 };	
     
@@ -151,7 +168,7 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
 		//editor.insertImage($scope.editable, url);
 		$scope.editor = editor;
 		var bUrl = '<c:url value="/image/upload"/>';
-	
+		
 		$scope.uploader.addToQueue(files);
       };
     

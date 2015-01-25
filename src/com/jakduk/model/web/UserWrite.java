@@ -31,8 +31,14 @@ public class UserWrite {
 	
 	private String about;
 	
+	/**
+	 * 이메일 겹침 검사 상태 값
+	 */
 	private String emailStatus = "none";
 	
+	/**
+	 * 별명 겹침 검사 상태 값
+	 */
 	private String usernameStatus = "none";
 
 	public String getEmail() {

@@ -4,13 +4,12 @@ import java.util.List;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardHistory;
+import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
@@ -38,15 +37,11 @@ public class BoardFree {
 	/**
 	 * 글 제목
 	 */
-	@NotNull
-	@Size(min = 3, max = 60)
 	private String subject;
 	
 	/**
 	 * 글 내용
 	 */
-	@NotNull
-	@Size(min = 5)
 	private String content;
 	
 	/**
@@ -57,13 +52,12 @@ public class BoardFree {
 	/**
 	 * 분류 ID
 	 */
-	@NotNull
 	private String categoryName;
 	
 	/**
 	 * 조회
 	 */
-	private int views = 0;
+	private int views;
 	
 	private List<BoardUser> usersLiking;
 	
@@ -72,6 +66,8 @@ public class BoardFree {
 	private BoardStatus status;
 	
 	private List<BoardHistory> history;
+	
+	private List<BoardImage> galleries;
 
 	public String getId() {
 		return id;
@@ -161,6 +157,14 @@ public class BoardFree {
 		this.history = history;
 	}
 
+	public List<BoardImage> getGalleries() {
+		return galleries;
+	}
+
+	public void setGalleries(List<BoardImage> galleries) {
+		this.galleries = galleries;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardFree [id=" + id + ", writer=" + writer + ", subject="
@@ -168,7 +172,8 @@ public class BoardFree {
 				+ ", categoryName=" + categoryName + ", views=" + views
 				+ ", usersLiking=" + usersLiking + ", usersDisliking="
 				+ usersDisliking + ", status=" + status + ", history="
-				+ history + "]";
+				+ history + ", galleries=" + galleries + "]";
 	}
+	
 
 }

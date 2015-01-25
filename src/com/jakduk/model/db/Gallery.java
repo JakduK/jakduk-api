@@ -17,7 +17,7 @@ import com.jakduk.model.embedded.BoardWriter;
  */
 
 @Document
-public class Image {
+public class Gallery {
 	
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
@@ -82,10 +82,9 @@ public class Image {
 
 	@Override
 	public String toString() {
-		return "Image [id=" + id + ", name=" + name + ", boardItem="
+		return "Gallery [id=" + id + ", name=" + name + ", boardItem="
 				+ boardItem + ", writer=" + writer + ", size=" + size
 				+ ", contentType=" + contentType + "]";
 	}
-	
 
 }

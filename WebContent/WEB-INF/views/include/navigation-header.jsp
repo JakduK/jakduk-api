@@ -18,6 +18,9 @@
 				<li ng-class="{active:isActive('<c:url value="/board"/>')}">
 					<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
 				</li>
+				<li ng-class="{active:isActive('<c:url value="/gallery"/>')}">
+					<a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
+				</li>				
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-globe"></span> <spring:message code="common.language"/> <span class="caret"></span></span>

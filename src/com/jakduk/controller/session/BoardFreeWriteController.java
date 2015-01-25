@@ -6,6 +6,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
-import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.service.BoardFreeService;
 
 /**
@@ -28,8 +31,8 @@ import com.jakduk.service.BoardFreeService;
 
 @Controller
 @RequestMapping("/board")
-@SessionAttributes({"boardFree","boardCategorys"})
-public class BoardFreeWrite {
+@SessionAttributes({"boardFreeWrite","boardCategorys"})
+public class BoardFreeWriteController {
 
 	@Autowired
 	private BoardFreeService boardFreeService;
@@ -39,13 +42,15 @@ public class BoardFreeWrite {
 	@RequestMapping(value = "/free/write", method = RequestMethod.GET)
 	public String freeWrite(Model model) {
 
-		boardFreeService.getFreeWrite(model);
+		boardFreeService.getWrite(model);
 
 		return "board/freeWrite";
 	}
 
 	@RequestMapping(value = "/free/write", method = RequestMethod.POST)
-	public String freeWrite(@Valid BoardFree boardFree, BindingResult result, SessionStatus sessionStatus) {
+	public String freeWrite(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus) {
+		
+		logger.debug("boardFreeWrite=" + boardFreeWrite);
 
 		if (result.hasErrors()) {
 			if (logger.isDebugEnabled()) {
@@ -54,7 +59,7 @@ public class BoardFreeWrite {
 			return "board/freeWrite";
 		}
 
-		boardFreeService.write(boardFree);
+		boardFreeService.write(boardFreeWrite);
 		sessionStatus.setComplete();
 
 		return "redirect:/board/free";
@@ -64,7 +69,7 @@ public class BoardFreeWrite {
 	public String freeEdit(@PathVariable int seq, Model model,
 			HttpServletResponse response) throws IOException {
 
-		Integer status = boardFreeService.getFreeEdit(model, seq, response);
+		Integer status = boardFreeService.getEdit(model, seq, response);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
 			response.sendError(status);
@@ -75,7 +80,7 @@ public class BoardFreeWrite {
 	}
 
 	@RequestMapping(value = "/free/edit", method = RequestMethod.POST)
-	public String freeEdit(@Valid BoardFree boardFree, BindingResult result, SessionStatus sessionStatus) {
+	public String freeEdit(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus) {
 
 		if (result.hasErrors()) {
 			if (logger.isDebugEnabled()) {
@@ -84,7 +89,7 @@ public class BoardFreeWrite {
 			return "board/freeEdit";
 		}
 		
-		boardFreeService.checkBoardFreeEdit(boardFree, result);
+		boardFreeService.checkBoardFreeEdit(boardFreeWrite, result);
 		
 		if (result.hasErrors()) {
 			if (logger.isDebugEnabled()) {
@@ -93,10 +98,10 @@ public class BoardFreeWrite {
 			return "board/freeEdit";
 		}
 		
-		boardFreeService.freeEdit(boardFree);
+		boardFreeService.edit(boardFreeWrite);
 		sessionStatus.setComplete();
 		
-		return "redirect:/board/free/" + boardFree.getSeq();
+		return "redirect:/board/free/" + boardFreeWrite.getSeq();
 	}
 
 }

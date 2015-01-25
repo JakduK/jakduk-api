@@ -23,16 +23,18 @@
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <c:set var="summernoteLang" value="en-US"/>
 
-<form:form commandName="boardFree" name="boardFree" action="${contextPath}/board/free/write" method="POST"
+<form:form commandName="boardFreeWrite" name="boardFreeWrite" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit($event)">
-	<form:textarea path="content" class="hidden" ng-bind="content" value="${boardFree.content}"/>
+	<form:textarea path="content" class="hidden" ng-bind="content" value="${boardFreeWrite.content}"/>
+	<form:textarea path="images" ng-model="images" ng-init="images='${boardFreeWrite.images}'"/>
+	
 	<legend><spring:message code="board.write"/></legend>
-	<div class="form-group" ng-class="{'has-success':boardFree.categoryName.$valid, 'has-error':boardFree.categoryName.$invalid}">
+	<div class="form-group" ng-class="{'has-success':boardFreeWrite.categoryName.$valid, 'has-error':boardFreeWrite.categoryName.$invalid}">
 		<div class="row">	
 			<div class="col-sm-3">
 			<label for="categoryName" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.category"/></label>
 			<form:select path="categoryName" cssClass="form-control" 
-			ng-model="categoryName" ng-init="categoryName='${boardFree.categoryName}'" ng-change="validationCategory()" ng-required="true">
+			ng-model="categoryName" ng-init="categoryName='${boardFreeWrite.categoryName}'" ng-change="validationCategory()" ng-required="true">
 				<form:option value=""><spring:message code="board.category.init"/></form:option>
 				<c:forEach items="${boardCategorys}" var="category">
 					<form:option value="${category.name}"><spring:message code="${category.resName}"/></form:option>
@@ -44,14 +46,14 @@
 		</div>
 	</div>
 	
-	<div class="form-group has-feedback" ng-class="{'has-success':boardFree.subject.$valid, 'has-error':boardFree.subject.$invalid}">
+	<div class="form-group has-feedback" ng-class="{'has-success':boardFreeWrite.subject.$valid, 'has-error':boardFreeWrite.subject.$invalid}">
 		<label for="subject" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.subject"/></label>
 		<input type="text" name="subject" class="form-control" placeholder='<spring:message code="board.placeholder.subject"/>'
-		ng-model="subject" ng-init="subject='${boardFree.subject}'"
+		ng-model="subject" ng-init="subject='${boardFreeWrite.subject}'"
 		ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
 		ng-required="true" ng-minlength="3" ng-maxlength="60"/>
-		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFree.subject.$valid, 
-		'glyphicon-remove':boardFree.subject.$invalid}"></span>
+		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFreeWrite.subject.$valid, 
+		'glyphicon-remove':boardFreeWrite.subject.$invalid}"></span>
 		<form:errors path="subject" cssClass="text-danger" element="span" ng-hide="subjectAlert.msg"/>
 		<span class="{{subjectAlert.classType}}" ng-show="subjectAlert.msg">{{subjectAlert.msg}}</span>		
 	</div>
@@ -66,18 +68,46 @@
 			</div>
 		</div>	
   </div>
-  
-<ul class="list-group" uploader="uploader" ng-show="uploader.queue.length > 0">
-  <li class="list-group-item list-group-item-warning"><spring:message code="board.upload.image"/></li>
-  <li class="list-group-item" ng-repeat="item in uploader.queue">
-	  {{item.file.name}} | {{item.file.size/1024|number:1}} KB
-	   <div class="progress" style="margin-bottom: 0;">
-<div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
-</div>
-  </li>
-  
-</ul>
-  
+
+<h4 ng-show="storedImages.length > 0 || uploader.queue.length > 0"><spring:message code="board.gallery.list"/></h4>
+<div class="row">
+  <div class="col-xs-4 col-sm-2 col-md-2" ng-repeat="image in storedImages">
+    <div class="thumbnail">
+      <div class="caption text-overflow">
+					<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
+						<span class="glyphicon glyphicon-upload"></span>
+					</button>		
+					<button type="button" class="btn btn-danger btn-xs" ng-click="removeStoredItem(image)">
+						<span class="glyphicon glyphicon-remove-circle"></span>
+					</button>
+						<small>
+						{{image.name}} | {{image.size/1024|number:1}} KB 
+					</small>
+	    </div>
+	    <img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.uid}}" width="60px;" height="60px;">
+  	</div>
+	</div>
+  <div class="col-xs-4 col-sm-2 col-md-2" ng-repeat="item in uploader.queue">
+    <div class="thumbnail">
+				<div class="caption">
+					<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
+						<span class="glyphicon glyphicon-upload"></span>
+					</button>		
+					<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
+						<span class="glyphicon glyphicon-remove-circle"></span>
+					</button>
+					<h5 class="text-overflow">
+						<small>
+						{{item.file.name}} | {{item.file.size/1024|number:1}} KB 
+						<code>{{item.progress}}%</code>
+					</small>
+					</h5>
+				</div>
+				<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" width="60px;" height="60px;">      
+  	</div>
+	</div>  
+</div>  
+
 	<div class="form-group">
 		<button type="submit" class="btn btn-success">
 			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
@@ -91,7 +121,7 @@
 		</div>	
 	</div>	  
 </form:form>
-    
+
 <jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
 <!-- Bootstrap core JavaScript
@@ -119,16 +149,35 @@ window.onbeforeunload = function(e) {
 var submitted = false;
 var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload"]);
 
-jakdukApp.controller('FreeWriteCtrl', function($scope, FileUploader) {
+function isEmpty(str) {
+	obj = String(str);
+
+	if(obj == null || obj == undefined || obj == 'null' || obj == 'undefined' || obj == '' ) return true;
+
+	else return false;
+}
+
+jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.submitConn = "none";
 	$scope.categoryAlert = {};
 	$scope.subjectAlert = {};
 	$scope.contentAlert = {};
 	$scope.buttonAlert = {};
+	$scope.storedImages = [];
+	
+	angular.element(document).ready(function() {
+		if (!isEmpty($scope.images)) {
+			var objImages = JSON.parse($scope.images);
+			objImages.forEach(function(entry) {
+				$scope.storedImages.push(entry);
+				$scope.$apply();
+			}) ;
+		}
+	});
 	
 	var contentValue = document.getElementById("content").value
 	$scope.content = contentValue ? contentValue : '♪';
-			
+	
 	$scope.options = {
 		height: 0,
 		lang : "${summernoteLang}",
@@ -147,21 +196,123 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, FileUploader) {
 			]
 	};
 	
-	$scope.uploader = new FileUploader({
-    	url:'<c:url value="/image/upload.json"/>',
-    	autoUpload:true,
-    	method:"POST"
+	$scope.uploader = new FileUploader({		
+		url:'<c:url value="/gallery/upload.json"/>',
+		autoUpload:true,
+		method:"POST"
 	});
+	
+	$scope.removeStoredItem = function(fileItem) {
+		if (fileItem.uid != null) {
+			var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
+			
+			var reqPromise = $http.get(bUrl);
+			
+			reqPromise.success(function(data, status, headers, config) {
 
-	/*
-	$scope.uploader.onProgressItem = function(fileItem, progress) {
-		 console.info('onProgressItem', fileItem, progress);
-		 };
+				if (!isEmpty($scope.storedImages)) {
+					var rmIdx = -1;
+					
+					$scope.storedImages.forEach(function(entry, index) {
+						if (entry.uid == fileItem.uid) {
+							rmIdx = index;							
+						}
+					});
+					
+					if (rmIdx != -1) {
+						$scope.storedImages.splice(rmIdx, 1);
+					}
+				}				
+				
+				if (!isEmpty($scope.images)) {
+					var tempImages = JSON.parse($scope.images);
+					var rmIdx = -1;
+					
+					tempImages.forEach(function(entry, index) {
+						if (entry.uid == fileItem.uid) {
+							rmIdx = index;							
+						}
+					});
+					
+					if (rmIdx != -1) {
+						tempImages.splice(rmIdx, 1);
+						$scope.images = JSON.stringify(tempImages);
+					}
+				}				
+				
+				console.log("fileItem removed(stored). status="+status);
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				console.log("remove(stored) image failed.");
+			});
+		}
+	};
+	
+	$scope.removeQueueItem = function(fileItem) {
+		
+		if (fileItem.uid != null) {
+			var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
+			
+			var reqPromise = $http.get(bUrl);
+			
+			reqPromise.success(function(data, status, headers, config) {
+				
+				fileItem.remove();
+				
+				if (!isEmpty($scope.images)) {
+					var tempImages = JSON.parse($scope.images);
+					var rmIdx = -1;
+					
+					tempImages.forEach(function(entry, index) {
+						if (entry.uid == fileItem.uid) {
+							rmIdx = index;							
+						}
+					});
+					
+					if (rmIdx != -1) {
+						tempImages.splice(rmIdx, 1);
+						$scope.images = JSON.stringify(tempImages);
+					}
+					console.log("fileItem removed(queue). status="+status);
+				}
+				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				console.log("remove(queue) image failed.");
+			});
+		}
+	};
+		 
+		 
+	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
+		//console.log('onCompleteItem fileItem=', fileItem);
+		//console.log('onCompleteItem status=', status);
+		//console.log('onCompleteItem headers=', headers);
+		
+		if (status == 200) {
+			var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.image.id;
 
- $scope.uploader.onProgressAll = function(progress) {
-		 console.info('onProgressAll', progress);
-		};	
-	*/
+			fileItem.uid = response.image.id;
+			
+			var imageInfo = {uid:fileItem.uid, name:fileItem.file.name, size:fileItem.file.size};
+			
+			if (!isEmpty($scope.images)) {
+				var tempImages = JSON.parse($scope.images);
+				tempImages.push(imageInfo);
+				$scope.images = JSON.stringify(tempImages);
+			} else {
+				var tempImages = [];
+				tempImages.push(imageInfo);
+				$scope.images = JSON.stringify(tempImages);
+			}
+			
+			$scope.editor.insertImage($scope.editable, imageUrl);		
+		} else {
+			console.log("status=" + status)
+			console.log("upload image failed.");
+		}
+	};	
+
 	$scope.imageUpload = function(files, editor) {
 		 console.log('image upload:', files);
 		 console.log('image upload:', editor);
@@ -170,15 +321,21 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, FileUploader) {
 			//var url = "<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png";       	
 			//editor.insertImage($scope.editable, url);
 			$scope.editor = editor;
-			var bUrl = '<c:url value="/image/upload"/>';
-		
-			$scope.uploader.addToQueue(files, function() {
-				alert("aaa");
-			});
+/*		
+			$scope.images.push("adasassad");
+			$scope.boardFreeWrite.images = "sddddd";
+			console.log("subject=", $scope.subject);
+			$scope.abc = "sdfsdfsdfsdf";
+			console.log("ddddd",$scope.images);
+			console.log("ddddd",$scope.abc);
+*/
+
+//			$scope.$apply();
+			$scope.uploader.addToQueue(files);
 	      };	
 	
 	$scope.onSubmit = function(event) {
-		if ($scope.boardFree.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+		if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
 			submitted = true;
 			$scope.submitConn = "connecting";
 			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};			
@@ -194,7 +351,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, FileUploader) {
 	};
 	
 	$scope.validationCategory = function() {
-		if ($scope.boardFree.categoryName.$invalid) {
+		if ($scope.boardFreeWrite.categoryName.$invalid) {
 			$scope.categoryAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
 		} else {
 			$scope.categoryAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
@@ -202,11 +359,11 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, FileUploader) {
 	};
 	
 	$scope.validationSubject = function() {
-		if ($scope.boardFree.subject.$invalid) {
-			if ($scope.boardFree.subject.$error.required) {
+		if ($scope.boardFreeWrite.subject.$invalid) {
+			if ($scope.boardFreeWrite.subject.$error.required) {
 				$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-			} else if ($scope.boardFree.subject.$error.minlength || $scope.boardFree.subject.$error.maxlength) {
-				$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFree.subject"/>'};
+			} else if ($scope.boardFreeWrite.subject.$error.minlength || $scope.boardFreeWrite.subject.$error.maxlength) {
+				$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFreeWrite.subject"/>'};
 			}				
 		} else {
 			$scope.subjectAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
@@ -215,7 +372,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, FileUploader) {
 	
 	$scope.validationContent = function() {
 		if ($scope.content.length < Jakduk.SummernoteContentsMinSize) {
-			$scope.contentAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFree.content"/>'};
+			$scope.contentAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFreeWrite.content"/>'};
 		} else {
 			$scope.contentAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 		}

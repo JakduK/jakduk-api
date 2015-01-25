@@ -1,9 +1,11 @@
 package com.jakduk.dao;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.Gallery;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -119,6 +122,16 @@ public class JakdukDAO {
 		}
 
 		return footballClubs;
+	}
+	
+	public List<Gallery> getGalleryList(List<ObjectId> arrId) {
+		
+		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrId));
+		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		Aggregation aggregation = Aggregation.newAggregation(match, sort);
+		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
+		
+		return results.getMappedResults();
 	}
 	
 }
