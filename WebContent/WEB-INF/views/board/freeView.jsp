@@ -108,6 +108,7 @@
 	  <!-- Default panel contents -->
 	  <div class="panel-heading">
 	  	<h4 class="panel-title">
+				<c:if test="${galleries != null}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>	  		
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
 						<spring:message code="board.msg.deleted"/>
@@ -142,19 +143,21 @@
 			</c:choose>
 		</div>
 		
-  <ul class="list-group">
-    <li class="list-group-item">
-    <strong><spring:message code="board.gallery.list"/></strong>
-				<c:forEach items="${galleries}" var="gallery">
-					<div>
-						<small>
-							<a href="<%=request.getContextPath()%>/gallery/${gallery.id}">${gallery.name}</a> | 
-							<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
-						</small>
-					</div>
-				</c:forEach>    
-    </li>
-  </ul>
+	<c:if test="${galleries != null}">
+	<ul class="list-group">
+	  <li class="list-group-item">
+	  <strong><spring:message code="board.gallery.list"/></strong>
+			<c:forEach items="${galleries}" var="gallery">
+				<div>
+					<small>
+						<a href="<%=request.getContextPath()%>/gallery/${gallery.id}">${gallery.name}</a> | 
+						<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
+					</small>
+				</div>
+			</c:forEach>    
+	  </li>
+	</ul>	
+	</c:if>		
 	  
 		<div class="panel-footer text-center">
 			<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">

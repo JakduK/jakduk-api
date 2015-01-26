@@ -98,4 +98,7 @@ public class CommonConst {
 	public final static String BOARD_HISTORY_TYPE_DELETE = "delete";
 	public final static String BOARD_HISTORY_TYPE_NOTICE = "notice";
 	public final static String BOARD_HISTORY_TYPE_CANCEL_NOTICE = "c.notice";
+	
+	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 130;
+	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 100;
 }

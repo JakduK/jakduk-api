@@ -39,8 +39,10 @@ public class GalleryController {
 		return "redirect:/gallery/list";
 	}
 	
-	@RequestMapping(value = "/list")
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String intro(Model model) {
+		
+		galleryService.getList(model);
 		
 		return "gallery/list";
 	}

@@ -21,16 +21,6 @@
 				<li ng-class="{active:isActive('<c:url value="/gallery"/>')}">
 					<a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
 				</li>				
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-globe"></span> <spring:message code="common.language"/> <span class="caret"></span></span>
-						<span class="visible-xs"> <spring:message code="common.language"/> <span class="caret"></span></span>						
-					</a>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
-						<li><a href="?lang=en"><spring:message code="common.language.english"/></a></li>
-					</ul>
-				</li>
 				<sec:authorize access="isAnonymous()">
 					<li>
 						<a href="<c:url value="/login"/>">
@@ -40,14 +30,15 @@
 					</li>
 	  		</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
-					<sec:authentication property="principal.username" var="userName"/>
+					<sec:authentication property="principal.username" var="accountName"/>
 					<sec:authentication property="principal.type" var="userType"/>
 					<li class="dropdown" ng-class="{active:isActive('<c:url value="/user"/>') || isActive('<c:url value="/oauth"/>')}">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-user"></span> ${userName} <span class="caret"></span></span>
-							<span class="visible-xs">${userName} <span class="caret"></span></span>							
+							<span class="glyphicon glyphicon-user"></span> <span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu" role="menu">
+							<li><a>${accountName}</a></li>
+							<li class="divider"></li>
 							<c:choose>
 								<c:when test="${userType == 'jakduk'}">
 									<li>
@@ -61,6 +52,15 @@
 						</ul>
 					</li>           
     		</sec:authorize>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<span class="glyphicon glyphicon-globe"></span> <span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
+						<li><a href="?lang=en"><spring:message code="common.language.english"/></a></li>
+					</ul>
+				</li>    		
 	    </ul>          
 	</div><!-- /.container -->
 </nav><!-- /.navbar -->

@@ -14,6 +14,12 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -22,11 +28,17 @@ import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeOnGallery;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.BoardWriter;
 import com.jakduk.repository.GalleryRepository;
@@ -52,6 +64,9 @@ public class GalleryService {
 	
 	@Autowired
 	private GalleryRepository galleryRepository;
+	
+	@Autowired
+	private JakdukDAO jakdukDAO;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -106,11 +121,19 @@ public class GalleryService {
 			if (Files.notExists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
 				//BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
 				BufferedImage bi = ImageIO.read(file.getInputStream());
-				BufferedImage bufferIm = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-				Image tempImg = bi.getScaledInstance(100, 100, Image.SCALE_AREA_AVERAGING);
+				BufferedImage bufferIm = new BufferedImage(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, BufferedImage.TYPE_INT_RGB);
+				Image tempImg = bi.getScaledInstance(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, Image.SCALE_AREA_AVERAGING);
 				Graphics2D g2 = bufferIm.createGraphics();
-				g2.drawImage(tempImg, 0, 0, 100, 100, null);
-				ImageIO.write(bufferIm, "jpg", thumbFilePath.toFile());
+				g2.drawImage(tempImg, 0, 0, CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, null);
+				
+				String formatName = "jpg";
+				
+				String splitContentType[] = gallery.getContentType().split("/");
+				if (splitContentType != null) {
+					formatName = splitContentType[1];
+				}
+				
+				ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
 			}
 			
 			model.addAttribute("image", gallery);
@@ -252,4 +275,28 @@ public class GalleryService {
 
 		return HttpServletResponse.SC_OK;
 	}	
+
+	public Model getList(Model model) {
+
+		List<ObjectId> ids = new ArrayList<ObjectId>();
+		
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Pageable pageable = new PageRequest(0, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
+		
+		List<Gallery> galleries = galleryRepository.findAll(pageable).getContent();
+		
+		for (Gallery gallery : galleries) {
+			ids.add(new ObjectId(gallery.getBoardItem().getId()));
+		}
+		
+		if (!ids.isEmpty()) {
+			HashMap<String, BoardFreeOnGallery> posts = jakdukDAO.getBoardFreeOnGallery(ids);
+			model.addAttribute("posts", posts);			
+		}
+
+		model.addAttribute("galleries", galleries);
+
+		return model;
+	}
+
 }

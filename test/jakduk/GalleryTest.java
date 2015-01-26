@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -35,8 +39,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardFreeCount;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.repository.GalleryRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -47,13 +54,19 @@ import com.jakduk.model.db.Gallery;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="classpath:applicationContext.xml")
-public class ImageTest {
+public class GalleryTest {
 	
 	@Value("${storage.image.path}")
 	private String storageImagePath;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private GalleryRepository galleryRepository;
+	
+	@Autowired
+	JakdukDAO jakdukDAO;
 	
 	@Test
 	public void convertDateTime01() {
@@ -169,6 +182,29 @@ public class ImageTest {
 		
 		System.out.println("findById=" + results.getMappedResults());
 	}
+	
+	@Test
+	public void splitString() {
+		String sample = "image/jpeg";
+		String[] result = sample.split("/");
+		System.out.println(result[0]);
+		System.out.println(result[1]);
+	}
+	
+	@Test
+	public void getGalleryList() {
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Pageable pageable = new PageRequest(0, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
 		
+		System.out.println("getGalleryList=" + galleryRepository.findAll(pageable).getContent());
+		
+		ArrayList<ObjectId> arrTemp = new ArrayList<ObjectId>();
+		arrTemp.add(new ObjectId("54c4d4313d9675d9e50e1bf0"));
+		arrTemp.add(new ObjectId("54c4df933d96600d7f55a04b"));
+		
+		System.out.println("getGalleryList=" + jakdukDAO.getBoardFreeOnGallery(arrTemp)
+				);
+	}
 
 }
+

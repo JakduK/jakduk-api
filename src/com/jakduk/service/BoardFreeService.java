@@ -413,6 +413,7 @@ public class BoardFreeService {
 			HashMap<String, Integer> commentCount = boardFreeDAO.getBoardFreeCommentCount(seqs);
 			HashMap<String, Integer> usersLikingCount = boardFreeDAO.getBoardFreeUsersLikingCount(seqs);
 			HashMap<String, Integer> usersDislikingCount = boardFreeDAO.getBoardFreeUsersDislikingCount(seqs);
+			HashMap<String, Integer> galleriesCount = boardFreeDAO.getBoardFreeGalleriesCount(seqs);
 			
 			model.addAttribute("posts", posts);
 			model.addAttribute("notices", notices);
@@ -422,6 +423,7 @@ public class BoardFreeService {
 			model.addAttribute("commentCount", commentCount);
 			model.addAttribute("usersLikingCount", usersLikingCount);
 			model.addAttribute("usersDislikingCount", usersDislikingCount);
+			model.addAttribute("galleriesCount", galleriesCount);
 			model.addAttribute("createDate", createDate);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 			

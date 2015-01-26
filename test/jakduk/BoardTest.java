@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -94,8 +95,6 @@ public class BoardTest {
 		
 		Date date2 = f.parse(ld.format(df02));
 		System.out.println("date2=" + date2.getTime());
-
-		
 	}
 	
 	@Test
@@ -167,5 +166,16 @@ public class BoardTest {
 		List<BoardFreeOnList> posts = boardFreeRepository.findByNotice(pageable).getContent();
 		
 		System.out.println("getNticeList01=" + posts);
+	}
+	
+	@Test
+	public void getGalleriesCount01() {
+		ArrayList<Integer> arrTemp = new ArrayList<Integer>();
+		arrTemp.add(28);
+		arrTemp.add(29);
+		arrTemp.add(30);
+		
+		HashMap<String, Integer> galleriesCount = boardFreeDAO.getBoardFreeGalleriesCount(arrTemp);
+		System.out.println("getGalleriesCount01=" + galleriesCount);
 	}
 }

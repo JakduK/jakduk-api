@@ -21,6 +21,19 @@
 </div>
 
 <p class="bg-info"><spring:message code="common.msg.test.version"/></p>
+<div class="row">
+	<c:forEach items="${galleries}" var="gallery">
+		<div class="col-xs-6 col-md-3">
+			<div class="thumbnail">
+				<a href="<%=request.getContextPath()%>/gallery/${gallery.id}"><img src="<%=request.getContextPath()%>/gallery/thumbnail/${gallery.id}" alt="..."></a>
+				<div class="caption">
+					<div class="text-overflow">${posts[gallery.boardItem.id].subject}</div>
+					<div><small>${gallery.writer.username}</small></div>
+				</div>
+			</div>  
+		</div>
+	</c:forEach>
+</div>
 
 <jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->

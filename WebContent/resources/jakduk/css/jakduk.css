@@ -109,4 +109,4 @@ footer {
   color: #777;
 }
 
-.text-overflow {overflow:hidden; text-overflow:ellipsis;}
+.text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}

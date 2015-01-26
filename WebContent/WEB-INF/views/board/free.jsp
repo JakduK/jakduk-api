@@ -89,6 +89,7 @@
 									<strong><spring:message code="board.msg.deleted"/></strong>
 								</c:when>
 								<c:otherwise>
+									<c:if test="${!empty galleriesCount[notice.id]}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>
 									<strong>${notice.subject}</strong>
 								</c:otherwise>
 							</c:choose>
@@ -150,6 +151,7 @@
 						</c:if>
 					</div>
 					<div class="col-sm-4">
+						<c:if test="${!empty galleriesCount[post.id]}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>
 						<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 							<c:choose>
 								<c:when test="${post.status.delete == 'delete'}">

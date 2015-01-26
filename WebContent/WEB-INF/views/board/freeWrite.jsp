@@ -26,7 +26,7 @@
 <form:form commandName="boardFreeWrite" name="boardFreeWrite" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit($event)">
 	<form:textarea path="content" class="hidden" ng-bind="content" value="${boardFreeWrite.content}"/>
-	<form:textarea path="images" ng-model="images" ng-init="images='${boardFreeWrite.images}'"/>
+	<form:textarea path="images" class="hidden" ng-model="images" ng-init="images='${boardFreeWrite.images}'"/>
 	
 	<legend><spring:message code="board.write"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFreeWrite.categoryName.$valid, 'has-error':boardFreeWrite.categoryName.$invalid}">

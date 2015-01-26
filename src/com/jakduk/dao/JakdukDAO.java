@@ -1,10 +1,10 @@
 package com.jakduk.dao;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -17,7 +17,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
 
@@ -33,6 +32,8 @@ public class JakdukDAO {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	private Logger logger = Logger.getLogger(this.getClass());
 	
 	public HashMap<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
 		
@@ -132,6 +133,47 @@ public class JakdukDAO {
 		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
 		
 		return results.getMappedResults();
+	}
+	
+	public HashMap<String, Integer> getBoardFreeGalleriesCount(List<Integer> arrSeq) {
+		AggregationOperation unwind = Aggregation.unwind("galleries");
+		AggregationOperation match = Aggregation.match(Criteria.where("seq").in(arrSeq));
+		AggregationOperation group = Aggregation.group("_id").count().as("count");
+		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
+		Aggregation aggregation = Aggregation.newAggregation(unwind, match, group);
+		AggregationResults<BoardFreeCount> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeCount.class);
+		
+		List<BoardFreeCount> boardFreeCount = results.getMappedResults();
+
+		HashMap<String, Integer> counts = new HashMap<String, Integer>();
+		
+		for (BoardFreeCount item : boardFreeCount) {
+			counts.put(item.getId(), item.getCount());
+		}
+		
+		return counts;
+	}
+	
+	public HashMap<String, BoardFreeOnGallery> getBoardFreeOnGallery(List<ObjectId> arrId) {
+		
+		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrId));
+		Aggregation aggregation = Aggregation.newAggregation(match);
+		AggregationResults<BoardFreeOnGallery> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnGallery.class);
+		
+		List<BoardFreeOnGallery> posts = results.getMappedResults();
+		
+		HashMap<String, BoardFreeOnGallery> postsOnGallery = new HashMap<String, BoardFreeOnGallery>();
+		
+		for (BoardFreeOnGallery post : posts) {
+			BoardFreeOnGallery postOnGallery = new BoardFreeOnGallery();
+			postOnGallery.setId(post.getId());
+			postOnGallery.setSeq(post.getSeq());
+			postOnGallery.setSubject(post.getSubject());
+			postsOnGallery.put(post.getId(), postOnGallery);
+		}
+		
+		return postsOnGallery;
 	}
 	
 }
