@@ -110,3 +110,4 @@ footer {
 }
 
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.navbar .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:90px;}

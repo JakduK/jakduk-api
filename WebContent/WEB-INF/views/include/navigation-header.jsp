@@ -33,8 +33,8 @@
 					<sec:authentication property="principal.username" var="accountName"/>
 					<sec:authentication property="principal.type" var="userType"/>
 					<li class="dropdown" ng-class="{active:isActive('<c:url value="/user"/>') || isActive('<c:url value="/oauth"/>')}">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<span class="glyphicon glyphicon-user"></span> <span class="caret"></span>
+						<a href="#" class="dropdown-toggle text-overflow" data-toggle="dropdown">
+							<span class="glyphicon glyphicon-user"></span> ${accountName} <span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu" role="menu">
 							<li><a>${accountName}</a></li>

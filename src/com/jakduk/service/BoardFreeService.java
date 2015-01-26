@@ -179,17 +179,21 @@ public class BoardFreeService {
 	 * 자유게시판 글쓰기 데이터 DB에 삽입
 	 * @param boardFree
 	 */
-	public void write(BoardFreeWrite boardFreeWrite) {
-		
-		BoardFree boardFree = new BoardFree();
+	public Integer write(BoardFreeWrite boardFreeWrite) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
-		String userid = principal.getId();
+		String accountId = principal.getId();
 		String username = principal.getUsername();
 		String type = principal.getType();
+		
+		if (accountId == null) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
+		
+		BoardFree boardFree = new BoardFree();
 
 		BoardWriter writer = new BoardWriter();
-		writer.setUserId(userid);
+		writer.setUserId(accountId);
 		writer.setUsername(username);
 		writer.setType(type);
 		boardFree.setWriter(writer);
@@ -266,21 +270,31 @@ public class BoardFreeService {
 			logger.debug("boardFree(new) = " + boardFree);
 		}
 		
+		return HttpServletResponse.SC_OK;		
 	}
 	
-	public void edit(BoardFreeWrite boardFreeWrite) {
+	public Integer edit(BoardFreeWrite boardFreeWrite) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
-		String userid = principal.getId();
+		String accountId = principal.getId();
 		String username = principal.getUsername();
 		String type = principal.getType();
+		
+		if (accountId == null) {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
 
 		BoardWriter writer = new BoardWriter();
-		writer.setUserId(userid);
+		writer.setUserId(accountId);
 		writer.setUsername(username);
 		writer.setType(type);
 		
 		BoardFree boardFree = boardFreeRepository.findOne(boardFreeWrite.getId());
+		
+		if (boardFree == null) {
+			return HttpServletResponse.SC_NOT_FOUND;
+		}
+		
 		boardFree.setCategoryName(boardFreeWrite.getCategoryName());
 		boardFree.setSubject(boardFreeWrite.getSubject());
 		boardFree.setContent(boardFreeWrite.getContent());
@@ -328,6 +342,24 @@ public class BoardFreeService {
 			}
 		}
 
+		if (jsonArray != null) {
+			BoardItem boardItem = new BoardItem();
+			boardItem.setId(boardFree.getId());
+			boardItem.setSeq(boardFree.getSeq());
+			
+			for (int i = 0 ; i < jsonArray.size() ; i++) {
+				JSONObject obj = (JSONObject)jsonArray.get(i);
+				String id = (String) obj.get("uid");
+
+				Gallery gallery = galleryRepository.findOne(id);
+
+				if (gallery != null) {
+					gallery.setBoardItem(boardItem);
+					galleryRepository.save(gallery);
+				}
+			}
+		}
+		
 		boardFreeRepository.save(boardFree);
 
 		if (logger.isInfoEnabled()) {
@@ -338,6 +370,7 @@ public class BoardFreeService {
 			logger.debug("BoardFree(edit) = " + boardFree);
 		}
 		
+		return HttpServletResponse.SC_OK;
 	}
 	
 	/**
@@ -445,12 +478,12 @@ public class BoardFreeService {
 		
 		try {
 			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-			List<BoardImage> images = boardFree.getGalleries();
 			
 			if (boardFree == null) {
 				return HttpServletResponse.SC_UNAUTHORIZED;
 			}
 			
+			List<BoardImage> images = boardFree.getGalleries();
 			BoardCategory boardCategory = boardCategoryRepository.findByName(boardFree.getCategoryName());
 			
 			if (isAddCookie == true) {

@@ -59,7 +59,7 @@ public class BoardFreeWriteController {
 			return "board/freeWrite";
 		}
 
-		boardFreeService.write(boardFreeWrite);
+		Integer status = boardFreeService.write(boardFreeWrite);
 		sessionStatus.setComplete();
 
 		return "redirect:/board/free";
@@ -98,7 +98,7 @@ public class BoardFreeWriteController {
 			return "board/freeEdit";
 		}
 		
-		boardFreeService.edit(boardFreeWrite);
+		Integer status = boardFreeService.edit(boardFreeWrite);
 		sessionStatus.setComplete();
 		
 		return "redirect:/board/free/" + boardFreeWrite.getSeq();
