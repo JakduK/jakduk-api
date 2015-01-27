@@ -10,6 +10,8 @@ public class BoardStatus {
 	private String notice;
 	
 	private String delete;
+	
+	private String device;
 
 	public String getNotice() {
 		return notice;
@@ -27,8 +29,19 @@ public class BoardStatus {
 		this.delete = delete;
 	}
 
+	public String getDevice() {
+		return device;
+	}
+
+	public void setDevice(String device) {
+		this.device = device;
+	}
+
 	@Override
 	public String toString() {
-		return "BoardStatus [notice=" + notice + ", delete=" + delete + "]";
+		return "BoardStatus [notice=" + notice + ", delete=" + delete
+				+ ", device=" + device + "]";
 	}
+	
+
 }

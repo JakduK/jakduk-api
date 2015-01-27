@@ -108,7 +108,9 @@
 	  <!-- Default panel contents -->
 	  <div class="panel-heading">
 	  	<h4 class="panel-title">
-				<c:if test="${galleries != null}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>	  		
+				<c:if test="${galleries != null}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>	
+				<c:if test="${post.status.device == 'mobile'}"><small><i class="fa fa-mobile fa-lg"></i></small></c:if>
+				<c:if test="${post.status.device == 'tablet'}"><small><i class="fa fa-tablet fa-lg"></i></small></c:if>
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
 						<spring:message code="board.msg.deleted"/>

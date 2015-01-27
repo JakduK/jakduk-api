@@ -23,6 +23,7 @@
 	  <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
 	      <property name="paramName" value="lang"></property>
 	  </bean>
+	  <bean class="org.springframework.mobile.device.DeviceResolverHandlerInterceptor" />
 	</mvc:interceptors>
 
 	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
@@ -68,17 +69,17 @@
 	
 	<mvc:resources location="/resources/" mapping="/resources/**"/>
 	
-  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<property name="maxUploadSize" value="2097152" />
 		<property name="maxInMemorySize" value="2097152" />
 		<property name="defaultEncoding" value="UTF-8" />
 		<property name="uploadTempDir" ref="uploadDirResource" />
-  </bean>
+	</bean>
   
-	 <bean id="uploadDirResource" class="org.springframework.core.io.FileSystemResource">
-			<constructor-arg>
-				<value>${file.server.temp.path}</value>
-			</constructor-arg>
-	 </bean>  
+	<bean id="uploadDirResource" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg>
+			<value>${file.server.temp.path}</value>
+		</constructor-arg>
+	</bean>  
 	
 </beans>

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -23,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -179,7 +182,7 @@ public class BoardFreeService {
 	 * 자유게시판 글쓰기 데이터 DB에 삽입
 	 * @param boardFree
 	 */
-	public Integer write(BoardFreeWrite boardFreeWrite) {
+	public Integer write(HttpServletRequest request, BoardFreeWrite boardFreeWrite) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
@@ -198,6 +201,17 @@ public class BoardFreeService {
 		writer.setType(type);
 		boardFree.setWriter(writer);
 		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
+		
+		BoardStatus boardStatus = new BoardStatus();
+		Device device = DeviceUtils.getCurrentDevice(request);
+		if (device.isNormal()) {
+			boardStatus.setDevice("normal");
+		} else if (device.isMobile()) {
+			boardStatus.setDevice("mobile");
+		} else if (device.isTablet()) {
+			boardStatus.setDevice("tablet");
+		}
+		boardFree.setStatus(boardStatus);
 		
 		List<BoardHistory> historys = new ArrayList<BoardHistory>();
 		BoardHistory history = new BoardHistory();
@@ -269,6 +283,8 @@ public class BoardFreeService {
 		if (logger.isDebugEnabled()) {
 			logger.debug("boardFree(new) = " + boardFree);
 		}
+		
+		logger.debug("device=" + DeviceUtils.getCurrentDevice(request));
 		
 		return HttpServletResponse.SC_OK;		
 	}

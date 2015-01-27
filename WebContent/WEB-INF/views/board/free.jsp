@@ -9,6 +9,8 @@
 <html ng-app="jakdukApp">
 <head>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -83,13 +85,15 @@
 						<spring:message code="board.notice"/>
 					</div>
 					<div class="col-sm-4">
+						<c:if test="${notice.status.device == 'mobile'}"><small><i class="fa fa-mobile fa-lg"></i></small></c:if>
+						<c:if test="${notice.status.device == 'tablet'}"><small><i class="fa fa-tablet fa-lg"></i></small></c:if>
+						<c:if test="${!empty galleriesCount[notice.id]}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>
 						<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 							<c:choose>
 								<c:when test="${notice.status.delete == 'delete'}">
 									<strong><spring:message code="board.msg.deleted"/></strong>
 								</c:when>
 								<c:otherwise>
-									<c:if test="${!empty galleriesCount[notice.id]}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>
 									<strong>${notice.subject}</strong>
 								</c:otherwise>
 							</c:choose>
@@ -152,6 +156,8 @@
 					</div>
 					<div class="col-sm-4">
 						<c:if test="${!empty galleriesCount[post.id]}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>
+						<c:if test="${post.status.device == 'mobile'}"><small><i class="fa fa-mobile fa-lg"></i></small></c:if>
+						<c:if test="${post.status.device == 'tablet'}"><small><i class="fa fa-tablet fa-lg"></i></small></c:if>
 						<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 							<c:choose>
 								<c:when test="${post.status.delete == 'delete'}">

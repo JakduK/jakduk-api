@@ -2,6 +2,7 @@ package com.jakduk.controller.session;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -48,7 +49,8 @@ public class BoardFreeWriteController {
 	}
 
 	@RequestMapping(value = "/free/write", method = RequestMethod.POST)
-	public String freeWrite(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus) {
+	public String freeWrite(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus
+			, HttpServletRequest request) {
 		
 		logger.debug("boardFreeWrite=" + boardFreeWrite);
 
@@ -59,7 +61,7 @@ public class BoardFreeWriteController {
 			return "board/freeWrite";
 		}
 
-		Integer status = boardFreeService.write(boardFreeWrite);
+		Integer status = boardFreeService.write(request, boardFreeWrite);
 		sessionStatus.setComplete();
 
 		return "redirect:/board/free";

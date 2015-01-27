@@ -74,7 +74,9 @@
 				<div class="list-group">
 					<div class="list-group-item">
 						<spring:message code="user.msg.not.user"/> 
-						<a href="<c:url value="/user/write"/>"><strong><spring:message code="user.msg.register.here"/></strong></a>
+						<a href="<c:url value="/user/write"/>">
+							<strong><i class="fa fa-user-plus"></i> <spring:message code="user.msg.register.here"/></strong>
+						</a>
 					</div>
 					<div class="list-group-item">
 						<h5 class="list-group-item-heading"><spring:message code="user.msg.register.oauth"/></h5>
