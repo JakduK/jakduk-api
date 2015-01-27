@@ -85,9 +85,9 @@
 						<spring:message code="board.notice"/>
 					</div>
 					<div class="col-sm-4">
-						<c:if test="${notice.status.device == 'mobile'}"><small><i class="fa fa-mobile fa-lg"></i></small></c:if>
-						<c:if test="${notice.status.device == 'tablet'}"><small><i class="fa fa-tablet fa-lg"></i></small></c:if>
-						<c:if test="${!empty galleriesCount[notice.id]}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>
+						<c:if test="${notice.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+						<c:if test="${notice.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+						<c:if test="${!empty galleriesCount[notice.id]}"><i class="fa fa-file-image-o"></i><</c:if>
 						<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 							<c:choose>
 								<c:when test="${notice.status.delete == 'delete'}">
@@ -155,9 +155,9 @@
 						</c:if>
 					</div>
 					<div class="col-sm-4">
-						<c:if test="${!empty galleriesCount[post.id]}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>
-						<c:if test="${post.status.device == 'mobile'}"><small><i class="fa fa-mobile fa-lg"></i></small></c:if>
-						<c:if test="${post.status.device == 'tablet'}"><small><i class="fa fa-tablet fa-lg"></i></small></c:if>
+						<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+						<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+						<c:if test="${!empty galleriesCount[post.id]}"><i class="fa fa-file-image-o"></i></c:if>
 						<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 							<c:choose>
 								<c:when test="${post.status.delete == 'delete'}">

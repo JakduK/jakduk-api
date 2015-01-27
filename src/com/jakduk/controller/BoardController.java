@@ -91,10 +91,11 @@ public class BoardController {
 	
 	@RequestMapping(value = "/free/comment/write", method = RequestMethod.POST)
 	public void freeCommentWrite(Model model,
+			HttpServletRequest request,
 			@RequestParam(required = false) String content,
 			@RequestParam(required = false) Integer seq) {
 		
-		boardFreeService.freeCommentWrite(seq, content);
+		boardFreeService.freeCommentWrite(request, seq, content);
 	}
 	
 	@RequestMapping(value = "/free/comment/{seq}", method = RequestMethod.GET)

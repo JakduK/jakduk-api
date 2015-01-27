@@ -37,6 +37,7 @@ import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.embedded.BoardCommentStatus;
 import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardItem;
@@ -284,12 +285,10 @@ public class BoardFreeService {
 			logger.debug("boardFree(new) = " + boardFree);
 		}
 		
-		logger.debug("device=" + DeviceUtils.getCurrentDevice(request));
-		
 		return HttpServletResponse.SC_OK;		
 	}
 	
-	public Integer edit(BoardFreeWrite boardFreeWrite) {
+	public Integer edit(HttpServletRequest request, BoardFreeWrite boardFreeWrite) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
@@ -314,6 +313,22 @@ public class BoardFreeService {
 		boardFree.setCategoryName(boardFreeWrite.getCategoryName());
 		boardFree.setSubject(boardFreeWrite.getSubject());
 		boardFree.setContent(boardFreeWrite.getContent());
+		
+		BoardStatus boardStatus = boardFree.getStatus();
+		
+		if (boardStatus == null) {
+			boardStatus = new BoardStatus();
+		}
+		
+		Device device = DeviceUtils.getCurrentDevice(request);
+		if (device.isNormal()) {
+			boardStatus.setDevice("normal");
+		} else if (device.isMobile()) {
+			boardStatus.setDevice("mobile");
+		} else if (device.isTablet()) {
+			boardStatus.setDevice("tablet");
+		}
+		boardFree.setStatus(boardStatus);
 		
 		List<BoardHistory> historys = boardFree.getHistory();
 		
@@ -629,7 +644,7 @@ public class BoardFreeService {
 		return model;
 	}
 	
-	public void freeCommentWrite(Integer seq, String content) {
+	public void freeCommentWrite(HttpServletRequest request, Integer seq, String content) {
 		BoardFreeComment boardFreeComment = new BoardFreeComment();
 		
 		if (!commonService.isAnonymousUser()) {
@@ -650,9 +665,24 @@ public class BoardFreeService {
 			
 			boardFreeComment.setContent(content);
 			
+			BoardCommentStatus status = new BoardCommentStatus();
+			Device device = DeviceUtils.getCurrentDevice(request);
+			
+			if (device.isNormal()) {
+				status.setDevice("normal");
+			} else if (device.isMobile()) {
+				status.setDevice("mobile");
+			} else if (device.isTablet()) {
+				status.setDevice("tablet");
+			}
+			
+			boardFreeComment.setStatus(status);
+			
 			boardFreeCommentRepository.save(boardFreeComment);
 		} else {
-			
+			if (logger.isDebugEnabled()) {
+				logger.debug("You can't write comment and need to login.");
+			}
 		}
 	}
 	

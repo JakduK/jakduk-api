@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.embedded.BoardCommentStatus;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
@@ -36,6 +37,8 @@ public class BoardFreeComment {
 	private List<BoardUser> usersLiking;
 	
 	private List<BoardUser> usersDisliking;
+	
+	private BoardCommentStatus status;
 
 	public String getId() {
 		return id;
@@ -85,12 +88,21 @@ public class BoardFreeComment {
 		this.usersDisliking = usersDisliking;
 	}
 
+	public BoardCommentStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(BoardCommentStatus status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardFreeComment [id=" + id + ", boardItem=" + boardItem
 				+ ", writer=" + writer + ", content=" + content
 				+ ", usersLiking=" + usersLiking + ", usersDisliking="
-				+ usersDisliking + "]";
+				+ usersDisliking + ", status=" + status + "]";
 	}
+	
 	
 }

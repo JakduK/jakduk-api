@@ -108,9 +108,9 @@
 	  <!-- Default panel contents -->
 	  <div class="panel-heading">
 	  	<h4 class="panel-title">
-				<c:if test="${galleries != null}"><small><span class="glyphicon glyphicon-picture"></span></small></c:if>	
-				<c:if test="${post.status.device == 'mobile'}"><small><i class="fa fa-mobile fa-lg"></i></small></c:if>
-				<c:if test="${post.status.device == 'tablet'}"><small><i class="fa fa-tablet fa-lg"></i></small></c:if>
+				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+				<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>	
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
 						<spring:message code="board.msg.deleted"/>
@@ -208,7 +208,13 @@
 	 						<strong>{{comment.writer.username}}</strong> | 
 	 						<small>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</small>
 	 					</div>
-	 					<div class="col-xs-12"><p ng-bind-html="comment.content"></p></div>
+	 					<div class="col-xs-12">
+	 						<p>
+	 							<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>
+	 							<span ng-if="comment.status.device == 'tablet'"><i class="fa fa-tablet fa-lg"></i></span>
+	 							<span ng-bind-html="comment.content"></span>
+	 						</p>
+	 					</div>
 	 					<div class="col-xs-12">
 							<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
 							  <span class="text-primary" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">

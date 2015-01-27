@@ -52,8 +52,6 @@ public class BoardFreeWriteController {
 	public String freeWrite(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus
 			, HttpServletRequest request) {
 		
-		logger.debug("boardFreeWrite=" + boardFreeWrite);
-
 		if (result.hasErrors()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("result=" + result);	
@@ -82,7 +80,8 @@ public class BoardFreeWriteController {
 	}
 
 	@RequestMapping(value = "/free/edit", method = RequestMethod.POST)
-	public String freeEdit(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus) {
+	public String freeEdit(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus
+			, HttpServletRequest request) {
 
 		if (result.hasErrors()) {
 			if (logger.isDebugEnabled()) {
@@ -100,7 +99,7 @@ public class BoardFreeWriteController {
 			return "board/freeEdit";
 		}
 		
-		Integer status = boardFreeService.edit(boardFreeWrite);
+		Integer status = boardFreeService.edit(request, boardFreeWrite);
 		sessionStatus.setComplete();
 		
 		return "redirect:/board/free/" + boardFreeWrite.getSeq();
