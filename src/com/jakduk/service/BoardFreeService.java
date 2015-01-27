@@ -224,7 +224,7 @@ public class BoardFreeService {
 		
 		JSONArray jsonArray = null;
 		
-		if (boardFreeWrite.getImages() != null) {
+		if (!boardFreeWrite.getImages().isEmpty()) {
 			JSONParser jsonParser = new JSONParser();
 			try {			
 				jsonArray = (JSONArray) jsonParser.parse(boardFreeWrite.getImages());
@@ -345,7 +345,7 @@ public class BoardFreeService {
 		
 		JSONArray jsonArray = null;
 
-		if (boardFreeWrite.getImages() != null) {
+		if (!boardFreeWrite.getImages().isEmpty()) {
 			JSONParser jsonParser = new JSONParser();
 			try {			
 				jsonArray = (JSONArray) jsonParser.parse(boardFreeWrite.getImages());
