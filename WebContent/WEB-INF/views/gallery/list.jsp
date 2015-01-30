@@ -25,7 +25,7 @@
 	<c:forEach items="${galleries}" var="gallery">
 		<div class="col-xs-6 col-md-3">
 			<div class="thumbnail">
-				<a href="<%=request.getContextPath()%>/gallery/${gallery.id}"><img src="<%=request.getContextPath()%>/gallery/thumbnail/${gallery.id}" alt="..."></a>
+				<a href="<c:url value='/gallery/view/${gallery.id}'/>"><img src="<%=request.getContextPath()%>/gallery/thumbnail/${gallery.id}" alt="..."></a>
 				<div class="caption">
 					<div class="text-overflow">${posts[gallery.boardItem.id].subject}</div>
 					<div><small>${gallery.writer.username}</small></div>
@@ -51,3 +51,5 @@ var jakdukApp = angular.module("jakdukApp", []);
 <jsp:include page="../include/body-footer.jsp"/>
 
 </body>
+
+</html>

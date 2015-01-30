@@ -86,6 +86,12 @@ public class GalleryController {
 		
 		Integer status = galleryService.removeImage(model, id);
 		
+	}
+	
+	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
+	public String view(@PathVariable String id, Model model) {
+		
+		return "gallery/view";		
 	}	
 
 }

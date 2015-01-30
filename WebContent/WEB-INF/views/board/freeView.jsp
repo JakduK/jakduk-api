@@ -128,7 +128,7 @@
 	  		<div class="col-md-5">
 		  		<small>
 					{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
-		    		| <spring:message code="board.views"/> ${post.views} 
+		    		| <span class="glyphicon glyphicon-eye-open"></span> ${post.views} 
 		    	</small>
 	  		</div>	
 	  	</div>

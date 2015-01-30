@@ -25,6 +25,7 @@
 </c:choose>
 
 <jsp:include page="../include/footer.jsp"/>
+
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript

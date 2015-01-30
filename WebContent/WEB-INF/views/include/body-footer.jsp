@@ -17,9 +17,9 @@
 
   ga('create', 'UA-59051176-1', 'auto');
   ga('send', 'pageview');
-  if ("${!empty accountName}") {
-	  ga(‘set’, ‘&uid’, "${accountName}");  
-  	}
+  if ("${!empty accountName}" == "true") {
+	  ga('set', '&uid', "${accountName}");  
+  }
   
 
 </script>

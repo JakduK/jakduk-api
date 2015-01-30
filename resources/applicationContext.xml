@@ -39,7 +39,7 @@
 				<value>classpath:/config/db/mongo.properties</value>
 				<value>classpath:/config/storage/file.properties</value>
 			</list>
-    </property>	
+    	</property>	
 	</bean>
 
 </beans>

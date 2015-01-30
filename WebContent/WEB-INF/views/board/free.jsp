@@ -120,7 +120,7 @@
 						</c:choose>					
 					</div>
 					<div class="col-sm-3 hidden-xs">
-						<spring:message code="board.views"/><strong> ${notice.views}</strong> |
+						<span class="glyphicon glyphicon-eye-open"></span><strong> ${notice.views}</strong> |
 						<span class="text-primary">
 							<span class="glyphicon glyphicon-thumbs-up"></span>
 							<strong>
@@ -191,7 +191,7 @@
 						</c:choose>		
 					</div>
 					<div class="col-sm-3">
-						<spring:message code="board.views"/><strong> ${post.views}</strong> |
+						<span class="glyphicon glyphicon-eye-open"></span><strong> ${post.views}</strong> |
 						<span class="text-primary">
 							<span class="glyphicon glyphicon-thumbs-up"></span>
 							<strong>
