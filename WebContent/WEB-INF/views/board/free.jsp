@@ -65,7 +65,7 @@
 
 <p></p>
 
-<div class="panel panel-info" ng-controller="boardCtrl">
+<div class="panel panel-warning" ng-controller="boardCtrl">
   <!-- Default panel contents -->
   <div class="panel-heading hidden-xs">
   	<div class="row">
@@ -79,7 +79,7 @@
 	<ul class="list-group">
 		<!-- posts as notice -->
 		<c:forEach items="${notices}" var="notice">
-			<li class="list-group-item list-group-item-warning">
+			<li class="list-group-item list-group-item-info">
 				<div class="row">
 					<div class="col-sm-2">
 						<spring:message code="board.notice"/>

@@ -25,7 +25,7 @@
 
 <div class="row">
 	<div class="col-6 col-sm-6 col-lg-6">
-		<div class="panel panel-info">
+		<div class="panel panel-warning">
 			<div class="panel-heading"><strong><a href="<c:url value="/board/free"/>"><spring:message code="home.posts.latest"/></a></strong></div>		
 			<table class="table table-hover table-condensed">
 			<thead>
@@ -49,7 +49,7 @@
 	</div>
 	
 	<div class="col-6 col-sm-6 col-lg-6">
-		<div class="panel panel-info">
+		<div class="panel panel-warning">
 			<div class="panel-heading"><strong><spring:message code="home.members.registered.latest"/></strong></div>
 			<table class="table table-hover table-condensed">
 			<thead>
