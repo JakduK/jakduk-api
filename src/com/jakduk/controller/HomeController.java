@@ -132,6 +132,12 @@ public class HomeController {
 		return "home/upload01";
 	}
 	
+	@RequestMapping(value = "/gallery01")
+	public String gallery01(Model model) {
+		
+		return "home/gallery01";
+	}	
+	
 	@RequestMapping(value = "/check/user/email")
 	public void checkEmail(Model model,
 			@RequestParam(required = true) String email) {

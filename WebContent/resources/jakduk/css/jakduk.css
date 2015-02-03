@@ -111,3 +111,9 @@ footer {
 
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .navbar .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:90px;}
+
+.jakduk .row {margin-left:0px; margin-right:0px;}
+.jakduk .col-xs-4 {padding-left:3px; padding-right:3px;}
+.jakduk .thumbnail {margin-bottom:10px;}
+.jakduk .thumbnail .caption {padding:3px;}
+.jakduk .thumbnail p {margin-bottom:3px;}

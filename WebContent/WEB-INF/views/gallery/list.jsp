@@ -10,10 +10,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
-	<link href="<%=request.getContextPath()%>/resources/bootstrap/css/carousel.css" rel="stylesheet">
 </head>
 <body>
-<div class="container" ng-controller="galleryCtrl">
+<div class="container jakduk" ng-controller="galleryCtrl">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <div class="page-header">
@@ -23,10 +22,20 @@
   </h4>
 </div>
 
-<!-- Carousel
-    ================================================== -->
+<div class="row">
+    <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-repeat="gallery in galleries">
+    	<a href="<%=request.getContextPath()%>/gallery/{{gallery.id}}" class="thumbnail">
+    		<img ng-src="<%=request.getContextPath()%>/gallery/{{gallery.id}}">
+    		<div class="caption text-overflow">
+    			{{gallery.name}}
+    			<p><small>{{gallery.writer.username}}</small></p>
+    		</div>
+    	</a>
+    </div>
+</div>
+
+<!--  
     <div id="myCarousel" class="carousel slide" data-ride="carousel">
-      <!-- Indicators -->
       <ol class="carousel-indicators">
 					<c:forEach begin="0" end="${fn:length(galleries) - 1}" var="index">
 						<c:choose>
@@ -60,29 +69,8 @@
         <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
       </a>
-    </div><!-- /.carousel -->
-
-  	<c:forEach items="${galleries}" var="gallery" varStatus="status">
-   <img src="<%=request.getContextPath()%>/gallery/thumbnail/${gallery.id}" class="img-thumbnail" style="width:60px;">
-  </c:forEach>
-
-
-<!-- 
-<p class="bg-info"><spring:message code="common.msg.test.version"/></p>
-<div class="row">
-	<c:forEach items="${galleries}" var="gallery">
-		<div class="col-xs-6 col-md-3">
-			<div class="thumbnail">
-				<a href="<c:url value='/gallery/view/${gallery.id}'/>"><img src="<%=request.getContextPath()%>/gallery/thumbnail/${gallery.id}" alt="..."></a>
-				<div class="caption">
-					<div class="text-overflow">${posts[gallery.boardItem.id].subject}</div>
-					<div><small>${gallery.writer.username}</small></div>
-				</div>
-			</div>  
-		</div>
-	</c:forEach>
-</div>
- -->
+    </div>
+    -->
 
 <jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
@@ -97,6 +85,37 @@
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("galleryCtrl", function($scope, $http) {
+	$scope.galleriesConn = "none";
+	$scope.galleries = [];
+	
+	angular.element(document).ready(function() {
+		$scope.getGalleries();
+	});	
+	
+	$scope.getGalleries = function() {
+		var bUrl = '<c:url value="/gallery/list.json"/>';
+		
+		if ($scope.galleriesConn == "none") {
+			
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.galleriesConn = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+				
+				$scope.galleries = data.galleries;
+				console.log(data);
+				
+				$scope.galleriesConn = "none";
+				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.galleriesConn = "none";
+				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+			});
+		}
+	};		
+
 	
 });
 </script>
