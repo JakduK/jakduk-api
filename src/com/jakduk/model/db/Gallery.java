@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.GalleryStatus;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -24,6 +25,8 @@ public class Gallery {
 	
 	private String name;
 	
+	private String fileName;
+	
 	private BoardItem boardItem;
 	
 	private BoardWriter writer;
@@ -31,6 +34,8 @@ public class Gallery {
 	private long size;
 	
 	private String contentType;
+	
+	private GalleryStatus status;
 
 	public String getId() {
 		return id;
@@ -46,6 +51,14 @@ public class Gallery {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public BoardItem getBoardItem() {
@@ -80,11 +93,21 @@ public class Gallery {
 		this.contentType = contentType;
 	}
 
+	public GalleryStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(GalleryStatus status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
-		return "Gallery [id=" + id + ", name=" + name + ", boardItem="
-				+ boardItem + ", writer=" + writer + ", size=" + size
-				+ ", contentType=" + contentType + "]";
+		return "Gallery [id=" + id + ", name=" + name + ", fileName="
+				+ fileName + ", boardItem=" + boardItem + ", writer=" + writer
+				+ ", size=" + size + ", contentType=" + contentType
+				+ ", status=" + status + "]";
 	}
+	
 
 }

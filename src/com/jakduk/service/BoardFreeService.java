@@ -44,6 +44,7 @@ import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.BoardUser;
 import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.GalleryStatus;
 import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardFreeWrite;
@@ -205,6 +206,7 @@ public class BoardFreeService {
 		
 		BoardStatus boardStatus = new BoardStatus();
 		Device device = DeviceUtils.getCurrentDevice(request);
+		
 		if (device.isNormal()) {
 			boardStatus.setDevice("normal");
 		} else if (device.isMobile()) {
@@ -212,6 +214,7 @@ public class BoardFreeService {
 		} else if (device.isTablet()) {
 			boardStatus.setDevice("tablet");
 		}
+		
 		boardFree.setStatus(boardStatus);
 		
 		List<BoardHistory> historys = new ArrayList<BoardHistory>();
@@ -267,10 +270,23 @@ public class BoardFreeService {
 			for (int i = 0 ; i < jsonArray.size() ; i++) {
 				JSONObject obj = (JSONObject)jsonArray.get(i);
 				String id = (String) obj.get("uid");
+				String name = (String) obj.get("name");
 
 				Gallery gallery = galleryRepository.findOne(id);
 
 				if (gallery != null) {
+					GalleryStatus status = gallery.getStatus();
+
+					if (!name.isEmpty()) {
+						status.setName("input");
+						gallery.setStatus(status);
+						gallery.setName(name);
+					} else {
+						status.setName("boardSubject");
+						gallery.setStatus(status);
+						gallery.setName(boardFree.getSubject());
+					}
+					
 					gallery.setBoardItem(boardItem);
 					galleryRepository.save(gallery);
 				}

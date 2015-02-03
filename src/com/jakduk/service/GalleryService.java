@@ -41,6 +41,7 @@ import com.jakduk.dao.BoardFreeOnGallery;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.GalleryStatus;
 import com.jakduk.repository.GalleryRepository;
 
 /**
@@ -85,12 +86,16 @@ public class GalleryService {
 			writer.setUsername(username);
 			writer.setType(type);
 			gallery.setWriter(writer);
-			gallery.setName(file.getOriginalFilename());
+			
+			GalleryStatus status = new GalleryStatus();
+			status.setName("none");
+			gallery.setStatus(status);
+			
+			gallery.setFileName(file.getOriginalFilename());
 			gallery.setSize(file.getSize());
 			gallery.setContentType(file.getContentType());
+
 			galleryRepository.save(gallery);
-			
-			logger.debug("gallery=" + gallery);
 			
 			ObjectId objId = new ObjectId(gallery.getId());
 			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
@@ -134,6 +139,10 @@ public class GalleryService {
 				}
 				
 				ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
+			}
+			
+			if (logger.isDebugEnabled()) {
+				logger.debug("gallery info=" + gallery);
 			}
 			
 			model.addAttribute("image", gallery);

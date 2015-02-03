@@ -17,7 +17,7 @@
 
 </head>
 <body>
-<div class="container" ng-controller="FreeWriteCtrl">
+<div class="container jakduk-board" ng-controller="FreeWriteCtrl">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
@@ -87,26 +87,30 @@
 	    <img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.uid}}" width="60px;" height="60px;">
   	</div>
 	</div>
-  <div class="col-xs-4 col-sm-2 col-md-2" ng-repeat="item in uploader.queue">
-    <div class="thumbnail">
-				<div class="caption">
+	
+	<div class="media col-md-3" ng-repeat="item in uploader.queue">
+	  <div class="media-left media-middle">
+	      <img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
+	  </div>
+	  <div class="media-body">
+	    <h5 class="media-heading">
 					<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
 						<span class="glyphicon glyphicon-upload"></span>
 					</button>		
 					<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
 						<span class="glyphicon glyphicon-remove-circle"></span>
-					</button>
-					<h5 class="text-overflow">
-						<small>
-						{{item.file.name}} | {{item.file.size/1024|number:1}} KB 
-						<code>{{item.progress}}%</code>
+					</button>   
+					<small>{{item.file.size/1024|number:1}} KB
+					<code>{{item.progress}}%</code>
 					</small>
-					</h5>
-				</div>
-				<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" width="60px;" height="60px;">      
-  	</div>
-	</div>  
-</div>  
+	    </h5>
+			<input type="text" class="form-control input-sm col-md-2" placeholder="Input name"
+			ng-model="item.newName" ng-blur="onGalleryItem(item)">
+	  </div>
+	</div>
+</div>
+
+<p></p>
 
 	<div class="form-group">
 		<button type="submit" class="btn btn-success">
@@ -202,6 +206,26 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		method:"POST"
 	});
 	
+	$scope.onGalleryItem = function(fileItem) {
+		if (!isEmpty($scope.images)) {
+			var tempImages = JSON.parse($scope.images);
+			var rmIdx = -1;
+			
+			tempImages.forEach(function(entry, index) {
+				if (entry.uid == fileItem.uid) {
+					rmIdx = index;							
+				}
+			});
+			
+			if (rmIdx != -1) {
+				var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};				
+				tempImages.splice(rmIdx, 1, imageInfo);
+				$scope.images = JSON.stringify(tempImages);
+				console.log("fileItem updated(queue). fileInfo=", imageInfo);
+			}
+		}
+	};
+	
 	$scope.removeStoredItem = function(fileItem) {
 		if (fileItem.uid != null) {
 			var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
@@ -285,7 +309,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		 
 		 
 	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-		//console.log('onCompleteItem fileItem=', fileItem);
+		console.log('onCompleteItem fileItem=', fileItem);
 		//console.log('onCompleteItem status=', status);
 		//console.log('onCompleteItem headers=', headers);
 		
@@ -294,7 +318,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 
 			fileItem.uid = response.image.id;
 			
-			var imageInfo = {uid:fileItem.uid, name:fileItem.file.name, size:fileItem.file.size};
+			var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};
 			
 			if (!isEmpty($scope.images)) {
 				var tempImages = JSON.parse($scope.images);
@@ -314,12 +338,10 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	};	
 
 	$scope.imageUpload = function(files, editor) {
-		 console.log('image upload:', files);
-		 console.log('image upload:', editor);
-		 console.log('image upload\'s editable:', $scope.editable);
+		 //console.log('image upload:', files);
+		 //console.log('image upload:', editor);
+		 //console.log('image upload\'s editable:', $scope.editable);
 		 
-			//var url = "<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png";       	
-			//editor.insertImage($scope.editable, url);
 			$scope.editor = editor;
 /*		
 			$scope.images.push("adasassad");
