@@ -7,7 +7,17 @@ package com.jakduk.model.embedded;
  */
 public class GalleryStatus {
 	
+	private String use;
+	
 	private String name;
+
+	public String getUse() {
+		return use;
+	}
+
+	public void setUse(String use) {
+		this.use = use;
+	}
 
 	public String getName() {
 		return name;
@@ -19,7 +29,7 @@ public class GalleryStatus {
 
 	@Override
 	public String toString() {
-		return "GalleryState [name=" + name + "]";
+		return "GalleryStatus [use=" + use + ", name=" + name + "]";
 	}
 
 }

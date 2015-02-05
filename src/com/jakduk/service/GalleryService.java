@@ -88,7 +88,7 @@ public class GalleryService {
 			gallery.setWriter(writer);
 			
 			GalleryStatus status = new GalleryStatus();
-			status.setName("none");
+			status.setUse(CommonConst.GALLERY_USE_STATUS_UNUSE);
 			gallery.setStatus(status);
 			
 			gallery.setFileName(file.getOriginalFilename());

@@ -317,7 +317,6 @@
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular/js/angular-sanitize.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
@@ -436,6 +435,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	      ['font', ['bold']],
 	      // ['fontsize', ['fontsize']], // Still buggy
 	      ['color', ['color']],
+	      ['insert', ['link']],
 	      ['help', ['help']]			          
 				]};	
 	

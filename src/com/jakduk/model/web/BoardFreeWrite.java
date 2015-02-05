@@ -1,7 +1,5 @@
 package com.jakduk.model.web;
 
-import java.util.Arrays;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 

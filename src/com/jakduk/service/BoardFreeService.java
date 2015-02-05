@@ -130,28 +130,24 @@ public class BoardFreeService {
 		
 		BoardFreeWrite boardFreeWrite = new BoardFreeWrite();
 		
-		logger.debug("boardFree=" + boardFree);
-		
 		if (boardFree.getGalleries() != null) {
 			List<String> images = new ArrayList<String>();
-			logger.debug("aaa");
 			
 			for (BoardImage gallery : boardFree.getGalleries()) {
 				Gallery tempGallery = galleryRepository.findOne(gallery.getId());
-				logger.debug("tempGallery=" + tempGallery);
 				
 				if (tempGallery != null) {
 					Map<String, String> image = new HashMap<String, String>();
 					
 					image.put("uid", tempGallery.getId());
 					image.put("name", tempGallery.getName());
+					image.put("fileName", tempGallery.getFileName());
 					image.put("size", String.valueOf(tempGallery.getSize()));
 					
 					images.add(JSONObject.toJSONString(image));
 				}
 			}
 			
-			logger.debug("images=" + images);
 			boardFreeWrite.setImages(images.toString());
 		}
 		
@@ -208,11 +204,11 @@ public class BoardFreeService {
 		Device device = DeviceUtils.getCurrentDevice(request);
 		
 		if (device.isNormal()) {
-			boardStatus.setDevice("normal");
+			boardStatus.setDevice(CommonConst.DEVICE_TYPE_NORMAL);
 		} else if (device.isMobile()) {
-			boardStatus.setDevice("mobile");
+			boardStatus.setDevice(CommonConst.DEVICE_TYPE_MOBILE);
 		} else if (device.isTablet()) {
-			boardStatus.setDevice("tablet");
+			boardStatus.setDevice(CommonConst.DEVICE_TYPE_TABLET);
 		}
 		
 		boardFree.setStatus(boardStatus);
@@ -276,13 +272,14 @@ public class BoardFreeService {
 
 				if (gallery != null) {
 					GalleryStatus status = gallery.getStatus();
+					status.setUse(CommonConst.GALLERY_USE_STATUS_USE);
 
 					if (!name.isEmpty()) {
-						status.setName("input");
+						status.setName(CommonConst.GALLERY_NAME_STATUS_INPUT);
 						gallery.setStatus(status);
 						gallery.setName(name);
 					} else {
-						status.setName("boardSubject");
+						status.setName(CommonConst.GALLERY_NAME_STATUS_SUBJECT);
 						gallery.setStatus(status);
 						gallery.setName(boardFree.getSubject());
 					}
@@ -337,13 +334,15 @@ public class BoardFreeService {
 		}
 		
 		Device device = DeviceUtils.getCurrentDevice(request);
+		
 		if (device.isNormal()) {
-			boardStatus.setDevice("normal");
+			boardStatus.setDevice(CommonConst.DEVICE_TYPE_NORMAL);
 		} else if (device.isMobile()) {
-			boardStatus.setDevice("mobile");
+			boardStatus.setDevice(CommonConst.DEVICE_TYPE_MOBILE);
 		} else if (device.isTablet()) {
-			boardStatus.setDevice("tablet");
+			boardStatus.setDevice(CommonConst.DEVICE_TYPE_TABLET);
 		}
+		
 		boardFree.setStatus(boardStatus);
 		
 		List<BoardHistory> historys = boardFree.getHistory();
@@ -685,11 +684,11 @@ public class BoardFreeService {
 			Device device = DeviceUtils.getCurrentDevice(request);
 			
 			if (device.isNormal()) {
-				status.setDevice("normal");
+				status.setDevice(CommonConst.DEVICE_TYPE_NORMAL);
 			} else if (device.isMobile()) {
-				status.setDevice("mobile");
+				status.setDevice(CommonConst.DEVICE_TYPE_MOBILE);
 			} else if (device.isTablet()) {
-				status.setDevice("tablet");
+				status.setDevice(CommonConst.DEVICE_TYPE_TABLET);
 			}
 			
 			boardFreeComment.setStatus(status);

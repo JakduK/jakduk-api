@@ -71,29 +71,36 @@
 
 <h4 ng-show="storedImages.length > 0 || uploader.queue.length > 0"><spring:message code="board.gallery.list"/></h4>
 <div class="row">
-  <div class="col-xs-4 col-sm-2 col-md-2" ng-repeat="image in storedImages">
-    <div class="thumbnail">
-      <div class="caption text-overflow">
+	<!-- sotred Images -->
+	<div class="media col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="item in storedImages">
+	  <div class="media-left media-middle">
+			<img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
+	  </div>
+	  <div class="media-body">
+			<h5 class="media-heading">
 					<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
 						<span class="glyphicon glyphicon-upload"></span>
 					</button>		
-					<button type="button" class="btn btn-danger btn-xs" ng-click="removeStoredItem(image)">
+					<button type="button" class="btn btn-danger btn-xs" ng-click="removeStoredItem(item)">
 						<span class="glyphicon glyphicon-remove-circle"></span>
-					</button>
-						<small>
-						{{image.name}} | {{image.size/1024|number:1}} KB 
-					</small>
-	    </div>
-	    <img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.uid}}" width="60px;" height="60px;">
-  	</div>
-	</div>
-	
-	<div class="media col-md-3" ng-repeat="item in uploader.queue">
-	  <div class="media-left media-middle">
-	      <img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
+					</button>   
+					<small>{{item.size/1024|number:1}} KB</small>
+			</h5>
+			<div class="form-group has-feedback" ng-class="{'has-success':item.name.length >= 2, 'has-warning':item.name.length < 2 || item.name == null}">
+				<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
+				ng-model="item.name" ng-blur="onGalleryItem(item, 'stored')">
+				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':item.name.length >= 2, 
+				'glyphicon-warning-sign':item.name.length < 2 || item.name == null}"></span>
+			</div>			
 	  </div>
-	  <div class="media-body">
-	    <h5 class="media-heading">
+	</div>
+	<!-- queue Images -->
+	<div class="media col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="item in uploader.queue">
+		<div class="media-left media-middle">
+			<img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
+	  </div>
+		<div class="media-body">
+			<h5 class="media-heading">
 					<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
 						<span class="glyphicon glyphicon-upload"></span>
 					</button>		
@@ -103,9 +110,13 @@
 					<small>{{item.file.size/1024|number:1}} KB
 					<code>{{item.progress}}%</code>
 					</small>
-	    </h5>
-			<input type="text" class="form-control input-sm col-md-2" placeholder="Input name"
-			ng-model="item.newName" ng-blur="onGalleryItem(item)">
+			</h5>
+			<div class="form-group has-feedback" ng-class="{'has-success':item.newName.length >= 2, 'has-warning':item.newName.length < 2 || item.newName == null}">
+				<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
+				ng-model="item.newName" ng-blur="onGalleryItem(item, 'queue')">
+				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':item.newName.length >= 2, 
+				'glyphicon-warning-sign':item.newName.length < 2 || item.newName == null}"></span>
+			</div>
 	  </div>
 	</div>
 </div>
@@ -206,7 +217,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		method:"POST"
 	});
 	
-	$scope.onGalleryItem = function(fileItem) {
+	$scope.onGalleryItem = function(fileItem, type) {
 		if (!isEmpty($scope.images)) {
 			var tempImages = JSON.parse($scope.images);
 			var rmIdx = -1;
@@ -218,7 +229,12 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			});
 			
 			if (rmIdx != -1) {
-				var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};				
+				if (type == 'queue') {
+					var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};				
+				} else if (type == 'stored') {
+					var imageInfo = {uid:fileItem.uid, name:fileItem.name, fileName:fileItem.fileName, size:fileItem.size};
+				}
+				
 				tempImages.splice(rmIdx, 1, imageInfo);
 				$scope.images = JSON.stringify(tempImages);
 				console.log("fileItem updated(queue). fileInfo=", imageInfo);

@@ -101,4 +101,15 @@ public class CommonConst {
 	
 	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 120;
 	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 100;
+	
+	public final static String GALLERY_USE_STATUS_USE = "use";
+	public final static String GALLERY_USE_STATUS_UNUSE = "unuse";
+	
+	public final static String GALLERY_NAME_STATUS_INPUT = "input";
+	public final static String GALLERY_NAME_STATUS_SUBJECT = "subject";
+	
+	public final static String DEVICE_TYPE_NORMAL = "normal";
+	public final static String DEVICE_TYPE_MOBILE = "mobile";
+	public final static String DEVICE_TYPE_TABLET = "tablet";
+	
 }
