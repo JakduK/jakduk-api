@@ -258,6 +258,7 @@ public class BoardFreeService {
 
 		boardFreeRepository.save(boardFree);
 		
+		// 글과 연동 된 사진 처리
 		if (jsonArray != null) {
 			BoardItem boardItem = new BoardItem();
 			boardItem.setId(boardFree.getId());
@@ -274,7 +275,7 @@ public class BoardFreeService {
 					GalleryStatus status = gallery.getStatus();
 					status.setUse(CommonConst.GALLERY_USE_STATUS_USE);
 
-					if (!name.isEmpty()) {
+					if (name != null && !name.isEmpty()) {
 						status.setName(CommonConst.GALLERY_NAME_STATUS_INPUT);
 						gallery.setStatus(status);
 						gallery.setName(name);
@@ -388,6 +389,7 @@ public class BoardFreeService {
 			}
 		}
 
+		// 글과 연동 된 사진 처리
 		if (jsonArray != null) {
 			BoardItem boardItem = new BoardItem();
 			boardItem.setId(boardFree.getId());
@@ -396,10 +398,24 @@ public class BoardFreeService {
 			for (int i = 0 ; i < jsonArray.size() ; i++) {
 				JSONObject obj = (JSONObject)jsonArray.get(i);
 				String id = (String) obj.get("uid");
+				String name = (String) obj.get("name");
 
 				Gallery gallery = galleryRepository.findOne(id);
 
 				if (gallery != null) {
+					GalleryStatus status = gallery.getStatus();
+					status.setUse(CommonConst.GALLERY_USE_STATUS_USE);
+
+					if (name != null && !name.isEmpty()) {
+						status.setName(CommonConst.GALLERY_NAME_STATUS_INPUT);
+						gallery.setStatus(status);
+						gallery.setName(name);
+					} else {
+						status.setName(CommonConst.GALLERY_NAME_STATUS_SUBJECT);
+						gallery.setStatus(status);
+						gallery.setName(boardFree.getSubject());
+					}
+					
 					gallery.setBoardItem(boardItem);
 					galleryRepository.save(gallery);
 				}
@@ -849,6 +865,9 @@ public class BoardFreeService {
 		} else if (type.equals(CommonConst.BOARD_DELETE_TYPE_ALL) && count > 0) {
 			return HttpServletResponse.SC_NOT_ACCEPTABLE;
 		}
+		
+		// 글이 지워질 때, 연동된 사진도 끊어주어야 한다.
+		// 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
 		
 		switch (type) {
 		case CommonConst.BOARD_DELETE_TYPE_POSTONLY:

@@ -3,7 +3,8 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>    
 
 <sec:authorize access="isAuthenticated()">
-	<sec:authentication property="principal.username" var="accountName"/>
+	<sec:authentication property="principal.username" var="accountName"/>	
+	<sec:authentication property="principal.id" var="accountId"/>
 </sec:authorize>
 
 <!-- This script should be under the AngularJS which is creating jakdukApp module. -->
@@ -17,9 +18,7 @@
 
   ga('create', 'UA-59051176-1', 'auto');
   ga('send', 'pageview');
-  if ("${!empty accountName}" == "true") {
-	  ga('set', '&uid', "${accountName}");  
+  if ("${!empty accountId}" == "true") {
+	  ga('set', '&uid', '${accountId}');  
   }
-  
-
 </script>

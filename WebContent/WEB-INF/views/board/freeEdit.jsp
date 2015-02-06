@@ -19,7 +19,7 @@
 
 </head>
 <body>
-<div class="container" ng-controller="FreeWriteCtrl">
+<div class="container jakduk-board" ng-controller="FreeWriteCtrl">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
@@ -74,42 +74,58 @@
 
 <h4 ng-show="storedImages.length > 0 || uploader.queue.length > 0"><spring:message code="board.gallery.list"/></h4>
 <div class="row">
-  <div class="col-xs-4 col-sm-2 col-md-2" ng-repeat="image in storedImages">
-    <div class="thumbnail">
-      <div class="caption text-overflow">
-					<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(image.uid)">
-						<span class="glyphicon glyphicon-upload"></span>
-					</button>		
-					<button type="button" class="btn btn-danger btn-xs" ng-click="removeStoredItem(image)">
-						<span class="glyphicon glyphicon-remove-circle"></span>
-					</button>
-						<small>
-						{{image.name}} | {{image.size/1024|number:1}} KB 
-					</small>
-				</div>
-				<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.uid}}" width="60px;" height="60px;">      
-  	</div>
-	</div>
-  <div class="col-xs-4 col-sm-2 col-md-2" ng-repeat="item in uploader.queue">
-    <div class="thumbnail">
-      <div class="caption">
+	<!-- sotred Images -->
+	<div class="media col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="item in storedImages">
+	  <div class="media-left media-middle">
+			<img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
+	  </div>
+	  <div class="media-body">
+			<h5 class="media-heading">
 					<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(item.uid)">
 						<span class="glyphicon glyphicon-upload"></span>
 					</button>		
-					<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
+					<button type="button" class="btn btn-danger btn-xs" ng-click="removeStoredItem(item)">
 						<span class="glyphicon glyphicon-remove-circle"></span>
-					</button>
-					<h5 class="text-overflow">
-						<small>
-						{{item.file.name}} | {{item.file.size/1024|number:1}} KB 
-						<code>{{item.progress}}%</code>
-					</small>
-					</h5>
-				</div>
-				<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" width="60px;" height="60px;">      
-  	</div>
-	</div>  
-</div>  
+					</button>   
+					<small>{{item.size/1024|number:1}} KB</small>
+			</h5>
+			<div class="form-group has-feedback" ng-class="{'has-success':item.name.length >= 2, 
+			'has-warning':item.name.length < 2 || item.name == null}">
+				<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
+				ng-model="item.name" ng-blur="onGalleryItem(item, 'stored')">
+				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':item.name.length >= 2, 
+				'glyphicon-warning-sign':item.name.length < 2 || item.name == null}"></span>
+			</div>			
+	  </div>
+	</div>
+	<!-- queue Images -->
+	<div class="media col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="item in uploader.queue">
+		<div class="media-left media-middle">
+			<img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
+	  </div>
+		<div class="media-body">
+			<h5 class="media-heading">
+				<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
+					<span class="glyphicon glyphicon-upload"></span>
+				</button>		
+				<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
+					<span class="glyphicon glyphicon-remove-circle"></span>
+				</button>   
+				<small>{{item.file.size/1024|number:1}} KB
+					<code>{{item.progress}}%</code>
+				</small>
+			</h5>
+			<div class="form-group has-feedback" ng-class="{'has-success':item.newName.length >= 2, 'has-warning':item.newName.length < 2 || item.newName == null}">
+				<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
+				ng-model="item.newName" ng-blur="onGalleryItem(item, 'queue')">
+				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':item.newName.length >= 2, 
+				'glyphicon-warning-sign':item.newName.length < 2 || item.newName == null}"></span>
+			</div>
+	  </div>
+	</div>
+</div>
+
+<p></p>
   
 	<div class="form-group">
 		<button type="submit" class="btn btn-success">
@@ -197,11 +213,37 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				]
 		};
 	
+	// angular-file-upload methods	
 	$scope.uploader = new FileUploader({		
 		url:'<c:url value="/gallery/upload.json"/>',
 		autoUpload:true,
 		method:"POST"
 	});
+	
+	$scope.onGalleryItem = function(fileItem, type) {
+		if (!isEmpty($scope.images)) {
+			var tempImages = JSON.parse($scope.images);
+			var rmIdx = -1;
+			
+			tempImages.forEach(function(entry, index) {
+				if (entry.uid == fileItem.uid) {
+					rmIdx = index;							
+				}
+			});
+			
+			if (rmIdx != -1) {
+				if (type == 'queue') {
+					var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};				
+				} else if (type == 'stored') {
+					var imageInfo = {uid:fileItem.uid, name:fileItem.name, fileName:fileItem.fileName, size:fileItem.size};
+				}
+				
+				tempImages.splice(rmIdx, 1, imageInfo);
+				$scope.images = JSON.stringify(tempImages);
+				console.log("fileItem updated(queue). fileInfo=", imageInfo);
+			}
+		}
+	};	
 
 	$scope.removeStoredItem = function(fileItem) {
 		if (fileItem.uid != null) {
@@ -284,11 +326,6 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		}
 	};
 
-	$scope.insertImage = function(uid) {
-		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
-		$scope.editor.insertImage($scope.editable, imageUrl);
-	};
-	 
 	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
 		
 		if (status == 200) {
@@ -315,6 +352,12 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		}
 	};	
 
+	$scope.insertImage = function(uid) {
+		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
+		$scope.editor.insertImage($scope.editable, imageUrl);
+	};
+	
+	// angular-summernote method
 	$scope.imageUpload = function(files, editor) {
 		$scope.editor = editor;
 //		$scope.$apply();
@@ -323,6 +366,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	
 	$scope.onSubmit = function(event) {
 		if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+			$scope.validationGalleries();
 			submitted = true;
 			$scope.submitConn = "connecting";
 			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};			
@@ -364,6 +408,21 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			$scope.contentAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 		}
 	};	
+	
+	$scope.validationGalleries = function() {
+		if (!isEmpty($scope.images)) {
+			var tempImages = JSON.parse($scope.images);
+			var rmIdx = -1;
+			
+			tempImages.forEach(function(entry, index) {
+				if (entry.name != null && (entry.name.length < 2 || entry.name.length > 50)) {
+					entry.name = "";
+				}
+			});
+			
+			$scope.images = JSON.stringify(tempImages);
+		}		
+	};
 	
 });
 </script>

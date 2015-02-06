@@ -237,6 +237,12 @@ public class GalleryService {
 		return HttpServletResponse.SC_OK;
 	}
 	
+	/**
+	 * 사진 삭제.
+	 * @param model
+	 * @param id
+	 * @return
+	 */
 	public Integer removeImage(Model model, String id) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
@@ -263,6 +269,9 @@ public class GalleryService {
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		
+		// 사진을 삭제하기 전에, 이 사진과 연동된 글이 있는지 검사를 해야 한다. 최종적으로 연동된 글이 전부 없어진다면 사진은 삭제되어야 한다.
+		// 추가 할것.
 		
 		Path imageFilePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), 
 				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());

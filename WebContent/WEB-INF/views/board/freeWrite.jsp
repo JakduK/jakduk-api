@@ -86,7 +86,8 @@
 					</button>   
 					<small>{{item.size/1024|number:1}} KB</small>
 			</h5>
-			<div class="form-group has-feedback" ng-class="{'has-success':item.name.length >= 2, 'has-warning':item.name.length < 2 || item.name == null}">
+			<div class="form-group has-feedback" ng-class="{'has-success':item.name.length >= 2, 
+			'has-warning':item.name.length < 2 || item.name == null}">
 				<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
 				ng-model="item.name" ng-blur="onGalleryItem(item, 'stored')">
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':item.name.length >= 2, 
@@ -101,15 +102,15 @@
 	  </div>
 		<div class="media-body">
 			<h5 class="media-heading">
-					<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
-						<span class="glyphicon glyphicon-upload"></span>
-					</button>		
-					<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
-						<span class="glyphicon glyphicon-remove-circle"></span>
-					</button>   
-					<small>{{item.file.size/1024|number:1}} KB
+				<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
+					<span class="glyphicon glyphicon-upload"></span>
+				</button>		
+				<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
+					<span class="glyphicon glyphicon-remove-circle"></span>
+				</button>   
+				<small>{{item.file.size/1024|number:1}} KB
 					<code>{{item.progress}}%</code>
-					</small>
+				</small>
 			</h5>
 			<div class="form-group has-feedback" ng-class="{'has-success':item.newName.length >= 2, 'has-warning':item.newName.length < 2 || item.newName == null}">
 				<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
@@ -322,8 +323,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			});
 		}
 	};
-		 
-		 
+	
 	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
 		console.log('onCompleteItem fileItem=', fileItem);
 		//console.log('onCompleteItem status=', status);
@@ -352,28 +352,21 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			console.log("upload image failed.");
 		}
 	};	
+	
+	$scope.insertImage = function(uid) {
+		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
+		$scope.editor.insertImage($scope.editable, imageUrl);
+	};	
 
 	$scope.imageUpload = function(files, editor) {
-		 //console.log('image upload:', files);
-		 //console.log('image upload:', editor);
-		 //console.log('image upload\'s editable:', $scope.editable);
-		 
 			$scope.editor = editor;
-/*		
-			$scope.images.push("adasassad");
-			$scope.boardFreeWrite.images = "sddddd";
-			console.log("subject=", $scope.subject);
-			$scope.abc = "sdfsdfsdfsdf";
-			console.log("ddddd",$scope.images);
-			console.log("ddddd",$scope.abc);
-*/
-
 //			$scope.$apply();
 			$scope.uploader.addToQueue(files);
 	      };	
 	
 	$scope.onSubmit = function(event) {
 		if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+			$scope.validationGalleries();
 			submitted = true;
 			$scope.submitConn = "connecting";
 			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};			
@@ -414,7 +407,22 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		} else {
 			$scope.contentAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
 		}
-	};	
+	};
+	
+	$scope.validationGalleries = function() {
+		if (!isEmpty($scope.images)) {
+			var tempImages = JSON.parse($scope.images);
+			var rmIdx = -1;
+			
+			tempImages.forEach(function(entry, index) {
+				if (entry.name != null && (entry.name.length < 2 || entry.name.length > 50)) {
+					entry.name = "";
+				}
+			});
+			
+			$scope.images = JSON.stringify(tempImages);
+		}		
+	};
 	
 });
 </script>
