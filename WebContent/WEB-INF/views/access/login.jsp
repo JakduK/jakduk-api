@@ -6,12 +6,13 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
-<jsp:include page="../include/html-header.jsp"></jsp:include>
-
-<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-
-<!-- Custom styles for this template -->
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/signin.css" rel="stylesheet">
+	<title><spring:message code="user.sign.in"/> &middot; <spring:message code="common.jakduk"/></title>
+	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	
+	<!-- Custom styles for this template -->
+	<link href="<%=request.getContextPath()%>/resources/bootstrap/css/signin.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" ng-controller="loginCtrl">

@@ -8,15 +8,13 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
-<jsp:include page="../include/html-header.jsp"></jsp:include>
-
-<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-
-<!--summernote-->
-<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
-
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
-
+	<title><spring:message code="board.edit"/> &middot; <spring:message code="common.jakduk"/></title>
+	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+	
+	<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
 </head>
 <body>
 <div class="container jakduk-board" ng-controller="FreeWriteCtrl">
@@ -72,7 +70,9 @@
 		</div>	
   </div>
 
-<h4 ng-show="storedImages.length > 0 || uploader.queue.length > 0"><spring:message code="board.gallery.list"/></h4>
+<div class="page-header" ng-show="storedImages.length > 0 || uploader.queue.length > 0">
+	<h4><spring:message code="board.gallery.list"/></h4>
+</div>
 <div class="row">
 	<!-- sotred Images -->
 	<div class="media col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="item in storedImages">
@@ -125,8 +125,8 @@
 	</div>
 </div>
 
-<p></p>
-  
+<hr/>
+
 	<div class="form-group">
 		<button type="submit" class="btn btn-success">
 			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>

@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Id;
 
-import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.CommonWriter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -18,7 +18,7 @@ public class BoardFreeWrite {
 	@Id
 	private String id;
 	
-	private BoardWriter writer;
+	private CommonWriter writer;
 
 	@NotNull
 	@Size(min = 3, max = 60)
@@ -45,11 +45,11 @@ public class BoardFreeWrite {
 		this.id = id;
 	}
 
-	public BoardWriter getWriter() {
+	public CommonWriter getWriter() {
 		return writer;
 	}
 
-	public void setWriter(BoardWriter writer) {
+	public void setWriter(CommonWriter writer) {
 		this.writer = writer;
 	}
 

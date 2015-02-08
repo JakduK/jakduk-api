@@ -14,12 +14,8 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -37,10 +33,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeOnGallery;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
-import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
 import com.jakduk.repository.GalleryRepository;
 
@@ -81,14 +76,14 @@ public class GalleryService {
 			String username = principal.getUsername();
 			String type = principal.getType();
 
-			BoardWriter writer = new BoardWriter();
+			CommonWriter writer = new CommonWriter();
 			writer.setUserId(userid);
 			writer.setUsername(username);
 			writer.setType(type);
 			gallery.setWriter(writer);
 			
 			GalleryStatus status = new GalleryStatus();
-			status.setUse(CommonConst.GALLERY_USE_STATUS_UNUSE);
+			status.setStatus(CommonConst.GALLERY_STATUS_TEMP);
 			gallery.setStatus(status);
 			
 			gallery.setFileName(file.getOriginalFilename());
@@ -296,13 +291,14 @@ public class GalleryService {
 
 	public Model getList(Model model) {
 
-		List<ObjectId> ids = new ArrayList<ObjectId>();
+		//List<ObjectId> ids = new ArrayList<ObjectId>();
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(0, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
 		
 		List<Gallery> galleries = galleryRepository.findAll(pageable).getContent();
-		
+
+		/*
 		for (Gallery gallery : galleries) {
 			ids.add(new ObjectId(gallery.getBoardItem().getId()));
 		}
@@ -311,10 +307,24 @@ public class GalleryService {
 			HashMap<String, BoardFreeOnGallery> posts = jakdukDAO.getBoardFreeOnGallery(ids);
 			model.addAttribute("posts", posts);			
 		}
+		*/
 
 		model.addAttribute("galleries", galleries);
 
 		return model;
+	}
+	
+	public Integer getGallery(Model model, String id) {
+
+		Gallery gallery = galleryRepository.findOne(id);
+		
+		if (gallery == null) {
+			return HttpServletResponse.SC_NOT_FOUND;
+		}
+
+		model.addAttribute("gallery", gallery);
+
+		return HttpServletResponse.SC_OK;
 	}
 
 }

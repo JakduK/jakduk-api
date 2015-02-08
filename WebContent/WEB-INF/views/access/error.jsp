@@ -1,13 +1,14 @@
 <%@ page language="java" isErrorPage="true" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>    
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
-<jsp:include page="../include/html-header.jsp"></jsp:include>
-
+	<title><spring:message code="common.error"/> &middot; <spring:message code="common.jakduk"/></title>
+	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
+
 <body>
 	<div class="container">
 		<h4><a class="text-muted" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a></h4>

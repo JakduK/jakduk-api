@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.CommonWriter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -22,7 +22,7 @@ public class BoardFreeOnHome {
 	/**
 	 * 작성자
 	 */
-	private BoardWriter writer;
+	private CommonWriter writer;
 	
 	/**
 	 * 글 제목
@@ -44,11 +44,11 @@ public class BoardFreeOnHome {
 		this.id = id;
 	}
 
-	public BoardWriter getWriter() {
+	public CommonWriter getWriter() {
 		return writer;
 	}
 
-	public void setWriter(BoardWriter writer) {
+	public void setWriter(CommonWriter writer) {
 		this.writer = writer;
 	}
 

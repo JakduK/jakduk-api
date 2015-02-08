@@ -9,14 +9,14 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<jsp:include page="../include/html-header.jsp"></jsp:include>
-
-<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
-
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>${post.subject} - <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
+	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+	
+	<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
 </head>
 <body>
 <div class="container">

@@ -8,11 +8,14 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title><spring:message code="gallery"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
+	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
+
 <body>
-<div class="container jakduk" ng-controller="galleryCtrl">
+<div class="container jakduk-gallery" ng-controller="galleryCtrl">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <div class="page-header">
@@ -23,56 +26,28 @@
 </div>
 
 <div class="row">
-    <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-repeat="gallery in galleries">
-    	<a href="<%=request.getContextPath()%>/gallery/{{gallery.id}}" class="thumbnail">
-    		<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}">
-    		<div class="caption text-overflow">
-    			{{gallery.name}}
-    			<p><small>{{gallery.writer.username}}</small></p>
-    		</div>
-    	</a>
-    </div>
+	<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2" ng-repeat="gallery in galleries">
+		<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
+			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}">
+		</a>
+		<div class="text-overflow">
+ 			<h5>{{gallery.name}}</h5>
+			<h4><small>{{gallery.writer.username}}</small></h4>  			
+		</div>
+		<h5>
+			<i class="fa fa-comments-o"></i><strong> {{gallery.views}}</strong>
+			<span class="text-primary">
+				<i class="fa fa-thumbs-o-up"></i><strong> {{gallery.views}}</strong>
+			</span>
+			<span class="text-danger">
+				<i class="fa fa-thumbs-o-down"></i><strong> {{gallery.views}}</strong>
+			</span>
+		</h5>
+	</div>
 </div>
 
-<!--  
-    <div id="myCarousel" class="carousel slide" data-ride="carousel">
-      <ol class="carousel-indicators">
-					<c:forEach begin="0" end="${fn:length(galleries) - 1}" var="index">
-						<c:choose>
-							<c:when test="${index == 0}">
-								<li data-target="#myCarousel" data-slide-to="${index}" class="active"></li>
-							</c:when>
-							<c:otherwise>
-								<li data-target="#myCarousel" data-slide-to="${index}"></li>
-							</c:otherwise>
-						</c:choose>
-					</c:forEach>
-      </ol>
-      <div class="carousel-inner" role="listbox">
-        <c:forEach items="${galleries}" var="gallery" varStatus="status">
-        <div class="item" ng-class="{'active':'${status.count}' == 1}">
-          <img src="<%=request.getContextPath()%>/gallery/${gallery.id}">
-          <div class="container">
-            <div class="carousel-caption">
-              <h3>${gallery.name}</h3>
-              <p>${gallery.writer.username}</p>
-            </div>
-          </div>
-        </div>
-        </c:forEach>
-      </div>
-      <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </div>
-    -->
-
 <jsp:include page="../include/footer.jsp"/>
+
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript

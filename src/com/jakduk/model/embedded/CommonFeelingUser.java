@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Document
-public class BoardUser {
+public class CommonFeelingUser {
 	
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;

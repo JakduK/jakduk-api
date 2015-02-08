@@ -7,16 +7,18 @@ package com.jakduk.model.embedded;
  */
 public class GalleryStatus {
 	
-	private String use;
+	private String status;
 	
 	private String name;
+	
+	private String from;
 
-	public String getUse() {
-		return use;
+	public String getStatus() {
+		return status;
 	}
 
-	public void setUse(String use) {
-		this.use = use;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public String getName() {
@@ -27,9 +29,19 @@ public class GalleryStatus {
 		this.name = name;
 	}
 
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
 	@Override
 	public String toString() {
-		return "GalleryStatus [use=" + use + ", name=" + name + "]";
+		return "GalleryStatus [status=" + status + ", name=" + name + ", from="
+				+ from + "]";
 	}
+
 
 }

@@ -18,7 +18,7 @@ public class BoardHistory {
 	
 	private String type;
 	
-	private BoardWriter writer;
+	private CommonWriter writer;
 
 	public String getId() {
 		return id;
@@ -36,11 +36,11 @@ public class BoardHistory {
 		this.type = type;
 	}
 
-	public BoardWriter getWriter() {
+	public CommonWriter getWriter() {
 		return writer;
 	}
 
-	public void setWriter(BoardWriter writer) {
+	public void setWriter(CommonWriter writer) {
 		this.writer = writer;
 	}
 

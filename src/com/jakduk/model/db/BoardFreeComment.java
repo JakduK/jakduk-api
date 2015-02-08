@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardCommentStatus;
 import com.jakduk.model.embedded.BoardItem;
-import com.jakduk.model.embedded.BoardUser;
-import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -29,14 +29,14 @@ public class BoardFreeComment {
 	
 	private BoardItem boardItem;
 	
-	private BoardWriter writer;
+	private CommonWriter writer;
 	
 	@NotEmpty
 	private String content;
 	
-	private List<BoardUser> usersLiking;
+	private List<CommonFeelingUser> usersLiking;
 	
-	private List<BoardUser> usersDisliking;
+	private List<CommonFeelingUser> usersDisliking;
 	
 	private BoardCommentStatus status;
 
@@ -56,11 +56,11 @@ public class BoardFreeComment {
 		this.boardItem = boardItem;
 	}
 
-	public BoardWriter getWriter() {
+	public CommonWriter getWriter() {
 		return writer;
 	}
 
-	public void setWriter(BoardWriter writer) {
+	public void setWriter(CommonWriter writer) {
 		this.writer = writer;
 	}
 
@@ -72,19 +72,19 @@ public class BoardFreeComment {
 		this.content = content;
 	}
 
-	public List<BoardUser> getUsersLiking() {
+	public List<CommonFeelingUser> getUsersLiking() {
 		return usersLiking;
 	}
 
-	public void setUsersLiking(List<BoardUser> usersLiking) {
+	public void setUsersLiking(List<CommonFeelingUser> usersLiking) {
 		this.usersLiking = usersLiking;
 	}
 
-	public List<BoardUser> getUsersDisliking() {
+	public List<CommonFeelingUser> getUsersDisliking() {
 		return usersDisliking;
 	}
 
-	public void setUsersDisliking(List<BoardUser> usersDisliking) {
+	public void setUsersDisliking(List<CommonFeelingUser> usersDisliking) {
 		this.usersDisliking = usersDisliking;
 	}
 

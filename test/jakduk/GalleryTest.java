@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bson.types.ObjectId;
 import org.json.simple.JSONArray;
@@ -43,6 +45,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardFreeCount;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.repository.GalleryRepository;
 
 /**
@@ -204,6 +207,16 @@ public class GalleryTest {
 		
 		System.out.println("getGalleryList=" + jakdukDAO.getBoardFreeOnGallery(arrTemp)
 				);
+	}
+	
+	@Test
+	public void streamAPITest01() {
+		Gallery gallery = galleryRepository.findOne("54d623828bf8513a58f41b60");
+		System.out.println("streamAPITest01=" + gallery);
+		Stream<BoardItem> tests = gallery.getPosts().stream();
+		long count = tests.filter(item -> item.getId().equals("54d6238a8bf8513a58f4b62")).count();
+		System.out.println("streamAPITest01=" + count);
+		
 	}
 
 }

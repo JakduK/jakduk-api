@@ -15,7 +15,7 @@ import com.jakduk.model.db.Gallery;
  */
 public interface GalleryRepository extends MongoRepository<Gallery, String>{
 	
-	@Query(value="{'boardItem' : {$exists:true}}")
+	@Query(value="{'status.status' : 'use'}")
 	Page<Gallery> findAll(Pageable pageable);
 
 }

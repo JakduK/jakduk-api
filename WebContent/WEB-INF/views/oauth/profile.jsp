@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
+	<title><spring:message code="user.profile"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 <body>

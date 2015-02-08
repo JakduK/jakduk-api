@@ -24,7 +24,7 @@ import com.jakduk.common.CommonRole;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
-import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.OAuthProfile;
@@ -77,11 +77,11 @@ public class UserService {
 		return userRepository.findAll();
 	}
 	
-	public BoardWriter testFindId(String userid) {
+	public CommonWriter testFindId(String userid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("email").is(userid));
 		
-		return mongoTemplate.findOne(query, BoardWriter.class);
+		return mongoTemplate.findOne(query, CommonWriter.class);
 	}
 	
 	public void checkUserWrite(UserWrite userWrite, BindingResult result) {

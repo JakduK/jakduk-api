@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,8 +43,8 @@ import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.BoardUser;
-import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
 import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
@@ -193,7 +194,7 @@ public class BoardFreeService {
 		
 		BoardFree boardFree = new BoardFree();
 
-		BoardWriter writer = new BoardWriter();
+		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(username);
 		writer.setType(type);
@@ -273,19 +274,32 @@ public class BoardFreeService {
 
 				if (gallery != null) {
 					GalleryStatus status = gallery.getStatus();
-					status.setUse(CommonConst.GALLERY_USE_STATUS_USE);
-
+					List<BoardItem> posts = gallery.getPosts();
+					
+					if (posts == null) {
+						posts = new ArrayList<BoardItem>();
+					}
+					
+					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다. 
+					Stream<BoardItem> sPosts = gallery.getPosts().stream();
+					long itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();
+					
+					if (itemCount == 0) {
+						posts.add(boardItem);
+						gallery.setPosts(posts);
+					}
+					
 					if (name != null && !name.isEmpty()) {
 						status.setName(CommonConst.GALLERY_NAME_STATUS_INPUT);
-						gallery.setStatus(status);
 						gallery.setName(name);
 					} else {
 						status.setName(CommonConst.GALLERY_NAME_STATUS_SUBJECT);
-						gallery.setStatus(status);
 						gallery.setName(boardFree.getSubject());
 					}
-					
-					gallery.setBoardItem(boardItem);
+
+					status.setFrom(CommonConst.BOARD_NAME_FREE);
+					status.setStatus(CommonConst.GALLERY_STATUS_USE);
+					gallery.setStatus(status);
 					galleryRepository.save(gallery);
 				}
 			}
@@ -313,7 +327,7 @@ public class BoardFreeService {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 
-		BoardWriter writer = new BoardWriter();
+		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(username);
 		writer.setType(type);
@@ -404,19 +418,39 @@ public class BoardFreeService {
 
 				if (gallery != null) {
 					GalleryStatus status = gallery.getStatus();
-					status.setUse(CommonConst.GALLERY_USE_STATUS_USE);
+					List<BoardItem> posts = gallery.getPosts();
+					
+					if (status == null) {
+						status = new GalleryStatus();
+					}
+					
+					if (posts == null) {
+						posts = new ArrayList<BoardItem>();
+					}
 
+					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
+					long itemCount = 0;
+					if (gallery.getPosts() != null) {
+						Stream<BoardItem> sPosts = gallery.getPosts().stream();
+						itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();
+					}
+					
+					if (itemCount == 0) {
+						posts.add(boardItem);
+						gallery.setPosts(posts);
+					}
+					
 					if (name != null && !name.isEmpty()) {
 						status.setName(CommonConst.GALLERY_NAME_STATUS_INPUT);
-						gallery.setStatus(status);
 						gallery.setName(name);
 					} else {
 						status.setName(CommonConst.GALLERY_NAME_STATUS_SUBJECT);
-						gallery.setStatus(status);
 						gallery.setName(boardFree.getSubject());
 					}
 					
-					gallery.setBoardItem(boardItem);
+					status.setFrom(CommonConst.BOARD_NAME_FREE);
+					status.setStatus(CommonConst.GALLERY_STATUS_USE);
+					gallery.setStatus(status);
 					galleryRepository.save(gallery);
 				}
 			}
@@ -605,17 +639,17 @@ public class BoardFreeService {
 		String username = principal.getUsername();
 		
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-		BoardWriter writer = boardFree.getWriter();
+		CommonWriter writer = boardFree.getWriter();
 
-		List<BoardUser> usersLiking = boardFree.getUsersLiking();
-		List<BoardUser> usersDisliking = boardFree.getUsersDisliking();
+		List<CommonFeelingUser> usersLiking = boardFree.getUsersLiking();
+		List<CommonFeelingUser> usersDisliking = boardFree.getUsersDisliking();
 
 		if (usersLiking == null) {
-			usersLiking = new ArrayList<BoardUser>(); 
+			usersLiking = new ArrayList<CommonFeelingUser>(); 
 		}
 		
 		if (usersDisliking == null) {
-			usersDisliking = new ArrayList<BoardUser>(); 
+			usersDisliking = new ArrayList<CommonFeelingUser>(); 
 		}
 		
 		if (userid != null && username != null) {
@@ -624,7 +658,7 @@ public class BoardFreeService {
 			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (BoardUser boardUser : usersLiking) {
+				for (CommonFeelingUser boardUser : usersLiking) {
 					if (boardUser != null && userid.equals(boardUser.getUserId())) {
 						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 						break;
@@ -633,7 +667,7 @@ public class BoardFreeService {
 			}
 			
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (BoardUser boardUser : usersDisliking) {
+				for (CommonFeelingUser boardUser : usersDisliking) {
 					if (boardUser != null && userid.equals(boardUser.getUserId())) {
 						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 						break;
@@ -642,7 +676,7 @@ public class BoardFreeService {
 			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				BoardUser boardUser = new BoardUser();
+				CommonFeelingUser boardUser = new CommonFeelingUser();
 				boardUser.setUserId(userid);
 				boardUser.setUsername(username);
 				boardUser.setId(new ObjectId().toString());
@@ -688,7 +722,7 @@ public class BoardFreeService {
 			boardFreeComment.setBoardItem(boardItem);
 			
 			CommonPrincipal principal = userService.getCommonPrincipal();
-			BoardWriter writer = new BoardWriter();
+			CommonWriter writer = new CommonWriter();
 			writer.setUserId(principal.getId());
 			writer.setUsername(principal.getUsername());
 			writer.setType(principal.getType());
@@ -757,17 +791,17 @@ public class BoardFreeService {
 		String username = principal.getUsername();
 		
 		BoardFreeComment boardComment = boardFreeCommentRepository.findById(id);
-		BoardWriter writer = boardComment.getWriter();
+		CommonWriter writer = boardComment.getWriter();
 
-		List<BoardUser> usersLiking = boardComment.getUsersLiking();
-		List<BoardUser> usersDisliking = boardComment.getUsersDisliking();
+		List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
+		List<CommonFeelingUser> usersDisliking = boardComment.getUsersDisliking();
 
 		if (usersLiking == null) {
-			usersLiking = new ArrayList<BoardUser>(); 
+			usersLiking = new ArrayList<CommonFeelingUser>(); 
 		}
 		
 		if (usersDisliking == null) {
-			usersDisliking = new ArrayList<BoardUser>(); 
+			usersDisliking = new ArrayList<CommonFeelingUser>(); 
 		}
 		
 		if (userid != null && username != null) {
@@ -777,7 +811,7 @@ public class BoardFreeService {
 			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (BoardUser boardUser : usersLiking) {
+				for (CommonFeelingUser boardUser : usersLiking) {
 					if (boardUser != null && userid.equals(boardUser.getUserId())) {
 						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 						break;
@@ -786,7 +820,7 @@ public class BoardFreeService {
 			}
 			
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (BoardUser boardUser : usersDisliking) {
+				for (CommonFeelingUser boardUser : usersDisliking) {
 					if (boardUser != null && userid.equals(boardUser.getUserId())) {
 						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 						break;
@@ -795,7 +829,7 @@ public class BoardFreeService {
 			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				BoardUser boardUser = new BoardUser();
+				CommonFeelingUser boardUser = new CommonFeelingUser();
 				boardUser.setUserId(userid);
 				boardUser.setUsername(username);
 				boardUser.setId(new ObjectId().toString());
@@ -835,7 +869,7 @@ public class BoardFreeService {
 		String accountUsername = principal.getUsername();
 		String accountType = principal.getType();
 
-		BoardWriter writer = new BoardWriter();
+		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(accountUsername);
 		writer.setType(accountType);
@@ -938,7 +972,7 @@ public class BoardFreeService {
 		String accountUsername = principal.getUsername();
 		String accountType = principal.getType();
 
-		BoardWriter writer = new BoardWriter();
+		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(accountUsername);
 		writer.setType(accountType);

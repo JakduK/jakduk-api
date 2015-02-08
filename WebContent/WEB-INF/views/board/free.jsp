@@ -8,6 +8,7 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
+	<title><spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
 	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">

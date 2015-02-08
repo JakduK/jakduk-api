@@ -7,10 +7,10 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
-<jsp:include page="../include/html-header.jsp"></jsp:include>
-
-<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-
+	<title><spring:message code="oauth.register"/> &middot; <spring:message code="common.jakduk"/></title>
+	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">

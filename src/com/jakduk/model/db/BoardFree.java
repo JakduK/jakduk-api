@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.BoardUser;
-import com.jakduk.model.embedded.BoardWriter;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
 
 /**
  * 자유게시판 모델
@@ -32,7 +32,7 @@ public class BoardFree {
 	 * 작성자
 	 */
 	
-	private BoardWriter writer;
+	private CommonWriter writer;
 	
 	/**
 	 * 글 제목
@@ -59,9 +59,9 @@ public class BoardFree {
 	 */
 	private int views;
 	
-	private List<BoardUser> usersLiking;
+	private List<CommonFeelingUser> usersLiking;
 	
-	private List<BoardUser> usersDisliking;
+	private List<CommonFeelingUser> usersDisliking;
 	
 	private BoardStatus status;
 	
@@ -77,11 +77,11 @@ public class BoardFree {
 		this.id = id;
 	}
 
-	public BoardWriter getWriter() {
+	public CommonWriter getWriter() {
 		return writer;
 	}
 
-	public void setWriter(BoardWriter writer) {
+	public void setWriter(CommonWriter writer) {
 		this.writer = writer;
 	}
 
@@ -125,19 +125,19 @@ public class BoardFree {
 		this.views = views;
 	}
 
-	public List<BoardUser> getUsersLiking() {
+	public List<CommonFeelingUser> getUsersLiking() {
 		return usersLiking;
 	}
 
-	public void setUsersLiking(List<BoardUser> usersLiking) {
+	public void setUsersLiking(List<CommonFeelingUser> usersLiking) {
 		this.usersLiking = usersLiking;
 	}
 
-	public List<BoardUser> getUsersDisliking() {
+	public List<CommonFeelingUser> getUsersDisliking() {
 		return usersDisliking;
 	}
 
-	public void setUsersDisliking(List<BoardUser> usersDisliking) {
+	public void setUsersDisliking(List<CommonFeelingUser> usersDisliking) {
 		this.usersDisliking = usersDisliking;
 	}
 

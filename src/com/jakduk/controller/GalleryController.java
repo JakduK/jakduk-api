@@ -36,15 +36,20 @@ public class GalleryController {
 	@RequestMapping
 	public String root() {
 		
-		return "redirect:/gallery/list";
+		return "redirect:/gallery/home";
+	}
+	
+	@RequestMapping(value = "/home", method = RequestMethod.GET)
+	public String home(Model model) {
+		
+		return "gallery/home";
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String intro(Model model) {
+	public void list(Model model) {
 		
 		galleryService.getList(model);
 		
-		return "gallery/list";
 	}
 	
 	@ResponseBody
@@ -89,7 +94,15 @@ public class GalleryController {
 	}
 	
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
-	public String view(@PathVariable String id, Model model) {
+	public String view(@PathVariable String id, Model model,
+			HttpServletResponse response) throws IOException {
+		
+		Integer status = galleryService.getGallery(model, id);
+		
+		if (!status.equals(HttpServletResponse.SC_OK)) {
+			response.sendError(status);
+			return null;
+		}
 		
 		return "gallery/view";		
 	}	
