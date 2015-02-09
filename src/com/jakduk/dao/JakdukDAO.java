@@ -176,4 +176,24 @@ public class JakdukDAO {
 		return postsOnGallery;
 	}
 	
+	public Gallery getGalleryByIdGreaterThan(ObjectId id) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("status.status").is("use"));
+		query.addCriteria(Criteria.where("_id").gt(id));
+		query.with(new Sort(Sort.Direction.DESC, "_id"));
+		Gallery gallery = mongoTemplate.findOne(query, Gallery.class);
+		
+		return gallery;
+	}
+	
+	public Gallery getGalleryByIdLessThan(ObjectId id) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("status.status").is("use"));
+		query.addCriteria(Criteria.where("_id").lt(id));
+		query.with(new Sort(Sort.Direction.DESC, "_id"));
+		Gallery gallery = mongoTemplate.findOne(query, Gallery.class);
+		
+		return gallery;
+	}
+	
 }

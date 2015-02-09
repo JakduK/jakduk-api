@@ -280,9 +280,13 @@ public class BoardFreeService {
 						posts = new ArrayList<BoardItem>();
 					}
 					
-					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다. 
-					Stream<BoardItem> sPosts = gallery.getPosts().stream();
-					long itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();
+					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
+					long itemCount = 0;
+					
+					if (gallery.getPosts() != null) {
+						Stream<BoardItem> sPosts = gallery.getPosts().stream();
+						itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();
+					}
 					
 					if (itemCount == 0) {
 						posts.add(boardItem);
@@ -430,6 +434,7 @@ public class BoardFreeService {
 
 					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
 					long itemCount = 0;
+					
 					if (gallery.getPosts() != null) {
 						Stream<BoardItem> sPosts = gallery.getPosts().stream();
 						itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();

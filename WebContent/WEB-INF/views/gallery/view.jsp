@@ -9,10 +9,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>${gallery.name} - <spring:message code="gallery"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
-	
-	<link href="http://getbootstrap.com/examples/carousel/carousel.css" rel="stylesheet">
-	
 </head>
+
 <body>
 <div class="container">
 <jsp:include page="../include/navigation-header.jsp"/>
@@ -21,12 +19,30 @@
 	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery"/>'">
 		<span class="glyphicon glyphicon-th-large"></span>
 	</button>
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery"/>'">
-		<span class="glyphicon glyphicon-chevron-left"></span>
-	</button>	
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery"/>'">
-		<span class="glyphicon glyphicon-chevron-right"></span>
-	</button>	
+	<c:choose>
+		<c:when test="${!empty prev}">
+			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery/view/${prev.id}"/>'">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>		
+		</c:when>
+		<c:otherwise>
+			<button type="button" class="btn btn-default" disabled="disabled">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>		
+		</c:otherwise>
+	</c:choose>
+	<c:choose>
+		<c:when test="${!empty next}">
+			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery/view/${next.id}"/>'">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>		
+		</c:when>
+		<c:otherwise>
+			<button type="button" class="btn btn-default" disabled="disabled">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>		
+		</c:otherwise>
+	</c:choose>	
 </div>
 
 <hr/>

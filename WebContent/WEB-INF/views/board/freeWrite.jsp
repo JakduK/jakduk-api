@@ -28,6 +28,7 @@
 	ng-submit="onSubmit($event)">
 	<form:textarea path="content" class="hidden" ng-bind="content" value="${boardFreeWrite.content}"/>
 	<form:textarea path="images" class="hidden" ng-model="images" ng-init="images='${boardFreeWrite.images}'"/>
+	<textarea id="subject_temp" hidden="hidden">${boardFreeWrite.subject}</textarea>
 	
 	<legend><spring:message code="board.write"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFreeWrite.categoryName.$valid, 'has-error':boardFreeWrite.categoryName.$invalid}">
@@ -50,15 +51,14 @@
 	<div class="form-group has-feedback" ng-class="{'has-success':boardFreeWrite.subject.$valid, 'has-error':boardFreeWrite.subject.$invalid}">
 		<label for="subject" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.subject"/></label>
 		<input type="text" name="subject" class="form-control" placeholder='<spring:message code="board.placeholder.subject"/>'
-		ng-model="subject" ng-init="subject='${boardFreeWrite.subject}'"
-		ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
+		ng-model="subject" ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
 		ng-required="true" ng-minlength="3" ng-maxlength="60"/>
 		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFreeWrite.subject.$valid, 
 		'glyphicon-remove':boardFreeWrite.subject.$invalid}"></span>
 		<form:errors path="subject" cssClass="text-danger" element="span" ng-hide="subjectAlert.msg"/>
 		<span class="{{subjectAlert.classType}}" ng-show="subjectAlert.msg">{{subjectAlert.msg}}</span>		
 	</div>
-  
+	
   <div class="form-group" ng-class="{'has-success':content.length >= 5, 'has-error':content.length < 5}">
 		<div class="row">
 			<div class="col-sm-12">
@@ -183,6 +183,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.contentAlert = {};
 	$scope.buttonAlert = {};
 	$scope.storedImages = [];
+	$scope.subject = document.getElementById("subject_temp").value;
 	
 	angular.element(document).ready(function() {
 		if (!isEmpty($scope.images)) {
@@ -191,7 +192,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.storedImages.push(entry);
 				$scope.$apply();
 			}) ;
-		}
+		}		
 	});
 	
 	var contentValue = document.getElementById("content").value

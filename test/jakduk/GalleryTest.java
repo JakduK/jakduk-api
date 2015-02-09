@@ -211,12 +211,19 @@ public class GalleryTest {
 	
 	@Test
 	public void streamAPITest01() {
+		/*
 		Gallery gallery = galleryRepository.findOne("54d623828bf8513a58f41b60");
 		System.out.println("streamAPITest01=" + gallery);
 		Stream<BoardItem> tests = gallery.getPosts().stream();
 		long count = tests.filter(item -> item.getId().equals("54d6238a8bf8513a58f4b62")).count();
 		System.out.println("streamAPITest01=" + count);
+		*/
+	}
+	
+	@Test
+	public void findOneById01() {
 		
+		System.out.println("findOneById01 gallery01=" + jakdukDAO.getGalleryByIdGreaterThan(new ObjectId("54d8a5f58bf84ef38e6b25f6")));
 	}
 
 }

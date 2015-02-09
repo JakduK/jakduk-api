@@ -1,11 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>    
-
-<sec:authorize access="isAuthenticated()">
-	<sec:authentication property="principal.username" var="accountName"/>	
-	<sec:authentication property="principal.id" var="accountId"/>
-</sec:authorize>
 
 <!-- This script should be under the AngularJS which is creating jakdukApp module. -->
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/navigation-header.js"></script>
@@ -18,7 +12,4 @@
 
   ga('create', 'UA-59051176-1', 'auto');
   ga('send', 'pageview');
-  if ("${!empty accountId}" == "true") {
-	  ga('set', '&uid', '${accountId}');  
-  }
 </script>

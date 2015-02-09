@@ -17,5 +17,4 @@ public interface GalleryRepository extends MongoRepository<Gallery, String>{
 	
 	@Query(value="{'status.status' : 'use'}")
 	Page<Gallery> findAll(Pageable pageable);
-
 }

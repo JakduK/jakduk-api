@@ -321,8 +321,13 @@ public class GalleryService {
 		if (gallery == null) {
 			return HttpServletResponse.SC_NOT_FOUND;
 		}
+		
+		Gallery prevGall = jakdukDAO.getGalleryByIdGreaterThan(new ObjectId(id));
+		Gallery nextGall = jakdukDAO.getGalleryByIdLessThan(new ObjectId(id));
 
 		model.addAttribute("gallery", gallery);
+		model.addAttribute("prev", prevGall);
+		model.addAttribute("next", nextGall);
 
 		return HttpServletResponse.SC_OK;
 	}

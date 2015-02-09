@@ -16,6 +16,7 @@
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
 </head>
+
 <body>
 <div class="container jakduk-board" ng-controller="FreeWriteCtrl">
 <jsp:include page="../include/navigation-header.jsp"/>
@@ -28,6 +29,7 @@
 	<form:hidden path="id"/>
 	<form:textarea path="content" class="hidden" ng-bind="content" value="${boardFreeWrite.content}"/>
 	<form:textarea path="images" class="hidden" ng-model="images" ng-init="images='${boardFreeWrite.images}'"/>	
+	<textarea id="subject_temp" hidden="hidden">${boardFreeWrite.subject}</textarea>
 	
 	<legend><spring:message code="board.edit"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFreeWrite.categoryName.$valid, 'has-error':boardFreeWrite.categoryName.$invalid}">
@@ -50,8 +52,7 @@
 	<div class="form-group has-feedback" ng-class="{'has-success':boardFreeWrite.subject.$valid, 'has-error':boardFreeWrite.subject.$invalid}">
 		<label for="subject" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.subject"/></label>
 		<input type="text" name="subject" class="form-control" placeholder='<spring:message code="board.placeholder.subject"/>'
-		ng-model="subject" ng-init="subject='${boardFreeWrite.subject}'" 
-		ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
+		ng-model="subject" ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
 		ng-required="true" ng-minlength="3" ng-maxlength="60"/>
 		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFreeWrite.subject.$valid, 
 		'glyphicon-remove':boardFreeWrite.subject.$invalid}"></span>
@@ -183,6 +184,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.contentAlert = {};
 	$scope.buttonAlert = {};
 	$scope.content = document.getElementById("content").value;
+	$scope.subject = document.getElementById("subject_temp").value;
 	$scope.storedImages = [];
 	
 	angular.element(document).ready(function() {

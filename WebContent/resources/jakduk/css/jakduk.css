@@ -115,8 +115,8 @@ footer {
 .jakduk-gallery .row {margin-left:0px; margin-right:0px;}
 .jakduk-gallery .row h4 {margin-top:0px; margin-bottom:0px;}
 .jakduk-gallery .row h5 {margin-top:0px; margin-bottom:0px;}
-.jakduk-gallery .col-xs-4 {padding-left:3px; padding-right:3px; margin-bottom:10px;}
-.jakduk-gallery .thumbnail {margin-bottom:10px;}
+.jakduk-gallery .col-xs-6 {padding-left:3px; padding-right:3px; margin-bottom:10px;}
+.jakduk-gallery .thumbnail {margin-bottom:5px;}
 .jakduk-gallery .thumbnail .caption {padding:3px;}
 .jakduk-gallery .thumbnail p {margin-bottom:0px;}
 .jakduk-board .media {margin-top:10px;}
