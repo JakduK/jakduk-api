@@ -113,11 +113,14 @@ footer {
 .navbar .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:90px;}
 
 .jakduk-gallery .row {margin-left:0px; margin-right:0px;}
-.jakduk-gallery .row h4 {margin-top:0px; margin-bottom:0px;}
-.jakduk-gallery .row h5 {margin-top:0px; margin-bottom:0px;}
+.jakduk-gallery .row h4 {margin-top:3px; margin-bottom:0px;}
+.jakduk-gallery .row h5 {margin-top:3px; margin-bottom:0px;}
 .jakduk-gallery .col-xs-6 {padding-left:3px; padding-right:3px; margin-bottom:10px;}
 .jakduk-gallery .thumbnail {margin-bottom:5px;}
 .jakduk-gallery .thumbnail .caption {padding:3px;}
 .jakduk-gallery .thumbnail p {margin-bottom:0px;}
+.jakduk-gallery blockquote {padding:5px 10px; margin:0px 0px 10px;}
+.jakduk-gallery blockquote h5 {margin-top:3px; margin-bottom:0px;}
 .jakduk-board .media {margin-top:10px;}
 .jakduk-board .media .media-body {width:100%;}
+.jakduk-board .row h4 {margin-top:0px; margin-bottom:0px;}

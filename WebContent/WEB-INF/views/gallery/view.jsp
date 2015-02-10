@@ -12,7 +12,7 @@
 </head>
 
 <body>
-<div class="container">
+<div class="container jakduk-gallery">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <div class="form-group">
@@ -45,7 +45,11 @@
 	</c:choose>	
 </div>
 
-<hr/>
+<blockquote>
+  ${gallery.name}
+  <h5><span class="glyphicon glyphicon-user"></span> ${gallery.writer.username}</h5>
+  <h5><span class="glyphicon glyphicon-eye-open"></span> ${gallery.views}</h5>
+</blockquote>
 
 <img class="img-responsive" src="<%=request.getContextPath()%>/gallery/${gallery.id}">
 

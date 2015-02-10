@@ -180,7 +180,7 @@ public class JakdukDAO {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("status.status").is("use"));
 		query.addCriteria(Criteria.where("_id").gt(id));
-		query.with(new Sort(Sort.Direction.DESC, "_id"));
+		query.with(new Sort(Sort.Direction.ASC, "_id"));
 		Gallery gallery = mongoTemplate.findOne(query, Gallery.class);
 		
 		return gallery;

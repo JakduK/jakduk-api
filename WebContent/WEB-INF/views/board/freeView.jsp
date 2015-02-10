@@ -19,7 +19,7 @@
 	<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
 </head>
 <body>
-<div class="container">
+<div class="container jakduk-board">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	<c:set var="summernoteLang" value="en-US"/>
 	
@@ -50,21 +50,21 @@
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
 		<button type="button" class="btn btn-default" onclick="needLogin();">
-			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
 		</button>	
 		</c:when>
 		<c:when test="${authRole == 'USER'}">
 		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
 		</button>	
 		</c:when>	
 	</c:choose>
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
 		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<span class="glyphicon glyphicon-edit"></span> <spring:message code="common.button.edit"/>
+			<span class="glyphicon glyphicon-edit hidden-xs"></span> <spring:message code="common.button.edit"/>
 		</button>
 		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
-			<span class="glyphicon glyphicon-trash"></span> <spring:message code="common.button.delete"/>
+			<span class="glyphicon glyphicon-trash hidden-xs"></span> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
 	<c:choose>
@@ -107,29 +107,32 @@
 	<div class="panel panel-info" ng-controller="boardFreeCtrl">
 	  <!-- Default panel contents -->
 	  <div class="panel-heading">
-	  	<h4 class="panel-title">
-				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-				<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>	
-				<c:choose>
-					<c:when test="${post.status.delete == 'delete'}">
-						<spring:message code="board.msg.deleted"/>
-					</c:when>
-					<c:otherwise>
-						${post.subject}
-					</c:otherwise>
-				</c:choose>
+	  	<h4 class="panel-title">	  	
+			<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+			<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+			<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>
+			<c:choose>
+				<c:when test="${post.status.delete == 'delete'}">
+					<spring:message code="board.msg.deleted"/>
+				</c:when>
+				<c:otherwise>
+					${post.subject}
+				</c:otherwise>
+			</c:choose>
 	  		<c:if test="${!empty category}">&nbsp;<small><spring:message code="${category.resName}"/></small></c:if>
 	  	</h4>
 	  	<div class="row">
 	  		<div class="col-sm-2">
-		  		<small>${post.writer.username}</small>
+		  		<h4><small><span class="glyphicon glyphicon-user"></span> ${post.writer.username}</small></h4>
 	  		</div>
 	  		<div class="col-md-5">
-		  		<small>
-					{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
-		    		| <span class="glyphicon glyphicon-eye-open"></span> ${post.views} 
-		    	</small>
+	  			<h4>
+	  				<small>
+		  				<span class="glyphicon glyphicon-time"></span>
+						{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
+			    		| <span class="glyphicon glyphicon-eye-open"></span> ${post.views}
+					</small>
+				</h4>		    		 
 	  		</div>	
 	  	</div>
 	  </div>
@@ -200,13 +203,15 @@
 				<li class="list-group-item" ng-repeat="comment in commentList">
 		 			<div class="row">			
 	 					<div class="col-xs-12 visible-xs">
-	 						<strong>{{comment.writer.username}}</strong> |
-							<small ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</small>
-							<small ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</small>
+	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong> |
+							<span class="glyphicon glyphicon-time"></span>
+							<span ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span>
+							<span ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>
 	 					</div>
 	 					<div class="col-xs-12 visible-sm visible-md visible-lg">
-	 						<strong>{{comment.writer.username}}</strong> | 
-	 						<small>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</small>
+	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong> |
+	 						<span class="glyphicon glyphicon-time"></span> 
+	 						<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
 	 					</div>
 	 					<div class="col-xs-12">
 	 						<p>
@@ -279,21 +284,21 @@
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
 		<button type="button" class="btn btn-default" onclick="needLogin();">
-			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
 		</button>	
 		</c:when>
 		<c:when test="${authRole == 'USER'}">
 		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
 		</button>	
 		</c:when>	
 	</c:choose>
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
 		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<span class="glyphicon glyphicon-edit"></span> <spring:message code="common.button.edit"/>
+			<span class="glyphicon glyphicon-edit hidden-xs"></span> <spring:message code="common.button.edit"/>
 		</button>
 		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
-			<span class="glyphicon glyphicon-trash"></span> <spring:message code="common.button.delete"/>
+			<span class="glyphicon glyphicon-trash hidden-xs"></span> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
 	<c:choose>

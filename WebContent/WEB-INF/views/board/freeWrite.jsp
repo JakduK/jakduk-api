@@ -81,7 +81,7 @@
 	  </div>
 	  <div class="media-body">
 			<h5 class="media-heading">
-					<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
+					<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(item.uid)">
 						<span class="glyphicon glyphicon-upload"></span>
 					</button>		
 					<button type="button" class="btn btn-danger btn-xs" ng-click="removeStoredItem(item)">
@@ -105,7 +105,7 @@
 	  </div>
 		<div class="media-body">
 			<h5 class="media-heading">
-				<button type="button" class="btn btn-success btn-xs" onclick="location.href='<c:url value="/board"/>'">
+				<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(item.uid)">
 					<span class="glyphicon glyphicon-upload"></span>
 				</button>		
 				<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
@@ -165,9 +165,6 @@ window.onbeforeunload = function(e) {
 	}
 };
 
-var submitted = false;
-var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload"]);
-
 function isEmpty(str) {
 	obj = String(str);
 
@@ -175,6 +172,10 @@ function isEmpty(str) {
 
 	else return false;
 }
+
+var submitted = false;
+var editor = $.summernote.eventHandler.getEditor();
+var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.submitConn = "none";
@@ -202,7 +203,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		height: 0,
 		lang : "${summernoteLang}",
 		toolbar: [
-//      ['style', ['style']],
+      ['style', ['style']],
       ['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
       ['fontname', ['fontname']],
 //      ['fontsize', ['fontsize']], // Still buggy
@@ -350,7 +351,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.images = JSON.stringify(tempImages);
 			}
 			
-			$scope.editor.insertImage($scope.editable, imageUrl);		
+			editor.insertImage($scope.editable, imageUrl);		
 		} else {
 			console.log("status=" + status)
 			console.log("upload image failed.");
@@ -358,12 +359,12 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	};	
 	
 	$scope.insertImage = function(uid) {
+		$scope.editable.focus();
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
-		$scope.editor.insertImage($scope.editable, imageUrl);
+		editor.insertImage($scope.editable, imageUrl);
 	};	
 
 	$scope.imageUpload = function(files, editor) {
-			$scope.editor = editor;
 //			$scope.$apply();
 			$scope.uploader.addToQueue(files);
 	      };	

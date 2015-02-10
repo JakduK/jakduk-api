@@ -26,13 +26,13 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-6 col-sm-4 col-md-3 col-lg-2" ng-repeat="gallery in galleries">
+	<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3" ng-repeat="gallery in galleries">
 		<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
 			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}">
 		</a>
 		<div class="text-overflow">
- 			<h5>{{gallery.name}}</h5>
-			<h5><small>{{gallery.writer.username}}</small></h5>  			
+ 			<h5><strong>{{gallery.name}}</strong></h5>
+			<h5><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</h5>  			
 		</div>
 		<h5>
 			<i class="fa fa-comments-o"></i><strong> {{gallery.views}}</strong>
