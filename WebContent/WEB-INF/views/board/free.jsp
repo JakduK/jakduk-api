@@ -79,6 +79,10 @@
 
 	<ul class="list-group">
 		<!-- posts as notice -->
+		<%@page import="java.util.Date"%>
+		<%Date CurrentDate = new Date();%>
+		<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+								
 		<c:forEach items="${notices}" var="notice">
 			<li class="list-group-item list-group-item-info">
 				<div class="row">
@@ -106,9 +110,6 @@
 					<div class="col-sm-3">
 						${notice.writer.username}
 						|
-						<%@page import="java.util.Date"%>
-						<%Date CurrentDate = new Date();%>
-						<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
 						<fmt:formatDate var="postDate" value="${createDate[notice.id]}" pattern="yyyy-MM-dd" />
 					
 						<c:choose>
@@ -177,9 +178,6 @@
 					<div class="col-sm-3">
 						${post.writer.username}
 						|
-						<%@page import="java.util.Date"%>
-						<%Date CurrentDate = new Date();%>
-						<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
 						<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
 					
 						<c:choose>

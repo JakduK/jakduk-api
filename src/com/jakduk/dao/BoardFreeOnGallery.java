@@ -3,6 +3,8 @@ package com.jakduk.dao;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.embedded.CommonWriter;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -13,8 +15,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "boardFree")
 public class BoardFreeOnGallery {
 	
+	/**
+	 * ID
+	 */
 	@Id
 	private String id;
+
+	/**
+	 * 작성자
+	 */
+	private CommonWriter writer;
 	
 	/**
 	 * 글 제목
@@ -32,6 +42,14 @@ public class BoardFreeOnGallery {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public CommonWriter getWriter() {
+		return writer;
+	}
+
+	public void setWriter(CommonWriter writer) {
+		this.writer = writer;
 	}
 
 	public String getSubject() {
@@ -52,9 +70,8 @@ public class BoardFreeOnGallery {
 
 	@Override
 	public String toString() {
-		return "BoardFreeOnGallery [id=" + id + ", subject=" + subject
-				+ ", seq=" + seq + "]";
+		return "BoardFreeOnGallery [id=" + id + ", writer=" + writer
+				+ ", subject=" + subject + ", seq=" + seq + "]";
 	}
-	
 
 }

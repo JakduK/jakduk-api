@@ -1,7 +1,10 @@
 package com.jakduk.controller;
 
 import java.io.IOException;
+import java.util.Locale;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.service.GalleryService;
 
@@ -30,6 +34,9 @@ public class GalleryController {
 	
 	@Autowired
 	private GalleryService galleryService;
+	
+	@Resource
+	LocaleResolver localeResolver;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -94,10 +101,11 @@ public class GalleryController {
 	}
 	
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
-	public String view(@PathVariable String id, Model model,
-			HttpServletResponse response) throws IOException {
+	public String view(@PathVariable String id, Model model
+			, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
-		Integer status = galleryService.getGallery(model, id);
+		Locale locale = localeResolver.resolveLocale(request);
+		Integer status = galleryService.getGallery(model, locale, id);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
 			response.sendError(status);

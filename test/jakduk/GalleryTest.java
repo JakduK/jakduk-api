@@ -196,17 +196,8 @@ public class GalleryTest {
 	
 	@Test
 	public void getGalleryList() {
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
 		
-		System.out.println("getGalleryList=" + galleryRepository.findAll(pageable).getContent());
-		
-		ArrayList<ObjectId> arrTemp = new ArrayList<ObjectId>();
-		arrTemp.add(new ObjectId("54c4d4313d9675d9e50e1bf0"));
-		arrTemp.add(new ObjectId("54c4df933d96600d7f55a04b"));
-		
-		System.out.println("getGalleryList=" + jakdukDAO.getBoardFreeOnGallery(arrTemp)
-				);
+		System.out.println("getGalleryList=" + jakdukDAO.getBoardFreeOnGallery(new ObjectId("54d8b3848bf8c15adcfce070")));
 	}
 	
 	@Test

@@ -155,6 +155,18 @@ public class JakdukDAO {
 		return counts;
 	}
 	
+	public List<BoardFreeOnGallery> getBoardFreeOnGallery(ObjectId id) {
+		AggregationOperation unwind = Aggregation.unwind("galleries");
+		AggregationOperation match = Aggregation.match(Criteria.where("galleries._id").is(id));
+		Aggregation aggregation = Aggregation.newAggregation(unwind, match);
+		AggregationResults<BoardFreeOnGallery> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnGallery.class);
+		
+		List<BoardFreeOnGallery> posts = results.getMappedResults();
+		
+		return posts;
+	}
+	
+/*
 	public HashMap<String, BoardFreeOnGallery> getBoardFreeOnGallery(List<ObjectId> arrId) {
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrId));
@@ -175,7 +187,8 @@ public class JakdukDAO {
 		
 		return postsOnGallery;
 	}
-	
+*/
+		
 	public Gallery getGalleryByIdGreaterThan(ObjectId id) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("status.status").is("use"));

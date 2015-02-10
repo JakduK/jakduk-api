@@ -1,16 +1,9 @@
 package com.jakduk.model.simple;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 
 /**

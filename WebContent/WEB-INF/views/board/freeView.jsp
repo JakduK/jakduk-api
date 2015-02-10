@@ -105,20 +105,19 @@
 	
 	<!-- Begin page content -->
 	<div class="panel panel-info" ng-controller="boardFreeCtrl">
-	  <!-- Default panel contents -->
 	  <div class="panel-heading">
 	  	<h4 class="panel-title">	  	
-			<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-			<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-			<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>
-			<c:choose>
-				<c:when test="${post.status.delete == 'delete'}">
-					<spring:message code="board.msg.deleted"/>
-				</c:when>
-				<c:otherwise>
-					${post.subject}
-				</c:otherwise>
-			</c:choose>
+				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+				<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>
+				<c:choose>
+					<c:when test="${post.status.delete == 'delete'}">
+						<spring:message code="board.msg.deleted"/>
+					</c:when>
+					<c:otherwise>
+						${post.subject}
+					</c:otherwise>
+				</c:choose>
 	  		<c:if test="${!empty category}">&nbsp;<small><spring:message code="${category.resName}"/></small></c:if>
 	  	</h4>
 	  	<div class="row">

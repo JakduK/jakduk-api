@@ -15,7 +15,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -33,10 +37,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeOnGallery;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.GalleryRepository;
 
 /**
@@ -63,6 +69,9 @@ public class GalleryService {
 	
 	@Autowired
 	private JakdukDAO jakdukDAO;
+	
+	@Autowired
+	private CommonService commonService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -314,8 +323,9 @@ public class GalleryService {
 		return model;
 	}
 	
-	public Integer getGallery(Model model, String id) {
-
+	public Integer getGallery(Model model, Locale locale, String id) {
+		Map<String, Date> createDate = new HashMap<String, Date>();
+		
 		Gallery gallery = galleryRepository.findOne(id);
 		
 		if (gallery == null) {
@@ -324,10 +334,22 @@ public class GalleryService {
 		
 		Gallery prevGall = jakdukDAO.getGalleryByIdGreaterThan(new ObjectId(id));
 		Gallery nextGall = jakdukDAO.getGalleryByIdLessThan(new ObjectId(id));
+		List<BoardFreeOnGallery> posts = jakdukDAO.getBoardFreeOnGallery(new ObjectId(id));
+		
+		ObjectId objId = new ObjectId(id);
+		createDate.put(id, objId.getDate());
+		
+		for (BoardFreeOnGallery post : posts) {
+			objId = new ObjectId(post.getId());
+			createDate.put(post.getId(), objId.getDate());
+		}
 
 		model.addAttribute("gallery", gallery);
 		model.addAttribute("prev", prevGall);
 		model.addAttribute("next", nextGall);
+		model.addAttribute("linkedPosts", posts);
+		model.addAttribute("createDate", createDate);
+		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 
 		return HttpServletResponse.SC_OK;
 	}
