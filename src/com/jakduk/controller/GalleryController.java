@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.LocaleResolver;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.service.GalleryService;
 
 /**
@@ -113,6 +114,18 @@ public class GalleryController {
 		}
 		
 		return "gallery/view";		
+	}	
+	
+	@RequestMapping(value = "/like/{id}")
+	public void setGalleryLike(@PathVariable String id, Model model) {
+		
+		galleryService.setUserFeeling(model, id, CommonConst.FEELING_TYPE_LIKE);
+	}
+	
+	@RequestMapping(value = "/dislike/{id}")
+	public void setGalleryDislike(@PathVariable String id, Model model) {
+		
+		galleryService.setUserFeeling(model, id, CommonConst.FEELING_TYPE_DISLIKE);
 	}	
 
 }

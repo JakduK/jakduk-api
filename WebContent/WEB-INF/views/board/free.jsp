@@ -73,7 +73,7 @@
   		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
   		<div class="col-sm-4"><spring:message code="board.subject"/></div>
   		<div class="col-sm-3"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
-  		<div class="col-sm-3"><spring:message code="board.views"/> | <spring:message code="board.like"/> | <spring:message code="board.dislike"/></div>
+  		<div class="col-sm-3"><spring:message code="board.views"/> | <spring:message code="common.like"/> | <spring:message code="common.dislike"/></div>
   	</div>  	
   </div> <!-- /panel-heading -->
 

@@ -210,12 +210,6 @@ public class GalleryTest {
 		System.out.println("streamAPITest01=" + count);
 		*/
 	}
-	
-	@Test
-	public void findOneById01() {
-		
-		System.out.println("findOneById01 gallery01=" + jakdukDAO.getGalleryByIdGreaterThan(new ObjectId("54d8a5f58bf84ef38e6b25f6")));
-	}
 
 }
 

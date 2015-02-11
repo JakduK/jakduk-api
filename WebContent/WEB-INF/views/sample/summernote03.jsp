@@ -16,13 +16,18 @@
 
 
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-hello.js"></script>
 
 
   <script type="text/javascript">
   var editor = $.summernote.eventHandler.getEditor();
   
   $(document).ready(function() {
-	  $('#summernote').summernote();
+	  $('#summernote').summernote({
+		  toolbar : [
+		             ['group', ['hello']]   // add button name
+		           ]		  
+	  });
 	});
   </script>
 </head>

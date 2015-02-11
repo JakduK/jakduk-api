@@ -14,12 +14,14 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -39,10 +41,12 @@ import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardFreeOnGallery;
 import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.embedded.BoardItem;
+import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
-import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.GalleryRepository;
 
 /**
@@ -332,8 +336,8 @@ public class GalleryService {
 			return HttpServletResponse.SC_NOT_FOUND;
 		}
 		
-		Gallery prevGall = jakdukDAO.getGalleryByIdGreaterThan(new ObjectId(id));
-		Gallery nextGall = jakdukDAO.getGalleryByIdLessThan(new ObjectId(id));
+		Gallery prevGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.ASC);
+		Gallery nextGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.DESC);
 		List<BoardFreeOnGallery> posts = jakdukDAO.getBoardFreeOnGallery(new ObjectId(id));
 		
 		ObjectId objId = new ObjectId(id);
@@ -353,5 +357,82 @@ public class GalleryService {
 
 		return HttpServletResponse.SC_OK;
 	}
+	
+	public Model setUserFeeling(Model model, String id, String feeling) {
+		
+		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
+
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String accountId = principal.getId();
+		String accountName = principal.getUsername();
+		
+		Gallery gallery = galleryRepository.findOne(id);
+		CommonWriter writer = gallery.getWriter();
+
+		List<CommonFeelingUser> usersLiking = gallery.getUsersLiking();
+		List<CommonFeelingUser> usersDisliking = gallery.getUsersDisliking();
+
+		if (usersLiking == null) {
+			usersLiking = new ArrayList<CommonFeelingUser>(); 
+		}
+		
+		if (usersDisliking == null) {
+			usersDisliking = new ArrayList<CommonFeelingUser>(); 
+		}
+		
+		if (accountId != null && accountName != null) {
+			if (writer != null && accountId.equals(writer.getUserId())) {
+				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
+			} 
+
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				Stream<CommonFeelingUser> users = usersLiking.stream();
+				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
+				if (itemCount > 0) {
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+				}
+			}
+			
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				Stream<CommonFeelingUser> users = usersDisliking.stream();
+				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
+				if (itemCount > 0) {
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+				}				
+			}
+
+			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+				CommonFeelingUser feelingUser = new CommonFeelingUser();
+				feelingUser.setUserId(accountId);
+				feelingUser.setUsername(accountName);
+				feelingUser.setId(new ObjectId().toString());
+
+				switch (feeling) {
+				case CommonConst.FEELING_TYPE_LIKE:
+					usersLiking.add(feelingUser);
+					gallery.setUsersLiking(usersLiking);
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
+					break;
+				case CommonConst.FEELING_TYPE_DISLIKE:
+					usersDisliking.add(feelingUser);
+					gallery.setUsersDisliking(usersDisliking);
+					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
+					break;
+				default:
+					break;
+				}
+				
+				galleryRepository.save(gallery);
+			}
+		} else {
+			errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ANONYMOUS;
+		}
+		
+		model.addAttribute("errorCode", errCode);
+		model.addAttribute("numberOfLike", usersLiking.size());
+		model.addAttribute("numberOfDislike", usersDisliking.size());
+		
+		return model;
+	}	
 
 }

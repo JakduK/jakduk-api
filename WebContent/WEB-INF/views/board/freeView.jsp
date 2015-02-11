@@ -21,20 +21,8 @@
 <body>
 <div class="container jakduk-board">
 	<jsp:include page="../include/navigation-header.jsp"/>
+	
 	<c:set var="summernoteLang" value="en-US"/>
-	
-	<c:url var="listUrl" value="/board/free">
-		<c:if test="${!empty listInfo.page}">
-			<c:param name="page" value="${listInfo.page}"/>
-		</c:if>
-		<c:if test="${!empty listInfo.category}">
-			<c:param name="category" value="${listInfo.category}"/>
-		</c:if>
-	</c:url>
-	
-	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
-		<spring:message code="board.list"/>
-	</button>
 	
 	<sec:authorize access="isAnonymous()">
 		<c:set var="authRole" value="ANNONYMOUS"/>
@@ -45,20 +33,69 @@
 	</sec:authorize>
 	<sec:authorize access="hasAnyRole('ROLE_ROOT')">
 		<c:set var="authAdminRole" value="ROOT"/>
-	</sec:authorize>	
+	</sec:authorize>		
+	
+	<c:url var="listUrl" value="/board/free">
+		<c:if test="${!empty listInfo.page}">
+			<c:param name="page" value="${listInfo.page}"/>
+		</c:if>
+		<c:if test="${!empty listInfo.category}">
+			<c:param name="category" value="${listInfo.category}"/>
+		</c:if>
+	</c:url>
+	
+	<c:if test="${!empty prev}">
+		<c:url var="prevUrl" value="/board/free/${prev.seq}">
+			<c:if test="${!empty listInfo.page}">
+				<c:param name="page" value="${listInfo.page}"/>
+			</c:if>
+			<c:if test="${!empty listInfo.category}">
+				<c:param name="category" value="${listInfo.category}"/>
+			</c:if>
+		</c:url>	
+	</c:if>
+	
+	<c:if test="${!empty next}">
+		<c:url var="nextUrl" value="/board/free/${next.seq}">
+			<c:if test="${!empty listInfo.page}">
+				<c:param name="page" value="${listInfo.page}"/>
+			</c:if>
+			<c:if test="${!empty listInfo.category}">
+				<c:param name="category" value="${listInfo.category}"/>
+			</c:if>
+		</c:url>	
+	</c:if>
+	
+	
+	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
+		<spring:message code="board.list"/>
+	</button>
 	
 	<c:choose>
-		<c:when test="${authRole == 'ANNONYMOUS'}">
-		<button type="button" class="btn btn-default" onclick="needLogin();">
-			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
-		</button>	
+		<c:when test="${!empty prevUrl}">
+			<button type="button" class="btn btn-default" onclick="location.href='${prevUrl}'">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>		
 		</c:when>
-		<c:when test="${authRole == 'USER'}">
-		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
-		</button>	
-		</c:when>	
+		<c:otherwise>
+			<button type="button" class="btn btn-default" disabled="disabled">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>		
+		</c:otherwise>
 	</c:choose>
+	<c:choose>
+		<c:when test="${!empty nextUrl}">
+			<button type="button" class="btn btn-default" onclick="location.href='${nextUrl}'">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>		
+		</c:when>
+		<c:otherwise>
+			<button type="button" class="btn btn-default" disabled="disabled">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>		
+		</c:otherwise>
+	</c:choose>	
+	
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
 		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
 			<span class="glyphicon glyphicon-edit hidden-xs"></span> <spring:message code="common.button.edit"/>
@@ -127,9 +164,9 @@
 	  		<div class="col-md-5">
 	  			<h4>
 	  				<small>
-		  				<span class="glyphicon glyphicon-time"></span>
-						{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
-			    		| <span class="glyphicon glyphicon-eye-open"></span> ${post.views}
+							<span class="glyphicon glyphicon-time"></span>
+							{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
+			    		&nbsp;<span class="glyphicon glyphicon-eye-open"></span> ${post.views}
 					</small>
 				</h4>		    		 
 	  		</div>	
@@ -165,7 +202,7 @@
 	  
 		<div class="panel-footer text-center">
 			<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
-				<spring:message code="board.like"/>			
+				<spring:message code="common.like"/>			
 				<span class="text-primary" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
 					<i class="fa fa-thumbs-o-up fa-lg"></i>
 				</span>
@@ -173,7 +210,7 @@
 				<span class="text-primary"><i class="fa fa-circle-o-notch fa-spin" ng-show="likeConn == 'connecting'"></i></span>
 			</button>
 			<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
-				<spring:message code="board.dislike"/>
+				<spring:message code="common.dislike"/>
 				<span class="text-danger" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
 					<i class="fa fa-thumbs-o-down fa-lg"></i>
 				</span>
@@ -202,13 +239,13 @@
 				<li class="list-group-item" ng-repeat="comment in commentList">
 		 			<div class="row">			
 	 					<div class="col-xs-12 visible-xs">
-	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong> |
+	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong>
 							<span class="glyphicon glyphicon-time"></span>
 							<span ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span>
 							<span ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>
 	 					</div>
 	 					<div class="col-xs-12 visible-sm visible-md visible-lg">
-	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong> |
+	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong>
 	 						<span class="glyphicon glyphicon-time"></span> 
 	 						<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
 	 					</div>
@@ -279,19 +316,32 @@
 	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
 		<spring:message code="board.list"/>
 	</button>
-	
+
 	<c:choose>
-		<c:when test="${authRole == 'ANNONYMOUS'}">
-		<button type="button" class="btn btn-default" onclick="needLogin();">
-			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
-		</button>	
+		<c:when test="${!empty prevUrl}">
+			<button type="button" class="btn btn-default" onclick="location.href='${prevUrl}'">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>		
 		</c:when>
-		<c:when test="${authRole == 'USER'}">
-		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<span class="glyphicon glyphicon-pencil hidden-xs"></span> <spring:message code="board.write"/>
-		</button>	
-		</c:when>	
+		<c:otherwise>
+			<button type="button" class="btn btn-default" disabled="disabled">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>		
+		</c:otherwise>
 	</c:choose>
+	<c:choose>
+		<c:when test="${!empty nextUrl}">
+			<button type="button" class="btn btn-default" onclick="location.href='${nextUrl}'">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>		
+		</c:when>
+		<c:otherwise>
+			<button type="button" class="btn btn-default" disabled="disabled">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>		
+		</c:otherwise>
+	</c:choose>	
+
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
 		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
 			<span class="glyphicon glyphicon-edit hidden-xs"></span> <spring:message code="common.button.edit"/>
@@ -639,12 +689,6 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		}
 	};
 });
-
-function needLogin() {
-	if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
-		location.href = '<c:url value="/board/free/write"/>';
-	}
-}	
 
 function confirmDelete() {
 	var commentCount = document.getElementById("commentCount").value;

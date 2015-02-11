@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
 
@@ -189,24 +190,43 @@ public class JakdukDAO {
 	}
 */
 		
-	public Gallery getGalleryByIdGreaterThan(ObjectId id) {
+	public Gallery getGalleryById(ObjectId id, Direction direction) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("status.status").is("use"));
-		query.addCriteria(Criteria.where("_id").gt(id));
-		query.with(new Sort(Sort.Direction.ASC, "_id"));
+		
+		if (direction.equals(Sort.Direction.ASC)) {
+			query.addCriteria(Criteria.where("_id").gt(id));
+		} else if (direction.equals(Sort.Direction.DESC)) {
+			query.addCriteria(Criteria.where("_id").lt(id));
+		}
+		
+		query.with(new Sort(direction, "_id"));
 		Gallery gallery = mongoTemplate.findOne(query, Gallery.class);
 		
 		return gallery;
 	}
 	
-	public Gallery getGalleryByIdLessThan(ObjectId id) {
+	public BoardFreeOnFreeView getBoardFreeById(ObjectId id, String categoty, Direction direction) {
 		Query query = new Query();
-		query.addCriteria(Criteria.where("status.status").is("use"));
-		query.addCriteria(Criteria.where("_id").lt(id));
-		query.with(new Sort(Sort.Direction.DESC, "_id"));
-		Gallery gallery = mongoTemplate.findOne(query, Gallery.class);
 		
-		return gallery;
+		switch (categoty) {
+		case CommonConst.BOARD_CATEGORY_DEVELOP:
+		case CommonConst.BOARD_CATEGORY_FOOTBALL:
+		case CommonConst.BOARD_CATEGORY_FREE:
+			query.addCriteria(Criteria.where("categoryName").is(categoty));	
+			break;
+		}
+		
+		if (direction.equals(Sort.Direction.ASC)) {
+			query.addCriteria(Criteria.where("_id").gt(id));
+		} else if (direction.equals(Sort.Direction.DESC)) {
+			query.addCriteria(Criteria.where("_id").lt(id));
+		}
+		
+		query.with(new Sort(direction, "_id"));
+		BoardFreeOnFreeView post = mongoTemplate.findOne(query, BoardFreeOnFreeView.class);
+		
+		return post;
 	}
 	
 }

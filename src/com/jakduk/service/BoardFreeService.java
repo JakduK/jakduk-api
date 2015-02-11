@@ -33,6 +33,7 @@ import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeOnFreeView;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
@@ -80,7 +81,7 @@ public class BoardFreeService {
 	private GalleryRepository galleryRepository;
 	
 	@Autowired
-	private JakdukDAO boardFreeDAO;
+	private JakdukDAO jakdukDAO;
 	
 	@Autowired
 	private CommonService commonService;
@@ -544,10 +545,10 @@ public class BoardFreeService {
 				categorys.put(category.getName(), category.getResName());
 			}
 			
-			HashMap<String, Integer> commentCount = boardFreeDAO.getBoardFreeCommentCount(seqs);
-			HashMap<String, Integer> usersLikingCount = boardFreeDAO.getBoardFreeUsersLikingCount(seqs);
-			HashMap<String, Integer> usersDislikingCount = boardFreeDAO.getBoardFreeUsersDislikingCount(seqs);
-			HashMap<String, Integer> galleriesCount = boardFreeDAO.getBoardFreeGalleriesCount(seqs);
+			HashMap<String, Integer> commentCount = jakdukDAO.getBoardFreeCommentCount(seqs);
+			HashMap<String, Integer> usersLikingCount = jakdukDAO.getBoardFreeUsersLikingCount(seqs);
+			HashMap<String, Integer> usersDislikingCount = jakdukDAO.getBoardFreeUsersDislikingCount(seqs);
+			HashMap<String, Integer> galleriesCount = jakdukDAO.getBoardFreeGalleriesCount(seqs);
 			
 			model.addAttribute("posts", posts);
 			model.addAttribute("notices", notices);
@@ -615,10 +616,17 @@ public class BoardFreeService {
 				}
 			}
 			
+			BoardFreeOnFreeView prevPost = jakdukDAO.getBoardFreeById(new ObjectId(boardFree.getId())
+				, boardListInfo.getCategory(), Sort.Direction.ASC);
+			BoardFreeOnFreeView nextPost = jakdukDAO.getBoardFreeById(new ObjectId(boardFree.getId())
+			, boardListInfo.getCategory(), Sort.Direction.DESC);
+			
 			model.addAttribute("post", boardFree);
 			model.addAttribute("category", boardCategory);
-			model.addAttribute("timeNow", timeNow);
 			model.addAttribute("listInfo", boardListInfo);
+			model.addAttribute("prev", prevPost);
+			model.addAttribute("next", nextPost);
+			model.addAttribute("timeNow", timeNow);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -687,12 +695,12 @@ public class BoardFreeService {
 				boardUser.setId(new ObjectId().toString());
 
 				switch (feeling) {
-				case CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE:
+				case CommonConst.FEELING_TYPE_LIKE:
 					usersLiking.add(boardUser);
 					boardFree.setUsersLiking(usersLiking);
 					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
 					break;
-				case CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE:
+				case CommonConst.FEELING_TYPE_DISLIKE:
 					usersDisliking.add(boardUser);
 					boardFree.setUsersDisliking(usersDisliking);
 					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
@@ -840,12 +848,12 @@ public class BoardFreeService {
 				boardUser.setId(new ObjectId().toString());
 
 				switch (feeling) {
-				case CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE:
+				case CommonConst.FEELING_TYPE_LIKE:
 					usersLiking.add(boardUser);
 					boardComment.setUsersLiking(usersLiking);
 					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
 					break;
-				case CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE:
+				case CommonConst.FEELING_TYPE_DISLIKE:
 					usersDisliking.add(boardUser);
 					boardComment.setUsersDisliking(usersDisliking);
 					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;

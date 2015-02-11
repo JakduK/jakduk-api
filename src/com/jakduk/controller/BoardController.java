@@ -78,13 +78,13 @@ public class BoardController {
 	@RequestMapping(value = "/like/{seq}")
 	public void setFreeLike(@PathVariable int seq, Model model) {
 		
-		boardFreeService.setUsersFeelings(model, seq, CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE);
+		boardFreeService.setUsersFeelings(model, seq, CommonConst.FEELING_TYPE_LIKE);
 	}
 	
 	@RequestMapping(value = "/dislike/{seq}")
 	public void setFreeDislike(@PathVariable int seq, Model model) {
 		
-		boardFreeService.setUsersFeelings(model, seq, CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE);
+		boardFreeService.setUsersFeelings(model, seq, CommonConst.FEELING_TYPE_DISLIKE);
 	}
 	
 	@RequestMapping(value = "/free/comment/write", method = RequestMethod.POST)
@@ -118,14 +118,14 @@ public class BoardController {
 	public void setFreeCommentLike(@PathVariable int seq, Model model,
 			@RequestParam(required = true) String id) {
 		
-		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.BOARD_USERS_FEELINGS_TYPE_LIKE);
+		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.FEELING_TYPE_LIKE);
 	}
 	
 	@RequestMapping(value = "/comment/dislike/{seq}")
 	public void setFreeCommentDislike(@PathVariable int seq, Model model,
 			@RequestParam(required = true) String id) {
 		
-		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.BOARD_USERS_FEELINGS_TYPE_DISLIKE);
+		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.FEELING_TYPE_DISLIKE);
 	}
 	
 	@RequestMapping(value = "/free/delete/{seq}", method = RequestMethod.GET)

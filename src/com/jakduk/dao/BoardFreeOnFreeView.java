@@ -1,0 +1,42 @@
+package com.jakduk.dao;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+/**
+ * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
+ * @company  : http://jakduk.com
+ * @date     : 2015. 2. 11.
+ * @desc     :
+ */
+
+@Document(collection = "boardFree")
+public class BoardFreeOnFreeView {
+	
+	@Id
+	private String id;
+	
+	private int seq;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public int getSeq() {
+		return seq;
+	}
+
+	public void setSeq(int seq) {
+		this.seq = seq;
+	}
+
+	@Override
+	public String toString() {
+		return "BoardFreeOnFreeView [id=" + id + ", seq=" + seq + "]";
+	}
+
+}
