@@ -87,7 +87,7 @@
 <hr/>
 
 <!-- 기분 표시 -->
-<div ng-controller="galleryController">
+<div class="text-center" ng-controller="galleryController">
 	<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
 		<spring:message code="common.like"/>			
 		<span class="text-primary" ng-init="numberOfLike=${fn:length(gallery.usersLiking)}">
@@ -104,10 +104,10 @@
 		<span class="text-danger" ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>
 		<span class="text-danger"><i class="fa fa-circle-o-notch fa-spin" ng-show="dislikeConn == 'connecting'"></i></span>				
 	</button>
-	<p class="{{feelingAlert.classType}}" ng-show="feelingAlert.msg">
+	<div class="alert {{feelingAlert.classType}}" role="alert" ng-show="feelingAlert.msg">
 		<span class="glyphicon {{feelingAlert.icon}}" aria-hidden="true"></span> 
 		{{feelingAlert.msg}}
-		</p>
+	</div>	
 </div>
 
 <hr/>
@@ -187,12 +187,12 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 		if ("${authRole}" == "ANNONYMOUS") {
 			$scope.feelingAlert.msg = '<spring:message code="gallery.msg.need.login.for.feel"/>';
 			$scope.feelingAlert.icon = "glyphicon-warning-sign";
-			$scope.feelingAlert.classType = "text-warning";
+			$scope.feelingAlert.classType = "alert-warning";
 			return;
 		} else if ("${accountId}" == "${post.writer.userId}") {
 			$scope.feelingAlert.msg = '<spring:message code="gallery.msg.you.are.writer"/>';
 			$scope.feelingAlert.icon = "glyphicon-warning-sign";
-			$scope.feelingAlert.classType = "text-warning";
+			$scope.feelingAlert.classType = "alert-warning";
 			return;
 		}
 		
@@ -216,25 +216,25 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 				if (data.errorCode == "like") {
 					message = '<spring:message code="gallery.msg.select.like"/>';
 					icon = "glyphicon-thumbs-up";
-					mType = "text-success";
+					mType = "alert-success";
 					$scope.numberOfLike = data.numberOfLike;
 				} else if (data.errorCode == "dislike") {
 					message = '<spring:message code="gallery.msg.select.dislike"/>';
 					icon = "glyphicon-thumbs-down";
-					mType = "text-success";
+					mType = "alert-success";
 					$scope.numberOfDislike = data.numberOfDislike;
 				} else if (data.errorCode == "already") {
 					message = '<spring:message code="gallery.msg.select.already.like"/>';
 					icon = "glyphicon-warning-sign";
-					mType = "text-warning";
+					mType = "alert-warning";
 				} else if (data.errorCode == "anonymous") {
 					message = '<spring:message code="gallery.msg.need.login.for.feel"/>';
 					icon = "glyphicon-warning-sign";
-					mType = "text-warning";
+					mType = "alert-warning";
 				} else if (data.errorCode == "writer") {
 					message = '<spring:message code="gallery.msg.you.are.writer"/>';
 					icon = "glyphicon-warning-sign";
-					mType = "text-warning";
+					mType = "alert-warning";
 				}
 				
 				$scope.feelingAlert.msg = message;
@@ -251,7 +251,7 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 			reqPromise.error(function(data, status, headers, config) {				
 				$scope.feelingAlert.msg = '<spring:message code="common.msg.error.network.unstable"/>';
 				$scope.feelingAlert.icon = "glyphicon-exclamation-sign";
-				$scope.feelingAlert.classType = "text-danger";
+				$scope.feelingAlert.classType = "alert-danger";
 				
 				if (type == "like") {
 					$scope.likeConn = "none";

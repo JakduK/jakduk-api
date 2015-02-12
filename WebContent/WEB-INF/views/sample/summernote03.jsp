@@ -25,7 +25,16 @@
   $(document).ready(function() {
 	  $('#summernote').summernote({
 		  toolbar : [
-		             ['group', ['hello']]   // add button name
+		             ['style', ['style']],
+		             ['font', ['bold', 'italic', 'underline', 'clear']],
+		             ['fontname', ['fontname']],
+		             ['color', ['color']],
+		             ['para', ['ul', 'ol', 'paragraph']],
+		             ['height', ['height']],
+		             ['table', ['table']],
+		             ['insert', ['link', 'picture', 'hr']],
+		             ['view', ['fullscreen', 'codeview']],
+		             ['help', ['help']]
 		           ]		  
 	  });
 	});

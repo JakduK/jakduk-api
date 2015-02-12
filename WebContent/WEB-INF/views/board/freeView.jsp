@@ -240,12 +240,14 @@
 		 			<div class="row">			
 	 					<div class="col-xs-12 visible-xs">
 	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong>
+							&nbsp;
 							<span class="glyphicon glyphicon-time"></span>
 							<span ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span>
 							<span ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>
 	 					</div>
 	 					<div class="col-xs-12 visible-sm visible-md visible-lg">
 	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong>
+	 						&nbsp;
 	 						<span class="glyphicon glyphicon-time"></span> 
 	 						<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
 	 					</div>

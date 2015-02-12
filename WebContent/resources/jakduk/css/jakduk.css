@@ -121,6 +121,7 @@ footer {
 .jakduk-gallery .thumbnail p {margin-bottom:0px;}
 .jakduk-gallery blockquote {padding:0px 8px; margin:0px 0px 8px;}
 .jakduk-gallery blockquote h5 {margin-top:3px; margin-bottom:0px;}
+.jakduk-gallery .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;} 
 .jakduk-board .media {margin-top:10px;}
 .jakduk-board .media .media-body {width:100%;}
 .jakduk-board .row h4 {margin-top:0px; margin-bottom:0px;}
