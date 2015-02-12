@@ -23,6 +23,19 @@
 	</button>
 </div>  
 
+<ul class="list-group pre-scrollable">
+  <li class="list-group-item">
+		<span ng-repeat="gallery in galleriesLatest">
+			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" class="img-rounded">
+		</span>
+		  		
+  </li>
+  <li class="list-group-item">Dapibus ac facilisis in</li>
+  <li class="list-group-item">Morbi leo risus</li>
+  <li class="list-group-item">Porta ac consectetur ac</li>
+  <li class="list-group-item">Vestibulum at eros</li>
+</ul>
+
 <div class="row">
 	<div class="col-6 col-sm-6 col-lg-6">
 		<div class="panel panel-warning">
@@ -86,6 +99,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.dataLatestConn = "none";
 	$scope.postsLatest = [];
 	$scope.usersLatest = [];
+	$scope.galleriesLatest = [];
 	
 	$scope.refreshEncyclopedia = function() {
 		var bUrl = '<c:url value="/home/jumbotron.json?lang=${pageContext.response.locale}"/>';
@@ -131,6 +145,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 				
 				$scope.postsLatest = data.posts;
 				$scope.usersLatest = data.users;
+				$scope.galleriesLatest = data.galleries;
 				
 				$scope.dataLatestConn = "none";
 				

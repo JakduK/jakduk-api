@@ -126,12 +126,13 @@ public class JakdukDAO {
 		return footballClubs;
 	}
 	
-	public List<Gallery> getGalleryList(List<ObjectId> arrId) {
+	public List<GalleryOnHome> getGalleryList(Integer size) {
 		
-		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrId));
+		AggregationOperation match = Aggregation.match(Criteria.where("status.status").is("use"));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		Aggregation aggregation = Aggregation.newAggregation(match, sort);
-		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
+		AggregationOperation limit = Aggregation.limit(size);
+		Aggregation aggregation = Aggregation.newAggregation(match, sort, limit);
+		AggregationResults<GalleryOnHome> results = mongoTemplate.aggregate(aggregation, "gallery", GalleryOnHome.class);
 		
 		return results.getMappedResults();
 	}
