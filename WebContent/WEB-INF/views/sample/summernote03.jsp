@@ -17,6 +17,7 @@
 
 <script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-hello.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-fontstyle.js"></script>
 
 
   <script type="text/javascript">
@@ -28,6 +29,7 @@
 		             ['style', ['style']],
 		             ['font', ['bold', 'italic', 'underline', 'clear']],
 		             ['fontname', ['fontname']],
+		           ['fontsize', ['fontsize']], // Still buggy		             
 		             ['color', ['color']],
 		             ['para', ['ul', 'ol', 'paragraph']],
 		             ['height', ['height']],

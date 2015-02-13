@@ -11,7 +11,7 @@
 </head>
 
 <body>
-<div class="container" ng-controller="homeCtrl">
+<div class="container jakduk-home" ng-controller="homeCtrl">
 
 <jsp:include page="../include/navigation-header.jsp"/>
 
@@ -23,18 +23,31 @@
 	</button>
 </div>  
 
-<ul class="list-group pre-scrollable">
-  <li class="list-group-item">
-		<span ng-repeat="gallery in galleriesLatest">
-			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" class="img-rounded">
-		</span>
-		  		
-  </li>
-  <li class="list-group-item">Dapibus ac facilisis in</li>
-  <li class="list-group-item">Morbi leo risus</li>
-  <li class="list-group-item">Porta ac consectetur ac</li>
-  <li class="list-group-item">Vestibulum at eros</li>
-</ul>
+<div class="panel panel-warning">
+	<div class="panel-heading"><strong><a href="<c:url value="/board/gallery/list"/>"><spring:message code="home.pictures.latest"/></a></strong></div>
+  <div class="panel-body scroll-x">
+	<div class="row gallery">
+		<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3 item" ng-repeat="gallery in galleriesLatest">
+			<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
+				<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}">
+			</a>
+			<div class="text-overflow">
+	 			<h5><strong>{{gallery.name}}</strong></h5>
+				<h5><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</h5>  			
+			</div>
+			<h5>
+				<i class="fa fa-comments-o"></i><strong> {{gallery.views}}</strong>
+				<span class="text-primary">
+					<i class="fa fa-thumbs-o-up"></i><strong> {{gallery.views}}</strong>
+				</span>
+				<span class="text-danger">
+					<i class="fa fa-thumbs-o-down"></i><strong> {{gallery.views}}</strong>
+				</span>
+			</h5>
+		</div>
+	</div>  
+  </div>
+</div>
 
 <div class="row">
 	<div class="col-6 col-sm-6 col-lg-6">
