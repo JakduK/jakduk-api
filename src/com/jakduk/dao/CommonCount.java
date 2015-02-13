@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 @Document
-public class BoardFreeCount {
+public class CommonCount {
 
 	@Id
 	private String id;

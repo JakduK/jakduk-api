@@ -35,12 +35,21 @@
 			<h5><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</h5>  			
 		</div>
 		<h5>
-			<i class="fa fa-comments-o"></i><strong> {{gallery.views}}</strong>
+			<!--<i class="fa fa-comments-o"></i><strong> {{gallery.views}}</strong> -->
+			<i class="fa fa-eye"></i><strong> {{gallery.views}}</strong>
 			<span class="text-primary">
-				<i class="fa fa-thumbs-o-up"></i><strong> {{gallery.views}}</strong>
+				<i class="fa fa-thumbs-o-up"></i>
+				<strong>
+					<span ng-if="usersLikingCount[gallery.id]">{{usersLikingCount[gallery.id]}}</span>				
+					<span ng-if="usersLikingCount[gallery.id] == null">0</span>
+				</strong>
 			</span>
 			<span class="text-danger">
-				<i class="fa fa-thumbs-o-down"></i><strong> {{gallery.views}}</strong>
+				<i class="fa fa-thumbs-o-down"></i>
+				<strong>
+					<span ng-if="usersDislikingCount[gallery.id]">{{usersDislikingCount[gallery.id]}}</span>				
+					<span ng-if="usersDislikingCount[gallery.id] == null">0</span>				
+				</strong>
 			</span>
 		</h5>
 	</div>
@@ -62,6 +71,8 @@ var jakdukApp = angular.module("jakdukApp", []);
 jakdukApp.controller("galleryCtrl", function($scope, $http) {
 	$scope.galleriesConn = "none";
 	$scope.galleries = [];
+	$scope.usersLikingCount = [];
+	$scope.usersDislikingCount = [];
 	
 	angular.element(document).ready(function() {
 		$scope.getGalleries();
@@ -79,6 +90,8 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 				
 				$scope.galleries = data.galleries;
+				$scope.usersLikingCount = data.usersLikingCount;
+				$scope.usersDislikingCount = data.usersDislikingCount;
 				console.log(data);
 				
 				$scope.galleriesConn = "none";

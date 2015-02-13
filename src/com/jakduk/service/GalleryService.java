@@ -47,6 +47,7 @@ import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.repository.GalleryRepository;
 
 /**
@@ -304,37 +305,42 @@ public class GalleryService {
 
 	public Model getList(Model model) {
 
-		//List<ObjectId> ids = new ArrayList<ObjectId>();
+		List<ObjectId> ids = new ArrayList<ObjectId>();
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(0, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
 		
-		List<Gallery> galleries = galleryRepository.findAll(pageable).getContent();
-
-		/*
-		for (Gallery gallery : galleries) {
-			ids.add(new ObjectId(gallery.getBoardItem().getId()));
+		List<GalleryOnList> galleries = galleryRepository.findList(pageable).getContent();
+		
+		for (GalleryOnList gallery : galleries) {
+			ids.add(new ObjectId(gallery.getId()));
 		}
 		
-		if (!ids.isEmpty()) {
-			HashMap<String, BoardFreeOnGallery> posts = jakdukDAO.getBoardFreeOnGallery(ids);
-			model.addAttribute("posts", posts);			
-		}
-		*/
+		HashMap<String, Integer> usersLikingCount = jakdukDAO.getGalleryUsersLikingCount(ids);
+		HashMap<String, Integer> usersDislikingCount = jakdukDAO.getGalleryUsersDislikingCount(ids);
 
 		model.addAttribute("galleries", galleries);
+		model.addAttribute("usersLikingCount", usersLikingCount);
+		model.addAttribute("usersDislikingCount", usersDislikingCount);
 
 		return model;
 	}
 	
-	public Integer getGallery(Model model, Locale locale, String id) {
-		Map<String, Date> createDate = new HashMap<String, Date>();
+	public Integer getGallery(Model model, Locale locale, String id, Boolean isAddCookie) {
 		
 		Gallery gallery = galleryRepository.findOne(id);
 		
 		if (gallery == null) {
 			return HttpServletResponse.SC_NOT_FOUND;
 		}
+		
+		if (isAddCookie == true) {
+			int views = gallery.getViews();
+			gallery.setViews(++views);
+			galleryRepository.save(gallery);
+		}
+		
+		Map<String, Date> createDate = new HashMap<String, Date>();
 		
 		Gallery prevGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.ASC);
 		Gallery nextGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.DESC);

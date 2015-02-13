@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.service.CommonService;
 import com.jakduk.service.GalleryService;
 
 /**
@@ -35,6 +36,9 @@ public class GalleryController {
 	
 	@Autowired
 	private GalleryService galleryService;
+	
+	@Autowired
+	private CommonService commonService;
 	
 	@Resource
 	LocaleResolver localeResolver;
@@ -106,7 +110,8 @@ public class GalleryController {
 			, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		Locale locale = localeResolver.resolveLocale(request);
-		Integer status = galleryService.getGallery(model, locale, id);
+		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.COOKIE_NAME_BOARD_FREE, id);
+		Integer status = galleryService.getGallery(model, locale, id, isAddCookie);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
 			response.sendError(status);

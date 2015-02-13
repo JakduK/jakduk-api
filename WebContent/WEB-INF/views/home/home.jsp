@@ -15,6 +15,7 @@
 
 <jsp:include page="../include/navigation-header.jsp"/>
 
+<!-- 백과사전 -->
 <div class="jumbotron">
 	<h4>{{encyclopedia.subject}} <small><span class="label label-primary">{{encyclopedia.kind}}</span></small></h4>
 	<h5>{{encyclopedia.content}}</h5>
@@ -23,33 +24,28 @@
 	</button>
 </div>  
 
+<!-- 최근 사진 -->
 <div class="panel panel-warning">
-	<div class="panel-heading"><strong><a href="<c:url value="/board/gallery/list"/>"><spring:message code="home.pictures.latest"/></a></strong></div>
-  <div class="panel-body scroll-x">
-	<div class="row gallery">
-		<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3 item" ng-repeat="gallery in galleriesLatest">
-			<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
-				<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}">
-			</a>
-			<div class="text-overflow">
-	 			<h5><strong>{{gallery.name}}</strong></h5>
-				<h5><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</h5>  			
+	<div class="panel-heading">
+		<strong><a href="<c:url value="/board/gallery/list"/>"><spring:message code="home.pictures.latest"/></a></strong>
+	</div>
+	<div class="panel-body scroll-x">
+		<div class="row gallery">
+			<div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 item" ng-repeat="gallery in galleriesLatest">
+				<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
+					<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
+				</a>
+				<div class="text-overflow">
+					<h5><strong>{{gallery.name}}</strong></h5>
+					<h5><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</h5>  			
+				</div>
 			</div>
-			<h5>
-				<i class="fa fa-comments-o"></i><strong> {{gallery.views}}</strong>
-				<span class="text-primary">
-					<i class="fa fa-thumbs-o-up"></i><strong> {{gallery.views}}</strong>
-				</span>
-				<span class="text-danger">
-					<i class="fa fa-thumbs-o-down"></i><strong> {{gallery.views}}</strong>
-				</span>
-			</h5>
-		</div>
-	</div>  
-  </div>
+		</div>  
+	</div>
 </div>
 
 <div class="row">
+	<!-- 최근 글 -->
 	<div class="col-6 col-sm-6 col-lg-6">
 		<div class="panel panel-warning">
 			<div class="panel-heading"><strong><a href="<c:url value="/board/free"/>"><spring:message code="home.posts.latest"/></a></strong></div>		
@@ -74,6 +70,7 @@
 		</div>
 	</div>
 	
+	<!-- 최근 가입 회원 -->
 	<div class="col-6 col-sm-6 col-lg-6">
 		<div class="panel panel-warning">
 			<div class="panel-heading"><strong><spring:message code="home.members.registered.latest"/></strong></div>

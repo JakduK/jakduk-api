@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.GalleryOnHome;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.simple.BoardFreeOnHome;
+import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.model.simple.UserOnHome;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
 import com.jakduk.repository.EncyclopediaRepository;
@@ -106,7 +106,7 @@ public class HomeService {
 	
 	public Model getGalleryLatest(Model model) {
 		
-		List<GalleryOnHome> galleries = jakdukDAO.getGalleryList(CommonConst.HOME_SIZE_LINE_NUMBER);
+		List<GalleryOnList> galleries = jakdukDAO.getGalleryList(CommonConst.HOME_SIZE_GALLERY);
 		
 		model.addAttribute("galleries", galleries);
 		

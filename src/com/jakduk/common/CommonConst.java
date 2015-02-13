@@ -11,10 +11,13 @@ public class CommonConst {
 	public final static String COMMON_TYPE_CANCEL = "cancel";
 	
 	/**
-	 * 게시판 종류. SEQUNCE 생성에도 쓰임.
+	 * 게시판 종류.
 	 */
 	public final static String BOARD_NAME_FREE = "freeBoard";
 	
+	/**
+	 * 백과사전 언어 구분.
+	 */
 	public final static String ENCYCLOPEDIA_EN = "encyclopediaEn";
 	public final static String ENCYCLOPEDIA_KO = "encyclopediaKo";
 	
@@ -23,11 +26,14 @@ public class CommonConst {
 	 */
 	public final static Integer BOARD_SIZE_LINE_NUMBER = 15;
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
+	public final static Integer HOME_SIZE_GALLERY = 6;
 
 	/**
 	 * 게시물 쿠키의 만료되는 시간(초)
 	 */
 	public final static Integer BOARD_COOKIE_EXPIRE_SECONDS = 30;
+	public final static String COOKIE_NAME_BOARD_FREE = "freeBoard";
+	public final static String COOKIE_NAME_GALLERY = "gallery";
 	
 	/**
 	 * 게시판 말머리.

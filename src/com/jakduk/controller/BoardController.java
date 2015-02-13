@@ -60,7 +60,7 @@ public class BoardController {
 			@RequestParam(required = false) String result) throws IOException {
 		
 		Locale locale = localeResolver.resolveLocale(request);	
-		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.BOARD_NAME_FREE, seq);
+		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.COOKIE_NAME_BOARD_FREE, String.valueOf(seq));
 		Integer status = boardFreeService.getFreeView(model, locale, seq, listInfo, isAddCookie);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {

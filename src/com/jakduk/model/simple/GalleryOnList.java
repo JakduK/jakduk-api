@@ -1,14 +1,8 @@
-package com.jakduk.dao;
-
-import java.util.List;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+package com.jakduk.model.simple;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.CommonWriter;
 
 /**
@@ -19,7 +13,7 @@ import com.jakduk.model.embedded.CommonWriter;
  */
 
 @Document(collection = "gallery")
-public class GalleryOnHome {
+public class GalleryOnList {
 	
 	@Id 
 	private String id;
@@ -27,6 +21,8 @@ public class GalleryOnHome {
 	private String name;
 	
 	private CommonWriter writer;
+	
+	private int views = 0;
 
 	public String getId() {
 		return id;
@@ -52,10 +48,18 @@ public class GalleryOnHome {
 		this.writer = writer;
 	}
 
-	@Override
-	public String toString() {
-		return "GalleryOnHome [id=" + id + ", name=" + name + ", writer="
-				+ writer + "]";
+	public int getViews() {
+		return views;
 	}
 
+	public void setViews(int views) {
+		this.views = views;
+	}
+
+	@Override
+	public String toString() {
+		return "GalleryOnList [id=" + id + ", name=" + name + ", writer="
+				+ writer + ", views=" + views + "]";
+	}
+	
 }

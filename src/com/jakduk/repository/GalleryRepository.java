@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.simple.GalleryOnList;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -16,5 +17,5 @@ import com.jakduk.model.db.Gallery;
 public interface GalleryRepository extends MongoRepository<Gallery, String>{
 	
 	@Query(value="{'status.status' : 'use'}")
-	Page<Gallery> findAll(Pageable pageable);
+	Page<GalleryOnList> findList(Pageable pageable);
 }
