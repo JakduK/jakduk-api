@@ -151,7 +151,6 @@
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/js/angular-file-upload.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-video.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>

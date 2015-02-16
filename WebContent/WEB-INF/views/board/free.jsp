@@ -92,7 +92,7 @@
 					<div class="col-sm-4">
 						<c:if test="${notice.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
 						<c:if test="${notice.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-						<c:if test="${!empty galleriesCount[notice.id]}"><i class="fa fa-file-image-o"></i><</c:if>
+						<c:if test="${!empty galleriesCount[notice.id]}"><i class="fa fa-file-image-o"></i></c:if>
 						<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 							<c:choose>
 								<c:when test="${notice.status.delete == 'delete'}">

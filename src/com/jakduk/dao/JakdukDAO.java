@@ -3,6 +3,7 @@ package com.jakduk.dao;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Repository;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.db.User;
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.simple.GalleryOnList;
 
 /**
@@ -278,13 +281,18 @@ public class JakdukDAO {
 		return commentCount;
 	}		
 	
-	public List<SupporterCount> getSupportFCCount() {
+	public List<SupporterCount> getSupportFCCount(String language) {
 		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));
 		AggregationOperation group = Aggregation.group("supportFC").count().as("count");
 		Aggregation aggregation = Aggregation.newAggregation(match, group);
+		
 		AggregationResults<SupporterCount> results = mongoTemplate.aggregate(aggregation, "user", SupporterCount.class);
 		
 		List<SupporterCount> users = results.getMappedResults();
+		
+		for (SupporterCount supporterCount : users) {
+			supporterCount.getId().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
+		}
 		
 		return users;
 	}	

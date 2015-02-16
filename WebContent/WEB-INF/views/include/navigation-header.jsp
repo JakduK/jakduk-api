@@ -17,6 +17,9 @@
 				</li>
 				<li ng-class="{active:isActive('<c:url value="/gallery"/>')}">
 					<a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
+				</li>
+				<li ng-class="{active:isActive('<c:url value="/stats"/>')}">
+					<a href="<c:url value="/stats"/>"><spring:message code="stats"/></a>
 				</li>				
 				<sec:authorize access="isAnonymous()">
 					<li>

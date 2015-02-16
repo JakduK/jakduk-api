@@ -1,6 +1,5 @@
 package com.jakduk.dao;
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.db.FootballClub;
@@ -15,17 +14,16 @@ import com.jakduk.model.db.FootballClub;
 @Document
 public class SupporterCount {
 	
-	@DBRef
-	private FootballClub supportFC;
+	private FootballClub id;
 	
 	private Integer count;
 
-	public FootballClub getSupportFC() {
-		return supportFC;
+	public FootballClub getId() {
+		return id;
 	}
 
-	public void setSupportFC(FootballClub supportFC) {
-		this.supportFC = supportFC;
+	public void setId(FootballClub id) {
+		this.id = id;
 	}
 
 	public Integer getCount() {
@@ -38,8 +36,7 @@ public class SupporterCount {
 
 	@Override
 	public String toString() {
-		return "SupporterCount [supportFC=" + supportFC + ", count=" + count
-				+ "]";
+		return "SupporterCount [id=" + id + ", count=" + count + "]";
 	}
 
 }

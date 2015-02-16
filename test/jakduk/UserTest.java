@@ -106,7 +106,7 @@ public class UserTest {
 	
 	@Test
 	public void getSupportFCCount() {
-		List<SupporterCount> users = jakdukDAO.getSupportFCCount();
+		List<SupporterCount> users = jakdukDAO.getSupportFCCount("ko");
 		System.out.println("getSupportFCCount=" + users);
 		
 	}
