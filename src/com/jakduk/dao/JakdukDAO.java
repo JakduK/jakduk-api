@@ -208,6 +208,13 @@ public class JakdukDAO {
 		return gallery;
 	}
 	
+	/**
+	 * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
+	 * @param id
+	 * @param categoty
+	 * @param direction
+	 * @return
+	 */
 	public BoardFreeOnFreeView getBoardFreeById(ObjectId id, String categoty, Direction direction) {
 		Query query = new Query();
 		
@@ -270,5 +277,16 @@ public class JakdukDAO {
 		
 		return commentCount;
 	}		
+	
+	public List<SupporterCount> getSupportFCCount() {
+		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));
+		AggregationOperation group = Aggregation.group("supportFC").count().as("count");
+		Aggregation aggregation = Aggregation.newAggregation(match, group);
+		AggregationResults<SupporterCount> results = mongoTemplate.aggregate(aggregation, "user", SupporterCount.class);
+		
+		List<SupporterCount> users = results.getMappedResults();
+		
+		return users;
+	}	
 	
 }
