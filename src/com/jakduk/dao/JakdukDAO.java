@@ -284,14 +284,15 @@ public class JakdukDAO {
 	public List<SupporterCount> getSupportFCCount(String language) {
 		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));
 		AggregationOperation group = Aggregation.group("supportFC").count().as("count");
-		Aggregation aggregation = Aggregation.newAggregation(match, group);
+		AggregationOperation project = Aggregation.project("count").and("_id").as("supportFC");
+		Aggregation aggregation = Aggregation.newAggregation(match, group, project);
 		
 		AggregationResults<SupporterCount> results = mongoTemplate.aggregate(aggregation, "user", SupporterCount.class);
 		
 		List<SupporterCount> users = results.getMappedResults();
 		
 		for (SupporterCount supporterCount : users) {
-			supporterCount.getId().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
+			supporterCount.getSupportFC().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
 		}
 		
 		return users;

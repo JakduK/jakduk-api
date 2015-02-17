@@ -14,16 +14,16 @@ import com.jakduk.model.db.FootballClub;
 @Document
 public class SupporterCount {
 	
-	private FootballClub id;
+	private FootballClub supportFC;
 	
 	private Integer count;
 
-	public FootballClub getId() {
-		return id;
+	public FootballClub getSupportFC() {
+		return supportFC;
 	}
 
-	public void setId(FootballClub id) {
-		this.id = id;
+	public void setSupportFC(FootballClub supportFC) {
+		this.supportFC = supportFC;
 	}
 
 	public Integer getCount() {
@@ -36,7 +36,8 @@ public class SupporterCount {
 
 	@Override
 	public String toString() {
-		return "SupporterCount [id=" + id + ", count=" + count + "]";
+		return "SupporterCount [supportFC=" + supportFC + ", count=" + count
+				+ "]";
 	}
 
 }
