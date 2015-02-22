@@ -102,6 +102,7 @@ public class GalleryService {
 			gallery.setStatus(status);
 			
 			gallery.setFileName(file.getOriginalFilename());
+			gallery.setFileSize(file.getSize());
 			gallery.setSize(file.getSize());
 			gallery.setContentType(file.getContentType());
 

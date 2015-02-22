@@ -36,6 +36,8 @@ public class Gallery {
 	
 	private long size;
 	
+	private long fileSize;
+	
 	private String contentType;
 	
 	private GalleryStatus status;
@@ -94,6 +96,14 @@ public class Gallery {
 		this.size = size;
 	}
 
+	public long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(long fileSize) {
+		this.fileSize = fileSize;
+	}
+
 	public String getContentType() {
 		return contentType;
 	}
@@ -138,10 +148,10 @@ public class Gallery {
 	public String toString() {
 		return "Gallery [id=" + id + ", name=" + name + ", fileName="
 				+ fileName + ", posts=" + posts + ", writer=" + writer
-				+ ", size=" + size + ", contentType=" + contentType
-				+ ", status=" + status + ", views=" + views + ", usersLiking="
-				+ usersLiking + ", usersDisliking=" + usersDisliking + "]";
+				+ ", size=" + size + ", fileSize=" + fileSize
+				+ ", contentType=" + contentType + ", status=" + status
+				+ ", views=" + views + ", usersLiking=" + usersLiking
+				+ ", usersDisliking=" + usersDisliking + "]";
 	}
-	
 
 }

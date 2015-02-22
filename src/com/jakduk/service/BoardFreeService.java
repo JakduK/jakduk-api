@@ -256,7 +256,7 @@ public class BoardFreeService {
 		boardFree.setCategoryName(boardFreeWrite.getCategoryName());
 		boardFree.setSubject(boardFreeWrite.getSubject());
 		boardFree.setContent(boardFreeWrite.getContent());
-		boardFree.setViews(boardFreeWrite.getViews());
+		boardFree.setViews(0);
 
 		boardFreeRepository.save(boardFree);
 		
