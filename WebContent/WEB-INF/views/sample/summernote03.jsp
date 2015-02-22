@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" /> 
   <title>summernote</title>
 
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap.css" rel="stylesheet">
-<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
+<link href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
 <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">	
 
 
-<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-hello.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-fontstyle.js"></script>
 

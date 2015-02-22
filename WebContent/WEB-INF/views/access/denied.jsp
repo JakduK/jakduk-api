@@ -6,7 +6,7 @@
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrapApp.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrapApp.css" rel="stylesheet">
 </head>
 <body>
 	<h1 id="banner">Unauthorized</h1>

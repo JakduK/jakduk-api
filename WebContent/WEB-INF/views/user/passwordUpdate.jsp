@@ -77,8 +77,8 @@ ng-submit="onSubmit(userPasswordUpdate, $event)">
 <!-- Bootstrap core JavaScript
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>    
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>    
 
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", []);

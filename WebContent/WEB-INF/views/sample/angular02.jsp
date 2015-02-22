@@ -9,9 +9,9 @@
 
 
   <!--summernote dependencies-->
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
  <!--angular-summernote dependencies -->
-<script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
 

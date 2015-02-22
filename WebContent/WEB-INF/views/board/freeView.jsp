@@ -14,9 +14,9 @@
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
 	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-	<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+	<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
 	
-	<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 </head>
 <body>
 <div class="container jakduk-board">
@@ -368,12 +368,12 @@
 	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
 
-<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
 <!--angular-summernote dependencies -->
-<script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/infinite-scroll/js/ng-infinite-scroll.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular/js/angular-sanitize.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>

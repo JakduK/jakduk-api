@@ -10,7 +10,7 @@
 <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
 
 <!-- Bootstrap core CSS -->
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap.css" rel="stylesheet">    
+<link href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrap.css" rel="stylesheet">    
 <!-- Custom styles for this template -->
 <link href="<%=request.getContextPath()%>/resources/jakduk/css/jakduk.css" rel="stylesheet">
 

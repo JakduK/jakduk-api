@@ -210,6 +210,19 @@ public class GalleryTest {
 		System.out.println("streamAPITest01=" + count);
 		*/
 	}
+	
+	@Test
+	public void imageCapacity01() {
+		
+		long temp = 2548576;
+		double bb = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) temp;
+		long width = 100;
+		long height = 90;
+		
+		System.out.format("imageCapacity01 = %f\n", 11.22);
+		System.out.println("imageCapacity01 = " + (long)(width * bb) + ", " + height * bb);
+
+	}
 
 }
 

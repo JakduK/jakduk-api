@@ -9,18 +9,18 @@
 
 
   <!--summernote dependencies-->
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
-<link href="<%=request.getContextPath()%>/resources/bootstrap/css/bootstrap.css" rel="stylesheet">
-<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<link href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
   
 <!--summernote-->
-<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
-<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
+<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
+<script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
 
  <!--angular-summernote dependencies -->
-<script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular-summernote/js/angular-summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 
 <style>
 body {

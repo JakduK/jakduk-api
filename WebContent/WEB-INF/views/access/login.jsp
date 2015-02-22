@@ -12,7 +12,7 @@
 	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 	
 	<!-- Custom styles for this template -->
-	<link href="<%=request.getContextPath()%>/resources/bootstrap/css/signin.css" rel="stylesheet">
+	<link href="<%=request.getContextPath()%>/resources/jakduk/css/signin.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" ng-controller="loginCtrl">
@@ -105,8 +105,8 @@
 	
 </div><!-- /.container -->
 
-<script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular/js/angular-cookies.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-cookies/angular-cookies.min.js"></script>
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["ngCookies"]);

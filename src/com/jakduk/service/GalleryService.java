@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -106,6 +107,7 @@ public class GalleryService {
 
 			galleryRepository.save(gallery);
 			
+			// 폴더 생성.
 			ObjectId objId = new ObjectId(gallery.getId());
 			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
@@ -124,14 +126,44 @@ public class GalleryService {
 				Files.createDirectories(thumbDirPath);
 			}
 			
+			// 사진 경로.
 			Path imageFilePath = imageDirPath.resolve(gallery.getId());
 			Path thumbFilePath = thumbDirPath.resolve(gallery.getId());
+			
+			// 사진 포맷.
+			String formatName = "jpg";
+			
+			String splitContentType[] = gallery.getContentType().split("/");
+			if (splitContentType != null) {
+				formatName = splitContentType[1];
+			}
 
+			// 사진 저장.
 			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				//BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-				Files.write(imageFilePath, file.getBytes());
+				if (CommonConst.GALLERY_MAXIUM_CAPACITY > file.getSize()) {
+					Files.write(imageFilePath, file.getBytes());
+				} else {
+					BufferedImage bi = ImageIO.read(file.getInputStream());
+
+					double ratio = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) file.getSize();
+					int ratioWidth = (int)(bi.getWidth() * ratio);
+					int ratioHeight = (int)(bi.getHeight() * ratio);
+					
+					BufferedImage bufferIm = new BufferedImage(ratioWidth, ratioHeight, BufferedImage.TYPE_INT_RGB);
+					Image tempImg = bi.getScaledInstance(ratioWidth, ratioHeight, Image.SCALE_AREA_AVERAGING);
+					Graphics2D g2 = bufferIm.createGraphics();
+					g2.drawImage(tempImg, 0, 0, ratioWidth, ratioHeight, null);
+					
+					ImageIO.write(bufferIm, formatName, imageFilePath.toFile());
+					
+					BasicFileAttributes attr = Files.readAttributes(imageFilePath, BasicFileAttributes.class);
+					
+					gallery.setSize(attr.size());
+					galleryRepository.save(gallery);
+				}
 			}
 			
+			// 썸네일 만들기.
 			if (Files.notExists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
 				//BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
 				BufferedImage bi = ImageIO.read(file.getInputStream());
@@ -140,14 +172,11 @@ public class GalleryService {
 				Graphics2D g2 = bufferIm.createGraphics();
 				g2.drawImage(tempImg, 0, 0, CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, null);
 				
-				String formatName = "jpg";
-				
-				String splitContentType[] = gallery.getContentType().split("/");
-				if (splitContentType != null) {
-					formatName = splitContentType[1];
-				}
-				
 				ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
+			}
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("file info=" + file);
 			}
 			
 			if (logger.isDebugEnabled()) {

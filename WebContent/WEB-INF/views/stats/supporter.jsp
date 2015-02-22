@@ -27,9 +27,9 @@
 <!-- Bootstrap core JavaScript
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>    
-<script src="<%=request.getContextPath()%>/resources/angular-google-chart/js/ng-google-chart.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>    
+<script src="<%=request.getContextPath()%>/resources/angular-google-chart/ng-google-chart.js"></script>
 
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", ["googlechart"]);
@@ -73,7 +73,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 				
 				supporters.forEach(function(supporter) {
 					console.log(supporter);
-					var item = {c:[{v:supporter.id.names[0].shortName}, {v:supporter.count}]};
+					var item = {c:[{v:supporter.supportFC.names[0].shortName}, {v:supporter.count}]};
 					$scope.supporters.data.rows.push(item);
 				});
 				

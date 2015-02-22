@@ -8,10 +8,10 @@
 <jsp:include page="../include/html-header.jsp"/>
 
 <!-- include summernote css/js-->
-<link href="<%=request.getContextPath()%>/resources/summernote/css/summernote.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
 
 <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/jquery.min.js"></script>
   </head>
 
 <body>
@@ -33,8 +33,8 @@
 
 <!-- Bootstrap core JavaScript ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/bootstrap/js/bootstrap.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/js/summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	  $('#summernote').summernote();

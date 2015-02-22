@@ -65,7 +65,7 @@
 	</div><!-- /.container -->
 </nav><!-- /.navbar -->
 
-<script src="<%=request.getContextPath()%>/resources/angular/js/angular.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
 <script type="text/javascript">
 
 </script>

@@ -105,18 +105,32 @@ public class CommonConst {
 	public final static String BOARD_HISTORY_TYPE_NOTICE = "notice";
 	public final static String BOARD_HISTORY_TYPE_CANCEL_NOTICE = "c.notice";
 	
+	/**
+	 * 사진 썸네일 크기.
+	 */
 	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 140;
 	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 120;
 	
+	/**
+	 * 사진 상태값.
+	 */
 	public final static String GALLERY_STATUS_TEMP = "temp";
 	public final static String GALLERY_STATUS_USE = "use";
 	public final static String GALLERY_STATUS_UNUSE = "unuse";
 	
+	/**
+	 * 사진 이름 입력 상태값.
+	 */
 	public final static String GALLERY_NAME_STATUS_INPUT = "input";
 	public final static String GALLERY_NAME_STATUS_SUBJECT = "subject";
 	
+	/**
+	 * 클라이언트 종류.
+	 */
 	public final static String DEVICE_TYPE_NORMAL = "normal";
 	public final static String DEVICE_TYPE_MOBILE = "mobile";
 	public final static String DEVICE_TYPE_TABLET = "tablet";
+	
+	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte
 	
 }

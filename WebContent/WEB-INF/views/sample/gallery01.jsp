@@ -74,7 +74,7 @@
 
 </div>
 
-<script src="<%=request.getContextPath()%>/resources/jquery/js/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
 
 function rand(min, max) {
