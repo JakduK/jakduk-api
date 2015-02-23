@@ -118,8 +118,10 @@
 				<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/"/>'">
 					<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
 				</button>
-				<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
-				<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+				<div>
+					<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
+					<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+				</div>
 			</div>
 		</div>
 	</form:form>

@@ -1,5 +1,9 @@
 package com.jakduk.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Resource;
@@ -7,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +20,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 
+import com.jakduk.model.db.BoardFree;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.HomeService;
 import com.jakduk.service.UserService;
+import com.sun.syndication.feed.synd.SyndContent;
+import com.sun.syndication.feed.synd.SyndContentImpl;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedOutput;
 
 @Controller
 @RequestMapping("/")
@@ -34,6 +48,9 @@ public class HomeController {
 	
 	@Resource
 	LocaleResolver localeResolver;
+	
+	@Resource
+	MessageSource messageSource;
 	
 	@RequestMapping
 	public String root() {
@@ -133,5 +150,13 @@ public class HomeController {
 		
 		return "access/error";
 	}
+	
+	@RequestMapping(value = "/rss")
+	public void rss(Model model
+			, HttpServletRequest request, HttpServletResponse response) {
+		
+		Locale locale = localeResolver.resolveLocale(request);
+		Integer status = homeService.getRss(response, locale, messageSource);
+	}		
 
 }

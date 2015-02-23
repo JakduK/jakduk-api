@@ -1,14 +1,24 @@
 package com.jakduk.service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,13 +27,24 @@ import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.simple.BoardFreeOnHome;
 import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.model.simple.UserOnHome;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
+import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.UserOnHomeRepository;
+import com.sun.syndication.feed.synd.SyndContent;
+import com.sun.syndication.feed.synd.SyndContentImpl;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedOutput;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -49,7 +70,10 @@ public class HomeService {
 	
 	@Autowired
 	private UserOnHomeRepository userOnHomeRepository;
-
+	
+	@Autowired
+	private BoardFreeRepository boardFreeRepository;
+	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	public Model getHome(Model model, Locale locale) {
@@ -111,5 +135,71 @@ public class HomeService {
 		model.addAttribute("galleries", galleries);
 		
 		return model;
-	}	
+	}
+	
+	public Integer getRss(HttpServletResponse response, Locale locale, MessageSource messageSource) {
+		
+		String link = "https://jakduk.com";
+		
+		SyndFeed feed = new SyndFeedImpl();
+		feed.setFeedType("rss_2.0");
+		feed.setEncoding("UTF-8");
+		feed.setTitle(messageSource.getMessage("common.jakduk", null, locale));
+		feed.setLink(link);
+		feed.setDescription(messageSource.getMessage("common.jakduk.description", null, locale));
+		feed.setPublishedDate(new Date());
+		
+		List<BoardFree> posts = boardFreeRepository.findAll();
+		
+		List<SyndEntry> entries = new ArrayList<SyndEntry>();
+		SyndEntry entry;
+		SyndContent description;
+
+		for(BoardFree post : posts) {
+			entry = new SyndEntryImpl();
+			entry.setTitle(post.getSubject());
+			entry.setLink(link + "/board/free/" + post.getSeq());
+			entry.setPublishedDate(new ObjectId(post.getId()).getDate());
+			entry.setAuthor(post.getWriter().getUsername());
+			
+			// updateDate 되는 줄 알고 스트림 API 써가며 만들어 놨더니, XML로 안나오네.
+			/*
+			List<BoardHistory> history = post.getHistory();
+			
+			if (history != null) {
+				Stream<BoardHistory> sHistory = history.stream();
+				
+				List<BoardHistory> uHistory = sHistory
+						.filter(item -> item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
+						.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
+						.limit(1)
+						.collect(Collectors.toList());
+				
+				if (!uHistory.isEmpty()) {
+					logger.debug("phjang =" + uHistory);
+					entry.setUpdatedDate(new ObjectId(uHistory.get(0).getId()).getDate());
+				}
+			}
+			*/
+			
+			description = new SyndContentImpl();
+			description.setType("text/plain");
+			description.setValue(post.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", ""));
+			entry.setDescription(description);
+			entries.add(entry);
+		}
+		
+		feed.setEntries(entries);
+		
+		SyndFeedOutput output = new SyndFeedOutput();
+		
+		try {
+			output.output(feed, response.getWriter());
+		} catch (IOException | FeedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return HttpServletResponse.SC_OK;
+	}		
 }

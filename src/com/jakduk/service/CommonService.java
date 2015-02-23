@@ -279,8 +279,6 @@ public class CommonService {
 		
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());
 		
-		logger.debug("phjang=" + token);
-		
 		SecurityContextHolder.getContext().setAuthentication(token);
 	}
 	

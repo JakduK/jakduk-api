@@ -66,10 +66,10 @@ public class GalleryController {
 	
 	@ResponseBody
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public void gallery(@PathVariable String id, Model model,
+	public void gallery(@PathVariable String id, 
 			HttpServletResponse response) throws IOException {
 
-		Integer status = galleryService.getImage(response, model, id);
+		Integer status = galleryService.getImage(response, id);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
 			response.sendError(status);
@@ -78,10 +78,10 @@ public class GalleryController {
 	
 	@ResponseBody
 	@RequestMapping(value = "/thumbnail/{id}", method = RequestMethod.GET)
-	public void thumbnail(@PathVariable String id, Model model,
+	public void thumbnail(@PathVariable String id,
 			HttpServletResponse response) throws IOException {
 
-		Integer status = galleryService.getThumbnail(response, model, id);
+		Integer status = galleryService.getThumbnail(response, id);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
 			response.sendError(status);

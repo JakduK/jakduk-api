@@ -247,7 +247,13 @@
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 			<scope>test</scope>
-		</dependency>    
+		</dependency>
+		
+<dependency>
+	<groupId>rome</groupId>
+	<artifactId>rome</artifactId>
+	<version>1.0</version>
+</dependency>
 
 		<!-- solr -->
 		<dependency>

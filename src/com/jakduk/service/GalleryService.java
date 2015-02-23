@@ -197,7 +197,7 @@ public class GalleryService {
 		return HttpServletResponse.SC_OK;
 	}
 	
-	public Integer getImage(HttpServletResponse response, Model model, String id) {
+	public Integer getImage(HttpServletResponse response, String id) {
 		
 		try{
 			Gallery gallery = galleryRepository.findOne(id);
@@ -236,7 +236,7 @@ public class GalleryService {
 		return HttpServletResponse.SC_OK;
 	}
 	
-	public Integer getThumbnail(HttpServletResponse response, Model model, String id) {
+	public Integer getThumbnail(HttpServletResponse response, String id) {
 		
 		try{
 			Gallery gallery = galleryRepository.findOne(id);
