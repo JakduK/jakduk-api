@@ -30,6 +30,7 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.embedded.BoardHistory;
+import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.simple.BoardFreeOnHome;
 import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.model.simple.UserOnHome;
@@ -146,7 +147,7 @@ public class HomeService {
 		feed.setEncoding("UTF-8");
 		feed.setTitle(messageSource.getMessage("common.jakduk", null, locale));
 		feed.setLink(link);
-		feed.setDescription(messageSource.getMessage("common.jakduk.description", null, locale));
+		feed.setDescription(messageSource.getMessage("common.jakduk.rss.description", null, locale));
 		feed.setPublishedDate(new Date());
 		
 		List<BoardFree> posts = boardFreeRepository.findAll();
@@ -155,38 +156,49 @@ public class HomeService {
 		SyndEntry entry;
 		SyndContent description;
 
-		for(BoardFree post : posts) {
-			entry = new SyndEntryImpl();
-			entry.setTitle(post.getSubject());
-			entry.setLink(link + "/board/free/" + post.getSeq());
-			entry.setPublishedDate(new ObjectId(post.getId()).getDate());
-			entry.setAuthor(post.getWriter().getUsername());
+		for (BoardFree post : posts) {
 			
-			// updateDate 되는 줄 알고 스트림 API 써가며 만들어 놨더니, XML로 안나오네.
-			/*
-			List<BoardHistory> history = post.getHistory();
+			BoardStatus status = post.getStatus();
 			
-			if (history != null) {
-				Stream<BoardHistory> sHistory = history.stream();
+			if (status != null) {
+				String delete = status.getDelete();
 				
-				List<BoardHistory> uHistory = sHistory
-						.filter(item -> item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
-						.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
-						.limit(1)
-						.collect(Collectors.toList());
-				
-				if (!uHistory.isEmpty()) {
-					logger.debug("phjang =" + uHistory);
-					entry.setUpdatedDate(new ObjectId(uHistory.get(0).getId()).getDate());
+				if (delete != null && delete.equals(CommonConst.BOARD_HISTORY_TYPE_DELETE)) {
+					
+				} else {
+					entry = new SyndEntryImpl();
+					entry.setTitle(post.getSubject());
+					entry.setLink(link + "/board/free/" + post.getSeq());
+					entry.setPublishedDate(new ObjectId(post.getId()).getDate());
+					entry.setAuthor(post.getWriter().getUsername());
+					
+					// updateDate 되는 줄 알고 스트림 API 써가며 만들어 놨더니, XML로 안나오네.
+					/*
+					List<BoardHistory> history = post.getHistory();
+					
+					if (history != null) {
+						Stream<BoardHistory> sHistory = history.stream();
+						
+						List<BoardHistory> uHistory = sHistory
+								.filter(item -> item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
+								.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
+								.limit(1)
+								.collect(Collectors.toList());
+						
+						if (!uHistory.isEmpty()) {
+							logger.debug("phjang =" + uHistory);
+							entry.setUpdatedDate(new ObjectId(uHistory.get(0).getId()).getDate());
+						}
+					}
+					*/
+					
+					description = new SyndContentImpl();
+					description.setType("text/plain");
+					description.setValue(post.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", ""));
+					entry.setDescription(description);
+					entries.add(entry);									
 				}
 			}
-			*/
-			
-			description = new SyndContentImpl();
-			description.setType("text/plain");
-			description.setValue(post.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", ""));
-			entry.setDescription(description);
-			entries.add(entry);
 		}
 		
 		feed.setEntries(entries);

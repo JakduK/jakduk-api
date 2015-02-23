@@ -285,7 +285,8 @@ public class JakdukDAO {
 		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));
 		AggregationOperation group = Aggregation.group("supportFC").count().as("count");
 		AggregationOperation project = Aggregation.project("count").and("_id").as("supportFC");
-		Aggregation aggregation = Aggregation.newAggregation(match, group, project);
+		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
+		Aggregation aggregation = Aggregation.newAggregation(match, group, project, sort);
 		
 		AggregationResults<SupporterCount> results = mongoTemplate.aggregate(aggregation, "user", SupporterCount.class);
 		

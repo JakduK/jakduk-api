@@ -13,64 +13,75 @@
 	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-<jsp:include page="../include/navigation-header.jsp"/>
-
-<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-
 <div class="container" ng-controller="writeCtrl">
-<form:form commandName="OAuthUserWrite" name="OAuthUserWrite" action="${contextPath}/oauth/profile/update" method="POST" cssClass="form-horizontal"
-	ng-submit="onSubmit(OAuthUserWrite, $event)">
-	<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${OAuthUserWrite.usernameStatus}'" ng-model="usernameStatus"/>
-		<legend><spring:message code="user.profile.update"/> </legend>
-		<div class="form-group has-feedback" ng-class="{'has-success':OAuthUserWrite.username.$valid, 
-		'has-error':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}">
-			<label class="col-sm-2 control-label" for="username">
-				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
-			</label>
-			<div class="col-sm-3">
-				<form:input path="username" cssClass="form-control" size="50" placeholder="Nickname" 
-				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" ng-blur="onUsername(OAuthUserWrite)"
-				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
-				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
-				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
-				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>					
-				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
-				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername(OAuthUserWrite)">{{usernameAlert.msg}}</span>
+	<jsp:include page="../include/navigation-header.jsp"/>
+	
+	<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
+	
+	<form:form commandName="OAuthUserWrite" name="OAuthUserWrite" action="${contextPath}/oauth/profile/update" method="POST" cssClass="form-horizontal"
+		ng-submit="onSubmit($event)">
+		<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${OAuthUserWrite.usernameStatus}'" ng-model="usernameStatus"/>
+			<legend><spring:message code="user.profile.update"/> </legend>
+	
+			<div class="form-group has-feedback" ng-class="{'has-success':OAuthUserWrite.username.$valid, 
+			'has-error':OAuthUserWrite.username.$invalid || usernameStatus != 'ok'}">
+				<label class="col-sm-2 control-label" for="username">
+					<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
+				</label>
+				<div class="col-sm-4">
+					<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>' 
+						ng-model="username" ng-init="username='${OAuthUserWrite.username}'"
+						ng-blur="onUsername()" ng-change="validationUsername()"
+						ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
+					'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus != 'ok'}"></span>
+					<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>			
+					<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
+					<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername()">{{usernameAlert.msg}}</span>		
+				</div>
 			</div>
-		</div>
-
-		<div class="form-group">
-			<label class="col-sm-2 control-label" for="supportFC">
-				<spring:message code="user.support.football.club"/>
-			</label>
-			<div class="col-sm-3">
-				<form:select path="footballClub" cssClass="form-control">
-					<form:option value=""><spring:message code="common.none"/></form:option>
-				<c:forEach items="${footballClubs}" var="club">
-					<c:forEach items="${club.names}" var="name">
-						<form:option value="${club.id}" label="${name.fullName}"/>
+	
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="supportFC">
+					<spring:message code="user.support.football.club"/>
+				</label>
+				<div class="col-sm-4">
+					<form:select path="footballClub" cssClass="form-control">
+						<form:option value=""><spring:message code="common.none"/></form:option>
+					<c:forEach items="${footballClubs}" var="club">
+						<c:forEach items="${club.names}" var="name">
+							<form:option value="${club.id}" label="${name.fullName}"/>
+						</c:forEach>
 					</c:forEach>
-				</c:forEach>
-				</form:select>
+					</form:select>
+				</div>
 			</div>
-		</div>
-		<div class="form-group">
-			<label class="col-sm-2 control-label" for="about"> <spring:message code="user.comment"/></label>
-			<div class="col-sm-4">
-				<form:textarea path="about" cssClass="form-control" cols="40" rows="5" placeholder="About"/>
+			
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="about"> <spring:message code="user.comment"/></label>
+				<div class="col-sm-4">
+					<textarea name="about" class="form-control" cols="40" rows="5" placeholder='<spring:message code="user.placeholder.about"/>'></textarea>
+				</div>
 			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-4">
-				<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
-				<a class="btn btn-danger" href="<c:url value="/oauth/profile"/>"><spring:message code="common.button.cancel"/></a>
-			</div> 
-		</div>				
-</form:form>
-
-<jsp:include page="../include/footer.jsp"/>
-</div>
+	
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-4">
+					<button type="submit" class="btn btn-success">
+						<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+					</button>		
+					<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/oauth/profile"/>'">
+						<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
+					</button>
+					<div>
+						<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
+						<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+					</div>
+				</div>
+			</div>
+					
+	</form:form>
+	
+	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript ================================================== -->
@@ -78,27 +89,42 @@
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <script type="text/javascript">
+
+window.onbeforeunload = function(e) {
+	if (!submitted) {
+		(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+		return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+	}
+};
+
+var submitted = false;
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.usernameConn = "none";
+	$scope.submitConn = "none";
 	$scope.usernameAlert = {};
+	$scope.buttonAlert = {};
 	
-	$scope.onSubmit = function(OAuthUserWrite, event) {
-		if (OAuthUserWrite.$valid && $scope.usernameStatus == "ok") {
+	$scope.onSubmit = function(event) {
+		if ($scope.OAuthUserWrite.$valid && $scope.usernameStatus == "ok") {
+			submitted = true;
+			$scope.submitConn = "connecting";
+			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 		} else {			
-			if (OAuthUserWrite.username.$invalid) {
-				checkUsername(OAuthUserWrite);
-			} else if ($scope.existUsername != 2) {
-				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
+			if ($scope.OAuthUserWrite.username.$invalid) {
+				$scope.validationUsername();
+			} else if ($scope.usernameStatus != 'ok') {
 			}
 
+			$scope.submitConn = "none";
+			$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
 			event.preventDefault();
 		}
-	};
+	};	
 	
-	$scope.onUsername = function(OAuthUserWrite) {
-		if (OAuthUserWrite.username.$valid) {
+	$scope.onUsername = function() {
+		if ($scope.OAuthUserWrite.username.$valid) {
 			var bUrl = '<c:url value="/check/oauth/update/username.json?username=' + $scope.username + '"/>';
 			if ($scope.usernameConn == "none") {
 				var reqPromise = $http.get(bUrl);
@@ -121,18 +147,22 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 				});
 			}
 		} else {
-			checkUsername(OAuthUserWrite);
+			$scope.usernameStatus = 'invalid';
+			$scope.validationUsername();
+		}
+	};	
+
+	$scope.validationUsername = function () {
+		if ($scope.OAuthUserWrite.username.$invalid) {
+			if ($scope.OAuthUserWrite.username.$error.required) {
+				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
+			} else if ($scope.OAuthUserWrite.username.$error.minlength || $scope.OAuthUserWrite.username.$error.maxlength) {
+				$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
+			}
+		} else {
+			$scope.usernameAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
 		}
 	};
-	
-	function checkUsername(OAuthUserWrite) {
-		
-		if (OAuthUserWrite.username.$error.required) {
-			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-		} else if (OAuthUserWrite.username.$error.minlength || OAuthUserWrite.username.$error.maxlength) {
-			$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
-		}
-	}
 	
 });
 

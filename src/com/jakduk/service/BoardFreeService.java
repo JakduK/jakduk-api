@@ -942,7 +942,7 @@ public class BoardFreeService {
 				boardStatus = new BoardStatus();
 			}
 			
-			boardStatus.setDelete("delete");
+			boardStatus.setDelete(CommonConst.BOARD_HISTORY_TYPE_DELETE);
 			boardFree.setStatus(boardStatus);
 			
 			boardFreeRepository.save(boardFree);

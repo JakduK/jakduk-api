@@ -16,12 +16,12 @@
 
 <div class="page-header">
   <h4>
-	  <a href="<c:url value="/stats"/>"><spring:message code="stats"/></a>
+	  <a href="<c:url value="/stats"/>"><spring:message code="stats.header"/></a>
 	  <small><spring:message code="stats.about"/></small>
   </h4>
 </div>
 
-<div google-chart chart=supporters></div>
+<div google-chart chart=chartObject></div>
 </div>
 
 <!-- Bootstrap core JavaScript
@@ -35,29 +35,24 @@
 var jakdukApp = angular.module("jakdukApp", ["googlechart"]);
 
 jakdukApp.controller('statsCtrl', function($scope, $http) {
-	$scope.supporters = {};
+	$scope.chartObject = {};
 	$scope.supportersConn = "none";
 	
 	angular.element(document).ready(function() {
 		$scope.getSupporters();
 	});
 
-    $scope.onions = [
-        {v: "Onions"},
-        {v: 3},
-    ];
-
-    $scope.supporters.data = {"cols": [
+    $scope.chartObject.data = {"cols": [
         {id: "t", label: "Topping", type: "string"},
-        {id: "s", label: "지지자 수", type: "number"}
+        {id: "s", label: '<spring:message code="stats.number"/>', type: "number"}
     ], "rows": []};
 
     // $routeParams.chartType == BarChart or PieChart or ColumnChart...
-    $scope.supporters.type = "BarChart";
-    $scope.supporters.options = {
-        'title': 'Supporters'
-    }
-    
+	$scope.chartObject.type = "BarChart";
+	$scope.chartObject.options = {
+		'title': '<spring:message code="stats.number.of.each.club.supporter"/>',
+    };
+	
 	$scope.getSupporters = function() {
 		var bUrl = '<c:url value="/stats/data/supporter.json"/>';
 		
@@ -70,11 +65,12 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 				
 				var supporters = data.supporters;
+				$scope.chartObject.options.height = supporters.length * 40;
 				
 				supporters.forEach(function(supporter) {
 					console.log(supporter);
 					var item = {c:[{v:supporter.supportFC.names[0].shortName}, {v:supporter.count}]};
-					$scope.supporters.data.rows.push(item);
+					$scope.chartObject.data.rows.push(item);
 				});
 				
 				$scope.supportersConn = "none";

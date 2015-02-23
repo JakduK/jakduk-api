@@ -110,6 +110,7 @@
 				<textarea name="about" class="form-control" cols="40" rows="5" placeholder='<spring:message code="user.placeholder.about"/>'></textarea>
 			</div>
 		</div>
+		
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
 				<button type="submit" class="btn btn-success">
