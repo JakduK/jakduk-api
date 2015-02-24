@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeOnRSS;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.Encyclopedia;
@@ -150,57 +151,46 @@ public class HomeService {
 		feed.setDescription(messageSource.getMessage("common.jakduk.rss.description", null, locale));
 		feed.setPublishedDate(new Date());
 		
-		List<BoardFree> posts = boardFreeRepository.findAll();
+		List<BoardFreeOnRSS> posts = jakdukDAO.getRSS();
 		
 		List<SyndEntry> entries = new ArrayList<SyndEntry>();
 		SyndEntry entry;
 		SyndContent description;
 
-		for (BoardFree post : posts) {
+		for (BoardFreeOnRSS post : posts) {
+			entry = new SyndEntryImpl();
+			entry.setTitle(post.getSubject());
+			entry.setLink(link + "/board/free/" + post.getSeq());
+			entry.setPublishedDate(new ObjectId(post.getId()).getDate());
+			entry.setAuthor(post.getWriter().getUsername());
 			
-			BoardStatus status = post.getStatus();
+			// updateDate 되는 줄 알고 스트림 API 써가며 만들어 놨더니, XML로 안나오네.
+			/*
+			List<BoardHistory> history = post.getHistory();
 			
-			if (status != null) {
-				String delete = status.getDelete();
+			if (history != null) {
+				Stream<BoardHistory> sHistory = history.stream();
 				
-				if (delete != null && delete.equals(CommonConst.BOARD_HISTORY_TYPE_DELETE)) {
-					
-				} else {
-					entry = new SyndEntryImpl();
-					entry.setTitle(post.getSubject());
-					entry.setLink(link + "/board/free/" + post.getSeq());
-					entry.setPublishedDate(new ObjectId(post.getId()).getDate());
-					entry.setAuthor(post.getWriter().getUsername());
-					
-					// updateDate 되는 줄 알고 스트림 API 써가며 만들어 놨더니, XML로 안나오네.
-					/*
-					List<BoardHistory> history = post.getHistory();
-					
-					if (history != null) {
-						Stream<BoardHistory> sHistory = history.stream();
-						
-						List<BoardHistory> uHistory = sHistory
-								.filter(item -> item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
-								.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
-								.limit(1)
-								.collect(Collectors.toList());
-						
-						if (!uHistory.isEmpty()) {
-							logger.debug("phjang =" + uHistory);
-							entry.setUpdatedDate(new ObjectId(uHistory.get(0).getId()).getDate());
-						}
-					}
-					*/
-					
-					description = new SyndContentImpl();
-					description.setType("text/plain");
-					description.setValue(post.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", ""));
-					entry.setDescription(description);
-					entries.add(entry);									
+				List<BoardHistory> uHistory = sHistory
+						.filter(item -> item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
+						.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
+						.limit(1)
+						.collect(Collectors.toList());
+				
+				if (!uHistory.isEmpty()) {
+					logger.debug("phjang =" + uHistory);
+					entry.setUpdatedDate(new ObjectId(uHistory.get(0).getId()).getDate());
 				}
 			}
+			*/
+			
+			description = new SyndContentImpl();
+			description.setType("text/plain");
+			description.setValue(post.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", ""));
+			entry.setDescription(description);
+			entries.add(entry);									
 		}
-		
+
 		feed.setEntries(entries);
 		
 		SyndFeedOutput output = new SyndFeedOutput();

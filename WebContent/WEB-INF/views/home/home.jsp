@@ -27,7 +27,7 @@
 <!-- 최근 사진 -->
 <div class="panel panel-warning">
 	<div class="panel-heading">
-		<strong><a href="<c:url value="/board/gallery/list"/>"><spring:message code="home.pictures.latest"/></a></strong>
+		<strong><a href="<c:url value="/gallery/home"/>"><spring:message code="home.pictures.latest"/></a></strong>
 	</div>
 	<div class="panel-body scroll-x">
 		<div class="row gallery">

@@ -28,7 +28,7 @@
 <div class="row">
 	<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3" ng-repeat="gallery in galleries">
 		<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
-			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}">
+			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
 		</a>
 		<div class="text-overflow">
  			<h5><strong>{{gallery.name}}</strong></h5>

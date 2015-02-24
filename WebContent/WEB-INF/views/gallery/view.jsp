@@ -82,7 +82,7 @@
   </h5>
 </blockquote>
 
-<img class="img-responsive" src="<%=request.getContextPath()%>/gallery/${gallery.id}">
+<img class="img-responsive" src="<%=request.getContextPath()%>/gallery/${gallery.id}" alt="${gallery.name}">
 
 <hr/>
 
