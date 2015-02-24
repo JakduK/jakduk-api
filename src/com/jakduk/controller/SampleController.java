@@ -1,11 +1,8 @@
 package com.jakduk.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.jakduk.repository.BoardFreeRepository;
 
 @Controller
 @RequestMapping("/")
@@ -95,6 +92,12 @@ public class SampleController {
 	public String stats01(Model model) {
 		
 		return "sample/stats01";
+	}
+	
+	@RequestMapping(value = "/stats02")
+	public String stats02(Model model) {
+		
+		return "sample/stats02";
 	}
 
 }

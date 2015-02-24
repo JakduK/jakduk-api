@@ -22,10 +22,7 @@
 			</li>
 			<sec:authorize access="isAnonymous()">
 				<li>
-					<a href="<c:url value="/login"/>">
-						<span class="visible-sm visible-md visible-lg"><span class="glyphicon glyphicon-log-in"></span> <spring:message code="common.login"/></span>
-						<span class="visible-xs"><spring:message code="common.login"/></span>
-					</a>
+					<a href="<c:url value="/login"/>"><spring:message code="common.login"/></a>
 				</li>
 	  		</sec:authorize>
 			<sec:authorize access="isAuthenticated()">
