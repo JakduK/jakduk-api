@@ -11,88 +11,90 @@
 </head>
 
 <body>
-<div class="container jakduk-home" ng-controller="homeCtrl">
-
-<jsp:include page="../include/navigation-header.jsp"/>
-
-<!-- 백과사전 -->
-<div class="jumbotron">
-	<h4>{{encyclopedia.subject}} <small><span class="label label-primary">{{encyclopedia.kind}}</span></small></h4>
-	<h5>{{encyclopedia.content}}</h5>
- 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
-		<span class="glyphicon glyphicon-refresh"></span>
-	</button>
-</div>  
-
-<!-- 최근 사진 -->
-<div class="panel panel-warning">
-	<div class="panel-heading">
-		<strong><a href="<c:url value="/gallery/home"/>"><spring:message code="home.pictures.latest"/></a></strong>
-	</div>
-	<div class="panel-body scroll-x">
-		<div class="row gallery">
-			<div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 item" ng-repeat="gallery in galleriesLatest">
-				<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
-					<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
-				</a>
-				<div class="text-overflow">
-					<h5><strong>{{gallery.name}}</strong></h5>
-					<h5><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</h5>  			
+<div class="wrapper jakduk-home" ng-controller="homeCtrl">
+	
+	<jsp:include page="../include/navigation-header.jsp"/>
+	
+	<!--=== Content Part ===-->
+	<div class="container content">
+	
+	<!-- 백과사전 -->
+	<div class="jumbotron">
+		<h4>{{encyclopedia.subject}} <small><span class="label label-primary">{{encyclopedia.kind}}</span></small></h4>
+		<h5>{{encyclopedia.content}}</h5>
+	 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
+			<span class="glyphicon glyphicon-refresh"></span>
+		</button>
+	</div>  
+	
+	<!-- 최근 사진 -->
+	<div class="headline"><h2><spring:message code="home.pictures.latest"/></h2></div>
+	<div class="row margin-bottom-20">
+		<div class="col-md-3 col-sm-6" ng-repeat="gallery in galleriesLatest">
+	   <div class="thumbnails thumbnail-style thumbnail-kenburn">
+	   	<div class="thumbnail-img">
+	      <div class="overflow-hidden">
+						<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
+	      </div>
+					<a class="btn-more hover-effect" href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}">read more +</a>					
 				</div>
-			</div>
-		</div>  
-	</div>
-</div>
-
-<div class="row">
-	<!-- 최근 글 -->
-	<div class="col-6 col-sm-6 col-lg-6">
-		<div class="panel panel-warning">
-			<div class="panel-heading"><strong><a href="<c:url value="/board/free"/>"><spring:message code="home.posts.latest"/></a></strong></div>		
-			<table class="table table-hover table-condensed">
-			<thead>
-				<tr>
-					<th class="col-xs-4"><spring:message code="board.subject"/></th>
-					<th class="col-xs-2"><spring:message code="board.date"/></th>
-				</tr>	
-			</thead>
-			<tbody>
-				<tr ng-repeat="post in postsLatest">
-					<td ng-switch="post.status.delete">
-						<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
-						<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
-					</td>
-					<td ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</td>
-					<td ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</td>
-				</tr>
-			</tbody>				
-			</table>
+	     <div class="caption">
+	      <h3><a class="hover-effect" href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}">{{gallery.name}}</a></h3>
+	      <p><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</p>
+	     </div>
+	   </div>
 		</div>
 	</div>
 	
-	<!-- 최근 가입 회원 -->
-	<div class="col-6 col-sm-6 col-lg-6">
-		<div class="panel panel-warning">
-			<div class="panel-heading"><strong><spring:message code="home.members.registered.latest"/></strong></div>
-			<table class="table table-hover table-condensed">
-			<thead>
-				<tr>
-					<th class="col-xs-1"><spring:message code="user.nickname"/></th>
-					<th class="col-xs-5"><spring:message code="user.comment"/></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="user in usersLatest">
-					<td>{{user.username}}</td>
-					<td>{{user.about}}</td>
-				</tr>	
-			</tbody>
-			</table>				
+	<div class="row margin-bottom-30">
+		<!-- 최근 글 -->
+		<div class="col-6 col-sm-6 col-lg-6 md-margin-bottom-40">
+	   <!-- Latest -->
+			<div class="posts">
+			    <div class="headline"><h2><spring:message code="home.posts.latest"/></h2></div>
+			    <ul class="list-unstyled latest-list">
+	        <li ng-repeat="post in postsLatest">
+							<span ng-switch="post.status.delete">
+								<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+								<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
+           </span>
+            <small ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</small>
+            <small ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</small>								
+	        </li>
+			    </ul>
+			</div>
+	 		<!-- End Latest -->		
 		</div>
-	</div><!--/span-->
-</div><!--/row-->
-
-<jsp:include page="../include/footer.jsp"/>
+		
+		<!-- 최근 가입 회원 -->
+		<div class="col-6 col-sm-6 col-lg-6">
+			<div class="panel panel-grey">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="fa fa-tasks"></i> 
+				 		<spring:message code="home.members.registered.latest"/>
+			 		</h3>
+				</div>			
+				<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th class="col-xs-1"><spring:message code="user.nickname"/></th>
+						<th class="col-xs-5"><spring:message code="user.comment"/></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="user in usersLatest">
+						<td>{{user.username}}</td>
+						<td>{{user.about}}</td>
+					</tr>	
+				</tbody>
+				</table>				
+			</div>
+		</div><!--/span-->
+	</div><!--/row-->
+	
+	</div>
+	
+	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript ================================================== -->

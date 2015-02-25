@@ -9,8 +9,20 @@
 <meta name="author" content="">
 <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
 
-<!-- Bootstrap core CSS -->
-<link href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrap.css" rel="stylesheet">    
+<!-- CSS Global Compulsory -->
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrap.min.css">    
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/style.css">
+
+
+<!-- CSS Theme -->
+<!-- 
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/theme-colors/brown.css"/>
+ -->
+
+<!-- CSS Implementing Plugins -->
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/line-icons/line-icons.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css">
+
 <!-- Custom styles for this template -->
 <link href="<%=request.getContextPath()%>/resources/jakduk/css/jakduk.css" rel="stylesheet">
 

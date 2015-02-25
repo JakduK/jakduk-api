@@ -10,23 +10,35 @@
 	<title><spring:message code="about"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
+
 <body>
-<div class="container">
-<jsp:include page="../include/navigation-header.jsp"/>
+<div class="wrapper">
+	<jsp:include page="../include/navigation-header.jsp"/>
 
-<c:choose>
-	<c:when test="${lang == 'ko'}">
-		<jsp:include page="about-us-ko.jsp"/>
-	</c:when>
-	<c:when test="${lang == 'en'}">
-		<jsp:include page="about-us-en.jsp"/>
-	</c:when>
-	<c:otherwise>
-		<jsp:include page="about-us-en.jsp"/>
-	</c:otherwise>
-</c:choose>
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="about"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->
 
-<jsp:include page="../include/footer.jsp"/>
+	<!--=== Content Part ===-->
+	<div class="container content">
+		<c:choose>
+			<c:when test="${lang == 'ko'}">
+				<jsp:include page="about-us-ko.jsp"/>
+			</c:when>
+			<c:when test="${lang == 'en'}">
+				<jsp:include page="about-us-en.jsp"/>
+			</c:when>
+			<c:otherwise>
+				<jsp:include page="about-us-en.jsp"/>
+			</c:otherwise>
+		</c:choose>
+	</div>
+	
+	<jsp:include page="../include/footer.jsp"/>
 
 </div><!-- /.container -->
 
