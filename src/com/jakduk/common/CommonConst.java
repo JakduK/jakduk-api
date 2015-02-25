@@ -26,7 +26,7 @@ public class CommonConst {
 	 */
 	public final static Integer BOARD_SIZE_LINE_NUMBER = 15;
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
-	public final static Integer HOME_SIZE_GALLERY = 4;
+	public final static Integer HOME_SIZE_GALLERY = 6;
 
 	/**
 	 * 게시물 쿠키의 만료되는 시간(초)
