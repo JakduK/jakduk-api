@@ -15,14 +15,6 @@
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 
-	<!--=== Breadcrumbs ===-->
-	<div class="breadcrumbs">
-		<div class="container">
-			<h1 class="pull-left"><spring:message code="about"/></h1>
-		</div><!--/container-->
-	</div><!--/breadcrumbs-->
-	<!--=== End Breadcrumbs ===-->
-
 	<!--=== Content Part ===-->
 	<div class="container content">
 		<c:choose>

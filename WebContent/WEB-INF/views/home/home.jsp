@@ -42,90 +42,59 @@
 			</div>
 		</div>
 		
-		<div class="row magazine-page margin-bottom-30">
-		
-            <!-- Begin Content -->
-            <div class="col-6 col-sm-6 col-lg-6 md-margin-bottom-40">
-                <div class="tag-box tag-box-v1">
-                    <div class="heading heading-v3">
-                        <h2><spring:message code="home.posts.latest"/></h2>
-                    </div>
-                    	<div ng-repeat="post in postsLatest">
-                        <div class="magazine-mini-news">
-								<h3 ng-switch="post.status.delete">
-									<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
-									<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
-							    </h3>                        
-                            <div class="post-author">
-						<i class="fa fa-user"></i> {{post.writer.username}}		
-						/						
-						<i class="fa fa-eye"></i>
-						<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
-						<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
-                            </div>
-                        </div>        
-           			   <hr>
-           			   </div>
-                </div>
-            </div>
-            <!-- End Content -->
+		<div class="row magazine-page">
             
             	<!-- 최근 글 -->
-       <!--Info Block-->
-          <div class="col-6 col-sm-6 col-lg-6 md-margin-bottom-40">
-              <div class="funny-boxes funny-boxes-top-sea">
-                                  <div class="heading heading-v3">
-                        <h2><spring:message code="home.posts.latest"/></h2>
-                    </div>
-              <h2><a href='<c:url value="/board/free/"/>'><spring:message code="home.posts.latest"/></a></h2>
-					<!-- Latest -->
-					<div class="posts">
-					    <ul class="list-unstyled latest-list">
-					      <li ng-repeat="post in postsLatest">
-									<span ng-switch="post.status.delete">
-										<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+  <!--Info Block-->
+     <div class="col-6 col-sm-6 col-lg-6">
+         <div class="funny-boxes funny-boxes-top-sea">
+							<div class="heading heading-v4">
+								<h2><spring:message code="home.posts.latest"/></h2>
+							</div>
+					<div ng-repeat="post in postsLatest">
+					<div class="magazine-mini-news">
+					<h3 ng-switch="post.status.delete">
+						<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
 					<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
-					    </span>
-					<small>
-						<i class="fa fa-user"></i> {{post.writer.username}}								
-						<i class="fa fa-eye"></i>
-						<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
+						    </h3>                        
+					<div class="post-author">
+					<i class="fa fa-user"></i> {{post.writer.username}}		
+					<i class="fa fa-clock-o"></i>
+					<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
 					<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
-									</small>
-					      </li>
-					    </ul>
 					</div>
-						<!-- End Latest -->	                         
-              </div>
-              
-          </div>
-          <!--End Info Block-->		
+					</div>        
+					<hr>
+					</div>							
+                      
+         </div>
+         
+     </div>
+     <!--End Info Block-->		
           	
           	<!-- 최근 가입 회원 -->
-          <div class="funny-boxes funny-boxes-top-yellow">
-             <h2><a href='<c:url value="/gallery/home/"/>'><spring:message code="home.members.registered.latest"/></a></h2>
-		   <!-- Latest -->
-				<div class="posts">
-				    <ul class="list-unstyled latest-list">
-		        <li ng-repeat="user in usersLatest">
-		        {{user.about}}
-								<small>
-									<i class="fa fa-user"></i> {{user.username}}								
-									<i class="fa fa-eye"></i>
-									<span ng-if="${timeNow} > intFromObjectId(user.id)">{{dateFromObjectId(user.id) | date:"${dateTimeFormat.date}"}}</span>
-									<span ng-if="${timeNow} <= intFromObjectId(user.id)">{{dateFromObjectId(user.id) | date:"${dateTimeFormat.time}"}}</span>							
-								</small>
-		        </li>
-				    </ul>
-				</div>
-		 		<!-- End Latest -->
-          </div>		
+          	<div class="col-6 col-sm-6 col-lg-6">
+		   <div class="funny-boxes funny-boxes-top-yellow">
+		<div class="heading heading-v4">
+			<h2><spring:message code="home.members.registered.latest"/></h2>
+		</div>          
+		
+    <div class="people-say margin-bottom-10" ng-repeat="user in usersLatest">
+        <div class="overflow-h">
+            <span>{{user.username}}</span>
+									<small class="hex" ng-if="${timeNow} > intFromObjectId(user.id)">{{dateFromObjectId(user.id) | date:"${dateTimeFormat.date}"}}</small>
+									<small class="hex" ng-if="${timeNow} <= intFromObjectId(user.id)">{{dateFromObjectId(user.id) | date:"${dateTimeFormat.time}"}}</small>            
+            <p>{{user.about}}</p>
+        </div>    
+    </div>   
+		 </div>		
+		 </div>
          
         </div><!--/row-->
         
    <!-- 최근 사진 -->
         <div class="owl-carousel-v1 owl-work-v1 margin-bottom-40">
-            <div class="headline"><h2 class="pull-left"><i class="icon-custom icon-sm icon-bg-u fa fa-lightbulb-o"></i><spring:message code="home.pictures.latest"/></h2>
+            <div class="headline"><h2 class="pull-left"><spring:message code="home.pictures.latest"/></h2>
                 <div class="owl-navigation">
                     <div class="customNavigation">
                         <a class="owl-btn prev-v2"><i class="fa fa-angle-left"></i></a>

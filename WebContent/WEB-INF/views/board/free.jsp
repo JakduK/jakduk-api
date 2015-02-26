@@ -10,39 +10,37 @@
 <head>
 	<title><spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
-	
-	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
 
-<div class="container">
-<jsp:include page="../include/navigation-header.jsp"/>
-
-<sec:authorize access="isAnonymous()">
-	<c:set var="authRole" value="ANNONYMOUS"/>
-</sec:authorize>
-<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-	<c:set var="authRole" value="USER"/>
-</sec:authorize>
-
-<div class="page-header">
-  <h4>
-	  <a href="<c:url value="/board"/>"><spring:message code="board.name.free"/></a>
-	  <small><spring:message code="board.name.free.about"/></small>
-  </h4>
-</div>
-
-<div class="btn-group">
+<div class="wrapper">
+	<jsp:include page="../include/navigation-header.jsp"/>
+	
+		<!--=== Content Part ===-->
+	<div class="container content">
+	
+	<sec:authorize access="isAnonymous()">
+		<c:set var="authRole" value="ANNONYMOUS"/>
+	</sec:authorize>
+	<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+		<c:set var="authRole" value="USER"/>
+	</sec:authorize>
+	
+	<div class="headline"><h2><spring:message code="board.name.free"/></h2></div>
+	
+	<div class="margin-bottom-20">
+	
+	<div class="btn-group">
 	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 		<c:choose>
 			<c:when test="${boardListInfo.category != 'none'}">
 				<spring:message code="${categorys[boardListInfo.category]}"/>
-				<span class="caret"></span>
 			</c:when>
 			<c:otherwise>
-				<spring:message code="board.category"/> <span class="caret"></span>
+				<spring:message code="board.category"/>
 			</c:otherwise>
 		</c:choose>		
+		<i class="fa fa-angle-down"></i>
 	</button>
 	<ul class="dropdown-menu" role="menu">
 		<c:forEach items="${categorys}" var="category">
@@ -50,6 +48,8 @@
 		</c:forEach>
 	</ul>
 </div>
+
+
 
 <c:choose>
 	<c:when test="${authRole == 'ANNONYMOUS'}">
@@ -63,158 +63,159 @@
 	</button>	
 	</c:when>	
 </c:choose>
-
-<p></p>
-
-<div class="panel panel-warning" ng-controller="boardCtrl">
-  <!-- Default panel contents -->
-  <div class="panel-heading hidden-xs">
-  	<div class="row">
-  		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
-  		<div class="col-sm-4"><spring:message code="board.subject"/></div>
-  		<div class="col-sm-3"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
-  		<div class="col-sm-3"><spring:message code="board.views"/> | <spring:message code="common.like"/> | <spring:message code="common.dislike"/></div>
-  	</div>  	
-  </div> <!-- /panel-heading -->
-
-	<ul class="list-group">
-		<!-- posts as notice -->
-		<%@page import="java.util.Date"%>
-		<%Date CurrentDate = new Date();%>
-		<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
-								
-		<c:forEach items="${notices}" var="notice">
-			<li class="list-group-item list-group-item-info">
-				<div class="row">
-					<div class="col-sm-2">
-						<spring:message code="board.notice"/>
-					</div>
-					<div class="col-sm-4">
-						<c:if test="${notice.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-						<c:if test="${notice.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-						<c:if test="${!empty galleriesCount[notice.id]}"><i class="fa fa-file-image-o"></i></c:if>
-						<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
+  
+</div>                    
+	
+	
+	<div class="panel panel-grey" ng-controller="boardCtrl">
+	  <!-- Default panel contents -->
+	  <div class="panel-heading hidden-xs">
+	  	<div class="row">
+	  		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>
+	  		<div class="col-sm-4"><spring:message code="board.subject"/></div>
+	  		<div class="col-sm-3"><spring:message code="board.writer"/> | <spring:message code="board.date"/></div>
+	  		<div class="col-sm-3"><spring:message code="board.views"/> | <spring:message code="common.like"/> | <spring:message code="common.dislike"/></div>
+	  	</div>  	
+	  </div> <!-- /panel-heading -->
+	
+		<ul class="list-group">
+			<!-- posts as notice -->
+			<%@page import="java.util.Date"%>
+			<%Date CurrentDate = new Date();%>
+			<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
+									
+			<c:forEach items="${notices}" var="notice">
+				<li class="list-group-item list-group-item-warning">
+					<div class="row">
+						<div class="col-sm-2">
+							<spring:message code="board.notice"/>
+						</div>
+						<div class="col-sm-4">
+							<c:if test="${notice.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+							<c:if test="${notice.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+							<c:if test="${!empty galleriesCount[notice.id]}"><i class="fa fa-file-image-o"></i></c:if>
+							<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
+								<c:choose>
+									<c:when test="${notice.status.delete == 'delete'}">
+										<strong><spring:message code="board.msg.deleted"/></strong>
+									</c:when>
+									<c:otherwise>
+										<strong>${notice.subject}</strong>
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${!empty commentCount[notice.id]}">
+									<span class="text-success">&nbsp;[${commentCount[notice.id]}]</span>
+								</c:if>		
+							</a>
+						</div>
+						<div class="col-sm-3">
+							${notice.writer.username}
+							|
+							<fmt:formatDate var="postDate" value="${createDate[notice.id]}" pattern="yyyy-MM-dd" />
+						
 							<c:choose>
-								<c:when test="${notice.status.delete == 'delete'}">
-									<strong><spring:message code="board.msg.deleted"/></strong>
+								<c:when test="${postDate < nowDate}">
+									<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.date}" />
 								</c:when>
 								<c:otherwise>
-									<strong>${notice.subject}</strong>
+									<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.time}" />
 								</c:otherwise>
-							</c:choose>
-							<c:if test="${!empty commentCount[notice.id]}">
-								<span class="text-success">&nbsp;[${commentCount[notice.id]}]</span>
-							</c:if>		
-						</a>
+							</c:choose>					
+						</div>
+						<div class="col-sm-3 hidden-xs">
+							<span class="glyphicon glyphicon-eye-open"></span><strong> ${notice.views}</strong> |
+							<span class="text-primary">
+								<span class="glyphicon glyphicon-thumbs-up"></span>
+								<strong>
+									<c:choose>
+										<c:when test="${!empty usersLikingCount[notice.id]}">${usersLikingCount[notice.id]}</c:when>
+										<c:otherwise>0</c:otherwise>
+									</c:choose>
+								</strong>
+							</span> |
+							<span class="text-danger">
+								<span class="glyphicon glyphicon-thumbs-down"></span>
+								<strong>
+									<c:choose>
+										<c:when test="${!empty usersDislikingCount[notice.id]}">${usersDislikingCount[notice.id]}</c:when>
+										<c:otherwise>0</c:otherwise>
+									</c:choose>
+								</strong>
+							</span>						
+						</div>
 					</div>
-					<div class="col-sm-3">
-						${notice.writer.username}
-						|
-						<fmt:formatDate var="postDate" value="${createDate[notice.id]}" pattern="yyyy-MM-dd" />
-					
-						<c:choose>
-							<c:when test="${postDate < nowDate}">
-								<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.date}" />
-							</c:when>
-							<c:otherwise>
-								<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.time}" />
-							</c:otherwise>
-						</c:choose>					
-					</div>
-					<div class="col-sm-3 hidden-xs">
-						<span class="glyphicon glyphicon-eye-open"></span><strong> ${notice.views}</strong> |
-						<span class="text-primary">
-							<span class="glyphicon glyphicon-thumbs-up"></span>
-							<strong>
+				</li>
+			</c:forEach>
+			<!-- posts -->
+			<c:forEach items="${posts}" var="post">
+				<li class="list-group-item">
+					<div class="row">
+						<div class="col-sm-2">	
+							${post.seq}
+							|
+							<c:if test="${!empty post.categoryName}">
+								<spring:message code="${categorys[post.categoryName]}"/>
+							</c:if>
+						</div>
+						<div class="col-sm-4">
+							<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+							<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+							<c:if test="${!empty galleriesCount[post.id]}"><i class="fa fa-file-image-o"></i></c:if>
+							<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 								<c:choose>
-									<c:when test="${!empty usersLikingCount[notice.id]}">${usersLikingCount[notice.id]}</c:when>
-									<c:otherwise>0</c:otherwise>
+									<c:when test="${post.status.delete == 'delete'}">
+										<strong><spring:message code="board.msg.deleted"/></strong>
+									</c:when>
+									<c:otherwise>
+										<strong>${post.subject}</strong>
+									</c:otherwise>
 								</c:choose>
-							</strong>
-						</span> |
-						<span class="text-danger">
-							<span class="glyphicon glyphicon-thumbs-down"></span>
-							<strong>
-								<c:choose>
-									<c:when test="${!empty usersDislikingCount[notice.id]}">${usersDislikingCount[notice.id]}</c:when>
-									<c:otherwise>0</c:otherwise>
-								</c:choose>
-							</strong>
-						</span>						
-					</div>
-				</div>
-			</li>
-		</c:forEach>
-		<!-- posts -->
-		<c:forEach items="${posts}" var="post">
-			<li class="list-group-item">
-				<div class="row">
-					<div class="col-sm-2">	
-						${post.seq}
-						|
-						<c:if test="${!empty post.categoryName}">
-							<spring:message code="${categorys[post.categoryName]}"/>
-						</c:if>
-					</div>
-					<div class="col-sm-4">
-						<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-						<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-						<c:if test="${!empty galleriesCount[post.id]}"><i class="fa fa-file-image-o"></i></c:if>
-						<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
+								<c:if test="${!empty commentCount[post.id]}">
+									<span class="text-success">&nbsp;[${commentCount[post.id]}]</span>
+								</c:if>		
+							</a>
+						</div>
+						
+						<div class="col-sm-3">
+							${post.writer.username}
+							|
+							<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
+						
 							<c:choose>
-								<c:when test="${post.status.delete == 'delete'}">
-									<strong><spring:message code="board.msg.deleted"/></strong>
+								<c:when test="${postDate < nowDate}">
+									<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
 								</c:when>
 								<c:otherwise>
-									<strong>${post.subject}</strong>
+									<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.time}" />
 								</c:otherwise>
-							</c:choose>
-							<c:if test="${!empty commentCount[post.id]}">
-								<span class="text-success">&nbsp;[${commentCount[post.id]}]</span>
-							</c:if>		
-						</a>
-					</div>
-					
-					<div class="col-sm-3">
-						${post.writer.username}
-						|
-						<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
-					
-						<c:choose>
-							<c:when test="${postDate < nowDate}">
-								<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
-							</c:when>
-							<c:otherwise>
-								<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.time}" />
-							</c:otherwise>
-						</c:choose>		
-					</div>
-					<div class="col-sm-3">
-						<span class="glyphicon glyphicon-eye-open"></span><strong> ${post.views}</strong> |
-						<span class="text-primary">
-							<span class="glyphicon glyphicon-thumbs-up"></span>
-							<strong>
-								<c:choose>
-									<c:when test="${!empty usersLikingCount[post.id]}">${usersLikingCount[post.id]}</c:when>
-									<c:otherwise>0</c:otherwise>
-								</c:choose>
-							</strong>
-						</span> |
-						<span class="text-danger">
-							<span class="glyphicon glyphicon-thumbs-down"></span>
-							<strong>
-								<c:choose>
-									<c:when test="${!empty usersDislikingCount[post.id]}">${usersDislikingCount[post.id]}</c:when>
-									<c:otherwise>0</c:otherwise>
-								</c:choose>
-							</strong>
-						</span>		
-					</div>	
-				</div> <!-- /row -->	
-			</li>
-		</c:forEach>
-	</ul>
-</div>
+							</c:choose>		
+						</div>
+						<div class="col-sm-3">
+							<span class="glyphicon glyphicon-eye-open"></span><strong> ${post.views}</strong> |
+							<span class="text-primary">
+								<span class="glyphicon glyphicon-thumbs-up"></span>
+								<strong>
+									<c:choose>
+										<c:when test="${!empty usersLikingCount[post.id]}">${usersLikingCount[post.id]}</c:when>
+										<c:otherwise>0</c:otherwise>
+									</c:choose>
+								</strong>
+							</span> |
+							<span class="text-danger">
+								<span class="glyphicon glyphicon-thumbs-down"></span>
+								<strong>
+									<c:choose>
+										<c:when test="${!empty usersDislikingCount[post.id]}">${usersDislikingCount[post.id]}</c:when>
+										<c:otherwise>0</c:otherwise>
+									</c:choose>
+								</strong>
+							</span>		
+						</div>	
+					</div> <!-- /row -->	
+				</li>
+			</c:forEach>
+		</ul>
+	</div>
 
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
@@ -259,6 +260,8 @@
 		 </c:choose> 
 		</ul>
 	</div>	
+	
+	</div>
  
 	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->

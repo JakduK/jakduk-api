@@ -1,11 +1,8 @@
-.blog h3 a {
-	color: #585f69;
-	line-height: 32px;
-}
-
-.blog h3 a:hover {
-	color: #72c02c;
-	text-decoration: none;
-}
-
+hr {margin:5px 0px;}
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+ .list-group-item { padding: 5px 5px;}
+ .panel-heading { padding: 5px 5px;}
+ .panel-body { padding:5px;}
+ .panel-footer { padding: 5px 5px;}
+ .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;} 
+ .content { padding-top: 10px; padding-bottom: 20px;}
