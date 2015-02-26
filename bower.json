@@ -21,7 +21,6 @@
     "ng-infinite-scroller-origin": "~1.2.0",
     "angular-google-chart": "~0.0.11",
     "angular-cookies": "~1.3.13",
-    "bootstrap": "~3.3.2",
-    "d3": "~3.5.5"
+    "bootstrap": "~3.3.2"
   }
 }

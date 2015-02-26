@@ -138,7 +138,7 @@ public class HomeController {
 		
 		homeService.getBoardLatest(model);
 		homeService.getUserLatest(model);
-		homeService.getGalleryLatest(model);
+		//homeService.getGalleryLatest(model);
 		
 		return "home/user/latest";
 	}
