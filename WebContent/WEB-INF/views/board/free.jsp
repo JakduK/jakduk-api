@@ -16,7 +16,15 @@
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
-		<!--=== Content Part ===-->
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="board.name.free"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->		
+	
+	<!--=== Content Part ===-->
 	<div class="container content">
 	
 	<sec:authorize access="isAnonymous()">
@@ -25,8 +33,6 @@
 	<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
 		<c:set var="authRole" value="USER"/>
 	</sec:authorize>
-	
-	<div class="headline"><h2><spring:message code="board.name.free"/></h2></div>
 	
 	<div class="margin-bottom-20">
 	
@@ -48,8 +54,6 @@
 		</c:forEach>
 	</ul>
 </div>
-
-
 
 <c:choose>
 	<c:when test="${authRole == 'ANNONYMOUS'}">
