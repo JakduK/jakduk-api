@@ -8,18 +8,19 @@
 
 <head>
 	<title><spring:message code="common.home"/> &middot; <spring:message code="common.jakduk"/></title>
-	<jsp:include page="../include/html-header.jsp"/>
-	
+
 	<!-- CSS Implementing Plugins -->
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.css">
 	<!-- CSS Page Style -->    
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog_magazine.css">	
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/flexslider/flexslider.css">  
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/parallax-slider/css/parallax-slider.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/parallax-slider/css/parallax-slider.css">	
+	
+	<jsp:include page="../include/html-header.jsp"/>
 </head>
 
 <body>
-<div class="wrapper jakduk-home" ng-controller="homeCtrl">
+<div class="wrapper" ng-controller="homeCtrl">
 	
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
@@ -27,22 +28,14 @@
     <div class="slider-inner">
         <div id="da-slider" class="da-slider">
             <div class="da-slide">
-                <h2>K LEAGUE JAKDU KING</h2>
-                <p><i>Lorem ipsum dolor amet</i> <br /> <i>tempor incididunt ut</i> <br /> <i>veniam omnis </i></p>
-                <div class="da-img"><img class="img-responsive" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/parallax-slider/img/1.png" alt=""></div>
+                <h2><i>국내 축구 </i> <br /> <i>중심 커뮤니티</i></h2>
+            <p><i>K리그 작두왕</i></p>
             </div>
             <div class="da-slide">
-                <h2><i>RESPONSIVE VIDEO</i> <br /> <i>SUPPORT AND</i> <br /> <i>MANY MORE</i></h2>
-                <p><i>Lorem ipsum dolor amet</i> <br /> <i>tempor incididunt ut</i></p>
-                <div class="da-img">
-                    <iframe src="http://player.vimeo.com/video/47911018" width="530" height="300" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> 
-                </div>
+            <h2><i>K리그 </i> <br /> <i>대표 커뮤니티</i></h2>
+            <p><i>K리그 작두왕</i></p>
             </div>
-            <div class="da-slide">
-                <h2><i>USING BEST WEB</i> <br /> <i>SOLUTIONS WITH</i> <br /> <i>HTML5/CSS3</i></h2>
-                <p><i>Lorem ipsum dolor amet</i> <br /> <i>tempor incididunt ut</i> <br /> <i>veniam omnis </i></p>
-                <div class="da-img"><img src="assets/plugins/parallax-slider/img/html5andcss3.png" alt="image01" /></div>
-            </div>
+            
             <div class="da-arrows">
                 <span class="da-arrows-prev"></span>
                 <span class="da-arrows-next"></span>        
@@ -84,38 +77,16 @@
 					</div>							
                       
                         </div>
-                        
+
+<!-- 최근 댓글  -->
 <div class="col-md-6">
-                
-                    <div class="headline"><h2>Latest Tweets</h></div>
+                    <div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
 <div class="blog-twitter">
-                    <div class="blog-twitter-inner">
-                        <i class="icon-twitter"></i>
-                        <a href="#">@htmlstream</a> 
-                        At vero seos etodela ccusamus et iusto odio dignissimos. 
-                        <a href="#">http://t.co/sBav7dm</a> 
-                        <span class="twitter-time">5 hours ago</span>
-                    </div>
-                    <div class="blog-twitter-inner">
-                        <i class="icon-twitter"></i>
-                        <a href="#">@htmlstream</a> 
-                        At vero eos et accusamus et iusto odio dignissimos. 
-                        <a href="#">http://t.co/sBav7dm</a> 
-                        <span class="twitter-time">5 hours ago</span>
-                    </div>
-                    <div class="blog-twitter-inner">
-                        <i class="icon-twitter"></i>
-                        <a href="#">@htmlstream</a> 
-                        At vero eos et accusamus et iusto odio dignissimos. 
-                        <a href="#">http://t.co/sBav7dm</a> 
-                        <span class="twitter-time">5 hours ago</span>
-                    </div>
-                    <div class="blog-twitter-inner">
-                        <i class="icon-twitter"></i>
-                        <a href="#">@htmlstream</a> 
-                        At vero eos et accusamus et iusto odio dignissimos. 
-                        <a href="#">http://t.co/sBav7dm</a> 
-                        <span class="twitter-time">5 hours ago</span>
+                    <div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
+                        <strong>{{comment.writer.username}}</strong>
+                        <a href="<c:url value="/board/free/{{comment.boardItem.seq}}"/>">{{comment.content}}</a>
+					<span class="twitter-time" ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span>
+					<span class="twitter-time" ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>                        
                     </div>
                 </div>                			
  
@@ -127,19 +98,9 @@
 		 </div>
 		 
 		 <div class="col-md-3">
-		 
-		<!-- 백과사전 -->
-<!-- 		
-		<div class="jumbotron">
-			<h4>{{encyclopedia.subject}} <small><span class="label label-primary">{{encyclopedia.kind}}</span></small></h4>
-			<h5>{{encyclopedia.content}}</h5>
-		 	<button type="button" class="btn btn-default" ng-click="refreshEncyclopedia()">
-				<span class="glyphicon glyphicon-refresh"></span>
-			</button>
-		</div>  
- -->		 
-		 
-		 <div class="margin-bottom-30">
+
+<!-- 최근 가입 회원 -->         
+	 <div class="margin-bottom-30">
     			<div class="headline"><h2><spring:message code="home.members.registered.latest"/></h2></div>
     			
 <div class="carousel slide testimonials testimonials-v1" id="testimonials-1">
@@ -149,13 +110,15 @@
                             <div class="testimonial-info">
                                 <span class="testimonial-author">
                                     {{user.username}}
-                                    <em>Web Developer, Unify Theme.</em>
+                                    <em><i class="fa fa-futbol-o"></i>
+                                    {{user.supportFC.names[0].fullName}}</em>
                                 </span>
                             </div>
                         </div>                    
                     </div>
+                
+                <hr>
                             
-                    
                     <div class="carousel-arrow">
                         <a data-slide="prev" href="#testimonials-1" class="left carousel-control">
                             <i class="fa fa-angle-left"></i>
@@ -165,23 +128,25 @@
                         </a>
                     </div>
                 </div>  		
-                </div>
+                </div>     
                 
-		<div class="shadow-wrapper margin-bottom-30">
+                
+                
+<!--  백과사전  -->                
+		<div class="shadow-wrapper">
 			<div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
-		<div class="heading">
-			<h2><spring:message code="home.encyclopedia"/></h2>
-		</div> 			
 			
 		   <h2>{{encyclopedia.subject}} <span class="label rounded label-sea">{{encyclopedia.kind}}</span></h2>
 		   <p>{{encyclopedia.content}}</p>
-		   
+
+<!-- 		   
 			<button class="btn-u btn-brd btn-brd-hover rounded btn-u-sea" type="button" ng-click="refreshEncyclopedia()">
 				<i class="fa fa-refresh"></i>
-			</button>		   
+			</button>
+ -->					   
 			</div>
-		</div>                
-                
+		</div>                    
+                           
 		 
 		 </div>		 
          
@@ -197,8 +162,6 @@
                     </div>
                 </div><!--/navigation-->
             </div>
-
-
 
             <div class="owl-recent-works-v1">
             	<c:forEach var="gallery" items="${galleries}">
@@ -249,6 +212,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.dataLatestConn = "none";
 	$scope.postsLatest = [];
 	$scope.usersLatest = [];
+	$scope.commentsLatest = [];
 	//$scope.galleriesLatest = [];
 	
 	angular.element(document).ready(function() {
@@ -257,8 +221,8 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 		
 		App.init();
 		App.initSliders();
-        StyleSwitcher.initStyleSwitcher();      
-        ParallaxSlider.initParallaxSlider();
+   StyleSwitcher.initStyleSwitcher();      
+   ParallaxSlider.initParallaxSlider();
 		OwlRecentWorks.initOwlRecentWorksV1();
 
 	});	
@@ -307,6 +271,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 				
 				$scope.postsLatest = data.posts;
 				$scope.usersLatest = data.users;
+				$scope.commentsLatest = data.comments;
 				//$scope.galleriesLatest = data.galleries;
 				
 				$scope.dataLatestConn = "none";

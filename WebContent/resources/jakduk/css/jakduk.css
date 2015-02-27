@@ -6,3 +6,17 @@ hr {margin:5px 0px;}
  .panel-footer { padding: 5px 5px;}
  .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;} 
  .content { padding-top: 10px; padding-bottom: 20px;}
+ 
+ .blog-twitter .blog-twitter-inner a {
+	color: #555;
+	text-decoration: none;
+}
+.blog-twitter .blog-twitter-inner a:hover {
+	color: #72c02c;
+	text-decoration: underline;
+}
+
+.header .topbar ul.loginbar > li > a, 
+.header .topbar ul.loginbar > li > a:hover {
+	text-transform: none;
+}

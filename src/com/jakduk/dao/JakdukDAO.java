@@ -312,4 +312,22 @@ public class JakdukDAO {
 		return posts;
 	}	
 	
+	public List<UserOnHome> getUserOnHome(String language) {
+		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
+		AggregationOperation limit = Aggregation.limit(CommonConst.HOME_SIZE_LINE_NUMBER);
+		Aggregation aggregation = Aggregation.newAggregation(sort, limit);
+		
+		AggregationResults<UserOnHome> results = mongoTemplate.aggregate(aggregation, "user", UserOnHome.class);
+		
+		List<UserOnHome> users = results.getMappedResults();
+		
+		for (UserOnHome user : users) {
+			if (user.getSupportFC() != null) {
+				user.getSupportFC().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
+			}
+		}
+		
+		return users;
+	}	
+	
 }

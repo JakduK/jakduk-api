@@ -134,5 +134,6 @@ public class CommonConst {
 	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte
 	
 	public final static Integer RSS_SIZE_ITEM = 200;
+	public final static Integer COMMENT_MAX_SIZE = 100;
 	
 }

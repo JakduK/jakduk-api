@@ -6,12 +6,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,17 +25,15 @@ import org.springframework.ui.Model;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardFreeOnRSS;
 import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.BoardFree;
+import com.jakduk.dao.UserOnHome;
 import com.jakduk.model.db.Encyclopedia;
-import com.jakduk.model.embedded.BoardHistory;
-import com.jakduk.model.embedded.BoardStatus;
+import com.jakduk.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.model.simple.BoardFreeOnHome;
 import com.jakduk.model.simple.GalleryOnList;
-import com.jakduk.model.simple.UserOnHome;
+import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.EncyclopediaRepository;
-import com.jakduk.repository.UserOnHomeRepository;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -71,10 +66,10 @@ public class HomeService {
 	private BoardFreeOnHomeRepository boardFreeOnHomeRepository;
 	
 	@Autowired
-	private UserOnHomeRepository userOnHomeRepository;
+	private BoardFreeRepository boardFreeRepository;
 	
 	@Autowired
-	private BoardFreeRepository boardFreeRepository;
+	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -121,12 +116,9 @@ public class HomeService {
 		return model;
 	}
 	
-	public Model getUserLatest(Model model) {
+	public Model getUserLatest(Model model, String language) {
 		
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
-		
-		List<UserOnHome> posts = userOnHomeRepository.findAll(pageable).getContent();
+		List<UserOnHome> posts = jakdukDAO.getUserOnHome(language);
 		
 		model.addAttribute("users", posts);
 		
@@ -207,4 +199,26 @@ public class HomeService {
 		
 		return HttpServletResponse.SC_OK;
 	}		
+	
+	public Model getBoardCommentLatest(Model model) {
+		
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
+		
+		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
+		
+		for (BoardFreeCommentOnHome comment : comments) {
+			String content = comment.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
+			if (content.length() > CommonConst.COMMENT_MAX_SIZE) {
+				content = content.substring(0, CommonConst.COMMENT_MAX_SIZE);
+				content = String.format("%s...", content);
+			}
+			comment.setContent(content);
+		}
+		
+		model.addAttribute("comments", comments);
+		
+		return model;
+	}
+	
 }

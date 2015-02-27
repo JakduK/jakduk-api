@@ -126,21 +126,27 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/home/user/latest", method = RequestMethod.GET)
-	public String userLatest(Model model) {
+	public String userLatest(Model model, HttpServletRequest request) {
 		
-		homeService.getUserLatest(model);
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, null);
+		
+		homeService.getUserLatest(model, language);
 		
 		return "home/user/latest";
 	}
 	
 	@RequestMapping(value = "/home/data/latest", method = RequestMethod.GET)
-	public String dataLatest(Model model) {
+	public void dataLatest(Model model, HttpServletRequest request,
+			@RequestParam(required = false) String lang) {
+		
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
 		
 		homeService.getBoardLatest(model);
-		homeService.getUserLatest(model);
+		homeService.getUserLatest(model, language);
 		//homeService.getGalleryLatest(model);
-		
-		return "home/user/latest";
+		homeService.getBoardCommentLatest(model);
 	}
 	
 	@RequestMapping(value = "/error/{code}", method = RequestMethod.GET)

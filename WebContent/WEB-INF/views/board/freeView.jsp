@@ -13,13 +13,17 @@
 	<title>${post.subject} - <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
-	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-	<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
+    <!-- CSS Page Style -->    
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
+	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 </head>
 <body>
-<div class="container jakduk-board">
+<div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
 	<c:set var="summernoteLang" value="en-US"/>
@@ -66,6 +70,16 @@
 		</c:url>	
 	</c:if>
 	
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="board.name.free"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->		
+	
+	<!--=== Content Part ===-->
+	<div class="container content blog-full-width">	
 	
 	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
 		<spring:message code="board.list"/>
@@ -140,13 +154,14 @@
 		</c:when>					
 	</c:choose>
 	
-	<!-- Begin page content -->
-	<div class="panel panel-info" ng-controller="boardFreeCtrl">
-	  <div class="panel-heading">
-	  	<h4 class="panel-title">	  	
-				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+        <!--Blog Post-->        
+    	<div class="blog margin-bottom-40" ng-controller="boardFreeCtrl">
+        	<h2>
+        	<small>
+				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile"></i></c:if>
+				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet"></i></c:if>
 				<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>
+				</small>
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
 						<spring:message code="board.msg.deleted"/>
@@ -155,25 +170,17 @@
 						${post.subject}
 					</c:otherwise>
 				</c:choose>
-	  		<c:if test="${!empty category}">&nbsp;<small><spring:message code="${category.resName}"/></small></c:if>
-	  	</h4>
-	  	<div class="row">
-	  		<div class="col-sm-2">
-		  		<h4><small><span class="glyphicon glyphicon-user"></span> ${post.writer.username}</small></h4>
-	  		</div>
-	  		<div class="col-md-5">
-	  			<h4>
-	  				<small>
-							<span class="glyphicon glyphicon-time"></span>
-							{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
-			    		&nbsp;<span class="glyphicon glyphicon-eye-open"></span> ${post.views}
-					</small>
-				</h4>		    		 
-	  		</div>	
-	  	</div>
-	  </div>
-	  
-		<div class="panel-body">
+				
+	  		<c:if test="${!empty category}">&nbsp;<small><spring:message code="${category.resName}"/></small></c:if>        	
+        	</h2>
+            <div class="blog-post-tags">
+                <ul class="list-unstyled list-inline blog-info">
+                    <li><i class="fa fa-user"></i> ${post.writer.username}</li>
+                    <li><i class="fa fa-clock-o"></i> {{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
+                    <li><i class="fa fa-eye"></i> ${post.views}</li>
+                </ul>                    
+            </div>
+            
 			<c:choose>
 				<c:when test="${post.status.delete == 'delete'}">
 					<p><spring:message code="board.msg.deleted"/></p>
@@ -181,45 +188,43 @@
 				<c:otherwise>
 					<p>${post.content}</p>
 				</c:otherwise>
-			</c:choose>
-		</div>
-		
+			</c:choose>            
+			
 	<c:if test="${galleries != null}">
 	<ul class="list-group">
 	  <li class="list-group-item">
 	  <strong><spring:message code="board.gallery.list"/></strong>
 			<c:forEach items="${galleries}" var="gallery">
 				<div>
-					<small>
-						<a href="<%=request.getContextPath()%>/gallery/${gallery.id}">${gallery.name}</a> | 
+						<a href="<%=request.getContextPath()%>/gallery/view/${gallery.id}">${gallery.name}</a> | 
 						<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
-					</small>
 				</div>
 			</c:forEach>    
 	  </li>
 	</ul>	
-	</c:if>		
-	  
-		<div class="panel-footer text-center">
-			<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
-				<spring:message code="common.like"/>			
-				<span class="text-primary" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
-					<i class="fa fa-thumbs-o-up fa-lg"></i>
-				</span>
-				<span class="text-primary" ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>
-				<span class="text-primary"><i class="fa fa-circle-o-notch fa-spin" ng-show="likeConn == 'connecting'"></i></span>
-			</button>
-			<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
-				<spring:message code="common.dislike"/>
-				<span class="text-danger" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
-					<i class="fa fa-thumbs-o-down fa-lg"></i>
-				</span>
-				<span class="text-danger" ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>
-				<span class="text-danger"><i class="fa fa-circle-o-notch fa-spin" ng-show="dislikeConn == 'connecting'"></i></span>				
-			</button>
-			<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
-		</div>
-	</div> <!-- /panel -->
+	</c:if>					
+	
+<div class="ladda-btn">
+
+<p>
+   
+<button class="btn-u btn-u-sm btn-u-green rounded ladda-button" type="button"
+data-style="expand-right" ladda="btnLike"
+	ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
+	<i class="fa fa-thumbs-o-up fa-lg"></i>
+   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
+</button>
+<button class="btn-u btn-u-sm rounded btn-u-orange ladda-button" data-style="expand-right" type="button" 
+	ng-click="btnFeeling('dislike')" ladda="btnDislike" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
+	<i class="fa fa-thumbs-o-down fa-lg"></i>
+   <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
+</button>
+<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
+   
+    </p>                               
+</div>	
+        </div>
+        <!--End Blog Post-->   	
 	
 	<!-- comment -->		
 	<div ng-controller="commentCtrl">
@@ -363,7 +368,9 @@
 				<spring:message code="common.button.cancel.notice"/>
 			</button>		
 		</c:when>
-	</c:choose>	
+	</c:choose>
+	
+	</div>	
 	
 	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
@@ -379,14 +386,26 @@
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>
 </c:if>
+
+<!-- JS Implementing Plugins -->
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/back-to-top.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
+
+
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize", "angular-ladda"]);
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
 	$scope.likeConn = "none";
 	$scope.dislikeConn = "none";
+	
+	angular.element(document).ready(function() {
+	});		
 	
 	$scope.objectIdFromDate = function(date) {
 		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
@@ -416,8 +435,10 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 			
 			if (type == "like") {
 				$scope.likeConn = "connecting";
+				$scope.btnLike = true;
 			} else if (type == "dislike") {
 				$scope.dislikeConn = "connecting";
+				$scope.btnDislike = true;
 			}
 			
 			reqPromise.success(function(data, status, headers, config) {
@@ -448,8 +469,10 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 				
 				if (type == "like") {
 					$scope.likeConn = "success";
+					$scope.btnLike = false;
 				} else if (type == "dislike") {
 					$scope.dislikeConn = "success";
+					$scope.btnDislike = false;
 				}
 				
 			});
@@ -459,8 +482,10 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 				
 				if (type == "like") {
 					$scope.likeConn = "none";
+					$scope.btnLike = false;
 				} else if (type == "dislike") {
 					$scope.dislikeConn = "none";
+					$scope.btnDislike = false;
 				}
 			});
 		}
