@@ -37,7 +37,7 @@
 	<div class="margin-bottom-20">
 	
 	<div class="btn-group">
-	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+	<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
 		<c:choose>
 			<c:when test="${boardListInfo.category != 'none'}">
 				<spring:message code="${categorys[boardListInfo.category]}"/>
@@ -55,23 +55,25 @@
 	</ul>
 </div>
 
+<div class="btn-group">
 <c:choose>
 	<c:when test="${authRole == 'ANNONYMOUS'}">
-	<button type="button" class="btn btn-default" onclick="needLogin();">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
+		<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
 	</button>	
 	</c:when>
 	<c:when test="${authRole == 'USER'}">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
-		<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
+		<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
 	</button>	
 	</c:when>	
 </c:choose>
+</div>
   
 </div>                    
 	
 	
-	<div class="panel panel-grey" ng-controller="boardCtrl">
+	<div class="panel panel-u" ng-controller="boardCtrl">
 	  <!-- Default panel contents -->
 	  <div class="panel-heading hidden-xs">
 	  	<div class="row">
@@ -89,7 +91,7 @@
 			<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
 									
 			<c:forEach items="${notices}" var="notice">
-				<li class="list-group-item list-group-item-warning">
+				<li class="list-group-item list-group-item-info">
 					<div class="row">
 						<div class="col-sm-2">
 							<spring:message code="board.notice"/>
@@ -223,13 +225,13 @@
 
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
-		<button type="button" class="btn btn-default" onclick="needLogin();">
-			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
+			<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
 		</button>	
 		</c:when>
 		<c:when test="${authRole == 'USER'}">
-		<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<span class="glyphicon glyphicon-pencil"></span> <spring:message code="board.write"/>
+		<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
+			<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
 		</button>	
 		</c:when>	
 	</c:choose>

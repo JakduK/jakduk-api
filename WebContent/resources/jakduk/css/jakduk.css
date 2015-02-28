@@ -1,11 +1,12 @@
-hr {margin:5px 0px;}
+.padding-5 {margin:10px 0px;}
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
  .list-group-item { padding: 5px 5px;}
  .panel-heading { padding: 5px 5px;}
  .panel-body { padding:5px;}
  .panel-footer { padding: 5px 5px;}
- .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;} 
- .content { padding-top: 10px; padding-bottom: 20px;}
+ .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;}
+  
+.padding-10 .content { padding-top: 10px; padding-bottom: 20px;}
  
  .blog-twitter .blog-twitter-inner a {
 	color: #555;
@@ -13,10 +14,29 @@ hr {margin:5px 0px;}
 }
 .blog-twitter .blog-twitter-inner a:hover {
 	color: #72c02c;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .header .topbar ul.loginbar > li > a, 
 .header .topbar ul.loginbar > li > a:hover {
 	text-transform: none;
+}
+
+.media h4 {color:#72C02C;}
+.post-comment h4 {color:#72C02C;}
+
+.blog-item .media h5.media-heading {
+	color: #555;
+	position: relative;
+}
+
+.blog-item .media h5.media-heading span {
+	right: 0;
+	color: #777;
+	font-size: 12px;
+	position: absolute;
+}
+
+.blog-item .media h5.media-heading span a {
+	color: #72c02c;
 }

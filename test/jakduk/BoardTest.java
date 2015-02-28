@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.junit.Test;
@@ -57,7 +58,7 @@ public class BoardTest {
 	BoardFreeCommentRepository boardFreeCommentRepository;
 	
 	@Autowired
-	JakdukDAO boardFreeDAO;
+	JakdukDAO jakdukDAO;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -112,26 +113,6 @@ public class BoardTest {
 	}
 	
 	@Test
-	public void test03() {
-		
-		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(1);
-		//System.out.println("boardFreeOnComment=" + boardFreeOnComment);
-		
-		if (boardFreeOnComment != null) {
-			BoardItem boardItem = new BoardItem();
-			boardItem.setId(boardFreeOnComment.getId());
-			boardItem.setSeq(boardFreeOnComment.getSeq());
-			
-			Integer page = 1; // temp
-			Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-			Pageable pageable = new PageRequest(page - 1, 100, sort);
-			
-			List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardItem(boardItem, pageable).getContent();
-			System.out.println("test03 comments=" + comments);
-		}
-	}
-	
-	@Test
 	public void mongoAggregationTest01() {
 		
 		ArrayList<Integer> arrTemp = new ArrayList<Integer>();
@@ -139,7 +120,7 @@ public class BoardTest {
 		arrTemp.add(22);
 		arrTemp.add(23);
 		
-		Map<String, Integer> map = boardFreeDAO.getBoardFreeCommentCount(arrTemp);
+		Map<String, Integer> map = jakdukDAO.getBoardFreeCommentCount(arrTemp);
 		
 		System.out.println("mongoAggregationTest01=" + map);
 	}
@@ -152,7 +133,7 @@ public class BoardTest {
 		arrTemp.add(22);
 		arrTemp.add(23);
 		
-		Map<String, Integer> map = boardFreeDAO.getBoardFreeUsersLikingCount(arrTemp);
+		Map<String, Integer> map = jakdukDAO.getBoardFreeUsersLikingCount(arrTemp);
 		
 		System.out.println("mongoAggregationTest02=" + map);
 	}
@@ -175,7 +156,19 @@ public class BoardTest {
 		arrTemp.add(29);
 		arrTemp.add(30);
 		
-		HashMap<String, Integer> galleriesCount = boardFreeDAO.getBoardFreeGalleriesCount(arrTemp);
+		HashMap<String, Integer> galleriesCount = jakdukDAO.getBoardFreeGalleriesCount(arrTemp);
 		System.out.println("getGalleriesCount01=" + galleriesCount);
+	}
+	
+	@Test
+	public void getFreeComment() {
+		
+		Integer boardSeq = 13;
+		ObjectId commentId = new ObjectId("54b916d73d965cb1dbdd4af6");
+		
+		List<BoardFreeComment> comments = jakdukDAO.getBoardFreeComment(boardSeq, null);
+		
+		System.out.println("getFreeComment=" + comments);
+		
 	}
 }

@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.User;
@@ -194,7 +195,13 @@ public class JakdukDAO {
 		return postsOnGallery;
 	}
 */
-		
+
+	/**
+	 * 사진첩 보기의 앞, 뒤 사진을 가져온다.
+	 * @param id
+	 * @param direction
+	 * @return
+	 */
 	public Gallery getGalleryById(ObjectId id, Direction direction) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("status.status").is("use"));
@@ -329,5 +336,26 @@ public class JakdukDAO {
 		
 		return users;
 	}	
+	
+	public List<BoardFreeComment> getBoardFreeComment(Integer boardSeq, ObjectId commentId) {
+		AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem.seq").is(boardSeq));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
+		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		AggregationOperation limit = Aggregation.limit(CommonConst.COMMENT_MAX_SIZE);
+		
+		Aggregation aggregation;
+		
+		if (commentId != null) {
+			aggregation = Aggregation.newAggregation(match1, match2, sort, limit);
+		} else {
+			aggregation = Aggregation.newAggregation(match1, sort, limit);
+		}
+		
+		AggregationResults<BoardFreeComment> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", BoardFreeComment.class);
+		
+		List<BoardFreeComment> comments = results.getMappedResults();
+		
+		return comments;
+	}
 	
 }

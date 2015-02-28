@@ -764,19 +764,21 @@ public class BoardFreeService {
 		}
 	}
 	
-	public void getFreeComment(Model model, int seq, Integer page, Integer size) {
+	public void getFreeComment(Model model, int seq, String commentId) {
 		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
 		BoardItem boardItem = new BoardItem();
 		boardItem.setId(boardFreeOnComment.getId());
 		boardItem.setSeq(boardFreeOnComment.getSeq());
 		
-		if (page == null) page = 1;
+		List<BoardFreeComment> comments;
 		
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(page - 1, size, sort);
+		if (commentId != null && !commentId.isEmpty()) {
+			comments  = jakdukDAO.getBoardFreeComment(seq, new ObjectId(commentId));
+		} else {
+			comments  = jakdukDAO.getBoardFreeComment(seq, null);
+		}
 		
-		List<BoardFreeComment> comments = boardFreeCommentRepository.findByBoardItem(boardItem, pageable).getContent();
 		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 		
 		model.addAttribute("comments", comments);

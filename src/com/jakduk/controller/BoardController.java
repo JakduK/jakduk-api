@@ -99,10 +99,9 @@ public class BoardController {
 	@RequestMapping(value = "/free/comment/{seq}", method = RequestMethod.GET)
 	public void freeComment(@PathVariable int seq,
 			Model model,			
-			@RequestParam(required = true) Integer page,
-			@RequestParam(required = true) Integer size) {
+			@RequestParam(required = false) String commentId) {
 		
-		boardFreeService.getFreeComment(model, seq, page, size);
+		boardFreeService.getFreeComment(model, seq, commentId);
 		
 //		return "board/free/comment";
 	}

@@ -15,10 +15,8 @@
 	
     <!-- CSS Page Style -->    
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
-	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 </head>
@@ -79,59 +77,49 @@
 	<!--=== End Breadcrumbs ===-->		
 	
 	<!--=== Content Part ===-->
-	<div class="container content blog-full-width">	
+	<div class="container content blog-page blog-item">	
 	
-	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
-		<spring:message code="board.list"/>
-	</button>
+	<div class="margin-bottom-10">
+	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"><i class="fa fa-list"></i></button>
 	
 	<c:choose>
 		<c:when test="${!empty prevUrl}">
-			<button type="button" class="btn btn-default" onclick="location.href='${prevUrl}'">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"><i class="fa fa-chevron-left"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-left"></i></button>		
 		</c:otherwise>
 	</c:choose>
 	<c:choose>
 		<c:when test="${!empty nextUrl}">
-			<button type="button" class="btn btn-default" onclick="location.href='${nextUrl}'">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"><i class="fa fa-chevron-right"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-right"></i></button>		
 		</c:otherwise>
 	</c:choose>	
 	
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<span class="glyphicon glyphicon-edit hidden-xs"></span> <spring:message code="common.button.edit"/>
+		<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+			<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
 		</button>
-		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
-			<span class="glyphicon glyphicon-trash hidden-xs"></span> <spring:message code="common.button.delete"/>
+		<button type="button" class="btn-u rounded" onclick="confirmDelete();">
+			<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
+	
 	<c:choose>
 		<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
+			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
 				<spring:message code="common.button.set.as.notice"/>
 			</button>
 		</c:when>
 		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
 				<spring:message code="common.button.cancel.notice"/>
 			</button>		
 		</c:when>
 	</c:choose>
-
-	<p></p>
 	
 	<c:choose>
 		<c:when test="${result == 'setNotice'}">
@@ -154,8 +142,9 @@
 		</c:when>					
 	</c:choose>
 	
+</div>	
         <!--Blog Post-->        
-    	<div class="blog margin-bottom-40" ng-controller="boardFreeCtrl">
+    	<div class="blog margin-bottom-20" ng-controller="boardFreeCtrl">
         	<h2>
         	<small>
 				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile"></i></c:if>
@@ -204,167 +193,148 @@
 	</ul>	
 	</c:if>					
 	
-<div class="ladda-btn">
-
-<p>
+<div class="ladda-btn margin-bottom-10">
    
-<button class="btn-u btn-u-sm btn-u-green rounded ladda-button" type="button"
-data-style="expand-right" ladda="btnLike"
-	ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}">
+<button class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-sm ladda-button" type="button"
+	ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
+	ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro">
 	<i class="fa fa-thumbs-o-up fa-lg"></i>
    <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
 </button>
-<button class="btn-u btn-u-sm rounded btn-u-orange ladda-button" data-style="expand-right" type="button" 
-	ng-click="btnFeeling('dislike')" ladda="btnDislike" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}">
+<button class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-sm ladda-button" type="button" 
+	ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
+	ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro">
 	<i class="fa fa-thumbs-o-down fa-lg"></i>
    <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
 </button>
-<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>
-   
-    </p>                               
-</div>	
+</div>
+<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>	
         </div>
         <!--End Blog Post-->   	
 	
+	<hr />
+	
 	<!-- comment -->		
 	<div ng-controller="commentCtrl">
-		<input type="hidden" id="commentCount" value="{{commentCount}}">
-		<div class="panel panel-default" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
-			<!-- Default panel contents -->	  
-			<div class="panel-heading">
-		  	<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
-		  	&nbsp;
-				<button type="button" class="btn btn-default" ng-click="btnRefreshComment()">
-			  	<i class="fa fa-refresh" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
-				</button>					
-		  </div>
-				
-			<!-- comment list -->
-			<ul class="list-group">
-				<li class="list-group-item" ng-repeat="comment in commentList">
-		 			<div class="row">			
-	 					<div class="col-xs-12 visible-xs">
-	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong>
-							&nbsp;
-							<span class="glyphicon glyphicon-time"></span>
-							<span ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span>
-							<span ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>
-	 					</div>
-	 					<div class="col-xs-12 visible-sm visible-md visible-lg">
-	 						<strong><span class="glyphicon glyphicon-user"></span> {{comment.writer.username}}</strong>
-	 						&nbsp;
-	 						<span class="glyphicon glyphicon-time"></span> 
-	 						<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
-	 					</div>
-	 					<div class="col-xs-12">
-	 						<p>
+	
+	<input type="hidden" id="commentCount" value="{{commentCount}}">
+
+<!-- 댓글 목록  -->	
+<div class="media margin-bottom-10">
+                	<h4 infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
+<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+<button type="button" class="btn-u btn-brd rounded btn-u-xs" ng-click="btnRefreshComment()">
+			  			  	&nbsp;<i class="fa fa-refresh" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
+				</button>	
+</h4>
+
+<div class="media-body">
+<div ng-repeat="comment in commentList">
+    <h5 class="media-heading">
+			<i class="fa fa-user"></i>{{comment.writer.username}} 
+			<span><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+    </h5>    
 	 							<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>
 	 							<span ng-if="comment.status.device == 'tablet'"><i class="fa fa-tablet fa-lg"></i></span>
 	 							<span ng-bind-html="comment.content"></span>
-	 						</p>
-	 					</div>
-	 					<div class="col-xs-12">
-							<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
+	 							
+	 							<div>
+    							<button type="button" class="btn-u btn-brd rounded btn-u-default btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
 							  <span class="text-primary" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
 								  <i class="fa fa-thumbs-o-up fa-lg"></i>
 								  {{numberOfCommentLike[comment.id]}}
 							  </span>
-							</button> 					
-							<button type="button" class="btn btn-default btn-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
+							</button>
+							<button type="button" class="btn-u btn-brd rounded btn-u-default btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
 								<span class="text-danger" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
 							  	<i class="fa fa-thumbs-o-down fa-lg"></i>
 							  	{{numberOfCommentDislike[comment.id]}}
 							  </span>
-							</button>
-							<div>
-							<span class="text-danger" ng-show="commentFeelingConn[comment.id]"><small>{{commentFeelingAlert[comment.id]}}</small></span>
-							</div>
-	 					</div>
-		 			</div>			
-				</li>
-			</ul>
-		  
-		<div class="panel-footer text-center" ng-show="commentCount || commentAlert.msg">
-			<button type="button" class="btn btn-default btn-block" ng-click="btnMoreComment()" ng-show="commentCount">
-				<spring:message code="common.button.load.comment"/> <span class="glyphicon glyphicon-chevron-down"></span>
+							</button>							
+							</div>		
+<span class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</span>							 
+
+    <hr class="padding-5">
+</div>    
+		<div class="margin-bottom-10" ng-show="commentCount || commentAlert.msg">
+			<button type="button" class="btn-u btn-brd rounded btn-block btn-u-dark" 
+			ng-click="btnMoreComment()" ng-show="commentCount">
+				<spring:message code="common.button.load.comment"/> <i class="fa fa-angle-down"></i>
 				<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
 			</button>
-			<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
 		</div>
-		</div>
-		
-		<div class="panel panel-default">
-			<div class="panel-body">
+		<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
+</div>
+                </div>		
+                
+<!-- 댓글 남기기 -->                
+<div class="post-comment">
+            <h4><spring:message code="board.comment.leave.comment"/></h4>
+<div class="margin-bottom-10">            
 				<summernote config="options" on-keydown="keydown(evt)" 
 				ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
 				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
-			</div>
-			<div class="panel-footer">
+</div>				  
+
+<p>
 				<c:choose>
 					<c:when test="${authRole == 'ANNONYMOUS'}">
-						<button type="button" class="btn btn-default" disabled="disabled">
-							<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
+						<button type="button" class="btn-u btn-u-dark-blue rounded disabled" disabled="disabled">
+							<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
 						</button>	
 					</c:when>
 					<c:when test="${authRole == 'USER'}">
-						<button type="button" class="btn btn-default" ng-click="btnWriteComment()">
-							<span class="glyphicon glyphicon-pencil"></span> <spring:message code="common.button.write.comment"/>
+						<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-sm ladda-button" 
+						ng-click="btnWriteComment()" 
+						ladda="writeComment" data-style="expand-right" data-spinner-color="Gainsboro">
+							<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
 						</button>				
 					</c:when>
-				</c:choose>
+				</c:choose>				          
+</p>
 				<div>
-					<i class="fa fa-circle-o-notch fa-spin" ng-show="writeCommentConn == 'connecting'"></i>
 					<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
-				</div>				
-			</div>
-		</div>	
+				</div>	
+</div>                
+	
 	</div>
 	
-	<button type="button" class="btn btn-default" onclick="location.href='${listUrl}'">
-		<spring:message code="board.list"/>
-	</button>
-
+	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"><i class="fa fa-list"></i></button>
+	
 	<c:choose>
 		<c:when test="${!empty prevUrl}">
-			<button type="button" class="btn btn-default" onclick="location.href='${prevUrl}'">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"><i class="fa fa-chevron-left"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-left"></i></button>		
 		</c:otherwise>
 	</c:choose>
 	<c:choose>
 		<c:when test="${!empty nextUrl}">
-			<button type="button" class="btn btn-default" onclick="location.href='${nextUrl}'">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"><i class="fa fa-chevron-right"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
+			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-right"></i></button>		
 		</c:otherwise>
 	</c:choose>	
-
+	
 	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-		<button type="button" class="btn btn-info" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<span class="glyphicon glyphicon-edit hidden-xs"></span> <spring:message code="common.button.edit"/>
+		<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+			<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
 		</button>
-		<button type="button" class="btn btn-danger" onclick="confirmDelete();">
-			<span class="glyphicon glyphicon-trash hidden-xs"></span> <spring:message code="common.button.delete"/>
+		<button type="button" class="btn-u rounded" onclick="confirmDelete();">
+			<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
+	
 	<c:choose>
 		<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
+			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
 				<spring:message code="common.button.set.as.notice"/>
 			</button>
 		</c:when>
 		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
 				<spring:message code="common.button.cancel.notice"/>
 			</button>		
 		</c:when>
@@ -496,9 +466,6 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.commentList = [];
 	$scope.commentAlert = {};
-	$scope.commentPage = 1;
-	$scope.infiniteDisabled = false;
-	$scope.btnWriteCommentHide = false;
 	$scope.summernoteAlert = {};
 	$scope.commentFeelingConn = {};
 	$scope.commentFeelingAlert = {};
@@ -507,6 +474,10 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.loadCommentConn = "none";
 	$scope.writeCommentConn = "none";
 	$scope.writeCommentAlert = {};
+	$scope.infiniteDisabled = false;
+	
+	angular.element(document).ready(function() {
+	});		
 
 	// summernote config
 	$scope.options = {
@@ -519,7 +490,6 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	      ['insert', ['link']],
 	      ['help', ['help']]			          
 				]};	
-	
 	
 	$scope.keydown = function(e) { 
 		if ("${authRole}" == "ANNONYMOUS") {
@@ -548,6 +518,18 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		    }
 	};
 	
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	};
+	
+	$scope.intFromObjectId = function(objectId) {
+		return parseInt(objectId.substring(0, 8), 16) * 1000;
+	};	
+	
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 	
 	$scope.btnWriteComment = function(status) {
@@ -561,64 +543,36 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 		if ($scope.writeCommentConn == "none") {
 			var reqPromise = $http.post(bUrl, $scope.summernote, config);
 			$scope.writeCommentConn = "connecting";
-			$scope.writeCommentAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
+			//$scope.writeCommentAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
+			$scope.writeComment = true;
 			
 			reqPromise.success(function(data, status, headers, config) {
+
+				var lastComment = $scope.commentList[$scope.commentList.length - 1];
+				$scope.loadComments("btnWriteComment", lastComment.id);
+				
 				$scope.summernote.content = "♪";
-				$scope.loadComments("btnWriteComment", 1, 100);
-				
-				var page = parseInt($scope.commentCount / Jakduk.BoardCommentSize);
-				if ($scope.commentCount % Jakduk.BoardCommentSize > 0) {
-					page++;
-				}
-				
-				$scope.commentPage = page;			
 				$scope.commentAlert = {};
 				$scope.summernoteAlert = {};
 				$scope.writeCommentAlert = {};
 				$scope.writeCommentConn = "none";
+				$scope.writeComment = false;
 			});
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.writeCommentAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.network.unstable"/>'};
-				$scope.writeCommentConn = "none";				
+				$scope.writeCommentConn = "none";		
+				$scope.writeComment = false;
 			});			
 		}
 	};
 	
-	$scope.objectIdFromDate = function(date) {
-		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
-	};
-	
-	$scope.dateFromObjectId = function(objectId) {
-		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
-	};
-	
-	$scope.intFromObjectId = function(objectId) {
-		return parseInt(objectId.substring(0, 8), 16) * 1000;
-	};
-	
 	$scope.initComment = function() {
-		
-		$scope.loadComments("init", $scope.commentPage, Jakduk.BoardCommentSize);
+		$scope.loadComments("init", "");
 		$scope.infiniteDisabled = true;
 	}
 	
-	// 현재 안씀.
-	$scope.loadCommentCount = function() {
-		var bUrl = '<c:url value="/board/free/comment/count/${post.seq}"/>';
-		
-		var reqPromise = $http.get(bUrl);
-		
-		reqPromise.success(function(data, status, headers, config) {
-			$scope.commentCount = data.count;
-		});
-		reqPromise.error(function(data, status, headers, config) {
-			
-		});
-	};
-	
-	$scope.loadComments = function(type, page, size) {
-		var bUrl = '<c:url value="/board/free/comment/${post.seq}?page=' + page + '&size=' + size + '"/>';
+	$scope.loadComments = function(type, commentId) {
+		var bUrl = '<c:url value="/board/free/comment/${post.seq}?commentId=' + commentId + '"/>';
 		
 		if ($scope.loadCommentConn == "none") {
 			var reqPromise = $http.get(bUrl);
@@ -629,38 +583,20 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 				
 				$scope.commentCount = data.count;
 							
-				if (data.comments.length < 1) { // 댓글이 없을때
+				if (data.comments.length < 1) { // 댓글이 하나도 없을때
 					if (type == "init") {					
 					} else {
 						$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
 						$scope.commentAlert.classType = "alert-warning";				
 					}				
-				} else { // 댓글이 1개 이상일때
-					
-					if (type == "btnWriteComment") {
-						$scope.commentList = data.comments;	
-					} else {
-						if ($scope.commentPage == page) { // 
-							$scope.commentList = data.comments;					
-						} else if ($scope.commentPage < page) { // 기존 댓글이 있고, 로드한 데이터는 추가
-							
-							if (data.comments.length == size) { // 로드한 데이터가 size에 딱 맞을때
-								$scope.commentList = $scope.commentList.concat(data.comments);
-								$scope.commentPage++;
-							} else { // 로드한 데이터가 size보다 작을때에는 기존 추가되지 않은 data만 추가한다.
-								var remainder = $scope.commentList.length % size;
-								var newComments = data.comments.slice(remainder, size - 1);
-								
-								if (newComments.length < 1) {
-									$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-									$scope.commentAlert.classType = "alert-info";
-								} else {
-									$scope.commentList = $scope.commentList.concat(newComments);
-								}
-							}
-						}
+				} else {	// 댓글을 1개 이상 가져왔을 때
+					if (type == "init" || type == "btnRefreshComment") {
+						$scope.commentList = data.comments;
+					} else if (type == "btnMoreComment" || type == "btnWriteComment") {
+						$scope.commentList = $scope.commentList.concat(data.comments);
 					}
 				}
+				
 				$scope.loadCommentConn = "none";
 			});
 			reqPromise.error(function(data, status, headers, config) {
@@ -670,14 +606,14 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnMoreComment = function() {
-		$scope.loadComments("btnMoreComment", $scope.commentPage + 1, Jakduk.BoardCommentSize);
+		var lastComment = $scope.commentList[$scope.commentList.length - 2];
+		$scope.loadComments("btnMoreComment", lastComment.id);
 	};
 	
 	$scope.btnRefreshComment = function() {
 		$scope.commentAlert = {};
 		$scope.commentList = [];
-		$scope.commentPage = 1;
-		$scope.loadComments("btnRefreshComment", $scope.commentPage, Jakduk.BoardCommentSize);
+		$scope.loadComments("btnRefreshComment", "");
 	};
 	
 	$scope.btnCommentFeeling = function(commentId, status) {

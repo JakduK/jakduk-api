@@ -47,6 +47,7 @@
 	<!--=== Content Part ===-->
 	<div class="container content">
 	
+<!-- 명언 -->	
 <blockquote class="hero">
                     <p><em>"인간의 도덕과 의무에 대해 내가 알고 있는 것은 모두 축구에서 배웠다. (After many years during which I saw many things, what I know most surely about morality and the duty of man I owe to sport and learned it in the RUA.)"</em></p>
                     <small><em>알베르 카뮈 , 노벨문학상 수상자</em></small>
@@ -57,9 +58,15 @@
             
 <div class="magazine-news">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6 margin-bottom-30">
 
-<div class="headline"><h2><spring:message code="home.posts.latest"/></h2></div>
+<!--  최근 글 -->
+<div class="headline">
+	<h2><spring:message code="home.posts.latest"/></h2>
+    	<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
+    		<spring:message code="common.button.more"/>
+    	</button>	
+</div>
         
 					<div ng-repeat="post in postsLatest">
 					<div class="magazine-mini-news">
@@ -80,7 +87,9 @@
 
 <!-- 최근 댓글  -->
 <div class="col-md-6">
-                    <div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
+                    <div class="headline">
+                    	<h2><spring:message code="home.comments.latest"/></h2>
+                    </div>
 <div class="blog-twitter">
                     <div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
                         <strong>{{comment.writer.username}}</strong>
@@ -103,7 +112,7 @@
 	 <div class="margin-bottom-30">
     			<div class="headline"><h2><spring:message code="home.members.registered.latest"/></h2></div>
     			
-<div class="carousel slide testimonials testimonials-v1" id="testimonials-1">
+<div class="carousel slide testimonials testimonials-v2" id="testimonials-1">
                     <div class="carousel-inner">
                         <div class="item" ng-repeat="user in usersLatest" ng-class="{'active':$index == 0}">
                             <p>{{user.about}}</p>
@@ -128,6 +137,7 @@
                         </a>
                     </div>
                 </div>  		
+                
                 </div>     
                 
                 
@@ -136,7 +146,7 @@
 		<div class="shadow-wrapper">
 			<div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
 			
-		   <h2>{{encyclopedia.subject}} <span class="label rounded label-sea">{{encyclopedia.kind}}</span></h2>
+		   <h2>{{encyclopedia.subject}} <span class="label rounded label-orange">{{encyclopedia.kind}}</span></h2>
 		   <p>{{encyclopedia.content}}</p>
 
 <!-- 		   
@@ -154,8 +164,15 @@
         
    <!-- 최근 사진 -->
         <div class="owl-carousel-v1 owl-work-v1 margin-bottom-40">
-            <div class="headline"><h2 class="pull-left"><spring:message code="home.pictures.latest"/></h2>
+            <div class="headline">
+            <h2 class="pull-left"><spring:message code="home.pictures.latest"/>
+            </h2>
+            
                 <div class="owl-navigation">
+
+    	<button style="margin:6px 0px 0px 6px;" class="btn-u btn-u-xs btn-u-default rounded pull-left" type="button" onclick="location.href='<c:url value="/gallery/home"/>'">
+    		<spring:message code="common.button.more"/>
+    	</button>	                     
                     <div class="customNavigation">
                         <a class="owl-btn prev-v2"><i class="fa fa-angle-left"></i></a>
                         <a class="owl-btn next-v2"><i class="fa fa-angle-right"></i></a>
