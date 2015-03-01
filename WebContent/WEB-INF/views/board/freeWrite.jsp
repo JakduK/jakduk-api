@@ -13,16 +13,26 @@
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 	
-	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 	<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 
 <body>
-<div class="container jakduk-board" ng-controller="FreeWriteCtrl">
+<div class="wrapper">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <c:set var="summernoteLang" value="en-US"/>
+
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="board.write"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->	
+
+<div class="container content" ng-controller="FreeWriteCtrl">
 
 <form:form commandName="boardFreeWrite" name="boardFreeWrite" action="${contextPath}/board/free/write" method="POST"
 	ng-submit="onSubmit($event)">
@@ -30,7 +40,6 @@
 	<form:textarea path="images" class="hidden" ng-model="images" ng-init="images='${boardFreeWrite.images}'"/>
 	<textarea id="subject_temp" hidden="hidden">${boardFreeWrite.subject}</textarea>
 	
-	<legend><spring:message code="board.write"/></legend>
 	<div class="form-group" ng-class="{'has-success':boardFreeWrite.categoryName.$valid, 'has-error':boardFreeWrite.categoryName.$invalid}">
 		<div class="row">	
 			<div class="col-sm-3">
@@ -125,28 +134,27 @@
 	</div>
 </div>
 
-<hr/>
-
 	<div class="form-group">
-		<button type="submit" class="btn btn-success">
+		<button type="submit" class="btn-u rounded ladda-button"
+		ladda="btnSubmit" data-style="expand-right">
 			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
 		</button>		
-		<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/board"/>'">
+		<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board"/>'">
 			<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
 		</button>
 		<div>
-		<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
 		<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
 		</div>	
 	</div>	  
 </form:form>
+
+</div>
 
 <jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
 <!-- Bootstrap core JavaScript
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script> 
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/angular-file-upload.min.js"></script>
@@ -155,6 +163,12 @@
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>
 </c:if>
+
+<!-- JS Implementing Plugins -->
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
 
 <script type="text/javascript">
 
@@ -175,10 +189,9 @@ function isEmpty(str) {
 
 var submitted = false;
 var editor = $.summernote.eventHandler.getEditor();
-var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
-	$scope.submitConn = "none";
 	$scope.categoryAlert = {};
 	$scope.subjectAlert = {};
 	$scope.contentAlert = {};
@@ -373,14 +386,12 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
 			$scope.validationGalleries();
 			submitted = true;
-			$scope.submitConn = "connecting";
-			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};			
+			$scope.btnSubmit = true;
 		} else {
 			$scope.validationCategory();
 			$scope.validationSubject();
 			$scope.validationContent();
 			
-			$scope.submitConn = "none";
 			$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
 			event.preventDefault();
 		}

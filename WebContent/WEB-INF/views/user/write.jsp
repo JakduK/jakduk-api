@@ -10,25 +10,47 @@
 	<title><spring:message code="user.register"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
-	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<!-- CSS Page Style -->    
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_log_reg_v1.css">	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
+
 <body>
-<div class="container" ng-controller="writeCtrl">
+<div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
 	<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 	
-	<form:form commandName="userWrite" name="userWrite" action="${contextPath}/user/write" method="POST" cssClass="form-horizontal" 
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="user.register"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->			
+	
+<div class="container content" ng-controller="writeCtrl">
+	
+<div class="row">
+
+<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+
+ <!-- Reg-Form -->
+ <form:form commandName="userWrite" name="userWrite" action="${contextPath}/user/write" method="POST" cssClass="reg-page" 
 	ng-submit="onSubmit($event)">
-		<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${userWrite.emailStatus}'" ng-model="emailStatus"/>
+	
+			<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${userWrite.emailStatus}'" ng-model="emailStatus"/>
 		<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userWrite.usernameStatus}'" ng-model="usernameStatus"/>
-		<legend><spring:message code="user.register"/> </legend>
+		
+                    <div class="reg-header">
+                        <h2><spring:message code="user.register.header"/></h2>
+                    </div>
+
 		<div class="form-group has-feedback" ng-class="{'has-success':userWrite.email.$valid, 
 		'has-error':userWrite.email.$invalid || emailStatus != 'ok'}">
-			<label class="col-sm-2 control-label" for="email">
+			<label class="control-label" for="email">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.email"/>
 			</label>
-			<div class="col-sm-4">
 				<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>' 
 				ng-init="email='${userWrite.email}'" ng-model="email" 
 				ng-blur="onEmail()" ng-change="validationEmail()"
@@ -38,14 +60,13 @@
 				<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
 				<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
 				<span class="{{emailAlert.classType}}" ng-show="emailAlert.msg">{{emailAlert.msg}}</span>
-			</div>	
 		</div>
+		
 		<div class="form-group has-feedback" ng-class="{'has-success':userWrite.username.$valid, 
 		'has-error':userWrite.username.$invalid || usernameStatus != 'ok'}">
-			<label class="col-sm-2 control-label" for="username">
+			<label class="control-label" for="username">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 			</label>
-			<div class="col-sm-4">
 				<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
 				ng-init="username='${userWrite.username}'" ng-model="username" 
 				ng-blur="onUsername()" ng-change="validationUsername()"
@@ -56,13 +77,14 @@
 				<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 				<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>
 			</div>
-		</div>
+			
+<div class="row">
+    <div class="col-sm-6">
 		<div class="form-group has-feedback" ng-class="{'has-success':userWrite.password.$valid, 
 		'has-error':userWrite.password.$invalid}">
-			<label class="col-sm-2 control-label" for="password">
+			<label class="control-label" for="password">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.password"/>
 			</label>
-			<div class="col-sm-4">
 				<input type="password" name="password" class="form-control" placeholder='<spring:message code="user.placeholder.password"/>'
 				ng-model="password" ng-change="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
 				ng-required="true" ng-minlength="4" ng-maxlength="20"/>
@@ -70,14 +92,14 @@
 				'glyphicon-remove':userWrite.password.$invalid}"></span>
 				<form:errors path="password" cssClass="text-danger" element="span" ng-hide="passwordAlert.msg"/>
 				<span class="{{passwordAlert.classType}}" ng-show="passwordAlert.msg">{{passwordAlert.msg}}</span>	
-			</div>
-		</div>
+		</div>	
+    </div>
+    <div class="col-sm-6">
 		<div class="form-group has-feedback" 	ng-class="{'has-success':userWrite.passwordConfirm.$valid, 
 		'has-error':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}">
-			<label class="col-sm-2 control-label" for="passwordConfirm">
+			<label class="control-label" for="passwordConfirm">
 				<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.password.confirm"/>
 			</label>
-			<div class="col-sm-4">
 				<input type="password" name="passwordConfirm" class="form-control" placeholder='<spring:message code="user.placeholder.password.confirm"/>'
 				ng-model="passwordConfirm" ng-change="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
 				ng-required="true" ng-minlength="4" ng-maxlength="20"/>
@@ -85,14 +107,14 @@
 				'glyphicon-remove':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}"></span>
 				<form:errors path="passwordConfirm" cssClass="text-danger" element="span" ng-hide="passwordConfirmAlert.msg || (passwordConfirm.length > 0 && password == passwordConfirm)"/>
 				<span class="{{passwordConfirmAlert.classType}}" ng-show="passwordConfirmAlert.msg">{{passwordConfirmAlert.msg}}</span>								
-			</div>
-		</div>
+		</div>		
+    </div>
+</div>			
 		
-		<div class="form-group">
-			<label class="col-sm-2 control-label" for="supportFC">
+	<div class="form-group">
+			<label class="control-label" for="supportFC">
 				<spring:message code="user.support.football.club"/>
 			</label>
-			<div class="col-sm-4">
 				<form:select path="footballClub" cssClass="form-control">
 					<form:option value=""><spring:message code="common.none"/></form:option>
 						<c:forEach items="${footballClubs}" var="club">
@@ -101,31 +123,33 @@
 							</c:forEach>
 						</c:forEach>
 				</form:select>
-			</div>
 		</div>		
 		
 		<div class="form-group">
-			<label class="col-sm-2 control-label" for="about"> <spring:message code="user.comment"/></label>
-			<div class="col-sm-4">
-				<textarea name="about" class="form-control" cols="40" rows="5" placeholder='<spring:message code="user.placeholder.about"/>'></textarea>
-			</div>
-		</div>
-		
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-4">
-				<button type="submit" class="btn btn-success">
+			<label class="control-label" for="about"> <spring:message code="user.comment"/></label>
+				<textarea name="about" class="form-control" cols="40" rows="3" placeholder='<spring:message code="user.placeholder.about"/>'></textarea>
+		</div>		
+                    <hr>
+
+     <div class="text-right">
+				<button type="submit" class="btn-u rounded ladda-button"
+				ladda="btnSubmit" data-style="expand-right">
 					<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
 				</button>		
-				<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/"/>'">
+				<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/"/>'">
 					<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
 				</button>
 				<div>
-					<i class="fa fa-circle-o-notch fa-spin" ng-show="submitConn == 'connecting'"></i>
 					<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
-				</div>
-			</div>
-		</div>
-	</form:form>
+				</div>     
+ </div>
+                    
+                </form:form>
+ 
+</div>
+        </div>	
+	
+	</div>
 		
 	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
@@ -134,7 +158,11 @@
  ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>    
+<!-- JS Implementing Plugins -->
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script> 
 <script type="text/javascript">
 
 window.onbeforeunload = function(e) {
@@ -145,12 +173,11 @@ window.onbeforeunload = function(e) {
 };
 
 var submitted = false;
-var jakdukApp = angular.module("jakdukApp", []);
+var jakdukApp = angular.module("jakdukApp", ["angular-ladda"]);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.emailConn = "none";
 	$scope.usernameConn = "none";
-	$scope.submitConn = "none";
 	$scope.emailAlert = {};
 	$scope.usernameAlert = {};
 	$scope.passwordAlert = {};
@@ -162,8 +189,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 		if ($scope.userWrite.$valid && $scope.emailStatus == 'ok' && $scope.usernameStatus == 'ok' 
 				&& $scope.equalPasswordStatus == "true") {
 			submitted = true;
-			$scope.submitConn = "connecting";
-			$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
+			$scope.btnSubmit = true;
 		} else {
 			if ($scope.userWrite.email.$invalid) {
 				$scope.validationEmail();				

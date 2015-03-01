@@ -72,7 +72,6 @@
   
 </div>                    
 	
-	
 	<div class="panel panel-u" ng-controller="boardCtrl">
 	  <!-- Default panel contents -->
 	  <div class="panel-heading hidden-xs">

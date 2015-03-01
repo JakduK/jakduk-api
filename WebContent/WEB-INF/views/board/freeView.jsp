@@ -103,7 +103,7 @@
 		<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
 			<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
 		</button>
-		<button type="button" class="btn-u rounded" onclick="confirmDelete();">
+		<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
 			<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
@@ -115,7 +115,7 @@
 			</button>
 		</c:when>
 		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+			<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
 				<spring:message code="common.button.cancel.notice"/>
 			</button>		
 		</c:when>
@@ -147,8 +147,8 @@
     	<div class="blog margin-bottom-20" ng-controller="boardFreeCtrl">
         	<h2>
         	<small>
-				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile"></i></c:if>
-				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet"></i></c:if>
+				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
+				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
 				<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>
 				</small>
 				<c:choose>
@@ -221,11 +221,12 @@
 
 <!-- 댓글 목록  -->	
 <div class="media margin-bottom-10">
-                	<h4 infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
+                	<h4 class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
 <spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
-<button type="button" class="btn-u btn-brd rounded btn-u-xs" ng-click="btnRefreshComment()">
-			  			  	&nbsp;<i class="fa fa-refresh" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
-				</button>	
+
+<button type="button" class="btn btn-link" ng-click="btnRefreshComment()">
+			  			  	<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
+				</button>
 </h4>
 
 <div class="media-body">
@@ -234,24 +235,24 @@
 			<i class="fa fa-user"></i>{{comment.writer.username}} 
 			<span><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
     </h5>    
+    <p>
 	 							<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>
 	 							<span ng-if="comment.status.device == 'tablet'"><i class="fa fa-tablet fa-lg"></i></span>
 	 							<span ng-bind-html="comment.content"></span>
+		</p>
 	 							
-	 							<div>
-    							<button type="button" class="btn-u btn-brd rounded btn-u-default btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
-							  <span class="text-primary" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
+    							<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
+							  <span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
 								  <i class="fa fa-thumbs-o-up fa-lg"></i>
 								  {{numberOfCommentLike[comment.id]}}
 							  </span>
 							</button>
-							<button type="button" class="btn-u btn-brd rounded btn-u-default btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
-								<span class="text-danger" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
+							<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
+								<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
 							  	<i class="fa fa-thumbs-o-down fa-lg"></i>
 							  	{{numberOfCommentDislike[comment.id]}}
 							  </span>
 							</button>							
-							</div>		
 <span class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</span>							 
 
     <hr class="padding-5">
@@ -269,7 +270,7 @@
                 
 <!-- 댓글 남기기 -->                
 <div class="post-comment">
-            <h4><spring:message code="board.comment.leave.comment"/></h4>
+            <h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
 <div class="margin-bottom-10">            
 				<summernote config="options" on-keydown="keydown(evt)" 
 				ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
@@ -279,7 +280,7 @@
 <p>
 				<c:choose>
 					<c:when test="${authRole == 'ANNONYMOUS'}">
-						<button type="button" class="btn-u btn-u-dark-blue rounded disabled" disabled="disabled">
+						<button type="button" class="btn-u btn-brd rounded btn-u-sm disabled" disabled="disabled">
 							<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
 						</button>	
 					</c:when>
@@ -322,7 +323,7 @@
 		<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
 			<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
 		</button>
-		<button type="button" class="btn-u rounded" onclick="confirmDelete();">
+		<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
 			<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
 		</button>	
 	</c:if>
@@ -334,7 +335,7 @@
 			</button>
 		</c:when>
 		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+			<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
 				<spring:message code="common.button.cancel.notice"/>
 			</button>		
 		</c:when>
@@ -358,12 +359,10 @@
 </c:if>
 
 <!-- JS Implementing Plugins -->
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/back-to-top.js"></script>
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
-
 
 <script type="text/javascript">
 
@@ -547,9 +546,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			$scope.writeComment = true;
 			
 			reqPromise.success(function(data, status, headers, config) {
-
-				var lastComment = $scope.commentList[$scope.commentList.length - 1];
-				$scope.loadComments("btnWriteComment", lastComment.id);
+				$scope.btnMoreComment();
 				
 				$scope.summernote.content = "♪";
 				$scope.commentAlert = {};
@@ -606,8 +603,12 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnMoreComment = function() {
-		var lastComment = $scope.commentList[$scope.commentList.length - 2];
-		$scope.loadComments("btnMoreComment", lastComment.id);
+		if ($scope.commentList.length > 0) {
+			var lastComment = $scope.commentList[$scope.commentList.length - 1];
+			$scope.loadComments("btnMoreComment", lastComment.id);
+		} else {
+			$scope.loadComments("btnMoreComment", "");			
+		}
 	};
 	
 	$scope.btnRefreshComment = function() {

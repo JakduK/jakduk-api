@@ -11,48 +11,49 @@
 	<title><spring:message code="gallery"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
-	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<!-- CSS Page Style -->    
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/portfolio-v2.css">	
 </head>
 
 <body>
-<div class="container jakduk-gallery" ng-controller="galleryCtrl">
+<div class="wrapper">
 <jsp:include page="../include/navigation-header.jsp"/>
 
-<div class="page-header">
-  <h4>
-	  <a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
-	  <small><spring:message code="gallery.about"/></small>
-  </h4>
-</div>
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="gallery"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->
 
-<div class="row">
-	<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3" ng-repeat="gallery in galleries">
-		<a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="thumbnail">
-			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
-		</a>
-		<div class="text-overflow">
- 			<h5><strong>{{gallery.name}}</strong></h5>
-			<h5><span class="glyphicon glyphicon-user"></span> {{gallery.writer.username}}</h5>  			
-		</div>
-		<h5>
-			<!--<i class="fa fa-comments-o"></i><strong> {{gallery.views}}</strong> -->
-			<i class="fa fa-eye"></i><strong> {{gallery.views}}</strong>
-			<span class="text-primary">
-				<i class="fa fa-thumbs-o-up"></i>
-				<strong>
-					<span ng-if="usersLikingCount[gallery.id]">{{usersLikingCount[gallery.id]}}</span>				
-					<span ng-if="usersLikingCount[gallery.id] == null">0</span>
-				</strong>
-			</span>
-			<span class="text-danger">
-				<i class="fa fa-thumbs-o-down"></i>
-				<strong>
-					<span ng-if="usersDislikingCount[gallery.id]">{{usersDislikingCount[gallery.id]}}</span>				
-					<span ng-if="usersDislikingCount[gallery.id] == null">0</span>				
-				</strong>
-			</span>
-		</h5>
-	</div>
+<div class="container content" ng-controller="galleryCtrl">
+
+<div class="sorting-block">
+            <ul style="   " class="row sorting-grid">
+                <li style=" display: inline-block; opacity: 1;" class="col-md-3 col-sm-6 col-xs-12 mix category_1 category_3 mix_all" data-cat="1" ng-repeat="gallery in galleries">
+                    <a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}">
+                        <img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
+                        <span class="sorting-cover">
+                            <span>{{gallery.name}}</span>
+                            <p>
+			<i class="fa fa-user"></i> {{gallery.writer.username}}
+			| <i class="fa fa-eye"></i><strong> {{gallery.views}}</strong>
+			| <i class="fa fa-thumbs-o-up text-primary"></i>
+			<strong class="text-primary" ng-if="usersLikingCount[gallery.id]">{{usersLikingCount[gallery.id]}}</strong>				
+			<strong class="text-primary" ng-if="usersLikingCount[gallery.id] == null">0</strong>
+			| <i class="fa fa-thumbs-o-down text-danger"></i>
+			<strong class="text-danger" ng-if="usersDislikingCount[gallery.id]">{{usersDislikingCount[gallery.id]}}</strong>				
+			<strong class="text-danger" ng-if="usersDislikingCount[gallery.id] == null">0</strong>				
+			</p>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        
+            <div class="clearfix"></div>
+        </div>
+
 </div>
 
 <jsp:include page="../include/footer.jsp"/>
@@ -63,7 +64,9 @@
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>    
+<!-- JS Implementing Plugins -->
+<!-- JS Page Level -->           
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/app.js"></script>
 
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", []);

@@ -20,7 +20,7 @@
 </head>
 
 <body>
-<div class="wrapper" ng-controller="homeCtrl">
+<div class="wrapper">
 	
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
@@ -45,7 +45,7 @@
     <!--=== End Slider ===-->	
 	
 	<!--=== Content Part ===-->
-	<div class="container content">
+	<div class="container content" ng-controller="homeCtrl">
 	
 <!-- 명언 -->	
 <blockquote class="hero">
@@ -204,12 +204,9 @@
 	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
-<!-- Bootstrap core JavaScript ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- JS Implementing Plugins -->
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/back-to-top.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/flexslider/jquery.flexslider-min.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/parallax-slider/js/modernizr.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/parallax-slider/js/jquery.cslider.js"></script>

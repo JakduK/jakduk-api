@@ -9,21 +9,23 @@
 	<title><spring:message code="user.sign.in"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
-	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- CSS Page Style -->    
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_log_reg_v1.css">    	
 	
-	<!-- Custom styles for this template -->
-	<link href="<%=request.getContextPath()%>/resources/jakduk/css/signin.css" rel="stylesheet">
 </head>
 <body>
-<div class="container" ng-controller="loginCtrl">
-	<div class="row">
-		<div class="col-md-4 col-md-offset-4">
-			<h4><a class="text-muted" href="<c:url value="/home"/>"><spring:message code="common.jakduk"/></a></h4>
-			<div class="login-panel panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title"><spring:message code="user.sign.in"/></h3>
-				</div>
-		  	<div class="panel-body">
+<div class="wrapper">
+	<jsp:include page="../include/navigation-header.jsp"/>
+
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="user.sign.in"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->		
+	
+<div class="container content" ng-controller="loginCtrl">		
 				<c:choose>
 					<c:when test="${result == 'failure'}">
 						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure"/></div>
@@ -31,16 +33,22 @@
 					<c:when test="${result == 'locked'}">
 						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure.locked"/></div>
 					</c:when>					
-					<c:when test="${result == 'sucess'}">
+					<c:when test="${result == 'success'}">
 						<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
 					</c:when>                		
 				</c:choose>
-				<form action="j_spring_security_check" name="loginForm" method="post" ng-submit="onSubmit($event)">
-				<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
-					<fieldset>
-						<div class="form-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
+					
+    	<div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+		<form action="j_spring_security_check" class="reg-page" name="loginForm" method="post" ng-submit="onSubmit($event)">		
+			<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
+                    <div class="reg-header">            
+                        <h2><spring:message code="user.sign.in.header"/></h2>
+                    </div>
+
+						<div class="input-group margin-bottom-20 has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
 						'has-error':loginForm.j_username.$invalid}">
-							<label class="control-label sr-only" for="j_username">Hidden label</label>
+						<span class="input-group-addon"><i class="fa fa-user"></i></span>
 							<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
 							ng-model="email" ng-required="true" ng-minlength="6" ng-maxlength="20" 
 							ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/" autofocus>
@@ -48,44 +56,44 @@
 							ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
 							<span class="text-danger" ng-model="errorEmail" ng-show="errorEmail">{{errorEmail}}</span>
 						</div>
-					
-						<div class="form-group has-feedback"
+						
+						<div class="input-group margin-bottom-20 has-feedback"
 						ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
-							<label class="control-label sr-only" for="password">Hidden label</label>
+							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 							<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>'
 							ng-model="password" ng-required="true" ng-minlength="4" ng-maxlength="20">
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>							
 							<span class="text-danger" ng-model="errorPassword" ng-show="errorPassword">{{errorPassword}}</span>                                    
-						</div>
-						<div class="checkbox">
+						</div>						
+                        
+                    <div class="row">
+                        <div class="col-md-6 checkbox">
 							<label>
 								<input type="checkbox" name="remember" ng-model="remember">
 								<spring:message code="user.email.remember"/>
-							</label>
-						</div>
-						<button type="submit" class="btn btn-lg btn-success btn-block">
-							<span class="glyphicon glyphicon-log-in"></span> <spring:message code="user.sign.in"/>
-						</button>
-					</fieldset>
-				</form>
-		
-				<p/>
-		
-				<div class="list-group">
-					<div class="list-group-item">
+							</label>                  
+                        </div>
+                        <div class="col-md-6">
+						<button type="submit" class="btn-u rounded pull-right">
+							<spring:message code="user.sign.in"/>
+						</button>                          
+                        </div>
+                    </div>
+
+                    <hr>
+
+<p>
 						<spring:message code="user.msg.not.user"/> 
 						<a href="<c:url value="/user/write"/>">
 							<strong><i class="fa fa-user-plus"></i> <spring:message code="user.msg.register.here"/></strong>
 						</a>
-					</div>
-					<div class="list-group-item">
-						<h5 class="list-group-item-heading"><spring:message code="user.msg.register.oauth"/></h5>
-						<div class="list-group-item-text">
+</p>
+						<h5><spring:message code="user.msg.register.oauth"/></h5>
 							<div class="row">
 								<div class="col-xs-3 col-md-3">
 									<a href="<c:url value="/oauth/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
-										<i class="fa fa-facebook-square fa-3x"></i>
+										<i class="fa fa-facebook-square fa-3x text-primary"></i>
 									</a>
 								</div>
 								<div class="col-xs-3 col-md-3">
@@ -94,18 +102,16 @@
 									</a>
 									</div>  
 								</div> 	
-							</div>
-						</div>
-					</div>
-				</div> <!-- /.panel-body -->
-			</div>
-			<jsp:include page="../include/footer.jsp"/>      
-		</div>		
-	</div>
-	
+
+                </form>            
+            </div>
+        </div><!--/row-->
+    </div>
+    	
+	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
-<script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-cookies/angular-cookies.min.js"></script>
 <script type="text/javascript">
 
@@ -150,5 +156,7 @@ jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
 	
 });
 </script>
+<jsp:include page="../include/body-footer.jsp"/>
+
 </body>
 </html>
