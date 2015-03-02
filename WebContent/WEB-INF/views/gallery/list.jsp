@@ -82,7 +82,7 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 	});	
 	
 	$scope.getGalleries = function() {
-		var bUrl = '<c:url value="/gallery/list.json"/>';
+		var bUrl = '<c:url value="/gallery/data/list.json"/>';
 		
 		if ($scope.galleriesConn == "none") {
 			

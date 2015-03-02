@@ -48,17 +48,17 @@ public class GalleryController {
 	@RequestMapping
 	public String root() {
 		
-		return "redirect:/gallery/home";
-	}
-	
-	@RequestMapping(value = "/home", method = RequestMethod.GET)
-	public String home(Model model) {
-		
-		return "gallery/home";
+		return "redirect:/gallery/list";
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public void list(Model model) {
+	public String list(Model model) {
+		
+		return "gallery/list";
+	}
+	
+	@RequestMapping(value = "/data/list", method = RequestMethod.GET)
+	public void dataList(Model model) {
 		
 		galleryService.getList(model);
 		

@@ -30,6 +30,7 @@
     <li><a href="<c:url value="/admin/footballclub/origin/write"/>">Football Club Origin Write</a></li>
     <li><a href="<c:url value="/admin/footballclub/write"/>">Football Club Write</a></li>
     <li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
+    <li><a href="<c:url value="/admin/thumbnail/size/write"/>">Thumbnail Size Write</a></li>
   </ul>
 </div>
 

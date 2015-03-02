@@ -1,12 +1,30 @@
 package com.jakduk.service;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.imageio.ImageIO;
+
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -15,13 +33,16 @@ import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
+import com.jakduk.model.web.ThumbnailSizeWrite;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
+import com.jakduk.repository.GalleryRepository;
 import com.jakduk.repository.SequenceRepository;
 
 /**
@@ -33,6 +54,12 @@ import com.jakduk.repository.SequenceRepository;
 
 @Service
 public class AdminService {
+	
+	@Value("${storage.image.path}")
+	private String storageImagePath;
+	
+	@Value("${storage.thumbnail.path}")
+	private String storageThumbnailPath;
 	
 	@Autowired
 	private CommonService commonService;
@@ -51,6 +78,9 @@ public class AdminService {
 	
 	@Autowired
 	private FootballClubOriginRepository footballClubOriginRepository;
+	
+	@Autowired
+	private GalleryRepository galleryRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -270,5 +300,60 @@ public class AdminService {
 		
 		return model;
 	}
+	
+	public void thumbnailSizeWrite(ThumbnailSizeWrite thumbnailSizeWrite) {
+		
+		List<Gallery> galleries = galleryRepository.findAll();
+		
+		for (Gallery gallery : galleries) {
+			ObjectId objId = new ObjectId(gallery.getId());
+			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
+			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+			
+			Path imageDirPath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), 
+					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+			
+			Path thumbDirPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), 
+					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+			
+			// 사진 경로.
+			Path imageFilePath = imageDirPath.resolve(gallery.getId());
+			Path thumbFilePath = thumbDirPath.resolve(gallery.getId());
+			
+			// 사진 포맷.
+			String formatName = "jpg";
+			
+			String splitContentType[] = gallery.getContentType().split("/");
+			if (splitContentType != null) {
+				formatName = splitContentType[1];
+			}
+			
+			if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
+				
+				try {
+					Files.delete(thumbFilePath);
+					
+					logger.debug("gallery=" + gallery);
+					
+					BufferedInputStream in = new BufferedInputStream(new FileInputStream(imageFilePath.toString()));
+					
+					BufferedImage bi = ImageIO.read(in);
+					BufferedImage bufferIm = new BufferedImage(thumbnailSizeWrite.getWidth(), thumbnailSizeWrite.getHeight(), BufferedImage.TYPE_INT_RGB);
+					Image tempImg = bi.getScaledInstance(thumbnailSizeWrite.getWidth(), thumbnailSizeWrite.getHeight(), Image.SCALE_AREA_AVERAGING);
+					Graphics2D g2 = bufferIm.createGraphics();
+					g2.drawImage(tempImg, 0, 0, thumbnailSizeWrite.getWidth(), thumbnailSizeWrite.getHeight(), null);
+					
+					ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());				
+					
+					in.close();					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}				
+		
+		}
+		
+	}	
 	
 }

@@ -87,7 +87,7 @@
 			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"><i class="fa fa-chevron-left"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-left"></i></button>		
+			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
 		</c:otherwise>
 	</c:choose>
 	<c:choose>
@@ -95,7 +95,7 @@
 			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"><i class="fa fa-chevron-right"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-right"></i></button>		
+			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>		
 		</c:otherwise>
 	</c:choose>	
 	
@@ -307,7 +307,7 @@
 			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"><i class="fa fa-chevron-left"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-left"></i></button>		
+			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
 		</c:otherwise>
 	</c:choose>
 	<c:choose>
@@ -315,7 +315,7 @@
 			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"><i class="fa fa-chevron-right"></i></button>		
 		</c:when>
 		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded" disabled="disabled"><i class="fa fa-chevron-right"></i></button>		
+			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>		
 		</c:otherwise>
 	</c:choose>	
 	

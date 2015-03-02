@@ -12,10 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import sun.tools.tree.NewArrayExpression;
+
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
+import com.jakduk.model.web.ThumbnailSizeWrite;
 import com.jakduk.service.AdminService;
 
 /**
@@ -200,5 +204,28 @@ public class AdminController {
 		
 		adminService.getBoardCategoryList(model);
 	}
+	
+	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.GET)
+	public String thumbnailSizeWrite(Model model) {
+		
+		model.addAttribute("resWidth", CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
+		model.addAttribute("resHeight", CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+		model.addAttribute("thumbnailSizeWrite", new ThumbnailSizeWrite());
+
+		return "admin/thumbnailSizeWrite";
+	}	
+	
+	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.POST)
+	public String thumbnailSizeWrite(@Valid ThumbnailSizeWrite thumbnailSizeWrite, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/thumbnailSizeWrite";
+		}
+		
+		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
+
+		return "redirect:/admin/settings?open=thumbnailSize";
+	}		
 
 }

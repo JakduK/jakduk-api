@@ -47,20 +47,16 @@
 	<!--=== Content Part ===-->
 	<div class="container content" ng-controller="homeCtrl">
 	
-<!-- 명언 -->	
-<blockquote class="hero">
-                    <p><em>"인간의 도덕과 의무에 대해 내가 알고 있는 것은 모두 축구에서 배웠다. (After many years during which I saw many things, what I know most surely about morality and the duty of man I owe to sport and learned it in the RUA.)"</em></p>
-                    <small><em>알베르 카뮈 , 노벨문학상 수상자</em></small>
-                </blockquote>
-	
-		<div class="row magazine-page">
-		<div class="col-md-9">
-            
-<div class="magazine-news">
-                    <div class="row">
-                        <div class="col-md-6 margin-bottom-30">
 
-<!--  최근 글 -->
+
+<div class="row blog-page">    
+            <!-- Left Sidebar -->
+        	<div class="col-md-9 md-margin-bottom-40">
+                <!--Blog Post-->
+                <div class="row blog blog-medium magazine-page margin-bottom-40">
+                    
+<!--  최근 글 -->                    
+                        <div class="col-md-6">
 <div class="headline">
 	<h2><spring:message code="home.posts.latest"/></h2>
     	<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
@@ -83,8 +79,8 @@
 					</div>        
 					</div>							
                       
-                        </div>
-
+                        </div>                    
+                        
 <!-- 최근 댓글  -->
 <div class="col-md-6">
                     <div class="headline">
@@ -99,15 +95,53 @@
                     </div>
                 </div>                			
  
-            </div>
-                                    
-                    </div>
-                </div>            
-		 
-		 </div>
-		 
-		 <div class="col-md-3">
+            </div> 
 
+               </div>
+                <!--End Blog Post-->                 
+
+   <!-- 최근 사진 -->
+        <div class="owl-carousel-v1 owl-work-v1">
+            <div class="headline">
+            <h2 class="pull-left"><spring:message code="home.pictures.latest"/>
+            </h2>
+            
+                <div class="owl-navigation">
+
+    	<button style="margin:6px 0px 0px 6px;" class="btn-u btn-u-xs btn-u-default rounded pull-left" type="button" onclick="location.href='<c:url value="/gallery/list"/>'">
+    		<spring:message code="common.button.more"/>
+    	</button>	                     
+                    <div class="customNavigation">
+                        <a class="owl-btn prev-v2"><i class="fa fa-angle-left"></i></a>
+                        <a class="owl-btn next-v2"><i class="fa fa-angle-right"></i></a>
+                    </div>
+                </div><!--/navigation-->
+            </div>
+
+            <div class="owl-recent-works-v1">
+            	<c:forEach var="gallery" items="${galleries}">
+                <div class="item">                
+					<a href="<%=request.getContextPath()%>/gallery/view/${gallery.id}">
+                        <em class="overflow-hidden">
+                            <img class="img-responsive" src="<%=request.getContextPath()%>/gallery/thumbnail/${gallery.id}" alt="${gallery.name}">
+                        </em>    
+                        <span>
+                            <strong class="text-overflow">${gallery.name}</strong>
+								<i class="fa fa-user"></i> <i>${gallery.writer.username}</i>
+                        </span>
+                    </a>    
+                </div>
+				</c:forEach>                
+            </div>
+        </div>  
+
+
+            </div>
+            <!-- End Left Sidebar -->
+
+            <!-- Right Sidebar -->
+        	<div class="col-md-3">
+        	
 <!-- 최근 가입 회원 -->         
 	 <div class="margin-bottom-30">
     			<div class="headline"><h2><spring:message code="home.members.registered.latest"/></h2></div>
@@ -126,8 +160,6 @@
                         </div>                    
                     </div>
                 
-                <hr>
-                            
                     <div class="carousel-arrow">
                         <a data-slide="prev" href="#testimonials-1" class="left carousel-control">
                             <i class="fa fa-angle-left"></i>
@@ -157,46 +189,19 @@
 			</div>
 		</div>                    
                            
-		 
-		 </div>		 
-         
-        </div>
-        
-   <!-- 최근 사진 -->
-        <div class="owl-carousel-v1 owl-work-v1 margin-bottom-40">
-            <div class="headline">
-            <h2 class="pull-left"><spring:message code="home.pictures.latest"/>
-            </h2>
-            
-                <div class="owl-navigation">
 
-    	<button style="margin:6px 0px 0px 6px;" class="btn-u btn-u-xs btn-u-default rounded pull-left" type="button" onclick="location.href='<c:url value="/gallery/home"/>'">
-    		<spring:message code="common.button.more"/>
-    	</button>	                     
-                    <div class="customNavigation">
-                        <a class="owl-btn prev-v2"><i class="fa fa-angle-left"></i></a>
-                        <a class="owl-btn next-v2"><i class="fa fa-angle-right"></i></a>
-                    </div>
-                </div><!--/navigation-->
-            </div>
+<!-- 명언 -->	
+<blockquote class="hero">
+                    <p><em>"인간의 도덕과 의무에 대해 내가 알고 있는 것은 모두 축구에서 배웠다."</em></p>
+                    <small><em>알베르 카뮈 , 노벨문학상 수상자</em></small>
+                </blockquote>   
 
-            <div class="owl-recent-works-v1">
-            	<c:forEach var="gallery" items="${galleries}">
-                <div class="item">                
-					<a href="<%=request.getContextPath()%>/gallery/view/${gallery.id}">
-                        <em class="overflow-hidden">
-                            <img class="img-responsive" src="<%=request.getContextPath()%>/gallery/thumbnail/${gallery.id}" alt="${gallery.name}">
-                        </em>    
-                        <span>
-                            <strong class="text-overflow">${gallery.name}</strong>
-								<i class="fa fa-user"></i> <i>${gallery.writer.username}</i>
-                        </span>
-                    </a>    
-                </div>
-				</c:forEach>                
+        	
+       
             </div>
-        </div>    
-        <!-- End Recent Works -->           
+            <!-- End Right Sidebar -->
+        </div>	
+
     </div><!--/container-->		
     <!--=== End Content Part ===-->				
 
@@ -237,7 +242,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 		App.initSliders();
    StyleSwitcher.initStyleSwitcher();      
    ParallaxSlider.initParallaxSlider();
-		OwlRecentWorks.initOwlRecentWorksV1();
+		OwlRecentWorks.initOwlRecentWorksV2();
 
 	});	
 	
