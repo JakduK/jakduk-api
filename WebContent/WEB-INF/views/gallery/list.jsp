@@ -12,7 +12,7 @@
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
 	<!-- CSS Page Style -->    
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/portfolio-v2.css">	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/portfolio-v1.css">	
 </head>
 
 <body>
@@ -28,6 +28,31 @@
 	<!--=== End Breadcrumbs ===-->
 
 <div class="container content" ng-controller="galleryCtrl">
+
+
+   <div class="row"> 
+            <div class="col-md-4" ng-repeat="gallery in galleries">
+                <div class="view view-tenth" ng-click="test()">
+                    <img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
+                    <div class="mask">
+                        <h2 class="text-overflow">{{gallery.name}}</h2>
+                        <p>ssss</p>
+                        <a href="portfolio_item.html" class="info">Read More</a>
+                    </div>                
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="view view-tenth">
+                    <img class="img-responsive" src="assets/img/main/2.jpg" alt="" />
+                    <div class="mask">
+                        <h2>Portfolio Item</h2>
+                        <p>At vero eos et accusamus et iusto odio dignissimos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
+                        <a href="portfolio_item.html" class="info">Read More</a>
+                    </div>                
+                </div>
+            </div>      
+        </div><!--/row-->
+
 
 <div class="sorting-block">
             <ul style="   " class="row sorting-grid">
@@ -105,8 +130,10 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 			});
 		}
-	};		
-
+	};
+	
+	$scope.test = function() {
+	};
 	
 });
 </script>
