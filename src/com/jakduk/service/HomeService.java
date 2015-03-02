@@ -181,7 +181,7 @@ public class HomeService {
 			
 			description = new SyndContentImpl();
 			description.setType("text/plain");
-			description.setValue(post.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", ""));
+			description.setValue(post.getContent().replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;",""));
 			entry.setDescription(description);
 			entries.add(entry);									
 		}
@@ -208,7 +208,7 @@ public class HomeService {
 		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
 		
 		for (BoardFreeCommentOnHome comment : comments) {
-			String content = comment.getContent().replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
+			String content = comment.getContent().replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
 			if (content.length() > CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
 				content = content.substring(0, CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH);
 				content = String.format("%s...", content);

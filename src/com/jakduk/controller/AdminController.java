@@ -225,7 +225,7 @@ public class AdminController {
 		
 		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
 
-		return "redirect:/admin/settings?open=thumbnailSize";
+		return "redirect:/admin/settings";
 	}		
 
 }

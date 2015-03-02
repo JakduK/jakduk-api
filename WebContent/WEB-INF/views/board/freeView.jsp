@@ -185,7 +185,7 @@
 	  <strong><spring:message code="board.gallery.list"/></strong>
 			<c:forEach items="${galleries}" var="gallery">
 				<div>
-						<a href="<%=request.getContextPath()%>/gallery/view/${gallery.id}">${gallery.name}</a> | 
+						<a href="<c:url value="/gallery/view/${gallery.id}"/>">${gallery.name}</a> | 
 						<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
 				</div>
 			</c:forEach>    
@@ -300,6 +300,7 @@
 	
 	</div>
 	
+	<div class="margin-bottom-10">
 	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"><i class="fa fa-list"></i></button>
 	
 	<c:choose>
@@ -340,6 +341,7 @@
 			</button>		
 		</c:when>
 	</c:choose>
+	</div>
 	
 	</div>	
 	

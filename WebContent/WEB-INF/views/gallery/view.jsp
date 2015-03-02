@@ -3,7 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>   
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
  
 <!DOCTYPE html>
@@ -12,170 +11,149 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>${gallery.name} - <spring:message code="gallery"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+    <!-- CSS Page Style -->    
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">		
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 
 <body>
-<div class="container jakduk-gallery">
-<jsp:include page="../include/navigation-header.jsp"/>
-
-<sec:authorize access="isAnonymous()">
-	<c:set var="authRole" value="ANNONYMOUS"/>
-</sec:authorize>
-<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-	<c:set var="authRole" value="USER"/>
-	<sec:authentication property="principal.id" var="accountId"/>
-</sec:authorize>
-<sec:authorize access="hasAnyRole('ROLE_ROOT')">
-	<c:set var="authAdminRole" value="ROOT"/>
-</sec:authorize>	
-
-<div class="form-group">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery"/>'">
-		<span class="glyphicon glyphicon-th-large"></span>
-	</button>
-	<c:choose>
-		<c:when test="${!empty prev}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery/view/${prev.id}"/>'">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
-		</c:otherwise>
-	</c:choose>
-	<c:choose>
-		<c:when test="${!empty next}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery/view/${next.id}"/>'">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
-		</c:otherwise>
-	</c:choose>	
-</div>
-
-<%@page import="java.util.Date"%>
-<%Date CurrentDate = new Date();%>
-<fmt:formatDate var="nowDate" value="<%=CurrentDate %>" pattern="yyyy-MM-dd" />
-<fmt:formatDate var="postDate" value="${createDate[gallery.id]}" pattern="yyyy-MM-dd" />
-					
-<blockquote>
-  ${gallery.name}
-  <h5><span class="glyphicon glyphicon-user"></span> ${gallery.writer.username}</h5>
-  <h5>
-  	<span class="glyphicon glyphicon-time"></span>
+<div class="wrapper">
+	<jsp:include page="../include/navigation-header.jsp"/>
+	
+	<sec:authorize access="isAnonymous()">
+		<c:set var="authRole" value="ANNONYMOUS"/>
+	</sec:authorize>
+	<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+		<c:set var="authRole" value="USER"/>
+		<sec:authentication property="principal.id" var="accountId"/>
+	</sec:authorize>
+	<sec:authorize access="hasAnyRole('ROLE_ROOT')">
+		<c:set var="authAdminRole" value="ROOT"/>
+	</sec:authorize>	
+	
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="gallery"/></h1>
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->	
+	
+	<!--=== Content Part ===-->
+	<div class="container content blog-page blog-item">		
+	
+	<div class="margin-bottom-10">
+		<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/gallery"/>'"><i class="fa fa-th"></i></button>
+		
 		<c:choose>
-			<c:when test="${postDate < nowDate}">
-				<fmt:formatDate value="${createDate[gallery.id]}" pattern="${dateTimeFormat.date}" />
+			<c:when test="${!empty prev}">
+				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/gallery/view/${prev.id}"/>'"><i class="fa fa-chevron-left"></i></button>			
 			</c:when>
 			<c:otherwise>
-				<fmt:formatDate value="${createDate[gallery.id]}" pattern="${dateTimeFormat.time}" />
+				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
 			</c:otherwise>
 		</c:choose>
-		&nbsp;
-  	<span class="glyphicon glyphicon-eye-open"></span> ${gallery.views}
-  </h5>
-</blockquote>
+		<c:choose>
+			<c:when test="${!empty next}">
+				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/gallery/view/${next.id}"/>'"><i class="fa fa-chevron-right"></i></button>
+			</c:when>
+			<c:otherwise>
+				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>
+			</c:otherwise>
+		</c:choose>	
+	</div>
 
-<img class="img-responsive" src="<%=request.getContextPath()%>/gallery/${gallery.id}" alt="${gallery.name}">
-
-<hr/>
-
-<!-- 기분 표시 -->
-<div class="text-center" ng-controller="galleryController">
-	<button type="button" class="btn btn-default" ng-click="btnFeeling('like')">
-		<spring:message code="common.like"/>			
-		<span class="text-primary" ng-init="numberOfLike=${fn:length(gallery.usersLiking)}">
-			<i class="fa fa-thumbs-o-up fa-lg"></i>
-		</span>
-		<span class="text-primary" ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>
-		<span class="text-primary"><i class="fa fa-circle-o-notch fa-spin" ng-show="likeConn == 'connecting'"></i></span>
-	</button>
-	<button type="button" class="btn btn-default" ng-click="btnFeeling('dislike')">		
-		<spring:message code="common.dislike"/>
-		<span class="text-danger" ng-init="numberOfDislike=${fn:length(gallery.usersDisliking)}">
-			<i class="fa fa-thumbs-o-down fa-lg"></i>
-		</span>
-		<span class="text-danger" ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>
-		<span class="text-danger"><i class="fa fa-circle-o-notch fa-spin" ng-show="dislikeConn == 'connecting'"></i></span>				
-	</button>
-	<div class="alert {{feelingAlert.classType}}" role="alert" ng-show="feelingAlert.msg">
-		<span class="glyphicon {{feelingAlert.icon}}" aria-hidden="true"></span> 
-		{{feelingAlert.msg}}
-	</div>	
+<div class="blog margin-bottom-20" ng-controller="galleryController">				
+	<h2>${gallery.name}</h2>	
+	<div class="blog-post-tags">
+	  <ul class="list-unstyled list-inline blog-info">
+	      <li><i class="fa fa-user"></i> ${gallery.writer.username}</li>
+	      <li><i class="fa fa-clock-o"></i> {{dateFromObjectId("${gallery.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
+	      <li><i class="fa fa-eye"></i> ${gallery.views}</li>
+	    </ul>                    
+	</div>
+	
+	<p>
+	<img class="img-responsive" src="<%=request.getContextPath()%>/gallery/${gallery.id}" alt="${gallery.name}">
+	</p>
+	
+	<!-- 엮인 글 -->
+		<ul class="list-group">
+	  <li class="list-group-item">
+	  <strong><spring:message code="gallery.linked.posts"/></strong>
+			<c:forEach items="${linkedPosts}" var="post">
+				<div>
+						<a href="<c:url value="/board/free/${post.seq}"/>">${post.subject}</a> | 
+						&nbsp;<span class="glyphicon glyphicon-user"></span> ${post.writer.username}
+						&nbsp;<span class="glyphicon glyphicon-time"></span> {{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}
+				</div>
+			</c:forEach>    
+	  </li>
+	</ul>	
+	
+	<div class="ladda-btn margin-bottom-10">
+   
+<button class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-sm ladda-button" type="button"
+	ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
+	ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro">
+	<i class="fa fa-thumbs-o-up fa-lg"></i>
+   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
+</button>
+<button class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-sm ladda-button" type="button" 
+	ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
+	ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro">
+	<i class="fa fa-thumbs-o-down fa-lg"></i>
+   <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
+</button>
 </div>
-
-<hr/>
-
-<!-- 엮인 글 -->
-<h4><spring:message code="gallery.linked.posts"/></h4>
-<ul>
-	<c:forEach items="${linkedPosts}" var="post">
-	<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
-		<li>
-			<a href="<c:url value="/board/free/${post.seq}"/>">${post.subject}</a> 
-			&nbsp;<span class="glyphicon glyphicon-user"></span> ${post.writer.username}
-			&nbsp;<span class="glyphicon glyphicon-time"></span>
-			<c:choose>
-				<c:when test="${postDate < nowDate}">
-					<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
-				</c:when>
-				<c:otherwise>
-					<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.time}" />
-				</c:otherwise>
-			</c:choose>			
-		</li>
-	</c:forEach>
-</ul>
-
-<hr/>
-
-<div class="form-group">
-	<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery"/>'">
-		<span class="glyphicon glyphicon-th-large"></span>
-	</button>
-	<c:choose>
-		<c:when test="${!empty prev}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery/view/${prev.id}"/>'">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-left"></span>
-			</button>		
-		</c:otherwise>
-	</c:choose>
-	<c:choose>
-		<c:when test="${!empty next}">
-			<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/gallery/view/${next.id}"/>'">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn btn-default" disabled="disabled">
-				<span class="glyphicon glyphicon-chevron-right"></span>
-			</button>		
-		</c:otherwise>
-	</c:choose>	
-</div>
-
-<jsp:include page="../include/footer.jsp"/>
+		<div class="alert {{feelingAlert.classType}}" role="alert" ng-show="feelingAlert.msg">
+			<span class="glyphicon {{feelingAlert.icon}}" aria-hidden="true"></span> 
+			{{feelingAlert.msg}}
+		</div>	
+	</div>
+	
+	<hr/>
+	
+		<div class="margin-bottom-10">
+		<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/gallery"/>'"><i class="fa fa-th"></i></button>
+		
+		<c:choose>
+			<c:when test="${!empty prev}">
+				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/gallery/view/${prev.id}"/>'"><i class="fa fa-chevron-left"></i></button>			
+			</c:when>
+			<c:otherwise>
+				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
+			</c:otherwise>
+		</c:choose>
+		<c:choose>
+			<c:when test="${!empty next}">
+				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/gallery/view/${next.id}"/>'"><i class="fa fa-chevron-right"></i></button>
+			</c:when>
+			<c:otherwise>
+				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>
+			</c:otherwise>
+		</c:choose>	
+	</div>
+	
+	</div>
+	
+	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
 <!-- Bootstrap core JavaScript
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>    
+
+<!-- JS Implementing Plugins -->
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", []);
+var jakdukApp = angular.module("jakdukApp", ["angular-ladda"]);
 
 jakdukApp.controller("galleryController", function($scope, $http) {
 	$scope.feelingAlert = {};
@@ -204,8 +182,10 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 			
 			if (type == "like") {
 				$scope.likeConn = "connecting";
+				$scope.btnLike = true;
 			} else if (type == "dislike") {
 				$scope.dislikeConn = "connecting";
+				$scope.btnDislike = true;
 			}
 			
 			reqPromise.success(function(data, status, headers, config) {
@@ -243,8 +223,10 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 				
 				if (type == "like") {
 					$scope.likeConn = "success";
+					$scope.btnLike = false;
 				} else if (type == "dislike") {
 					$scope.dislikeConn = "success";
+					$scope.btnDislike = false;
 				}
 				
 			});
@@ -255,12 +237,26 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 				
 				if (type == "like") {
 					$scope.likeConn = "none";
+					$scope.btnLike = false;
 				} else if (type == "dislike") {
 					$scope.dislikeConn = "none";
+					$scope.btnDislike = false;
 				}
 			});
 		}
 	};		
+	
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	};
+	
+	$scope.intFromObjectId = function(objectId) {
+		return parseInt(objectId.substring(0, 8), 16) * 1000;
+	};	
 	
 });
 </script>

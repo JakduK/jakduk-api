@@ -32,53 +32,25 @@
 
    <div class="row"> 
             <div class="col-md-4" ng-repeat="gallery in galleries">
-                <div class="view view-tenth" ng-click="test()">
+                <div class="view view-tenth" ng-click>
                     <img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
                     <div class="mask">
                         <h2 class="text-overflow">{{gallery.name}}</h2>
-                        <p>ssss</p>
-                        <a href="portfolio_item.html" class="info">Read More</a>
+                            <p>
+			<i class="fa fa-user"></i> {{gallery.writer.username}}
+			<i class="fa fa-eye"></i> {{gallery.views}}
+			<i class="fa fa-thumbs-o-up"></i>
+			<span ng-if="usersLikingCount[gallery.id]">{{usersLikingCount[gallery.id]}}</span>				
+			<span ng-if="usersLikingCount[gallery.id] == null">0</span>
+			<i class="fa fa-thumbs-o-down"></i>
+			<span ng-if="usersDislikingCount[gallery.id]">{{usersDislikingCount[gallery.id]}}</span>				
+			<span ng-if="usersDislikingCount[gallery.id] == null">0</span>				
+			</p>
+                        <a ng-href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="info"><spring:message code="common.button.read.more"/></a>
                     </div>                
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="view view-tenth">
-                    <img class="img-responsive" src="assets/img/main/2.jpg" alt="" />
-                    <div class="mask">
-                        <h2>Portfolio Item</h2>
-                        <p>At vero eos et accusamus et iusto odio dignissimos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
-                        <a href="portfolio_item.html" class="info">Read More</a>
-                    </div>                
-                </div>
-            </div>      
         </div><!--/row-->
-
-
-<div class="sorting-block">
-            <ul style="   " class="row sorting-grid">
-                <li style=" display: inline-block; opacity: 1;" class="col-md-3 col-sm-6 col-xs-12 mix category_1 category_3 mix_all" data-cat="1" ng-repeat="gallery in galleries">
-                    <a href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}">
-                        <img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
-                        <span class="sorting-cover">
-                            <span>{{gallery.name}}</span>
-                            <p>
-			<i class="fa fa-user"></i> {{gallery.writer.username}}
-			| <i class="fa fa-eye"></i><strong> {{gallery.views}}</strong>
-			| <i class="fa fa-thumbs-o-up text-primary"></i>
-			<strong class="text-primary" ng-if="usersLikingCount[gallery.id]">{{usersLikingCount[gallery.id]}}</strong>				
-			<strong class="text-primary" ng-if="usersLikingCount[gallery.id] == null">0</strong>
-			| <i class="fa fa-thumbs-o-down text-danger"></i>
-			<strong class="text-danger" ng-if="usersDislikingCount[gallery.id]">{{usersDislikingCount[gallery.id]}}</strong>				
-			<strong class="text-danger" ng-if="usersDislikingCount[gallery.id] == null">0</strong>				
-			</p>
-                        </span>
-                    </a>
-                </li>
-            </ul>
-        
-            <div class="clearfix"></div>
-        </div>
-
 </div>
 
 <jsp:include page="../include/footer.jsp"/>

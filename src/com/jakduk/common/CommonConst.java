@@ -108,8 +108,8 @@ public class CommonConst {
 	/**
 	 * 사진 썸네일 크기.
 	 */
-	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 140;
-	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 120;
+	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 360;
+	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 230;
 	
 	/**
 	 * 사진 상태값.

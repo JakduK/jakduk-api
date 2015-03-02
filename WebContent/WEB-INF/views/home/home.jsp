@@ -51,12 +51,12 @@
 
 <div class="row blog-page">    
             <!-- Left Sidebar -->
-        	<div class="col-md-9 md-margin-bottom-40">
+        	<div class="col-md-9 md-margin-bottom-30">
                 <!--Blog Post-->
-                <div class="row blog blog-medium magazine-page margin-bottom-40">
+                <div class="row blog blog-medium magazine-page margin-bottom-30">
                     
 <!--  최근 글 -->                    
-                        <div class="col-md-6">
+                        <div class="col-md-6 margin-bottom-30">
 <div class="headline">
 	<h2><spring:message code="home.posts.latest"/></h2>
     	<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -169,6 +170,26 @@ public class BoardTest {
 		List<BoardFreeComment> comments = jakdukDAO.getBoardFreeComment(boardSeq, null);
 		
 		System.out.println("getFreeComment=" + comments);
+		
+	}
+	
+	@Test
+	public void isNumeric() {
+		
+		String val01 = "10";
+		String val02 = "football";
+		String val03 = "football1";
+		String val04 = "1football";
+		String val05 = "1football2";
+		
+		Pattern pattern = Pattern.compile("[+-]?\\d+");
+		
+		System.out.println("isNumeric=" + pattern.matcher(val01).matches());
+		System.out.println("isNumeric=" + pattern.matcher(val02).matches());
+		System.out.println("isNumeric=" + pattern.matcher(val03).matches());
+		System.out.println("isNumeric=" + pattern.matcher(val04).matches());
+		System.out.println("isNumeric=" + pattern.matcher(val05).matches());
+		
 		
 	}
 }

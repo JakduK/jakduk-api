@@ -10,18 +10,28 @@
 	<title><spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
+
 <body>
-<div class="container" ng-controller="statsCtrl">
-<jsp:include page="../include/navigation-header.jsp"/>
-
-<div class="page-header">
-  <h4>
-	  <a href="<c:url value="/stats"/>"><spring:message code="stats.header"/></a>
-	  <small><spring:message code="stats.about"/></small>
-  </h4>
-</div>
-
-<div google-chart chart=chartObject></div>
+<div class="wrapper" ng-controller="statsCtrl">
+	<jsp:include page="../include/navigation-header.jsp"/>
+	
+	<!--=== Breadcrumbs ===-->
+	<div class="breadcrumbs">
+		<div class="container">
+			<h1 class="pull-left"><spring:message code="stats.number.of.supporter"/></h1>
+<ul class="pull-right breadcrumb">
+                <li><a href="">막대형</a></li>
+                <li><a href="">파이형</a></li>
+                <li class="active">표</li>
+            </ul>			
+		</div><!--/container-->
+	</div><!--/breadcrumbs-->
+	<!--=== End Breadcrumbs ===-->		
+	
+	<!--=== Content Part ===-->
+	<div class="container content">	
+	<div google-chart chart=chartObject></div>
+	</div>
 </div>
 
 <!-- Bootstrap core JavaScript

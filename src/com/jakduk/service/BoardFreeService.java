@@ -483,88 +483,89 @@ public class BoardFreeService {
 	 */
 	public Model getFree(Model model, Locale locale, BoardListInfo boardListInfo) {
 
-		try {
-			Map<String, Date> createDate = new HashMap<String, Date>();
-			List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
-			ArrayList<Integer> seqs = new ArrayList<Integer>();
-			Long numberPosts = (long) 0;
-			
-			Integer page = boardListInfo.getPage();
-			String categoryName = boardListInfo.getCategory();
-			
-			if (page < 1) {
-				page = 1;
-				boardListInfo.setPage(page);
-			}
-			
-			Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
-			Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
-			
-			if (categoryName != null && 
-					(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
-				posts = boardFreeOnListRepository.findAll(pageable).getContent();
-				numberPosts = boardFreeOnListRepository.count();
-			} else {
-				posts = boardFreeRepository.findByCategoryName(categoryName, pageable).getContent();
-				numberPosts = boardFreeRepository.countByCategoryName(categoryName);
-			}
-			
-			Pageable noticePageable = new PageRequest(0, 10, sort);
-			List<BoardFreeOnList> notices = boardFreeRepository.findByNotice(noticePageable).getContent();
-			
-			BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
-			
-//			logger.debug("countAll=" + boardPageInfo);
-			
-			for (BoardFreeOnList tempPost : posts) {
-				String tempId = tempPost.getId();
-				Integer tempSeq = tempPost.getSeq();
-				
-				ObjectId objId = new ObjectId(tempId);
-				createDate.put(tempId, objId.getDate());
-				
-				seqs.add(tempSeq);
-			}
-			
-			for (BoardFreeOnList tempNotice : notices) {
-				String tempId = tempNotice.getId();
-				Integer tempSeq = tempNotice.getSeq();
-				
-				ObjectId objId = new ObjectId(tempId);
-				createDate.put(tempId, objId.getDate());
-				
-				seqs.add(tempSeq);
-			}
-			
-			List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
-			
-			HashMap<String, String> categorys = new HashMap<String, String>();
-			categorys.put("all", "board.category.all");
-			
-			for (BoardCategory category : boardCategorys) {
-				categorys.put(category.getName(), category.getResName());
-			}
-			
-			HashMap<String, Integer> commentCount = jakdukDAO.getBoardFreeCommentCount(seqs);
-			HashMap<String, Integer> usersLikingCount = jakdukDAO.getBoardFreeUsersLikingCount(seqs);
-			HashMap<String, Integer> usersDislikingCount = jakdukDAO.getBoardFreeUsersDislikingCount(seqs);
-			HashMap<String, Integer> galleriesCount = jakdukDAO.getBoardFreeGalleriesCount(seqs);
-			
-			model.addAttribute("posts", posts);
-			model.addAttribute("notices", notices);
-			model.addAttribute("categorys", categorys);
-			model.addAttribute("pageInfo", boardPageInfo);
-			model.addAttribute("boardListInfo", boardListInfo);
-			model.addAttribute("commentCount", commentCount);
-			model.addAttribute("usersLikingCount", usersLikingCount);
-			model.addAttribute("usersDislikingCount", usersDislikingCount);
-			model.addAttribute("galleriesCount", galleriesCount);
-			model.addAttribute("createDate", createDate);
-			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		Map<String, Date> createDate = new HashMap<String, Date>();
+		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
+		ArrayList<Integer> seqs = new ArrayList<Integer>();
+		Long numberPosts = (long) 0;
+
+		Integer page = boardListInfo.getPage();
+		String categoryName = boardListInfo.getCategory();
+		
+		if (categoryName == null || commonService.isNumeric(categoryName)) {
+			categoryName = CommonConst.BOARD_CATEGORY_ALL;
+			boardListInfo.setCategory(categoryName);
 		}
+		
+		if (page < 1) {
+			page = 1;
+			boardListInfo.setPage(page);
+		}
+
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
+		Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
+
+		if (categoryName != null && 
+				(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
+			posts = boardFreeOnListRepository.findAll(pageable).getContent();
+			numberPosts = boardFreeOnListRepository.count();
+		} else {
+			posts = boardFreeRepository.findByCategoryName(categoryName, pageable).getContent();
+			numberPosts = boardFreeRepository.countByCategoryName(categoryName);
+		}
+
+		Pageable noticePageable = new PageRequest(0, 10, sort);
+		List<BoardFreeOnList> notices = boardFreeRepository.findByNotice(noticePageable).getContent();
+
+		BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
+
+		//			logger.debug("countAll=" + boardPageInfo);
+
+		for (BoardFreeOnList tempPost : posts) {
+			String tempId = tempPost.getId();
+			Integer tempSeq = tempPost.getSeq();
+
+			ObjectId objId = new ObjectId(tempId);
+			createDate.put(tempId, objId.getDate());
+
+			seqs.add(tempSeq);
+		}
+
+		for (BoardFreeOnList tempNotice : notices) {
+			String tempId = tempNotice.getId();
+			Integer tempSeq = tempNotice.getSeq();
+
+			ObjectId objId = new ObjectId(tempId);
+			createDate.put(tempId, objId.getDate());
+
+			seqs.add(tempSeq);
+		}
+
+		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+
+		HashMap<String, String> categorys = new HashMap<String, String>();
+		categorys.put("all", "board.category.all");
+
+		for (BoardCategory category : boardCategorys) {
+			categorys.put(category.getName(), category.getResName());
+		}
+
+		HashMap<String, Integer> commentCount = jakdukDAO.getBoardFreeCommentCount(seqs);
+		HashMap<String, Integer> usersLikingCount = jakdukDAO.getBoardFreeUsersLikingCount(seqs);
+		HashMap<String, Integer> usersDislikingCount = jakdukDAO.getBoardFreeUsersDislikingCount(seqs);
+		HashMap<String, Integer> galleriesCount = jakdukDAO.getBoardFreeGalleriesCount(seqs);
+
+		model.addAttribute("posts", posts);
+		model.addAttribute("notices", notices);
+		model.addAttribute("categorys", categorys);
+		model.addAttribute("pageInfo", boardPageInfo);
+		model.addAttribute("boardListInfo", boardListInfo);
+		model.addAttribute("commentCount", commentCount);
+		model.addAttribute("usersLikingCount", usersLikingCount);
+		model.addAttribute("usersDislikingCount", usersDislikingCount);
+		model.addAttribute("galleriesCount", galleriesCount);
+		model.addAttribute("createDate", createDate);
+		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
+
 		return model;
 
 	}
