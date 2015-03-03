@@ -7,6 +7,7 @@
 </sec:authorize>
 
 <script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/app.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/back-to-top.js"></script>
 
 <!-- This script should be under the AngularJS which is creating jakdukApp module. -->

@@ -46,7 +46,7 @@
                         <h2><spring:message code="user.sign.in.header"/></h2>
                     </div>
 
-						<div class="input-group margin-bottom-20 has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
+						<div class="input-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
 						'has-error':loginForm.j_username.$invalid}">
 						<span class="input-group-addon"><i class="fa fa-user"></i></span>
 							<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
@@ -54,18 +54,22 @@
 							ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/" autofocus>
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
+						</div>
+						<div class="margin-bottom-20">
 							<span class="text-danger" ng-model="errorEmail" ng-show="errorEmail">{{errorEmail}}</span>
 						</div>
 						
-						<div class="input-group margin-bottom-20 has-feedback"
+						<div class="input-group has-feedback"
 						ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 							<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>'
 							ng-model="password" ng-required="true" ng-minlength="4" ng-maxlength="20">
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>							
-							<span class="text-danger" ng-model="errorPassword" ng-show="errorPassword">{{errorPassword}}</span>                                    
-						</div>						
+						</div>			
+						<div class="margin-bottom-20">
+							<span class="text-danger" ng-model="errorPassword" ng-show="errorPassword">{{errorPassword}}</span>	
+						</div>									
                         
                     <div class="row">
                         <div class="col-md-6 checkbox">
@@ -113,6 +117,7 @@
 
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-cookies/angular-cookies.min.js"></script>
+
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["ngCookies"]);

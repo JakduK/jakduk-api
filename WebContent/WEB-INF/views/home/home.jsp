@@ -217,7 +217,6 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/parallax-slider/js/jquery.cslider.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.js"></script>
 <!-- JS Page Level -->           
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/app.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/owl-recent-works.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/parallax-slider.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/style-switcher.js"></script>

@@ -37,3 +37,5 @@
 .blog-item .media h5.media-heading span a {
 	color: #72c02c;
 }
+
+.breadcrumbs li .active a {color:#72C02C;}

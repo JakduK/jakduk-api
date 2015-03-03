@@ -20,9 +20,8 @@
 		<div class="container">
 			<h1 class="pull-left"><spring:message code="stats.number.of.supporter"/></h1>
 <ul class="pull-right breadcrumb">
-                <li><a href="">막대형</a></li>
-                <li><a href="">파이형</a></li>
-                <li class="active">표</li>
+                <li ><a href="" ng-click="changeChartType('BarChart')"><spring:message code="stats.chart.bar"/></a></li>
+                <li ><a href="" ng-click="changeChartType('PieChart')"><spring:message code="stats.chart.pie"/></a></li>
             </ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
@@ -47,6 +46,7 @@ var jakdukApp = angular.module("jakdukApp", ["googlechart"]);
 jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.chartObject = {};
 	$scope.supportersConn = "none";
+	$scope.chartType = "BarChart";
 	
 	angular.element(document).ready(function() {
 		$scope.getSupporters();
@@ -75,7 +75,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 				
 				var supporters = data.supporters;
-				$scope.chartObject.options.height = supporters.length * 40;
+				$scope.chartObject.options.height = 50 + (supporters.length * 30);
 				
 				supporters.forEach(function(supporter) {
 					console.log(supporter);
@@ -91,6 +91,10 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 			});
 		}
+	};
+	
+	$scope.changeChartType = function(chartName) {
+		$scope.chartObject.type = chartName;
 	};
 	
 });
