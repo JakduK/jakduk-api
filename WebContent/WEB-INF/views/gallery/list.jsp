@@ -29,11 +29,12 @@
 
 <div class="container content" ng-controller="galleryCtrl">
 
-
    <div class="row"> 
             <div class="col-md-4" ng-repeat="gallery in galleries">
                 <div class="view view-tenth" ng-click>
-                    <img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">
+    
+                    <img class="img-responsive" lazy-img="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">    
+                
                     <div class="mask">
                         <h2 class="text-overflow">{{gallery.name}}</h2>
                             <p>
@@ -61,12 +62,9 @@
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<!-- JS Implementing Plugins -->
-<!-- JS Page Level -->           
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/app.js"></script>
-
+<script src="<%=request.getContextPath()%>/resources/angular-lazy-img/release/angular-lazy-img.js"></script>
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", []);
+var jakdukApp = angular.module("jakdukApp", ["angularLazyImg"]);
 
 jakdukApp.controller("galleryCtrl", function($scope, $http) {
 	$scope.galleriesConn = "none";
