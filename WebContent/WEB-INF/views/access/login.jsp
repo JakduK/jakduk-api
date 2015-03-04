@@ -10,7 +10,8 @@
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
     <!-- CSS Page Style -->    
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_log_reg_v1.css">    	
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_log_reg_v1.css">  
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">  	
 	
 </head>
 <body>
@@ -79,7 +80,8 @@
 							</label>                  
                         </div>
                         <div class="col-md-6">
-						<button type="submit" class="btn-u rounded pull-right">
+						<button type="submit" class="btn-u rounded pull-right ladda-button"
+						ladda="btnSubmit" data-style="expand-right">
 							<spring:message code="user.sign.in"/>
 						</button>                          
                         </div>
@@ -118,9 +120,15 @@
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-cookies/angular-cookies.min.js"></script>
 
+<!-- JS Implementing Plugins -->
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
+
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["ngCookies"]);
+var jakdukApp = angular.module("jakdukApp", ["ngCookies", "angular-ladda"]);
 
 jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
 	var email = $cookieStore.get("email");
@@ -133,6 +141,7 @@ jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
 	
 	$scope.onSubmit = function(event){
 		if ($scope.loginForm.$valid) {
+			$scope.btnSubmit = true;
 		} else {
 			$scope.onEmail();
 			

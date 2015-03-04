@@ -99,5 +99,11 @@ public class SampleController {
 		
 		return "sample/stats02";
 	}
+	
+	@RequestMapping(value = "/home01")
+	public String home01(Model model) {
+		
+		return "sample/home01";
+	}	
 
 }
