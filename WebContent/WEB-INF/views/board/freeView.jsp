@@ -194,7 +194,8 @@
 	</c:if>					
 	
 <div class="ladda-btn margin-bottom-10">
-   
+<div class="row">
+<div class="col-xs-6">
 <button class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-sm ladda-button" type="button"
 	ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
 	ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro">
@@ -207,6 +208,13 @@
 	<i class="fa fa-thumbs-o-down fa-lg"></i>
    <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
 </button>
+</div>
+<div class="col-xs-6 text-right">
+    <a id="kakao-link-btn" href="javascript:;">
+      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
+    </a>
+</div>
+</div>
 </div>
 <div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>	
         </div>
@@ -350,6 +358,7 @@
 
 <script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
 <!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
@@ -376,6 +385,19 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.dislikeConn = "none";
 	
 	angular.element(document).ready(function() {
+		
+	    // 사용할 앱의 Javascript 키를 설정해 주세요.
+	    Kakao.init('${kakaoKey}');
+
+	    // 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
+	    Kakao.Link.createTalkLinkButton({
+	      container: '#kakao-link-btn',
+	      label: '${post.subject}\r- <spring:message code="common.jakduk"/>',
+	      webLink: {
+		        text: "https://jakduk.com/board/free/${post.seq}",
+		        url: "https://jakduk.com/board/free/${post.seq}"	    	  
+	      }
+	    });		
 	});		
 	
 	$scope.objectIdFromDate = function(date) {

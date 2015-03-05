@@ -111,5 +111,11 @@ public class SampleController {
 		
 		return "sample/home02";
 	}		
+	
+	@RequestMapping(value = "/kakao01")
+	public String cacaotalk01(Model model) {
+		
+		return "sample/kakao01";
+	}	
 
 }

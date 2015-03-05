@@ -133,8 +133,8 @@
 
                </div>
                 <!--End Blog Post-->                 
-
    <!-- 최근 사진 -->
+   
         <div class="owl-carousel-v1 owl-work-v1">
             <div class="headline">
             <h2 class="pull-left"><spring:message code="home.pictures.latest"/>
@@ -153,6 +153,21 @@
             </div>
 
             <div class="owl-recent-works-v1">
+
+       <div ng-repeat="gallery in galleriesLatest">  
+       <div class="item">
+       <a href="">
+       <em class="overflow-hidden">
+        <img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}"/>
+        </em>
+                        <span>
+                            <strong class="text-overflow">aa</strong>
+								<i class="fa fa-user"></i> <i>aa</i>
+                        </span>        
+        </a>
+        </div>  
+    </div>             
+            
             	<c:forEach var="gallery" items="${galleries}">
                 <div class="item">                
 					<a href="<%=request.getContextPath()%>/gallery/view/${gallery.id}">
@@ -255,6 +270,27 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/layer-slider.js"></script>
 <script type="text/javascript">
 
+var setupcarousel = function(){
+    console.log('setting up carousel..');
+    var owl = jQuery(".owl-recent-works-v1");
+    owl.owlCarousel({
+        items: [3],
+        itemsDesktop : [1000,3],
+        itemsDesktopSmall : [900,2],
+        itemsTablet: [600,2],
+        itemsMobile : [479,1],
+        slideSpeed: 1000
+    });
+
+    // Custom Navigation Events
+    jQuery(".next-v2").click(function(){
+        owl.trigger('owl.next');
+    })
+    jQuery(".prev-v2").click(function(){
+        owl.trigger('owl.prev');
+    })
+};
+
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("homeCtrl", function($scope, $http) {
@@ -264,7 +300,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.postsLatest = [];
 	$scope.usersLatest = [];
 	$scope.commentsLatest = [];
-	//$scope.galleriesLatest = [];
+	$scope.galleriesLatest = [];
 	
 	angular.element(document).ready(function() {
 		$scope.refreshEncyclopedia();
@@ -273,7 +309,8 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 		App.init();
 		
 		LayerSlider.initLayerSlider();
-		OwlRecentWorks.initOwlRecentWorksV2();
+		//OwlRecentWorks.initOwlRecentWorksV2();
+		setupcarousel();
 
 	});	
 	
@@ -322,7 +359,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 				$scope.postsLatest = data.posts;
 				$scope.usersLatest = data.users;
 				$scope.commentsLatest = data.comments;
-				//$scope.galleriesLatest = data.galleries;
+				$scope.galleriesLatest = data.galleries;
 				
 				$scope.dataLatestConn = "none";
 			});

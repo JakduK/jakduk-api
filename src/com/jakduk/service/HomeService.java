@@ -76,7 +76,7 @@ public class HomeService {
 	public Model getHome(Model model, Locale locale) {
 		
 		try {
-			List<GalleryOnList> galleries = jakdukDAO.getGalleryList(CommonConst.HOME_SIZE_GALLERY);
+			//List<GalleryOnList> galleries = jakdukDAO.getGalleryList(CommonConst.HOME_SIZE_GALLERY);
 			
 			LocalDate date = LocalDate.now();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -84,7 +84,7 @@ public class HomeService {
 			
 			Long timeNow = sdf.parse(date.format(format)).getTime();
 
-			model.addAttribute("galleries", galleries);
+			//model.addAttribute("galleries", galleries);
 			model.addAttribute("timeNow", timeNow);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 		}  catch (Exception e) {

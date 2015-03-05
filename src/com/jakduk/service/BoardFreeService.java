@@ -22,6 +22,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -61,6 +62,9 @@ import com.jakduk.repository.SequenceRepository;
 
 @Service
 public class BoardFreeService {
+	
+	@Value("${kakao.javascript.key}")
+	private String kakaoJavascriptKey;
 	
 	@Autowired
 	private BoardFreeRepository boardFreeRepository;
@@ -622,6 +626,9 @@ public class BoardFreeService {
 			BoardFreeOnFreeView nextPost = jakdukDAO.getBoardFreeById(new ObjectId(boardFree.getId())
 			, boardListInfo.getCategory(), Sort.Direction.DESC);
 			
+			//# URL 에서 URI 를 제거, 필요 값만 사용(프로토콜, 호스트, 포트)
+			//String frontUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+			
 			model.addAttribute("post", boardFree);
 			model.addAttribute("category", boardCategory);
 			model.addAttribute("listInfo", boardListInfo);
@@ -629,6 +636,7 @@ public class BoardFreeService {
 			model.addAttribute("next", nextPost);
 			model.addAttribute("timeNow", timeNow);
 			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
+			model.addAttribute("kakaoKey", kakaoJavascriptKey);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();

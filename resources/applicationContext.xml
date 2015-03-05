@@ -38,6 +38,7 @@
 			<list>
 				<value>classpath:/config/db/mongo.properties</value>
 				<value>classpath:/config/storage/file.properties</value>
+				<value>classpath:/config/kakao/kakao.properties</value>
 			</list>
     	</property>	
 	</bean>
