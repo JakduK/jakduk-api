@@ -64,6 +64,9 @@ public class GalleryService {
 	
 	@Value("${storage.thumbnail.path}")
 	private String storageThumbnailPath;
+	
+	@Value("${kakao.javascript.key}")
+	private String kakaoJavascriptKey;
 
 	@Autowired
 	private UserService userService;
@@ -388,6 +391,7 @@ public class GalleryService {
 		model.addAttribute("linkedPosts", posts);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
 
 		return HttpServletResponse.SC_OK;
 	}

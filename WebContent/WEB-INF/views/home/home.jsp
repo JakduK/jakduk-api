@@ -26,7 +26,7 @@
     <!--=== Slider ===-->
     <div id="layerslider" style="width: 100%; height: 440px; margin: 0px auto;">
         <!-- First slide -->
-        <div class="ls-slide" data-ls="slidedelay:15000;transition2d:5;">
+        <div class="ls-slide" data-ls="slidedelay:10000;transition2d:5;">
             <img src="<%=request.getContextPath()%>/resources/jakduk/img/bg01.jpg" class="ls-bg" alt="Slide background"/>
 
 <p class="ls-l" style="font-size:35px; background: rgba(0,0,0,.2); color:#fff; top:50px; left: 100px;"
@@ -54,7 +54,7 @@
         </div>	
         
       <!--Second Slide-->
-        <div class="ls-slide" data-ls="slidedelay:15000;transition2d:5;">
+        <div class="ls-slide" data-ls="slidedelay:10000;transition2d:5;">
             <img src="<%=request.getContextPath()%>/resources/jakduk/img/bg.jpg" class="ls-bg" alt="Slide background"/>
 
 <p class="ls-l" style="font-size:35px; background: rgba(0,0,0,.2); color:#fff; top:50px; left: 70px;"
@@ -153,21 +153,6 @@
             </div>
 
             <div class="owl-recent-works-v1">
-
-       <div ng-repeat="gallery in galleriesLatest">  
-       <div class="item">
-       <a href="">
-       <em class="overflow-hidden">
-        <img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}"/>
-        </em>
-                        <span>
-                            <strong class="text-overflow">aa</strong>
-								<i class="fa fa-user"></i> <i>aa</i>
-                        </span>        
-        </a>
-        </div>  
-    </div>             
-            
             	<c:forEach var="gallery" items="${galleries}">
                 <div class="item">                
 					<a href="<%=request.getContextPath()%>/gallery/view/${gallery.id}">
@@ -270,27 +255,6 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/layer-slider.js"></script>
 <script type="text/javascript">
 
-var setupcarousel = function(){
-    console.log('setting up carousel..');
-    var owl = jQuery(".owl-recent-works-v1");
-    owl.owlCarousel({
-        items: [3],
-        itemsDesktop : [1000,3],
-        itemsDesktopSmall : [900,2],
-        itemsTablet: [600,2],
-        itemsMobile : [479,1],
-        slideSpeed: 1000
-    });
-
-    // Custom Navigation Events
-    jQuery(".next-v2").click(function(){
-        owl.trigger('owl.next');
-    })
-    jQuery(".prev-v2").click(function(){
-        owl.trigger('owl.prev');
-    })
-};
-
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("homeCtrl", function($scope, $http) {
@@ -300,7 +264,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.postsLatest = [];
 	$scope.usersLatest = [];
 	$scope.commentsLatest = [];
-	$scope.galleriesLatest = [];
+	//$scope.galleriesLatest = [];
 	
 	angular.element(document).ready(function() {
 		$scope.refreshEncyclopedia();
@@ -309,9 +273,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 		App.init();
 		
 		LayerSlider.initLayerSlider();
-		//OwlRecentWorks.initOwlRecentWorksV2();
-		setupcarousel();
-
+		OwlRecentWorks.initOwlRecentWorksV2();
 	});	
 	
 	$scope.refreshEncyclopedia = function() {
@@ -359,7 +321,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 				$scope.postsLatest = data.posts;
 				$scope.usersLatest = data.users;
 				$scope.commentsLatest = data.comments;
-				$scope.galleriesLatest = data.galleries;
+				//$scope.galleriesLatest = data.galleries;
 				
 				$scope.dataLatestConn = "none";
 			});

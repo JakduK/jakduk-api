@@ -261,7 +261,7 @@
 							  	{{numberOfCommentDislike[comment.id]}}
 							  </span>
 							</button>							
-<span class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</span>							 
+<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>							 
 
     <hr class="padding-5">
 </div>    
@@ -385,7 +385,6 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.dislikeConn = "none";
 	
 	angular.element(document).ready(function() {
-		
 	    // 사용할 앱의 Javascript 키를 설정해 주세요.
 	    Kakao.init('${kakaoKey}');
 

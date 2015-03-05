@@ -145,7 +145,7 @@ public class HomeController {
 		
 		homeService.getBoardLatest(model);
 		homeService.getUserLatest(model, language);
-		homeService.getGalleryLatest(model);
+		//homeService.getGalleryLatest(model);
 		homeService.getBoardCommentLatest(model);
 	}
 	
