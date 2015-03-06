@@ -31,6 +31,7 @@ public class CommonConst {
 	public final static Integer RSS_SIZE_ITEM = 200;
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 120;
 	public final static Integer COMMENT_MAX_SIZE = 30;	
+	public final static Integer GALLERY_SIZE = 12;
 
 	/**
 	 * 게시물 쿠키의 만료되는 시간(초)

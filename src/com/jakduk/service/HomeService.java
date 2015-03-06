@@ -19,6 +19,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -76,7 +77,7 @@ public class HomeService {
 	public Model getHome(Model model, Locale locale) {
 		
 		try {
-			List<GalleryOnList> galleries = jakdukDAO.getGalleryList(CommonConst.HOME_SIZE_GALLERY);
+			List<GalleryOnList> galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
 			
 			LocalDate date = LocalDate.now();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -127,7 +128,7 @@ public class HomeService {
 	
 	public Model getGalleryLatest(Model model) {
 		
-		List<GalleryOnList> galleries = jakdukDAO.getGalleryList(CommonConst.HOME_SIZE_GALLERY);
+		List<GalleryOnList> galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
 		
 		model.addAttribute("galleries", galleries);
 		

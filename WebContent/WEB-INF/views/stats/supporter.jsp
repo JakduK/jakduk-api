@@ -64,7 +64,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	                height: 100
 	            },
 	            tooltip: {
-	                pointFormat: 'Supports: <b>{point.y:1f} millions</b>'
+	                pointFormat: '<spring:message code="stats.number.of.supporter"/>: <b>{point.y:1f}</b>'
 	            },
 	            legend: {
 	                enabled: false

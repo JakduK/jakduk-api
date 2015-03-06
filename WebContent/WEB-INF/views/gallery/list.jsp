@@ -52,6 +52,8 @@
                 </div>
             </div>
         </div><!--/row-->
+<div infinite-scroll="getGalleries()" infinite-scroll-disabled="infiniteDisabled">
+</div>        
 </div>
 
 <jsp:include page="../include/footer.jsp"/>
@@ -63,21 +65,31 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-lazy-img/release/angular-lazy-img.js"></script>
+<script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
+
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["angularLazyImg"]);
+var jakdukApp = angular.module("jakdukApp", ["infinite-scroll", "angularLazyImg"]);
 
 jakdukApp.controller("galleryCtrl", function($scope, $http) {
 	$scope.galleriesConn = "none";
 	$scope.galleries = [];
 	$scope.usersLikingCount = [];
 	$scope.usersDislikingCount = [];
+	$scope.infiniteDisabled = false;
 	
 	angular.element(document).ready(function() {
-		$scope.getGalleries();
+		//$scope.getGalleries();
 	});	
 	
 	$scope.getGalleries = function() {
-		var bUrl = '<c:url value="/gallery/data/list.json"/>';
+		
+		var bUrl;
+		if ($scope.galleries.length > 0) {
+			var lastGallery = $scope.galleries[$scope.galleries.length - 1].id;
+			bUrl = '<c:url value="/gallery/data/list.json?id=' + lastGallery + '"/>';
+		} else {
+			bUrl = '<c:url value="/gallery/data/list.json"/>';
+		}
 		
 		if ($scope.galleriesConn == "none") {
 			
@@ -87,12 +99,26 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 			
 			reqPromise.success(function(data, status, headers, config) {
 				
-				$scope.galleries = data.galleries;
-				$scope.usersLikingCount = data.usersLikingCount;
-				$scope.usersDislikingCount = data.usersDislikingCount;
-				console.log(data);
+				data.galleries.forEach(function(gallery) {
+					$scope.galleries.push(gallery);
+				});
+
+				
+				for (var key in data.usersLikingCount) {
+					var value = data.usersLikingCount[key];
+					$scope.usersLikingCount[key] = value;
+				}
+				
+				for (var key in data.usersDislikingCount) {
+					var value = data.usersDislikingCount[key];
+					$scope.usersDislikingCount[key] = value;					
+				}
 				
 				$scope.galleriesConn = "none";
+				
+				if (data.galleries.length < 12) {
+					$scope.infiniteDisabled = true;
+				}
 				
 			});
 			reqPromise.error(function(data, status, headers, config) {
@@ -102,7 +128,8 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 		}
 	};
 	
-	$scope.test = function() {
+	$scope.btnMore = function() {
+		
 	};
 	
 });

@@ -58,9 +58,10 @@ public class GalleryController {
 	}
 	
 	@RequestMapping(value = "/data/list", method = RequestMethod.GET)
-	public void dataList(Model model) {
+	public void dataList(Model model,
+			@RequestParam(required = false) String id) {
 		
-		galleryService.getList(model);
+		galleryService.getList(model, id);
 		
 	}
 	

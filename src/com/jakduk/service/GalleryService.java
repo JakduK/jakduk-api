@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -334,14 +335,17 @@ public class GalleryService {
 		return HttpServletResponse.SC_OK;
 	}	
 
-	public Model getList(Model model) {
+	public Model getList(Model model, String id) {
 
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 		
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
+		List<GalleryOnList> galleries;
 		
-		List<GalleryOnList> galleries = galleryRepository.findList(pageable).getContent();
+		if (id != null) {
+			galleries = jakdukDAO.getGalleryList(Direction.ASC, CommonConst.GALLERY_SIZE, new ObjectId(id));
+		} else {
+			galleries = jakdukDAO.getGalleryList(Direction.ASC, CommonConst.GALLERY_SIZE, null);
+		}
 		
 		for (GalleryOnList gallery : galleries) {
 			ids.add(new ObjectId(gallery.getId()));
