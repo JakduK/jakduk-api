@@ -241,7 +241,7 @@
 <div ng-repeat="comment in commentList">
     <h5 class="media-heading">
 			<i class="fa fa-user"></i>{{comment.writer.username}} 
-			<span><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+			<span><i class="fa fa-clock-o"></i>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
     </h5>    
     <p>
 	 							<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>

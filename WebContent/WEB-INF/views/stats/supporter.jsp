@@ -20,16 +20,19 @@
 		<div class="container">
 			<h1 class="pull-left"><spring:message code="stats.number.of.supporter"/></h1>
 <ul class="pull-right breadcrumb">
-                <li ><a href="" ng-click="changeChartType('BarChart')"><spring:message code="stats.chart.bar"/></a></li>
-                <li ><a href="" ng-click="changeChartType('PieChart')"><spring:message code="stats.chart.pie"/></a></li>
+                <li ><a href="" ng-click="changeChartType('bar')"><spring:message code="stats.chart.bar"/></a></li>
+                <li ><a href="" ng-click="changeChartType('pie')"><spring:message code="stats.chart.pie"/></a></li>
             </ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->		
 	
 	<!--=== Content Part ===-->
-	<div class="container content">	
+	<div class="container content">
+	<!-- 	
 	<div google-chart chart=chartObject></div>
+	 -->
+	 <highchart id="chart1" config="chartConfig" class="span10"></highchart>
 	</div>
 </div>
 
@@ -37,21 +40,80 @@
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>    
-<script src="<%=request.getContextPath()%>/resources/angular-google-chart/ng-google-chart.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/highcharts/highcharts.js"></script>
+<script src="<%=request.getContextPath()%>/resources/highcharts-ng/dist/highcharts-ng.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["googlechart"]);
+var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
 
 jakdukApp.controller('statsCtrl', function($scope, $http) {
-	$scope.chartObject = {};
 	$scope.supportersConn = "none";
 	$scope.chartType = "BarChart";
 	
 	angular.element(document).ready(function() {
 		$scope.getSupporters();
 	});
+	
+	$scope.chartSeriesData = [];
+	
+    $scope.chartConfig = {
+	        options: {
+	            chart: {
+	                type: 'bar',
+	                height: 100
+	            },
+	            tooltip: {
+	                pointFormat: 'Supports: <b>{point.y:1f} millions</b>'
+	            },
+	            legend: {
+	                enabled: false
+	            }
+	        },
+	        title: {
+	            text: '<spring:message code="stats.number.of.each.club.supporter"/>'
+	        },	        
+	        subtitle: {
+                text: 'Source: K LEAGUE JAKDU KING'
+            },
+            xAxis: {
+                type: 'category',
+                labels: {
+                    //rotation: -45,
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '<spring:message code="stats.number"/>'
+                }
+            },                                 
+            series: [{
+                name: 'Supporters',
+                data: $scope.chartSeriesData,
+                dataLabels: {
+                    enabled: true,
+                    //rotation: -90,
+                    color: '#FFFFFF',
+                    align: 'right',
+                    format: '{point.y:1f}', // one decimal
+                    //y: 10, // 10 pixels down from the top
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            }],
 
+	        loading: false,
+	        credits:{enabled:true}
+	    }	
+
+	/*
     $scope.chartObject.data = {"cols": [
         {id: "t", label: "Topping", type: "string"},
         {id: "s", label: '<spring:message code="stats.number"/>', type: "number"}
@@ -62,6 +124,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.chartObject.options = {
 		'title': '<spring:message code="stats.number.of.each.club.supporter"/>',
     };
+	*/
 	
 	$scope.getSupporters = function() {
 		var bUrl = '<c:url value="/stats/data/supporter.json"/>';
@@ -75,12 +138,13 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 				
 				var supporters = data.supporters;
-				$scope.chartObject.options.height = 50 + (supporters.length * 30);
+				$scope.chartConfig.options.chart.height = 150 + (supporters.length * 30);
 				
 				supporters.forEach(function(supporter) {
 					console.log(supporter);
-					var item = {c:[{v:supporter.supportFC.names[0].shortName}, {v:supporter.count}]};
-					$scope.chartObject.data.rows.push(item);
+					//var item = {c:[{v:supporter.supportFC.names[0].shortName}, {v:supporter.count}]};
+					var item = [supporter.supportFC.names[0].shortName, supporter.count];
+					$scope.chartSeriesData.push(item);
 				});
 				
 				$scope.supportersConn = "none";
@@ -94,7 +158,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	};
 	
 	$scope.changeChartType = function(chartName) {
-		$scope.chartObject.type = chartName;
+		$scope.chartConfig.options.chart.type = chartName;
 	};
 	
 });

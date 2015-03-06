@@ -39,3 +39,18 @@
 }
 
 .breadcrumbs li .active a {color:#72C02C;}
+
+/* 홈에서 최근 글 */
+.magazine-mini-news h3, .magazine-mini-news h3 a {
+    margin-bottom: 0px;
+}
+.magazine-mini-news .post-author {color:#777;}
+
+
+/* 홈에서 최근 댓글 */
+.blog-twitter .blog-twitter-inner i.fa {font-size:inherit; line-height:ingerit; top:0px; color:#555;}
+
+/* 로그인, 회원 가입 */
+.reg-page {padding:30px 15px 30px 15px;}
+.has-feedback .form-control {padding-right:38px;}
+.form-control {padding:6px 10px;}

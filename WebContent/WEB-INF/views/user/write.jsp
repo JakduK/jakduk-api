@@ -8,11 +8,12 @@
 <html ng-app="jakdukApp">
 <head>
 	<title><spring:message code="user.register"/> &middot; <spring:message code="common.jakduk"/></title>
-	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
 	<!-- CSS Page Style -->    
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_log_reg_v1.css">	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
+	
+	<jsp:include page="../include/html-header.jsp"></jsp:include>	
 </head>
 
 <body>

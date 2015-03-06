@@ -107,7 +107,7 @@ public class HomeService {
 	public Model getBoardLatest(Model model) {
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
-		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
+		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_POST, sort);
 		
 		List<BoardFreeOnHome> posts = boardFreeOnHomeRepository.findAll(pageable).getContent();
 		

@@ -11,9 +11,9 @@
 
 	<!-- CSS Implementing Plugins -->
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.css">
- <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/layer-slider/layerslider/css/layerslider.css">	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/layer-slider/layerslider/css/layerslider.css">	
 	<!-- CSS Page Style -->    
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog_magazine.css">	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog_magazine.css">	
 	
 	<jsp:include page="../include/html-header.jsp"/>
 </head>
@@ -99,7 +99,7 @@
 </div>
         
 					<div ng-repeat="post in postsLatest">
-					<div class="magazine-mini-news">
+					<div class="magazine-mini-news margin-bottom-10">
 					<h3 ng-switch="post.status.delete">
 						<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
 					<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
@@ -122,10 +122,9 @@
                     </div>
 <div class="blog-twitter">
                     <div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
-                        <strong>{{comment.writer.username}}</strong>
+                        <strong><i class="fa fa-user"></i> {{comment.writer.username}}</strong>
                         <a href="<c:url value="/board/free/{{comment.boardItem.seq}}"/>">{{comment.content}}</a>
-					<span class="twitter-time" ng-if="${timeNow} > intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.date}"}}</span>
-					<span class="twitter-time" ng-if="${timeNow} <= intFromObjectId(comment.id)">{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.time}"}}</span>                        
+                        <span class="twitter-time"><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
                     </div>
                 </div>                			
  
@@ -186,7 +185,7 @@
                             <p>{{user.about}}</p>
                             <div class="testimonial-info">
                                 <span class="testimonial-author">
-                                    {{user.username}}
+                                    <i class="fa fa-user"></i> {{user.username}}
                                     <em><i class="fa fa-futbol-o"></i>
                                     {{user.supportFC.names[0].fullName}}</em>
                                 </span>

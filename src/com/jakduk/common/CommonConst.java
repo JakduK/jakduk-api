@@ -22,11 +22,15 @@ public class CommonConst {
 	public final static String ENCYCLOPEDIA_KO = "encyclopediaKo";
 	
 	/**
-	 * 게시물 목록에서 보여지는 게시물 갯수
+	 * 화면에 보여질 목록 갯수
 	 */
 	public final static Integer BOARD_SIZE_LINE_NUMBER = 15;
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
+	public final static Integer HOME_SIZE_POST = 7;
 	public final static Integer HOME_SIZE_GALLERY = 6;
+	public final static Integer RSS_SIZE_ITEM = 200;
+	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 120;
+	public final static Integer COMMENT_MAX_SIZE = 30;	
 
 	/**
 	 * 게시물 쿠키의 만료되는 시간(초)
@@ -132,9 +136,4 @@ public class CommonConst {
 	public final static String DEVICE_TYPE_TABLET = "tablet";
 	
 	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte
-	
-	public final static Integer RSS_SIZE_ITEM = 200;
-	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 100;
-	public final static Integer COMMENT_MAX_SIZE = 30;
-	
 }

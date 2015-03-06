@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css">
 
 <!-- Custom styles for this template -->
-<link href="<%=request.getContextPath()%>/resources/jakduk/css/jakduk.css" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/jakduk/css/jakduk.css">
 
 <!-- 
 <link href="//fonts.googleapis.com/earlyaccess/nanumgothic.css" rel="stylesheet">
