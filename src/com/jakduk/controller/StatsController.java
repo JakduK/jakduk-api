@@ -38,16 +38,16 @@ public class StatsController {
 	@RequestMapping
 	public String root() {
 		
-		return "redirect:/stats/supporter";
+		return "redirect:/stats/supporters";
 	}
 	
-	@RequestMapping(value = "/supporter", method = RequestMethod.GET)
+	@RequestMapping(value = "/supporters", method = RequestMethod.GET)
 	public String supporter(Model model) {
 		
-		return "stats/supporter";
+		return "stats/supporters";
 	}
 	
-	@RequestMapping(value = "/data/supporter", method = RequestMethod.GET)
+	@RequestMapping(value = "/data/supporters", method = RequestMethod.GET)
 	public void dataSupporter(Model model
 			, HttpServletRequest request) {
 		
@@ -55,6 +55,18 @@ public class StatsController {
 		String language = commonService.getLanguageCode(locale, null);
 		
 		statsService.getSupporter(model, language);
+	}
+	
+	@RequestMapping(value = "/attendance", method = RequestMethod.GET)
+	public String attendance(Model model) {
+		
+		return "stats/attendance";
+	}
+	
+	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
+	public void dataLeagueAttendance(Model model) {
+		
+		statsService.getLeagueAttendance(model);
 	}
 
 }

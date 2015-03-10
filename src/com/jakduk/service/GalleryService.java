@@ -342,9 +342,9 @@ public class GalleryService {
 		List<GalleryOnList> galleries;
 		
 		if (id != null) {
-			galleries = jakdukDAO.getGalleryList(Direction.ASC, CommonConst.GALLERY_SIZE, new ObjectId(id));
+			galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.GALLERY_SIZE, new ObjectId(id));
 		} else {
-			galleries = jakdukDAO.getGalleryList(Direction.ASC, CommonConst.GALLERY_SIZE, null);
+			galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.GALLERY_SIZE, null);
 		}
 		
 		for (GalleryOnList gallery : galleries) {

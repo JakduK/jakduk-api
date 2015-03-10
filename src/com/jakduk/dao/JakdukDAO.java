@@ -134,7 +134,7 @@ public class JakdukDAO {
 	public List<GalleryOnList> getGalleryList(Direction direction, Integer size, ObjectId commentId) {
 		
 		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is("use"));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").lt(commentId));
 		AggregationOperation sort = Aggregation.sort(direction, "_id");
 		AggregationOperation limit = Aggregation.limit(size);
 		

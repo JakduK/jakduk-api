@@ -31,6 +31,7 @@
     <li><a href="<c:url value="/admin/footballclub/write"/>">Football Club Write</a></li>
     <li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
     <li><a href="<c:url value="/admin/thumbnail/size/write"/>">Thumbnail Size Write</a></li>
+    <li><a href="<c:url value="/admin/attendance/league/write"/>">League Attendance Write</a></li>
   </ul>
 </div>
 
@@ -44,6 +45,7 @@
     <li><a ng-click="getData('fcOrigin')"/>Get Football Club Origin</a></li>
     <li><a ng-click="getData('fc')">Get Football Club</a></li>
     <li><a ng-click="getData('boardCategory')">Get Board Category</a></li>
+    <li><a ng-click="getData('leagueAttendance')">Get League Attendance</a></li>
   </ul>
 </div>
 
@@ -104,6 +106,21 @@
 </tr>
 </table>
 </div>
+
+<div ng-show="leagueAttendances.length > 0">
+<h4>League Attendance</h4>
+<table class="table">
+<tr>
+	<th>Season</th><th>Games</th><th>Total</th><th>Average</th>
+</tr>
+<tr ng-repeat="leagueAttendance in leagueAttendances">
+	<td><a href="<c:url value="/admin/attendance/league/write/{{leagueAttendance.id}}"/>">{{leagueAttendance.season}}</a></td>
+	<td>{{leagueAttendance.games}}</td>
+	<td>{{leagueAttendance.total}}</td>
+	<td>{{leagueAttendance.average}}</td>
+</tr>
+</table>
+</div>
 		
 		<jsp:include page="../include/footer.jsp"/>
 	</div>
@@ -122,6 +139,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.fcOrigins = [];
 	$scope.fcs = [];
 	$scope.boardCategorys = [];
+	$scope.leagueAttendances = [];
 	
 	$scope.getData = function(type) {
 		var bUrl;
@@ -134,6 +152,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 			bUrl = '<c:url value="/admin/footballclub.json"/>';
 		} else if (type == "boardCategory") {
 			bUrl = '<c:url value="/admin/board/category.json"/>';
+		} else if (type == "leagueAttendance") {
+			bUrl = '<c:url value="/admin/attendance/league.json"/>';
 		}
 		
 		if ($scope.dataConn == "none") {
@@ -154,6 +174,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 					$scope.fcs = data.fcs;
 				} else if (type == "boardCategory") {
 					$scope.boardCategorys = data.boardCategorys;
+				} else if (type == "leagueAttendance") {
+					$scope.leagueAttendances = data.leagueAttendances;
 				}
 				
 				$scope.dataConn = "none";

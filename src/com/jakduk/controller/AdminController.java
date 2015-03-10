@@ -12,11 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import sun.tools.tree.NewArrayExpression;
-
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.LeagueAttendance;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.model.web.ThumbnailSizeWrite;
@@ -42,7 +41,7 @@ public class AdminController {
 	public String root() {
 		
 		return "redirect:/admin/settings";
-	}
+	}	
 	
 	@RequestMapping("/settings")
 	public String root(Model model,
@@ -205,6 +204,12 @@ public class AdminController {
 		adminService.getBoardCategoryList(model);
 	}
 	
+	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
+	public void leagueAttendance(Model model) {
+		
+		adminService.getLeagueAttendanceList(model);
+	}
+	
 	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.GET)
 	public String thumbnailSizeWrite(Model model) {
 		
@@ -227,5 +232,33 @@ public class AdminController {
 
 		return "redirect:/admin/settings";
 	}		
+	
+	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)
+	public String leagueAttendanceWrite(Model model) {
+		model.addAttribute("leagueAttendance", new LeagueAttendance());
+		
+		return "admin/leagueAttendanceWrite";
+	}	
+	
+	@RequestMapping(value = "/attendance/league/write/{id}", method = RequestMethod.GET)
+	public String leagueAttendanceWrite(@PathVariable String id, Model model) {
+		
+		adminService.getLeagueAttendance(model, id);
+		
+		return "admin/leagueAttendanceWrite";
+	}	
+	
+	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.POST)
+	public String leagueAttendanceWrite(@Valid LeagueAttendance leagueAttendance, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/league/write";
+		}
+		
+		adminService.leagueAttendanceWrite(leagueAttendance);
+
+		return "redirect:/admin/settings?open=leagueAttendance";
+	}
 
 }

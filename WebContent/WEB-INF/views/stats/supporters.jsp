@@ -18,7 +18,7 @@
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><spring:message code="stats.number.of.supporter"/></h1>
+			<h1 class="pull-left"><spring:message code="stats.supporters"/></h1>
 <ul class="pull-right breadcrumb">
                 <li ><a href="" ng-click="changeChartType('bar')"><spring:message code="stats.chart.bar"/></a></li>
                 <li ><a href="" ng-click="changeChartType('pie')"><spring:message code="stats.chart.pie"/></a></li>
@@ -50,12 +50,13 @@ var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
 jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.supportersConn = "none";
 	$scope.chartType = "BarChart";
+	$scope.chartSeriesData = [];
 	
 	angular.element(document).ready(function() {
 		$scope.getSupporters();
 	});
 	
-	$scope.chartSeriesData = [];
+	
 	
     $scope.chartConfig = {
 	        options: {
@@ -71,7 +72,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	            }
 	        },
 	        title: {
-	            text: '<spring:message code="stats.number.of.each.club.supporter"/>'
+	            text: '<spring:message code="stats.supporters.title"/>'
 	        },	        
 	        subtitle: {
                 text: 'Source: K LEAGUE JAKDU KING'
@@ -90,7 +91,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
                 min: 0,
                 title: {
                     text: '<spring:message code="stats.number"/>'
-                }
+                }							
             },                                 
             series: [{
                 name: 'Supporters',
@@ -100,7 +101,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
                     //rotation: -90,
                     color: '#FFFFFF',
                     align: 'right',
-                    format: '{point.y:1f}', // one decimal
+                    format: '<b>{point.name}</b> {point.y:1f}', // one decimal
                     //y: 10, // 10 pixels down from the top
                     style: {
                         fontSize: '13px',
@@ -111,23 +112,10 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 
 	        loading: false,
 	        credits:{enabled:true}
-	    }	
-
-	/*
-    $scope.chartObject.data = {"cols": [
-        {id: "t", label: "Topping", type: "string"},
-        {id: "s", label: '<spring:message code="stats.number"/>', type: "number"}
-    ], "rows": []};
-
-    // $routeParams.chartType == BarChart or PieChart or ColumnChart...
-	$scope.chartObject.type = "BarChart";
-	$scope.chartObject.options = {
-		'title': '<spring:message code="stats.number.of.each.club.supporter"/>',
-    };
-	*/
+	    };
 	
 	$scope.getSupporters = function() {
-		var bUrl = '<c:url value="/stats/data/supporter.json"/>';
+		var bUrl = '<c:url value="/stats/data/supporters.json"/>';
 		
 		if ($scope.supportersConn == "none") {
 			

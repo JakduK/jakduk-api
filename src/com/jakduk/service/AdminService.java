@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -34,6 +33,7 @@ import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.db.LeagueAttendance;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
@@ -43,6 +43,7 @@ import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.GalleryRepository;
+import com.jakduk.repository.LeagueAttendanceRepository;
 import com.jakduk.repository.SequenceRepository;
 
 /**
@@ -81,6 +82,9 @@ public class AdminService {
 	
 	@Autowired
 	private GalleryRepository galleryRepository;
+	
+	@Autowired
+	private LeagueAttendanceRepository leagueAttendanceReposidory;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -286,6 +290,14 @@ public class AdminService {
 		return model;
 	}
 	
+	public Model getLeagueAttendanceList(Model model) {
+		List<LeagueAttendance> leagueAttendances = leagueAttendanceReposidory.findAll();
+		
+		model.addAttribute("leagueAttendances", leagueAttendances);
+		
+		return model;
+	}
+	
 	public Model getBoardCategory(Model model, String id) {
 		BoardCategory boardCategory = boardCategoryRepository.findOne(id);
 		
@@ -351,9 +363,28 @@ public class AdminService {
 					e.printStackTrace();
 				}
 			}				
+		}
+	}	
+	
+	public Model getLeagueAttendance(Model model, String id) {
+		LeagueAttendance leagueAttendance = leagueAttendanceReposidory.findOne(id);
 		
+		model.addAttribute("leagueAttendance", leagueAttendance);
+		
+		return model;
+	}
+	
+	public void leagueAttendanceWrite(LeagueAttendance leagueAttendance) {
+		
+		if (leagueAttendance.getId().isEmpty()) {
+			leagueAttendance.setId(null);
+		} 
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("leagueAttendance=" + leagueAttendance);
 		}
 		
-	}	
+		leagueAttendanceReposidory.save(leagueAttendance);
+	}
 	
 }
