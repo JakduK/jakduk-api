@@ -82,8 +82,8 @@
 				</li>
 				<li class="dropdown" ng-class="{active:isActive('<c:url value="/stats"/>')}">
 					<a href="<c:url value="/stats"/>" class="dropdown-toggle" data-toggle="dropdown">
-						<spring:message code="stats"/>
-					</a>
+						<spring:message code="stats"/>						
+					</a>					
 					<ul class="dropdown-menu">
 						<li ng-class="{active:isActive('<c:url value="/stats/supporters"/>')}"><a href="<c:url value="/stats/supporters"/>"><spring:message code="stats.supporters"/></a></li>
 						<li ng-class="{active:isActive('<c:url value="/stats/attendance"/>')}"><a href="<c:url value="/stats/attendance"/>"><spring:message code="stats.attendance"/></a></li>

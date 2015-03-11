@@ -9,9 +9,11 @@
 <head>
 	<title><spring:message code="common.home"/> &middot; <spring:message code="common.jakduk"/></title>
 
+    <!-- CSS Page Style -->    
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_job_inner.css">
+    
 	<!-- CSS Implementing Plugins -->
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.css">
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/layer-slider/layerslider/css/layerslider.css">	
 	<jsp:include page="../include/html-header.jsp"/>
 </head>
 
@@ -20,65 +22,25 @@
 	
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
-    <!--=== Slider ===-->
-    <div id="layerslider" style="width: 100%; height: 440px; margin: 0px auto;">
-        <!-- First slide -->
-        <div class="ls-slide" data-ls="slidedelay:10000;transition2d:5;">
-            <img src="<%=request.getContextPath()%>/resources/jakduk/img/bg01.jpg" class="ls-bg" alt="Slide background"/>
-
-<p class="ls-l" style="font-size:35px; background: rgba(0,0,0,.2); color:#fff; top:50px; left: 100px;"
-	data-ls="offsetxin: -10; fadein: true; durationin : 1000; durationout : 350; delayin : 1000;">
-    K리그 클래식 1R
-</p>
-<p class="ls-l" style="top:120px; left:100px; background: rgba(0,0,0,.2); font-size:25px; line-height:37px; color:#fff;" 
-	data-ls="offsetxin: -10; fadein: true; durationin : 1000; durationout : 350; delayin : 1000;">
-	2015-03-07(토)<br>
-	15:00 전북 vs 성남, 전주 월드컵<br>
-	14:00 인천 vs 광주, 인천 전용<br>
-	16:00 부산 vs 대전, 부산 아시아드<br>
-</p>
-<p class="ls-l" style="top:120px; left:500px; background: rgba(0,0,0,.2); font-size:25px; line-height:37px; color:#fff;" 
-	data-ls="offsetxin: -10; fadein: true; durationin : 1000; durationout : 350; delayin : 1000;">
-	2015-03-08(일)<br>
-	14:00 전남 vs 제주, 광양 전용<br>
-	14:00 수원 vs 포항, 수원 월드컵<br>
-	16:00 울산 vs 서울, 울산 문수<br>
-</p>
-<p class="ls-l" style="top:350px; left:650px; background: rgba(0,0,0,.2); font-size:18px; line-height:37px; color:#fff;" 
-	data-ls="offsetxin: -10; fadein: true; durationin : 1000; durationout : 350; delayin : 1000;">
-	사진제공 : 상암뒤
-</p>
-        </div>	
-        
-      <!--Second Slide-->
-        <div class="ls-slide" data-ls="slidedelay:10000;transition2d:5;">
-            <img src="<%=request.getContextPath()%>/resources/jakduk/img/bg.jpg" class="ls-bg" alt="Slide background"/>
-
-<p class="ls-l" style="font-size:35px; background: rgba(0,0,0,.2); color:#fff; top:50px; left: 70px;"
-	data-ls="offsetxin: -10; fadein: true; durationin : 1000; durationout : 350; delayin : 1000;">
-    AFC 챔피언스리그 3R
-</p>
-<p class="ls-l" style="top:120px; left:70px; background: rgba(0,0,0,.2); font-size:22px; line-height:37px; color:#fff;" 
-	data-ls="offsetxin: -10; fadein: true; durationin : 1000; durationout : 350; delayin : 1000;">
-	2015-03-17(화)<br>
-	18:30 수원 vs 브리즈번, 로비나 스타디움<br>
-	19:00 전북 vs 빈즈엉, 전주 월드컵<br>		
-</p>
-<p class="ls-l" style="top:120px; left:480px; background: rgba(0,0,0,.2); font-size:22px; line-height:37px; color:#fff;" 
-	data-ls="offsetxin: -10; fadein: true; durationin : 1000; durationout : 350; delayin : 1000;">
-	2015-03-18(수)<br>
-	19:30 서울 vs 웨스턴 시드니, 서울 월드컵<br>
-	20:30 광저우 푸리 vs 성남, 유시유샨 스타디움<br>
-</p>
- 
-        </div>                
 	
-	</div>	
+<div class="image-block">
+        <div class="container">
+            <div class="company-description">
+                <h2>2015 K리그 클래식 2R</h2>
+                <p><strong>2015-03-14(토)</strong></p>
+<p>14:00 서울 vs 전북, 서울 월드컵</p>
+<p>14:00 수원 vs 인천, 수원 월드컵</p>
+<p>16:00 성남 vs 전남, 광양 전용</p>
+<p><strong>2015-03-15(일)</strong></p>
+<p>14:00 대전 vs 광주, 대전 월드컵</p>
+<p>14:15 포항 vs 울산, 포항 스틸야드</p>
+<p>16:00 제주 vs 부산, 제주 월드컵</p>
+            </div>   
+        </div>    
+    </div>	
 	
 	<!--=== Content Part ===-->
 	<div class="container content" ng-controller="homeCtrl">
-	
-
 
 <div class="row">
     
@@ -89,17 +51,13 @@
                 <div class="row margin-bottom-30">
                     
 <!--  최근 글 -->                    
-                        <div class="col-md-6 margin-bottom-30">
-
-                <div class="headline-v2 bg-color-light">
-                	<h2><spring:message code="home.posts.latest"/>    	
-                	<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
+                        <div class="col-md-6">
+<div class="headline"><h2><spring:message code="home.posts.latest"/></h2><button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
 			    		<spring:message code="common.button.more"/>
-    				</button>	
-    				</h2>
-    			</div>
+    				</button></div>                        
+
                 <!-- Trending -->
-                <ul class="list-unstyled blog-trending margin-bottom-50">
+                <ul class="list-unstyled blog-trending">
                     <li ng-repeat="post in postsLatest">
                         <h3 ng-switch="post.status.delete">
                         <a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
@@ -120,10 +78,7 @@
                         
 <!-- 최근 댓글  -->
 <div class="col-md-6">
-
-                <div class="headline-v2 bg-color-light">
-                	<h2><spring:message code="home.comments.latest"/></h2>
-    			</div>
+<div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
 
 <div class="blog-twitter">
                     <div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
@@ -276,7 +231,6 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 		
 		App.init();
 		
-		LayerSlider.initLayerSlider();
 		OwlRecentWorks.initOwlRecentWorksV2();
 	});	
 	

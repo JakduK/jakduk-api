@@ -55,4 +55,11 @@
 .has-feedback .form-control {padding-right:38px;}
 .form-control {padding:6px 10px;}
 
+/* 각 페이지 마다 있는 제목 */
 .breadcrumbs a {color:#666;}
+
+.cube-portfolio .content-xs {padding-bottom:0px;}
+
+.image-block {
+	background: url(../img/bg.jpg) no-repeat;
+}
