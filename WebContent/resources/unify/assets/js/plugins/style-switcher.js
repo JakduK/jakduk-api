@@ -25,14 +25,13 @@ var StyleSwitcher = function () {
             var setColor = function (color, data_header) {
                 jQuery('#style_color').attr("href", "assets/css/theme-colors/" + color + ".css");
                 if(data_header == 'light'){
-                    jQuery('#logo-header').attr("src", "assets/img/logo1-" + color + ".png");
-                    jQuery('#logo-footer').attr("src", "assets/img/logo2-" + color + ".png");
+                    jQuery('.logo img').attr("src", "assets/img/themes/logo1-" + color + ".png");
+                    jQuery('#logo-footer').attr("src", "assets/img/themes/logo2-" + color + ".png");
                 } else if(data_header == 'dark'){
-                    jQuery('#logo-header').attr("src", "assets/img/logo1-" + color + ".png");
-                    jQuery('#logo-footer').attr("src", "assets/img/logo2-" + color + ".png");
+                    jQuery('.logo img').attr("src", "assets/img/themes/logo1-" + color + ".png");
+                    jQuery('#logo-footer').attr("src", "assets/img/themes/logo2-" + color + ".png");
                 }
             }
-
 
             //Boxed Layout
             jQuery('.skins-btn').click(function(){

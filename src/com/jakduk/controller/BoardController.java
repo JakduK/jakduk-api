@@ -43,6 +43,12 @@ public class BoardController {
 		
 		return "redirect:/board/free";
 	}
+
+	@RequestMapping(value = "/free/refresh", method = RequestMethod.GET)
+	public String refreshFree() {
+		
+		return "redirect:/board/free";
+	}	
 	
 	@RequestMapping(value = "/free", method = RequestMethod.GET)
 	public String freeList(@ModelAttribute BoardListInfo boardListInfo, Model model

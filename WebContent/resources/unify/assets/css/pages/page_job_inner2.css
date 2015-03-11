@@ -73,6 +73,10 @@
 	margin-bottom: 5px;
 }
 
+.job-description .star-vote {
+	margin-left: 5px;
+}
+
 .job-description .star-vote li {
 	padding: 0;
 }

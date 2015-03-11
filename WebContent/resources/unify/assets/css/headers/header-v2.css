@@ -1,6 +1,22 @@
-/*Top Bar (login, sign in etc.)
+/*----------------------------------------------------------------------
+
+[-----*** TABLE OF CONTENT ***-----]
+
+1. Header - Topbar
+2. Header - Navbar
+3. Header - Responsive Navbar Style
+4. Header - Submenu
+5. Header - Mega Menu
+6. Header - Fixed
+-----------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------
+    [1. Header - Topbar]
+----------------------------------------------------*/
+
+/*Top Bar v2 (login, sign in etc.)
 ------------------------------------*/
-/*Top v2 Contacts*/
 .header-v2 .topbar-v2 {
 	z-index: 12;
 	padding: 15px 0;
@@ -172,8 +188,12 @@ topbar including in mobile version*/
 	text-decoration: none;
 }
 
-/*Header v2
-------------------------------------*/
+
+/*--------------------------------------------------
+    [2. Header - Navbar]
+----------------------------------------------------*/
+
+/*Navbar*/
 .header-v2 {
 	z-index: 99;
 	position: relative;
@@ -273,6 +293,11 @@ topbar including in mobile version*/
 	}	
 }
 
+
+/*--------------------------------------------------
+    [3. Header - Responsive Navbar Style]
+----------------------------------------------------*/
+
 /*Responsive Navbar*/
 @media (max-width: 991px) {
 	/*Responsive code for max-width: 991px*/
@@ -311,6 +336,11 @@ topbar including in mobile version*/
     .header-v2 .navbar-default .navbar-nav > li > a {
     	color: #777;
     }
+
+    /*Pull Right*/
+    .header-v2 .dropdown-menu.pull-right {
+		float: none !important;
+	}
 
 	/*Dropdown Menu Slide Down Effect*/
 	.header-v2 .navbar-nav .open .dropdown-menu {
@@ -492,6 +522,11 @@ topbar including in mobile version*/
 	}
 }
 
+
+/*--------------------------------------------------
+    [4. Header - Submenu]
+----------------------------------------------------*/
+
 /*Dropdown Submenu for BS3
 ------------------------------------*/
 .header-v2 .dropdown-submenu { 
@@ -569,84 +604,10 @@ topbar including in mobile version*/
 	width: 1.5625em;
 }
 
-/*Header Fixed
-------------------------------------*/
-/*Header*/
-.header-fixed .header-v2 {
-	height: 0;
-}
 
-.header-fixed .header-v2.header-fixed-shrink {
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 93px;
-	z-index: 9999;
-	position: fixed;
-	margin-top: -35px;
-	border-bottom: none;
-	box-shadow: 0 0 3px #bbb;
-	background: rgba(255,255,255, 0.96); 
-/*	-webkit-transition: height 0.4s;
-	-moz-transition: height 0.4s;
-	transition: height 0.4s;
-*/}
-
-/*Topbar v2*/
-.header-fixed .header-v2.header-fixed-shrink .topbar-v2 {
-	display: none;
-}
-
-/*Brand*/
-.header-fixed .header-v2.header-fixed-shrink .navbar-brand { 
-	top: 50px;
-	z-index: 1;
-	position: relative;
-	padding: 0 10px 10px;
-}
-
-.header-fixed .header-v2.header-fixed-shrink .navbar-brand img {
-	width: 90%;
-}
-
-/*Navbar*/
-.header-fixed .header-v2.header-fixed-shrink .navbar {
-	margin-top: 0;
-}
-
-.header-fixed .header-v2.header-fixed-shrink .active a {
-	border-bottom: none !important;
-}
-
-@media (max-width: 991px) {
-	/*Header*/
-	.header-fixed .header-v2,
-	.header-fixed .header-v2.header-fixed-shrink {
-		height: inherit;
-		position: relative;
-	}
-}
-
-@media (min-width: 992px) {
-	.header-fixed .header-v2.header-fixed-shrink .navbar-nav > li > a {
-		color: #777;
-		margin-top: 25px;
-		padding: 21px 30px 17px 20px;
-		border-bottom: solid 1px transparent !important;
-		-webkit-transition: color 0.2s ease-in-out;
-		-moz-transition: color 0.2s ease-in-out;
-		-o-transition: color 0.2s ease-in-out;
-		transition: color 0.2s ease-in-out;		
-	}
-
-	.header-fixed .header-v2.header-fixed-shrink .navbar-nav > .active > a:hover {
-		color: #777;
-	}
-
-	.header-fixed .header-v2.header-fixed-shrink .dropdown > a:after {
-		top: 22px;
-	}
-}
+/*--------------------------------------------------
+    [5. Header - Mega Menu]
+----------------------------------------------------*/
 
 /*Mega Menu
 ------------------------------------*/
@@ -871,5 +832,84 @@ topbar including in mobile version*/
 	.header-v2 .mega-menu .equal-height-list li a:hover {
 		color: #333;
 		text-decoration: none;
+	}
+}
+
+
+/*--------------------------------------------------
+    [6. Header - Dark Option]
+----------------------------------------------------*/
+
+/*Header*/
+.header-fixed .header-v2 {
+	height: 0;
+}
+
+.header-fixed .header-v2.header-fixed-shrink {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 93px;
+	z-index: 9999;
+	position: fixed;
+	margin-top: -35px;
+	border-bottom: none;
+	box-shadow: 0 0 3px #bbb;
+	background: rgba(255,255,255, 0.96); 
+}
+
+/*Topbar v2*/
+.header-fixed .header-v2.header-fixed-shrink .topbar-v2 {
+	display: none;
+}
+
+/*Brand*/
+.header-fixed .header-v2.header-fixed-shrink .navbar-brand { 
+	top: 50px;
+	z-index: 1;
+	position: relative;
+	padding: 0 10px 10px 15px;
+}
+
+.header-fixed .header-v2.header-fixed-shrink .navbar-brand img {
+	width: 90%;
+}
+
+/*Navbar*/
+.header-fixed .header-v2.header-fixed-shrink .navbar {
+	margin-top: 0;
+}
+
+.header-fixed .header-v2.header-fixed-shrink .active a {
+	border-bottom: none !important;
+}
+
+@media (max-width: 991px) {
+	/*Header*/
+	.header-fixed .header-v2,
+	.header-fixed .header-v2.header-fixed-shrink {
+		height: inherit;
+		position: relative;
+	}
+}
+
+@media (min-width: 992px) {
+	.header-fixed .header-v2.header-fixed-shrink .navbar-nav > li > a {
+		color: #777;
+		margin-top: 25px;
+		padding: 21px 30px 17px 20px;
+		border-bottom: solid 1px transparent !important;
+		-webkit-transition: color 0.2s ease-in-out;
+		-moz-transition: color 0.2s ease-in-out;
+		-o-transition: color 0.2s ease-in-out;
+		transition: color 0.2s ease-in-out;		
+	}
+
+	.header-fixed .header-v2.header-fixed-shrink .navbar-nav > .active > a:hover {
+		color: #777;
+	}
+
+	.header-fixed .header-v2.header-fixed-shrink .dropdown > a:after {
+		top: 22px;
 	}
 }

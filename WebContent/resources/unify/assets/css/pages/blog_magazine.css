@@ -4,7 +4,7 @@
 .magazine-page h3,
 .magazine-page h3 a {
 	color: #555;
-	font-size: 20px;
+	font-size: 18px;
 	line-height: 28px;
 	margin-bottom: 1px;
 	text-decoration: none;
@@ -64,7 +64,7 @@
 
 .magazine-news-img {
 	overflow: hidden;
-	max-height: 150px;
+	max-height: 200px;
 	position: relative;
 }
 

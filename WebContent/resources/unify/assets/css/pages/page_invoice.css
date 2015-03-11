@@ -1,5 +1,21 @@
 /*Invoice Page
 ------------------------------------*/
+@media print {
+	* { -webkit-print-color-adjust: exact; }
+	
+	.btn-u,
+	.header,
+	.footer-v1, 
+	.breadcrumbs,
+	#topcontrol {
+		display: none; 
+	}
+
+	.panel {
+		border: none;
+	}
+}
+
 /*Invoice Header*/
 .invoice-header {
 	color: #555;
@@ -33,6 +49,10 @@
 }
 
 /*Invoice Footer*/
+address {
+	line-height: 20px;
+}
+
 .invoice-total-info {
 	margin-bottom: 30px;
 }

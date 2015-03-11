@@ -20,6 +20,7 @@
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 </head>
+
 <body>
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
@@ -71,7 +72,7 @@
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><spring:message code="board.name.free"/></h1>
+			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->		
@@ -288,7 +289,7 @@
 <p>
 				<c:choose>
 					<c:when test="${authRole == 'ANNONYMOUS'}">
-						<button type="button" class="btn-u btn-brd rounded btn-u-sm disabled" disabled="disabled">
+						<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled">
 							<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
 						</button>	
 					</c:when>

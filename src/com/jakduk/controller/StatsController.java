@@ -41,6 +41,12 @@ public class StatsController {
 		return "redirect:/stats/supporters";
 	}
 	
+	@RequestMapping(value = "/supporters/refresh", method = RequestMethod.GET)
+	public String supportersRefresh() {
+		
+		return "redirect:/stats/supporters";
+	}	
+	
 	@RequestMapping(value = "/supporters", method = RequestMethod.GET)
 	public String supporter(Model model) {
 		
@@ -60,8 +66,20 @@ public class StatsController {
 	@RequestMapping(value = "/attendance", method = RequestMethod.GET)
 	public String attendance(Model model) {
 		
-		return "stats/attendance";
+		return "redirect:/stats/attendance/league";
 	}
+	
+	@RequestMapping(value = "/attendance/league/refresh", method = RequestMethod.GET)
+	public String attendanceLeagueRefresh() {
+		
+		return "redirect:/stats/attendance/league";
+	}
+	
+	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
+	public String attendanceLeague() {
+		
+		return "stats/attendanceLeague";
+	}	
 	
 	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
 	public void dataLeagueAttendance(Model model) {

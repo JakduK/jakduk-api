@@ -18,7 +18,7 @@
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><spring:message code="about"/></h1>
+			<h1 class="pull-left"><a href="<c:url value="/about/intro/refresh"/>"><spring:message code="about"/></a></h1>
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->	

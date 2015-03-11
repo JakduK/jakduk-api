@@ -12,9 +12,6 @@
 	<!-- CSS Implementing Plugins -->
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/layer-slider/layerslider/css/layerslider.css">	
-	<!-- CSS Page Style -->    
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog_magazine.css">	
-	
 	<jsp:include page="../include/html-header.jsp"/>
 </head>
 
@@ -83,43 +80,51 @@
 	
 
 
-<div class="row blog-page">    
+<div class="row">
+    
             <!-- Left Sidebar -->
         	<div class="col-md-9 md-margin-bottom-30">
+        	
                 <!--Blog Post-->
-                <div class="row blog blog-medium magazine-page margin-bottom-30">
+                <div class="row margin-bottom-30">
                     
 <!--  최근 글 -->                    
                         <div class="col-md-6 margin-bottom-30">
-<div class="headline">
-	<h2><spring:message code="home.posts.latest"/></h2>
-    	<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
-    		<spring:message code="common.button.more"/>
-    	</button>	
-</div>
-        
-					<div ng-repeat="post in postsLatest">
-					<div class="magazine-mini-news margin-bottom-10">
-					<h3 ng-switch="post.status.delete">
-						<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
-					<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
-						    </h3>                        
-					<div class="post-author">
-					<i class="fa fa-user"></i> {{post.writer.username}}		
+
+                <div class="headline-v2 bg-color-light">
+                	<h2><spring:message code="home.posts.latest"/>    	
+                	<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
+			    		<spring:message code="common.button.more"/>
+    				</button>	
+    				</h2>
+    			</div>
+                <!-- Trending -->
+                <ul class="list-unstyled blog-trending margin-bottom-50">
+                    <li ng-repeat="post in postsLatest">
+                        <h3 ng-switch="post.status.delete">
+                        <a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+                        <a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
+                        </h3>
+                        <small>
+                        <i class="fa fa-user"></i> {{post.writer.username}}
 					<i class="fa fa-clock-o"></i>
 					<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
 					<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
-					</div>
-					</div>        
-					</div>							
+                        
+                        </small>                        
+                    </li>
+                </ul>
+                <!-- End Trending -->   
                       
                         </div>                    
                         
 <!-- 최근 댓글  -->
 <div class="col-md-6">
-                    <div class="headline">
-                    	<h2><spring:message code="home.comments.latest"/></h2>
-                    </div>
+
+                <div class="headline-v2 bg-color-light">
+                	<h2><spring:message code="home.comments.latest"/></h2>
+    			</div>
+
 <div class="blog-twitter">
                     <div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
                         <strong><i class="fa fa-user"></i> {{comment.writer.username}}</strong>

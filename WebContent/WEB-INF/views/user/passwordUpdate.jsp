@@ -12,6 +12,7 @@
 	
 	<link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 </head>
+
 <body>
 <div class="container" ng-controller="writeCtrl">
 	<jsp:include page="../include/navigation-header.jsp"/>

@@ -1,3 +1,21 @@
+/*----------------------------------------------------------------------
+
+[-----*** TABLE OF CONTENT ***-----]
+
+1. Header - Topbar
+2. Header - Shop Badge
+3. Header - Navbar
+4. Header - Responsive Navbar Style
+4. Header - Submenu
+5. Header - Mega Menu
+6. Header - Fixed
+-----------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------
+    [1. Header - Topbar]
+----------------------------------------------------*/
+
 /*Top Bar v3 (currency, language, account etc.)
 ------------------------------------*/
 .topbar-v3 {
@@ -189,8 +207,11 @@
     font-weight: 200;
 }
 
-/*Shop Badge
-------------------------------------*/
+
+/*--------------------------------------------------
+    [2. Header - Shop Badge]
+----------------------------------------------------*/
+
 /*Badge Lists*/
 .header-v5 .shop-badge.badge-lists {
     margin-bottom: 0;
@@ -224,7 +245,7 @@
 }
 
 .header-v5 .shop-badge.badge-icons i {
-    color: #687074;
+    color: #555;
     font-size: 24px;
     min-width: 25px;
 }
@@ -236,20 +257,12 @@
 }
 
 .header-v5 .shop-badge span.badge-sea {
-    background: #18ba9b;
+    background: #72c02c;
 }
 
 /*Scrollbar*/
-.header-v5 .contentHolder {
-    padding: 0;
+.header-v5 .mCustomScrollbar {
     height: 400px; 
-    margin: 0 auto;
-    overflow: hidden; 
-    position: relative; 
-}
-
-.header-v5 .ps-scrollbar-x-rail {
-    display: none !important;
 }
 
 /*Badge Open*/
@@ -270,7 +283,7 @@
     min-width: 300px;
     background: #fff;
     position: absolute;
-    border-top: 2px solid #18ba9b;
+    border-top: 2px solid #72c02c;
     -webkit-box-shadow: 0 2px 2px 0px rgba(90,90,90,0.075);
     -moz-box-shadow: 0 2px 2px 0px rgba(90,90,90,0.075);
     box-shadow: 0 5px 5px 0px rgba(90,90,90,0.075);
@@ -311,7 +324,7 @@
 
 .header-v5 .badge-open span {
     margin: 7px 0;
-    color: #687074;
+    color: #555;
     display: block;
     font-size: 14px;
 }
@@ -334,6 +347,10 @@
     text-transform: uppercase;
 }
 
+.header-v5 li.subtotal .subtotal-cost {
+    color: #72c02c;
+}
+
 .header-v5 li.subtotal .btn-u {
     font-size: 12px;
 }
@@ -346,8 +363,12 @@
     padding-left: 8px;
 }
 
-/*Header v5
-------------------------------------*/
+
+/*--------------------------------------------------
+    [3. Header - Navbar]
+----------------------------------------------------*/
+
+/*Navbar*/
 .header-v5 {
     z-index: 99;
     position: relative;
@@ -426,15 +447,20 @@
 
 /*Navbar Menu*/
 .header-v5 .navbar-default .navbar-nav > li > a {
-    color: #687074;
+    color: #555;
     font-size: 16px;
     font-weight: 400;
     text-transform: uppercase;
 }
 
 .header-v5 .navbar-default .navbar-nav > .active > a {
-    color: #18ba9b;
+    color: #72c02c;
 }
+
+
+/*--------------------------------------------------
+    [4. Header - Responsive Navbar Style]
+----------------------------------------------------*/
 
 /*Responsive Navbar*/
 @media (max-width: 991px) {
@@ -468,6 +494,11 @@
     .header-v5 .navbar-nav > li > a {
         padding-top: 30px;
         padding-bottom: 40px;
+    }
+
+    /*Pull Right*/
+    .header-v5 .dropdown-menu.pull-right {
+        float: none !important;
     }
 
     /*Dropdown Menu Slide Down Effect*/
@@ -544,14 +575,14 @@
     }
 
     .header-v5 .navbar-default .navbar-nav > li > a:hover {
-        color: #18ba9b;
+        color: #72c02c;
     }
 
     .header-v5 .navbar-default .navbar-nav > .active > a,
     .header-v5 .navbar-default .navbar-nav > .active > a:hover,
     .header-v5 .navbar-default .navbar-nav > .active > a:focus {
-        background: #18ba9b;
         color: #fff !important; 
+        background: #72c02c !important;
     }
 
     .header-v5 .dropdown .dropdown-submenu > a { 
@@ -583,7 +614,7 @@
 
     .header-v5 .navbar-default .navbar-nav > li > a:hover,
     .header-v5 .navbar-default .navbar-nav > .active > a {
-        border-top: solid 2px #18ba9b;
+        border-top: solid 2px #72c02c;
     }
     
     .header-v5 .navbar-default .navbar-nav > li > a,
@@ -598,11 +629,11 @@
     .header-v5 .navbar-default .navbar-nav > .open > a,
     .header-v5 .navbar-default .navbar-nav > .open > a:hover,
     .header-v5 .navbar-default .navbar-nav > .open > a:focus {
-        color: #18ba9b;
+        color: #72c02c;
     }
 
     .header-v5 .navbar-default .navbar-nav > li:hover > a {
-        color: #18ba9b;
+        color: #72c02c;
     }
 
     /*Dropdown Menu*/
@@ -612,14 +643,14 @@
         min-width: 200px;
         border-radius: 0;
         z-index: 9999 !important;
-        border-top: solid 2px #18ba9b;
+        border-top: solid 2px #72c02c;
         -webkit-box-shadow: 0 2px 2px 0px rgba(90,90,90,0.075);
         -moz-box-shadow: 0 2px 2px 0px rgba(90,90,90,0.075);
         box-shadow: 0 5px 5px 0px rgba(90,90,90,0.075);
     }
 
     .header-v5 .dropdown-menu li a { 
-        color: #687074; 
+        color: #555; 
         font-size: 14px; 
         font-weight: 400; 
         padding: 8px 15px; 
@@ -637,7 +668,7 @@
     .header-v5 .dropdown-menu .active > a,
     .header-v5 .dropdown-menu li > a:hover {
         color: #fff;
-        background: #18ba9b;
+        background: #72c02c;
         filter: none !important;
     }
 
@@ -657,9 +688,14 @@
 
     .header-v5 .dropdown-menu li.dropdown-submenu:hover > a {
         color: #fff;
-        background: #18ba9b;
+        background: #72c02c;
     }
 }
+
+
+/*--------------------------------------------------
+    [5. Header - Submenu]
+----------------------------------------------------*/
 
 /*Dropdown Submenu for BS3
 ------------------------------------*/
@@ -744,109 +780,9 @@
     width: 1.5625em;
 }
 
-/*Header Fixed
-------------------------------------*/
-/*Header*/
-.header-fixed .header-v5.header-fixed-shrink {
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 9999;
-    position: fixed;
-    height: 95px;
-    margin-top: -29.5px;
-    border-bottom: none;
-    box-shadow: 0 0 3px #bbb;
-    background: rgba(255,255,255, 0.96); 
-    -webkit-transition: background 0.4s;
-    -moz-transition: background 0.4s;
-    transition: background 0.4s;
-}
-
-/*Topbar*/
-.header-fixed .header-v5.header-fixed-shrink .topbar {
-    display: none;
-}
-
-/*No Topbar*/
-.header-fixed .header-v5.no-topbar {
-    height: 78px;
-}
-
-.header-fixed .header-v5.no-topbar.header-fixed-shrink {
-    height: 95px;
-    margin-top: -35px;
-}
-
-.header-fixed .header-v5.no-topbar.header-fixed-shrink .navbar-brand {
-    top: 46px;
-}
-
-.header-fixed .header-v5.no-topbar.header-fixed-shrink .shop-badge.badge-lists {
-    margin-top: 26px;
-}
-
-.header-fixed .header-v5.no-topbar.header-fixed-shrink .shop-badge.badge-lists > li {
-    padding-bottom: 17px;
-}
-
-.header-fixed .header-v5.no-topbar.header-fixed-shrink .shop-badge .badge-open {
-    top: 69px;
-}
-
-.header-fixed .header-v5.no-topbar.header-fixed-shrink .navbar-nav > li > .dropdown-menu {
-    margin-top: -1px;
-}
-
-/*Brand*/
-.header-fixed .header-v5.header-fixed-shrink .navbar-brand { 
-    top: 15px;
-    z-index: 1;
-    position: relative;
-    padding: 0 10px 10px;
-}
-
-.header-fixed .header-v5.header-fixed-shrink .navbar-brand img {
-    width: 90%;
-}
-
-.header-fixed .header-v5.header-fixed-shrink .navbar-nav > li > .dropdown-menu {
-    margin-top: -8px;
-}
-
-/*Badge List*/
-.header-fixed .header-v5.header-fixed-shrink .shop-badge.badge-lists {
-    margin-top: -3px;
-}
-
-.header-fixed .header-v5.header-fixed-shrink .shop-badge .badge-open {
-    top: 70px;
-}
-
-@media (max-width: 991px) {
-    /*Header*/
-    .header-fixed .header-v5,
-    .header-fixed .header-v5.header-fixed-shrink,
-    .header-fixed .header-v5.no-topbar,
-    .header-fixed .header-v5.no-topbar.header-fixed-shrink {
-        height: inherit;
-        position: relative;
-    }
-}
-
-@media (min-width: 992px) {
-    .header-fixed .header-v5.header-fixed-shrink .navbar-nav > li > a {
-        font-size: 15px;
-        margin-top: 2px;
-        padding: 17px 18px 26px;
-    }
-
-    /*No Topbar*/
-    .header-fixed .header-v5.no-topbar.header-fixed-shrink .navbar-nav > li > a {
-        margin-top: 35px;
-        padding: 14px 17px 16px;
-    }
-}
+/*--------------------------------------------------
+    [5. Header - Mega Menu]
+----------------------------------------------------*/
 
 /*Mega Menu
 ------------------------------------*/
@@ -984,13 +920,13 @@
 }
 
 .header-v5 .style-list li a {
-    color: #888;
+    color: #555;
     font-size: 14px;
     margin-right: 5px;
 }
 
 .header-v5 .style-list li a:hover {
-    color: #18ba9b;
+    color: #72c02c;
     background: none;
     text-decoration: none;
 }
@@ -998,4 +934,110 @@
 .header-v5 .style-list li .label {
     top: -2px;
     position: relative;
+}
+
+/*--------------------------------------------------
+    [6. Header - Fixed]
+----------------------------------------------------*/
+
+/*Header*/
+.header-fixed .header-v5.header-fixed-shrink {
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    position: fixed;
+    height: 95px;
+    margin-top: -29.5px;
+    border-bottom: none;
+    box-shadow: 0 0 3px #bbb;
+    background: rgba(255,255,255, 0.96); 
+    -webkit-transition: background 0.4s;
+    -moz-transition: background 0.4s;
+    transition: background 0.4s;
+}
+
+/*Topbar*/
+.header-fixed .header-v5.header-fixed-shrink .topbar {
+    display: none;
+}
+
+/*No Topbar*/
+.header-fixed .header-v5.no-topbar {
+    height: 78px;
+}
+
+.header-fixed .header-v5.no-topbar.header-fixed-shrink {
+    height: 95px;
+    margin-top: -35px;
+}
+
+.header-fixed .header-v5.no-topbar.header-fixed-shrink .navbar-brand {
+    top: 46px;
+}
+
+.header-fixed .header-v5.no-topbar.header-fixed-shrink .shop-badge.badge-lists {
+    margin-top: 26px;
+}
+
+.header-fixed .header-v5.no-topbar.header-fixed-shrink .shop-badge.badge-lists > li {
+    padding-bottom: 17px;
+}
+
+.header-fixed .header-v5.no-topbar.header-fixed-shrink .shop-badge .badge-open {
+    top: 69px;
+}
+
+.header-fixed .header-v5.no-topbar.header-fixed-shrink .navbar-nav > li > .dropdown-menu {
+    margin-top: -1px;
+}
+
+/*Brand*/
+.header-fixed .header-v5.header-fixed-shrink .navbar-brand { 
+    top: 15px;
+    z-index: 1;
+    position: relative;
+    padding: 0 10px 10px;
+}
+
+.header-fixed .header-v5.header-fixed-shrink .navbar-brand img {
+    width: 90%;
+}
+
+.header-fixed .header-v5.header-fixed-shrink .navbar-nav > li > .dropdown-menu {
+    margin-top: -8px;
+}
+
+/*Badge List*/
+.header-fixed .header-v5.header-fixed-shrink .shop-badge.badge-lists {
+    margin-top: -3px;
+}
+
+.header-fixed .header-v5.header-fixed-shrink .shop-badge .badge-open {
+    top: 70px;
+}
+
+@media (max-width: 991px) {
+    /*Header*/
+    .header-fixed .header-v5,
+    .header-fixed .header-v5.header-fixed-shrink,
+    .header-fixed .header-v5.no-topbar,
+    .header-fixed .header-v5.no-topbar.header-fixed-shrink {
+        height: inherit;
+        position: relative;
+    }
+}
+
+@media (min-width: 992px) {
+    .header-fixed .header-v5.header-fixed-shrink .navbar-nav > li > a {
+        font-size: 15px;
+        margin-top: 2px;
+        padding: 17px 18px 26px;
+    }
+
+    /*No Topbar*/
+    .header-fixed .header-v5.no-topbar.header-fixed-shrink .navbar-nav > li > a {
+        margin-top: 35px;
+        padding: 14px 17px 16px;
+    }
 }

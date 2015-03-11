@@ -3,7 +3,8 @@
 .contacts-section {
   color: #fff;
   position: relative;
-  background: #333 url(../../img/bg/17.jpg) center fixed;
+  background: #333 url(../../img/bg/3.jpg) center fixed;
+  background-size: cover;
 }
 
 .contacts-section:after {
@@ -70,6 +71,7 @@
 }
 
 .contacts-in form label {
+  color: #fff;
   font-size: 14px; 
   font-weight: 200;
 }
@@ -137,4 +139,69 @@
 
 .copyright-section i.back-to-top:hover {
   color: #72c02c;
+}
+
+/*Sky Form
+------------------------------------*/
+/*Error State*/
+.sky-form .state-error input,
+.sky-form .state-error textarea {
+  border-color: #e0aaaa;
+}
+
+.sky-form .state-error + em {
+  display: block;
+  margin-top: 6px;
+  padding: 0 1px;
+  font-style: normal;
+  font-size: 11px;
+  line-height: 15px;
+  color: #ee9393;
+}
+.sky-form .rating.state-error + em {
+  margin-top: -4px;
+  margin-bottom: 4px;
+}
+
+/*Success State*/
+.sky-form .state-success input {
+  border-color: #f0fff0;
+}
+
+/*Disabled State*/
+.sky-form .input.state-disabled input {
+  border-color: #f0fff0;
+}
+
+/*Submited State*/
+.sky-form .message {
+  display: none;
+  color: #6fb679;
+}
+
+.sky-form .message i {
+  display: block;
+  margin: 0 auto 20px;
+  width: 81px;
+  height: 81px;
+  border: 1px solid #6fb679;
+  border-radius: 50%;
+  font-size: 30px;
+  line-height: 81px;
+}
+
+.sky-form.submited fieldset,
+.sky-form.submited footer {
+  display: none;
+}
+
+.sky-form.submited .message {
+  display: block;
+  padding: 25px 30px;
+  font: 300 18px/27px 'Open Sans', Helvetica, Arial, sans-serif;
+  text-align: center;
+}
+
+.sky-form.submited .message p {
+  color: #fff;
 }

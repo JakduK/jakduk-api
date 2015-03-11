@@ -14,6 +14,7 @@
 
    	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
+
 <body>
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>

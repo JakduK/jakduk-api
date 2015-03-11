@@ -26,7 +26,7 @@ var PageContactForm = function () {
 	                captcha:
 	                {
 	                    required: true,
-	                    remote: 'assets/plugins/sky-forms/version-2.0.1/captcha/process.php'
+	                    remote: 'assets/plugins/sky-forms-pro/skyforms/captcha/process.php'
 	                }
 	            },
 	                                

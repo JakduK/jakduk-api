@@ -13,18 +13,18 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrap.min.css">    
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/style.css">
 
-
-<!-- CSS Theme -->
-<!-- 
-<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/theme-colors/brown.css"/>
- -->
+<!-- CSS Header and Footer -->
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/headers/header-default.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/footers/footer-v1.css">
 
 <!-- CSS Implementing Plugins -->
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/line-icons/line-icons.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css">
 
 <!-- Custom styles for this template -->
+<!-- 
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/jakduk/css/jakduk.css">
+-->
 
 <!-- 
 <link href="//fonts.googleapis.com/earlyaccess/nanumgothic.css" rel="stylesheet">

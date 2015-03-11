@@ -1,3 +1,21 @@
+/*----------------------------------------------------------------------
+
+[-----*** TABLE OF CONTENT ***-----]
+
+1. Header - Topbar
+2. Header - Navbar
+3. Header - Responsive Navbar Style
+4. Header - Submenu
+5. Header - Search
+6. Header - Mega Menu
+7. Header - Fixed
+-----------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------
+    [1. Header - Topbar]
+----------------------------------------------------*/
+
 /*Top Bar v1 (login, search etc.)
 ------------------------------------*/
 .header-v1 .topbar-v1 {
@@ -78,8 +96,12 @@
 	}		
 }
 
-/*Header v1
-------------------------------------*/
+
+/*--------------------------------------------------
+    [2. Header - Navbar]
+----------------------------------------------------*/
+
+/*Navbar*/
 .header-v1 {
 	z-index: 99;
 	position: relative;
@@ -175,6 +197,11 @@
 	}	
 }
 
+
+/*--------------------------------------------------
+    [3. Header - Responsive Navbar Style]
+----------------------------------------------------*/
+
 /*Responsive Navbar*/
 @media (max-width: 991px) {
 	/*Responsive code for max-width: 991px*/
@@ -212,6 +239,11 @@
     /*Header*/
 	.header-v1 {
 		border-bottom: solid 1px #eee;
+	}
+
+	/*Pull Right*/
+    .header-v1 .dropdown-menu.pull-right {
+		float: none !important;
 	}
 
 	/*Dropdown Menu Slide Down Effect*/
@@ -406,6 +438,11 @@
 	}
 }
 
+
+/*--------------------------------------------------
+    [4. Header - Submenu]
+----------------------------------------------------*/
+
 /*Dropdown Submenu for BS3
 ------------------------------------*/
 .header-v1 .dropdown-submenu { 
@@ -489,6 +526,11 @@
 	width: 1.5625em;
 }
 
+
+/*--------------------------------------------------
+    [5. Header - Search]
+----------------------------------------------------*/
+
 /*Search Box
 ------------------------------------*/
 .header-v1 .navbar .nav > li > .search {
@@ -564,88 +606,10 @@
 	}
 }
 
-/*Header Fixed
-------------------------------------*/
-/*Header*/
-.header-fixed .header-v1 {
-	height: 78px;
-}
 
-.header-fixed .header-v1.header-fixed-shrink {
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 95px;
-	z-index: 9999;
-	position: fixed;
-	margin-top: -35px;
-	border-bottom: none;
-	box-shadow: 0 0 3px #bbb;
-	background: rgba(255,255,255, 0.96); 
-	-webkit-transition: height 0.4s;
-	-moz-transition: height 0.4s;
-	transition: height 0.4s;
-}
-
-/*Topbar v2*/
-.header-fixed .header-v1.header-fixed-shrink .topbar-v1 {
-	display: none;
-}
-
-/*Brand*/
-.header-fixed .header-v1.header-fixed-shrink .navbar-brand { 
-	top: 41px;
-	z-index: 1;
-	position: relative;
-	padding: 0 10px 10px;
-}
-
-.header-fixed .header-v1.header-fixed-shrink .navbar-brand img {
-	width: 90%;
-}
-
-.header-fixed .header-v1.header-fixed-shrink .search,
-.header-fixed .header-v1.header-fixed-shrink .active a {
-	border-bottom: none !important;
-}
-
-.header-fixed .header-v1.header-fixed-shrink .navbar-nav > li > .dropdown-menu {
-	margin-top: 2px;
-}
-
-@media (max-width: 991px) {
-	/*Header*/
-	.header-fixed .header-v1,
-	.header-fixed .header-v1.header-fixed-shrink {
-		height: inherit;
-		position: relative;
-	}
-}
-
-@media (min-width: 992px) {
-	.header-fixed .header-v1.header-fixed-shrink .navbar-nav > li > a {
-		padding: 40px 30px 20px 20px;
-		border-bottom: solid 1px transparent !important;
-	}
-
-	.header-fixed .header-v1.header-fixed-shrink .dropdown > a:after {
-		top: 41px;
-	}
-
-	/*Search Bar*/
-	.header-fixed .header-v1.header-fixed-shrink .search {
-		margin-top: 35px;
-		color: #585f69 !important;
-		background: none !important;
-		padding: 8px 8px 8px 3px !important;
-	}
-
-	.header-fixed .header-v1.header-fixed-shrink .search-open {
-		top: 81px;
-		border-top: none;
-		background: rgba(255,255,255, 0.9);	
-	}
-}
+/*--------------------------------------------------
+    [6. Header - Mega Menu]
+----------------------------------------------------*/
 
 /*Mega Menu
 ------------------------------------*/
@@ -873,5 +837,87 @@
 	.header-v1 .mega-menu .equal-height-list li a:hover {
 		color: #333;
 		text-decoration: none;
+	}
+}
+
+
+/*--------------------------------------------------
+    [7. Header - Fixed]
+----------------------------------------------------*/
+
+/*Header*/
+.header-fixed .header-v1.header-fixed-shrink {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 95px;
+	z-index: 9999;
+	position: fixed;
+	margin-top: -35px;
+	border-bottom: none;
+	box-shadow: 0 0 3px #bbb;
+	background: rgba(255,255,255, 0.96); 
+	-webkit-transition: height 0.4s;
+	-moz-transition: height 0.4s;
+	transition: height 0.4s;
+}
+
+/*Topbar v2*/
+.header-fixed .header-v1.header-fixed-shrink .topbar-v1 {
+	display: none;
+}
+
+/*Brand*/
+.header-fixed .header-v1.header-fixed-shrink .navbar-brand { 
+	top: 41px;
+	z-index: 1;
+	position: relative;
+	padding: 0 10px 10px;
+}
+
+.header-fixed .header-v1.header-fixed-shrink .navbar-brand img {
+	width: 90%;
+}
+
+.header-fixed .header-v1.header-fixed-shrink .search,
+.header-fixed .header-v1.header-fixed-shrink .active a {
+	border-bottom: none !important;
+}
+
+.header-fixed .header-v1.header-fixed-shrink .navbar-nav > li > .dropdown-menu {
+	margin-top: 2px;
+}
+
+@media (max-width: 991px) {
+	/*Header*/
+	.header-fixed .header-v1,
+	.header-fixed .header-v1.header-fixed-shrink {
+		height: inherit;
+		position: relative;
+	}
+}
+
+@media (min-width: 992px) {
+	.header-fixed .header-v1.header-fixed-shrink .navbar-nav > li > a {
+		padding: 40px 30px 20px 20px;
+		border-bottom: solid 1px transparent !important;
+	}
+
+	.header-fixed .header-v1.header-fixed-shrink .dropdown > a:after {
+		top: 41px;
+	}
+
+	/*Search Bar*/
+	.header-fixed .header-v1.header-fixed-shrink .search {
+		margin-top: 35px;
+		color: #585f69 !important;
+		background: none !important;
+		padding: 8px 8px 8px 3px !important;
+	}
+
+	.header-fixed .header-v1.header-fixed-shrink .search-open {
+		top: 81px;
+		border-top: none;
+		background: rgba(255,255,255, 0.9);	
 	}
 }

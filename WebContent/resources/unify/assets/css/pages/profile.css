@@ -16,16 +16,8 @@
 }
 
 /*Scrollbar*/
-.contentHolder {
-	padding: 0;
+.mCustomScrollbar {
 	height: 320px; 
-	margin: 0px auto;
-	overflow: hidden; 
-	position: relative; 
-}
-
-.spacer { 
-  	text-align: center 
 }
 
 /*Panel Title Box*/
@@ -199,6 +191,31 @@
 /*Table*/
 .profile .table {
 	background: #fff;
+}
+
+.profile .table th {
+	min-width: 100px;
+}
+
+.profile .table td {
+	vertical-align: middle;
+}
+
+.profile .table h3 {
+	margin-top: 0;
+	font-size: 16px;
+	margin-bottom: 5px;
+}
+
+.profile .table a {
+	color: #555;
+}
+
+.profile .table-search-v2 td img {
+	width: 70px;
+	height: 70px;
+	margin: 0 auto;
+	display: block;
 }
 
 .profile .table > thead > tr > th, 
@@ -392,10 +409,6 @@
 }
 
 /*Image Uploaded*/
-.profile .img-uploaded li {
-	padding: 0;
-}
-
 .profile .img-uploaded img {
 	width: 120px;
 	height: auto;

@@ -1,12 +1,36 @@
 /*Parallax Block
 ------------------------------------*/
+.parallax-bg {
+  position: relative;
+  background: url(../../img/bg/25.jpg) 50% no-repeat fixed;
+}
+
+.parallax-bg:before {
+  width: 100%;
+  height: 100%;
+  content: " ";
+  position: absolute;
+  background: rgba(255,255,255,0.85); 
+}
+
 .parallax-about .info-blocks-v2 {
     margin-bottom: 5px;
 }
 
 .parallax-about .title-box-v2 p,
 .parallax-about .title-box-v2 h2 {
-    color: #eee;
+    color: #585f69;
+    position: relative;
+}
+
+/*Contacts
+------------------------------------*/
+.contacts h3 {
+    margin-top: 0;
+}
+
+.contacts hr {
+    margin: 10px 0;
 }
 
 /*Our-Location

@@ -51,6 +51,12 @@ public class GalleryController {
 		return "redirect:/gallery/list";
 	}
 	
+	@RequestMapping(value = "/list/refresh", method = RequestMethod.GET)
+	public String refreshList() {
+		
+		return "redirect:/gallery/list";
+	}		
+	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
 		

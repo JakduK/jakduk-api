@@ -11,15 +11,15 @@
 	<title><spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
-<body>
 
+<body>
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><spring:message code="board.name.free"/></h1>
+			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->		
@@ -114,10 +114,10 @@
 							</a>
 						</div>
 						<div class="col-sm-3">
-							${notice.writer.username}
-							|
+							<i class="fa fa-user"></i> ${notice.writer.username}
+							
 							<fmt:formatDate var="postDate" value="${createDate[notice.id]}" pattern="yyyy-MM-dd" />
-						
+							<i class="fa fa-clock-o"></i>
 							<c:choose>
 								<c:when test="${postDate < nowDate}">
 									<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.date}" />
@@ -128,7 +128,7 @@
 							</c:choose>					
 						</div>
 						<div class="col-sm-3 hidden-xs">
-							<span class="glyphicon glyphicon-eye-open"></span><strong> ${notice.views}</strong> |
+							<span class="glyphicon glyphicon-eye-open"></span><strong> ${notice.views}</strong>
 							<span class="text-primary">
 								<span class="glyphicon glyphicon-thumbs-up"></span>
 								<strong>
@@ -137,7 +137,7 @@
 										<c:otherwise>0</c:otherwise>
 									</c:choose>
 								</strong>
-							</span> |
+							</span>
 							<span class="text-danger">
 								<span class="glyphicon glyphicon-thumbs-down"></span>
 								<strong>
@@ -182,10 +182,11 @@
 						</div>
 						
 						<div class="col-sm-3">
-							${post.writer.username}
-							|
+							<i class="fa fa-user"></i> ${post.writer.username}
+							
 							<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
-						
+							
+							<i class="fa fa-clock-o"></i>						
 							<c:choose>
 								<c:when test="${postDate < nowDate}">
 									<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
@@ -196,7 +197,7 @@
 							</c:choose>		
 						</div>
 						<div class="col-sm-3">
-							<span class="glyphicon glyphicon-eye-open"></span><strong> ${post.views}</strong> |
+							<span class="glyphicon glyphicon-eye-open"></span><strong> ${post.views}</strong>
 							<span class="text-primary">
 								<span class="glyphicon glyphicon-thumbs-up"></span>
 								<strong>
@@ -205,7 +206,7 @@
 										<c:otherwise>0</c:otherwise>
 									</c:choose>
 								</strong>
-							</span> |
+							</span>
 							<span class="text-danger">
 								<span class="glyphicon glyphicon-thumbs-down"></span>
 								<strong>
@@ -281,6 +282,11 @@
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("boardCtrl", function($scope) {
+	
+	angular.element(document).ready(function() {
+		App.init();
+	});	
+
 });
 
 function needLogin() {

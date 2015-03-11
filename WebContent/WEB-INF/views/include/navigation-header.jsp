@@ -7,9 +7,16 @@
 
 <!--=== Header ===-->    
 <div class="header" ng-controller="headerCtrl">
-	<!-- Topbar -->
-	<div class="topbar">
-		<div class="container">
+	<div class="container">
+       
+       <!-- Logo -->
+       <a class="logo" href="<c:url value="/"/>">
+           <img src="<%=request.getContextPath()%>/resources/jakduk/img/jakduk_logo_01.png" alt="Logo">
+       </a>
+       <!-- End Logo -->       	
+	
+		<!-- Topbar -->
+		<div class="topbar">
 			<!-- Topbar Navigation -->
 			<ul class="loginbar pull-right">
 				<li>
@@ -47,65 +54,58 @@
 			</ul>
 			<!-- End Topbar Navigation -->
 		</div>
-	</div>
-	<!-- End Topbar -->
+		<!-- End Topbar -->
 
-	<!-- Navbar -->
-	<div class="navbar navbar-default" role="navigation">
+		<!-- Toggle get grouped for better mobile display -->
+		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+		    <span class="sr-only">Toggle navigation</span>
+		    <span class="fa fa-bars"></span>
+		</button>
+		<!-- End Toggle -->		
+	</div>
+
+	<!-- Collect the nav links, forms, and other content for toggling -->
+	<div class="collapse navbar-collapse mega-menu navbar-responsive-collapse">
 		<div class="container">
-			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-				    <span class="sr-only">Toggle navigation</span>
-				    <span class="fa fa-bars"></span>
-				</button>
-				<a class="navbar-brand" href="<c:url value="/"/>">
-					<spring:message code="common.jakduk"/>
-				</a>
-			</div>
-			
-			<!-- Collect the nav links, forms, and other content for toggling -->
-			<div class="collapse navbar-collapse navbar-responsive-collapse">
-				<ul class="nav navbar-nav">                
-					<li ng-class="{active:isActive('<c:url value="/home"/>')}">
-						<a href="<c:url value="/home"/>"><spring:message code="common.home"/></a>
-					</li>
-					<li ng-class="{active:isActive('<c:url value="/about"/>')}">
-						<a href="<c:url value="/about"/>"><spring:message code="about"/></a>
-					</li>
-					<li ng-class="{active:isActive('<c:url value="/board"/>')}">
-						<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
-					</li>
-					<li ng-class="{active:isActive('<c:url value="/gallery"/>')}">
-						<a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
-					</li>
-					<li class="dropdown" ng-class="{active:isActive('<c:url value="/stats"/>')}">
-						<a href="<c:url value="/stats"/>" class="dropdown-toggle" data-toggle="dropdown">
-							<spring:message code="stats"/>
-						</a>
-						<ul class="dropdown-menu">
-							<li ng-class="{active:isActive('<c:url value="/stats/supporters"/>')}"><a href="<c:url value="/stats/supporters"/>"><spring:message code="stats.supporters"/></a></li>
-							<li ng-class="{active:isActive('<c:url value="/stats/attendance"/>')}"><a href="<c:url value="/stats/attendance"/>"><spring:message code="stats.attendance"/></a></li>
-						</ul>					
-					</li>
-					
-					<!-- Search Block -->
-					<!-- 
-					<li>
-					    <i class="search fa fa-search search-btn"></i>
-					    <div class="search-open">
-					        <div class="input-group animated fadeInDown">
-					            <input type="text" class="form-control" placeholder="Search">
-					            <span class="input-group-btn">
-					                <button class="btn-u" type="button">Go</button>
-					            </span>
-					        </div>
-					    </div>    
-					</li>
-					 -->
-					<!-- End Search Block -->
-				</ul>
-			</div><!--/navbar-collapse-->
+			<ul class="nav navbar-nav">                
+				<li ng-class="{active:isActive('<c:url value="/home"/>')}">
+					<a href="<c:url value="/home"/>"><spring:message code="common.home"/></a>
+				</li>
+				<li ng-class="{active:isActive('<c:url value="/about"/>')}">
+					<a href="<c:url value="/about"/>"><spring:message code="about"/></a>
+				</li>
+				<li ng-class="{active:isActive('<c:url value="/board"/>')}">
+					<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
+				</li>
+				<li ng-class="{active:isActive('<c:url value="/gallery"/>')}">
+					<a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
+				</li>
+				<li class="dropdown" ng-class="{active:isActive('<c:url value="/stats"/>')}">
+					<a href="<c:url value="/stats"/>" class="dropdown-toggle" data-toggle="dropdown">
+						<spring:message code="stats"/>
+					</a>
+					<ul class="dropdown-menu">
+						<li ng-class="{active:isActive('<c:url value="/stats/supporters"/>')}"><a href="<c:url value="/stats/supporters"/>"><spring:message code="stats.supporters"/></a></li>
+						<li ng-class="{active:isActive('<c:url value="/stats/attendance"/>')}"><a href="<c:url value="/stats/attendance"/>"><spring:message code="stats.attendance"/></a></li>
+					</ul>					
+				</li>
+				
+				<!-- Search Block -->
+				<!-- 
+				<li>
+				    <i class="search fa fa-search search-btn"></i>
+				    <div class="search-open">
+				        <div class="input-group animated fadeInDown">
+				            <input type="text" class="form-control" placeholder="Search">
+				            <span class="input-group-btn">
+				                <button class="btn-u" type="button">Go</button>
+				            </span>
+				        </div>
+				    </div>    
+				</li>
+				 -->
+				<!-- End Search Block -->
+			</ul>
 		</div>    
 	</div>            
 	<!-- End Navbar -->

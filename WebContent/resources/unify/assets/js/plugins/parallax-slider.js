@@ -12,10 +12,10 @@ var ParallaxSlider = function () {
 			    // increment the background position 
 			    // (parallax effect) when sliding
 			     
-			    autoplay    : true,
+			    autoplay    : false,
 			    // slideshow on / off
 			     
-			    interval    : 10000  
+			    interval    : 4000  
 			    // time between transitions
 			});
         },

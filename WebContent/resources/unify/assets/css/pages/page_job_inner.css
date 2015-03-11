@@ -42,7 +42,7 @@
 }
 
 .image-block {
-	background: url(../../img/job/slider.jpg) 70% 40% no-repeat;
+	background: url(../../img/bg/19.jpg) 70% 40% no-repeat;
 }
 
 /*Company Description*/
@@ -52,7 +52,7 @@
 	padding: 35px 25px;	
 	position: relative;
 	text-align: center;
-	background: rgba(255,255,255,0.8);
+	background: rgba(255,255,255,0.9);
 }
 
 .image-block .company-description h2 {
@@ -97,7 +97,7 @@
 }
 
 .block-description .left-inner .hex {
-	color: #999;
+	color: #777;
 	margin-bottom: 0;
 }
 
@@ -128,6 +128,7 @@
 
 .block-description .star-vote {
 	float: left;
+	margin-left: 0;
 	margin-right: 10px;
 }
 
@@ -199,13 +200,13 @@
 }
 
 .block-description .save-job i {
-	color: #999;
+	color: #555;
 	min-width: 25px;
 	text-align: center;
 }
 
 .block-description .save-job a {
-	color: #999;
+	color: #555;
 }
 
 .block-description .save-job a:hover {
