@@ -57,7 +57,7 @@ var jakdukApp = angular.module("jakdukApp", []);
 jakdukApp.controller("adminCtrl", function($scope, $filter) {
 	
 	$scope.calcAve = function() {
-		$scope.average = Math.floor($scope.total / $scope.games); 
+		$scope.average = Math.round($scope.total / $scope.games); 
 	};
 	
 });

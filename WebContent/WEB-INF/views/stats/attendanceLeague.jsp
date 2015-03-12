@@ -50,6 +50,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	$scope.attendancesConn = "none";
 	$scope.seriesTotal = [];
 	$scope.seriesAverage = [];	
+	$scope.seriesGames = [];
 	
 	angular.element(document).ready(function() {
 		Highcharts.setOptions({
@@ -65,7 +66,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		                height: 200		                
 		            },
 		            tooltip: {
-		            	//pointFormat: '<spring:message code="stats.number.of.supporter"/>: <b>{point.y:1f}</b>'
 		            	//pointFormat: '<spring:message code="stats.attendance.total"/> : <b>{point.y:,.0f}</b> <spring:message code="stats.attendance.people"/>',
 		            	shared: true
 		            }
@@ -81,12 +81,11 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	                type: 'category',
 	                labels: {
 	                    style: {
-	                        fontSize: '13px',
-	                        fontFamily: 'Verdana, sans-serif'
+	                        fontSize: '13px'
 	                    }
 	                }          
 	            },
-	            yAxis: [{
+	            yAxis: [{ // Total yAxis
 	                min: 0,
 	                title: {
 	                    text: '<spring:message code="stats.attendance.total"/>',
@@ -100,7 +99,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 						}					
 					},
 	            }, 
-	            { // Primary yAxis
+	            { // Average yAxis
 	                labels: {
 						x: 0,						                	
 						formatter: function() {
@@ -111,22 +110,31 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	                	text: '<spring:message code="stats.attendance.average"/>'
 	                },
 	                opposite: true
-	            }
+	            },
+	            { // Games yAxis
+	                labels: {
+						x: 0,						                	
+						formatter: function() {
+							return Highcharts.numberFormat(this.value,0);
+						}
+	                },
+	                title: {
+	                	text: '<spring:message code="stats.attendance.games"/>'
+	                }
+	            }	            
 	            ],                                 
 	            series: [{
-	                name: '<spring:message code="stats.attendance.total"/>',	    
+	                name: '<spring:message code="stats.attendance.total"/>',
+	                yAxis: 0,
 	                type: 'bar',
 	                data: $scope.seriesTotal,
 	                dataLabels: {
 	                    enabled: true,
-	                    //rotation: -90,
 	                    color: '#FFFFFF',
 	                    align: 'right',
 	                    format: '{point.y:,.0f} <spring:message code="stats.attendance.people"/>', // one decimal    
-	                    //y: 10, // 10 pixels down from the top
 	                    style: {
-	                        fontSize: '13px',
-	                        fontFamily: 'Verdana, sans-serif'
+	                        fontSize: '13px'
 	                    }
 	                }
 	            },
@@ -145,6 +153,22 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	                    enabled: true,
 	                    align: 'right',
 	                    format: '{point.y:,.0f} <spring:message code="stats.attendance.people"/>'
+	                }
+	            },
+	            {
+	                name: '<spring:message code="stats.attendance.games"/>',
+	                yAxis: 2,
+	                visible: false,
+	                type: 'bar',
+	                data: $scope.seriesGames,
+	                dataLabels: {
+	                    enabled: true,
+	                    color: '#FFFFFF',
+	                    align: 'right',
+	                    format: '{point.y:,.0f} <spring:message code="stats.attendance.game"/>',
+	                    style: {
+	                        fontSize: '13px'
+	                    }
 	                }
 	            }
 	            ],
@@ -173,9 +197,11 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				attendances.forEach(function(attendance) {
 					var itemTotal = [attendance.season, attendance.total];
 					var itemAverage = [attendance.season, attendance.average];
+					var itemGames = [attendance.season, attendance.games];
 					
 					$scope.seriesTotal.push(itemTotal);
 					$scope.seriesAverage.push(itemAverage);
+					$scope.seriesGames.push(itemGames);
 				});
 				
 				$scope.attendancesConn = "none";				

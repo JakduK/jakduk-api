@@ -75,18 +75,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 		                height: 100
 		            },
 		            tooltip: {
-		                pointFormat: '<spring:message code="stats.number.of.supporter"/> : <b>{point.y:1f}</b> <spring:message code="stats.attendance.people"/>'
-		            },
-		            legend: {
-		                layout: 'vertical',
-		                align: 'right',
-		                verticalAlign: 'top',
-		                x: -10,
-		                y: 30,
-		                floating: true,
-		                borderWidth: 1,
-		                backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
-		                shadow: true
+		                //pointFormat: '<spring:message code="stats.number.of.supporter"/> : <b>{point.y:1f}</b> <spring:message code="stats.attendance.people"/>'
 		            }
 		        },
 		        title: {
@@ -100,31 +89,25 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	                labels: {
 	                    //rotation: -45,
 	                    style: {
-	                        fontSize: '13px',
-	                        fontFamily: 'Verdana, sans-serif'
+	                        fontSize: '13px'
 	                    }
 	                }
 	            },
 	            yAxis: {
 	                min: 0,
 	                title: {
-	                    text: '<spring:message code="stats.number"/>',
-	                    	align: 'high'
+	                    text: '<spring:message code="stats.number.of.supporter"/>'
 	                }							
 	            },                                 
 	            series: [{
-	                name: '<spring:message code="stats.supporters"/>',
+	                name: '<spring:message code="stats.number.of.supporter"/>',
 	                data: $scope.chartSeriesData,
 	                dataLabels: {
 	                    enabled: true,
-	                    //rotation: -90,
-	                    color: '#FFFFFF',
 	                    align: 'right',
 	                    format: '{point.name} <b>{point.y:1f}</b>', // one decimal
-	                    //y: 10, // 10 pixels down from the top
 	                    style: {
-	                        fontSize: '13px',
-	                        fontFamily: 'Verdana, sans-serif'
+	                        fontSize: '13px'
 	                    }
 	                }
 	            }],
@@ -148,7 +131,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 				
 				var supporters = data.supporters;
-				$scope.chartConfig.options.chart.height = 150 + (supporters.length * 30);
+				$scope.chartConfig.options.chart.height = 200 + (supporters.length * 30);
 				
 				supporters.forEach(function(supporter) {
 					console.log(supporter);
