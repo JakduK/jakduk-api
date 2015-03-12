@@ -81,7 +81,6 @@
 <jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/angular-file-upload.min.js"></script>
@@ -118,10 +117,8 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
 	test1.push("cccc");
 	
 	test2 = JSON.stringify(test1);
-	alert(test2);
 	
 	var test3 = JSON.parse(test2);
-	alert(test3);
 	
     
 	$scope.uploader.filters.push({

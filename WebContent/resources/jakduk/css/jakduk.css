@@ -60,6 +60,8 @@
 
 .cube-portfolio .content-xs {padding-bottom:0px;}
 
-.image-block {
-	background: url(../img/bg.jpg) no-repeat;
-}
+/* 홈의 상단*/
+.image-block {background: url(../img/bg.jpg) no-repeat;}
+.image-block .company-description {padding:15px 15px;}
+.image-block p {margin:0px 0px 0px;}
+.image-block h4 {margin-bottom:0px;}

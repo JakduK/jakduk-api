@@ -45,7 +45,7 @@ ENG SHORTNAME : 	<form:input path="shortNameEn" cssClass="form-control" placehol
 ENG FULLNAME : 	<form:input path="fullNameEn" cssClass="form-control" placeholder="ENG fullName" size="30"/>
 </p>
 <p>
-<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+<input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </p>
 </form:form>
 </body>

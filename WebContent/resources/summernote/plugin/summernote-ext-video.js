@@ -1,13 +1,4 @@
-(function (factory) {
-  /* global define */
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(['jquery'], factory);
-  } else {
-    // Browser globals: jQuery
-    factory(window.jQuery);
-  }
-}(function ($) {
+(function ($) {
   // template, editor
   var tmpl = $.summernote.renderer.getTemplate();
   var editor = $.summernote.eventHandler.getEditor();
@@ -18,14 +9,12 @@
 
   /**
    * createVideoNode
-   *  
-   * @member plugin.video
-   * @private
+   *
    * @param {String} url
    * @return {Node}
    */
   var createVideoNode = function (url) {
-    // video url patterns(youtube, instagram, vimeo, dailymotion, youku, mp4, ogg, webm)
+    // video url patterns(youtube, instagram, vimeo, dailymotion, youku)
     var ytRegExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
     var ytMatch = url.match(ytRegExp);
 
@@ -44,65 +33,46 @@
     var youkuRegExp = /\/\/v\.youku\.com\/v_show\/id_(\w+)\.html/;
     var youkuMatch = url.match(youkuRegExp);
 
-    var mp4RegExp = /^.+.(mp4|m4v)$/;
-    var mp4Match = url.match(mp4RegExp);
-
-    var oggRegExp = /^.+.(ogg|ogv)$/;
-    var oggMatch = url.match(oggRegExp);
-
-    var webmRegExp = /^.+.(webm)$/;
-    var webmMatch = url.match(webmRegExp);
-
     var $video;
     if (ytMatch && ytMatch[1].length === 11) {
       var youtubeId = ytMatch[1];
       $video = $('<iframe>')
-        .attr('frameborder', 0)
         .attr('src', '//www.youtube.com/embed/' + youtubeId)
         .attr('width', '640').attr('height', '360');
     } else if (igMatch && igMatch[0].length) {
       $video = $('<iframe>')
-        .attr('frameborder', 0)
         .attr('src', igMatch[0] + '/embed/')
         .attr('width', '612').attr('height', '710')
         .attr('scrolling', 'no')
         .attr('allowtransparency', 'true');
     } else if (vMatch && vMatch[0].length) {
       $video = $('<iframe>')
-        .attr('frameborder', 0)
         .attr('src', vMatch[0] + '/embed/simple')
         .attr('width', '600').attr('height', '600')
         .attr('class', 'vine-embed');
     } else if (vimMatch && vimMatch[3].length) {
       $video = $('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
-        .attr('frameborder', 0)
         .attr('src', '//player.vimeo.com/video/' + vimMatch[3])
         .attr('width', '640').attr('height', '360');
     } else if (dmMatch && dmMatch[2].length) {
       $video = $('<iframe>')
-        .attr('frameborder', 0)
         .attr('src', '//www.dailymotion.com/embed/video/' + dmMatch[2])
         .attr('width', '640').attr('height', '360');
     } else if (youkuMatch && youkuMatch[1].length) {
       $video = $('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
-        .attr('frameborder', 0)
         .attr('height', '498')
         .attr('width', '510')
         .attr('src', '//player.youku.com/embed/' + youkuMatch[1]);
-    } else if (mp4Match || oggMatch || webmMatch) {
-      $video = $('<video controls>')
-        .attr('src', url)
-        .attr('width', '640').attr('height', '360');
     } else {
       // this is not a known video link. Now what, Cat? Now what?
     }
+
+    $video.attr('frameborder', 0);
 
     return $video[0];
   };
 
   /**
-   * @member plugin.video
-   * @private
    * @param {jQuery} $editable
    * @return {String}
    */
@@ -122,9 +92,7 @@
 
   /**
    * toggle button status
-   *  
-   * @member plugin.video
-   * @private
+   *
    * @param {jQuery} $btn
    * @param {Boolean} isEnable
    */
@@ -136,9 +104,7 @@
   /**
    * Show video dialog and set event handlers on dialog controls.
    *
-   * @member plugin.video
-   * @private
-   * @param {jQuery} $dialog
+   * @param {jQuery} $dialog 
    * @param {jQuery} $dialog
    * @param {Object} text
    * @return {Promise}
@@ -151,9 +117,9 @@
           $videoBtn = $videoDialog.find('.note-video-btn');
 
       $videoDialog.one('shown.bs.modal', function () {
-        $videoUrl.val(text).on('input', function () {
+        $videoUrl.val(text).keyup(function () {
           toggleBtn($videoBtn, $videoUrl.val());
-        }).trigger('focus');
+        }).trigger('keyup').trigger('focus');
 
         $videoBtn.click(function (event) {
           event.preventDefault();
@@ -162,7 +128,7 @@
           $videoDialog.modal('hide');
         });
       }).one('hidden.bs.modal', function () {
-        $videoUrl.off('input');
+        $videoUrl.off('keyup');
         $videoBtn.off('click');
 
         if (deferred.state() === 'pending') {
@@ -172,38 +138,14 @@
     });
   };
 
-  /**
-   * @class plugin.video
-   *
-   * Video Plugin
-   *
-   * video plugin is to make embeded video tag.
-   *
-   * ### load script
-   *
-   * ```
-   * < script src="plugin/summernote-ext-video.js"></script >
-   * ```
-   *
-   * ### use a plugin in toolbar
-   * ```
-   *    $("#editor").summernote({
-   *    ...
-   *    toolbar : [
-   *        ['group', [ 'video' ]]
-   *    ]
-   *    ...    
-   *    });
-   * ```
-   */
+  // add video plugin
   $.summernote.addPlugin({
-    /** @property {String} name name of plugin */
     name: 'video',
-    /**
-     * @property {Object} buttons
-     * @property {function(object): string} buttons.video
-     */
     buttons: {
+      /**
+       * @param {Object} lang
+       * @return {String}
+       */
       video: function (lang) {
         return tmpl.iconButton('fa fa-youtube-play', {
           event: 'showVideoDialog',
@@ -213,11 +155,12 @@
       }
     },
 
-    /**
-     * @property {Object} dialogs
-     * @property {function(object, object): string} dialogs.video
-    */
     dialogs: {
+      /**
+       * @param {Object} lang
+       * @param {Object} options
+       * @return {String}
+       */
       video: function (lang) {
         var body = '<div class="form-group row-fluid">' +
                      '<label>' + lang.video.url + ' <small class="text-muted">' + lang.video.providers + '</small></label>' +
@@ -227,11 +170,11 @@
         return tmpl.dialog('note-video-dialog', lang.video.insert, body, footer);
       }
     },
-    /**
-     * @property {Object} events
-     * @property {Function} events.showVideoDialog
-     */
+
     events: {
+      /**
+       * @param {Object} layoutInfo
+       */
       showVideoDialog: function (layoutInfo) {
         var $dialog = layoutInfo.dialog(),
             $editable = layoutInfo.editable(),
@@ -565,4 +508,4 @@
       }
     }
   });
-}));
+})(jQuery);

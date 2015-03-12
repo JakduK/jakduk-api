@@ -32,7 +32,7 @@ SUBJECT : 	<form:input path="subject" cssClass="form-control" placeholder="subje
 CONTENT : <form:textarea path="content" cols="40" rows="5"/>
 </p>
 <p>
-<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+<input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </p>
 </form:form>
 </body>

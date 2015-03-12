@@ -48,7 +48,8 @@ var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
 
 jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	$scope.attendancesConn = "none";
-	$scope.chartSeriesData = [];	
+	$scope.seriesTotal = [];
+	$scope.seriesAverage = [];	
 	
 	angular.element(document).ready(function() {
 		Highcharts.setOptions({
@@ -60,23 +61,13 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	   $scope.chartConfig = {
 		        options: {
 		            chart: {
-		                type: 'bar',
-		                height: 100
+		            	type: 'bar',
+		                height: 200		                
 		            },
 		            tooltip: {
 		            	//pointFormat: '<spring:message code="stats.number.of.supporter"/>: <b>{point.y:1f}</b>'
-		            	pointFormat: '<spring:message code="stats.attendance.total"/> : <b>{point.y:,.0f}</b> <spring:message code="stats.attendance.people"/>'
-		            },
-		            legend: {
-		                layout: 'vertical',
-		                align: 'right',
-		                verticalAlign: 'top',
-		                x: -10,
-		                y: 30,
-		                floating: true,
-		                borderWidth: 1,
-		                backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
-		                shadow: true
+		            	//pointFormat: '<spring:message code="stats.attendance.total"/> : <b>{point.y:,.0f}</b> <spring:message code="stats.attendance.people"/>',
+		            	shared: true
 		            }
 		        },
 		        
@@ -95,24 +86,37 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	                    }
 	                }          
 	            },
-	            yAxis: {
+	            yAxis: [{
 	                min: 0,
 	                title: {
-	                    text: '<spring:message code="stats.number"/>',
-	                    align: 'high'
+	                    text: '<spring:message code="stats.attendance.total"/>',
+	                    align: 'middle'
 	                },
 					labels:{
 						x: 0,
-						y: 24,
-						rotation: -45,
+						rotation: -30,
 						formatter: function() {
 							return Highcharts.numberFormat(this.value,0);
 						}					
-					},                
-	            },                                 
+					},
+	            }, 
+	            { // Primary yAxis
+	                labels: {
+						x: 0,						                	
+						formatter: function() {
+							return Highcharts.numberFormat(this.value,0);
+						}
+	                },
+	                title: {
+	                	text: '<spring:message code="stats.attendance.average"/>'
+	                },
+	                opposite: true
+	            }
+	            ],                                 
 	            series: [{
-	                name: '<spring:message code="stats.attendance.total"/>',
-	                data: $scope.chartSeriesData,
+	                name: '<spring:message code="stats.attendance.total"/>',	    
+	                type: 'bar',
+	                data: $scope.seriesTotal,
 	                dataLabels: {
 	                    enabled: true,
 	                    //rotation: -90,
@@ -125,7 +129,25 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	                        fontFamily: 'Verdana, sans-serif'
 	                    }
 	                }
-	            }],
+	            },
+	            {
+	                name: '<spring:message code="stats.attendance.average"/>',	
+	                yAxis: 1,	                
+	                type: 'spline',
+	                data: $scope.seriesAverage,
+	                color: Highcharts.getOptions().colors[3],
+	                marker: {
+	                    lineWidth: 2,
+	                    lineColor: Highcharts.getOptions().colors[3],
+	                    fillColor: 'white'
+	                },	                
+	                dataLabels: {
+	                    enabled: true,
+	                    align: 'right',
+	                    format: '{point.y:,.0f} <spring:message code="stats.attendance.people"/>'
+	                }
+	            }
+	            ],
 
 		        loading: false,
 		        credits:{enabled:true}
@@ -146,11 +168,14 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			reqPromise.success(function(data, status, headers, config) {
 				
 				var attendances = data.attendances;
-				$scope.chartConfig.options.chart.height = 150 + (attendances.length * 30);
+				$scope.chartConfig.options.chart.height = 300 + (attendances.length * 30);
 				
 				attendances.forEach(function(attendance) {
-					var item = [attendance.season, attendance.total];
-					$scope.chartSeriesData.push(item);
+					var itemTotal = [attendance.season, attendance.total];
+					var itemAverage = [attendance.season, attendance.average];
+					
+					$scope.seriesTotal.push(itemTotal);
+					$scope.seriesAverage.push(itemAverage);
 				});
 				
 				$scope.attendancesConn = "none";				

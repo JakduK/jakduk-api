@@ -31,7 +31,7 @@ USING BOARD :
 </p>
 <form:errors path="usingBoard"/>
 <p>
-<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+<input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </p>
 </form:form>
 </body>

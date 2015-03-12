@@ -64,7 +64,8 @@
 		</c:choose>	
 	</div>
 
-<div class="blog margin-bottom-20" ng-controller="galleryController">				
+<div class="blog margin-bottom-20" ng-controller="galleryController">
+	<input type="hidden" id="galleryName" value="${gallery.name}">		
 	<h2>${gallery.name}</h2>	
 	<div class="blog-post-tags">
 	  <ul class="list-unstyled list-inline blog-info">
@@ -168,6 +169,7 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 	$scope.feelingAlert = {};
 	$scope.likeConn = "none";
 	$scope.dislikeConn = "none";
+	$scope.galleryName = document.getElementById("galleryName").value;
 	
 	angular.element(document).ready(function() {
 	    // 사용할 앱의 Javascript 키를 설정해 주세요.
@@ -176,7 +178,7 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 	    // 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
 	    Kakao.Link.createTalkLinkButton({
 	      container: '#kakao-link-btn',
-	      label: '${gallery.name}\r- <spring:message code="common.jakduk"/>',
+	      label: $scope.galleryName + '\r- <spring:message code="common.jakduk"/>',
 	      image: {
 	          src: 'https://jakduk.com/gallery/thumbnail/${gallery.id}',
 	          width: '360',

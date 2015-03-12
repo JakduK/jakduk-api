@@ -137,7 +137,7 @@
 	<div class="form-group">
 		<button type="submit" class="btn-u rounded ladda-button"
 		ladda="btnSubmit" data-style="expand-right">
-			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.write"/>
 		</button>		
 		<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board"/>'">
 			<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>

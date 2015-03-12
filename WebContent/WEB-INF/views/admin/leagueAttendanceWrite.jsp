@@ -40,7 +40,7 @@ ng-model="average" ng-init="average='${leagueAttendance.average}'"/>
 </p>
 <form:errors path="average"/>
 <p>
-<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+<input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </p>
 </form:form>
 </div>

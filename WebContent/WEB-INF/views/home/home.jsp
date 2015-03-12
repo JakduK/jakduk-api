@@ -27,11 +27,11 @@
         <div class="container">
             <div class="company-description">
                 <h2>2015 K리그 클래식 2R</h2>
-                <p><strong>2015-03-14(토)</strong></p>
+                <h4 class="text-left">2015-03-14(토)</h4>
 <p>14:00 서울 vs 전북, 서울 월드컵</p>
 <p>14:00 수원 vs 인천, 수원 월드컵</p>
 <p>16:00 성남 vs 전남, 광양 전용</p>
-<p><strong>2015-03-15(일)</strong></p>
+<h4 class="text-left">2015-03-15(일)</h4>
 <p>14:00 대전 vs 광주, 대전 월드컵</p>
 <p>14:15 포항 vs 울산, 포항 스틸야드</p>
 <p>16:00 제주 vs 부산, 제주 월드컵</p>
@@ -52,7 +52,7 @@
                     
 <!--  최근 글 -->                    
                         <div class="col-md-6">
-<div class="headline"><h2><spring:message code="home.posts.latest"/></h2><button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
+<div class="headline"><h2><spring:message code="home.posts.latest"/></h2> <button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
 			    		<spring:message code="common.button.more"/>
     				</button></div>                        
 

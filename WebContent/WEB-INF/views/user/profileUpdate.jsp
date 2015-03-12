@@ -76,7 +76,7 @@
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
 				<button type="submit" class="btn btn-success">
-					<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+					<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.write"/>
 				</button>		
 				<button type="button" class="btn btn-warning" onclick="location.href='<c:url value="/user/profile"/>'">
 					<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>

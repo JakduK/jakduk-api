@@ -5,13 +5,14 @@
 <html ng-app="jakdukApp">
   <head>
     <title>Starter Template for Bootstrap</title>
-<jsp:include page="../include/html-header.jsp"/>
+    
+    <jsp:include page="../include/html-header.jsp"/>
+    
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 
 <!-- include summernote css/js-->
 <link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
-
 <link href="<%=request.getContextPath()%>/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-<script src="<%=request.getContextPath()%>/resources/jquery/jquery.min.js"></script>
   </head>
 
 <body>
@@ -19,13 +20,13 @@
 
 <jsp:include page="../include/navigation-header.jsp"/>
 
-<div>
+<div ng-controller="StatsCtrl">
 	<div class="starter-template">
 		<h1>Bootstrap starter template</h1>
 		<p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
 	</div>
 
-<div id="summernote"></div>
+<summernote></summernote>
 </div>	
 	
 <jsp:include page="../include/footer.jsp"/>
@@ -33,16 +34,15 @@
 
 <!-- Bootstrap core JavaScript ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-	  $('#summernote').summernote();
-	});
 
+var jakdukApp = angular.module("jakdukApp", ["summernote"]);
 
-var jakdukApp = angular.module("jakdukApp", []);
-
+jakdukApp.controller('StatsCtrl', function($scope) {
+	
+});
 
 </script>
 <jsp:include page="../include/body-footer.jsp"/>

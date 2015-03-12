@@ -1,49 +1,11 @@
-(function (factory) {
-  /* global define */
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(['jquery'], factory);
-  } else {
-    // Browser globals: jQuery
-    factory(window.jQuery);
-  }
-}(function ($) {
+(function ($) {
   // template, editor
   var tmpl = $.summernote.renderer.getTemplate();
   var editor = $.summernote.eventHandler.getEditor();
 
-  /**
-   * @class plugin.fontstyle
-   *
-   * FontStyle Plugin
-   * 
-   * ### load script 
-   * 
-   * ```
-   * < script src="plugin/summernote-ext-fontstyle.js"></script >
-   * ``` 
-   * 
-   * ### use a plugin in toolbar
-   * ```
-   *    $("#editor").summernote({
-   *    ...
-   *    toolbar : [
-   *        ['group', [ 'fontstyle' ]]
-   *    ]
-   *    ...    
-   *    }); 
-   * ```
-   */
+  // add plugin
   $.summernote.addPlugin({
-    /** @property {String} name name of plugin */
     name: 'fontstyle', // name of plugin
-    /**
-     * @property {Object} buttons 
-     * @property {Function} buttons.strikethrough  
-     * @property {Function} buttons.superscript   
-     * @property {Function} buttons.subscript   
-     * @property {Function} buttons.fontsize   dropdown button
-     */
     buttons: { // buttons
       strikethrough: function (lang) {
         return tmpl.iconButton('fa fa-strikethrough', {
@@ -78,13 +40,6 @@
       }
     },
 
-    /**
-     * @property {Object} events
-     * @property {Function} events.strikethrough  apply strikethrough  style to selected range
-     * @property {Function} events.superscript apply superscript to selected range
-     * @property {Function} events.subscript apply subscript to selected range
-     * @property {Function} events.fontSize apply font size to selected range
-     */
     events: { // events
       strikethrough: function (layoutInfo) {
         editor.strikethrough(layoutInfo.editable());
@@ -333,4 +288,4 @@
       }
     }
   });
-}));
+})(jQuery);

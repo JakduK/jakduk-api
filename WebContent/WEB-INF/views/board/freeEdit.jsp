@@ -13,7 +13,7 @@
 
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 	
-	<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 
@@ -140,7 +140,7 @@
 		<div class="form-group">
 			<button type="submit" class="btn-u rounded ladda-button"
 			ladda="btnSubmit" data-style="expand-right">
-				<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.submit"/>
+				<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.write"/>
 			</button>		
 			<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/free/${boardFreeWrite.seq}"/>'">
 				<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
@@ -162,17 +162,17 @@
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/angular-file-upload.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>
 </c:if>
-
 <!-- JS Implementing Plugins -->
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 window.onbeforeunload = function(e) {

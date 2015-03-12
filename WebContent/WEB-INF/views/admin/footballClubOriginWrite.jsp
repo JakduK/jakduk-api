@@ -18,7 +18,7 @@
 <p>
 NAME : <form:input path="name" cssClass="form-control" placeholder="football club origin name"/>
 </p>
-<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+<input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </form:form>
 </body>
 </html>

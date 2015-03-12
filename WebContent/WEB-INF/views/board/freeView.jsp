@@ -13,12 +13,12 @@
 	<title>${post.subject} - <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
+	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+	
     <!-- CSS Page Style -->    
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
-	
-	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 </head>
 
 <body>
@@ -146,12 +146,13 @@
 </div>	
         <!--Blog Post-->        
     	<div class="blog margin-bottom-20" ng-controller="boardFreeCtrl">
+    	<input type="hidden" id="subject" value="${post.subject}">
         	<h2>
         	<small>
 				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
 				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
 				<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>
-				</small>
+			</small>
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
 						<spring:message code="board.msg.deleted"/>
@@ -357,18 +358,16 @@
 	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
 
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
-<!--angular-summernote dependencies -->
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>
 </c:if>
+<script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <!-- JS Implementing Plugins -->
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
@@ -384,6 +383,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
 	$scope.likeConn = "none";
 	$scope.dislikeConn = "none";
+	$scope.subject = document.getElementById("subject").value;
 	
 	angular.element(document).ready(function() {
 	    // 사용할 앱의 Javascript 키를 설정해 주세요.
@@ -392,7 +392,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	    // 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
 	    Kakao.Link.createTalkLinkButton({
 	      container: '#kakao-link-btn',
-	      label: '${post.subject}\r- <spring:message code="common.jakduk"/>',
+	      label: $scope.subject + '\r- <spring:message code="common.jakduk"/>',
 	      webLink: {
 		        text: "https://jakduk.com/board/free/${post.seq}",
 		        url: "https://jakduk.com/board/free/${post.seq}"	    	  

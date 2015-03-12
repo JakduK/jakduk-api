@@ -37,9 +37,13 @@
 		             ['insert', ['link', 'picture', 'hr']],
 		             ['view', ['fullscreen', 'codeview']],
 		             ['help', ['help']]
-		           ]		  
+		           ],
+		     	  onImageUpload: function(files, editor, $editable) {
+		     		    console.log('image upload:', files, editor, $editable);
+		     		  }		           
 	  });
 	});
+  
   </script>
 </head>
 <body>

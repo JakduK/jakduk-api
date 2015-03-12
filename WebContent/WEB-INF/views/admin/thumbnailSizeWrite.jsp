@@ -23,7 +23,7 @@ WIDTH : <form:input path="width" cssClass="form-control" placeholder="width" siz
 <p>
 HEIGHT : <form:input path="height" cssClass="form-control" placeholder="height" size="30"/>
 </p>
-<input type="submit" value="<spring:message code="common.button.submit"/>" class="btn btn-default"/>
+<input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </form:form>
 </body>
 </html>
