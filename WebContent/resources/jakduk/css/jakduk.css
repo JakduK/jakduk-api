@@ -58,7 +58,8 @@
 /* 각 페이지 마다 있는 제목 */
 .breadcrumbs a {color:#666;}
 
-.cube-portfolio .content-xs {padding-bottom:0px;}
+.cube-portfolio {padding-bottom:10px;}
+.tag-box {padding: 10px;}
 
 /* 홈의 상단*/
 .image-block {background: url(../img/bg.jpg) no-repeat;}

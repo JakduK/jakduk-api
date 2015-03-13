@@ -50,6 +50,8 @@ public class StatsController {
 	@RequestMapping(value = "/supporters", method = RequestMethod.GET)
 	public String supporter(Model model) {
 		
+		Integer status = statsService.getSupporters(model);
+		
 		return "stats/supporters";
 	}
 	
@@ -59,8 +61,7 @@ public class StatsController {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, null);
-		
-		statsService.getSupporter(model, language);
+		statsService.getSupportersData(model, language);
 	}
 	
 	@RequestMapping(value = "/attendance", method = RequestMethod.GET)

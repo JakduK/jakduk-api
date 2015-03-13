@@ -33,7 +33,10 @@
 	
 		<highchart id="chart1" config="chartConfig" class="span10"></highchart>
 	</div>
+	
+	<jsp:include page="../include/footer.jsp"/>	
 </div>
+
 <!-- Bootstrap core JavaScript
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->

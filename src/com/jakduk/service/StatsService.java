@@ -3,7 +3,10 @@ package com.jakduk.service;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -23,13 +26,23 @@ import com.jakduk.repository.LeagueAttendanceRepository;
 @Service
 public class StatsService {
 	
+	@Value("${kakao.javascript.key}")
+	private String kakaoJavascriptKey;
+	
 	@Autowired
 	private JakdukDAO jakdukDAO;
 	
 	@Autowired
 	private LeagueAttendanceRepository leagueAttendanceRepository;
+	
+	public Integer getSupporters(Model model) {
+		
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		
+		return HttpServletResponse.SC_OK;
+	}
 
-	public void getSupporter(Model model, String language) {
+	public void getSupportersData(Model model, String language) {
 		
 		List<SupporterCount> supporters = jakdukDAO.getSupportFCCount(language);
 		
