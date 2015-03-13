@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.service.CommonService;
@@ -48,9 +49,10 @@ public class StatsController {
 	}	
 	
 	@RequestMapping(value = "/supporters", method = RequestMethod.GET)
-	public String supporter(Model model) {
+	public String supporter(Model model,
+			@RequestParam(required = false) String chartType) {
 		
-		Integer status = statsService.getSupporters(model);
+		Integer status = statsService.getSupporters(model, chartType);
 		
 		return "stats/supporters";
 	}
@@ -77,7 +79,9 @@ public class StatsController {
 	}
 	
 	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
-	public String attendanceLeague() {
+	public String attendanceLeague(Model model) {
+		
+		Integer status = statsService.getLeagueAttendance(model);
 		
 		return "stats/attendanceLeague";
 	}	
@@ -85,7 +89,7 @@ public class StatsController {
 	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
 	public void dataLeagueAttendance(Model model) {
 		
-		statsService.getLeagueAttendance(model);
+		statsService.getLeagueAttendanceData(model);
 	}
 
 }

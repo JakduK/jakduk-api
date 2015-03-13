@@ -46,8 +46,8 @@
 	 <highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 
 <div class="tag-box tag-box-v4 margin-bottom-20">
-	<p><spring:message code="stats.msg.total.number.of.members"/></p>
-	<p><spring:message code="stats.msg.total.number.of.supporters"/></p>	
+	<p><spring:message code="stats.msg.total.number.of.members"/><strong>{{usersTotal}}</strong></p>
+	<p><spring:message code="stats.msg.total.number.of.supporters"/><strong>{{supportersTotal}}</strong></p>	
 </div>
 
 <div class="text-right">
@@ -58,7 +58,6 @@
       <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
     </a>
 </div>
-
 	 
 	</div>
 	
@@ -82,71 +81,76 @@ var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
 jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.supportersConn = "none";
 	$scope.chartSeriesData = [];
+	$scope.supportersTotal = 0;
+	$scope.usersTotal = 0;
 	
-	angular.element(document).ready(function() {
-		
-	    $scope.chartConfig = {
-		        options: {
-		            chart: {
-		                type: 'bar',
-		                height: 100
-		            },
-		            tooltip: {
-		                //pointFormat: '<spring:message code="stats.number.of.supporter"/> : <b>{point.y:1f}</b> <spring:message code="stats.attendance.people"/>'
-		            }
-		        },
-		        title: {
-		            text: '<spring:message code="stats.supporters.title"/>'
-		        },	        
-		        subtitle: {
-	                text: 'Source: https://jakduk.com'
-	            },
-	            xAxis: {
-	                type: 'category',
-	                labels: {
-	                    //rotation: -45,
-	                    style: {
-	                        fontSize: '13px'
-	                    }
-	                }
-	            },
-	            yAxis: {
-	                min: 0,
-	                title: {
-	                    text: '<spring:message code="stats.number.of.supporter"/>'
-	                }							
-	            },                                 
-	            series: [{
-	                name: '<spring:message code="stats.number.of.supporter"/>',
-	                data: $scope.chartSeriesData,
-	                dataLabels: {
-	                    enabled: true,
-	                    align: 'right',
-	                    format: '{point.name} <b>{point.y:1f}</b>', // one decimal
-	                    style: {
-	                        fontSize: '13px'
-	                    }
-	                }
-	            }],
-
-		        loading: false,
-		        credits:{enabled:true}
-		    };		
-		
+	angular.element(document).ready(function() {			
 		$scope.getSupporters();
 		
+		var chartType = "${chartType}";
+		
+		if (chartType != "pie") {			
+			chartType = "bar";
+		}
+		
+		$scope.chartConfig = {
+			options: {
+				chart: {
+					type: chartType,
+					height: 100
+				},
+				tooltip: {
+					//pointFormat: '<spring:message code="stats.number.of.supporter"/> : <b>{point.y:1f}</b> <spring:message code="stats.attendance.people"/>'
+	            }
+			},	        
+			title: {
+				text: '<spring:message code="stats.supporters.title"/>'
+	        },	        
+			subtitle: {
+				text: 'Source: https://jakduk.com'
+            },
+			xAxis: {
+				type: 'category',
+				labels: {
+					style: {
+						fontSize: '13px'
+                    }
+                }
+            },
+			yAxis: {
+				min: 0,
+				title: {
+					text: '<spring:message code="stats.number.of.supporter"/>'
+                }							
+            },                                 
+			series: [{
+				name: '<spring:message code="stats.number.of.supporter"/>',
+				data: $scope.chartSeriesData,
+				dataLabels: {
+					enabled: true,
+					align: 'right',
+					format: '{point.name} <b>{point.y:1f}</b>',
+					style: {
+						fontSize: '13px'
+                    }
+                }
+            }],
+			loading: true,
+			credits:{enabled:true}
+		};		
+		
 	    // 사용할 앱의 Javascript 키를 설정해 주세요.
-	    Kakao.init('${kakaoKey}');
+   Kakao.init('${kakaoKey}');
 
 	    // 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
-	    Kakao.Link.createTalkLinkButton({
-	      container: '#kakao-link-btn',
-	      label: '<spring:message code="stats.supporters.title"/>\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>',
-	      webLink: {
-		        text: "https://jakduk.com/stats/supporters",
-		        url: "https://jakduk.com/stats/supporters"	    	  
-	      }
-	    });		
+   Kakao.Link.createTalkLinkButton({
+			container: '#kakao-link-btn',
+			label: '<spring:message code="stats.supporters.title"/>\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>',
+			webLink: {
+				text: "https://jakduk.com/stats/supporters",
+				url: "https://jakduk.com/stats/supporters"	    	  
+			}
+		});	    
 	});
 	
 	$scope.getSupporters = function() {
@@ -160,17 +164,18 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			
 			reqPromise.success(function(data, status, headers, config) {
 				
+				$scope.supportersTotal = data.supportersTotal;
+				$scope.usersTotal = data.usersTotal;
 				var supporters = data.supporters;
 				$scope.chartConfig.options.chart.height = 200 + (supporters.length * 30);
 				
 				supporters.forEach(function(supporter) {
-					console.log(supporter);
-					//var item = {c:[{v:supporter.supportFC.names[0].shortName}, {v:supporter.count}]};
 					var item = [supporter.supportFC.names[0].shortName, supporter.count];
 					$scope.chartSeriesData.push(item);
 				});
 				
 				$scope.supportersConn = "none";
+				$scope.chartConfig.loading = false;
 				
 			});
 			reqPromise.error(function(data, status, headers, config) {
@@ -185,7 +190,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	};
 	
 	$scope.btnUrlCopy = function() {
-		var url = "https://jakduk.com/stats/supporters";
+		var url = "https://jakduk.com/stats/supporters?chartType=" + $scope.chartConfig.options.chart.type;
 		
 		if(window.clipboardData){
 		    // IE처리

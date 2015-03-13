@@ -206,12 +206,8 @@
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <!-- JS Implementing Plugins -->
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/layer-slider/layerslider/js/greensock.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/layer-slider/layerslider/js/layerslider.transitions.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/layer-slider/layerslider/js/layerslider.kreaturamedia.jquery.js"></script>
 <!-- JS Page Level -->           
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/owl-recent-works.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/layer-slider.js"></script>
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", []);

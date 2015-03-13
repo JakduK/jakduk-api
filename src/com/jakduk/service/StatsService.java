@@ -2,6 +2,7 @@ package com.jakduk.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +16,7 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.SupporterCount;
 import com.jakduk.model.db.LeagueAttendance;
 import com.jakduk.repository.LeagueAttendanceRepository;
+import com.jakduk.repository.UserRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -33,11 +35,18 @@ public class StatsService {
 	private JakdukDAO jakdukDAO;
 	
 	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
 	private LeagueAttendanceRepository leagueAttendanceRepository;
 	
-	public Integer getSupporters(Model model) {
+	public Integer getSupporters(Model model, String chartType) {
 		
 		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		
+		if (chartType != null && !chartType.isEmpty()) {
+			model.addAttribute("chartType", chartType);
+		}
 		
 		return HttpServletResponse.SC_OK;
 	}
@@ -45,12 +54,24 @@ public class StatsService {
 	public void getSupportersData(Model model, String language) {
 		
 		List<SupporterCount> supporters = jakdukDAO.getSupportFCCount(language);
+		Long usersTotal = userRepository.count();
+		
+		Stream<SupporterCount> sSupporters = supporters.stream();
+		Integer supportersTotal = sSupporters.mapToInt(SupporterCount::getCount).sum();
 		
 		model.addAttribute("supporters", supporters);
-		
+		model.addAttribute("supportersTotal", supportersTotal);
+		model.addAttribute("usersTotal", usersTotal.intValue());
 	}
 	
-	public void getLeagueAttendance(Model model) {
+	public Integer getLeagueAttendance(Model model) {
+		
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		
+		return HttpServletResponse.SC_OK;
+	}	
+	
+	public void getLeagueAttendanceData(Model model) {
 		
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		
