@@ -46,8 +46,8 @@
 	 <highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 
 <div class="tag-box tag-box-v4 margin-bottom-20">
-	<p><spring:message code="stats.msg.total.number.of.members"/><strong>{{usersTotal}}</strong></p>
-	<p><spring:message code="stats.msg.total.number.of.supporters"/><strong>{{supportersTotal}}</strong></p>	
+	<p><spring:message code="stats.msg.total.number.of.members" arguments="<strong>{{usersTotal}}</strong>"/></p>
+	<p><spring:message code="stats.msg.total.number.of.supporters" arguments="<strong>{{supportersTotal}}</strong>"/></p>	
 </div>
 
 <div class="text-right">
@@ -101,7 +101,13 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 				},
 				tooltip: {
 					//pointFormat: '<spring:message code="stats.number.of.supporter"/> : <b>{point.y:1f}</b> <spring:message code="stats.attendance.people"/>'
-	            }
+	            },
+	            plotOptions: {
+	                pie: {
+	                    allowPointSelect: true,
+	                    cursor: 'pointer'
+	                }
+	            }	            
 			},	        
 			title: {
 				text: '<spring:message code="stats.supporters.title"/>'
@@ -164,6 +170,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			
 			reqPromise.success(function(data, status, headers, config) {
 				
+				$scope.chartConfig.loading = false;
 				$scope.supportersTotal = data.supportersTotal;
 				$scope.usersTotal = data.usersTotal;
 				var supporters = data.supporters;
@@ -175,8 +182,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 				});
 				
 				$scope.supportersConn = "none";
-				$scope.chartConfig.loading = false;
-				
 			});
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.supportersConn = "none";

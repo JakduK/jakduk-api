@@ -9,6 +9,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title><spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/css/cubeportfolio.min.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/custom/custom-cubeportfolio.css">	
+	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
@@ -20,10 +23,10 @@
 	<div class="breadcrumbs">
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/league/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
-<ul class="pull-right breadcrumb">
-                <li ><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.league.breadcrumbs"/></a></li>
-                <li ><a href=""><spring:message code="stats.attendance.club.breadcrumbs"/></a></li>
-            </ul>			
+				<ul class="pull-right breadcrumb">
+	      <li ><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
+	      <li ><a href=""><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
+      </ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->
@@ -31,11 +34,28 @@
 	<!--=== Content Part ===-->
 	<div class="container content">
 	
+<div class="cube-portfolio">	
+		<div id="filters-container" class="cbp-l-filters-text content-xs">
+			<div class="cbp-filter-item"
+			ng-class="{'cbp-filter-item-active':chartConfig.options.chart.type == 'bar'}" ng-click="changeChartType('bar')"> 
+				<spring:message code="stats.attendance.filter.league"/> 
+			</div> |
+			<div class="cbp-filter-item"
+			ng-class="{'cbp-filter-item-active':chartConfig.options.chart.type == 'pie'}" ng-click="changeChartType('pie')"> 
+				<spring:message code="stats.attendance.filter.league.classic"/> 
+			</div>
+			<div class="cbp-filter-item"
+			ng-class="{'cbp-filter-item-active':chartConfig.options.chart.type == 'pie'}" ng-click="changeChartType('pie')"> 
+				<spring:message code="stats.attendance.filter.league.challenge"/> 
+			</div>			
+		</div><!--/end Filters Container-->
+</div>  	
+	
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
 		<div class="tag-box tag-box-v4 margin-bottom-20">
-			<p><spring:message code="stats.msg.total.number.of.members"/><strong>{{usersTotal}}</strong></p>
-			<p><spring:message code="stats.msg.total.number.of.supporters"/><strong>{{supportersTotal}}</strong></p>	
+			<p><spring:message code="stats.msg.total.number.of.attendance.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
+			<p><spring:message code="stats.msg.total.number.of.attendance.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>	
 		</div>
 		
 		<div class="text-right">
@@ -70,6 +90,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	$scope.seriesTotal = [];
 	$scope.seriesAverage = [];	
 	$scope.seriesGames = [];
+	$scope.totalSum = 0;
+	$scope.gamesSum = 0;
 	
 	angular.element(document).ready(function() {
 		$scope.getAttendance();
@@ -89,7 +111,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				tooltip: {
 					//pointFormat: '<spring:message code="stats.attendance.total"/> : <b>{point.y:,.0f}</b> <spring:message code="stats.attendance.people"/>',
 					shared: true
-				}
+				}			
 			},
 			title: {
 				text: '<spring:message code="stats.attendance.league.title"/>'
@@ -145,7 +167,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			series: [{
 				name: '<spring:message code="stats.attendance.total"/>',
 				yAxis: 0,
-				type: 'bar',
+				type: 'column',
 				data: $scope.seriesTotal,
 				dataLabels: {
 					enabled: true,
@@ -164,7 +186,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
       data: $scope.seriesAverage,          
 				dataLabels: {
 					enabled: true,
-					align: 'right',
 					format: '{point.y:,.0f} <spring:message code="stats.attendance.people"/>'
 				}
 			},
@@ -172,19 +193,14 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				name: '<spring:message code="stats.attendance.games"/>',
 				yAxis: 2,
 				visible: false,
-				type: 'bar',
+				type: 'spline',
 				data: $scope.seriesGames,
 				dataLabels: {
 					enabled: true,
-					color: '#FFFFFF',
-					align: 'right',
 					format: '{point.y:,.0f} <spring:message code="stats.attendance.game"/>',
-					style: {
-						fontSize: '13px'
-					}
 				}
 			}],
-    loading: false,
+    loading: true,
     credits:{enabled:true}
 		};		
 
@@ -213,6 +229,9 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			
 			reqPromise.success(function(data, status, headers, config) {
 				
+				$scope.chartConfig.loading = false;
+				$scope.totalSum = data.totalSum;
+				$scope.gamesSum = data.gamesSum;
 				var attendances = data.attendances;
 				$scope.chartConfig.options.chart.height = 300 + (attendances.length * 30);
 				
@@ -237,6 +256,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	};
 	
 	$scope.btnUrlCopy = function() {
+		
 		var url = "https://jakduk.com/stats/attendance/league";
 		
 		if(window.clipboardData){
