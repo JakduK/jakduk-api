@@ -18,29 +18,19 @@
 </head>
 
 <body>
-<div class="wrapper">
+<div class="wrapper" ng-controller="homeCtrl">
 	
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
-	
 <div class="image-block">
         <div class="container">
-            <div class="company-description">
-                <h2>2015 K리그 클래식 2R</h2>
-                <h4 class="text-left">2015-03-14(토)</h4>
-<p>14:00 서울 vs 전북, 서울 월드컵</p>
-<p>14:00 수원 vs 인천, 수원 월드컵</p>
-<p>16:00 성남 vs 전남, 광양 전용</p>
-<h4 class="text-left">2015-03-15(일)</h4>
-<p>14:00 대전 vs 광주, 대전 월드컵</p>
-<p>14:15 포항 vs 울산, 포항 스틸야드</p>
-<p>16:00 제주 vs 부산, 제주 월드컵</p>
+            <div class="company-description" ng-bind-html="homeDescription">
             </div>   
         </div>    
     </div>	
 	
 	<!--=== Content Part ===-->
-	<div class="container content" ng-controller="homeCtrl">
+	<div class="container content">
 
 <div class="row">
     
@@ -204,13 +194,14 @@
 
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
 <!-- JS Implementing Plugins -->
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.js"></script>
 <!-- JS Page Level -->           
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/owl-recent-works.js"></script>
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", []);
+var jakdukApp = angular.module("jakdukApp", ["ngSanitize"]);
 
 jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.encyclopedia = {};
@@ -220,6 +211,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.usersLatest = [];
 	$scope.commentsLatest = [];
 	//$scope.galleriesLatest = [];
+	$scope.homeDescription = {};
 	
 	angular.element(document).ready(function() {
 		$scope.refreshEncyclopedia();
@@ -276,6 +268,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 				$scope.usersLatest = data.users;
 				$scope.commentsLatest = data.comments;
 				//$scope.galleriesLatest = data.galleries;
+				$scope.homeDescription = data.homeDescription.desc;
 				
 				$scope.dataLatestConn = "none";
 			});

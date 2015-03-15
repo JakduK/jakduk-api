@@ -65,15 +65,15 @@ public class StatsController {
 		String language = commonService.getLanguageCode(locale, null);
 		statsService.getSupportersData(model, language);
 	}
+
+	@RequestMapping(value = "/attendance/refresh", method = RequestMethod.GET)
+	public String attendanceRefresh() {
+		
+		return "redirect:/stats/attendance/league";
+	}	
 	
 	@RequestMapping(value = "/attendance", method = RequestMethod.GET)
 	public String attendance(Model model) {
-		
-		return "redirect:/stats/attendance/league";
-	}
-	
-	@RequestMapping(value = "/attendance/league/refresh", method = RequestMethod.GET)
-	public String attendanceLeagueRefresh() {
 		
 		return "redirect:/stats/attendance/league";
 	}
@@ -87,9 +87,10 @@ public class StatsController {
 	}	
 	
 	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
-	public void dataLeagueAttendance(Model model) {
+	public void dataLeagueAttendance(Model model,
+			@RequestParam(required = false) String league) {
 		
-		statsService.getLeagueAttendanceData(model);
+		statsService.getLeagueAttendanceData(model, league);
 	}
 
 }

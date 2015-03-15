@@ -22,6 +22,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.simple.GalleryOnList;
@@ -365,5 +366,14 @@ public class JakdukDAO {
 		
 		return comments;
 	}
+	
+	public HomeDescription getHomeDescription() {
+		
+		Query query = new Query();
+		query.with(new Sort(Direction.DESC, "_id"));
+		HomeDescription homeDescription = mongoTemplate.findOne(query, HomeDescription.class);
+		
+		return homeDescription;
+	}	
 	
 }

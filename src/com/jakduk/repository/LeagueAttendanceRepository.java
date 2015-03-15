@@ -1,5 +1,8 @@
 package com.jakduk.repository;
 
+import java.util.List;
+
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.jakduk.model.db.LeagueAttendance;
@@ -11,5 +14,6 @@ import com.jakduk.model.db.LeagueAttendance;
  * @desc     :
  */
 public interface LeagueAttendanceRepository extends MongoRepository<LeagueAttendance, String>{
+	List<LeagueAttendance> findByLeague(String league, Sort sort);
 
 }

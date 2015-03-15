@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -33,6 +34,7 @@ import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.db.LeagueAttendance;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.BoardCategoryWrite;
@@ -43,6 +45,7 @@ import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.GalleryRepository;
+import com.jakduk.repository.HomeDescriptionRepository;
 import com.jakduk.repository.LeagueAttendanceRepository;
 import com.jakduk.repository.SequenceRepository;
 
@@ -85,6 +88,9 @@ public class AdminService {
 	
 	@Autowired
 	private LeagueAttendanceRepository leagueAttendanceReposidory;
+	
+	@Autowired
+	private HomeDescriptionRepository homeDescriptionReposotiry;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -290,8 +296,16 @@ public class AdminService {
 		return model;
 	}
 	
-	public Model getLeagueAttendanceList(Model model) {
-		List<LeagueAttendance> leagueAttendances = leagueAttendanceReposidory.findAll();
+	public Model getLeagueAttendanceList(Model model, String league) {
+		
+		List<LeagueAttendance> leagueAttendances;
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+		
+		if (league == null) {
+			leagueAttendances = leagueAttendanceReposidory.findAll(sort);
+		} else {
+			leagueAttendances = leagueAttendanceReposidory.findByLeague(league, sort);
+		}
 		
 		model.addAttribute("leagueAttendances", leagueAttendances);
 		
@@ -386,5 +400,26 @@ public class AdminService {
 		
 		leagueAttendanceReposidory.save(leagueAttendance);
 	}
+	
+	public void homeDescriptionWrite(HomeDescription homeDescription) {
+		
+		if (homeDescription.getId().isEmpty()) {
+			homeDescription.setId(null);
+		} 
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("homeDescription=" + homeDescription);
+		}
+		
+		homeDescriptionReposotiry.save(homeDescription);
+	}	
+	
+	public Model getHomeDescriptionList(Model model) {
+		List<HomeDescription> homeDescriptions = homeDescriptionReposotiry.findAll();
+		
+		model.addAttribute("homeDescriptions", homeDescriptions);
+		
+		return model;
+	}	
 	
 }

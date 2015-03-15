@@ -15,9 +15,19 @@
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="leagueAttendance" action="${contextPath}/admin/attendance/league/write" method="POST">
 <form:hidden path="id"/>
-<p>ex) 1983</p>
+
 <p>
-SEASON : 	<form:input path="season" cssClass="form-control" placeholder="Season"/>
+<label for="league" class="control-label">LEAGUE</label>
+<form:select path="league" cssClass="form-control">
+	<form:option value="KL">K LEAGUE</form:option>
+	<form:option value="KLCL">K LEAGUE CLASSIC</form:option>
+	<form:option value="KLCH">K LEAGUE CHALLENGE</form:option>
+</form:select> 	
+</p>
+
+<p>
+<label for="season" class="control-label">SEASON</label>
+<form:input path="season" cssClass="form-control" placeholder="Season"/>
 </p>
 <form:errors path="season"/>
 <p>ex) 40</p>
@@ -39,6 +49,11 @@ AVERAGE : <form:input path="average" cssClass="form-control" placeholder="Averag
 ng-model="average" ng-init="average='${leagueAttendance.average}'"/>
 </p>
 <form:errors path="average"/>
+<p>
+<label for="numberOfClubs" class="control-label">NUMBER OF CLUBS</label>
+<form:input path="numberOfClubs" cssClass="form-control" placeholder="Number Of Clubs"/>
+</p>
+<form:errors path="numberOfClubs"/>
 <p>
 <input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </p>

@@ -28,6 +28,7 @@ import com.jakduk.dao.BoardFreeOnRSS;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.UserOnHome;
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.model.simple.BoardFreeOnHome;
 import com.jakduk.model.simple.GalleryOnList;
@@ -35,6 +36,7 @@ import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.EncyclopediaRepository;
+import com.jakduk.repository.HomeDescriptionRepository;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -221,5 +223,14 @@ public class HomeService {
 		
 		return model;
 	}
+	
+	public Model getHomeDescription(Model model) {
+		
+		HomeDescription homeDescription = jakdukDAO.getHomeDescription();
+		
+		model.addAttribute("homeDescription", homeDescription);
+		
+		return model;
+	}	
 	
 }

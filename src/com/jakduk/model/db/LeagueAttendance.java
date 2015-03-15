@@ -4,6 +4,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,6 +24,9 @@ public class LeagueAttendance {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
+	@NotEmpty
+	private String league;
+	
 	@NotNull
 	private Integer season;
 	
@@ -34,6 +38,9 @@ public class LeagueAttendance {
 	
 	@NotNull
 	private Integer average;
+	
+	@NotNull
+	private Integer numberOfClubs;
 
 	public String getId() {
 		return id;
@@ -41,6 +48,14 @@ public class LeagueAttendance {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getLeague() {
+		return league;
+	}
+
+	public void setLeague(String league) {
+		this.league = league;
 	}
 
 	public Integer getSeason() {
@@ -75,10 +90,20 @@ public class LeagueAttendance {
 		this.average = average;
 	}
 
-	@Override
-	public String toString() {
-		return "LeagueAttendance [id=" + id + ", season=" + season + ", games="
-				+ games + ", total=" + total + ", average=" + average + "]";
+	public Integer getNumberOfClubs() {
+		return numberOfClubs;
 	}
 
+	public void setNumberOfClubs(Integer numberOfClubs) {
+		this.numberOfClubs = numberOfClubs;
+	}
+
+	@Override
+	public String toString() {
+		return "LeagueAttendance [id=" + id + ", league=" + league
+				+ ", season=" + season + ", games=" + games + ", total="
+				+ total + ", average=" + average + ", numberOfClubs="
+				+ numberOfClubs + "]";
+	}
+	
 }

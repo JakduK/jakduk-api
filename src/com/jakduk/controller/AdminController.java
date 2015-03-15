@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.db.LeagueAttendance;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
@@ -205,9 +206,16 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
-	public void leagueAttendance(Model model) {
+	public void leagueAttendance(Model model,
+			@RequestParam(required = false) String league) {
 		
-		adminService.getLeagueAttendanceList(model);
+		adminService.getLeagueAttendanceList(model, league);
+	}
+	
+	@RequestMapping(value = "/data/home/description", method = RequestMethod.GET)
+	public void dataHomeDescription(Model model) {
+		
+		adminService.getHomeDescriptionList(model);
 	}
 	
 	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.GET)
@@ -253,12 +261,32 @@ public class AdminController {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
-			return "admin/league/write";
+			return "admin/leagueAttendanceWrite";
 		}
 		
 		adminService.leagueAttendanceWrite(leagueAttendance);
 
 		return "redirect:/admin/settings?open=leagueAttendance";
 	}
+	
+	@RequestMapping(value = "/home/description/write", method = RequestMethod.GET)
+	public String homeDescriptionWrite(Model model) {
+		model.addAttribute("homeDescription", new HomeDescription());
+		
+		return "admin/homeDescriptionWrite";
+	}
+	
+	@RequestMapping(value = "/home/description/write", method = RequestMethod.POST)
+	public String homeDescriptionWrite(@Valid HomeDescription homeDescription, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/homeDescriptionWrite";
+		}
+		
+		adminService.homeDescriptionWrite(homeDescription);
+
+		return "redirect:/admin/settings?open=homeDescription";
+	}	
 
 }

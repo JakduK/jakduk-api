@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.SupporterCount;
 import com.jakduk.model.db.LeagueAttendance;
@@ -71,11 +72,15 @@ public class StatsService {
 		return HttpServletResponse.SC_OK;
 	}	
 	
-	public void getLeagueAttendanceData(Model model) {
+	public void getLeagueAttendanceData(Model model, String league) {
+		
+		if (league == null) {
+			league = CommonConst.K_LEAGUE_ABBREVIATION;
+		}
 		
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		
-		List<LeagueAttendance> attendances = leagueAttendanceRepository.findAll(sort);
+		List<LeagueAttendance> attendances = leagueAttendanceRepository.findByLeague(league, sort);
 		Stream<LeagueAttendance> sAttendances = attendances.stream();
 		Integer totalSum = sAttendances.mapToInt(LeagueAttendance::getTotal).sum();
 		sAttendances = attendances.stream();

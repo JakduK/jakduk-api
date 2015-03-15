@@ -32,6 +32,7 @@
     <li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
     <li><a href="<c:url value="/admin/thumbnail/size/write"/>">Thumbnail Size Write</a></li>
     <li><a href="<c:url value="/admin/attendance/league/write"/>">League Attendance Write</a></li>
+    <li><a href="<c:url value="/admin/home/description/write"/>">Home Description Write</a></li>
   </ul>
 </div>
 
@@ -46,6 +47,7 @@
     <li><a ng-click="getData('fc')">Get Football Club</a></li>
     <li><a ng-click="getData('boardCategory')">Get Board Category</a></li>
     <li><a ng-click="getData('leagueAttendance')">Get League Attendance</a></li>
+    <li><a ng-click="getData('homeDescription')">Get Home Description</a></li>
   </ul>
 </div>
 
@@ -109,15 +111,41 @@
 
 <div ng-show="leagueAttendances.length > 0">
 <h4>League Attendance</h4>
+<div class="btn-group">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+    LEAGUE
+    <span class="caret"></span>
+  </button>  
+  <ul class="dropdown-menu" role="menu">
+    <li><a ng-click="getDataLeague('KL')">K LEAGUE</a></li>
+    <li><a ng-click="getDataLeague('KLCL')"/>K LEAGUE CLASSIC</a></li>
+    <li><a ng-click="getDataLeague('KLCH')">K LEAGUE CHALLENGE</a></li>
+  </ul>
+</div>
 <table class="table">
 <tr>
-	<th>Season</th><th>Games</th><th>Total</th><th>Average</th>
+	<th>League</th><th>Season</th><th>Games</th><th>Total</th><th>Average</th><th>Number Of Clubs</th>
 </tr>
 <tr ng-repeat="leagueAttendance in leagueAttendances">
+	<td>{{leagueAttendance.league}}</td>
 	<td><a href="<c:url value="/admin/attendance/league/write/{{leagueAttendance.id}}"/>">{{leagueAttendance.season}}</a></td>
 	<td>{{leagueAttendance.games}}</td>
 	<td>{{leagueAttendance.total}}</td>
 	<td>{{leagueAttendance.average}}</td>
+	<td>{{leagueAttendance.numberOfClubs}}</td>
+</tr>
+</table>
+</div>
+
+<div ng-show="homeDescriptions.length > 0">
+<h4>Home Descriptions</h4>
+<table class="table">
+<tr>
+	<th>id</th><th>Description</th>
+</tr>
+<tr ng-repeat="homeDescription in homeDescriptions">
+	<td><a href="<c:url value="/admin/home/description/write/{{homeDescription.id}}"/>">{{homeDescription.id}}</a></td>
+	<td>{{homeDescription.desc}}</td>
 </tr>
 </table>
 </div>
@@ -135,11 +163,19 @@ var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.dataConn = "none";
+	$scope.dataLeagueConn = "none";
 	$scope.encyclopedias = [];
 	$scope.fcOrigins = [];
 	$scope.fcs = [];
 	$scope.boardCategorys = [];
 	$scope.leagueAttendances = [];
+	$scope.homeDescriptions = [];
+	
+	angular.element(document).ready(function() {
+		if ("${open}" != null && "${open}" != "") {
+			$scope.getData("${open}");
+		}		
+	});
 	
 	$scope.getData = function(type) {
 		var bUrl;
@@ -154,6 +190,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 			bUrl = '<c:url value="/admin/board/category.json"/>';
 		} else if (type == "leagueAttendance") {
 			bUrl = '<c:url value="/admin/attendance/league.json"/>';
+		} else if (type == "homeDescription") {
+			bUrl = '<c:url value="/admin/data/home/description.json"/>';
 		}
 		
 		if ($scope.dataConn == "none") {
@@ -176,6 +214,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 					$scope.boardCategorys = data.boardCategorys;
 				} else if (type == "leagueAttendance") {
 					$scope.leagueAttendances = data.leagueAttendances;
+				} else if (type == "homeDescription") {
+					$scope.homeDescriptions = data.homeDescriptions;
 				}
 				
 				$scope.dataConn = "none";
@@ -188,15 +228,36 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		}
 	};
 	
-	if ("${open}" != null && "${open}" != "") {
-		$scope.getData("${open}");
-	}
+	$scope.getDataLeague = function(league) {
+		var bUrl = '<c:url value="/admin/attendance/league.json?league=' + league + '"/>';
+		
+		if ($scope.dataLeagueConn == "none") {
+			
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.dataLeagueConn = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+
+				$scope.clearData();
+				$scope.leagueAttendances = data.leagueAttendances;
+				
+				$scope.dataLeagueConn = "none";				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.dataLeagueConn = "none";
+				alert("get data league error");
+			});
+		}
+	};	
 	
 	$scope.clearData = function() {
 		$scope.encyclopedias = [];
 		$scope.fcOrigins = [];
 		$scope.fcs = [];
 		$scope.boardCategorys = [];
+		$scope.leagueAttendances = [];
+		$scope.homeDescriptions = [];
 	};
 	
 });

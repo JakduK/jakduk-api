@@ -134,6 +134,7 @@ public class HomeController {
 		homeService.getUserLatest(model, language);
 		//homeService.getGalleryLatest(model);
 		homeService.getBoardCommentLatest(model);
+		homeService.getHomeDescription(model);
 	}
 	
 	@RequestMapping(value = "/error/{code}", method = RequestMethod.GET)

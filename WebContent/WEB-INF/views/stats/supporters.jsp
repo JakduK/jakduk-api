@@ -85,8 +85,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.usersTotal = 0;
 	
 	angular.element(document).ready(function() {			
-		$scope.getSupporters();
-		
 		var chartType = "${chartType}";
 		
 		if (chartType != "pie") {			
@@ -157,6 +155,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 				url: "https://jakduk.com/stats/supporters"	    	  
 			}
 		});	    
+	    
+   $scope.getSupporters();
 	});
 	
 	$scope.getSupporters = function() {
@@ -164,6 +164,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 		
 		if ($scope.supportersConn == "none") {
 			
+			$scope.chartConfig.loading = true;
 			var reqPromise = $http.get(bUrl);
 			
 			$scope.supportersConn = "loading";

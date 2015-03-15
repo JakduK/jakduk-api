@@ -22,9 +22,9 @@
 		<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/league/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
+			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
-	      <li ><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
+	      <li class="active"><spring:message code="stats.attendance.breadcrumbs.league"/></li>
 	      <li ><a href=""><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
       </ul>			
 		</div><!--/container-->
@@ -37,15 +37,15 @@
 <div class="cube-portfolio">	
 		<div id="filters-container" class="cbp-l-filters-text content-xs">
 			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':chartConfig.options.chart.type == 'bar'}" ng-click="changeChartType('bar')"> 
+			ng-class="{'cbp-filter-item-active':league == 'KL'}" ng-click="changeLeague('KL')"> 
 				<spring:message code="stats.attendance.filter.league"/> 
 			</div> |
 			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':chartConfig.options.chart.type == 'pie'}" ng-click="changeChartType('pie')"> 
+			ng-class="{'cbp-filter-item-active':league == 'KLCL'}" ng-click="changeLeague('KLCL')"> 
 				<spring:message code="stats.attendance.filter.league.classic"/> 
-			</div>
+			</div> |
 			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':chartConfig.options.chart.type == 'pie'}" ng-click="changeChartType('pie')"> 
+			ng-class="{'cbp-filter-item-active':league == 'KLCH'}" ng-click="changeLeague('KLCH')"> 
 				<spring:message code="stats.attendance.filter.league.challenge"/> 
 			</div>			
 		</div><!--/end Filters Container-->
@@ -87,14 +87,11 @@ var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
 
 jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	$scope.attendancesConn = "none";
-	$scope.seriesTotal = [];
-	$scope.seriesAverage = [];	
-	$scope.seriesGames = [];
+	$scope.league = "KL";
 	$scope.totalSum = 0;
 	$scope.gamesSum = 0;
 	
 	angular.element(document).ready(function() {
-		$scope.getAttendance();
 		
 		Highcharts.setOptions({
 			lang: {
@@ -162,13 +159,25 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			 	},
 				title: {
 					text: '<spring:message code="stats.attendance.games"/>'
-				}
-			}],                                 
+				}								
+			},                 
+			{ // Number Of Clubs yAxis
+				labels: {
+					x: 0,						                	
+					formatter: function() {
+						return Highcharts.numberFormat(this.value,0);
+					}
+			 	},
+				title: {
+					text: '<spring:message code="stats.attendance.number.of.clubs"/>'
+				},
+				opposite: true				
+			}],       			
 			series: [{
 				name: '<spring:message code="stats.attendance.total"/>',
 				yAxis: 0,
 				type: 'column',
-				data: $scope.seriesTotal,
+				data: [],
 				dataLabels: {
 					enabled: true,
 					color: '#FFFFFF',
@@ -183,7 +192,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				name: '<spring:message code="stats.attendance.average"/>',	
       yAxis: 1,	                
       type: 'spline',
-      data: $scope.seriesAverage,          
+      data: [],
 				dataLabels: {
 					enabled: true,
 					format: '{point.y:,.0f} <spring:message code="stats.attendance.people"/>'
@@ -194,12 +203,24 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				yAxis: 2,
 				visible: false,
 				type: 'spline',
-				data: $scope.seriesGames,
+				data: [],
 				dataLabels: {
 					enabled: true,
 					format: '{point.y:,.0f} <spring:message code="stats.attendance.game"/>',
 				}
+			},
+			{
+				name: '<spring:message code="stats.attendance.number.of.clubs"/>',
+				yAxis: 3,
+				visible: false,
+				type: 'spline',
+				data: [],
+				dataLabels: {
+					enabled: true,
+					format: '{point.y:,.0f}',
+				}
 			}],
+			
     loading: true,
     credits:{enabled:true}
 		};		
@@ -215,14 +236,17 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				text: "https://jakduk.com/stats/supporters",
 				url: "https://jakduk.com/stats/supporters"	    	  
 			}
-		});	   		   
+		});
+		
+		$scope.getAttendance();		
 	});
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/league.json"/>';
+		var bUrl = '<c:url value="/stats/data/attendance/league.json?league=' + $scope.league + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
+			$scope.chartConfig.loading = true;
 			var reqPromise = $http.get(bUrl);
 			
 			$scope.attendancesConn = "loading";
@@ -239,10 +263,12 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 					var itemTotal = [attendance.season, attendance.total];
 					var itemAverage = [attendance.season, attendance.average];
 					var itemGames = [attendance.season, attendance.games];
+					var itemNumberOfClubs = [attendance.season, attendance.numberOfClubs];
 					
-					$scope.seriesTotal.push(itemTotal);
-					$scope.seriesAverage.push(itemAverage);
-					$scope.seriesGames.push(itemGames);
+					$scope.chartConfig.series[0].data.push(itemTotal);
+					$scope.chartConfig.series[1].data.push(itemAverage);
+					$scope.chartConfig.series[2].data.push(itemGames);
+					$scope.chartConfig.series[3].data.push(itemNumberOfClubs);
 				});
 				
 				$scope.attendancesConn = "none";				
@@ -254,6 +280,24 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			});
 		}
 	};
+	
+	$scope.changeLeague = function(league) {
+		
+		$scope.chartConfig.series.forEach(function(series) {
+			series.data = [];
+		}) ;
+		
+		if (league == "KL") {
+			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.title"/>';			
+		} else if (league == "KLCL") {
+			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
+		} else if (league == "KLCH") {
+			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
+		}
+		
+		$scope.league = league;
+		$scope.getAttendance();
+	};	
 	
 	$scope.btnUrlCopy = function() {
 		

@@ -136,5 +136,15 @@ public class CommonConst {
 	public final static String DEVICE_TYPE_MOBILE = "mobile";
 	public final static String DEVICE_TYPE_TABLET = "tablet";
 	
+	/**
+	 * 그림의 용량을 축소시키는 기준 값.
+	 */
 	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte
+	
+	/**
+	 * K리그 줄임말.
+	 */
+	public final static String K_LEAGUE_ABBREVIATION = "KL";
+	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
+	public final static String K_LEAGUE_CHALLENGE_ABBREVIATION = "KLCH";
 }
