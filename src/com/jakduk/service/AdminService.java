@@ -401,6 +401,14 @@ public class AdminService {
 		leagueAttendanceReposidory.save(leagueAttendance);
 	}
 	
+	public Model getHomeDescription(Model model, String id) {
+		HomeDescription homeDescription = homeDescriptionReposotiry.findOne(id);
+		
+		model.addAttribute("homeDescription", homeDescription);
+		
+		return model;
+	}
+	
 	public void homeDescriptionWrite(HomeDescription homeDescription) {
 		
 		if (homeDescription.getId().isEmpty()) {
