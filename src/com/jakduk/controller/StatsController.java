@@ -49,7 +49,7 @@ public class StatsController {
 	}	
 	
 	@RequestMapping(value = "/supporters", method = RequestMethod.GET)
-	public String supporter(Model model,
+	public String supporters(Model model,
 			@RequestParam(required = false) String chartType) {
 		
 		Integer status = statsService.getSupporters(model, chartType);
@@ -79,9 +79,10 @@ public class StatsController {
 	}
 	
 	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
-	public String attendanceLeague(Model model) {
+	public String attendanceLeague(Model model,
+			@RequestParam(required = false) String league) {
 		
-		Integer status = statsService.getLeagueAttendance(model);
+		Integer status = statsService.getLeagueAttendance(model, league);
 		
 		return "stats/attendanceLeague";
 	}	

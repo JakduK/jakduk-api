@@ -141,10 +141,11 @@
 <h4>Home Descriptions</h4>
 <table class="table">
 <tr>
-	<th>id</th><th>Description</th>
+	<th>id</th><th>Priority</th><th>Description</th>
 </tr>
 <tr ng-repeat="homeDescription in homeDescriptions">
 	<td><a href="<c:url value="/admin/home/description/write/{{homeDescription.id}}"/>">{{homeDescription.id}}</a></td>
+	<td>{{homeDescription.priority}}</td>
 	<td>{{homeDescription.desc}}</td>
 </tr>
 </table>

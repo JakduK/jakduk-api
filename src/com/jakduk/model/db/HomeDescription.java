@@ -23,6 +23,8 @@ public class HomeDescription {
 	private String id;
 	
 	private String desc;
+	
+	private Integer priority;
 
 	public String getId() {
 		return id;
@@ -40,9 +42,18 @@ public class HomeDescription {
 		this.desc = desc;
 	}
 
+	public Integer getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
 	@Override
 	public String toString() {
-		return "HomeDescription [id=" + id + ", desc=" + desc + "]";
+		return "HomeDescription [id=" + id + ", desc=" + desc + ", priority="
+				+ priority + "]";
 	}
 
 }

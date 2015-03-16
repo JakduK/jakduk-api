@@ -93,6 +93,12 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	
 	angular.element(document).ready(function() {
 		
+		var league = "${league}";
+		
+		if (league == "KLCL" || league == "KLCH") {			
+			$scope.league = league;
+		}
+		
 		Highcharts.setOptions({
 			lang: {
 				thousandsSep: ','
@@ -122,7 +128,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 					style: {
 						fontSize: '13px'
 					}
-				}          
+				},
+				crosshair: true
 			},
 			yAxis: [{ // Total yAxis
 				min: 0,
@@ -233,8 +240,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			container: '#kakao-link-btn',
 			label: '<spring:message code="stats.attendance.league.title"/>\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>',
 			webLink: {
-				text: "https://jakduk.com/stats/supporters",
-				url: "https://jakduk.com/stats/supporters"	    	  
+				text: "https://jakduk.com/stats/attendance/league",
+				url: "https://jakduk.com/stats/attendance/league"	    	  
 			}
 		});
 		
@@ -283,27 +290,28 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	
 	$scope.changeLeague = function(league) {
 		
-		$scope.chartConfig.series.forEach(function(series) {
-			series.data = [];
-		}) ;
-		
-		if (league == "KL") {
-			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.title"/>';			
-		} else if (league == "KLCL") {
-			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
-		} else if (league == "KLCH") {
-			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
+		if ($scope.league != league) {
+			$scope.chartConfig.series.forEach(function(series) {
+				series.data = [];
+			}) ;
+			
+			if (league == "KL") {
+				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.title"/>';			
+			} else if (league == "KLCL") {
+				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
+			} else if (league == "KLCH") {
+				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
+			}
+			
+			$scope.league = league;
+			$scope.getAttendance();			
 		}
-		
-		$scope.league = league;
-		$scope.getAttendance();
 	};	
 	
 	$scope.btnUrlCopy = function() {
+		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.league;
 		
-		var url = "https://jakduk.com/stats/attendance/league";
-		
-		if(window.clipboardData){
+		if (window.clipboardData){
 		    // IE처리
 		    // 클립보드에 문자열 복사
 		    window.clipboardData.setData('text', url);

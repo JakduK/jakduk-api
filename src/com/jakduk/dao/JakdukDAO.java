@@ -370,7 +370,7 @@ public class JakdukDAO {
 	public HomeDescription getHomeDescription() {
 		
 		Query query = new Query();
-		query.with(new Sort(Direction.DESC, "_id"));
+		query.with(new Sort(Direction.DESC, "priority"));
 		HomeDescription homeDescription = mongoTemplate.findOne(query, HomeDescription.class);
 		
 		return homeDescription;

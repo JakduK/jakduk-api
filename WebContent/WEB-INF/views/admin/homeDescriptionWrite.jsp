@@ -15,11 +15,19 @@
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 <form:form commandName="homeDescription" action="${contextPath}/admin/home/description/write" method="POST">
 <form:hidden path="id"/>
+
 <p>
-<label for="desc" class="control-label">DESCRIPTION :</label>
+<label for="priority" class="control-label">PRIORITY</label>
+<form:input path="priority" cssClass="form-control" placeholder="Priority"/>
+</p>
+<form:errors path="priority"/>
+
+<p>
+<label for="desc" class="control-label">DESCRIPTION</label>
 <form:textarea path="desc" cssClass="form-control" placeholder="Description"/>
 </p>
 <form:errors path="desc"/>
+
 <p>
 <input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </p>

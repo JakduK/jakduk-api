@@ -65,9 +65,13 @@ public class StatsService {
 		model.addAttribute("usersTotal", usersTotal.intValue());
 	}
 	
-	public Integer getLeagueAttendance(Model model) {
+	public Integer getLeagueAttendance(Model model, String league) {
 		
 		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		
+		if (league != null && !league.isEmpty()) {
+			model.addAttribute("league", league);
+		}
 		
 		return HttpServletResponse.SC_OK;
 	}	
