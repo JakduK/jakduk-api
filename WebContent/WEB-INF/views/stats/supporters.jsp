@@ -119,8 +119,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 					style: {
 						fontSize: '13px'
                     }
-                },
-              crosshair: true
+                }
             },
 			yAxis: {
 				min: 0,

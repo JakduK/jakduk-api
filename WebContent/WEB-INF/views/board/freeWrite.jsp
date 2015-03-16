@@ -364,6 +364,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.images = JSON.stringify(tempImages);
 			}
 			
+			$scope.editable.focus();
 			editor.insertImage($scope.editable, imageUrl);		
 		} else {
 			console.log("status=" + status)
