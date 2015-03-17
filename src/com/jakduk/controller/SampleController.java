@@ -94,6 +94,12 @@ public class SampleController {
 		return "sample/gallery02";
 	}		
 	
+	@RequestMapping(value = "/gallery03")
+	public String gallery03(Model model) {
+		
+		return "sample/gallery03";
+	}		
+	
 	@RequestMapping(value = "/stats01")
 	public String stats01(Model model) {
 		
