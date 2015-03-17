@@ -9,10 +9,11 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title><spring:message code="gallery"/> &middot; <spring:message code="common.jakduk"/></title>
-	<jsp:include page="../include/html-header.jsp"></jsp:include>
-	
+
 	<!-- CSS Page Style -->    
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/portfolio-v1.css">	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/blueimp-gallery/css/blueimp-gallery.min.css">
+	
+	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
 <body>
@@ -28,30 +29,24 @@
 	<!--=== End Breadcrumbs ===-->
 
 <div class="container content" ng-controller="galleryCtrl">
+	<div id="links" class="row"> 
+		<div class="col-md-4 sm-margin-bottom-30" ng-repeat="gallery in galleries">
+	   <a ng-href="<%=request.getContextPath()%>/gallery/{{gallery.id}}" class="fancybox img-hover-v1" title="{{gallery.name}}">
+				<span><img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}"></span>
+	   </a>		
+		</div>
+	</div><!--/row-->
 
-   <div class="row"> 
-            <div class="col-md-4" ng-repeat="gallery in galleries">
-                <div class="view view-tenth" ng-click>
-    
-                    <img class="img-responsive" lazy-img="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}">    
-                
-                    <div class="mask">
-                        <h2 class="text-overflow">{{gallery.name}}</h2>
-                            <p>
-			<i class="fa fa-user"></i> {{gallery.writer.username}}
-			<i class="fa fa-eye"></i> {{gallery.views}}
-			<i class="fa fa-thumbs-o-up"></i>
-			<span ng-if="usersLikingCount[gallery.id]">{{usersLikingCount[gallery.id]}}</span>				
-			<span ng-if="usersLikingCount[gallery.id] == null">0</span>
-			<i class="fa fa-thumbs-o-down"></i>
-			<span ng-if="usersDislikingCount[gallery.id]">{{usersDislikingCount[gallery.id]}}</span>				
-			<span ng-if="usersDislikingCount[gallery.id] == null">0</span>				
-			</p>
-                        <a ng-href="<%=request.getContextPath()%>/gallery/view/{{gallery.id}}" class="info"><spring:message code="common.button.read.more"/></a>
-                    </div>                
-                </div>
-            </div>
-        </div><!--/row-->
+<!-- The Gallery as lightbox dialog, should be a child element of the document body -->
+<div id="blueimp-gallery" class="blueimp-gallery">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+</div>	
+	
 <div infinite-scroll="getGalleries()" infinite-scroll-disabled="infiniteDisabled">
 </div>        
 </div>
@@ -66,6 +61,7 @@
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-lazy-img/release/angular-lazy-img.js"></script>
 <script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/blueimp-gallery/js/blueimp-gallery.min.js"></script>
 
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", ["infinite-scroll", "angularLazyImg"]);
@@ -79,6 +75,16 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 	
 	angular.element(document).ready(function() {
 		//$scope.getGalleries();
+		
+		document.getElementById('links').onclick = function (event) {
+		    event = event || window.event;
+		    var target = event.target || event.srcElement,
+		        link = target.children[0].src ? target.parentNode : target,
+		        options = {index: link, event: event},
+		        links = this.getElementsByTagName('a');
+		    
+		    blueimp.Gallery(links, options);
+		};		
 	});	
 	
 	$scope.getGalleries = function() {
