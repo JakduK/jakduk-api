@@ -22,12 +22,11 @@
 	
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
-<div class="image-block">
-        <div class="container">
-            <div class="company-description" ng-bind-html="homeDescription">
-            </div>   
-        </div>    
-    </div>	
+	<div class="image-block">
+		<div class="container">
+			<div class="company-description" ng-bind-html="homeDescription"></div>   
+		</div>    
+	</div>	
 	
 	<!--=== Content Part ===-->
 	<div class="container content">
@@ -35,56 +34,52 @@
 <div class="row">
     
             <!-- Left Sidebar -->
-        	<div class="col-md-9 md-margin-bottom-30">
+        	<div class="col-md-9">
         	
                 <!--Blog Post-->
-                <div class="row margin-bottom-30">
-                    
+                <div class="row ">
+	                    
 <!--  최근 글 -->                    
-                        <div class="col-md-6">
-<div class="headline"><h2><spring:message code="home.posts.latest"/></h2> <button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
-			    		<spring:message code="common.button.more"/>
-    				</button></div>                        
+<div class="col-sm-6 sm-margin-bottom-30">
+	<div class="headline">
+		<h2><spring:message code="home.posts.latest"/></h2> 
+		<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
+			<spring:message code="common.button.more"/>
+		</button>
+	</div>                        
 
-                <!-- Trending -->
-                <ul class="list-unstyled blog-trending">
-                    <li ng-repeat="post in postsLatest">
-                        <h3 ng-switch="post.status.delete">
-                        <a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
-                        <a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
-                        </h3>
-                        <small>
-                        <i class="fa fa-user"></i> {{post.writer.username}}
-					<i class="fa fa-clock-o"></i>
-					<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
-					<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
-                        
-                        </small>                        
-                    </li>
-                </ul>
-                <!-- End Trending -->   
-                      
-                        </div>                    
+	<!-- Trending -->
+	<ul class="list-unstyled blog-trending">
+		<li ng-repeat="post in postsLatest">
+			<h3 ng-switch="post.status.delete">
+				<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+				<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
+			</h3>
+			<small>
+				<i class="fa fa-user"></i> {{post.writer.username}}
+				<i class="fa fa-clock-o"></i>
+				<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
+				<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
+			</small>                        
+		</li>
+	</ul>
+	<!-- End Trending -->   
+</div>                    
                         
 <!-- 최근 댓글  -->
-<div class="col-md-6">
-<div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
+<div class="col-sm-6 sm-margin-bottom-30">
+	<div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
 
-<div class="blog-twitter">
-                    <div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
-                        <strong><i class="fa fa-user"></i> {{comment.writer.username}}</strong>
-                        <a href="<c:url value="/board/free/{{comment.boardItem.seq}}"/>">{{comment.content}}</a>
-                        <span class="twitter-time"><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
-                    </div>
-                </div>                			
- 
-            </div> 
-
-               </div>
-                <!--End Blog Post-->                 
+	<div class="blog-twitter">
+		<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
+			<strong><i class="fa fa-user"></i> {{comment.writer.username}}</strong>
+			<a href="<c:url value="/board/free/{{comment.boardItem.seq}}"/>">{{comment.content}}</a>
+			<span class="twitter-time"><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+		</div>
+    </div>                			
+</div> 
    <!-- 최근 사진 -->
-   
-        <div class="owl-carousel-v1 owl-work-v1">
+        <div class="owl-carousel-v1 owl-work-v1 col-sm-12 md-margin-bottom-30">
             <div class="headline">
             <h2 class="pull-left"><spring:message code="home.pictures.latest"/>
             </h2>
@@ -116,8 +111,10 @@
                 </div>
 				</c:forEach>                
             </div>
-        </div>  
+        </div>             
 
+               </div>
+                <!--End Blog Post-->        
 
             </div>
             <!-- End Left Sidebar -->
@@ -125,8 +122,10 @@
             <!-- Right Sidebar -->
         	<div class="col-md-3">
         	
+        	<div class="row">
+        	
 <!-- 최근 가입 회원 -->         
-	 <div class="margin-bottom-30">
+	 <div class="margin-bottom-30 col-md-12 col-sm-6">
     			<div class="headline"><h2><spring:message code="home.members.registered.latest"/></h2></div>
     			
 <div class="carousel slide testimonials testimonials-v2" id="testimonials-1">
@@ -156,30 +155,27 @@
                 </div>     
                 
                 
-                
-<!--  백과사전  -->                
-		<div class="shadow-wrapper">
-			<div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
-			
-		   <h2>{{encyclopedia.subject}} <span class="label rounded label-orange">{{encyclopedia.kind}}</span></h2>
-		   <p>{{encyclopedia.content}}</p>
-
-<!-- 		   
+	<!--  백과사전  -->                
+	<div class="shadow-wrapper col-md-12 col-sm-6">
+		<div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
+			<h2>{{encyclopedia.subject}} <span class="label rounded label-orange">{{encyclopedia.kind}}</span></h2>
+			<p>{{encyclopedia.content}}</p>
+			<!-- 		   
 			<button class="btn-u btn-brd btn-brd-hover rounded btn-u-sea" type="button" ng-click="refreshEncyclopedia()">
 				<i class="fa fa-refresh"></i>
 			</button>
- -->					   
-			</div>
-		</div>                    
+			-->					   
+		</div>
+	</div>                    
                            
-
-<!-- 명언 -->	
-<blockquote class="hero">
-                    <p><em>"인간의 도덕과 의무에 대해 내가 알고 있는 것은 모두 축구에서 배웠다."</em></p>
-                    <small><em>알베르 카뮈 , 노벨문학상 수상자</em></small>
-                </blockquote>   
-
-        	
+	<!-- 명언 -->	
+	<div class="col-sm-12">
+		<blockquote class="hero">
+			<p><em>"인간의 도덕과 의무에 대해 내가 알고 있는 것은 모두 축구에서 배웠다."</em></p>
+			<small><em>알베르 카뮈 , 노벨문학상 수상자</em></small>
+		</blockquote>   
+	</div>        	
+</div>
        
             </div>
             <!-- End Right Sidebar -->

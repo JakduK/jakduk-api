@@ -59,10 +59,10 @@
 		</div>
 		
 		<div class="text-right">
-		<button class="btn-u btn-brd rounded" type="button" ng-click="btnUrlCopy()">
-			<spring:message code="common.button.copy.url.to.clipboard"/>
-		</button>
-		    <a id="kakao-link-btn" href="javascript:;">
+			<button class="btn-u btn-brd rounded" type="button" ng-click="btnUrlCopy()">
+				<spring:message code="common.button.copy.url.to.clipboard"/>
+			</button>
+		    <a id="kakao-link-btn" href="" ng-click="sendLink()">
 		      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
 		    </a>
 		</div>		
@@ -235,16 +235,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		 // 사용할 앱의 Javascript 키를 설정해 주세요.
 		Kakao.init('${kakaoKey}');
 		
-		// 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
-		Kakao.Link.createTalkLinkButton({
-			container: '#kakao-link-btn',
-			label: '<spring:message code="stats.attendance.league.title"/>\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>',
-			webLink: {
-				text: "https://jakduk.com/stats/attendance/league",
-				url: "https://jakduk.com/stats/attendance/league"	    	  
-			}
-		});
-		
 		$scope.getAttendance();		
 	});
 	
@@ -325,9 +315,22 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		    // 비IE 처리    
 		    window.prompt ('<spring:message code="common.msg.copy.to.clipboard"/>', url);  
 		  }
-	}	
+	};
 	
-});
+	$scope.sendLink = function() {
+		var label = $scope.chartConfig.title.text + '\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>';
+		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.league;
+		
+	    Kakao.Link.sendTalkLink({
+			label: label,
+			webLink: {
+				text: url,
+				url: url	    	  
+			}
+	    });
+	};	
+	
+});	
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
