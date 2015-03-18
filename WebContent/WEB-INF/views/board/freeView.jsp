@@ -211,11 +211,16 @@
    <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
 </button>
 </div>
-<div class="col-xs-6 text-right">
-    <a id="kakao-link-btn" href="javascript:;">
-      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
-    </a>
-</div>
+
+	<div class="text-right">
+		<button class="btn-u btn-brd rounded" type="button" ng-click="btnUrlCopy()">
+			<spring:message code="common.button.copy.url.to.clipboard"/>
+		</button>
+		<a id="kakao-link-btn" href="javascript:;">
+	   <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
+	  </a>
+	</div>		
+
 </div>
 </div>
 <div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>	
@@ -484,6 +489,25 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 				}
 			});
 		}
+	};	
+	
+	$scope.btnUrlCopy = function() {
+		var url = "https://jakduk.com/board/free/${post.seq}";
+		
+		if (window.clipboardData){
+		    // IE처리
+		    // 클립보드에 문자열 복사
+		    window.clipboardData.setData('text', url);
+		    
+		    // 클립보드의 내용 가져오기
+		    // window.clipboardData.getData('Text');
+		 
+		    // 클립보드의 내용 지우기
+		    // window.clipboardData.clearData("Text");
+		  }  else {                     
+		    // 비IE 처리    
+		    window.prompt ('<spring:message code="common.msg.copy.to.clipboard"/>', url);  
+		  }
 	};	
 });
 

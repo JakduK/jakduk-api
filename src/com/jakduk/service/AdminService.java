@@ -29,24 +29,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceClub;
+import com.jakduk.model.db.AttendanceLeague;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.db.LeagueAttendance;
 import com.jakduk.model.embedded.FootballClubName;
+import com.jakduk.model.web.AttendanceClubWrite;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.model.web.ThumbnailSizeWrite;
+import com.jakduk.repository.AttendanceClubRepository;
+import com.jakduk.repository.AttendanceLeagueRepository;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.GalleryRepository;
 import com.jakduk.repository.HomeDescriptionRepository;
-import com.jakduk.repository.LeagueAttendanceRepository;
 import com.jakduk.repository.SequenceRepository;
 
 /**
@@ -87,10 +90,13 @@ public class AdminService {
 	private GalleryRepository galleryRepository;
 	
 	@Autowired
-	private LeagueAttendanceRepository leagueAttendanceReposidory;
+	private AttendanceLeagueRepository attendanceLeagueReposidory;
 	
 	@Autowired
 	private HomeDescriptionRepository homeDescriptionReposotiry;
+	
+	@Autowired
+	private AttendanceClubRepository attendanceClubRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -296,18 +302,18 @@ public class AdminService {
 		return model;
 	}
 	
-	public Model getLeagueAttendanceList(Model model, String league) {
+	public Model getAttendanceLeagueList(Model model, String league) {
 		
-		List<LeagueAttendance> leagueAttendances;
+		List<AttendanceLeague> attendanceLeagues;
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		
 		if (league == null) {
-			leagueAttendances = leagueAttendanceReposidory.findAll(sort);
+			attendanceLeagues = attendanceLeagueReposidory.findAll(sort);
 		} else {
-			leagueAttendances = leagueAttendanceReposidory.findByLeague(league, sort);
+			attendanceLeagues = attendanceLeagueReposidory.findByLeague(league, sort);
 		}
 		
-		model.addAttribute("leagueAttendances", leagueAttendances);
+		model.addAttribute("attendanceLeagues", attendanceLeagues);
 		
 		return model;
 	}
@@ -380,25 +386,25 @@ public class AdminService {
 		}
 	}	
 	
-	public Model getLeagueAttendance(Model model, String id) {
-		LeagueAttendance leagueAttendance = leagueAttendanceReposidory.findOne(id);
+	public Model getAttendanceLeague(Model model, String id) {
+		AttendanceLeague attendanceLeague = attendanceLeagueReposidory.findOne(id);
 		
-		model.addAttribute("leagueAttendance", leagueAttendance);
+		model.addAttribute("attendanceLeague", attendanceLeague);
 		
 		return model;
 	}
 	
-	public void leagueAttendanceWrite(LeagueAttendance leagueAttendance) {
+	public void attendanceLeagueWrite(AttendanceLeague attendanceLeague) {
 		
-		if (leagueAttendance.getId().isEmpty()) {
-			leagueAttendance.setId(null);
+		if (attendanceLeague.getId().isEmpty()) {
+			attendanceLeague.setId(null);
 		} 
 		
 		if (logger.isDebugEnabled()) {
-			logger.debug("leagueAttendance=" + leagueAttendance);
+			logger.debug("attendanceLeague=" + attendanceLeague);
 		}
 		
-		leagueAttendanceReposidory.save(leagueAttendance);
+		attendanceLeagueReposidory.save(attendanceLeague);
 	}
 	
 	public Model getHomeDescription(Model model, String id) {
@@ -428,6 +434,35 @@ public class AdminService {
 		model.addAttribute("homeDescriptions", homeDescriptions);
 		
 		return model;
+	}	
+	
+	public void getAttendanceClubWrite(Model model) {
+		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+		
+		model.addAttribute("footballClubs", footballClubs);
+		model.addAttribute("attendanceClubWrite", new AttendanceClubWrite());
+	}
+	
+	public void attendanceClubWrite(AttendanceClubWrite attendanceClubWrite) {
+		AttendanceClub attendanceClub = new AttendanceClub();
+		
+		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOne(attendanceClubWrite.getOrigin());
+		
+		attendanceClub.setClub(footballClubOrigin);
+		
+		if (attendanceClubWrite.getId().isEmpty()) {
+			attendanceClub.setId(null);
+		} else {
+			attendanceClub.setId(attendanceClubWrite.getId());
+		}
+		
+		attendanceClub.setSeason(attendanceClubWrite.getSeason());
+		attendanceClub.setLeague(attendanceClubWrite.getLeague());
+		attendanceClub.setGames(attendanceClubWrite.getGames());
+		attendanceClub.setTotal(attendanceClubWrite.getTotal());
+		attendanceClub.setAverage(attendanceClubWrite.getAverage());
+		
+		attendanceClubRepository.save(attendanceClub);
 	}	
 	
 }

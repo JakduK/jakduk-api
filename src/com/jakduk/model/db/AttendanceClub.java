@@ -6,17 +6,18 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2015. 3. 10.
+ * @date     : 2015. 3. 18.
  * @desc     :
  */
 
 @Document
-public class LeagueAttendance {
+public class AttendanceClub {
 	
 	/**
 	 * ID
@@ -24,23 +25,18 @@ public class LeagueAttendance {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	@NotEmpty
+	@DBRef
+	private FootballClubOrigin club;
+	
 	private String league;
 	
-	@NotNull
 	private Integer season;
 	
-	@NotNull
 	private Integer games;
 	
-	@NotNull
 	private Integer total;
 	
-	@NotNull
 	private Integer average;
-	
-	@NotNull
-	private Integer numberOfClubs;
 
 	public String getId() {
 		return id;
@@ -48,6 +44,14 @@ public class LeagueAttendance {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public FootballClubOrigin getClub() {
+		return club;
+	}
+
+	public void setClub(FootballClubOrigin club) {
+		this.club = club;
 	}
 
 	public String getLeague() {
@@ -90,20 +94,11 @@ public class LeagueAttendance {
 		this.average = average;
 	}
 
-	public Integer getNumberOfClubs() {
-		return numberOfClubs;
-	}
-
-	public void setNumberOfClubs(Integer numberOfClubs) {
-		this.numberOfClubs = numberOfClubs;
-	}
-
 	@Override
 	public String toString() {
-		return "LeagueAttendance [id=" + id + ", league=" + league
-				+ ", season=" + season + ", games=" + games + ", total="
-				+ total + ", average=" + average + ", numberOfClubs="
-				+ numberOfClubs + "]";
+		return "AttendanceClub [id=" + id + ", club=" + club + ", league="
+				+ league + ", season=" + season + ", games=" + games
+				+ ", total=" + total + ", average=" + average + "]";
 	}
-	
+
 }

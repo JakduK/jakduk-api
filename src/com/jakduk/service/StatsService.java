@@ -15,8 +15,8 @@ import org.springframework.ui.Model;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.SupporterCount;
-import com.jakduk.model.db.LeagueAttendance;
-import com.jakduk.repository.LeagueAttendanceRepository;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.repository.AttendanceLeagueRepository;
 import com.jakduk.repository.UserRepository;
 
 /**
@@ -39,7 +39,7 @@ public class StatsService {
 	private UserRepository userRepository;
 	
 	@Autowired
-	private LeagueAttendanceRepository leagueAttendanceRepository;
+	private AttendanceLeagueRepository attendanceLeagueRepository;
 	
 	public Integer getSupporters(Model model, String chartType) {
 		
@@ -65,7 +65,7 @@ public class StatsService {
 		model.addAttribute("usersTotal", usersTotal.intValue());
 	}
 	
-	public Integer getLeagueAttendance(Model model, String league) {
+	public Integer getAttendanceLeague(Model model, String league) {
 		
 		model.addAttribute("kakaoKey", kakaoJavascriptKey);
 		
@@ -76,7 +76,7 @@ public class StatsService {
 		return HttpServletResponse.SC_OK;
 	}	
 	
-	public void getLeagueAttendanceData(Model model, String league) {
+	public void getAttendanceLeagueData(Model model, String league) {
 		
 		if (league == null) {
 			league = CommonConst.K_LEAGUE_ABBREVIATION;
@@ -84,11 +84,11 @@ public class StatsService {
 		
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		
-		List<LeagueAttendance> attendances = leagueAttendanceRepository.findByLeague(league, sort);
-		Stream<LeagueAttendance> sAttendances = attendances.stream();
-		Integer totalSum = sAttendances.mapToInt(LeagueAttendance::getTotal).sum();
+		List<AttendanceLeague> attendances = attendanceLeagueRepository.findByLeague(league, sort);
+		Stream<AttendanceLeague> sAttendances = attendances.stream();
+		Integer totalSum = sAttendances.mapToInt(AttendanceLeague::getTotal).sum();
 		sAttendances = attendances.stream();
-		Integer gamesSum = sAttendances.mapToInt(LeagueAttendance::getGames).sum();
+		Integer gamesSum = sAttendances.mapToInt(AttendanceLeague::getGames).sum();
 		
 		model.addAttribute("attendances", attendances);
 		model.addAttribute("totalSum", totalSum);

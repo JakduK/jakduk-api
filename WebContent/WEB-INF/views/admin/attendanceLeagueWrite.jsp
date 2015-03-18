@@ -11,9 +11,9 @@
 </head>
 <body>
 <div class="container" ng-controller="adminCtrl">
-<h4>Write LeagueAttendance.</h4>
+<h4>Write attendanceLeague.</h4>
 <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
-<form:form commandName="leagueAttendance" action="${contextPath}/admin/attendance/league/write" method="POST">
+<form:form commandName="attendanceLeague" action="${contextPath}/admin/attendance/league/write" method="POST">
 <form:hidden path="id"/>
 
 <p>
@@ -34,19 +34,19 @@
 <p>
 GAMES : 	
 <form:input path="games" cssClass="form-control" placeholder="Games" 
-ng-model="games" ng-init="games='${leagueAttendance.games}'" ng-blur="calcAve()"/>
+ng-model="games" ng-init="games='${attendanceLeague.games}'" ng-blur="calcAve()"/>
 </p>
 <form:errors path="games"/>
 <p>ex) 419478</p>
 <p>
 TOTAL : <form:input path="total" cssClass="form-control" placeholder="Total" 
-ng-model="total" ng-init="total='${leagueAttendance.total}'" ng-blur="calcAve()"/>
+ng-model="total" ng-init="total='${attendanceLeague.total}'" ng-blur="calcAve()"/>
 </p>
 <form:errors path="total"/>
 <p>
 <p>
 AVERAGE : <form:input path="average" cssClass="form-control" placeholder="Average" 
-ng-model="average" ng-init="average='${leagueAttendance.average}'"/>
+ng-model="average" ng-init="average='${attendanceLeague.average}'"/>
 </p>
 <form:errors path="average"/>
 <p>

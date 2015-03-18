@@ -31,8 +31,9 @@
     <li><a href="<c:url value="/admin/footballclub/write"/>">Football Club Write</a></li>
     <li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
     <li><a href="<c:url value="/admin/thumbnail/size/write"/>">Thumbnail Size Write</a></li>
-    <li><a href="<c:url value="/admin/attendance/league/write"/>">League Attendance Write</a></li>
     <li><a href="<c:url value="/admin/home/description/write"/>">Home Description Write</a></li>
+    <li><a href="<c:url value="/admin/attendance/league/write"/>">Attendance League Write</a></li>
+    <li><a href="<c:url value="/admin/attendance/club/write"/>">Attendance Club Write</a></li>
   </ul>
 </div>
 
@@ -46,8 +47,9 @@
     <li><a ng-click="getData('fcOrigin')"/>Get Football Club Origin</a></li>
     <li><a ng-click="getData('fc')">Get Football Club</a></li>
     <li><a ng-click="getData('boardCategory')">Get Board Category</a></li>
-    <li><a ng-click="getData('leagueAttendance')">Get League Attendance</a></li>
     <li><a ng-click="getData('homeDescription')">Get Home Description</a></li>
+    <li><a ng-click="getData('attendanceLeague')">Get Attendance League</a></li>
+    <li><a ng-click="getData('attendanceClub')">Get Attendance Club</a></li>
   </ul>
 </div>
 
@@ -109,8 +111,8 @@
 </table>
 </div>
 
-<div ng-show="leagueAttendances.length > 0">
-<h4>League Attendance</h4>
+<div ng-show="attendanceLeagues.length > 0">
+<h4>Attendance League</h4>
 <div class="btn-group">
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
     LEAGUE
@@ -126,13 +128,13 @@
 <tr>
 	<th>League</th><th>Season</th><th>Games</th><th>Total</th><th>Average</th><th>Number Of Clubs</th>
 </tr>
-<tr ng-repeat="leagueAttendance in leagueAttendances">
-	<td>{{leagueAttendance.league}}</td>
-	<td><a href="<c:url value="/admin/attendance/league/write/{{leagueAttendance.id}}"/>">{{leagueAttendance.season}}</a></td>
-	<td>{{leagueAttendance.games}}</td>
-	<td>{{leagueAttendance.total}}</td>
-	<td>{{leagueAttendance.average}}</td>
-	<td>{{leagueAttendance.numberOfClubs}}</td>
+<tr ng-repeat="attendanceLeague in attendanceLeagues">
+	<td>{{attendanceLeague.league}}</td>
+	<td><a href="<c:url value="/admin/attendance/league/write/{{attendanceLeague.id}}"/>">{{attendanceLeague.season}}</a></td>
+	<td>{{attendanceLeague.games}}</td>
+	<td>{{attendanceLeague.total}}</td>
+	<td>{{attendanceLeague.average}}</td>
+	<td>{{attendanceLeague.numberOfClubs}}</td>
 </tr>
 </table>
 </div>
@@ -169,7 +171,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.fcOrigins = [];
 	$scope.fcs = [];
 	$scope.boardCategorys = [];
-	$scope.leagueAttendances = [];
+	$scope.attendanceLeagues = [];
 	$scope.homeDescriptions = [];
 	
 	angular.element(document).ready(function() {
@@ -189,7 +191,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 			bUrl = '<c:url value="/admin/footballclub.json"/>';
 		} else if (type == "boardCategory") {
 			bUrl = '<c:url value="/admin/board/category.json"/>';
-		} else if (type == "leagueAttendance") {
+		} else if (type == "attendanceLeague") {
 			bUrl = '<c:url value="/admin/attendance/league.json"/>';
 		} else if (type == "homeDescription") {
 			bUrl = '<c:url value="/admin/data/home/description.json"/>';
@@ -213,8 +215,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 					$scope.fcs = data.fcs;
 				} else if (type == "boardCategory") {
 					$scope.boardCategorys = data.boardCategorys;
-				} else if (type == "leagueAttendance") {
-					$scope.leagueAttendances = data.leagueAttendances;
+				} else if (type == "attendanceLeague") {
+					$scope.attendanceLeagues = data.attendanceLeagues;
 				} else if (type == "homeDescription") {
 					$scope.homeDescriptions = data.homeDescriptions;
 				}
@@ -241,7 +243,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 
 				$scope.clearData();
-				$scope.leagueAttendances = data.leagueAttendances;
+				$scope.attendanceLeagues = data.attendanceLeagues;
 				
 				$scope.dataLeagueConn = "none";				
 			});
@@ -257,7 +259,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		$scope.fcOrigins = [];
 		$scope.fcs = [];
 		$scope.boardCategorys = [];
-		$scope.leagueAttendances = [];
+		$scope.attendanceLeagues = [];
 		$scope.homeDescriptions = [];
 	};
 	

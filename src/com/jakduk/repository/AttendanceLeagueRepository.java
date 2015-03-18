@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.jakduk.model.db.LeagueAttendance;
+import com.jakduk.model.db.AttendanceLeague;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -13,7 +13,7 @@ import com.jakduk.model.db.LeagueAttendance;
  * @date     : 2015. 3. 10.
  * @desc     :
  */
-public interface LeagueAttendanceRepository extends MongoRepository<LeagueAttendance, String>{
-	List<LeagueAttendance> findByLeague(String league, Sort sort);
+public interface AttendanceLeagueRepository extends MongoRepository<AttendanceLeague, String>{
+	List<AttendanceLeague> findByLeague(String league, Sort sort);
 
 }

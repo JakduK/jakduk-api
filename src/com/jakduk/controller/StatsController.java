@@ -82,7 +82,7 @@ public class StatsController {
 	public String attendanceLeague(Model model,
 			@RequestParam(required = false) String league) {
 		
-		Integer status = statsService.getLeagueAttendance(model, league);
+		Integer status = statsService.getAttendanceLeague(model, league);
 		
 		return "stats/attendanceLeague";
 	}	
@@ -91,7 +91,7 @@ public class StatsController {
 	public void dataLeagueAttendance(Model model,
 			@RequestParam(required = false) String league) {
 		
-		statsService.getLeagueAttendanceData(model, league);
+		statsService.getAttendanceLeagueData(model, league);
 	}
 
 }

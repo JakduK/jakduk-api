@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceLeague;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.db.LeagueAttendance;
+import com.jakduk.model.web.AttendanceClubWrite;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.FootballClubWrite;
 import com.jakduk.model.web.ThumbnailSizeWrite;
@@ -209,7 +210,7 @@ public class AdminController {
 	public void leagueAttendance(Model model,
 			@RequestParam(required = false) String league) {
 		
-		adminService.getLeagueAttendanceList(model, league);
+		adminService.getAttendanceLeagueList(model, league);
 	}
 	
 	@RequestMapping(value = "/data/home/description", method = RequestMethod.GET)
@@ -241,34 +242,6 @@ public class AdminController {
 		return "redirect:/admin/settings";
 	}		
 	
-	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)
-	public String leagueAttendanceWrite(Model model) {
-		model.addAttribute("leagueAttendance", new LeagueAttendance());
-		
-		return "admin/leagueAttendanceWrite";
-	}	
-	
-	@RequestMapping(value = "/attendance/league/write/{id}", method = RequestMethod.GET)
-	public String leagueAttendanceWrite(@PathVariable String id, Model model) {
-		
-		adminService.getLeagueAttendance(model, id);
-		
-		return "admin/leagueAttendanceWrite";
-	}	
-	
-	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.POST)
-	public String leagueAttendanceWrite(@Valid LeagueAttendance leagueAttendance, BindingResult result) {
-		
-		if (result.hasErrors()) {
-			logger.debug("result=" + result);
-			return "admin/leagueAttendanceWrite";
-		}
-		
-		adminService.leagueAttendanceWrite(leagueAttendance);
-
-		return "redirect:/admin/settings?open=leagueAttendance";
-	}
-	
 	@RequestMapping(value = "/home/description/write", method = RequestMethod.GET)
 	public String homeDescriptionWrite(Model model) {
 		model.addAttribute("homeDescription", new HomeDescription());
@@ -295,6 +268,55 @@ public class AdminController {
 		adminService.homeDescriptionWrite(homeDescription);
 
 		return "redirect:/admin/settings?open=homeDescription";
+	}		
+	
+	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)
+	public String attendanceLeagueWrite(Model model) {
+		model.addAttribute("attendanceLeague", new AttendanceLeague());
+		
+		return "admin/attendanceLeagueWrite";
+	}	
+	
+	@RequestMapping(value = "/attendance/league/write/{id}", method = RequestMethod.GET)
+	public String attendanceLeagueWrite(@PathVariable String id, Model model) {
+		
+		adminService.getAttendanceLeague(model, id);
+		
+		return "admin/attendanceLeagueWrite";
+	}	
+	
+	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.POST)
+	public String attendanceLeagueWrite(@Valid AttendanceLeague attendanceLeague, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/attendanceLeagueWrite";
+		}
+		
+		adminService.attendanceLeagueWrite(attendanceLeague);
+
+		return "redirect:/admin/settings?open=attendanceLeague";
+	}
+	
+	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.GET)
+	public String attendanceClubWrite(Model model) {
+		
+		adminService.getAttendanceClubWrite(model);
+		
+		return "admin/attendanceClubWrite";
+	}
+	
+	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.POST)
+	public String attendanceClubWrite(@Valid AttendanceClubWrite attendanceClubWrite, BindingResult result) {
+		
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/attendanceClubWrite";
+		}
+		
+		adminService.attendanceClubWrite(attendanceClubWrite);
+
+		return "redirect:/admin/settings?open=attendanceClub";
 	}	
 
 }
