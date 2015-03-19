@@ -211,9 +211,8 @@
    <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
 </button>
 </div>
-
-	<div class="text-right">
-		<button class="btn-u btn-brd rounded" type="button" ng-click="btnUrlCopy()">
+	<div class="col-xs-6 text-right">
+		<button class="btn-u btn-brd btn-u-xs rounded" type="button" ng-click="btnUrlCopy()">
 			<spring:message code="common.button.copy.url.to.clipboard"/>
 		</button>
 		<a id="kakao-link-btn" href="javascript:;">

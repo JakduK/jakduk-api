@@ -24,7 +24,7 @@
 
 <p>
 <label for="desc" class="control-label">DESCRIPTION</label>
-<form:textarea path="desc" cssClass="form-control" placeholder="Description"/>
+<form:textarea path="desc" cssClass="form-control" rows="15" placeholder="Description"/>
 </p>
 <form:errors path="desc"/>
 

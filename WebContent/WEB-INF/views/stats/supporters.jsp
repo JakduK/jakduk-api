@@ -51,7 +51,7 @@
 </div>
 
 <div class="text-right">
-<button class="btn-u btn-brd rounded" type="button" ng-click="btnUrlCopy()">
+<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()">
 	<spring:message code="common.button.copy.url.to.clipboard"/>
 </button>
     <a id="kakao-link-btn" href="" ng-click="sendLink()">

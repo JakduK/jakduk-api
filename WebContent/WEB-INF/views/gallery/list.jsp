@@ -30,10 +30,10 @@
 
 <div class="container content" ng-controller="galleryCtrl">
 	<div id="links" class="row"> 
-		<div class="col-md-4 sm-margin-bottom-30" ng-repeat="gallery in galleries">
-	   <a ng-href="<%=request.getContextPath()%>/gallery/{{gallery.id}}" class="fancybox img-hover-v1" title="{{gallery.name}}">
+		<div class="col-md-4 margin-bottom-10-n" ng-repeat="gallery in galleries">
+	   		<a ng-href="<%=request.getContextPath()%>/gallery/{{gallery.id}}" class="fancybox img-hover-v1" title="{{gallery.name}}">
 				<span><img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}"></span>
-	   </a>		
+			</a>		
 		</div>
 	</div><!--/row-->
 
