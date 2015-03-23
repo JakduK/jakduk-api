@@ -71,9 +71,6 @@
 				<li ng-class="{active:isActive('<c:url value="/home"/>')}">
 					<a href="<c:url value="/home"/>"><spring:message code="common.home"/></a>
 				</li>
-				<li ng-class="{active:isActive('<c:url value="/about"/>')}">
-					<a href="<c:url value="/about"/>"><spring:message code="about"/></a>
-				</li>
 				<li ng-class="{active:isActive('<c:url value="/board"/>')}">
 					<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
 				</li>

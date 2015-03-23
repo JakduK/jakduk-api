@@ -7,7 +7,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="about"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="about.site"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
@@ -18,7 +18,7 @@
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><a href="<c:url value="/about/intro/refresh"/>"><spring:message code="about"/></a></h1>
+			<h1 class="pull-left"><a href="<c:url value="/about/intro/refresh"/>"><spring:message code="about.site"/></a></h1>
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->	
