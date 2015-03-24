@@ -121,29 +121,29 @@
 			</button>		
 		</c:when>
 	</c:choose>
-	
-	<c:choose>
+</div>
+
+	<c:choose>	
 		<c:when test="${result == 'setNotice'}">
-			<div class="alert alert-success" role="alert"><spring:message code="board.msg.set.as.notice"/></div>
+			<div class="contex-bg"><p class="bg-success rounded"><spring:message code="board.msg.set.as.notice"/></p></div>		
 		</c:when>	
 		<c:when test="${result == 'cancelNotice'}">
-			<div class="alert alert-success" role="alert"><spring:message code="board.msg.cancel.notice"/></div>
+			<div class="contex-bg"><p class="bg-success rounded"><spring:message code="board.msg.cancel.notice"/></p></div>
 		</c:when>
 		<c:when test="${result == 'alreadyNotice'}">
-			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.already.notice"/></div>
+			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.already.notice"/></p></div>
 		</c:when>
 		<c:when test="${result == 'alreadyNotNotice'}">
-			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.already.not.notice"/></div>
+			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.already.not.notice"/></p></div>
 		</c:when>		
 		<c:when test="${result == 'existComment'}">
-			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post"/></div>
+			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.can.not.delete.post"/></p></div>
 		</c:when>
 		<c:when test="${result == 'emptyComment'}">
-			<div class="alert alert-danger" role="alert"><spring:message code="board.msg.error.can.not.delete.post.except.comment"/></div>
-		</c:when>					
+			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.can.not.delete.post.except.comment"/></p></div>
+		</c:when>
 	</c:choose>
 	
-</div>	
         <!--Blog Post-->        
     	<div class="blog margin-bottom-20" ng-controller="boardFreeCtrl">
     	<input type="hidden" id="subject" value="${post.subject}">
@@ -222,7 +222,9 @@
 
 </div>
 </div>
-<div class="alert {{alert.classType}}" role="alert" ng-show="alert.msg">{{alert.msg}}</div>	
+<div class="contex-bg" ng-show="alert.msg">
+	<p class="{{alert.classType}} rounded">{{alert.msg}}</p>
+</div>
         </div>
         <!--End Blog Post-->   	
 	
@@ -284,32 +286,32 @@
                 
 <!-- 댓글 남기기 -->                
 <div class="post-comment">
-            <h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
-<div class="margin-bottom-10">            
-				<summernote config="options" on-keydown="keydown(evt)" 
-				ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
-				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
-</div>				  
+	<h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
+	<div class="margin-bottom-10">            
+		<summernote config="options" on-focus="focus(evt)" 
+		ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
+		<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
+	</div>				  
 
-<p>
-				<c:choose>
-					<c:when test="${authRole == 'ANNONYMOUS'}">
-						<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled">
-							<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
-						</button>	
-					</c:when>
-					<c:when test="${authRole == 'USER'}">
-						<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-sm ladda-button" 
-						ng-click="btnWriteComment()" 
-						ladda="writeComment" data-style="expand-right" data-spinner-color="Gainsboro">
-							<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
-						</button>				
-					</c:when>
-				</c:choose>				          
-</p>
-				<div>
-					<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
-				</div>	
+	<p>
+		<c:choose>
+			<c:when test="${authRole == 'ANNONYMOUS'}">
+				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled">
+					<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
+				</button>	
+			</c:when>
+			<c:when test="${authRole == 'USER'}">
+				<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-sm ladda-button" 
+				ng-click="btnWriteComment()" 
+				ladda="writeComment" data-style="expand-right" data-spinner-color="Gainsboro">
+					<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
+				</button>				
+			</c:when>
+		</c:choose>				          
+	</p>
+	<div>
+		<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
+	</div>	
 </div>                
 	
 	</div>
@@ -418,11 +420,11 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 		
 		if ("${authRole}" == "ANNONYMOUS") {
 			$scope.alert.msg = '<spring:message code="board.msg.need.login.for.feel"/>';
-			$scope.alert.classType = "alert-warning";
+			$scope.alert.classType = "bg-warning";
 			return;
 		} else if ("${accountId}" == "${post.writer.userId}") {
 			$scope.alert.msg = '<spring:message code="board.msg.you.are.writer"/>';
-			$scope.alert.classType = "alert-warning";
+			$scope.alert.classType = "bg-warning";
 			return;
 		}
 		
@@ -446,21 +448,21 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 				
 				if (data.errorCode == "like") {
 					message = '<spring:message code="board.msg.select.like"/>';
-					mType = "alert-success";
+					mType = "bg-success";
 					$scope.numberOfLike = data.numberOfLike;
 				} else if (data.errorCode == "dislike") {
 					message = '<spring:message code="board.msg.select.dislike"/>';
-					mType = "alert-success";
+					mType = "bg-success";
 					$scope.numberOfDislike = data.numberOfDislike;
 				} else if (data.errorCode == "already") {
 					message = '<spring:message code="board.msg.select.already.like"/>';
-					mType = "alert-warning";
+					mType = "bg-warning";
 				} else if (data.errorCode == "anonymous") {
 					message = '<spring:message code="board.msg.need.login.for.feel"/>';
-					mType = "alert-warning";
+					mType = "bg-warning";
 				} else if (data.errorCode == "writer") {
 					message = '<spring:message code="board.msg.you.are.writer"/>';
-					mType = "alert-warning";
+					mType = "bg-warning";
 				}
 				
 				$scope.alert.msg = message;
@@ -477,7 +479,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 			});
 			reqPromise.error(function(data, status, headers, config) {				
 				$scope.alert.msg = '<spring:message code="common.msg.error.network.unstable"/>';
-				$scope.alert.classType = "alert-danger";
+				$scope.alert.classType = "bg-danger";
 				
 				if (type == "like") {
 					$scope.likeConn = "none";
@@ -539,13 +541,13 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	      ['help', ['help']]			          
 				]};	
 	
-	$scope.keydown = function(e) { 
+	$scope.focus = function(e) { 
 		if ("${authRole}" == "ANNONYMOUS") {
 			if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
 				location.href = "<c:url value='/login'/>";
 			}
 		}	
-	}
+	};
 	
 	if ("${authRole}" == "ANNONYMOUS") {
 		$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login.for.write"/>'};

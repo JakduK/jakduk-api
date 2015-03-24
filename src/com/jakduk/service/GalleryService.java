@@ -177,11 +177,7 @@ public class GalleryService {
 				
 				ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
 			}
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("file info=" + file);
-			}
-			
+		
 			if (logger.isDebugEnabled()) {
 				logger.debug("gallery info=" + gallery);
 			}

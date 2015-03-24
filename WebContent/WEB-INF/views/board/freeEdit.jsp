@@ -85,7 +85,7 @@
 	</div>
 	<div class="row">
 		<!-- sotred Images -->
-		<div class="media col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="item in storedImages">
+		<div class="media col-xs-12 col-sm-4" ng-repeat="item in storedImages">
 		  <div class="media-left media-middle">
 				<img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
 		  </div>
@@ -109,7 +109,7 @@
 		  </div>
 		</div>
 		<!-- queue Images -->
-		<div class="media col-xs-12 col-sm-4 col-md-3 col-lg-3" ng-repeat="item in uploader.queue">
+		<div class="media col-xs-12 col-sm-4" ng-repeat="item in uploader.queue">
 			<div class="media-left media-middle">
 				<img class="media-object" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{item.uid}}" style="width:50px; height:50px;">
 		  </div>
@@ -365,8 +365,8 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.images = JSON.stringify(tempImages);
 			}
 		
-			$scope.editable.focus();
-			editor.insertImage($scope.editable, imageUrl);
+			//$scope.editable.focus();
+			editor.insertImage($scope.editable, imageUrl, response.image.id);
 			
 		} else {
 			console.log("upload image failed. status=" + status);
@@ -374,14 +374,13 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	};	
 
 	$scope.insertImage = function(uid) {
-		$scope.editable.focus();
+		//$scope.editable.focus();
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
 		editor.insertImage($scope.editable, imageUrl);
 	};
 	
 	// angular-summernote method
 	$scope.imageUpload = function(files, editor) {
-//		$scope.editor = editor;
 //		$scope.$apply();
 		$scope.uploader.addToQueue(files);
       };	
