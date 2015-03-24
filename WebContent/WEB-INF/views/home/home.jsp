@@ -33,52 +33,50 @@
 
 <div class="row">
     
-            <!-- Left Sidebar -->
-        	<div class="col-md-9">
-        	
-                <!--Blog Post-->
-                <div class="row ">
+<div class="col-md-9">
+	<div class="row ">
 	                    
-<!--  최근 글 -->                    
-<div class="col-sm-6 sm-margin-bottom-30">
-	<div class="headline">
-		<h2><spring:message code="home.posts.latest"/></h2> 
-		<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
-			<spring:message code="common.button.more"/>
-		</button>
-	</div>                        
-
-	<!-- Trending -->
-	<ul class="list-unstyled blog-trending">
-		<li ng-repeat="post in postsLatest">
-			<h3 ng-switch="post.status.delete">
-				<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
-				<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
-			</h3>
-			<small>
-				<i class="fa fa-user"></i> {{post.writer.username}}
-				<i class="fa fa-clock-o"></i>
-				<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
-				<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
-			</small>                        
-		</li>
-	</ul>
-	<!-- End Trending -->   
-</div>                    
+		<!--  최근 글 -->                    
+		<div class="col-sm-6 sm-margin-bottom-30">
+			<div class="headline">
+				<h2><spring:message code="home.posts.latest"/></h2> 
+				<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
+					<spring:message code="common.button.more"/>
+				</button>
+			</div>                        
+		
+			<!-- Trending -->
+			<ul class="list-unstyled blog-trending">
+				<li ng-repeat="post in postsLatest">
+					<h3 ng-switch="post.status.delete">
+						<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+						<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
+					</h3>
+					<small>
+						<i class="fa fa-user"></i> {{post.writer.username}}
+						<i class="fa fa-clock-o"></i>
+						<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
+						<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
+					</small>                        
+				</li>
+			</ul>
+			<!-- End Trending -->   
+		</div>                    
                         
-<!-- 최근 댓글  -->
-<div class="col-sm-6 sm-margin-bottom-30">
-	<div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
-
-	<div class="blog-twitter">
-		<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
-			<strong><i class="fa fa-user"></i> {{comment.writer.username}}</strong>
-			<a href="<c:url value="/board/free/{{comment.boardItem.seq}}"/>">{{comment.content}}</a>
-			<span class="twitter-time"><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
-		</div>
-    </div>                			
-</div> 
-   <!-- 최근 사진 -->
+		<!-- 최근 댓글  -->
+		<div class="col-sm-6 sm-margin-bottom-30">
+			<div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
+		
+			<div class="blog-twitter">
+				<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
+					<strong><i class="fa fa-user"></i> {{comment.writer.username}}</strong>
+					<a href="<c:url value="/board/free/{{comment.boardItem.seq}}"/>">{{comment.content}}</a>
+					<span class="twitter-time"><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+				</div>
+		    </div>                			
+		</div> 
+		
+		<!-- 최근 사진 -->
         <div class="owl-carousel-v1 owl-work-v1 col-sm-12 md-margin-bottom-30">
             <div class="headline">
             <h2 class="pull-left"><spring:message code="home.pictures.latest"/>

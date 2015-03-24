@@ -374,7 +374,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	};	
 
 	$scope.insertImage = function(uid) {
-		//$scope.editable.focus();
+		$scope.editable.focus();
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
 		editor.insertImage($scope.editable, imageUrl);
 	};
