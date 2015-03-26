@@ -37,23 +37,23 @@
 	<div class="margin-bottom-20">
 	
 	<div class="btn-group">
-	<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
-		<c:choose>
-			<c:when test="${boardListInfo.category != 'none'}">
-				<spring:message code="${categorys[boardListInfo.category]}"/>
-			</c:when>
-			<c:otherwise>
-				<spring:message code="board.category"/>
-			</c:otherwise>
-		</c:choose>		
-		<i class="fa fa-angle-down"></i>
-	</button>
-	<ul class="dropdown-menu" role="menu">
-		<c:forEach items="${categorys}" var="category">
-			<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>	
-		</c:forEach>
-	</ul>
-</div>
+		<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
+			<c:choose>
+				<c:when test="${boardListInfo.category != 'none'}">
+					<spring:message code="${categorys[boardListInfo.category]}"/>
+				</c:when>
+				<c:otherwise>
+					<spring:message code="board.category"/>
+				</c:otherwise>
+			</c:choose>		
+			<i class="fa fa-angle-down"></i>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+			<c:forEach items="${categorys}" var="category">
+				<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
+			</c:forEach>
+		</ul>
+	</div>
 
 <div class="btn-group">
 <c:choose>

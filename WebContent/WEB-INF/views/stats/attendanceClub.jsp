@@ -9,9 +9,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title><spring:message code="stats.attendance.breadcrumbs.league"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/css/cubeportfolio.min.css">
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/custom/custom-cubeportfolio.css">	
-	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
@@ -24,8 +21,8 @@
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
-	      <li class="active"><spring:message code="stats.attendance.breadcrumbs.league"/></li>
-	      <li><a href="<c:url value="/stats/attendance/club"/>"><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
+	      <li><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
+	      <li class="active"><spring:message code="stats.attendance.breadcrumbs.club"/></li>
       </ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
@@ -33,23 +30,16 @@
 	
 	<!--=== Content Part ===-->
 	<div class="container content">
-	
-<div class="cube-portfolio">	
-		<div id="filters-container" class="cbp-l-filters-text content-xs">
-			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':league == 'KL'}" ng-click="changeLeague('KL')"> 
-				<spring:message code="stats.attendance.filter.league"/> 
-			</div> |
-			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':league == 'KLCL'}" ng-click="changeLeague('KLCL')"> 
-				<spring:message code="stats.attendance.filter.league.classic"/> 
-			</div> |
-			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':league == 'KLCH'}" ng-click="changeLeague('KLCH')"> 
-				<spring:message code="stats.attendance.filter.league.challenge"/> 
-			</div>			
-		</div><!--/end Filters Container-->
-</div>  	
+
+<div class="row">
+	<div class="col-xs-6 col-sm-2">	
+		<select class="form-control">
+			<c:forEach items="${footballClubs}" var="footballClub">
+			  <option value="${footballClub.id}">${footballClub.names[0].shortName}</option>
+			</c:forEach>  
+		</select>
+	</div>
+</div>
 	
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
@@ -239,7 +229,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	});
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/league.json?league=' + $scope.league + '"/>';
+		var bUrl = '<c:url value="/stats/data/attendance/club.json?club=' + $scope.league + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			

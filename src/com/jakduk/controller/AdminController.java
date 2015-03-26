@@ -206,19 +206,25 @@ public class AdminController {
 		adminService.getBoardCategoryList(model);
 	}
 	
-	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
-	public void leagueAttendance(Model model,
+	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
+	public void leagueAttendanceLeague(Model model,
 			@RequestParam(required = false) String league) {
 		
 		adminService.getAttendanceLeagueList(model, league);
 	}
+	
+	@RequestMapping(value = "/data/attendance/club", method = RequestMethod.GET)
+	public void dataAttendanceClub(Model model) {
+		
+		adminService.getAttendanceClubList(model);
+	}	
 	
 	@RequestMapping(value = "/data/home/description", method = RequestMethod.GET)
 	public void dataHomeDescription(Model model) {
 		
 		adminService.getHomeDescriptionList(model);
 	}
-	
+
 	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.GET)
 	public String thumbnailSizeWrite(Model model) {
 		
@@ -305,6 +311,14 @@ public class AdminController {
 		
 		return "admin/attendanceClubWrite";
 	}
+	
+	@RequestMapping(value = "/attendance/club/write/{id}", method = RequestMethod.GET)
+	public String attendanceClubWrite(@PathVariable String id, Model model) {
+		
+		adminService.getAttendanceClubWrite(model, id);
+		
+		return "admin/attendanceClubWrite";
+	}	
 	
 	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.POST)
 	public String attendanceClubWrite(@Valid AttendanceClubWrite attendanceClubWrite, BindingResult result) {

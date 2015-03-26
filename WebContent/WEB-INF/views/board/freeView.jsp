@@ -280,7 +280,10 @@
 				<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
 			</button>
 		</div>
-		<div class="alert {{commentAlert.classType}}" role="alert" ng-show="commentAlert.msg">{{commentAlert.msg}}</div>
+
+	<div class="contex-bg" ng-show="commentAlert.msg">
+		<p class="{{commentAlert.classType}} rounded">{{commentAlert.msg}}</p>
+	</div>
 </div>
                 </div>		
                 
@@ -635,7 +638,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 					if (type == "init") {					
 					} else {
 						$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-						$scope.commentAlert.classType = "alert-warning";				
+						$scope.commentAlert.classType = "bg-warning";				
 					}				
 				} else {	// 댓글을 1개 이상 가져왔을 때
 					if (type == "init" || type == "btnRefreshComment") {

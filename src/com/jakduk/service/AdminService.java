@@ -318,6 +318,18 @@ public class AdminService {
 		return model;
 	}
 	
+	public Model getAttendanceClubList(Model model) {
+		
+		List<AttendanceClub> attendanceClubs;
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+		
+		attendanceClubs = attendanceClubRepository.findAll(sort);
+		
+		model.addAttribute("attendanceClubs", attendanceClubs);
+		
+		return model;
+	}	
+	
 	public Model getBoardCategory(Model model, String id) {
 		BoardCategory boardCategory = boardCategoryRepository.findOne(id);
 		
@@ -442,6 +454,23 @@ public class AdminService {
 		model.addAttribute("footballClubs", footballClubs);
 		model.addAttribute("attendanceClubWrite", new AttendanceClubWrite());
 	}
+	
+	public void getAttendanceClubWrite(Model model, String id) {
+		AttendanceClub attendanceClub = attendanceClubRepository.findOne(id);
+		logger.debug("attendanceClub=" + attendanceClub);
+		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+		
+		AttendanceClubWrite attendanceClubWrite = new AttendanceClubWrite();
+		attendanceClubWrite.setId(attendanceClub.getId());
+		attendanceClubWrite.setOrigin(attendanceClub.getClub().getId());
+		attendanceClubWrite.setSeason(attendanceClub.getSeason());
+		attendanceClubWrite.setGames(attendanceClub.getGames());
+		attendanceClubWrite.setTotal(attendanceClub.getTotal());
+		attendanceClubWrite.setAverage(attendanceClub.getAverage());
+		
+		model.addAttribute("footballClubs", footballClubs);
+		model.addAttribute("attendanceClubWrite", attendanceClubWrite);
+	}	
 	
 	public void attendanceClubWrite(AttendanceClubWrite attendanceClubWrite) {
 		AttendanceClub attendanceClub = new AttendanceClub();

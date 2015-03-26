@@ -139,6 +139,23 @@
 </table>
 </div>
 
+<div ng-show="attendanceClubs.length > 0">
+<h4>Attendance Clubs</h4>
+<table class="table">
+<tr>
+	<th>Club</th><th>Season</th><th>League</th><th>Games</th><th>Total</th><th>Average</th>
+</tr>
+<tr ng-repeat="attendanceClub in attendanceClubs">
+	<td><a href="<c:url value="/admin/attendance/club/write/{{attendanceClub.id}}"/>">{{attendanceClub.club.name}}</a></td>
+	<td>{{attendanceClub.season}}</td>	
+	<td>{{attendanceClub.league}}</td>
+	<td>{{attendanceClub.games}}</td>
+	<td>{{attendanceClub.total}}</td>
+	<td>{{attendanceClub.average}}</td>	
+</tr>
+</table>
+</div>
+
 <div ng-show="homeDescriptions.length > 0">
 <h4>Home Descriptions</h4>
 <table class="table">
@@ -172,6 +189,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.fcs = [];
 	$scope.boardCategorys = [];
 	$scope.attendanceLeagues = [];
+	$scope.attendanceClubs = [];
 	$scope.homeDescriptions = [];
 	
 	angular.element(document).ready(function() {
@@ -192,7 +210,9 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		} else if (type == "boardCategory") {
 			bUrl = '<c:url value="/admin/board/category.json"/>';
 		} else if (type == "attendanceLeague") {
-			bUrl = '<c:url value="/admin/attendance/league.json"/>';
+			bUrl = '<c:url value="/admin/data/attendance/league.json"/>';
+		} else if (type == "attendanceClub") {
+			bUrl = '<c:url value="/admin/data/attendance/club.json"/>';
 		} else if (type == "homeDescription") {
 			bUrl = '<c:url value="/admin/data/home/description.json"/>';
 		}
@@ -217,6 +237,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 					$scope.boardCategorys = data.boardCategorys;
 				} else if (type == "attendanceLeague") {
 					$scope.attendanceLeagues = data.attendanceLeagues;
+				} else if (type == "attendanceClub") {
+					$scope.attendanceClubs = data.attendanceClubs;
 				} else if (type == "homeDescription") {
 					$scope.homeDescriptions = data.homeDescriptions;
 				}
@@ -260,6 +282,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		$scope.fcs = [];
 		$scope.boardCategorys = [];
 		$scope.attendanceLeagues = [];
+		$scope.attendanceClubs = [];
 		$scope.homeDescriptions = [];
 	};
 	

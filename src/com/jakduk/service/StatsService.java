@@ -15,8 +15,13 @@ import org.springframework.ui.Model;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.SupporterCount;
+import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.repository.AttendanceClubRepository;
 import com.jakduk.repository.AttendanceLeagueRepository;
+import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.UserRepository;
 
 /**
@@ -40,6 +45,12 @@ public class StatsService {
 	
 	@Autowired
 	private AttendanceLeagueRepository attendanceLeagueRepository;
+	
+	@Autowired
+	private AttendanceClubRepository attendanceClubRepository;
+	
+	@Autowired
+	private FootballClubOriginRepository footballClubOriginRepository;
 	
 	public Integer getSupporters(Model model, String chartType) {
 		
@@ -95,4 +106,41 @@ public class StatsService {
 		model.addAttribute("gamesSum", gamesSum);
 		
 	}
+	
+	public Integer getAttendanceClub(Model model, String club, String language) {
+		
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
+		
+		model.addAttribute("footballClubs", footballClubs);
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		
+		if (club != null && !club.isEmpty()) {
+			model.addAttribute("club", club);
+		}
+		
+		return HttpServletResponse.SC_OK;
+	}
+	
+	public void getAttendanceClubData(Model model, String club) {
+		
+		FootballClubOrigin footballClubOrigin;
+		
+		if (club == null) {
+			footballClubOrigin = footballClubOriginRepository.findOne(club);
+			
+			Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+			
+			List<AttendanceClub> attendances = attendanceClubRepository.findByClub(footballClubOrigin, sort);
+			Stream<AttendanceClub> sAttendances = attendances.stream();
+			Integer totalSum = sAttendances.mapToInt(AttendanceClub::getTotal).sum();
+			sAttendances = attendances.stream();
+			Integer gamesSum = sAttendances.mapToInt(AttendanceClub::getGames).sum();
+			
+			model.addAttribute("attendances", attendances);
+			model.addAttribute("totalSum", totalSum);
+			model.addAttribute("gamesSum", gamesSum);
+		} else {
+		}
+	}
+	
 }

@@ -47,7 +47,7 @@ public class UserProfileUpdateController {
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
-	public String profileUpdate(HttpServletRequest request, HttpServletResponse response,
+	public String profileUpdate(HttpServletRequest request,
 			@RequestParam(required = false) String lang,
 			Model model) {
 		

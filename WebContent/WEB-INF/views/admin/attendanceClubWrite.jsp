@@ -43,21 +43,21 @@
 <p>
 <label for="games" class="control-label">GAMES</label>
 <form:input path="games" cssClass="form-control" placeholder="Games" 
-ng-model="games" ng-init="games='${attendanceLeague.games}'" ng-blur="calcAve()"/>
+ng-model="games" ng-init="games='${attendanceClubWrite.games}'" ng-blur="calcAve()"/>
 </p>
 <form:errors path="games"/>
 
 <p>
 <label for="total" class="control-label">TOTAL</label> 
 <form:input path="total" cssClass="form-control" placeholder="Total" 
-ng-model="total" ng-init="total='${attendanceLeague.total}'" ng-blur="calcAve()"/>
+ng-model="total" ng-init="total='${attendanceClubWrite.total}'" ng-blur="calcAve()"/>
 </p>
 <form:errors path="total"/>
 
 <p>
 <label for="average" class="control-label">AVERAGE</label>
 <form:input path="average" cssClass="form-control" placeholder="Average" 
-ng-model="average" ng-init="average='${attendanceLeague.average}'"/>
+ng-model="average" ng-init="average='${attendanceClubWrite.average}'"/>
 </p>
 <form:errors path="average"/>
 
