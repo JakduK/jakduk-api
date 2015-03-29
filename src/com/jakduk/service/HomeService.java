@@ -28,6 +28,7 @@ import com.jakduk.dao.BoardFreeOnRSS;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.UserOnHome;
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.model.simple.BoardFreeOnHome;
@@ -232,5 +233,14 @@ public class HomeService {
 		
 		return model;
 	}	
+	
+	public Integer getDataFootballClubs(Model model, String language) {
+		
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
+		
+		model.addAttribute("footballClubs", footballClubs);
+		
+		return HttpServletResponse.SC_OK;		
+	}
 	
 }

@@ -18,10 +18,9 @@ import com.jakduk.dao.SupporterCount;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.AttendanceLeague;
 import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.repository.AttendanceClubRepository;
 import com.jakduk.repository.AttendanceLeagueRepository;
-import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
 
 /**
@@ -50,7 +49,7 @@ public class StatsService {
 	private AttendanceClubRepository attendanceClubRepository;
 	
 	@Autowired
-	private FootballClubOriginRepository footballClubOriginRepository;
+	private FootballClubRepository footballClubRepository;
 	
 	public Integer getSupporters(Model model, String chartType) {
 		
@@ -107,38 +106,41 @@ public class StatsService {
 		
 	}
 	
-	public Integer getAttendanceClub(Model model, String club, String language) {
+	public Integer getAttendanceClub(Model model, String clubId) {
 		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
-		
-		model.addAttribute("footballClubs", footballClubs);
 		model.addAttribute("kakaoKey", kakaoJavascriptKey);
 		
-		if (club != null && !club.isEmpty()) {
-			model.addAttribute("club", club);
+		if (clubId != null && !clubId.isEmpty()) {
+			model.addAttribute("clubId", clubId);
 		}
 		
 		return HttpServletResponse.SC_OK;
 	}
 	
-	public void getAttendanceClubData(Model model, String club) {
+	public void getAttendanceClubData(Model model, String clubId) {
 		
-		FootballClubOrigin footballClubOrigin;
+		FootballClub footballClub;
 		
-		if (club == null) {
-			footballClubOrigin = footballClubOriginRepository.findOne(club);
+		if (clubId != null) {
+			footballClub = footballClubRepository.findOne(clubId);
 			
 			Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 			
-			List<AttendanceClub> attendances = attendanceClubRepository.findByClub(footballClubOrigin, sort);
+			List<AttendanceClub> attendances = attendanceClubRepository.findByClub(footballClub.getOrigin(), sort);
 			Stream<AttendanceClub> sAttendances = attendances.stream();
 			Integer totalSum = sAttendances.mapToInt(AttendanceClub::getTotal).sum();
 			sAttendances = attendances.stream();
 			Integer gamesSum = sAttendances.mapToInt(AttendanceClub::getGames).sum();
+			Integer average = 0;
+
+			if (totalSum != 0 && gamesSum != 0) {
+				average = totalSum / gamesSum;
+			}
 			
 			model.addAttribute("attendances", attendances);
 			model.addAttribute("totalSum", totalSum);
 			model.addAttribute("gamesSum", gamesSum);
+			model.addAttribute("average", average);
 		} else {
 		}
 	}

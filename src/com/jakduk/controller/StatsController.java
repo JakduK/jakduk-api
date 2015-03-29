@@ -88,14 +88,10 @@ public class StatsController {
 	}	
 	
 	@RequestMapping(value = "/attendance/club", method = RequestMethod.GET)
-	public String attendanceClub(HttpServletRequest request, Model model,
-			@RequestParam(required = false) String club,
-			@RequestParam(required = false) String lang) {
+	public String attendanceClub(Model model,
+			@RequestParam(required = false) String clubId) {
 		
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-		
-		Integer status = statsService.getAttendanceClub(model, club, language);
+		Integer status = statsService.getAttendanceClub(model, clubId);
 		
 		return "stats/attendanceClub";
 	}	
@@ -109,9 +105,9 @@ public class StatsController {
 	
 	@RequestMapping(value = "/data/attendance/club", method = RequestMethod.GET)
 	public void dataAttendanceClub(Model model,
-			@RequestParam(required = false) String club) {
+			@RequestParam(required = false) String clubId) {
 		
-		statsService.getAttendanceClubData(model, club);
+		statsService.getAttendanceClubData(model, clubId);
 	}	
 
 }
