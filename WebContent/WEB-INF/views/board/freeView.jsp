@@ -222,11 +222,14 @@
 
 </div>
 </div>
-<div class="contex-bg" ng-show="alert.msg">
-	<p class="{{alert.classType}} rounded">{{alert.msg}}</p>
+
+<div class="alert {{alert.classType}} fade in rounded" ng-show="alert.msg">
+	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	{{alert.msg}} <a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl">{{alert.linkLabel}}</a>
 </div>
-        </div>
-        <!--End Blog Post-->   	
+
+</div>
+<!--End Blog Post-->   	
 	
 	<hr />
 	
@@ -423,11 +426,13 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 		
 		if ("${authRole}" == "ANNONYMOUS") {
 			$scope.alert.msg = '<spring:message code="board.msg.need.login.for.feel"/>';
-			$scope.alert.classType = "bg-warning";
+			$scope.alert.linkUrl = "<c:url value='/login'/>";
+			$scope.alert.linkLabel = '<spring:message code="common.button.login"/>';
+			$scope.alert.classType = "alert-warning";
 			return;
 		} else if ("${accountId}" == "${post.writer.userId}") {
 			$scope.alert.msg = '<spring:message code="board.msg.you.are.writer"/>';
-			$scope.alert.classType = "bg-warning";
+			$scope.alert.classType = "alert-warning";
 			return;
 		}
 		
@@ -447,25 +452,26 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 			
 			reqPromise.success(function(data, status, headers, config) {
 				var message = "";
+				var link = "";
 				var mType = "";
 				
 				if (data.errorCode == "like") {
 					message = '<spring:message code="board.msg.select.like"/>';
-					mType = "bg-success";
+					mType = "alert-success";
 					$scope.numberOfLike = data.numberOfLike;
 				} else if (data.errorCode == "dislike") {
 					message = '<spring:message code="board.msg.select.dislike"/>';
-					mType = "bg-success";
+					mType = "alert-success";
 					$scope.numberOfDislike = data.numberOfDislike;
 				} else if (data.errorCode == "already") {
 					message = '<spring:message code="board.msg.select.already.like"/>';
-					mType = "bg-warning";
+					mType = "alert-warning";
 				} else if (data.errorCode == "anonymous") {
 					message = '<spring:message code="board.msg.need.login.for.feel"/>';
-					mType = "bg-warning";
+					mType = "alert-warning";
 				} else if (data.errorCode == "writer") {
 					message = '<spring:message code="board.msg.you.are.writer"/>';
-					mType = "bg-warning";
+					mType = "alert-warning";
 				}
 				
 				$scope.alert.msg = message;
@@ -482,7 +488,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 			});
 			reqPromise.error(function(data, status, headers, config) {				
 				$scope.alert.msg = '<spring:message code="common.msg.error.network.unstable"/>';
-				$scope.alert.classType = "bg-danger";
+				$scope.alert.classType = "alert-danger";
 				
 				if (type == "like") {
 					$scope.likeConn = "none";

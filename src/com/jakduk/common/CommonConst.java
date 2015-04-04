@@ -54,6 +54,7 @@ public class CommonConst {
 	 */
 	public final static String COOKIE_EMAIL = "email";
 	public final static String COOKIE_REMEMBER = "remember";
+	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30;
 	
 	/**
 	 * OAuth 종류

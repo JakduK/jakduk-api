@@ -283,7 +283,7 @@ public class CommonService {
 	
 	public void setCookie(HttpServletResponse response, String name, String value, String path) {
 		Cookie cookie = new Cookie(name, value);
-		cookie.setMaxAge(60 * 60 * 24); // a day
+		cookie.setMaxAge(CommonConst.COOKIE_EMAIL_MAX_AGE); // a day
 		cookie.setPath(path);
 		response.addCookie(cookie);		
 	}
