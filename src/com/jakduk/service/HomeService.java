@@ -236,7 +236,7 @@ public class HomeService {
 	
 	public Integer getDataFootballClubs(Model model, String language) {
 		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
 		
 		model.addAttribute("footballClubs", footballClubs);
 		

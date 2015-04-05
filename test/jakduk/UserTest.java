@@ -98,13 +98,6 @@ public class UserTest {
 	}
 	
 	@Test
-	public void getFootballClubList() {
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList("en");
-		System.out.println("getFootballClubList=" + footballClubs);
-		
-	}
-	
-	@Test
 	public void getSupportFCCount() {
 		List<SupporterCount> users = jakdukDAO.getSupportFCCount("ko");
 		System.out.println("getSupportFCCount=" + users);

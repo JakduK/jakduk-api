@@ -2,10 +2,8 @@ package com.jakduk.service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -16,9 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -33,7 +28,6 @@ import com.jakduk.authentication.common.CommonUserDetails;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Sequence;
 import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.FootballClubRepository;
@@ -252,15 +246,6 @@ public class CommonService {
 		dateTimeFormat.put("time", sf.toPattern());
 		
 		return dateTimeFormat;
-	}
-	
-	public List<FootballClub> getFootballClubs(String language) {
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("names"));
-		Pageable pageable = new PageRequest(0, 100, sort);
-		
-		List<FootballClub> footballClubs = footballClubRepository.findByNamesLanguage(language, pageable);
-		
-		return footballClubs;
 	}
 	
 	public void doOAuthAutoLogin(OAuthPrincipal principal, Object credentials, CommonUserDetails userDetails) {

@@ -104,7 +104,7 @@ public class UserService {
 	
 	public Model getUserWrite(Model model, String language) {
 		
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language);
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
 		
 		model.addAttribute("userWrite", new UserWrite());
 		model.addAttribute("footballClubs", footballClubs);
@@ -202,7 +202,7 @@ public class UserService {
 	
 	public Model getOAuthWriteDetails(Model model, String language) {
 		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
 		
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -323,7 +323,7 @@ public class UserService {
 
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			
-			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
+			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
 			
 			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			UserProfile userProfile = userRepository.userProfileFindById(authUser.getId());
@@ -472,7 +472,7 @@ public class UserService {
 		
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			
-			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
+			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
 			
 			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

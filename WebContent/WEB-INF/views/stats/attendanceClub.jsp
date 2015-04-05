@@ -32,8 +32,8 @@
 	<div class="container content">
 
 <div class="row">
-	<div class="col-xs-6 col-sm-2">	
-		<select class="form-control" ng-model="footballClub" ng-options="opt.names[0].shortName for opt in footballClubs"
+	<div class="col-xs-6 col-sm-4 col-md-2">	
+		<select class="form-control" ng-model="footballClub" ng-options="opt.names[0].fullName for opt in footballClubs"
 		ng-change="changeFootballClub()">
 			<option value=""><spring:message code="stats.select.football.club"/></option>
 		</select>

@@ -1,9 +1,7 @@
 package com.jakduk.dao;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -23,8 +21,6 @@ import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.db.User;
-import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.simple.GalleryOnList;
 
 /**
@@ -109,24 +105,21 @@ public class JakdukDAO {
 	 * @param language
 	 * @return
 	 */
-	public List<FootballClub> getFootballClubList(String language) {
-		
-		Sort.Direction sort;
-		
-		if (language.equals("ko")) {
-			sort = Sort.Direction.DESC;
-		} else {
-			sort = Sort.Direction.ASC;
-		}
-		
+	public List<FootballClub> getFootballClubList(String language, String sortProperties) {
+
 		Query query = new Query();
 		query.addCriteria(Criteria.where("names.language").is(language));
 		query.fields().include("active").include("origin").include("names.$");
-		query.with(new Sort(sort, "names.fullName"));
+		query.with(new Sort(Sort.Direction.DESC, "names.fullName"));
 		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
 		
-		if (language.equals("ko")) {
-			Collections.reverse(footballClubs);
+		switch (sortProperties) {
+		case CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME:
+			footballClubs.sort((f1, f2) -> f1.getNames().get(0).getFullName().compareTo(f2.getNames().get(0).getFullName()));			
+			break;
+		case CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME:
+			footballClubs.sort((f1, f2) -> f1.getNames().get(0).getShortName().compareTo(f2.getNames().get(0).getShortName()));			
+			break;			
 		}
 
 		return footballClubs;

@@ -54,7 +54,7 @@ public class CommonConst {
 	 */
 	public final static String COOKIE_EMAIL = "email";
 	public final static String COOKIE_REMEMBER = "remember";
-	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30;
+	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 	
 	/**
 	 * OAuth 종류
@@ -148,4 +148,7 @@ public class CommonConst {
 	public final static String K_LEAGUE_ABBREVIATION = "KL";
 	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
 	public final static String K_LEAGUE_CHALLENGE_ABBREVIATION = "KLCH";
+	
+	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME = "fullName";
+	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME = "shortName";
 }

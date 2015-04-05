@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.UserOnHome;
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
@@ -45,7 +46,7 @@ public class HomeTest {
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
 		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
 		
-		System.out.println("getBoardLatest=" + boardFreeOnHomeRepository.findAll(pageable).getContent());
+		//System.out.println("getBoardLatest=" + boardFreeOnHomeRepository.findAll(pageable).getContent());
 	}
 	
 	@Test
@@ -53,7 +54,7 @@ public class HomeTest {
 		
 		List<UserOnHome> users = jakdukDAO.getUserOnHome("ko");
 		
-		System.out.println("getUserLatest=" +users);
+		//System.out.println("getUserLatest=" +users);
 	}
 	
 	@Test
@@ -64,7 +65,15 @@ public class HomeTest {
 		
 		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
 		
-		System.out.println("getCommentLatest=" +comments);
+		//System.out.println("getCommentLatest=" +comments);
+	}
+	
+	@Test
+	public void getFootballClubList() {
+		
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList("ko", CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME);
+		
+		System.out.println("getFootballClubList=" + footballClubs);
 	}
 
 }
