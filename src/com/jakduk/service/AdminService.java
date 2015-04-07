@@ -347,7 +347,14 @@ public class AdminService {
 	
 	public void thumbnailSizeWrite(ThumbnailSizeWrite thumbnailSizeWrite) {
 		
-		List<Gallery> galleries = galleryRepository.findAll();
+		List<Gallery> galleries;
+		
+		if (thumbnailSizeWrite.getGalleryId() != null && !thumbnailSizeWrite.getGalleryId().isEmpty()) {
+			galleries = new ArrayList<Gallery>();
+			galleries.add(galleryRepository.findOne(thumbnailSizeWrite.getGalleryId()));
+		} else {
+			galleries = galleryRepository.findAll();
+		}
 		
 		for (Gallery gallery : galleries) {
 			ObjectId objId = new ObjectId(gallery.getId());
@@ -368,14 +375,17 @@ public class AdminService {
 			String formatName = "jpg";
 			
 			String splitContentType[] = gallery.getContentType().split("/");
-			if (splitContentType != null) {
+			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
 				formatName = splitContentType[1];
 			}
 			
 			if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
 				
 				try {
-					Files.delete(thumbFilePath);
+					
+					if (Files.exists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
+						Files.delete(thumbFilePath);
+					}
 					
 					logger.debug("gallery=" + gallery);
 					
@@ -396,7 +406,7 @@ public class AdminService {
 				}
 			}				
 		}
-	}	
+	}
 	
 	public Model getAttendanceLeague(Model model, String id) {
 		AttendanceLeague attendanceLeague = attendanceLeagueReposidory.findOne(id);

@@ -137,7 +137,7 @@ public class GalleryService {
 			String formatName = "jpg";
 			
 			String splitContentType[] = gallery.getContentType().split("/");
-			if (splitContentType != null) {
+			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
 				formatName = splitContentType[1];
 			}
 

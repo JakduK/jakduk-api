@@ -210,6 +210,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				
 				if (value.id == $scope.clubId) {
 					$scope.footballClub = $scope.footballClubs[index];
+					$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attencance.club.title"/>';
 				}
 			});
 			

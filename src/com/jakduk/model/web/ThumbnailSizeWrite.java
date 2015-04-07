@@ -17,23 +17,36 @@ public class ThumbnailSizeWrite {
 	@Min(1)
 	private int height = 1;
 	
+	private String galleryId;
+
 	public int getWidth() {
 		return width;
 	}
+
 	public void setWidth(int width) {
 		this.width = width;
 	}
+
 	public int getHeight() {
 		return height;
 	}
+
 	public void setHeight(int height) {
 		this.height = height;
 	}
-	
+
+	public String getGalleryId() {
+		return galleryId;
+	}
+
+	public void setGalleryId(String galleryId) {
+		this.galleryId = galleryId;
+	}
+
 	@Override
 	public String toString() {
 		return "ThumbnailSizeWrite [width=" + width + ", height=" + height
-				+ "]";
+				+ ", galleryId=" + galleryId + "]";
 	}
 
 }

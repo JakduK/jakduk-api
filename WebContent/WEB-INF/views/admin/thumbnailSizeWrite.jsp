@@ -23,6 +23,12 @@ WIDTH : <form:input path="width" cssClass="form-control" placeholder="width" siz
 <p>
 HEIGHT : <form:input path="height" cssClass="form-control" placeholder="height" size="30"/>
 </p>
+
+<p>
+<label for="galleryId" class="control-label">GALLERY ID</label>
+<form:input path="galleryId" cssClass="form-control" placeholder="Gallery ID"/>
+</p>
+
 <input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
 </form:form>
 </body>

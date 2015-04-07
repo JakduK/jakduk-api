@@ -86,8 +86,9 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
+	<!-- 30 days -->
 	<session-config>
-		<session-timeout>4320</session-timeout>
+		<session-timeout>43200</session-timeout>
 	</session-config>
 
 	<error-page>
