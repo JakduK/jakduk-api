@@ -121,7 +121,7 @@ public class StatsService {
 		
 		FootballClub footballClub;
 		
-		if (clubId != null) {
+		if (clubId != null && !clubId.isEmpty()) {
 			footballClub = footballClubRepository.findOne(clubId);
 			
 			Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));

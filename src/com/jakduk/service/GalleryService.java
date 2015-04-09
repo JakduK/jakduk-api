@@ -337,7 +337,7 @@ public class GalleryService {
 		
 		List<GalleryOnList> galleries;
 		
-		if (id != null) {
+		if (id != null && !id.isEmpty()) {
 			galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.GALLERY_SIZE, new ObjectId(id));
 		} else {
 			galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.GALLERY_SIZE, null);
