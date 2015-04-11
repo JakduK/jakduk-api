@@ -7,7 +7,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="stats.attendance.breadcrumbs.league"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="stats.attendance.league.title"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/css/cubeportfolio.min.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/custom/custom-cubeportfolio.css">	
@@ -24,9 +24,9 @@
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
-	      <li class="active"><spring:message code="stats.attendance.breadcrumbs.league"/></li>
-	      <li><a href="<c:url value="/stats/attendance/club"/>"><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
-      </ul>			
+			      <li><a href="<c:url value="/stats/attendance/club"/>"><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
+			      <li class="active"><spring:message code="stats.attendance.breadcrumbs.league"/></li>
+      			</ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->

@@ -75,7 +75,7 @@ public class StatsController {
 	@RequestMapping(value = "/attendance", method = RequestMethod.GET)
 	public String attendance(Model model) {
 		
-		return "redirect:/stats/attendance/league";
+		return "redirect:/stats/attendance/club";
 	}
 	
 	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)

@@ -7,7 +7,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="stats.attendance.breadcrumbs.league"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="stats.attendance.club.title"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
@@ -21,9 +21,9 @@
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
-	      <li><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
-	      <li class="active"><spring:message code="stats.attendance.breadcrumbs.club"/></li>
-      </ul>			
+			      <li class="active"><spring:message code="stats.attendance.breadcrumbs.club"/></li>
+			      <li><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
+		      </ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->
@@ -109,7 +109,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				}			
 			},
 			title: {
-				text: '<spring:message code="stats.attencance.club.title"/>'
+				text: '<spring:message code="stats.attendance.club.chart.title"/>'
 			},	        
 			subtitle: {
 				text: 'Source: blog.daum.net/vhgksl'
@@ -210,7 +210,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				
 				if (value.id == $scope.clubId) {
 					$scope.footballClub = $scope.footballClubs[index];
-					$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attencance.club.title"/>';
+					$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
 				}
 			});
 			
@@ -253,7 +253,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			}) ;
 			
 			$scope.clubId = $scope.footballClub.id;
-			$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attencance.club.title"/>';
+			$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
 			$scope.getAttendance();			
 		}
 	};

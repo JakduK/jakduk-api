@@ -7,7 +7,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="stats.supporters"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/css/cubeportfolio.min.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/custom/custom-cubeportfolio.css">
