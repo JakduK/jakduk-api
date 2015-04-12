@@ -11,5 +11,5 @@ import com.jakduk.model.db.FootballClubOrigin;
  * @desc     :
  */
 public interface FootballClubOriginRepository extends MongoRepository<FootballClubOrigin, String> {
-
+	FootballClubOrigin findByName(String name);
 }

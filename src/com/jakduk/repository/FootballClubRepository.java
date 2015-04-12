@@ -18,6 +18,4 @@ public interface FootballClubRepository extends MongoRepository<FootballClub, St
 	
 	@Query(value="{'names.language' : ?0}", fields="{'active' : 1, 'origin' : 1, 'names.$' : 1}")
 	List<FootballClub> findByNamesLanguage(String language, Pageable pageable);
-	
-	FootballClub findById(String id);
 }

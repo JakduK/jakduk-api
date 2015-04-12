@@ -89,9 +89,9 @@ public class StatsController {
 	
 	@RequestMapping(value = "/attendance/club", method = RequestMethod.GET)
 	public String attendanceClub(Model model,
-			@RequestParam(required = false) String clubId) {
+			@RequestParam(required = false) String clubOrigin) {
 		
-		Integer status = statsService.getAttendanceClub(model, clubId);
+		Integer status = statsService.getAttendanceClub(model, clubOrigin);
 		
 		return "stats/attendanceClub";
 	}	
@@ -105,9 +105,9 @@ public class StatsController {
 	
 	@RequestMapping(value = "/data/attendance/club", method = RequestMethod.GET)
 	public void dataAttendanceClub(Model model,
-			@RequestParam(required = false) String clubId) {
+			@RequestParam(required = false) String clubOrigin) {
 		
-		statsService.getAttendanceClubData(model, clubId);
+		statsService.getAttendanceClubData(model, clubOrigin);
 	}	
 
 }

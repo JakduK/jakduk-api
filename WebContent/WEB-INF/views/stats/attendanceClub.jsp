@@ -39,7 +39,7 @@
 		</select>
 	</div>
 </div>
-<span class="color-blue" ng-class="{'hidden':clubId != ''}"><spring:message code="stats.msg.choose.football.club"/></span>
+<span class="color-blue" ng-class="{'hidden':clubOrigin != ''}"><spring:message code="stats.msg.choose.football.club"/></span>
 	
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
@@ -81,15 +81,15 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	$scope.footballClubsConn = "none";
 	$scope.attendancesConn = "none";
 	$scope.footballClubs = [];
-	$scope.clubId = "";
+	$scope.clubOrigin = "";
 	$scope.totalSum = 0;
 	$scope.gamesSum = 0;
 	$scope.average = 0;
 	
 	angular.element(document).ready(function() {
 		
-		var clubId = "${clubId}";
-		$scope.clubId = clubId;
+		var clubOrigin = "${clubOrigin}";
+		$scope.clubOrigin = clubOrigin;
 		
 		Highcharts.setOptions({
 			lang: {
@@ -208,7 +208,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		$scope.getFootballClubs(function() {
 			$scope.footballClubs.forEach(function(value, index) {
 				
-				if (value.id == $scope.clubId) {
+				if (value.id == $scope.clubOrigin) {
 					$scope.footballClub = $scope.footballClubs[index];
 					$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
 				}
@@ -216,7 +216,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			
 		});
 		
-		if ($scope.clubId != "") {
+		if ($scope.clubOrigin != "") {
 			$scope.getAttendance();			
 		}
 	});
@@ -247,19 +247,19 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	
 	$scope.changeFootballClub = function() {
 		
-		if ($scope.footballClub != null && $scope.clubId != $scope.footballClub.id) {
+		if ($scope.footballClub != null && $scope.clubOrigin != $scope.footballClub.origin.name) {
 			$scope.chartConfig.series.forEach(function(series) {
 				series.data = [];
 			}) ;
 			
-			$scope.clubId = $scope.footballClub.id;
+			$scope.clubOrigin = $scope.footballClub.origin.name;
 			$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
 			$scope.getAttendance();			
 		}
 	};
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/club.json?clubId=' + $scope.clubId + '"/>';
+		var bUrl = '<c:url value="/stats/data/attendance/club.json?clubOrigin=' + $scope.clubOrigin + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
@@ -276,15 +276,17 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				$scope.average = data.average;
 				var attendances = data.attendances;
 				
-				attendances.forEach(function(attendance) {
-					var itemTotal = [attendance.season, attendance.total];
-					var itemAverage = [attendance.season, attendance.average];
-					var itemGames = [attendance.season, attendance.games];
-					
-					$scope.chartConfig.series[0].data.push(itemTotal);
-					$scope.chartConfig.series[1].data.push(itemAverage);
-					$scope.chartConfig.series[2].data.push(itemGames);
-				});
+				if (attendances != null) {
+					attendances.forEach(function(attendance) {
+						var itemTotal = [attendance.season, attendance.total];
+						var itemAverage = [attendance.season, attendance.average];
+						var itemGames = [attendance.season, attendance.games];
+						
+						$scope.chartConfig.series[0].data.push(itemTotal);
+						$scope.chartConfig.series[1].data.push(itemAverage);
+						$scope.chartConfig.series[2].data.push(itemGames);
+					});
+				}
 				
 				$scope.attendancesConn = "none";				
 			});
@@ -297,7 +299,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	};
 	
 	$scope.btnUrlCopy = function() {
-		var url = "https://jakduk.com/stats/attendance/club?clubId=" + $scope.clubId;
+		var url = "https://jakduk.com/stats/attendance/club?clubOrigin=" + $scope.clubOrigin;
 		
 		if (window.clipboardData){
 		    // IE처리
@@ -317,7 +319,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	
 	$scope.sendLink = function() {
 		var label = $scope.chartConfig.title.text + '\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>';
-		var url = "https://jakduk.com/stats/attendance/club?clubId=" + $scope.clubId;
+		var url = "https://jakduk.com/stats/attendance/club?clubOrigin=" + $scope.clubOrigin;
 		
 	    Kakao.Link.sendTalkLink({
 			label: label,

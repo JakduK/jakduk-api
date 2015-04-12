@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.jakduk.common.CommonRole;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.SupporterCount;
-import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.FootballClubRepository;
@@ -49,7 +48,7 @@ public class UserTest {
 	private MongoTemplate mongoTemplate;
 	
 	@Autowired
-	JakdukDAO jakdukDAO;
+	private JakdukDAO jakdukDAO;
 	
 	@Before
 	public void setUp() {

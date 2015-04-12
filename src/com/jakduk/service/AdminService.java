@@ -169,7 +169,7 @@ public class AdminService {
 	public Model getFootballClubWrite(Model model, String id) {
 		
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
-		FootballClub fc = footballClubRepository.findById(id);
+		FootballClub fc = footballClubRepository.findOne(id);
 		FootballClubWrite fcWrite = new FootballClubWrite();
 		fcWrite.setId(fc.getId());
 		fcWrite.setActive(fc.getActive());

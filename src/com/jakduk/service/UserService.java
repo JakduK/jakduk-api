@@ -121,7 +121,7 @@ public class UserService {
 		String footballClub = userWrite.getFootballClub();
 		
 		if (footballClub != null && !footballClub.isEmpty()) {
-			FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
+			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
 			
 			user.setSupportFC(supportFC);
 		}
@@ -261,7 +261,7 @@ public class UserService {
 		}
 		
 		if (footballClub != null && !footballClub.isEmpty()) {
-			FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
+			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
 			
 			user.setSupportFC(supportFC);
 		}
@@ -377,7 +377,7 @@ public class UserService {
 		String footballClub = userProfileWrite.getFootballClub();
 		
 		if (footballClub != null && !footballClub.isEmpty()) {
-			FootballClub supportFC = footballClubRepository.findById(userProfileWrite.getFootballClub());
+			FootballClub supportFC = footballClubRepository.findOne(userProfileWrite.getFootballClub());
 			
 			user.setSupportFC(supportFC);
 		}
@@ -519,7 +519,7 @@ public class UserService {
 			}
 			
 			if (footballClub != null && !footballClub.isEmpty()) {
-				FootballClub supportFC = footballClubRepository.findById(userWrite.getFootballClub());
+				FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
 				
 				user.setSupportFC(supportFC);
 			}

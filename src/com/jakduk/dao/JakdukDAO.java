@@ -101,7 +101,7 @@ public class JakdukDAO {
 	}
 	
 	/**
-	 * 축구단 목록 정렬해서 가져온다. 허나 정렬이 제대로 지원이 안되는 모양인지 결국 이모양이 됐다.
+	 * 축구단 목록 정렬해서 가져온다.
 	 * @param language
 	 * @return
 	 */
