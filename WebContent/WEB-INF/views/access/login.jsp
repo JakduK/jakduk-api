@@ -74,13 +74,13 @@
 						</div>									
                         
                     <div class="row">
-                        <div class="col-md-6 checkbox">
+                        <div class="col-md-8 checkbox">
 							<label>
 								<input type="checkbox" name="remember" ng-model="remember">
 								<spring:message code="user.email.remember"/>
 							</label>                  
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
 						<button type="submit" class="btn-u rounded pull-right ladda-button"
 						ladda="btnSubmit" data-style="expand-right">
 							<spring:message code="user.sign.in"/>

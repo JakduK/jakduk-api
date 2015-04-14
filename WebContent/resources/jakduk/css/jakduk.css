@@ -15,6 +15,11 @@
 	text-decoration: none;
 }
 
+.header .topbar ul.loginbar > li > a, 
+.header .topbar ul.loginbar > li > a:hover {
+	text-transform: none;
+}
+
 .blog-item .media h5.media-heading {
 	color: #555;
 	position: relative;

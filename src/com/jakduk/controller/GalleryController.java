@@ -91,7 +91,8 @@ public class GalleryController {
 		Integer status = galleryService.getThumbnail(response, id);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
-			response.sendError(status);
+			// after the response has been committed 에러가 자꾸 떠서 일단 주석.
+			//response.sendError(status);
 		}
 	}		
 	

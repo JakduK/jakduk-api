@@ -128,9 +128,9 @@
 							</c:choose>					
 						</div>
 						<div class="col-sm-3 hidden-xs">
-							<span class="glyphicon glyphicon-eye-open"></span><strong> ${notice.views}</strong>
+							<i class="fa fa-eye"></i><strong> ${notice.views}</strong>
 							<span class="text-primary">
-								<span class="glyphicon glyphicon-thumbs-up"></span>
+								<i class="fa fa-thumbs-o-up"></i>
 								<strong>
 									<c:choose>
 										<c:when test="${!empty usersLikingCount[notice.id]}">${usersLikingCount[notice.id]}</c:when>
@@ -139,7 +139,7 @@
 								</strong>
 							</span>
 							<span class="text-danger">
-								<span class="glyphicon glyphicon-thumbs-down"></span>
+								<i class="fa fa-thumbs-o-down"></i>
 								<strong>
 									<c:choose>
 										<c:when test="${!empty usersDislikingCount[notice.id]}">${usersDislikingCount[notice.id]}</c:when>
@@ -197,9 +197,9 @@
 							</c:choose>		
 						</div>
 						<div class="col-sm-3">
-							<span class="glyphicon glyphicon-eye-open"></span><strong> ${post.views}</strong>
+							<i class="fa fa-eye"></i><strong> ${post.views}</strong>
 							<span class="text-primary">
-								<span class="glyphicon glyphicon-thumbs-up"></span>
+								<i class="fa fa-thumbs-o-up"></i>
 								<strong>
 									<c:choose>
 										<c:when test="${!empty usersLikingCount[post.id]}">${usersLikingCount[post.id]}</c:when>
@@ -208,7 +208,7 @@
 								</strong>
 							</span>
 							<span class="text-danger">
-								<span class="glyphicon glyphicon-thumbs-down"></span>
+								<i class="fa fa-thumbs-o-down"></i>
 								<strong>
 									<c:choose>
 										<c:when test="${!empty usersDislikingCount[post.id]}">${usersDislikingCount[post.id]}</c:when>

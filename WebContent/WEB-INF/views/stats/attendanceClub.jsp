@@ -11,7 +11,6 @@
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
-
 <body>
 <div class="wrapper" ng-controller="statsCtrl">
 	<jsp:include page="../include/navigation-header.jsp"/>
@@ -32,7 +31,7 @@
 	<div class="container content">
 
 <div class="row">
-	<div class="col-xs-6 col-sm-4 col-md-2">	
+	<div class="col-xs-8 col-sm-4 col-md-3">	
 		<select class="form-control" ng-model="footballClub" ng-options="opt.names[0].fullName for opt in footballClubs"
 		ng-change="changeFootballClub()">
 			<option value=""><spring:message code="stats.select.football.club"/></option>
@@ -208,7 +207,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		$scope.getFootballClubs(function() {
 			$scope.footballClubs.forEach(function(value, index) {
 				
-				if (value.id == $scope.clubOrigin) {
+				if (value.origin.name == $scope.clubOrigin) {
 					$scope.footballClub = $scope.footballClubs[index];
 					$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
 				}
