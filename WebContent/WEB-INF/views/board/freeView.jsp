@@ -11,6 +11,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>${post.subject} - <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
+	<link href='https://jakduk.com/board/free/${post.seq}' rel='canonical' />
+	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
@@ -224,7 +226,6 @@
 </div>
 
 <div class="alert {{alert.classType}} fade in rounded" ng-show="alert.msg">
-	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 	{{alert.msg}} <a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl">{{alert.linkLabel}}</a>
 </div>
 
