@@ -18,6 +18,8 @@
 <body>
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
+	
+	<c:set var="contextPath" value="<%=request.getContextPath()%>" />
 
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
@@ -42,7 +44,8 @@
 					
     	<div class="row">
             <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-		<form action="j_spring_security_check" class="reg-page" name="loginForm" method="post" ng-submit="onSubmit($event)">		
+		<form action="${contextPath}/j_spring_security_check" class="reg-page" name="loginForm" method="post" 
+		ng-submit="onSubmit($event)">		
 			<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
                     <div class="reg-header">            
                         <h2><spring:message code="user.sign.in.header"/></h2>
