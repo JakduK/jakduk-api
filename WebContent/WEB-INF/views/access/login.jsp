@@ -19,8 +19,6 @@
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
-	<c:set var="contextPath" value="<%=request.getContextPath()%>" />
-
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
