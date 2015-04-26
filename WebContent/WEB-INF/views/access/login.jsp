@@ -18,7 +18,7 @@
 <body>
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
-
+	
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
@@ -39,10 +39,10 @@
 						<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
 					</c:when>                		
 				</c:choose>
-					
+
     	<div class="row">
             <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-		<form action="j_spring_security_check" class="reg-page" name="loginForm" method="post" ng-submit="onSubmit($event)">		
+		<form action="login" class="reg-page" name="loginForm" method="POST" ng-submit="onSubmit($event)">		
 			<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
                     <div class="reg-header">            
                         <h2><spring:message code="user.sign.in.header"/></h2>
