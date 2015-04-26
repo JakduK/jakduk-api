@@ -188,7 +188,6 @@ function isEmpty(str) {
 }
 
 var submitted = false;
-var editor = $.summernote.eventHandler.getEditor();
 var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
@@ -365,7 +364,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			}
 			
 //			$scope.editable.focus();
-			editor.insertImage($scope.editable, imageUrl);		
+			$(".summernote").summernote("insertImage", imageUrl, fileItem.newName); 
 		} else {
 			console.log("status=" + status)
 			console.log("upload image failed.");
@@ -373,9 +372,9 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	};	
 	
 	$scope.insertImage = function(uid) {
-		$scope.editable.focus();
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
-		editor.insertImage($scope.editable, imageUrl);
+		$(".summernote").summernote("insertImage", imageUrl);
+		//editor.insertImage($scope.editable, imageUrl);
 	};	
 
 	$scope.imageUpload = function(files, editor) {
