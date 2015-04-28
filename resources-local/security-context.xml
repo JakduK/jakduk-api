@@ -11,9 +11,9 @@
            http://www.springframework.org/schema/util 
            http://www.springframework.org/schema/util/spring-util-4.0.xsd
            http://www.springframework.org/schema/security/oauth2 
-           http://www.springframework.org/schema/security/spring-security-oauth2-2.0.xsd">
+           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
        
-  <beans:bean class="com.jakduk.common.FilterModifiy"/>
+  	<!--beans:bean class="com.jakduk.common.FilterModifiy"/-->
 	<http pattern="/resources/**" security="none" />
 	
 	<http auto-config="true" use-expressions="true" disable-url-rewriting="false">
@@ -71,8 +71,8 @@
 		access-token-uri="#{facebookProp['facebook.access-token-uri']}"
 		user-authorization-uri="#{facebookProp['facebook.user-authorization-uri']}"
 		authentication-scheme="query" 
-		token-name="oauth_token"		
-		pre-established-redirect-uri="/"
+		token-name="access_token"
+		pre-established-redirect-uri="oauth/callback?type=facebook"
 		client-authentication-scheme="form"/>
 		
 	<oauth:resource id="daum" type="authorization_code"
@@ -87,7 +87,6 @@
 
 	<!-- Facebook 서버에 접속하기 위한 RestTemplate -->	
 	<oauth:rest-template id="facebookRestTemplate" resource="facebook"/>
-	
 	<oauth:rest-template id="daumRestTemplate" resource="daum"/>
 	
 	<!-- OAuth 2.0 Client를 연동 시키기 위한 Filter 생성 -->
