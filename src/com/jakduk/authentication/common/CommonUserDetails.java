@@ -1,11 +1,19 @@
 package com.jakduk.authentication.common;
+
+import java.io.Serializable;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
  * @date     : 2014. 9. 10.
  * @desc     :
  */
-public class CommonUserDetails {
+public class CommonUserDetails implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1524940037753558006L;
 	
 	private String email;
 	private String gender;

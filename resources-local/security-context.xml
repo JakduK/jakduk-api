@@ -72,7 +72,7 @@
 		user-authorization-uri="#{facebookProp['facebook.user-authorization-uri']}"
 		authentication-scheme="query" 
 		token-name="access_token"
-		pre-established-redirect-uri="oauth/callback?type=facebook"
+		pre-established-redirect-uri="/"
 		client-authentication-scheme="form"/>
 		
 	<oauth:resource id="daum" type="authorization_code"
