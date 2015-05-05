@@ -122,12 +122,18 @@ public class SampleController {
 	public String home02(Model model) {
 		
 		return "sample/home02";
-	}		
+	}
 	
 	@RequestMapping(value = "/kakao01")
-	public String cacaotalk01(Model model) {
+	public String kakaotalk01(Model model) {
 		
 		return "sample/kakao01";
-	}	
+	}
+	
+	@RequestMapping(value = "/scroll01")
+	public String scroll01(Model model) {
+		
+		return "sample/scroll01";
+	}
 
 }

@@ -60,11 +60,11 @@
 
 /* 홈의 상단*/
 .image-block {background: url(../img/tancheon_20150314.jpg) no-repeat;}
-.image-block .company-description {padding:10px 10px; margin:20px auto;}
+.image-block .company-description {padding:10px 10px; margin:15px auto;}
 .image-block .company-description h2 {margin-bottom:5px;}
 .image-block .company-description h3 {margin-bottom:5px;}
-.image-block .company-description h4 {margin-top:0px; margin-bottom:5px;}
-.image-block .company-description ul {text-align:left; margin-bottom:5px;}
+.image-block .company-description h4 {margin-bottom:5px;}
+.image-block .company-description ul {text-align:left;}
 .image-block h5 {margin-bottom:0px;}
 .image-block p {margin:0px 0px 0px;}
 

@@ -9,11 +9,14 @@
 <head>
 	<title><spring:message code="common.home"/> &middot; <spring:message code="common.jakduk"/></title>
 
-    <!-- CSS Page Style -->    
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_job_inner.css">
-    
 	<!-- CSS Implementing Plugins -->
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/scrollbar/css/jquery.mCustomScrollbar.css">
+	
+    <!-- CSS Page Style -->
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_job_inner.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/profile.css">
+    	
 	<jsp:include page="../include/html-header.jsp"/>
 </head>
 
@@ -23,7 +26,7 @@
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
 	<div class="image-block">
-		<div class="container">
+		<div class="container mCustomScrollbar" data-mcs-theme="minimal-dark">
 			<div class="company-description" ng-bind-html="homeDescription"></div>   
 		</div>    
 	</div>	
@@ -191,6 +194,8 @@
 <script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
 <!-- JS Implementing Plugins -->
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/owl-carousel/owl-carousel/owl.carousel.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/smoothScroll.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/scrollbar/js/jquery.mCustomScrollbar.concat.min.js"></script>
 <!-- JS Page Level -->           
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/js/plugins/owl-recent-works.js"></script>
 <script type="text/javascript">
@@ -212,7 +217,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 		$scope.getDataLatest();		
 		
 		App.init();
-		
+		App.initScrollBar();
 		OwlRecentWorks.initOwlRecentWorksV2();
 	});	
 	
