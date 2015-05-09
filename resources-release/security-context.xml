@@ -5,21 +5,22 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
            http://www.springframework.org/schema/security
-           http://www.springframework.org/schema/security/spring-security-3.2.xsd
+           http://www.springframework.org/schema/security/spring-security-4.0.xsd
            http://www.springframework.org/schema/util 
-           http://www.springframework.org/schema/util/spring-util-3.2.xsd
+           http://www.springframework.org/schema/util/spring-util-4.0.xsd
            http://www.springframework.org/schema/security/oauth2 
-           http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd">
+           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
        
-  <beans:bean class="com.jakduk.common.FilterModifiy"/>
+	<!--beans:bean class="com.jakduk.common.FilterModifiy"/-->
 	<http pattern="/resources/**" security="none" />
 	
-	<http auto-config="true" use-expressions="true">
-  	<!-- OAuth 2.0 로직을 적용 시키기 위한 Filter 설정 -->
-  	<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
-  	<custom-filter ref="oauthFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
+	<http auto-config="true" use-expressions="true" disable-url-rewriting="false">
+		<csrf disabled="true"/>
+	  	<!-- OAuth 2.0 로직을 적용 시키기 위한 Filter 설정 -->
+	  	<custom-filter ref="oauth2ClientFilter" after="EXCEPTION_TRANSLATION_FILTER" />
+	  	<custom-filter ref="oauthFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
 
 		<intercept-url pattern="/login*" access="isAnonymous()" requires-channel="https"/>
 		<intercept-url pattern="/j_spring_*" access="isAnonymous()" requires-channel="https"/>
@@ -38,6 +39,8 @@
 		<intercept-url pattern="/user/list" access="hasRole('ROLE_ROOT')" />
 		
 		<form-login login-page="/login"
+			username-parameter="j_username" 
+			password-parameter="j_password" 
 			authentication-success-handler-ref="jakdukSuccessHandler" 
 			authentication-failure-handler-ref="jakdukFailureHandler"/>
 			
@@ -47,7 +50,7 @@
 			<concurrency-control max-sessions="3" expired-url="/error/maxSession"/>
 		</session-management>
 		
-		<logout invalidate-session="true" logout-url="/logout" logout-success-url="/logout/success"/>					
+		<logout invalidate-session="true" delete-cookies="JSESSIONID" logout-url="/logout" logout-success-url="/logout/success"/>					
 	</http>
 	
 	<beans:bean id="jakdukSuccessHandler" class="com.jakduk.authentication.jakduk.JakdukSuccessHandler"/>
@@ -69,7 +72,7 @@
 		access-token-uri="#{facebookProp['facebook.access-token-uri']}"
 		user-authorization-uri="#{facebookProp['facebook.user-authorization-uri']}"
 		authentication-scheme="query" 
-		token-name="oauth_token" 
+		token-name="access_token" 
 		pre-established-redirect-uri="/"
 		client-authentication-scheme="form" />
 		

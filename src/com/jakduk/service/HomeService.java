@@ -213,8 +213,10 @@ public class HomeService {
 		
 		for (BoardFreeCommentOnHome comment : comments) {
 			String content = comment.getContent().replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
-			if (content.length() > CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
-				content = content.substring(0, CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH);
+			Integer contentLength = content.length() + comment.getWriter().getUsername().length();
+			
+			if (contentLength > CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+				content = content.substring(0, CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
 				content = String.format("%s...", content);
 			}
 			comment.setContent(content);
