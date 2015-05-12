@@ -276,7 +276,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 			});
 		}
-	};	
+	};
 	
 	$scope.objectIdFromDate = function(date) {
 		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";

@@ -74,3 +74,8 @@
 
 /* 사진 올리기에 쓰임 */
 .row .media {margin-top:0px;}
+
+/* 게시판 TOP */
+td a {color:#555;}
+
+.max-width-320 {max-width:320px;}

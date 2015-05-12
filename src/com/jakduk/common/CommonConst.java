@@ -32,6 +32,7 @@ public class CommonConst {
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 110;
 	public final static Integer COMMENT_MAX_SIZE = 30;	
 	public final static Integer GALLERY_SIZE = 12;
+	public final static Integer BOARD_TOP_LIMIT = 3;
 
 	/**
 	 * 게시물 쿠키의 만료되는 시간(초)

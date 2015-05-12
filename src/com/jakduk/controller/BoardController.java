@@ -191,5 +191,11 @@ public class BoardController {
 		
 		return null;	
 	}
+	
+	@RequestMapping(value = "/data/free/top", method = RequestMethod.GET)
+	public void dataFreeTopList(Model model) {
+		
+		Integer status = boardFreeService.getDataFreeTopList(model);
+	}		
 
 }

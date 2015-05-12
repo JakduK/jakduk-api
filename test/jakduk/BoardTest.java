@@ -3,8 +3,10 @@ package jakduk;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -12,10 +14,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -23,7 +28,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,11 +36,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeOnBest;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.embedded.BoardItem;
-import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
@@ -189,7 +192,83 @@ public class BoardTest {
 		System.out.println("isNumeric=" + pattern.matcher(val03).matches());
 		System.out.println("isNumeric=" + pattern.matcher(val04).matches());
 		System.out.println("isNumeric=" + pattern.matcher(val05).matches());
-		
-		
 	}
+	
+	@Test
+	public void newDate01() {
+		
+		LocalDate date = LocalDate.now().minusWeeks(1);
+		
+		System.out.println("date=" + date.format(DateTimeFormatter.BASIC_ISO_DATE));
+		
+		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+		
+		System.out.println("objectId=" + new ObjectId(Date.from(instant)));
+		
+		HashMap<String, Integer> boardFreeCount = jakdukDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+		
+		System.out.println("boardFreeCount=" + boardFreeCount);
+		
+		ArrayList<ObjectId> ids = new ArrayList<ObjectId>();
+
+		Iterator<?> iterator = boardFreeCount.entrySet().iterator();
+		
+		while (iterator.hasNext()) {
+			Entry<String, Integer> entry = (Entry<String, Integer>) iterator.next();
+			ObjectId objId = new ObjectId(entry.getKey().toString());
+			ids.add(objId);
+		}
+		
+		List<BoardFreeOnBest> boardFreeList = jakdukDAO.getBoardFreeListOfTop(ids);
+		
+		for (BoardFreeOnBest boardFree : boardFreeList) {
+			String id = boardFree.getId();
+			Integer count = boardFreeCount.get(id);
+			boardFree.setCount(count);
+		}
+		
+		boardFreeList = boardFreeList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
+				.collect(Collectors.toList());
+		
+		System.out.println("boardFreeList=" + boardFreeList);
+	}	
+	
+	@Test
+	public void newDate02() {
+		
+		LocalDate date = LocalDate.now().minusWeeks(1);
+		
+		System.out.println("date=" + date.format(DateTimeFormatter.BASIC_ISO_DATE));
+		
+		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+		
+		System.out.println("objectId=" + new ObjectId(Date.from(instant)));
+		
+		HashMap<String, Integer> boardFreeCount = jakdukDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
+		
+		System.out.println("boardFreeCount2=" + boardFreeCount);
+		
+		ArrayList<ObjectId> ids = new ArrayList<ObjectId>();
+
+		Iterator<?> iterator = boardFreeCount.entrySet().iterator();
+		
+		while (iterator.hasNext()) {
+			Entry<String, Integer> entry = (Entry<String, Integer>) iterator.next();
+			ObjectId objId = new ObjectId(entry.getKey().toString());
+			ids.add(objId);
+		}
+		
+		List<BoardFreeOnBest> boardFreeList = jakdukDAO.getBoardFreeListOfTop(ids);
+		
+		for (BoardFreeOnBest boardFree : boardFreeList) {
+			String id = boardFree.getId();
+			Integer count = boardFreeCount.get(id);
+			boardFree.setCount(count);
+		}
+		
+		boardFreeList = boardFreeList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
+				.collect(Collectors.toList());
+		
+		System.out.println("boardFreeList2=" + boardFreeList);
+	}		
 }

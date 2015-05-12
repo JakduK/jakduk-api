@@ -25,7 +25,7 @@
 	<!--=== End Breadcrumbs ===-->		
 	
 	<!--=== Content Part ===-->
-	<div class="container content">
+	<div class="container content" ng-controller="boardCtrl">
 	
 	<sec:authorize access="isAnonymous()">
 		<c:set var="authRole" value="ANNONYMOUS"/>
@@ -35,6 +35,60 @@
 	</sec:authorize>
 	
 	<div class="margin-bottom-20">
+	
+<div class="row">
+                    <!--Striped Rows-->
+                    <div class="col-md-6">
+                        <div class="panel panel-sea margin-bottom-20">
+                            <div class="panel-heading"><spring:message code="board.top.likes"/></div>
+                            <table class="table table-hover">
+                                <tbody>
+<tr ng-repeat="post in topLike">
+	<td class="text-overflow max-width-320">
+		<a ng-href="<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
+			<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
+			<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+		</a>	
+	</td>
+	<td>
+		<span class="text-primary">
+			<i class="fa fa-thumbs-o-up"></i>
+			<strong>{{post.count}}</strong>
+		</span>	
+	</td>
+</tr>                                
+                                </tbody>
+                            </table>
+                        </div>                  
+                    </div>
+                    <!--End Striped Rows-->
+
+                    <!--Hover Rows-->
+                    <div class="col-md-6">
+                        <div class="panel panel-sea margin-bottom-20">
+                            <div class="panel-heading"><spring:message code="board.top.comments"/></div>
+                            <table class="table table-hover">
+                                <tbody>
+<tr ng-repeat="post in topComment">
+	<td class="text-overflow max-width-320">
+		<a ng-href="<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
+			<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
+			<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+		</a>	
+	</td>
+	<td>
+		<span class="text-default">
+			<i class="fa fa-comment-o"></i>
+			<strong>{{post.count}}</strong>
+		</span>	
+	</td>
+</tr>  
+                                </tbody>
+                            </table>
+                        </div>                  
+                    </div>
+                    <!--End Hover Rows-->
+                </div>	
 	
 	<div class="btn-group">
 		<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
@@ -72,7 +126,7 @@
   
 </div>                    
 	
-	<div class="panel panel-u" ng-controller="boardCtrl">
+	<div class="panel panel-u">
 	  <!-- Default panel contents -->
 	  <div class="panel-heading hidden-xs">
 	  	<div class="row">
@@ -281,11 +335,41 @@
 
 var jakdukApp = angular.module("jakdukApp", []);
 
-jakdukApp.controller("boardCtrl", function($scope) {
+jakdukApp.controller("boardCtrl", function($scope, $http) {
+	$scope.dataTopPostConn = "none";
+	$scope.topLike = [];
+	$scope.topComment = [];
 	
 	angular.element(document).ready(function() {
+		$scope.getDataBestLike();
+		
 		App.init();
-	});	
+	});
+	
+	$scope.getDataBestLike = function() {
+		var bUrl = '<c:url value="/board/data/free/top.json"/>';
+		
+		if ($scope.dataTopPostConn == "none") {
+			
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.dataTopPostConn = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+				
+				console.log(data);
+				
+				$scope.topLike = data.topLike;
+				$scope.topComment = data.topComment;
+				
+				$scope.dataTopPostConn = "none";
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.dataTopPostConn = "none";
+				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+			});
+		}
+	};	
 
 });
 

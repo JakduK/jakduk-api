@@ -21,6 +21,7 @@ import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.simple.GalleryOnList;
 
 /**
@@ -367,6 +368,58 @@ public class JakdukDAO {
 		HomeDescription homeDescription = mongoTemplate.findOne(query, HomeDescription.class);
 		
 		return homeDescription;
+	}
+	
+	public HashMap<String, Integer> getBoardFreeCountOfLikeBest(ObjectId commentId) {
+		AggregationOperation unwind = Aggregation.unwind("usersLiking");
+		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
+		AggregationOperation group = Aggregation.group("_id").count().as("count");
+		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
+		AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_TOP_LIMIT);
+		
+		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, group, sort, limit);
+		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFree", CommonCount.class);
+		
+		List<CommonCount> boardFreeCount = results.getMappedResults();
+		
+		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
+		
+		for (CommonCount item : boardFreeCount) {
+			commentCount.put(item.getId(), item.getCount());
+		}
+		
+		return commentCount;
+	}
+	
+	public List<BoardFreeOnBest> getBoardFreeListOfTop(List<ObjectId> arrId) {
+		
+		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrId));
+		Aggregation aggregation = Aggregation.newAggregation(match);
+		AggregationResults<BoardFreeOnBest> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnBest.class);
+		
+		List<BoardFreeOnBest> posts = results.getMappedResults();
+		
+		return posts;
+	}
+	
+	public HashMap<String, Integer> getBoardFreeCountOfCommentBest(ObjectId commentId) {
+		
+		AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(commentId));
+		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
+		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
+		AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_TOP_LIMIT);
+		Aggregation aggregation = Aggregation.newAggregation(match1, group, sort, limit);
+		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
+		
+		List<CommonCount> boardFreeCount = results.getMappedResults();
+		
+		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
+		
+		for (CommonCount item : boardFreeCount) {
+			commentCount.put(item.getId(), item.getCount());
+		}
+		
+		return commentCount;
 	}	
 	
 }

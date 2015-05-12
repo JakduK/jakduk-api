@@ -1,15 +1,20 @@
 package com.jakduk.service;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +39,7 @@ import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFreeOnBest;
 import com.jakduk.dao.BoardFreeOnFreeView;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardCategory;
@@ -1063,5 +1069,61 @@ public class BoardFreeService {
 		}
 		
 		return HttpServletResponse.SC_OK;
+	}
+	
+	public Integer getDataFreeTopList(Model model) {
+		
+		LocalDate date = LocalDate.now().minusWeeks(1);
+		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+		
+		HashMap<String, Integer> boardFreeCount = jakdukDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+		HashMap<String, Integer> boardFreeCommentCount = jakdukDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
+		
+		ArrayList<ObjectId> likeIds = new ArrayList<ObjectId>();
+		ArrayList<ObjectId> commentIds = new ArrayList<ObjectId>();
+
+		Iterator<?> likeIterator = boardFreeCount.entrySet().iterator();
+		Iterator<?> commentIterator = boardFreeCommentCount.entrySet().iterator();
+		
+		// 좋아요 많은 글 뽑아내기
+		while (likeIterator.hasNext()) {
+			Entry<String, Integer> entry = (Entry<String, Integer>) likeIterator.next();
+			ObjectId objId = new ObjectId(entry.getKey().toString());
+			likeIds.add(objId);
+		}
+		
+		List<BoardFreeOnBest> boardFreeList = jakdukDAO.getBoardFreeListOfTop(likeIds);
+		
+		for (BoardFreeOnBest boardFree : boardFreeList) {
+			String id = boardFree.getId();
+			Integer count = boardFreeCount.get(id);
+			boardFree.setCount(count);
+		}
+		
+		boardFreeList = boardFreeList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
+				.collect(Collectors.toList());
+		
+		// 댓글 많은 글 뽑아내기
+		while (commentIterator.hasNext()) {
+			Entry<String, Integer> entry = (Entry<String, Integer>) commentIterator.next();
+			ObjectId objId = new ObjectId(entry.getKey().toString());
+			commentIds.add(objId);
+		}
+		
+		List<BoardFreeOnBest> boardFreeCommentList = jakdukDAO.getBoardFreeListOfTop(commentIds);
+		
+		for (BoardFreeOnBest boardFree : boardFreeCommentList) {
+			String id = boardFree.getId();
+			Integer count = boardFreeCommentCount.get(id);
+			boardFree.setCount(count);
+		}
+		
+		boardFreeCommentList = boardFreeCommentList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
+				.collect(Collectors.toList());
+		
+		model.addAttribute("topLike", boardFreeList);
+		model.addAttribute("topComment", boardFreeCommentList);
+		
+		return HttpServletResponse.SC_OK;		
 	}
 }
