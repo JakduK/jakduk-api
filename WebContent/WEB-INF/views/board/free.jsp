@@ -35,60 +35,59 @@
 	</sec:authorize>
 	
 	<div class="margin-bottom-20">
-	
-<div class="row">
-                    <!--Striped Rows-->
-                    <div class="col-md-6">
-                        <div class="panel panel-sea margin-bottom-20">
-                            <div class="panel-heading"><spring:message code="board.top.likes"/></div>
-                            <table class="table table-hover">
-                                <tbody>
-<tr ng-repeat="post in topLike">
-	<td class="text-overflow max-width-320">
-		<a ng-href="<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
-			<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
-			<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
-		</a>	
-	</td>
-	<td>
-		<span class="text-primary">
-			<i class="fa fa-thumbs-o-up"></i>
-			<strong>{{post.count}}</strong>
-		</span>	
-	</td>
-</tr>                                
-                                </tbody>
-                            </table>
-                        </div>                  
-                    </div>
-                    <!--End Striped Rows-->
+		<div class="row">
+			<!--Top Likes Rows-->
+			<div class="col-md-6">
+				<div class="panel panel-sea margin-bottom-20">
+					<div class="panel-heading"><spring:message code="board.top.likes"/></div>
+			       <table class="table table-hover">
+						<tbody>
+							<tr ng-repeat="post in topLike">
+								<td class="text-overflow max-width-240">
+									<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
+										<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
+										<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+									</a>	
+								</td>
+								<td>
+									<span class="text-primary">
+										<i class="fa fa-thumbs-o-up"></i>
+										<strong>{{post.count}}</strong>
+									</span>	
+								</td>
+							</tr>                                
+						</tbody>
+					</table>
+				</div>                  
+			</div>
+			<!--End Top Likes Rows-->
 
-                    <!--Hover Rows-->
-                    <div class="col-md-6">
-                        <div class="panel panel-sea margin-bottom-20">
-                            <div class="panel-heading"><spring:message code="board.top.comments"/></div>
-                            <table class="table table-hover">
-                                <tbody>
-<tr ng-repeat="post in topComment">
-	<td class="text-overflow max-width-320">
-		<a ng-href="<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
-			<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
-			<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
-		</a>	
-	</td>
-	<td>
-		<span class="text-default">
-			<i class="fa fa-comment-o"></i>
-			<strong>{{post.count}}</strong>
-		</span>	
-	</td>
-</tr>  
-                                </tbody>
-                            </table>
-                        </div>                  
-                    </div>
-                    <!--End Hover Rows-->
-                </div>	
+			<!--Top Comments Rows-->
+			<div class="col-md-6">
+			    <div class="panel panel-sea margin-bottom-20">
+					<div class="panel-heading"><spring:message code="board.top.comments"/></div>
+		  			<table class="table table-hover">
+		      			<tbody>
+							<tr ng-repeat="post in topComment">
+								<td class="text-overflow max-width-240">
+									<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
+										<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
+										<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+									</a>	
+								</td>
+								<td>
+									<span class="text-default">
+										<i class="fa fa-comment-o"></i>
+										<strong>{{post.count}}</strong>
+									</span>	
+								</td>
+							</tr>  
+						</tbody>
+					</table>
+				</div>                  
+			</div>
+			<!--End Top Comments Rows-->
+		</div>	
 	
 	<div class="btn-group">
 		<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">

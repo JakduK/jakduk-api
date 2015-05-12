@@ -1071,6 +1071,11 @@ public class BoardFreeService {
 		return HttpServletResponse.SC_OK;
 	}
 	
+	/**
+	 * 구조를 바꾸고 싶다. 너무 복잡하다.
+	 * @param model
+	 * @return
+	 */
 	public Integer getDataFreeTopList(Model model) {
 		
 		LocalDate date = LocalDate.now().minusWeeks(1);
