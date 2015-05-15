@@ -103,7 +103,17 @@ public class GalleryService {
 			gallery.setFileName(file.getOriginalFilename());
 			gallery.setFileSize(file.getSize());
 			gallery.setSize(file.getSize());
-			gallery.setContentType(file.getContentType());
+
+			// 사진 포맷.
+			String formatName = "jpg";
+			String splitContentType[] = file.getContentType().split("/");
+			
+			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
+				formatName = splitContentType[1];
+				gallery.setContentType(file.getContentType());
+			} else {
+				gallery.setContentType("image/jpeg");
+			}
 
 			galleryRepository.save(gallery);
 			
@@ -130,14 +140,6 @@ public class GalleryService {
 			Path imageFilePath = imageDirPath.resolve(gallery.getId());
 			Path thumbFilePath = thumbDirPath.resolve(gallery.getId());
 			
-			// 사진 포맷.
-			String formatName = "jpg";
-			
-			String splitContentType[] = gallery.getContentType().split("/");
-			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
-				formatName = splitContentType[1];
-			}
-
 			// 사진 저장.
 			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
 				if (CommonConst.GALLERY_MAXIUM_CAPACITY > file.getSize()) {

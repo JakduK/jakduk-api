@@ -355,9 +355,6 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 			$scope.dataTopPostConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				
-				console.log(data);
-				
 				$scope.topLike = data.topLike;
 				$scope.topComment = data.topComment;
 				

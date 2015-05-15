@@ -1,5 +1,6 @@
 package com.jakduk.model.db;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.GeneratedValue;
@@ -9,7 +10,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class BoardCategory {
+public class BoardCategory implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7181142801221366583L;
 
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
