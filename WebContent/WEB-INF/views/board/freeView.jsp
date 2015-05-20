@@ -297,7 +297,14 @@
 	<div class="margin-bottom-10">            
 		<summernote config="options" on-focus="focus(evt)" 
 		ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
-		<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
+		<div class="row">
+			<div class="col-xs-9">
+				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
+			</div>
+			<div class="col-xs-3 text-right">
+				{{summernote.content.length}} / 800
+			</div>		
+		</div>		
 	</div>				  
 
 	<p>
