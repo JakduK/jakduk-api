@@ -1,5 +1,6 @@
 var Jakduk = {
 	BoardCommentSize : 30,
+	BoardCommentContentMaxSize : 800,
 	SummernoteContentsMinSize : 5
 };
 

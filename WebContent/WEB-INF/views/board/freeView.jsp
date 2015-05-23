@@ -302,7 +302,7 @@
 				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
 			</div>
 			<div class="col-xs-3 text-right">
-				{{summernote.content.length}} / 800
+				{{summernote.content.length}} / {{boardCommentContentMaxSize}}
 			</div>		
 		</div>		
 	</div>				  
@@ -542,6 +542,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.writeCommentConn = "none";
 	$scope.writeCommentAlert = {};
 	$scope.infiniteDisabled = false;
+	$scope.boardCommentContentMaxSize = Jakduk.BoardCommentContentMaxSize;
 	
 	angular.element(document).ready(function() {
 	});		
@@ -602,7 +603,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
 		
-		if ($scope.summernote.content.length < 3 || $scope.summernote.content.length > 800) {
+		if ($scope.summernote.content.length < 3 || $scope.summernote.content.length > Jakduk.BoardCommentContentMaxSize) {
 			$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.board.comment.content"/>'};
 			return;
 		}
