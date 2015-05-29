@@ -39,9 +39,9 @@
 	ng-submit="onSubmit($event)">
 		<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${OAuthUserWrite.usernameStatus}'" ng-model="usernameStatus"/>
 
-                    <div class="reg-header">
-                        <h2><spring:message code="oauth.register.header"/></h2>
-                    </div>
+		<div class="reg-header">
+		    <h2><spring:message code="oauth.register.header"/></h2>
+		</div>
 
 		<div class="form-group has-feedback" 	ng-class="{'has-success':OAuthUserWrite.username.$valid, 
 		'has-error':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}">
@@ -51,7 +51,7 @@
 				<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>' 
 				ng-model="username" ng-init="username='${OAuthUserWrite.username}'" 
 				ng-blur="onUsername()" ng-change="validationUsername()"
-				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+				ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
 				'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus == 'duplication'}"></span>
 				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>					
@@ -108,6 +108,9 @@
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script> 
+
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 window.onbeforeunload = function(e) {
@@ -121,6 +124,9 @@ var submitted = false;
 var jakdukApp = angular.module("jakdukApp", ["angular-ladda"]);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
+	$scope.usernameLengthMin = Jakduk.FormUsernameLengthMin;
+	$scope.usernameLengthMax = Jakduk.FormUsernameLengthMax;
+	
 	$scope.usernameConn = "none";
 	$scope.usernameAlert = {};
 	$scope.buttonAlert = {};

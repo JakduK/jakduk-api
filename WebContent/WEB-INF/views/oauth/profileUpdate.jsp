@@ -33,7 +33,7 @@
 					<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>' 
 						ng-model="username" ng-init="username='${OAuthUserWrite.username}'"
 						ng-blur="onUsername()" ng-change="validationUsername()"
-						ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+						ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':OAuthUserWrite.username.$valid, 
 					'glyphicon-remove':OAuthUserWrite.username.$invalid || usernameStatus != 'ok'}"></span>
 					<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>			
@@ -89,6 +89,9 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 window.onbeforeunload = function(e) {
@@ -102,6 +105,9 @@ var submitted = false;
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
+	$scope.usernameLengthMin = Jakduk.FormUsernameLengthMin;
+	$scope.usernameLengthMax = Jakduk.FormUsernameLengthMax;
+	
 	$scope.usernameConn = "none";
 	$scope.submitConn = "none";
 	$scope.usernameAlert = {};

@@ -40,12 +40,12 @@
  <form:form commandName="userWrite" name="userWrite" action="${contextPath}/user/write" method="POST" cssClass="reg-page" 
 	ng-submit="onSubmit($event)">
 	
-			<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${userWrite.emailStatus}'" ng-model="emailStatus"/>
+		<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${userWrite.emailStatus}'" ng-model="emailStatus"/>
 		<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userWrite.usernameStatus}'" ng-model="usernameStatus"/>
 		
-                    <div class="reg-header">
-                        <h2><spring:message code="user.register.header"/></h2>
-                    </div>
+		<div class="reg-header">
+		    <h2><spring:message code="user.register.header"/></h2>
+		</div>
 
 		<div class="form-group has-feedback" ng-class="{'has-success':userWrite.email.$valid, 
 		'has-error':userWrite.email.$invalid || emailStatus != 'ok'}">
@@ -55,7 +55,8 @@
 				<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>' 
 				ng-init="email='${userWrite.email}'" ng-model="email" 
 				ng-blur="onEmail()" ng-change="validationEmail()"
-				ng-required="true" ng-minlength="6" ng-maxlength="30" ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/"/>
+				ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"
+				ng-pattern="/^((?:(?:(?:[a-zA-Z0-9][\.\-\+_]?)*)[a-zA-Z0-9])+){3,}\@((?:(?:(?:[a-zA-Z0-9][\.\-_]?){1,20})[a-zA-Z0-9])+)\.([a-zA-Z0-9]{2,6})$/"/>
 				<span class="glyphicon form-control-feedback" 
 				ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'ok'}"></span>					
 				<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
@@ -71,7 +72,7 @@
 				<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
 				ng-init="username='${userWrite.username}'" ng-model="username" 
 				ng-blur="onUsername()" ng-change="validationUsername()"
-				ng-required="true" ng-minlength="2" ng-maxlength="20"/>
+				ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.username.$valid, 
 				'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'ok'}"></span>
 				<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
@@ -88,7 +89,7 @@
 			</label>
 				<input type="password" name="password" class="form-control" placeholder='<spring:message code="user.placeholder.password"/>'
 				ng-model="password" ng-change="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
-				ng-required="true" ng-minlength="4" ng-maxlength="20"/>
+				ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.password.$valid, 
 				'glyphicon-remove':userWrite.password.$invalid}"></span>
 				<form:errors path="password" cssClass="text-danger" element="span" ng-hide="passwordAlert.msg"/>
@@ -103,7 +104,7 @@
 			</label>
 				<input type="password" name="passwordConfirm" class="form-control" placeholder='<spring:message code="user.placeholder.password.confirm"/>'
 				ng-model="passwordConfirm" ng-change="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
-				ng-required="true" ng-minlength="4" ng-maxlength="20"/>
+				ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.passwordConfirm.$valid, 
 				'glyphicon-remove':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}"></span>
 				<form:errors path="passwordConfirm" cssClass="text-danger" element="span" ng-hide="passwordConfirmAlert.msg || (passwordConfirm.length > 0 && password == passwordConfirm)"/>
@@ -164,6 +165,9 @@
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script> 
+
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 window.onbeforeunload = function(e) {
@@ -177,6 +181,13 @@ var submitted = false;
 var jakdukApp = angular.module("jakdukApp", ["angular-ladda"]);
 
 jakdukApp.controller("writeCtrl", function($scope, $http) {
+	$scope.emailLengthMin = Jakduk.FormEmailLengthMin;
+	$scope.emailLengthMax = Jakduk.FormEmailLengthMax;
+	$scope.passwordLengthMin = Jakduk.FormPasswordLengthMin;
+	$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
+	$scope.usernameLengthMin = Jakduk.FormUsernameLengthMin;
+	$scope.usernameLengthMax = Jakduk.FormUsernameLengthMax;
+	
 	$scope.emailConn = "none";
 	$scope.usernameConn = "none";
 	$scope.emailAlert = {};

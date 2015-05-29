@@ -29,7 +29,8 @@
 			</label>
 			<div class="col-sm-3">
 				<input type="password" name="oldPassword" class="form-control" placeholder='<spring:message code="user.placeholder.old.password"/>'
-				ng-model="oldPassword" ng-blur="checkOldPassword()" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
+				ng-model="oldPassword" ng-blur="checkOldPassword()" ng-required="true" 
+				ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userPasswordUpdate.oldPassword.$valid, 
 				'glyphicon-remove':userPasswordUpdate.oldPassword.$invalid}"></span>
 				<form:errors path="oldPassword" cssClass="text-danger" element="span" ng-hide="oldPasswordAlert.msg"/>
@@ -44,7 +45,8 @@
 			</label>
 			<div class="col-sm-3">
 				<input type="password" name="newPassword" class="form-control" placeholder='<spring:message code="user.placeholder.new.password"/>'
-				ng-model="newPassword" ng-blur="checkNewPassword()" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
+				ng-model="newPassword" ng-blur="checkNewPassword()" ng-required="true" 
+				ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userPasswordUpdate.newPassword.$valid, 
 				'glyphicon-remove':userPasswordUpdate.newPassword.$invalid}"></span>
 				<form:errors path="newPassword" cssClass="text-danger" element="span" ng-hide="newPasswordAlert.msg"/>
@@ -59,7 +61,8 @@
 			</label>
 			<div class="col-sm-3">
 			<input type="password" name="newPasswordConfirm" class="form-control" placeholder='<spring:message code="user.placeholder.confirm.new.password"/>'
-				ng-model="newPasswordConfirm" ng-blur="checkNewPasswordConfirm()" ng-required="true" ng-minlength="4" ng-maxlength="20"/>
+				ng-model="newPasswordConfirm" ng-blur="checkNewPasswordConfirm()" ng-required="true" 
+				ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userPasswordUpdate.newPasswordConfirm.$valid, 
 				'glyphicon-remove':userPasswordUpdate.newPasswordConfirm.$invalid || newPasswordConfirm.length > 0 && newPassword != newPasswordConfirm}"></span>
 				<form:errors path="newPasswordConfirm" cssClass="text-danger" element="span" 
@@ -94,6 +97,8 @@
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>    
 
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 window.onbeforeunload = function(e) {
@@ -107,6 +112,9 @@ var submitted = false;
 var jakdukApp = angular.module("jakdukApp", []);
 
 jakdukApp.controller("writeCtrl", function($scope) {
+	$scope.passwordLengthMin = Jakduk.FormPasswordLengthMin;
+	$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
+	
 	$scope.oldPasswordAlert = {};
 	$scope.newPasswordAlert = {};
 	$scope.newPasswordConfirmAlert = {};

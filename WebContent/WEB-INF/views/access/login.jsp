@@ -52,7 +52,7 @@
 						'has-error':loginForm.j_username.$invalid}">
 						<span class="input-group-addon"><i class="fa fa-user"></i></span>
 							<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
-							ng-model="email" ng-required="true" ng-minlength="6" ng-maxlength="20" 
+							ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" 
 							ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/" autofocus>
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
@@ -65,7 +65,7 @@
 						ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 							<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>'
-							ng-model="password" ng-required="true" ng-minlength="4" ng-maxlength="20">
+							ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>							
 						</div>			
@@ -127,11 +127,18 @@
 
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
 
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["ngCookies", "angular-ladda"]);
 
 jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
+	$scope.emailLengthMin = Jakduk.FormEmailLengthMin;
+	$scope.emailLengthMax = Jakduk.FormEmailLengthMax;
+	$scope.passwordLengthMin = Jakduk.FormPasswordLengthMin;
+	$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
+	
 	var email = $cookieStore.get("email");
 	var remember = $cookieStore.get("remember");
 	
