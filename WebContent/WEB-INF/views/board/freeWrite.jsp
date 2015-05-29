@@ -90,7 +90,7 @@
 	  </div>
 	  <div class="media-body">
 			<h5 class="media-heading">
-					<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(item.uid)">
+					<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(item)">
 						<span class="glyphicon glyphicon-upload"></span>
 					</button>		
 					<button type="button" class="btn btn-danger btn-xs" ng-click="removeStoredItem(item)">
@@ -114,7 +114,7 @@
 	  </div>
 		<div class="media-body">
 			<h5 class="media-heading">
-				<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(item.uid)">
+				<button type="button" class="btn btn-success btn-xs" ng-click="insertImage(item)">
 					<span class="glyphicon glyphicon-upload"></span>
 				</button>		
 				<button type="button" class="btn btn-danger btn-xs" ng-click="removeQueueItem(item)">
@@ -158,7 +158,8 @@
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/angular-file-upload.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-video.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>
@@ -169,6 +170,8 @@
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
+
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
 
@@ -188,7 +191,7 @@ function isEmpty(str) {
 }
 
 var submitted = false;
-var editor = $.summernote.eventHandler.getEditor();
+//var editor = $.summernote.eventHandler.getEditor();
 var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
@@ -236,6 +239,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		method:"POST"
 	});
 	
+	// 이미 등록된 이미지들 가져오기.
 	$scope.onGalleryItem = function(fileItem, type) {
 		if (!isEmpty($scope.images)) {
 			var tempImages = JSON.parse($scope.images);
@@ -261,6 +265,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		}
 	};
 	
+	// 이미 등록된 이미지 삭제.
 	$scope.removeStoredItem = function(fileItem) {
 		if (fileItem.uid != null) {
 			var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
@@ -307,6 +312,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		}
 	};
 	
+	// 지금 업로드한 이미지를 큐에서 삭제.
 	$scope.removeQueueItem = function(fileItem) {
 		
 		if (fileItem.uid != null) {
@@ -342,6 +348,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 		}
 	};
 	
+	// 이미지 업로드를 완료.
 	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
 		console.log('onCompleteItem fileItem=', fileItem);
 		//console.log('onCompleteItem status=', status);
@@ -364,18 +371,20 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.images = JSON.stringify(tempImages);
 			}
 			
-//			$scope.editable.focus();
-			editor.insertImage($scope.editable, imageUrl);		
+			//editor.insertImage($scope.editable, imageUrl);
+			$(".summernote").summernote("insertImage", imageUrl, fileItem.newName); 
 		} else {
 			console.log("status=" + status)
 			console.log("upload image failed.");
 		}
 	};	
 	
-	$scope.insertImage = function(uid) {
-		$scope.editable.focus();
-		var imageUrl = "<%=request.getContextPath()%>/gallery/" + uid;
-		editor.insertImage($scope.editable, imageUrl);
+	// 에디터 아래의 이미지 업로드 버튼을 누를 때.
+	$scope.insertImage = function(item) {
+		var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
+
+		//editor.insertImage($scope.editable, imageUrl);
+		$(".summernote").summernote("insertImage", imageUrl, item.name);
 	};	
 
 	$scope.imageUpload = function(files, editor) {

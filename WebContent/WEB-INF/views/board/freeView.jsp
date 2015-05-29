@@ -297,17 +297,10 @@
 	<div class="margin-bottom-10">            
 		<summernote config="options" on-focus="focus(evt)" 
 		ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
-		<div class="row">
-			<div class="col-xs-9">
-				<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
-			</div>
-			<div class="col-xs-3 text-right">
-				{{summernote.content.length}} / {{boardCommentContentMaxSize}}
-			</div>		
-		</div>		
+		<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
 	</div>				  
 
-	<p>
+	<div class="margin-bottom-10">
 		<c:choose>
 			<c:when test="${authRole == 'ANNONYMOUS'}">
 				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled">
@@ -321,8 +314,9 @@
 					<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
 				</button>				
 			</c:when>
-		</c:choose>				          
-	</p>
+		</c:choose>	
+		{{summernote.content.length}} / {{boardCommentContentLengthMax}}			          
+	</div>
 	<div>
 		<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
 	</div>	
@@ -531,6 +525,9 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 
 
 jakdukApp.controller("commentCtrl", function($scope, $http) {
+	$scope.boardCommentContentLengthMin = Jakduk.BoardCommentContentLengthMin;
+	$scope.boardCommentContentLengthMax = Jakduk.BoardCommentContentLengthMax;
+	
 	$scope.commentList = [];
 	$scope.commentAlert = {};
 	$scope.summernoteAlert = {};
@@ -542,7 +539,6 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.writeCommentConn = "none";
 	$scope.writeCommentAlert = {};
 	$scope.infiniteDisabled = false;
-	$scope.boardCommentContentMaxSize = Jakduk.BoardCommentContentMaxSize;
 	
 	angular.element(document).ready(function() {
 	});		
@@ -603,7 +599,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.btnWriteComment = function(status) {
 		var bUrl = '<c:url value="/board/free/comment/write"/>';
 		
-		if ($scope.summernote.content.length < 3 || $scope.summernote.content.length > Jakduk.BoardCommentContentMaxSize) {
+		if ($scope.summernote.content.length < Jakduk.BoardCommentContentLengthMin 
+				|| $scope.summernote.content.length > Jakduk.BoardCommentContentLengthMax) {
 			$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.board.comment.content"/>'};
 			return;
 		}

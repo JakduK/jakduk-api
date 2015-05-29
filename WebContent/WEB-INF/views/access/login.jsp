@@ -27,18 +27,18 @@
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->		
 	
-<div class="container content" ng-controller="loginCtrl">		
-				<c:choose>
-					<c:when test="${result == 'failure'}">
-						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure"/></div>
-					</c:when>
-					<c:when test="${result == 'locked'}">
-						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure.locked"/></div>
-					</c:when>					
-					<c:when test="${result == 'success'}">
-						<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
-					</c:when>                		
-				</c:choose>
+	<div class="container content" ng-controller="loginCtrl">		
+		<c:choose>
+			<c:when test="${result == 'failure'}">
+				<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure"/></div>
+			</c:when>
+			<c:when test="${result == 'locked'}">
+				<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure.locked"/></div>
+			</c:when>					
+			<c:when test="${result == 'success'}">
+				<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
+			</c:when>                		
+		</c:choose>
 
     	<div class="row">
             <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
@@ -53,7 +53,7 @@
 						<span class="input-group-addon"><i class="fa fa-user"></i></span>
 							<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
 							ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" 
-							ng-pattern="/^[\w]{3,}@[\w]+(\.[\w-]+){1,3}$/" autofocus>
+							ng-pattern="/^((?:(?:(?:[a-zA-Z0-9][\.\-\+_]?)*)[a-zA-Z0-9])+){3,}\@((?:(?:(?:[a-zA-Z0-9][\.\-_]?){1,20})[a-zA-Z0-9])+)\.([a-zA-Z0-9]{2,6})$/" autofocus>
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
 						</div>

@@ -14,12 +14,12 @@
     "tests"
   ],
   "dependencies": {
-    "summernote": "0.6.0",
+    "summernote": "~0.6.0",
+    "angular": "~1.4.0",
     "angular-file-upload": "~1.1.5",
-    "angular-summernote": "~0.3.2",
+    "angular-summernote": "~0.4.0",
     "angular-sanitize": "~1.3.13",
     "ng-infinite-scroller-origin": "~1.2.0",
-    "angular-google-chart": "~0.0.11",
     "angular-cookies": "~1.3.13",
     "bootstrap": "~3.3.2",
     "angular-ladda": "~0.2.2",
