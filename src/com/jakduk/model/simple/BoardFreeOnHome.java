@@ -35,6 +35,8 @@ public class BoardFreeOnHome {
 	private int seq;
 	
 	private BoardStatus status;
+	
+	private int views;
 
 	public String getId() {
 		return id;
@@ -76,11 +78,19 @@ public class BoardFreeOnHome {
 		this.status = status;
 	}
 
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardFreeOnHome [id=" + id + ", writer=" + writer
 				+ ", subject=" + subject + ", seq=" + seq + ", status="
-				+ status + "]";
+				+ status + ", views=" + views + "]";
 	}
 	
 }

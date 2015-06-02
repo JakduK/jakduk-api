@@ -1,5 +1,6 @@
 package com.jakduk.model.db;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.GeneratedValue;
@@ -19,8 +20,13 @@ import com.jakduk.model.embedded.FootballClubName;
  */
 
 @Document
-public class FootballClub {
+public class FootballClub implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 817223142559164242L;
+
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	

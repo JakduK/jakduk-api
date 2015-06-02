@@ -59,7 +59,8 @@
 						<i class="fa fa-user"></i> {{post.writer.username}}
 						<i class="fa fa-clock-o"></i>
 						<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
-						<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>							
+						<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>
+						<i class="fa fa-eye"></i> {{post.views}}							
 					</small>                        
 				</li>
 			</ul>
