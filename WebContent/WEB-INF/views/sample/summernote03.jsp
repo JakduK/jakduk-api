@@ -21,7 +21,7 @@
 
 
   <script type="text/javascript">
-  var editor = $.summernote.eventHandler.getEditor();
+  //var editor = $.summernote.eventHandler.getEditor();
   
   $(document).ready(function() {
 	  $('#summernote').summernote({
