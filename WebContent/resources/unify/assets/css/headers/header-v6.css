@@ -8,6 +8,7 @@
 4. Header - Submenu
 5. Header - Mega Menu
 6. Header - Fixed
+6.1. Header - Fixed Boxed
 7. Header - Border Bottom Style Option
 8. Header - White Transparent Background Option
 9. Header - Dark Transparent Background Option
@@ -180,6 +181,10 @@
 }
 
 @media (min-width: 992px) {
+	.navbar {
+		border-radius: 0;
+	}
+
 	.header-v6 .navbar-nav {
 		float: right;
 	}	
@@ -918,7 +923,7 @@
 		left: 0;
 		width: 100%;
 		height: auto;
-		z-index: 9999;
+		z-index: 999;
 		position: fixed;
 	}
 
@@ -1022,6 +1027,16 @@
 	.header-v6 li.menu-icons i.menu-icons-style {
 		color: #555;
 	}
+}
+
+
+/*--------------------------------------------------
+    [6.1. Header - Fixed Boxed]
+----------------------------------------------------*/
+
+.boxed-layout.header-fixed .header-v6.header-sticky {
+	left: inherit;
+	width: inherit;
 }
 
 

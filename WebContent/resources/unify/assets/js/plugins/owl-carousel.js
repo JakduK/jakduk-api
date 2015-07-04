@@ -37,7 +37,7 @@ var OwlCarousel = function () {
 
 	        //Owl Slider v3
 			jQuery(".owl-slider-v3").owlCarousel({
-            	items : 9,
+            	items : 7,
             	autoPlay : 5000,
 				itemsDesktop : [1000,5],
 				itemsDesktopSmall : [900,4],

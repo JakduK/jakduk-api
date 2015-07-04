@@ -9,6 +9,8 @@
 5. Header - Search
 6. Header - Mega Menu
 7. Header - Fixed
+8. Header - Fixed Boxed
+
 -----------------------------------------------------------------------*/
 
 
@@ -920,4 +922,14 @@
 		border-top: none;
 		background: rgba(255,255,255, 0.9);	
 	}
+}
+
+
+/*--------------------------------------------------
+    [8. Header - Fixed Boxed]
+----------------------------------------------------*/
+
+.boxed-layout.header-fixed .header-v1.header-sticky {
+	left: inherit;
+	width: inherit;
 }

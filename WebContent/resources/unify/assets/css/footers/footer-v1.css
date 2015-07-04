@@ -35,6 +35,15 @@
 	background: url(../../img/map-img.png) 5px 60px no-repeat;
 }
 
+/*Blog Posts (with images)*/
+.footer-v1 .footer .posts .dl-horizontal a {
+ color: #dadada;
+}
+
+.footer-v1 .footer .dl-horizontal a:hover {
+ color: #5fb611 !important;
+}
+
 /*Copyright*/
 .footer-v1 .copyright {
 	background: #222;

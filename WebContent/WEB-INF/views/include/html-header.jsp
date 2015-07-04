@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/style.css">
 
 <!-- CSS Header and Footer -->
-<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/headers/header-default.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/headers/header-v5.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/footers/footer-v3.css">
 
 <!-- CSS Implementing Plugins -->

@@ -18,3 +18,7 @@ body {
   height: 62px;
   background-color: #f5f5f5;
 }
+
+.boxed-layout .sticky-footer {
+  width: inherit;
+}

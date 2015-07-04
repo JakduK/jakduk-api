@@ -15,8 +15,12 @@
 	text-decoration: none;
 }
 
+/* 헤더 */
 .header .topbar ul.loginbar > li > a, 
 .header .topbar ul.loginbar > li > a:hover {
+	text-transform: none;
+}
+.topbar-v3 .right-topbar li a {
 	text-transform: none;
 }
 

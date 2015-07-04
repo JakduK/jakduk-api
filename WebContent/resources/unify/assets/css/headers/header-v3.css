@@ -8,6 +8,8 @@
 4. Header - Search
 5. Header - Mega Menu
 6. Header - Fixed
+7. Header - Fixed Boxed
+
 -----------------------------------------------------------------------*/
 
 
@@ -258,7 +260,7 @@
 
 	.header-v3 .navbar-default .navbar-nav > li > a {
 		font-size: 13px;
-		padding: 30px 30px 26px 20px;
+		padding: 30px 30px 27px 20px;
 	}
 	
 	.header-v3 .navbar-default .navbar-nav > li > a,
@@ -743,7 +745,7 @@
 	left: 0;
 	width: 100%;
 	height: 95px;
-	z-index: 9999;
+	z-index: 999;
 	position: fixed;
 	margin-top: -35px;
 	border-bottom: none;
@@ -803,4 +805,14 @@
 		border-top: none;
 		background: rgba(255,255,255, 0.9);	
 	}
+}
+
+
+/*--------------------------------------------------
+    [7. Header - Fixed Boxed]
+----------------------------------------------------*/
+
+.boxed-layout.header-fixed .header-v3.header-sticky {
+	left: inherit;
+	width: inherit;
 }

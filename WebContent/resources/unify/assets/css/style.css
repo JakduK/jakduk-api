@@ -1,7 +1,7 @@
 /*
  * Template Name: Unify - Responsive Bootstrap Template
  * Description: Business, Corporate, Portfolio, E-commerce, Blog and One Page Template.
- * Version: 1.7
+ * Version: 1.8
  * Author: @htmlstream
  * Website: http://htmlstream.com
 */
@@ -12,6 +12,9 @@
 @import url(plugins.css);
 @import url(app.css);
 
+/*Import CSS Plugins*/
+@import url(plugins/style-switcher.css);
+
 body { 
    color: #333; 
    font-size: 13px;
@@ -21,11 +24,15 @@ body {
 body.header-fixed-space {
   padding-top: 94px;
 }
+body.header-fixed-space-v2 {
+	padding-top: 135px;
+}
 
 @media (max-width: 991px) {
-  body.header-fixed-space {
-    padding-top: 0;
-  }
+	body.header-fixed-space,
+	body.header-fixed-space-v2 {
+		padding-top: 0;
+	}
 }
 
 p, 

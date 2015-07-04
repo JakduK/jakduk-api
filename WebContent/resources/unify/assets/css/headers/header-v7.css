@@ -72,12 +72,12 @@
 }
 
 .header-v7 .navbar-toggle,
-.header-v7 .navbar-toggle:hover, 
+.header-v7 .navbar-toggle:hover,
 .header-v7 .navbar-toggle:focus {
     background: inherit;
 }
 
-/*Logo
+/* Logo
 ------------------------------------*/
 .header-v7 .logo img {
     width: 100px;
@@ -100,9 +100,22 @@
     .header-v7 .logo img {
         margin: 12px 0 11px;
     }
+
+    .header-v7 .navbar-nav .dropdown-menu {
+        position: static;
+        float: none;
+        border: none;
+        box-shadow: none;
+        background: none;
+    }
+    .header-v7 .navbar-nav .dropdown-menu a {
+        border-bottom: 1px solid #eee;
+        display: block;
+        padding: 5px 15px 5px 25px;
+    }
 }
 
-/*Navbar Menu
+/* Navbar Menu
 ------------------------------------*/
 .header-v7 .navbar-default .navbar-nav > li > a {
     color: #555;
@@ -132,12 +145,12 @@
     color: #72c02c !important;
 }
 
-/*Dropdown Menu
+/* Dropdown Menu
 ------------------------------------*/
-.header-v7 .dropdown-menu li a { 
-    color: #666; 
-    font-size: 14px; 
-    font-weight: 400; 
+.header-v7 .dropdown-menu li a {
+    color: #666;
+    font-size: 14px;
+    font-weight: 400;
     padding: 4px 10px;
 }
 
@@ -147,6 +160,15 @@
     filter: none !important;
     color: #72c02c !important;
     background: inherit !important;
+}
+.header-v7 .dropdown-menu li ul {
+    list-style: none;
+    padding: 0 0 0 30px;
+}
+.header-v7 .dropdown-menu li ul li:before {
+    content: "–";
+    color: #555;
+    font-weight: 200;
 }
 
 
@@ -205,6 +227,11 @@
         color: #72c02c;
         background: inherit;
     }
+
+    .header-v7 .dropdown-menu li ul li:before {
+        float: left;
+        padding: 3px 0 0 10px;
+    }
 }
 
 /*Vertical Sidebar Nav
@@ -256,13 +283,13 @@
         max-height: none;
         margin: 0 20px 25px;
     }
-    
+
     .header-v7 .navbar-collapse.collapse {
         width: auto !important;
         display: block !important;
         overflow: visible !important;
     }
-    
+
     .header-v7 .navbar-collapse.in {
         overflow-x: visible;
     }
@@ -292,9 +319,9 @@
 
     .header-v7 .navbar-default .navbar-nav > li > a,
     .header-v7 .navbar-default .navbar-nav > li > a:hover,
-    .header-v7 .navbar-default .navbar-nav > li > a:focus, 
-    .header-v7 .navbar-default .navbar-nav > .active > a, 
-    .header-v7 .navbar-default .navbar-nav > .active > a:hover, 
+    .header-v7 .navbar-default .navbar-nav > li > a:focus,
+    .header-v7 .navbar-default .navbar-nav > .active > a,
+    .header-v7 .navbar-default .navbar-nav > .active > a:hover,
     .header-v7 .navbar-default .navbar-nav > .active > a:focus {
         background: none;
     }
@@ -308,7 +335,7 @@
     }
 
     /*Dropdown Menu*/
-    .header-v7 .dropdown-menu { 
+    .header-v7 .dropdown-menu {
         top: 100%;
         left: auto;
         width: 100%;
@@ -319,9 +346,9 @@
         box-shadow: none;
         position: static;
         padding: 0 0 0 10px;
-    }    
+    }
 
-    .header-v7 .dropdown-menu > li > a {
+    .header-v7 .dropdown-menu li a {
         color: #555;
         font-weight: 200;
     }

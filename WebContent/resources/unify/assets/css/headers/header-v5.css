@@ -9,6 +9,8 @@
 4. Header - Submenu
 5. Header - Mega Menu
 6. Header - Fixed
+7. Header - Fixed Boxed
+
 -----------------------------------------------------------------------*/
 
 
@@ -599,7 +601,7 @@
     }
 
     .header-v5 .navbar-default .navbar-nav > li > a {
-        line-height: 29px;
+        line-height: 30px;
         padding: 23px 18px 24px;
     }
 
@@ -945,7 +947,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 9999;
+    z-index: 999;
     position: fixed;
     height: 95px;
     margin-top: -29.5px;
@@ -1040,4 +1042,14 @@
         margin-top: 35px;
         padding: 14px 17px 16px;
     }
+}
+
+
+/*--------------------------------------------------
+    [7. Header - Fixed Boxed]
+----------------------------------------------------*/
+
+.boxed-layout.header-fixed .header-v5.header-sticky {
+    left: inherit;
+    width: inherit;
 }

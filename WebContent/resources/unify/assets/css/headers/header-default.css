@@ -10,6 +10,7 @@
 6. Header - Mega Menu
 7. Header - Dark Option
 8. Header - Fixed
+9. Header - Fixed Boxed
 -----------------------------------------------------------------------*/
 
 
@@ -119,6 +120,10 @@
 	text-decoration: none; 
 }
 
+/*No Topbar*/
+.header.no-topbar .navbar-toggle {
+	margin-top: 25px;
+}
 
 /*--------------------------------------------------
     [2. Header - Navbar]
@@ -153,7 +158,7 @@
 /*Logo*/
 .header .logo {
 	height: 100%;
-	width: 100px;
+	min-width: 100px;
 	display: table-cell;
 	vertical-align: middle;
 }
@@ -167,23 +172,9 @@
 /*Big Logo Style*/
 @media (max-width: 1200px) {
 	.header img.big-logo {
-		width: 170px;
+		width: 120px;
 		height: auto;
 	}
-}
-
-@media (max-width: 500px) {
-	.header img.big-logo {
-		width: 130px;
-		height: auto;
-	}
-}
-
-.header img.big-logo {
-	transition: all 0.4s ease-in-out;
-	-o-transition: all 0.4s ease-in-out;
-	-moz-transition: all 0.4s ease-in-out;
-	-webkit-transition: all 0.4s ease-in-out;
 }
 
 /*Navbar Toggle*/
@@ -218,6 +209,15 @@
 	position: relative;
 }
 
+/*Navbar Collapse*/
+@media (max-width: 991px) {
+  	.header .navbar-collapse,
+	.header .navbar-collapse .container {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+
 /*Navbar Menu*/
 .header .navbar-nav > li > a {
 	color: #687074;
@@ -235,27 +235,6 @@
 		float: right;
 	}	
 }
-
-/*No Topbar*/
-.header.no-topbar .navbar-toggle {
-	margin-top: 25px;
-}
-
-@media (min-width: 992px) {
-	.header.no-topbar .navbar-nav {
-		padding-top: 36px;
-	}
-}
-
-/*Navbar Collapse*/
-@media (max-width: 991px) {
-  	.header .navbar-collapse,
-	.header .navbar-collapse .container {
-		padding-left: 0;
-		padding-right: 0;
-	}
-}
-
 
 /*--------------------------------------------------
     [3. Header - Responsive Navbar Style]
@@ -391,7 +370,7 @@
 	}
 }
 
-@media (min-width: 992px) {		
+@media (min-width: 992px) {
 	/*Navbar Collapse*/
 	.header .navbar-collapse {
 		padding: 0;
@@ -495,7 +474,6 @@
 	}
 }
 
-
 /*--------------------------------------------------
     [4. Header - Submenu]
 ----------------------------------------------------*/
@@ -562,6 +540,7 @@
 	margin-left: 10px;
 }
 
+/*Dropdow Mmenu Icons (Font Awesome)*/
 .header .dropdown-menu li [class^="fa-"],
 .header .dropdown-menu li [class*=" fa-"] {
 	left: -3px;
@@ -1028,17 +1007,23 @@
 	height: auto;
 }
 
+.header-fixed .header.header-sticky {
+	margin-top: 0;
+	transition: all 0.2s ease-in-out;
+}
+
 .header-fixed .header.header-fixed-shrink {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 95px;
-	z-index: 9999;
+	/*height: 95px;*/
+	z-index: 999;
 	position: fixed;
 	margin-top: -35px;
 	border-bottom: none;
 	box-shadow: 0 0 3px #bbb;
-	background: rgba(255,255,255, 0.96); 
+	background: rgba(255,255,255, 0.96);
+	transition: all 0.3s ease-in-out;
 }
 
 @media (max-width: 991px) {
@@ -1062,11 +1047,6 @@
 		margin: 45px 0 -4px;
 	}
 
-	/*Topbar*/
-	.header-fixed .header.header-fixed-shrink .topbar {
-		margin-top: -10px;
-	}
-
 	/*Navbar Nav*/
 	.header-fixed .header.header-fixed-shrink .navbar-nav > li > a {
 		padding-top: 19px;
@@ -1085,7 +1065,7 @@
 
 	/*Search*/
 	.header-fixed .header.header-fixed-shrink .nav > li > .search {
-		color: #555;
+		color: #777;
 		padding: 20px 0 22px;
 		background: inherit;
 		border-bottom: none;
@@ -1094,4 +1074,14 @@
 	.header-fixed .header.header-fixed-shrink .nav .search-open {
 		top: 60px;
 	}
+}
+
+
+/*--------------------------------------------------
+    [9. Header - Fixed Boxed]
+----------------------------------------------------*/
+
+.boxed-layout.header-fixed .header.header-sticky {
+	left: inherit;
+	width: inherit;
 }

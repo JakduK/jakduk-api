@@ -27,6 +27,7 @@ var StyleSwitcher = function () {
                 if(data_header == 'light'){
                     jQuery('.logo img').attr("src", "assets/img/themes/logo1-" + color + ".png");
                     jQuery('#logo-footer').attr("src", "assets/img/themes/logo2-" + color + ".png");
+                    jQuery('.navbar-brand img').attr("src", "assets/img/themes/logo1-" + color + ".png");
                 } else if(data_header == 'dark'){
                     jQuery('.logo img').attr("src", "assets/img/themes/logo1-" + color + ".png");
                     jQuery('#logo-footer').attr("src", "assets/img/themes/logo2-" + color + ".png");

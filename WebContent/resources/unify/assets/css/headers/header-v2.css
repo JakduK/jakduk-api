@@ -8,6 +8,8 @@
 4. Header - Submenu
 5. Header - Mega Menu
 6. Header - Fixed
+7. Header - Fixed Boxed
+
 -----------------------------------------------------------------------*/
 
 
@@ -850,7 +852,7 @@ topbar including in mobile version*/
 	left: 0;
 	width: 100%;
 	height: 93px;
-	z-index: 9999;
+	z-index: 999;
 	position: fixed;
 	margin-top: -35px;
 	border-bottom: none;
@@ -912,4 +914,14 @@ topbar including in mobile version*/
 	.header-fixed .header-v2.header-fixed-shrink .dropdown > a:after {
 		top: 22px;
 	}
+}
+
+
+/*--------------------------------------------------
+    [7. Header - Fixed Boxed]
+----------------------------------------------------*/
+
+.boxed-layout.header-fixed .header-v2.header-sticky {
+	left: inherit;
+	width: inherit;
 }

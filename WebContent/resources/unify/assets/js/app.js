@@ -10,7 +10,7 @@ var App = function () {
     //Fixed Header
     function handleHeader() {
          jQuery(window).scroll(function() {
-            if (jQuery(window).scrollTop()>100){
+            if (jQuery(window).scrollTop()){
                 jQuery(".header-fixed .header-sticky").addClass("header-fixed-shrink");
             }
             else {
@@ -27,7 +27,7 @@ var App = function () {
     }
 
     //Search Box (Header)
-    function handleSearch() {    
+    function handleSearch() {
         jQuery('.search').click(function () {
             if(jQuery('.search-btn').hasClass('fa-search')){
                 jQuery('.search-open').fadeIn(500);
@@ -53,6 +53,56 @@ var App = function () {
 
         jQuery(window).scroll(function(){
           if(jQuery(this).scrollTop() > 1) jQuery('.header-v5 .search-open').fadeOut('fast');
+        });
+    }
+
+    // Search Box v2 (Header v8)
+    function handleSearchV2() {
+        $(".blog-topbar .search-btn").on("click", function() {
+          if (jQuery(".topbar-search-block").hasClass("topbar-search-visible")) {
+            jQuery(".topbar-search-block").slideUp();
+            jQuery(".topbar-search-block").removeClass("topbar-search-visible");
+          } else {
+            jQuery(".topbar-search-block").slideDown();
+            jQuery(".topbar-search-block").addClass("topbar-search-visible");
+          }
+        });
+        $(".blog-topbar .search-close").on("click", function() {
+          jQuery(".topbar-search-block").slideUp();
+          jQuery(".topbar-search-block").removeClass("topbar-search-visible");
+        });
+        jQuery(window).scroll(function() {
+          jQuery(".topbar-search-block").slideUp();
+          jQuery(".topbar-search-block").removeClass("topbar-search-visible");
+        });
+    }
+
+    // TopBar (Header v8)
+    function handleTopBar() {
+        $(".topbar-toggler").on("click", function() {
+          if (jQuery(".topbar-toggler").hasClass("topbar-list-visible")) {
+            jQuery(".topbar-menu").slideUp();
+            jQuery(this).removeClass("topbar-list-visible");
+          } else {
+            jQuery(".topbar-menu").slideDown();
+            jQuery(this).addClass("topbar-list-visible");
+          }
+        });
+    }
+
+    // TopBar SubMenu (Header v8)
+    function handleTopBarSubMenu() {
+        $(".topbar-list > li").on("click", function(e) {
+          if (jQuery(this).children("ul").hasClass("topbar-dropdown")) {
+            if (jQuery(this).children("ul").hasClass("topbar-dropdown-visible")) {
+              jQuery(this).children(".topbar-dropdown").slideUp();
+              jQuery(this).children(".topbar-dropdown").removeClass("topbar-dropdown-visible");
+            } else {
+              jQuery(this).children(".topbar-dropdown").slideDown();
+              jQuery(this).children(".topbar-dropdown").addClass("topbar-dropdown-visible");
+            }
+          }
+          //e.preventDefault();
         });
     }
 
@@ -131,20 +181,14 @@ var App = function () {
             handleBootstrap();
             handleSearch();
             handleSearchV1();
+            handleSearchV2();
+            handleTopBar();
+            handleTopBarSubMenu();         
             handleToggle();
             handleHeader();
             handleMegaMenu();
             handleHoverSelector();
             handleEqualHeightColumns();
-        },
-
-        //Scroll Bar 
-        initScrollBar: function () {
-            jQuery('.mCustomScrollbar').mCustomScrollbar({
-                theme:"minimal",
-                scrollInertia: 300,
-                scrollEasing: "linear"
-            });
         },
 
         //Counters 
@@ -157,32 +201,57 @@ var App = function () {
 
         //Parallax Backgrounds
         initParallaxBg: function () {
-             jQuery(window).load(function() {
+            jQuery(window).load(function() {
                 jQuery('.parallaxBg').parallax("50%", 0.2);
                 jQuery('.parallaxBg1').parallax("50%", 0.4);
             });
         },
 
-        //Animate Dropdown
-        initAnimateDropdown: function () {
-            function MenuMode() {
-                jQuery('.dropdown').on('show.bs.dropdown', function(e){
-                    jQuery(this).find('.dropdown-menu').first().stop(true, true).slideDown();
-                });
-                jQuery('.dropdown').on('hide.bs.dropdown', function(e){
-                    jQuery(this).find('.dropdown-menu').first().stop(true, true).slideUp();
-                });
-            }
-         
-            jQuery(window).resize(function(){
-                if (jQuery(window).width() > 768) {
-                    MenuMode();
-                }
+        //Scroll Bar 
+        initScrollBar: function () {
+            jQuery('.mCustomScrollbar').mCustomScrollbar({
+                theme:"minimal",
+                scrollInertia: 200,
+                scrollEasing: "linear"
             });
+        },
 
+        // Sidebar Menu Dropdown
+        initSidebarMenuDropdown: function() {
+          function SidebarMenuDropdown() {
+            jQuery('.header-v7 .dropdown-toggle').on('click', function() {
+              jQuery('.header-v7 .dropdown-menu').stop(true, false).slideUp();
+              jQuery('.header-v7 .dropdown').removeClass('open');
+
+              if (jQuery(this).siblings('.dropdown-menu').is(":hidden") == true) {
+                jQuery(this).siblings('.dropdown-menu').stop(true, false).slideDown();
+                jQuery(this).parents('.dropdown').addClass('open');
+              }
+            });
+          }
+          SidebarMenuDropdown();
+        },
+
+        //Animate Dropdown
+        initAnimateDropdown: function() {
+          function MenuMode() {
+            jQuery('.dropdown').on('show.bs.dropdown', function() {
+              jQuery(this).find('.dropdown-menu').first().stop(true, true).slideDown();
+            });
+            jQuery('.dropdown').on('hide.bs.dropdown', function() {
+              jQuery(this).find('.dropdown-menu').first().stop(true, true).slideUp();
+            });
+          }
+
+          jQuery(window).resize(function() {
             if (jQuery(window).width() > 768) {
-                MenuMode();
+              MenuMode();
             }
+          });
+
+          if (jQuery(window).width() > 768) {
+            MenuMode();
+          }
         },
 
     };

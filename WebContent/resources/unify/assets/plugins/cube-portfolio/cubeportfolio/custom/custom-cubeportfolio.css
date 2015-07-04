@@ -15,6 +15,10 @@
   border-radius: 50% !important;
 }
 
+.cbp-l-grid-agency .cbp-caption:after {
+	border: none;
+}
+
 /*Overlays
 ------------------------------------*/
 /*Default*/

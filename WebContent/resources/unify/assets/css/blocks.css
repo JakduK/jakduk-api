@@ -1,7 +1,7 @@
 /*   
  * Template Name: Unify - Responsive Bootstrap Template
  * Description: Business, Corporate, Portfolio, E-commerce, Blog and One Page Template.
- * Version: 1.7
+ * Version: 1.8
  * Author: @htmlstream
  * Website: http://htmlstream.com
 */
@@ -495,8 +495,8 @@
   color: #fff;
   width: 60px;
   height: 60px;
-  padding: 16px;
-  font-size: 30px;
+  font-size: 26px;
+  line-height: 62px;
   margin-left: -30px;
   text-align: center;
   position: absolute;
@@ -717,8 +717,8 @@
   color: #fff;
   width: 45px;
   height: 45px;
-  padding: 10px;
-  font-size: 25px;
+  font-size: 22px;
+  line-height: 46px;
   text-align: center;
   position: absolute;
   background: #72c02c;
@@ -1157,6 +1157,7 @@
 }
 
 .team-v4 span {
+  color: #333;
   display: block;
   font-size: 18px;
   margin-bottom: 5px;
@@ -1188,7 +1189,7 @@
 }
 
 .team-v5 span {
-  color: #777;
+  color: #555;
   display: block;
   font-size: 16px;
   margin-bottom: 5px;
@@ -1486,10 +1487,6 @@
 /*Portfolio Box
 ------------------------------------*/
 /*Portfolio Box*/
-.portfolio-box {
-  margin-bottom: 100px;
-}
-
 @media (min-width: 991px) and (max-width: 1199px) {
   .portfolio-box {
     margin-bottom: 60px;
@@ -3293,7 +3290,7 @@
 ------------------------------------*/
 /*News Posts*/
 .news-v3 {
-  background: #fff;
+  /*background: #fff;*/
 }
 
 .news-v3 .news-v3-in {
@@ -3439,4 +3436,235 @@
   padding: 4px;
   font-size: 10px;
   line-height: 16px;
+}
+
+
+/*--------------------------------------------------
+[Blog Grid]
+----------------------------------------------------*/
+
+.blog-grid img {
+  margin-bottom: 15px;
+}
+
+.blog-grid h3 {
+  font-size: 22px;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.blog-grid h2.blog-grid-title-lg {
+  font-size: 28px;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+
+.blog-grid h3.blog-grid-title-sm {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.blog-grid h3 a {
+  color: #333;
+}
+
+.blog-grid p {
+  margin-bottom: 15px;
+}
+
+.blog-grid-inner {
+  padding: 20px;
+  background: #fff;
+  margin: -70px 40px 0;
+  position: relative;
+}
+
+/*Blog Grid Gradient*/
+.blog-grid .blog-grid-grad {
+  position: relative;
+}
+
+.blog-grid .blog-grid-grad i {
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  line-height: 30px;
+  text-align: center;
+  position: absolute;
+  display: inline-block;
+  background: rgba(0,0,0,0.5);
+}
+
+/*Blog Grid Info*/
+.blog-grid .blog-grid-info {
+  padding-left: 0;
+  list-style: none;
+}
+
+.blog-grid .blog-grid-info li {
+  color: #888;
+  padding: 0 2px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.blog-grid .blog-grid-info li:before {
+  content: '/';
+  font-size: 12px;
+  line-height: 1.4;
+  margin-right: 9px;
+}
+
+.blog-grid .blog-grid-info li:first-child:before {
+  content: " ";
+  margin-right: 0;
+}
+
+.blog-grid .blog-grid-info li a {
+  color: #888;
+}
+
+.blog-grid .blog-grid-info li a:hover {
+  text-decoration: none;
+}
+
+/*Read More Link*/
+.blog-grid a.r-more {
+  font-size: 13px;
+  font-weight: 400;
+  font-style: italic;
+  display: inline-block;
+}
+
+.blog-grid a.r-more:hover {
+  text-decoration: none;
+}
+
+
+/*--------------------------------------------------
+[Blog Thumb]
+----------------------------------------------------*/
+
+.blog-thumb {
+  overflow: hidden;
+}
+
+/*Blog Grid Hover*/
+.blog-thumb .blog-thumb-hover {
+  float: left;
+  position: relative;
+  margin-right: 15px;
+}
+
+.blog-thumb .blog-thumb-hover:after {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: " ";
+  position: absolute;
+  -webkit-transition: all 0.35s, -webkit-transform 0.35s;
+  transition: all 0.35s, transform 0.35s;
+}
+
+.blog-thumb .blog-thumb-hover img {
+  width: 120px;
+  height: auto;
+}
+
+.blog-thumb .blog-thumb-hover img.video-play-btn {
+  width: 30px;
+  height: 30px;
+}
+
+/*Icon Hover Gradient*/
+.blog-thumb .blog-thumb-hover .hover-grad {
+  left: 0;
+  top: 50%;
+  z-index: 1;
+  opacity: 0;
+  width: 100%;
+  color: #fff;
+  font-size: 20px;
+  margin-top: -14px;
+  text-align: center;
+  position: absolute;
+  display: inline-block;
+  -webkit-transition: all 0.65s, -webkit-transform 0.65s;
+  transition: all 0.65s, transform 0.65s;
+}
+
+.blog-thumb .blog-thumb-hover:hover .hover-grad {
+  opacity: 1;
+  -webkit-transition: opacity 0.55s, -webkit-transform 0.55s;
+  transition: opacity 0.55s, transform 0.55s;
+}
+
+/*Blog Thumb Description*/
+.blog-thumb .blog-thumb-desc {
+  overflow: hidden;
+}
+
+.blog-thumb .blog-thumb-desc h3 {
+  font-size: 14px;
+  margin: 0 0 5px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.blog-thumb .blog-thumb-desc h3 a {
+  color: #555;
+}
+
+/*Blog Grid Info*/
+.blog-thumb .blog-thumb-info {
+  padding-left: 0;
+  list-style: none;
+}
+
+.blog-thumb .blog-thumb-info li {
+  color: #888;
+  padding: 0 2px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.blog-thumb .blog-thumb-info li:before {
+  content: '/';
+  font-size: 12px;
+  line-height: 1.4;
+  margin-right: 9px;
+}
+
+.blog-thumb .blog-thumb-info li:first-child:before {
+  content: " ";
+  margin-right: 0;
+}
+
+.blog-thumb .blog-thumb-info li a {
+  color: #888;
+}
+
+.blog-thumb .blog-thumb-info li a:hover {
+  color: #e74c3c;
+}
+
+/*Blog Thumb Circle
+------------------------------------*/
+.blog-thumb.blog-thumb-circle .blog-thumb-hover:after {
+  border-radius: 50% !important;
+}
+
+.blog-thumb.blog-thumb-circle .blog-thumb-hover img {
+  width: 50px;
+  height: 50px;
+}
+
+.blog-thumb.blog-thumb-circle .blog-thumb-hover .hover-grad {
+  font-size: 15px;
+  margin-top: -10px;
 }

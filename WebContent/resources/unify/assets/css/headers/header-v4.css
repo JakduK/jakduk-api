@@ -15,94 +15,88 @@
     [1. Header - Topbar]
 ----------------------------------------------------*/
 
-/*Top Bar v1 (login, search etc.)
+/*Top Bar (login, search etc.)
 ------------------------------------*/
-.header-v4 .topbar-v1 {
+.topbar-v1 {
 	background: #fdfdfd;
 	border-top: solid 1px #f0f0f0;
 	border-bottom: solid 1px #f0f0f0;
 }
 
 /*Top Contacts*/
-.header-v4 .topbar-v1 ul {
+.topbar-v1 ul {
 	margin: 0;
 }
 
-.header-v4 .topbar-v1 .top-v1-data li {
-	padding: 5px 11px;
-	margin-left: -3px;
-	display: inline-block;	
-	border-right: solid 1px #eee;
+.topbar-v1 .top-v1-contacts {
+	margin-top: 8px;
+	font-size: 12px;
 }
 
-.header-v4 .topbar-v1 .top-v1-data li:first-child {
-	margin-left: 0;
-	border-left: solid 1px #eee;
-}
-
-.header-v4 .topbar-v1 .top-v1-contacts {
-	margin-top: 5px;
-}
-
-.header-v4 .topbar-v1 .top-v1-contacts i {
+.topbar-v1 .top-v1-contacts i {
 	color: #999;
-	font-size: 13px;
+	font-size: 12px;
 	margin-right: 3px;
 }
 
 /*Top Data*/
-.header-v4 .topbar-v1 .top-v1-data {
+.topbar-v1 .top-v1-data {
 	text-align: right;
 }
 
-.header-v4 .topbar-v1 .top-v1-data li {
-	padding: 5px 11px;
-	margin-left: -4px;
+.topbar-v1 .top-v1-data li {
+	padding: 7px 11px;
+	margin-right: -4px;
 	display: inline-block;	
 	border-right: solid 1px #eee;
 }
 
-.header-v4 .topbar-v1 .top-v1-data li:first-child {
-	margin-left: 0;
-	border-left: solid 1px #eee;
-}
-
-.header-v4 .topbar-v1 .top-v1-data li a {
+.topbar-v1 .top-v1-data li a {
 	font-size: 12px; 
 }
 
-.header-v4 .topbar-v1 .top-v1-data li a:hover {
+.topbar-v1 .top-v1-data li a:hover {
 	text-decoration: none;
 }
 
-.header-v4 .topbar-v1 .top-v1-data li i {
+.topbar-v1 .top-v1-data li i {
 	color: #777;
 	font-size: 13px;
 }
 
-.header-v4 .topbar-v1 .top-v1-data li a:hover i {
+.topbar-v1 .top-v1-data li a:hover i {
 	color: #72c02c;
 }
 
 /*Responsive Topbar v1*/
 @media (max-width: 991px) {
-	.header-v4 .topbar-v1 ul {
+	.topbar-v1 ul {
 		text-align: center !important;
 	}
 
-	.header-v4 .topbar-v1 .top-v1-contacts {
+	.topbar-v1 .top-v1-contacts {
 		margin: 10px 0;
 	}
 
-	.header-v4 .topbar-v1 .top-v1-data li {
+	.topbar-v1 .top-v1-data li {
 		top: 1px;
 		padding: 6px 16px;
-		margin-left: -5px;
+		margin-left: -1px;
 		position: relative;
-		border: solid 1px #eee;
+		border-top: solid 1px #eee;
+	}		
+
+	.topbar-v1 .top-v1-data li:first-child {
+		border-left: solid 1px #eee;
 	}		
 }
 
+@media (min-width: 992px) {
+	.topbar-v1 .top-v1-data li:last-child {
+		margin-right: 0;
+		border-right: none;
+	}
+}
 
 /*--------------------------------------------------
     [2. Header - Navbar]
@@ -238,7 +232,6 @@
 		margin-right: 0;
 	}
 }
-
 
 /*--------------------------------------------------
     [3. Header - Responsive Navbar Style]
@@ -879,7 +872,7 @@
 	left: 0;
 	width: 100%;
 	height: 95px;
-	z-index: 9999;
+	z-index: 999;
 	position: fixed;
 	margin-top: -35px;
 	border-bottom: none;

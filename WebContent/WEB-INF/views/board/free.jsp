@@ -38,8 +38,10 @@
 		<div class="row">
 			<!--Top Likes Rows-->
 			<div class="col-md-6">
-				<div class="panel panel-sea margin-bottom-20">
-					<div class="panel-heading"><spring:message code="board.top.likes"/></div>
+                <h2 class="heading-sm">
+                    <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-thumbs-o-up"></i>
+                    <span><spring:message code="board.top.likes"/></span>
+                </h2>
 			       <table class="table table-hover">
 						<tbody>
 							<tr ng-repeat="post in topLike">
@@ -57,15 +59,15 @@
 								</td>
 							</tr>                                
 						</tbody>
-					</table>
-				</div>                  
-			</div>
-			<!--End Top Likes Rows-->
-
-			<!--Top Comments Rows-->
+					</table>                
+            </div>	
+            <!--End Top Likes Rows-->	
+            <!--Top Comments Rows-->
 			<div class="col-md-6">
-			    <div class="panel panel-sea margin-bottom-20">
-					<div class="panel-heading"><spring:message code="board.top.comments"/></div>
+                <h2 class="heading-sm">
+                    <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-comment-o"></i>
+                    <span><spring:message code="board.top.comments"/></span>
+                </h2>
 		  			<table class="table table-hover">
 		      			<tbody>
 							<tr ng-repeat="post in topComment">
@@ -83,9 +85,8 @@
 								</td>
 							</tr>  
 						</tbody>
-					</table>
-				</div>                  
-			</div>
+					</table>               
+            </div>	           
 			<!--End Top Comments Rows-->
 		</div>	
 	
