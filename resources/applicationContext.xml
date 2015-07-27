@@ -28,7 +28,8 @@
 	</context:component-scan>
 
 	<import resource="security-context.xml" />
-	<import resource="config/oauth/oauth-data.xml"/>
+	<import resource="elasticsearch-context.xml" />
+	<import resource="config/oauth/oauth-data.xml"/>	
 
 	<!-- Imports datasource configuration -->
 	<import resource="config/db/mongo-data.xml" />

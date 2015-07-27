@@ -4,7 +4,7 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk</artifactId>
-  <version>0.3.19-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>jakduk</name>
@@ -29,6 +29,9 @@
 		<!-- Mongo DB driver & Spring Data MongoDB -->
 		<spring.data.mongodb.version>1.5.4.RELEASE</spring.data.mongodb.version>
 		<mongodb.driver.version>2.12.3</mongodb.driver.version>
+		
+		<!-- Elasticsearch -->
+		<elasticsearch.version>1.2.1.RELEASE</elasticsearch.version>
   </properties>
 	  
  	<repositories>
@@ -259,8 +262,16 @@
 			<artifactId>rome</artifactId>
 			<version>1.0</version>
 		</dependency>
+		
+		<!-- Elasticsearch -->		
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-elasticsearch</artifactId>
+			<version>${elasticsearch.version}</version>
+		</dependency>		
 
 		<!-- solr -->
+		<!-- 
 		<dependency>
 			<artifactId>solr-solrj</artifactId>
 			<groupId>org.apache.solr</groupId>
@@ -274,7 +285,8 @@
 			<version>4.9.0</version>
 			<type>jar</type>
 			<scope>test</scope>
-		</dependency>         
+		</dependency>
+		 -->         
   </dependencies>
   
  	<build>

@@ -79,7 +79,7 @@
   
 	<bean id="uploadDirResource" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg>
-			<value>${file.server.temp.path}</value>
+			<value>/tmp/jakduk</value>
 		</constructor-arg>
 	</bean>  
 	

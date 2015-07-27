@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,8 +22,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,11 +77,13 @@ public class BoardTest {
 		System.out.println("p1=" + p1);
 		System.out.println("p2=" + p2);
 		
+		/*
 		DateTimeFormatter date = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 		DateTime dt = new DateTime();
 		org.joda.time.format.DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
 		String str = fmt.print(dt);
 		System.out.println("str=" + str);
+		*/
 		
 		LocalDateTime dateTime1 = LocalDateTime.parse("Thu, 5 Jun 2014 05:10:40 GMT", DateTimeFormatter.RFC_1123_DATE_TIME);
 		System.out.println(dateTime1);
