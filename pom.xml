@@ -31,7 +31,7 @@
 		<mongodb.driver.version>2.12.3</mongodb.driver.version>
 		
 		<!-- Elasticsearch -->
-		<elasticsearch.version>1.2.1.RELEASE</elasticsearch.version>
+		<elasticsearch.version>1.7.0</elasticsearch.version>
   </properties>
 	  
  	<repositories>
@@ -263,12 +263,12 @@
 			<version>1.0</version>
 		</dependency>
 		
-		<!-- Elasticsearch -->		
+		<!-- Elasticsearch -->
 		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-elasticsearch</artifactId>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
 			<version>${elasticsearch.version}</version>
-		</dependency>		
+		</dependency>
 
 		<!-- solr -->
 		<!-- 
