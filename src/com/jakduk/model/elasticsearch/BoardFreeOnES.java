@@ -1,4 +1,4 @@
-package com.jakduk;
+package com.jakduk.model.elasticsearch;
 
 import com.jakduk.model.embedded.CommonWriter;
 
@@ -7,32 +7,22 @@ import io.searchbox.annotations.JestId;
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
 * @company  : http://jakduk.com
-* @date     : 2015. 8. 2.
+* @date     : 2015. 8. 3.
 * @desc     :
 */
-public class Article {
+public class BoardFreeOnES {
 	
 	@JestId
     private String id;
 	
-	/**
-	 * 작성자
-	 */
 	private CommonWriter writer;
 	
-	/**
-	 * 글 제목
-	 */
 	private String subject;
 	
-	/**
-	 * 글 번호
-	 */
+	private String content;
+	
 	private int seq;
 	
-	/**
-	 * 분류 ID
-	 */
 	private String categoryName;
 
 	public String getId() {
@@ -56,7 +46,15 @@ public class Article {
 	}
 
 	public void setSubject(String subject) {
-		this.subject = subject;
+		this.subject = subject.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
 	}
 
 	public int getSeq() {
@@ -75,4 +73,9 @@ public class Article {
 		this.categoryName = categoryName;
 	}
 
+	@Override
+	public String toString() {
+		return "BoardFreeOnES [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content
+				+ ", seq=" + seq + ", categoryName=" + categoryName + "]";
+	}
 }

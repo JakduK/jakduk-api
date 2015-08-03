@@ -79,9 +79,6 @@ public class BoardFreeService {
 	private BoardFreeOnListRepository boardFreeOnListRepository;
 	
 	@Autowired
-	private SequenceRepository boardSequenceRepository;
-	
-	@Autowired
 	private BoardCategoryRepository boardCategoryRepository;	
 	
 	@Autowired

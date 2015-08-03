@@ -21,7 +21,7 @@ import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.simple.GalleryOnList;
 
 /**
@@ -421,5 +421,36 @@ public class JakdukDAO {
 		
 		return commentCount;
 	}	
+	
+	public List<BoardFreeOnES> getBoardFreeOnES(ObjectId commentId) {
+		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE_DELETE));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
+		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		AggregationOperation limit = Aggregation.limit(100);
+		
+		Aggregation aggregation;
+		
+		if (commentId != null) {
+			aggregation = Aggregation.newAggregation(match1, match2, sort, limit);
+		} else {
+			aggregation = Aggregation.newAggregation(match1, sort, limit);
+		}
+		
+		AggregationResults<BoardFreeOnES> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnES.class);
+		
+		List<BoardFreeOnES> posts = results.getMappedResults();
+		
+		for (BoardFreeOnES post : posts) {
+			post.setContent(post.getContent()
+					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+					.replaceAll("\r|\n|&nbsp;",""));
+			
+			post.setSubject(post.getSubject()
+					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+					.replaceAll("\r|\n|&nbsp;",""));
+		}
+		
+		return posts;
+	}
 	
 }
