@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.index.mapper.DocumentMapper;
+import org.elasticsearch.index.mapper.core.StringFieldMapper;
+import org.elasticsearch.index.mapper.object.RootObjectMapper;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
@@ -27,11 +30,13 @@ import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeOnListRepository;
 
 import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.mapping.PutMapping;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -89,6 +94,36 @@ public class JestTest {
 	}
 	
 	@Test
+	public void mapping() {
+		/*
+		RootObjectMapper.Builder rootObjectMapperBuilder = new RootObjectMapper.Builder("tweet")
+				.add(new StringFieldMapper.Builder("message").store(true));
+		
+		DocumentMapper documentMapper = new DocumentMapper.Builder("articles", settingsBuilder.build(), rootObjectMapperBuilder).build(null);
+		String expectedMappingSource = documentMapper.mappingSource().toString();
+		System.out.println("expectedMappingSource=" + expectedMappingSource);
+		PutMapping putMapping = new PutMapping.Builder("articles", "tweet", expectedMappingSource).build();
+		jestClient.execute(putMapping);
+		*/
+		
+        PutMapping putMapping = new PutMapping.Builder(
+                "articles",
+                "tweet",
+                "{ \"properties\" : { \"subject\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"}"
+                + ", \"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} }"
+                + "}"
+        ).build();
+
+		try {
+			JestResult result = jestClient.execute(putMapping);
+			System.out.println("result=" + result.getErrorMessage());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
 	public void createDocument() {
 		Article source = new Article();
 		
@@ -109,7 +144,7 @@ public class JestTest {
 	@Test
 	public void search() {
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		searchSourceBuilder.query(QueryBuilders.matchQuery("content", "잘"));
+		searchSourceBuilder.query(QueryBuilders.matchQuery("content", "dfs"));
 		
 		Search search = new Search.Builder(searchSourceBuilder.toString())
 				.addIndex("articles")
