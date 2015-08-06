@@ -2,32 +2,23 @@ package jakduk;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.index.mapper.DocumentMapper;
-import org.elasticsearch.index.mapper.core.StringFieldMapper;
-import org.elasticsearch.index.mapper.object.RootObjectMapper;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.google.gson.JsonObject;
 import com.jakduk.Article;
-import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.repository.BoardFreeOnListRepository;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -90,7 +81,8 @@ public class JestTest {
 		settingsBuilder.put("index.analysis.analyzer.korean.type", "custom");
 		settingsBuilder.put("index.analysis.analyzer.korean.tokenizer", "mecab_ko_standard_tokenizer");
 		
-		jestClient.execute(new CreateIndex.Builder("articles").settings(settingsBuilder.build().getAsMap()).build());
+		JestResult result = jestClient.execute(new CreateIndex.Builder("articles").settings(settingsBuilder.build().getAsMap()).build());
+		System.out.println("result=" + result.getErrorMessage());
 	}
 	
 	@Test
@@ -144,7 +136,7 @@ public class JestTest {
 	@Test
 	public void search() {
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		searchSourceBuilder.query(QueryBuilders.matchQuery("content", "dfs"));
+		searchSourceBuilder.query(QueryBuilders.matchQuery("content", "건강"));
 		
 		Search search = new Search.Builder(searchSourceBuilder.toString())
 				.addIndex("articles")
@@ -152,7 +144,12 @@ public class JestTest {
 		
 		try {
 			SearchResult result = jestClient.execute(search);
-			System.out.println("result=" + result.getJsonString());
+//			System.out.println("result=" + result.getJsonString());
+			
+			JsonObject jsonObj = result.getJsonObject();
+						
+			System.out.println(result.getJsonObject());
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

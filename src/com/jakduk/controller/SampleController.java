@@ -135,5 +135,10 @@ public class SampleController {
 		
 		return "sample/scroll01";
 	}
+	
+	@RequestMapping(value ="/search01")
+	public String search01(Model model) {
+		return "sample/search01";
+	}
 
 }

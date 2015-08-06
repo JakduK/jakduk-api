@@ -37,7 +37,6 @@ import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.EncyclopediaRepository;
-import com.jakduk.repository.HomeDescriptionRepository;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;

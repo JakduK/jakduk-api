@@ -33,8 +33,6 @@ public class JestConfiguration {
     			.multiThreaded(true)
     			.build());
     	
-    	//System.out.println("phjang=" + factory.getObject());
-    	
     	return factory.getObject();
 	}
 }
