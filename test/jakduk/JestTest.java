@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.JsonObject;
 import com.jakduk.Article;
@@ -147,8 +148,11 @@ public class JestTest {
 //			System.out.println("result=" + result.getJsonString());
 			
 			JsonObject jsonObj = result.getJsonObject();
+			
+			ModelAndView model = new ModelAndView();
+			model.addObject("json", jsonObj);
+			System.out.println("model=" + model);
 						
-			System.out.println(result.getJsonObject());
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
