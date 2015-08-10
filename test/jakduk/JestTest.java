@@ -24,6 +24,7 @@ import com.jakduk.model.embedded.CommonWriter;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
+import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
@@ -212,5 +213,4 @@ public class JestTest {
 			e.printStackTrace();
 		}
 	}
-
 }
