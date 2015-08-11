@@ -45,7 +45,7 @@ public class JestTest {
 	private JestClient jestClient;
 	
 	@Autowired
-	JakdukDAO jakdukDAO;
+	private JakdukDAO jakdukDAO;
 	
 	@Before
 	public void before() {

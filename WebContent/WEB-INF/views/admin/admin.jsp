@@ -15,10 +15,16 @@
 	<div class="page-header">
   <h4>JakduK Admin Page.</h4>
 </div>
-<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/admin/init"/>'">Init Data</button>
-<c:if test="${not empty message}">
-	<div class="span6 offset2 alert">${message}</div>
-</c:if>
+<div class="btn-group">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+    Init Data
+    <span class="caret"></span>
+  </button>  
+  <ul class="dropdown-menu" role="menu">
+    <li><a href="<c:url value="/admin/board/category/init"/>">Init Board Category</a></li>
+    <li><a href="<c:url value="/admin/search/index/init"/>">Init Search Index</a></li>
+  </ul>
+</div>
 
 <div class="btn-group">
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
@@ -52,6 +58,10 @@
     <li><a ng-click="getData('attendanceClub')">Get Attendance Club</a></li>
   </ul>
 </div>
+
+<c:if test="${not empty message}">
+	<div class="span6 offset2 alert">${message}</div>
+</c:if>
 
 <div ng-show="encyclopedias.length > 0">
 <h4>Encyclopedia</h4>

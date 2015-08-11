@@ -3,6 +3,7 @@ package com.jakduk.controller;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,13 +28,19 @@ public class SearchController {
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	@RequestMapping(value = "/board")
-	public ModelAndView list(@RequestParam(required = true) String q) {
+	public String list(Model model,
+			@RequestParam(required = false) String q) {
 		
-		ModelAndView model = new ModelAndView();
-		model.setViewName("search/board");
-		JsonObject jsonObject =  searchService.searchBoard(q);
-		model.addObject("result", jsonObject.toString());
+		searchService.getSearchBoard(model, q);
 		
-		return model;
+		return "search/board";
+	}
+	
+	@RequestMapping(value = "/data/board")
+	public void dataBoardList(Model model,
+			@RequestParam(required = true) String q) {
+		
+		searchService.searchDataOfBoard(model, q);
+		
 	}
 }

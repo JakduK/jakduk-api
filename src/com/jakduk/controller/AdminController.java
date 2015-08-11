@@ -59,12 +59,20 @@ public class AdminController {
 		return "admin/admin";
 	}
 	
-	@RequestMapping(value = "/init")
-	public String loginFailure() {
+	@RequestMapping(value = "/board/category/init")
+	public String initBoardCategory() {
 
-		String message = adminService.initData();
+		String message = adminService.initBoardCategory();
 		
-		return "redirect:/admin?message=" + message;
+		return "redirect:/admin/settings?message=" + message;
+	}
+	
+	@RequestMapping(value = "/search/index/init")
+	public String initSearchIndex() {
+
+		String message = adminService.initSearchIndex();
+		
+		return "redirect:/admin/settings?message=" + message;
 	}
 	
 	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.GET)

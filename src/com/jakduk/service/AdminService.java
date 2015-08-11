@@ -22,6 +22,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.AttendanceLeague;
 import com.jakduk.model.db.BoardCategory;
@@ -37,6 +39,7 @@ import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.AttendanceClubWrite;
 import com.jakduk.model.web.BoardCategoryWrite;
@@ -50,7 +53,13 @@ import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.GalleryRepository;
 import com.jakduk.repository.HomeDescriptionRepository;
-import com.jakduk.repository.SequenceRepository;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Bulk;
+import io.searchbox.core.Index;
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.mapping.PutMapping;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -69,13 +78,16 @@ public class AdminService {
 	private String storageThumbnailPath;
 	
 	@Autowired
+	private JestClient jestClient;
+	
+	@Autowired
+	private JakdukDAO jakdukDAO;
+	
+	@Autowired
 	private CommonService commonService;
 	
 	@Autowired
 	private BoardCategoryRepository boardCategoryRepository;
-	
-	@Autowired
-	private SequenceRepository sequenceRepository;
 	
 	@Autowired
 	private EncyclopediaRepository encyclopediaRepository;
@@ -100,7 +112,7 @@ public class AdminService {
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	public String initData() {
+	public String initBoardCategory() {
 		
 		String result = "";
 		
@@ -135,6 +147,74 @@ public class AdminService {
 			result = "success input board category data at DB";
 		} else {
 			result = "already exist board category at DB.";
+		}
+		
+		return result;
+	}
+	
+	public String initSearchIndex() {
+		
+		String result = "";
+		
+		ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder();
+		//settingsBuilder.put("number_of_shards", 5);
+		//settingsBuilder.put("number_of_replicas", 1);
+		settingsBuilder.put("index.analysis.analyzer.korean.type", "custom");
+		settingsBuilder.put("index.analysis.analyzer.korean.tokenizer", "mecab_ko_standard_tokenizer");
+		
+		try {
+			JestResult jestResult = jestClient.execute(new CreateIndex.Builder("jakduk").settings(settingsBuilder.build().getAsMap()).build());
+			
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+        PutMapping putMapping = new PutMapping.Builder(
+                "jakduk",
+                "board",
+                "{ \"properties\" : { \"subject\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"}"
+                + ", \"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} }"
+                + "}"
+        ).build();
+
+		try {
+			JestResult jestResult = jestClient.execute(putMapping);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
+		
+		List<Index> idxList = new ArrayList<>();
+		
+		for (BoardFreeOnES post : posts) {
+			idxList.add(new Index.Builder(post).build());
+		}
+		
+		Bulk bulk = new Bulk.Builder()
+				.defaultIndex("jakduk")
+				.defaultType("board")
+				.addAction(idxList)
+				.build();
+		
+		try {
+			JestResult jestResult = jestClient.execute(bulk);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return result;
