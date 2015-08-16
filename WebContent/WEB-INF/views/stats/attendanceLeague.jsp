@@ -235,7 +235,9 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		 // 사용할 앱의 Javascript 키를 설정해 주세요.
 		Kakao.init('${kakaoKey}');
 		
-		$scope.getAttendance();		
+		$scope.getAttendance();
+		
+		App.init();
 	});
 	
 	$scope.getAttendance = function() {

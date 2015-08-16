@@ -21,6 +21,8 @@ public class BoardFreeOnES {
 	
 	private String content;
 	
+	private String contentPreview;
+	
 	private int seq;
 	
 	private String categoryName;
@@ -46,7 +48,7 @@ public class BoardFreeOnES {
 	}
 
 	public void setSubject(String subject) {
-		this.subject = subject.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
+		this.subject = subject;
 	}
 
 	public String getContent() {
@@ -54,7 +56,15 @@ public class BoardFreeOnES {
 	}
 
 	public void setContent(String content) {
-		this.content = content.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
+		this.content = content;
+	}
+
+	public String getContentPreview() {
+		return contentPreview;
+	}
+
+	public void setContentPreview(String contentPreview) {
+		this.contentPreview = contentPreview;
 	}
 
 	public int getSeq() {
@@ -76,6 +86,7 @@ public class BoardFreeOnES {
 	@Override
 	public String toString() {
 		return "BoardFreeOnES [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content
-				+ ", seq=" + seq + ", categoryName=" + categoryName + "]";
+				+ ", contentPreview=" + contentPreview + ", seq=" + seq + ", categoryName=" + categoryName + "]";
 	}
+	
 }

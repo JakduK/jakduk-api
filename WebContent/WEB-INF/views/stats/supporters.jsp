@@ -147,6 +147,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
    Kakao.init('${kakaoKey}');
 	    
    $scope.getSupporters();
+   
+   App.init();
 	});
 	
 	$scope.getSupporters = function() {

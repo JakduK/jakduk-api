@@ -172,6 +172,8 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 	$scope.galleryName = document.getElementById("galleryName").value;
 	
 	angular.element(document).ready(function() {
+		App.init();
+		
 		// 사용할 앱의 Javascript 키를 설정해 주세요.
 		Kakao.init('${kakaoKey}');
 	   

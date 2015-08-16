@@ -38,7 +38,7 @@ var jakdukApp = angular.module("jakdukApp", []);
 jakdukApp.controller('sampleCtrl', function($scope) {
 	
 	$scope.onSearchBtn = function() {
-		location.href = '<c:url value="/search/board"/>' + '?q=' + $scope.searchText;
+		location.href = '<c:url value="/search"/>' + '?q=' + $scope.searchText;
 		//location.href = '<c:url value="/search/' + $scope.searchText + '"></c:url>';
 	};
 	

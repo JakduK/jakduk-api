@@ -120,6 +120,10 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.usernameAlert = {};
 	$scope.buttonAlert = {};
 	
+	angular.element(document).ready(function() {
+		App.init();
+	});
+	
 	$scope.onSubmit = function(event) {
 		if ($scope.userProfileWrite.$valid && $scope.usernameStatus == "ok") {
 			submitted = true;

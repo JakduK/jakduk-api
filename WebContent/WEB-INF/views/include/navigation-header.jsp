@@ -4,15 +4,15 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
-
 <!--=== Header ===-->    
 <div class="header-v5" ng-controller="headerCtrl">
-
 	<!-- Topbar v3 -->
 	<div class="topbar-v3">
 	    <div class="search-open">
 	        <div class="container">
-	            <input type="text" class="form-control" placeholder="Search">
+	            <input type="text" class="form-control" ng-model="searchOnHeader" ng-init="searchOnHeader=''"
+	            ng-keypress="($event.which === 13)?btnEnterOnHeaderSearch('<c:url value="/search"/>'):return" placeholder='<spring:message code="search.placeholder.words"/>'
+	            focus="searchFocusOnHeader">
 	            <div class="search-close"><i class="icon-close"></i></div>
 	        </div>    
 	    </div>
@@ -55,9 +55,7 @@
 							</c:choose>
 							<li><a href="<c:url value="/logout"/>"><spring:message code="common.logout"/></a></li>
 				 		</sec:authorize>				  			              
-				 		<!-- 
-	                    <li><i class="search fa fa-search search-button"></i></li>
-	                     -->
+						<li ng-click="btnSearchOnHeader()"><i class="search fa fa-search search-button"></i></li>
 	                </ul>
 	            </div>
 	        </div>

@@ -218,6 +218,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		if ($scope.clubOrigin != "") {
 			$scope.getAttendance();			
 		}
+		
+		App.init();
 	});
 	
 	$scope.getFootballClubs = function(cb) {

@@ -24,7 +24,7 @@
 	<!--=== End Breadcrumbs ===-->	
 
 	<!--=== Content Part ===-->
-	<div class="container content">
+	<div class="container content" ng-controller="aboutCtrl">
 		<c:choose>
 			<c:when test="${lang == 'ko'}">
 				<jsp:include page="about-us-ko.jsp"/>
@@ -49,6 +49,14 @@
 
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("aboutCtrl", function($scope) {
+	
+	angular.element(document).ready(function() {
+		App.init();
+	});
+	
+});
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>

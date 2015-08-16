@@ -206,6 +206,8 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.storedImages = [];
 	
 	angular.element(document).ready(function() {
+		App.init();
+		
 		if (!isEmpty($scope.images)) {
 			var objImages = JSON.parse($scope.images);
 			objImages.forEach(function(entry) {

@@ -48,6 +48,7 @@ import com.jakduk.model.web.ThumbnailSizeWrite;
 import com.jakduk.repository.AttendanceClubRepository;
 import com.jakduk.repository.AttendanceLeagueRepository;
 import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.EncyclopediaRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
@@ -77,6 +78,9 @@ public class AdminService {
 	@Value("${storage.thumbnail.path}")
 	private String storageThumbnailPath;
 	
+	@Value("${elasticsearch.index.name}")
+	private String elasticsearchIndexName;
+	
 	@Autowired
 	private JestClient jestClient;
 	
@@ -85,6 +89,9 @@ public class AdminService {
 	
 	@Autowired
 	private CommonService commonService;
+	
+	@Autowired
+	private BoardFreeRepository boardFreeRepository;
 	
 	@Autowired
 	private BoardCategoryRepository boardCategoryRepository;
@@ -163,7 +170,7 @@ public class AdminService {
 		settingsBuilder.put("index.analysis.analyzer.korean.tokenizer", "mecab_ko_standard_tokenizer");
 		
 		try {
-			JestResult jestResult = jestClient.execute(new CreateIndex.Builder("jakduk").settings(settingsBuilder.build().getAsMap()).build());
+			JestResult jestResult = jestClient.execute(new CreateIndex.Builder(elasticsearchIndexName).settings(settingsBuilder.build().getAsMap()).build());
 			
 			if (!jestResult.isSucceeded()) {
 				logger.debug(jestResult.getErrorMessage());
@@ -174,7 +181,7 @@ public class AdminService {
 		}
 		
         PutMapping putMapping = new PutMapping.Builder(
-                "jakduk",
+        		elasticsearchIndexName,
                 "board",
                 "{ \"properties\" : { \"subject\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"}"
                 + ", \"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} }"
@@ -193,28 +200,36 @@ public class AdminService {
 		}
 		
 		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
+		BoardFreeOnES lastPost = posts.get(posts.size() - 1);
 		
-		List<Index> idxList = new ArrayList<>();
-		
-		for (BoardFreeOnES post : posts) {
-			idxList.add(new Index.Builder(post).build());
-		}
-		
-		Bulk bulk = new Bulk.Builder()
-				.defaultIndex("jakduk")
-				.defaultType("board")
-				.addAction(idxList)
-				.build();
-		
-		try {
-			JestResult jestResult = jestClient.execute(bulk);
+		while (posts.size() > 0) {
+			List<Index> idxList = new ArrayList<>();
 			
-			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+			for (BoardFreeOnES post : posts) {
+				idxList.add(new Index.Builder(post).build());
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			Bulk bulk = new Bulk.Builder()
+					.defaultIndex(elasticsearchIndexName)
+					.defaultType("board")
+					.addAction(idxList)
+					.build();
+			
+			try {
+				JestResult jestResult = jestClient.execute(bulk);
+				
+				if (!jestResult.isSucceeded()) {
+					logger.debug(jestResult.getErrorMessage());
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
+			if (posts.size() > 0) {
+				lastPost = posts.get(posts.size() - 1);
+			}
 		}
 		
 		return result;

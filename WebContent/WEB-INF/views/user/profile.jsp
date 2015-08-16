@@ -11,7 +11,7 @@
 </head>
 
 <body>
-<div class="container">
+<div class="container" ng-controller="userCtrl">
 <jsp:include page="../include/navigation-header.jsp"/>
 
 <legend><spring:message code="user.profile"/></legend>
@@ -73,6 +73,14 @@
 <script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", []);
+
+jakdukApp.controller("userCtrl", function($scope) {
+	
+	angular.element(document).ready(function() {
+		App.init();
+	});
+	
+});
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>

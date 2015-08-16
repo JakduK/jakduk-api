@@ -6,7 +6,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="search.results"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="search"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
     <!-- CSS Page Style -->    
@@ -14,74 +14,48 @@
 </head>
 <body>
 
-<div class="wrapper">
+<div class="wrapper" ng-controller="searchCtrl">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><a href="<c:url value="/about/intro/refresh"/>"><spring:message code="search.results"/></a></h1>
+			<h1 class="pull-left"><a href="<c:url value="/search/refresh"/>"><spring:message code="search"/></a></h1>
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->	
-
+	
 <div class="search-block-v2">
         <div class="container">
             <div class="col-md-6 col-md-offset-3">
                 <div class="input-group">
-                    <input type="text" class="form-control" ng-model="searchTxt" ng-init="searchTxt='${q}'" placeholder="Search words with regular expressions ...">
+                    <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords='${q}'" 
+                    ng-keypress="($event.which === 13)?btnEnter():return" placeholder='<spring:message code="search.placeholder.words"/>'>
                     <span class="input-group-btn">
-                        <button class="btn-u" type="button"><i class="fa fa-search"></i></button>
+                        <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
             </div>
         </div>    
     </div>
 
-<div class="container s-results margin-bottom-50" ng-controller="searchCtrl">
-        <span class="results-number">About {{results.hits.total}} results</span>
+<div class="container s-results margin-bottom-50" ng-if="results.hits.total > 0">
+        <span class="results-number"><spring:message code="search.about.results" arguments="{{results.hits.total}}"/></span>
         <!-- Begin Inner Results -->
-        <div ng-if="results.hits.total > 0" ng-repeat="hit in results.hits.hits">
+        <div ng-repeat="hit in results.hits.hits">
 	        <div class="inner-results">
-	            <h3><a href="#">{{hit._source.subject}}</a></h3>
-	            <p>{{hit._source.content}}</p>
+	            <h3 ng-if="hit.highlight.subject.length > 0"><a href='<c:url value="/board/free/{{hit._source.seq}}"/>' ng-bind-html="hit.highlight.subject[0]"></a></h3>
+	            <h3 ng-if="hit.highlight.subject.length == null"><a href="<c:url value="/board/free/{{hit._source.seq}}"/>">{{hit._source.subject}}</a></h3>
+	            <p ng-if="hit.highlight.content.length > 0" ng-bind-html="hit.highlight.content[0]"></p>
+	            <p ng-if="hit.highlight.content.length == null">{{hit._source.contentPreview}}</p>
 	            <ul class="list-inline down-ul">
-	                <li>{{hit._source.writer.username}}</li>
-	                <li>234,034 views</li>
-	                <li><a href="#">Web designer</a></li>
+	                <li><i class="fa fa-user"></i> {{hit._source.writer.username}}</li>
+	                <li><i class="fa fa-clock-o"></i> {{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
+	                <li></li>
 	            </ul>    
 	        </div>
 	        <hr>
         </div>
-
-        
-
-        <!-- Begin Inner Results -->
-        <div class="inner-results">
-            <h3><a href="#">Web Design - Website Design Tutorials, Articles</a></h3>
-            <ul class="list-inline up-ul">
-                <li>www.webdesign.org/</li>
-                <li class="btn-group">
-                    <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
-                        More<i class="fa fa-caret-down margin-left-5"></i>
-                        <span class="sr-only">Toggle Dropdown</span>                            
-                    </button>
-                    <ul role="menu" class="dropdown-menu">
-                        <li><a href="#">Share</a></li>
-                        <li><a href="#">Similar</a></li>
-                        <li><a href="#">Advanced search</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi, tempus in placerat non, auctor eu purus. Morbi suscipit porta libero, ac tempus tellus consectetur non. Praesent eget consectetur nunc. Aliquam erat volutpat. Suspendisse ultrices eros eros, consectetur facilisis urna posuere id.</p>
-            <ul class="list-inline down-ul">
-                <li>By Alice Emilsson</li>
-                <li>98,298 views</li>
-            </ul>
-        </div>
-        <!-- Begin Inner Results -->
-
-        <hr>
         
         <div class="margin-bottom-30"></div>
 
@@ -109,9 +83,10 @@
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", []);
+var jakdukApp = angular.module("jakdukApp", ["ngSanitize"]);
 
 jakdukApp.controller("searchCtrl", function($scope, $http) {
 	$scope.resultsConn = "none";
@@ -119,11 +94,34 @@ jakdukApp.controller("searchCtrl", function($scope, $http) {
 	
 	angular.element(document).ready(function() {
 		$scope.getResults();
+		App.init();
 	});
+	
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	};
+	
+	$scope.intFromObjectId = function(objectId) {
+		return parseInt(objectId.substring(0, 8), 16) * 1000;
+	};
+	
+	$scope.btnEnter = function() {
+		if ($scope.resultsConn == "none") {
+			$scope.getResults();
+		}
+	};
 	
 	$scope.getResults = function() {
 		
-		var bUrl = '<c:url value="/search/data/board.json?q=' + $scope.searchTxt + '"/>';
+		if ($scope.searchWords.trim() < 1) {
+			return;
+		}
+		
+		var bUrl = '<c:url value="/search/data/board.json?q=' + $scope.searchWords + '"/>';
 		
 		if ($scope.resultsConn == "none") {
 			

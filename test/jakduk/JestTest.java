@@ -2,19 +2,26 @@ package jakduk;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jakduk.Article;
 import com.jakduk.dao.JakdukDAO;
@@ -24,10 +31,10 @@ import com.jakduk.model.embedded.CommonWriter;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
-import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import io.searchbox.core.SearchResult.Hit;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 
@@ -61,7 +68,6 @@ public class JestTest {
     	client = factory.getObject();
     	*/
 		
-		System.out.println("jestClient=" + jestClient);
 	}
 	
 	@Test
@@ -136,13 +142,15 @@ public class JestTest {
 	}
 	
 	@Test
-	public void search() {
+	public void search01() {
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 		searchSourceBuilder.query(QueryBuilders.matchQuery("content", "건강"));
 		
 		Search search = new Search.Builder(searchSourceBuilder.toString())
 				.addIndex("articles")
 				.build();
+		System.out.println("search=" + search.getRestMethodName());
+		System.out.println("search=" + search.getPathToResult());
 		
 		try {
 			SearchResult result = jestClient.execute(search);
@@ -150,15 +158,48 @@ public class JestTest {
 			
 			JsonObject jsonObj = result.getJsonObject();
 			
-			ModelAndView model = new ModelAndView();
-			model.addObject("json", jsonObj);
-			System.out.println("model=" + model);
+			System.out.println("jsonObj=" + jsonObj);
 						
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void search02() {
+		
+		String query = "{\n" +
+//				"\"fields\" : [\"seq\", \"writer.type\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
+//				"\"_source\" : { \"include\" : \"contentPreview\"}, " +
+				"\"query\": {\n" +
+				"\"multi_match\" : {" +
+				"\"fields\" : [\"subject\", \"content\"]," +
+				"\"query\" : \"성남\"" + 
+				"}\n" +
+				"}, " +
+				"\"highlight\" : {" +
+				"\"pre_tags\" : [\"<span class='color-sea'>\"]," +
+				"\"post_tags\" : [\"</span>\"]," +
+				"\"fields\" : { \"subject\" : {}, \"content\" : {} } }" +
+				"}";
+		
+		//System.out.println("query=" + query);
+
+	Search search = new Search.Builder(query)
+	                // multiple index or types can be added.
+	                .addIndex("articles")
+	                .build();
+
+	try {
+		SearchResult result = jestClient.execute(search);
+		
+		System.out.println("jsonObj=" + result.getJsonString());
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	}
 	
 	@Test
@@ -187,30 +228,40 @@ public class JestTest {
 		*/
 	}
 	
-	@Test
+	@Ignore
 	public void bulk02() {
 		
 		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
+		BoardFreeOnES lastPost = posts.get(posts.size() - 1);
 		
-		System.out.println("posts=" + posts);
-		
-		List<Index> idxList = new ArrayList<>();
-		
-		for (BoardFreeOnES post : posts) {
-			idxList.add(new Index.Builder(post).build());
-		}
-		
-		Bulk bulk = new Bulk.Builder()
-				.defaultIndex("articles")
-				.defaultType("tweet")
-				.addAction(idxList)
-				.build();
-		
-		try {
-			jestClient.execute(bulk);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		while (posts.size() > 0) {
+			List<Index> idxList = new ArrayList<>();
+			
+			for (BoardFreeOnES post : posts) {
+				idxList.add(new Index.Builder(post).build());
+			}
+			
+			Bulk bulk = new Bulk.Builder()
+					.defaultIndex("articles")
+					.defaultType("tweet")
+					.addAction(idxList)
+					.build();
+			
+			try {
+				JestResult jestResult = jestClient.execute(bulk);
+				
+				if (!jestResult.isSucceeded()) {
+					System.out.println(jestResult.getErrorMessage());
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
+			if (posts.size() > 0) {
+				lastPost = posts.get(posts.size() - 1);
+			}
 		}
 	}
 }

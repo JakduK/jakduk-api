@@ -197,6 +197,10 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 	$scope.buttonAlert = {};
 	$scope.equalPasswordStatus = "false";
 	
+	angular.element(document).ready(function() {
+		App.init();
+	});
+	
 	$scope.onSubmit = function(event) {
 		if ($scope.userWrite.$valid && $scope.emailStatus == 'ok' && $scope.usernameStatus == 'ok' 
 				&& $scope.equalPasswordStatus == "true") {

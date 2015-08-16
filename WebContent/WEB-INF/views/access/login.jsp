@@ -138,7 +138,8 @@ jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
 	$scope.emailLengthMax = Jakduk.FormEmailLengthMax;
 	$scope.passwordLengthMin = Jakduk.FormPasswordLengthMin;
 	$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
-	
+
+	// angular.ready()함수에서는 안된다. 마우스 클릭하니 이메일이 들어간다.
 	var email = $cookieStore.get("email");
 	var remember = $cookieStore.get("remember");
 	
@@ -146,6 +147,10 @@ jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
 		$scope.email = email;
 		$scope.remember = true;
 	}
+	
+	angular.element(document).ready(function() {
+		App.init();
+	});
 	
 	$scope.onSubmit = function(event){
 		if ($scope.loginForm.$valid) {

@@ -119,6 +119,10 @@ jakdukApp.controller("writeCtrl", function($scope) {
 	$scope.newPasswordAlert = {};
 	$scope.newPasswordConfirmAlert = {};
 	
+	angular.element(document).ready(function() {
+		App.init();
+	});
+	
 	$scope.onSubmit = function(event) {
 		if ($scope.userPasswordUpdate.$valid && $scope.newPassword == $scope.newPasswordConfirm) {
 			submitted = true;

@@ -34,97 +34,107 @@
 		<c:set var="authRole" value="USER"/>
 	</sec:authorize>
 	
-	<div class="margin-bottom-20">
-		<div class="row">
-			<!--Top Likes Rows-->
-			<div class="col-md-6">
-                <h2 class="heading-sm">
-                    <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-thumbs-o-up"></i>
-                    <span><spring:message code="board.top.likes"/></span>
-                </h2>
-			       <table class="table table-hover">
-						<tbody>
-							<tr ng-repeat="post in topLike">
-								<td class="text-overflow max-width-240">
-									<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
-										<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
-										<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
-									</a>	
-								</td>
-								<td>
-									<span class="text-primary">
-										<i class="fa fa-thumbs-o-up"></i>
-										<strong>{{post.count}}</strong>
-									</span>	
-								</td>
-							</tr>                                
-						</tbody>
-					</table>                
-            </div>	
-            <!--End Top Likes Rows-->	
-            <!--Top Comments Rows-->
-			<div class="col-md-6">
-                <h2 class="heading-sm">
-                    <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-comment-o"></i>
-                    <span><spring:message code="board.top.comments"/></span>
-                </h2>
-		  			<table class="table table-hover">
-		      			<tbody>
-							<tr ng-repeat="post in topComment">
-								<td class="text-overflow max-width-240">
-									<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
-										<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
-										<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
-									</a>	
-								</td>
-								<td>
-									<span class="text-default">
-										<i class="fa fa-comment-o"></i>
-										<strong>{{post.count}}</strong>
-									</span>	
-								</td>
-							</tr>  
-						</tbody>
-					</table>               
-            </div>	           
-			<!--End Top Comments Rows-->
-		</div>	
-	
-	<div class="btn-group">
-		<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
-			<c:choose>
-				<c:when test="${boardListInfo.category != 'none'}">
-					<spring:message code="${categorys[boardListInfo.category]}"/>
-				</c:when>
-				<c:otherwise>
-					<spring:message code="board.category"/>
-				</c:otherwise>
-			</c:choose>		
-			<i class="fa fa-angle-down"></i>
-		</button>
-		<ul class="dropdown-menu" role="menu">
-			<c:forEach items="${categorys}" var="category">
-				<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
-			</c:forEach>
-		</ul>
-	</div>
+	<div class="row">
+		<!--Top Likes Rows-->
+		<div class="col-md-6">
+               <h2 class="heading-sm">
+                   <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-thumbs-o-up"></i>
+                   <span><spring:message code="board.top.likes"/></span>
+               </h2>
+		       <table class="table table-hover">
+					<tbody>
+						<tr ng-repeat="post in topLike">
+							<td class="text-overflow max-width-240">
+								<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
+									<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
+									<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+								</a>	
+							</td>
+							<td>
+								<span class="text-primary">
+									<i class="fa fa-thumbs-o-up"></i>
+									<strong>{{post.count}}</strong>
+								</span>	
+							</td>
+						</tr>                                
+					</tbody>
+				</table>                
+           </div>	
+           <!--End Top Likes Rows-->	
+           <!--Top Comments Rows-->
+		<div class="col-md-6">
+               <h2 class="heading-sm">
+                   <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-comment-o"></i>
+                   <span><spring:message code="board.top.comments"/></span>
+               </h2>
+	  			<table class="table table-hover">
+	      			<tbody>
+						<tr ng-repeat="post in topComment">
+							<td class="text-overflow max-width-240">
+								<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
+									<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
+									<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+								</a>	
+							</td>
+							<td>
+								<span class="text-default">
+									<i class="fa fa-comment-o"></i>
+									<strong>{{post.count}}</strong>
+								</span>	
+							</td>
+						</tr>  
+					</tbody>
+				</table>               
+           </div>	           
+		<!--End Top Comments Rows-->
+	</div>	
 
-<div class="btn-group">
-<c:choose>
-	<c:when test="${authRole == 'ANNONYMOUS'}">
-	<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
-		<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
-	</button>	
-	</c:when>
-	<c:when test="${authRole == 'USER'}">
-	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
-		<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
-	</button>	
-	</c:when>	
-</c:choose>
-</div>
-  
-</div>                    
+	<div class="row">
+		<div class="col-sm-6 margin-bottom-10">
+			<div class="btn-group">
+				<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
+					<c:choose>
+						<c:when test="${boardListInfo.category != 'none'}">
+							<spring:message code="${categorys[boardListInfo.category]}"/>
+						</c:when>
+						<c:otherwise>
+							<spring:message code="board.category"/>
+						</c:otherwise>
+					</c:choose>		
+					<i class="fa fa-angle-down"></i>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<c:forEach items="${categorys}" var="category">
+						<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
+					</c:forEach>
+				</ul>
+			</div>
+			<div class="btn-group">
+			<c:choose>
+				<c:when test="${authRole == 'ANNONYMOUS'}">
+				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
+					<i class="fa fa-pencil"></i>
+				</button>	
+				</c:when>
+				<c:when test="${authRole == 'USER'}">
+				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
+					<i class="fa fa-pencil"></i>
+				</button>	
+				</c:when>	
+			</c:choose>
+			</div>
+		</div>
+		<div class="col-sm-6">
+	       <div class="input-group margin-bottom-10">
+	           <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''" 
+	           ng-keypress="($event.which === 13)?btnEnter():return" 
+	           placeholder='<spring:message code="search.placeholder.words"/>'>
+	           <span class="input-group-btn">
+	               <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
+	           </span>
+	       </div>
+		</div>			
+	</div>
 	
 	<div class="panel panel-u">
 	  <!-- Default panel contents -->
@@ -280,12 +290,12 @@
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
 		<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
-			<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
+			<i class="fa fa-pencil"></i>
 		</button>	
 		</c:when>
 		<c:when test="${authRole == 'USER'}">
 		<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<i class="fa fa-pencil"></i> <spring:message code="board.write"/>
+			<i class="fa fa-pencil"></i>
 		</button>	
 		</c:when>	
 	</c:choose>
@@ -366,8 +376,15 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 			});
 		}
+	};
+	
+	$scope.btnEnter = function() {
+		if ($scope.searchWords.trim() < 1) {
+			return;
+		}
+		
+		location.href = '<c:url value="/search"/>' + '?q=' + $scope.searchWords.trim();
 	};	
-
 });
 
 function needLogin() {
