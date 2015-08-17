@@ -113,12 +113,12 @@
 			<c:choose>
 				<c:when test="${authRole == 'ANNONYMOUS'}">
 				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
-					<i class="fa fa-pencil"></i>
+					<span aria-hidden="true" class="icon-pencil"></span>
 				</button>	
 				</c:when>
 				<c:when test="${authRole == 'USER'}">
 				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
-					<i class="fa fa-pencil"></i>
+					<span aria-hidden="true" class="icon-pencil"></span>
 				</button>	
 				</c:when>	
 			</c:choose>
@@ -157,12 +157,12 @@
 				<li class="list-group-item list-group-item-info">
 					<div class="row">
 						<div class="col-sm-2">
-							<spring:message code="board.notice"/>
+							<span aria-hidden="true" class="icon-directions visible-xs-inline"></span><spring:message code="board.notice"/>
 						</div>
 						<div class="col-sm-4">
 							<c:if test="${notice.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
 							<c:if test="${notice.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-							<c:if test="${!empty galleriesCount[notice.id]}"><i class="fa fa-file-image-o"></i></c:if>
+							<c:if test="${!empty galleriesCount[notice.id]}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 							<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 								<c:choose>
 									<c:when test="${notice.status.delete == 'delete'}">
@@ -178,10 +178,9 @@
 							</a>
 						</div>
 						<div class="col-sm-3">
-							<i class="fa fa-user"></i> ${notice.writer.username}
-							
+							<span aria-hidden="true" class="icon-user visible-xs-inline"></span> ${notice.writer.username}
+							|
 							<fmt:formatDate var="postDate" value="${createDate[notice.id]}" pattern="yyyy-MM-dd" />
-							<i class="fa fa-clock-o"></i>
 							<c:choose>
 								<c:when test="${postDate < nowDate}">
 									<fmt:formatDate value="${createDate[notice.id]}" pattern="${dateTimeFormat.date}" />
@@ -220,16 +219,16 @@
 				<li class="list-group-item">
 					<div class="row">
 						<div class="col-sm-2">	
-							${post.seq}
-							|
+							${post.seq} 
+							<span class="hidden-xs">|</span>
 							<c:if test="${!empty post.categoryName}">
-								<spring:message code="${categorys[post.categoryName]}"/>
+								<span aria-hidden="true" class="icon-directions visible-xs-inline"></span><spring:message code="${categorys[post.categoryName]}"/>
 							</c:if>
 						</div>
 						<div class="col-sm-4">
 							<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
 							<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-							<c:if test="${!empty galleriesCount[post.id]}"><i class="fa fa-file-image-o"></i></c:if>
+							<c:if test="${!empty galleriesCount[post.id]}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 							<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 								<c:choose>
 									<c:when test="${post.status.delete == 'delete'}">
@@ -246,11 +245,9 @@
 						</div>
 						
 						<div class="col-sm-3">
-							<i class="fa fa-user"></i> ${post.writer.username}
-							
+							<span aria-hidden="true" class="icon-user visible-xs-inline"></span> ${post.writer.username}
+							|
 							<fmt:formatDate var="postDate" value="${createDate[post.id]}" pattern="yyyy-MM-dd" />
-							
-							<i class="fa fa-clock-o"></i>						
 							<c:choose>
 								<c:when test="${postDate < nowDate}">
 									<fmt:formatDate value="${createDate[post.id]}" pattern="${dateTimeFormat.date}" />
@@ -290,12 +287,12 @@
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
 		<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
-			<i class="fa fa-pencil"></i>
+			<span aria-hidden="true" class="icon-pencil"></span>
 		</button>	
 		</c:when>
 		<c:when test="${authRole == 'USER'}">
 		<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<i class="fa fa-pencil"></i>
+			<span aria-hidden="true" class="icon-pencil"></span>
 		</button>	
 		</c:when>	
 	</c:choose>

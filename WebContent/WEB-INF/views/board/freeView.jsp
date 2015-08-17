@@ -81,7 +81,6 @@
 	
 	<!--=== Content Part ===-->
 	<div class="container content blog-page blog-item">	
-	
 	<div class="margin-bottom-10">
 	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"><i class="fa fa-list"></i></button>
 	
@@ -151,9 +150,7 @@
     	<input type="hidden" id="subject" value="${post.subject}">
         	<h2>
         	<small>
-				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-				<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-				<c:if test="${galleries != null}"><i class="fa fa-file-image-o"></i></c:if>
+				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if><c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if><c:if test="${galleries != null}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 			</small>
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
@@ -164,12 +161,12 @@
 					</c:otherwise>
 				</c:choose>
 				
-	  		<c:if test="${!empty category}">&nbsp;<small><spring:message code="${category.resName}"/></small></c:if>        	
+	  		<c:if test="${!empty category}"><small><span aria-hidden="true" class="icon-directions"></span><spring:message code="${category.resName}"/></small></c:if>        	
         	</h2>
             <div class="blog-post-tags">
                 <ul class="list-unstyled list-inline blog-info">
-                    <li><i class="fa fa-user"></i> ${post.writer.username}</li>
-                    <li><i class="fa fa-clock-o"></i> {{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
+                    <li><span aria-hidden="true" class="icon-user"></span> ${post.writer.username}</li>
+                    <li>{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
                     <li><i class="fa fa-eye"></i> ${post.views}</li>
                 </ul>                    
             </div>
@@ -189,8 +186,9 @@
 	  <strong><spring:message code="board.gallery.list"/></strong>
 			<c:forEach items="${galleries}" var="gallery">
 				<div>
-						<a href="<c:url value="/gallery/view/${gallery.id}"/>">${gallery.name}</a> | 
-						<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
+					<span aria-hidden="true" class="icon-paper-clip"></span>
+					<a href="<c:url value="/gallery/view/${gallery.id}"/>">${gallery.name}</a> | 
+					<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
 				</div>
 			</c:forEach>    
 	  </li>

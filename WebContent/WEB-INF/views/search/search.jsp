@@ -88,7 +88,7 @@
 <script type="text/javascript">
 var jakdukApp = angular.module("jakdukApp", ["ngSanitize"]);
 
-jakdukApp.controller("searchCtrl", function($scope, $http) {
+jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 	$scope.resultsConn = "none";
 	$scope.results = {};
 	
@@ -110,9 +110,11 @@ jakdukApp.controller("searchCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnEnter = function() {
-		if ($scope.resultsConn == "none") {
-			$scope.getResults();
+		if ($scope.searchWords.trim() < 1) {
+			return;
 		}
+		
+		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '"/>';
 	};
 	
 	$scope.getResults = function() {
