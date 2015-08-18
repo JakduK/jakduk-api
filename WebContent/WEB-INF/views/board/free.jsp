@@ -191,7 +191,7 @@
 							</c:choose>					
 						</div>
 						<div class="col-sm-3 hidden-xs">
-							<i class="fa fa-eye"></i><strong> ${notice.views}</strong>
+							<span aria-hidden="true" class="icon-eye"></span><strong> ${notice.views}</strong>
 							<span class="text-primary">
 								<i class="fa fa-thumbs-o-up"></i>
 								<strong>
@@ -258,7 +258,7 @@
 							</c:choose>		
 						</div>
 						<div class="col-sm-3">
-							<i class="fa fa-eye"></i><strong> ${post.views}</strong>
+							<span aria-hidden="true" class="icon-eye"></span><strong> ${post.views}</strong>
 							<span class="text-primary">
 								<i class="fa fa-thumbs-o-up"></i>
 								<strong>

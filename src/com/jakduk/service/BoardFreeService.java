@@ -46,6 +46,7 @@ import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.embedded.BoardCommentStatus;
 import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.embedded.BoardImage;
@@ -95,6 +96,9 @@ public class BoardFreeService {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private SearchService searchService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 
@@ -316,6 +320,31 @@ public class BoardFreeService {
 				}
 			}
 		}
+		
+		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
+		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
+		boardFreeOnEs.setId(boardFree.getId());
+		boardFreeOnEs.setSeq(boardFree.getSeq());
+		boardFreeOnEs.setSubject(boardFree.getSubject());
+		boardFreeOnEs.setWriter(boardFree.getWriter());
+		boardFreeOnEs.setCategoryName(boardFree.getCategoryName());
+		
+		String content = boardFree.getContent()					
+				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+				.replaceAll("\r|\n|&nbsp;","");
+		
+		boardFreeOnEs.setContent(content);
+		
+		if (content.length() > CommonConst.SEARCH_CONTENT_MAX_LENGTH) {
+			String contentPreview = content.substring(0, CommonConst.SEARCH_CONTENT_MAX_LENGTH);
+			contentPreview = String.format("%s...", contentPreview);
+			boardFreeOnEs.setContentPreview(contentPreview);
+		} else {
+			boardFreeOnEs.setContentPreview(content);
+		}
+		
+		searchService.createDocumentBoard(boardFreeOnEs);
+		
 
 		if (logger.isInfoEnabled()) {
 			logger.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());

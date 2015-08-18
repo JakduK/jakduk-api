@@ -163,6 +163,7 @@ public class AdminService {
 		
 		String result = "";
 		
+		// 인덱스 초기화.
 		ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder();
 		//settingsBuilder.put("number_of_shards", 5);
 		//settingsBuilder.put("number_of_replicas", 1);
@@ -180,6 +181,7 @@ public class AdminService {
 			e.printStackTrace();
 		}
 		
+		// 매핑 초기화.
         PutMapping putMapping = new PutMapping.Builder(
         		elasticsearchIndexName,
                 "board",
@@ -199,6 +201,7 @@ public class AdminService {
 			e.printStackTrace();
 		}
 		
+		// 게시물을 엘라스틱 서치에 모두 넣기.
 		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
 		BoardFreeOnES lastPost = posts.get(posts.size() - 1);
 		

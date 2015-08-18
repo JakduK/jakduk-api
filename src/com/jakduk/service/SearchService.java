@@ -9,7 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
+
 import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 
@@ -92,6 +96,21 @@ public class SearchService {
 			
 			model.addAttribute("results", result.getJsonObject().toString());
 			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void createDocumentBoard(BoardFreeOnES boardFreeOnEs) {
+		Index index = new Index.Builder(boardFreeOnEs).index(elasticsearchIndexName).type("board").build();
+		
+		try {
+			JestResult jestResult = jestClient.execute(index);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.error(jestResult.getErrorMessage());
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

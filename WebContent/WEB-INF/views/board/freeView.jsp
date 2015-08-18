@@ -167,7 +167,7 @@
                 <ul class="list-unstyled list-inline blog-info">
                     <li><span aria-hidden="true" class="icon-user"></span> ${post.writer.username}</li>
                     <li>{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
-                    <li><i class="fa fa-eye"></i> ${post.views}</li>
+                    <li><span aria-hidden="true" class="icon-eye"></span> ${post.views}</li>
                 </ul>                    
             </div>
             
@@ -250,8 +250,8 @@
 <div class="media-body">
 <div ng-repeat="comment in commentList">
     <h5 class="media-heading">
-			<i class="fa fa-user"></i>{{comment.writer.username}} 
-			<span><i class="fa fa-clock-o"></i>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+			<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
+			<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
     </h5>    
     <p>
 	 							<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>
@@ -302,14 +302,14 @@
 		<c:choose>
 			<c:when test="${authRole == 'ANNONYMOUS'}">
 				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled">
-					<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
+					<span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.write.comment"/>
 				</button>	
 			</c:when>
 			<c:when test="${authRole == 'USER'}">
 				<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-sm ladda-button" 
 				ng-click="btnWriteComment()" 
 				ladda="writeComment" data-style="expand-right" data-spinner-color="Gainsboro">
-					<i class="fa fa-pencil"></i> <spring:message code="common.button.write.comment"/>
+					<span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.write.comment"/>
 				</button>				
 			</c:when>
 		</c:choose>	

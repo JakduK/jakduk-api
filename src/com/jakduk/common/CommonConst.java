@@ -153,4 +153,6 @@ public class CommonConst {
 	
 	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME = "fullName";
 	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME = "shortName";
+	
+	public final static int ELASTICSEARCH_BULK_LIMIT = 500;
 }

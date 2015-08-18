@@ -426,7 +426,7 @@ public class JakdukDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE_DELETE));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(100);
+		AggregationOperation limit = Aggregation.limit(CommonConst.ELASTICSEARCH_BULK_LIMIT);
 		
 		Aggregation aggregation;
 		

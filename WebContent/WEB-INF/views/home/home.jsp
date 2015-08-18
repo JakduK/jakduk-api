@@ -56,11 +56,12 @@
 						<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
 					</h3>
 					<small>
-						<i class="fa fa-user"></i> {{post.writer.username}}
-						<i class="fa fa-clock-o"></i>
+						<span aria-hidden="true" class="icon-user"></span> {{post.writer.username}}
+						&nbsp;
 						<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
 						<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>
-						<i class="fa fa-eye"></i> {{post.views}}							
+						&nbsp;
+						<span aria-hidden="true" class="icon-eye"></span> {{post.views}}							
 					</small>                        
 				</li>
 			</ul>
@@ -73,9 +74,9 @@
 		
 			<div class="blog-twitter">
 				<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
-					<strong><i class="fa fa-user"></i> {{comment.writer.username}}</strong>
+					<strong><span aria-hidden="true" class="icon-user"></span> {{comment.writer.username}}</strong>
 					<a href="<c:url value="/board/free/{{comment.boardItem.seq}}"/>">{{comment.content}}</a>
-					<span class="twitter-time"><i class="fa fa-clock-o"></i> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+					<span class="twitter-time"> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
 				</div>
 		    </div>                			
 		</div> 
@@ -107,7 +108,7 @@
                         </em>    
                         <span>
                             <strong class="text-overflow">${gallery.name}</strong>
-								<i class="fa fa-user"></i> <i>${gallery.writer.username}</i>
+								<i aria-hidden="true" class="icon-user"></i> <i>${gallery.writer.username}</i>
                         </span>
                     </a>    
                 </div>
@@ -136,7 +137,7 @@
                             <p>{{user.about}}</p>
                             <div class="testimonial-info">
                                 <span class="testimonial-author">
-                                    <i class="fa fa-user"></i> {{user.username}}
+                                    <i aria-hidden="true" class="icon-user-follow"></i> {{user.username}}
                                     <em><i class="fa fa-futbol-o"></i>
                                     {{user.supportFC.names[0].fullName}}</em>
                                 </span>
