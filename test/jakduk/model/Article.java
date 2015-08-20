@@ -1,4 +1,4 @@
-package com.jakduk;
+package jakduk.model;
 
 import com.jakduk.model.embedded.CommonWriter;
 

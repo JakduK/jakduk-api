@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
+import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
@@ -43,33 +45,19 @@ public class SearchService {
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 	}
 	
-	/*
-	public void searchDataOfBoard(Model model, String q) {
+	public void searchDataOfBoard(Model model, String q, int from, int size) {
 		
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		searchSourceBuilder.query(QueryBuilders.multiMatchQuery(q, "subject", "content"));
+		if (size <= 0) size = 10;
 		
-		Search search = new Search.Builder(searchSourceBuilder.toString())
-				.addIndex(elasticsearchIndexName)
-				.build();
-		
-		try {
-			SearchResult result = jestClient.execute(search);
-//			System.out.println("result=" + result.getJsonString());
-			
-			model.addAttribute("results", result.getJsonObject().toString());
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		model.addAttribute("results", this.searchDocumentBoard(q, from, size));
 	}
-	*/
 	
-	public void searchDataOfBoard(Model model, String q) {
+	public String searchDocumentBoard(String q, int from, int size) {
 		
 		String query = "{\n" +
 				//"\"fields\" : [\"seq\", \"writer.type\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
+				"\"from\" : " + from + "," + 
+				"\"size\" : " + size + "," + 
 				"\"_source\" : { \"exclude\" : \"content\"}, " +
 				"\"query\": {" +
 				"\"multi_match\" : {" +
@@ -81,24 +69,32 @@ public class SearchService {
 				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
 				"\"post_tags\" : [\"</span>\"]," +
 				"\"fields\" : { \"subject\" : {}, \"content\" : {}" +
-				"} }" +
+				"}" + 
+				"}," +
+				"\"script_fields\" : {" +
+				"\"content_preview\" : {" +
+				"\"script\" : \"_source.content.length() > " + CommonConst.SEARCH_CONTENT_MAX_LENGTH + 
+				"? _source.content.substring(0," + CommonConst.SEARCH_CONTENT_MAX_LENGTH + ") : _source.content\"" +
+				"}" +
+				"}" +				
 				"}";
 
 //		logger.debug("query=" + query);
 
-	Search search = new Search.Builder(query)
-	                .addIndex(elasticsearchIndexName)
-	                .addType("board")
-	                .build();
+		Search search = new Search.Builder(query)
+				.addIndex(elasticsearchIndexName)
+				.addType("board")
+				.build();
 		
 		try {
 			SearchResult result = jestClient.execute(search);
 			
-			model.addAttribute("results", result.getJsonObject().toString());
+			return result.getJsonObject().toString();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "";
 		}
 	}
 	
@@ -111,6 +107,29 @@ public class SearchService {
 			if (!jestResult.isSucceeded()) {
 				logger.error(jestResult.getErrorMessage());
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteDocumentBoard(String id) {
+        try {
+			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
+			        .index(elasticsearchIndexName)
+			        .type("board")
+			        .build());
+			
+			if (logger.isDebugEnabled()) {
+				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
+					logger.debug("board id " + id + " is not found. so can't delete it!");
+				}
+			}
+			
+			if (!jestResult.isSucceeded()) {
+				logger.error(jestResult.getErrorMessage());
+			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

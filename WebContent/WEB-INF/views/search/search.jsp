@@ -47,7 +47,7 @@
 	            <h3 ng-if="hit.highlight.subject.length > 0"><a href='<c:url value="/board/free/{{hit._source.seq}}"/>' ng-bind-html="hit.highlight.subject[0]"></a></h3>
 	            <h3 ng-if="hit.highlight.subject.length == null"><a href="<c:url value="/board/free/{{hit._source.seq}}"/>">{{hit._source.subject}}</a></h3>
 	            <p ng-if="hit.highlight.content.length > 0" ng-bind-html="hit.highlight.content[0]"></p>
-	            <p ng-if="hit.highlight.content.length == null">{{hit._source.contentPreview}}</p>
+	            <p ng-if="hit.highlight.content.length == null">{{hit.fields.content_preview[0]}}</p>
 	            <ul class="list-inline down-ul">
 	                <li><i class="fa fa-user"></i> {{hit._source.writer.username}}</li>
 	                <li><i class="fa fa-clock-o"></i> {{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
@@ -60,20 +60,13 @@
         <div class="margin-bottom-30"></div>
 
         <div class="text-left">
-            <ul class="pagination">
-                <li><a href="#">«</a></li>
-                <li class="active"><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">...</a></li>
-                <li><a href="#">157</a></li>
-                <li><a href="#">158</a></li>
-                <li><a href="#">»</a></li>
-            </ul>                                                            
+        <pagination total-items="bigTotalItems" ng-model="currentPage" ng-change="pageChanged()"></pagination>
+        <pagination ng-model="bigCurrentPage" total-items="bigTotalItems" max-size="10" 
+        previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></pagination>
+        <pre>Page: {{bigCurrentPage}} / {{numPages}}</pre>
+        <pre>Page: {{currentPage}} / {{numPages}}</pre>
         </div>
     </div>
-
-
 	
 	<jsp:include page="../include/footer.jsp"/>
 
@@ -84,13 +77,18 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-animate/angular-animate.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["ngSanitize"]);
+var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ngAnimate", "ui.bootstrap"]);
 
 jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 	$scope.resultsConn = "none";
 	$scope.results = {};
+	$scope.currentPage = 4;
+	$scope.bigTotalItems = 175;
+	  $scope.bigCurrentPage = 1;
 	
 	angular.element(document).ready(function() {
 		$scope.getResults();
@@ -135,6 +133,9 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 
 				$scope.results = JSON.parse(data.results);
 				
+				$scope.bigTotalItems = $scope.results.hits.total;
+				//$scope.bigCurrentPage = 1;
+				
 				console.log($scope.results);
 				
 				$scope.resultsConn = "none";
@@ -145,7 +146,11 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 			});
 		}
-	};	
+	};
+	
+	  $scope.pageChanged = function() {
+		  console.log('Page changed to: ' + $scope.currentPage);
+		  };
 	
 });
 </script>

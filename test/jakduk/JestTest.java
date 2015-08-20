@@ -16,27 +16,24 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.ui.Model;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.jakduk.Article;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.service.SearchService;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
+import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import io.searchbox.core.SearchResult.Hit;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
+import jakduk.model.Article;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -53,6 +50,9 @@ public class JestTest {
 	
 	@Autowired
 	private JakdukDAO jakdukDAO;
+	
+	@Autowired
+	private SearchService searchService;
 	
 	@Before
 	public void before() {
@@ -200,6 +200,76 @@ public class JestTest {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+	}
+	
+	@Test
+	public void search03() {
+
+		String query = "{\n" +
+				//				"\"fields\" : [\"seq\", \"writer.type\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
+				"\"_source\" : { \"exclude\" : \"content\"}, " +
+				"\"from\" : 2," +
+				"\"size\" : 2," +
+				"\"query\": {\n" +
+				"\"multi_match\" : {" +
+				"\"fields\" : [\"subject\", \"content\"]," +
+				"\"query\" : \"축구\"" + 
+				"}\n" +
+				"}, " +
+				"\"highlight\" : {" +
+				"\"pre_tags\" : [\"<span class='color-sea'>\"]," +
+				"\"post_tags\" : [\"</span>\"]," +
+				"\"fields\" : { \"subject\" : {}, \"content\" : {} } " +
+				"}," +
+				"\"script_fields\" : {" +
+				"\"field1_substring\" : {" +
+				"\"script\" : \"_source.content.length() > 10 ? _source.content.substring(0,10) : _source.content\"" +
+				"}" +
+				"}" +
+				"}";
+
+		//System.out.println("query=" + query);
+
+		Search search = new Search.Builder(query)
+				// multiple index or types can be added.
+				.addIndex("articles")
+				.build();
+
+		try {
+			SearchResult result = jestClient.execute(search);
+
+			System.out.println("jsonObj=" + result.getJsonString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void search04() {
+		System.out.println(searchService.searchDocumentBoard("사진", 0, 0));
+	
+	}
+	
+	@Test
+	public void delete01() {
+        try {
+			JestResult result = jestClient.execute(new Delete.Builder("54a8a3d9e4b05110382b4409")
+			        .index("articles")
+			        .type("tweet")
+			        .build());
+			
+			System.out.println("result=" + result.getJsonString());
+			System.out.println("result=" + result.getValue("found"));
+			
+			if (result.getValue("found").toString().equals("false")) {
+				System.out.println("not found document.");
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@Test

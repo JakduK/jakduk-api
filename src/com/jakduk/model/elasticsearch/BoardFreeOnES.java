@@ -21,8 +21,6 @@ public class BoardFreeOnES {
 	
 	private String content;
 	
-	private String contentPreview;
-	
 	private int seq;
 	
 	private String categoryName;
@@ -59,14 +57,6 @@ public class BoardFreeOnES {
 		this.content = content;
 	}
 
-	public String getContentPreview() {
-		return contentPreview;
-	}
-
-	public void setContentPreview(String contentPreview) {
-		this.contentPreview = contentPreview;
-	}
-
 	public int getSeq() {
 		return seq;
 	}
@@ -86,7 +76,6 @@ public class BoardFreeOnES {
 	@Override
 	public String toString() {
 		return "BoardFreeOnES [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content
-				+ ", contentPreview=" + contentPreview + ", seq=" + seq + ", categoryName=" + categoryName + "]";
+				+ ", seq=" + seq + ", categoryName=" + categoryName + "]";
 	}
-	
 }

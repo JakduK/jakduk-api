@@ -448,16 +448,6 @@ public class JakdukDAO {
 			post.setContent(post.getContent()
 					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
 					.replaceAll("\r|\n|&nbsp;",""));
-			
-			int contentLength = post.getContent().length();
-			
-			if (contentLength > CommonConst.SEARCH_CONTENT_MAX_LENGTH) {
-				String contentPreview = post.getContent().substring(0, CommonConst.SEARCH_CONTENT_MAX_LENGTH);
-				contentPreview = String.format("%s...", contentPreview);
-				post.setContentPreview(contentPreview);
-			} else {
-				post.setContentPreview(post.getContent());
-			}
 		}
 		
 		return posts;

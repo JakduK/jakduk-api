@@ -325,27 +325,19 @@ public class BoardFreeService {
 		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
 		boardFreeOnEs.setId(boardFree.getId());
 		boardFreeOnEs.setSeq(boardFree.getSeq());
-		boardFreeOnEs.setSubject(boardFree.getSubject());
 		boardFreeOnEs.setWriter(boardFree.getWriter());
 		boardFreeOnEs.setCategoryName(boardFree.getCategoryName());
 		
-		String content = boardFree.getContent()					
+		boardFreeOnEs.setSubject(boardFree.getSubject()
 				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;","");
+				.replaceAll("\r|\n|&nbsp;",""));
 		
-		boardFreeOnEs.setContent(content);
-		
-		if (content.length() > CommonConst.SEARCH_CONTENT_MAX_LENGTH) {
-			String contentPreview = content.substring(0, CommonConst.SEARCH_CONTENT_MAX_LENGTH);
-			contentPreview = String.format("%s...", contentPreview);
-			boardFreeOnEs.setContentPreview(contentPreview);
-		} else {
-			boardFreeOnEs.setContentPreview(content);
-		}
+		boardFreeOnEs.setContent(boardFree.getContent()					
+				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+				.replaceAll("\r|\n|&nbsp;",""));
 		
 		searchService.createDocumentBoard(boardFreeOnEs);
 		
-
 		if (logger.isInfoEnabled()) {
 			logger.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 		}
@@ -1013,6 +1005,8 @@ public class BoardFreeService {
 			
 			break;
 		}
+		
+		searchService.deleteDocumentBoard(boardFree.getId());
 		
 		return HttpServletResponse.SC_OK;
 	}

@@ -55,9 +55,11 @@ public class SearchController {
 	
 	@RequestMapping(value = "/data/board")
 	public void dataBoardList(Model model,
-			@RequestParam(required = true) String q) {
+			@RequestParam(required = true) String q,
+			@RequestParam(required = false, defaultValue = "0") int from,
+			@RequestParam(required = false, defaultValue = "10") int size) {
 		
-		searchService.searchDataOfBoard(model, q);
+		searchService.searchDataOfBoard(model, q, from, size);
 		
 	}
 }

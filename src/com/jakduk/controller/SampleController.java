@@ -140,5 +140,10 @@ public class SampleController {
 	public String search01(Model model) {
 		return "sample/search01";
 	}
+	
+	@RequestMapping(value ="/pager01")
+	public String pager01(Model model) {
+		return "sample/pager01";
+	}
 
 }
