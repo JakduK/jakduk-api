@@ -491,6 +491,23 @@ public class BoardFreeService {
 		}
 		
 		boardFreeRepository.save(boardFree);
+		
+		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
+		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
+		boardFreeOnEs.setId(boardFree.getId());
+		boardFreeOnEs.setSeq(boardFree.getSeq());
+		boardFreeOnEs.setWriter(boardFree.getWriter());
+		boardFreeOnEs.setCategoryName(boardFree.getCategoryName());
+		
+		boardFreeOnEs.setSubject(boardFree.getSubject()
+				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+				.replaceAll("\r|\n|&nbsp;",""));
+		
+		boardFreeOnEs.setContent(boardFree.getContent()					
+				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+				.replaceAll("\r|\n|&nbsp;",""));
+		
+		searchService.createDocumentBoard(boardFreeOnEs);
 
 		if (logger.isInfoEnabled()) {
 			logger.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());

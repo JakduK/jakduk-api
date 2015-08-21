@@ -187,7 +187,6 @@
     </div><!--/container-->		
     <!--=== End Content Part ===-->				
 
-	
 	<jsp:include page="../include/footer.jsp"/>
 </div><!-- /.container -->
 

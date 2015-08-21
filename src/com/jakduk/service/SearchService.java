@@ -40,8 +40,10 @@ public class SearchService {
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 
-	public void getSearchBoard(Model model, Locale locale, String q) {
+	public void getSearchBoard(Model model, Locale locale, String q, int from, int size) {
 		model.addAttribute("q", q);
+		model.addAttribute("from", from);
+		model.addAttribute("size", size);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 	}
 	

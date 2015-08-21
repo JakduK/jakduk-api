@@ -39,10 +39,12 @@ public class SearchController {
 	
 	@RequestMapping
 	public String root(HttpServletRequest request, Model model,
-			@RequestParam(required = false) String q) {
+			@RequestParam(required = false) String q,
+			@RequestParam(required = false, defaultValue = "0") int from,
+			@RequestParam(required = false, defaultValue = "10") int size) {
 		
 		Locale locale = localeResolver.resolveLocale(request);	
-		searchService.getSearchBoard(model, locale, q);
+		searchService.getSearchBoard(model, locale, q, from, size);
 		
 		return "search/search";
 	}

@@ -38,8 +38,11 @@
             </div>
         </div>    
     </div>
+    
+    	<!--=== Content Part ===-->
+	<div class="container content">
 
-<div class="container s-results margin-bottom-50" ng-if="results.hits.total > 0">
+<div class="s-results margin-bottom-50" ng-show="results.hits.total > 0">
         <span class="results-number"><spring:message code="search.about.results" arguments="{{results.hits.total}}"/></span>
         <!-- Begin Inner Results -->
         <div ng-repeat="hit in results.hits.hits">
@@ -56,18 +59,16 @@
 	        </div>
 	        <hr>
         </div>
-        
-        <div class="margin-bottom-30"></div>
-
-        <div class="text-left">
-        <pagination total-items="bigTotalItems" ng-model="currentPage" ng-change="pageChanged()"></pagination>
-        <pagination ng-model="bigCurrentPage" total-items="bigTotalItems" max-size="10" 
-        previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></pagination>
-        <pre>Page: {{bigCurrentPage}} / {{numPages}}</pre>
-        <pre>Page: {{currentPage}} / {{numPages}}</pre>
-        </div>
     </div>
-	
+    
+		<div class="text-left" ng-show="results.hits.total > 0">
+        	<pagination ng-model="currentPage" total-items="totalItems" max-size="10" 
+        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></pagination>
+		</div>
+    
+    </div><!--/container-->		
+    <!--=== End Content Part ===-->
+    
 	<jsp:include page="../include/footer.jsp"/>
 
 </div><!-- /.container -->
@@ -86,12 +87,16 @@ var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ngAnimate", "ui.boot
 jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 	$scope.resultsConn = "none";
 	$scope.results = {};
-	$scope.currentPage = 4;
-	$scope.bigTotalItems = 175;
-	  $scope.bigCurrentPage = 1;
 	
 	angular.element(document).ready(function() {
-		$scope.getResults();
+		var from = parseInt("${from}");
+		if (from > 0) {
+			$scope.currentPage = (from + 10) / 10;
+		} else {
+			$scope.currentPage = 1;			
+		}
+		
+		$scope.getResults(from);
 		App.init();
 	});
 	
@@ -115,28 +120,24 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '"/>';
 	};
 	
-	$scope.getResults = function() {
+	$scope.getResults = function(from) {
 		
 		if ($scope.searchWords.trim() < 1) {
 			return;
 		}
 		
-		var bUrl = '<c:url value="/search/data/board.json?q=' + $scope.searchWords + '"/>';
+		var bUrl = '<c:url value="/search/data/board.json?q=' + $scope.searchWords + '&from=' + from + '"/>';
 		
 		if ($scope.resultsConn == "none") {
 			
 			var reqPromise = $http.get(bUrl);
 			
 			$scope.resultsConn = "loading";
-			
-			reqPromise.success(function(data, status, headers, config) {
 
+			reqPromise.success(function(data, status, headers, config) {
 				$scope.results = JSON.parse(data.results);
 				
-				$scope.bigTotalItems = $scope.results.hits.total;
-				//$scope.bigCurrentPage = 1;
-				
-				console.log($scope.results);
+				$scope.totalItems = $scope.results.hits.total;
 				
 				$scope.resultsConn = "none";
 				
@@ -148,9 +149,17 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 		}
 	};
 	
-	  $scope.pageChanged = function() {
-		  console.log('Page changed to: ' + $scope.currentPage);
-		  };
+	$scope.pageChanged = function() {
+		var from = $scope.currentPage;
+		
+		if (from > 1) {
+			from = (from - 1) * 10;
+		} else {
+			from = 0;
+		}
+		
+		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&from=' + from + '"/>';
+	};
 	
 });
 </script>
