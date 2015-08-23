@@ -59,13 +59,11 @@ import com.jakduk.model.simple.BoardFreeOnComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.model.web.BoardListInfo;
-import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.GalleryRepository;
-import com.jakduk.repository.SequenceRepository;
 
 @Service
 public class BoardFreeService {
@@ -531,9 +529,10 @@ public class BoardFreeService {
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
 		ArrayList<Integer> seqs = new ArrayList<Integer>();
-		Long numberPosts = (long) 0;
+		Long totalPosts = (long) 0;
 
 		Integer page = boardListInfo.getPage();
+		Integer size = boardListInfo.getSize();
 		String categoryName = boardListInfo.getCategory();
 		
 		if (categoryName == null || commonService.isNumeric(categoryName)) {
@@ -547,23 +546,19 @@ public class BoardFreeService {
 		}
 
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
-		Pageable pageable = new PageRequest(page - 1, CommonConst.BOARD_SIZE_LINE_NUMBER, sort);
+		Pageable pageable = new PageRequest(page - 1, size, sort);
 
 		if (categoryName != null && 
 				(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
 			posts = boardFreeOnListRepository.findAll(pageable).getContent();
-			numberPosts = boardFreeOnListRepository.count();
+			totalPosts = boardFreeOnListRepository.count();
 		} else {
 			posts = boardFreeRepository.findByCategoryName(categoryName, pageable).getContent();
-			numberPosts = boardFreeRepository.countByCategoryName(categoryName);
+			totalPosts = boardFreeRepository.countByCategoryName(categoryName);
 		}
 
 		Pageable noticePageable = new PageRequest(0, 10, sort);
 		List<BoardFreeOnList> notices = boardFreeRepository.findByNotice(noticePageable).getContent();
-
-		BoardPageInfo boardPageInfo = commonService.getCountPages(page.longValue(), numberPosts, 5);
-
-		//			logger.debug("countAll=" + boardPageInfo);
 
 		for (BoardFreeOnList tempPost : posts) {
 			String tempId = tempPost.getId();
@@ -597,17 +592,15 @@ public class BoardFreeService {
 		HashMap<String, Integer> commentCount = jakdukDAO.getBoardFreeCommentCount(seqs);
 		HashMap<String, Integer> usersLikingCount = jakdukDAO.getBoardFreeUsersLikingCount(seqs);
 		HashMap<String, Integer> usersDislikingCount = jakdukDAO.getBoardFreeUsersDislikingCount(seqs);
-		HashMap<String, Integer> galleriesCount = jakdukDAO.getBoardFreeGalleriesCount(seqs);
 
 		model.addAttribute("posts", posts);
 		model.addAttribute("notices", notices);
 		model.addAttribute("categorys", categorys);
-		model.addAttribute("pageInfo", boardPageInfo);
 		model.addAttribute("boardListInfo", boardListInfo);
+		model.addAttribute("totalPosts", totalPosts);
 		model.addAttribute("commentCount", commentCount);
 		model.addAttribute("usersLikingCount", usersLikingCount);
 		model.addAttribute("usersDislikingCount", usersDislikingCount);
-		model.addAttribute("galleriesCount", galleriesCount);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 

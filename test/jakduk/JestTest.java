@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.ui.Model;
 
 import com.google.gson.JsonObject;
+import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.embedded.CommonWriter;
@@ -94,7 +95,7 @@ public class JestTest {
 	}
 	
 	@Test
-	public void mapping() {
+	public void mapping01() {
 		/*
 		RootObjectMapper.Builder rootObjectMapperBuilder = new RootObjectMapper.Builder("tweet")
 				.add(new StringFieldMapper.Builder("message").store(true));
@@ -112,6 +113,26 @@ public class JestTest {
                 "{ \"properties\" : { \"subject\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"}"
                 + ", \"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} }"
                 + "}"
+        ).build();
+
+		try {
+			JestResult result = jestClient.execute(putMapping);
+			System.out.println("result=" + result.getErrorMessage());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void mapping02() {
+        PutMapping putMapping = new PutMapping.Builder(
+                "articles",
+                "comment",
+                "{ \"properties\" : { " +
+                        "\"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} " +
+                        	"}" +
+                          "}"
         ).build();
 
 		try {
@@ -247,7 +268,8 @@ public class JestTest {
 	
 	@Test
 	public void search04() {
-		System.out.println(searchService.searchDocumentBoard("사진", 0, 0));
+		//System.out.println(searchService.searchDocumentBoard("사진", 0, 0));
+		System.out.println(searchService.searchDocumentComment("댓글", 0, 10));
 	
 	}
 	

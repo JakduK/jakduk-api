@@ -40,6 +40,7 @@ import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.AttendanceClubWrite;
 import com.jakduk.model.web.BoardCategoryWrite;
@@ -181,17 +182,24 @@ public class AdminService {
 			e.printStackTrace();
 		}
 		
+		return result;
+	}
+	
+public String initSearchType() {
+		
+		String result = "";
+	
 		// 매핑 초기화.
-        PutMapping putMapping = new PutMapping.Builder(
+        PutMapping putMapping1 = new PutMapping.Builder(
         		elasticsearchIndexName,
-                "board",
+        		CommonConst.ELASTICSEARCH_TYPE_BOARD,
                 "{ \"properties\" : { \"subject\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"}"
                 + ", \"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} }"
                 + "}"
         ).build();
 
 		try {
-			JestResult jestResult = jestClient.execute(putMapping);
+			JestResult jestResult = jestClient.execute(putMapping1);
 			
 			if (!jestResult.isSucceeded()) {
 				logger.debug(jestResult.getErrorMessage());
@@ -201,42 +209,104 @@ public class AdminService {
 			e.printStackTrace();
 		}
 		
-		// 게시물을 엘라스틱 서치에 모두 넣기.
-		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
-		BoardFreeOnES lastPost = posts.get(posts.size() - 1);
-		
-		while (posts.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
+		// 매핑 초기화.
+		PutMapping putMapping2 = new PutMapping.Builder(
+        		elasticsearchIndexName,
+        		CommonConst.ELASTICSEARCH_TYPE_COMMENT,
+              "{ \"properties\" : { " +
+              "\"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} " +
+              	"}" +
+                "}"
+        ).build();
+
+		try {
+			JestResult jestResult = jestClient.execute(putMapping2);
 			
-			for (BoardFreeOnES post : posts) {
-				idxList.add(new Index.Builder(post).build());
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
 			}
-			
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType("board")
-					.addAction(idxList)
-					.build();
-			
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				
-				if (!jestResult.isSucceeded()) {
-					logger.debug(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
-			if (posts.size() > 0) {
-				lastPost = posts.get(posts.size() - 1);
-			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
+
+public String initSearchData() {
+	
+	String result = "";
+	
+	// 게시물을 엘라스틱 서치에 모두 넣기.
+	List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
+	BoardFreeOnES lastPost = posts.get(posts.size() - 1);
+	
+	while (posts.size() > 0) {
+		List<Index> idxList = new ArrayList<>();
+		
+		for (BoardFreeOnES post : posts) {
+			idxList.add(new Index.Builder(post).build());
+		}
+		
+		Bulk bulk = new Bulk.Builder()
+				.defaultIndex(elasticsearchIndexName)
+				.defaultType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+				.addAction(idxList)
+				.build();
+		
+		try {
+			JestResult jestResult = jestClient.execute(bulk);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
+		if (posts.size() > 0) {
+			lastPost = posts.get(posts.size() - 1);
+		}
+	}
+	
+	// 게시물을 엘라스틱 서치에 모두 넣기.
+	List<CommentOnES> comments = jakdukDAO.getCommentOnES(null);
+	CommentOnES lastComment = comments.get(comments.size() - 1);
+	
+	while (comments.size() > 0) {
+		List<Index> idxList = new ArrayList<>();
+		
+		for (CommentOnES comment : comments) {
+			idxList.add(new Index.Builder(comment).build());
+		}
+		
+		Bulk bulk = new Bulk.Builder()
+				.defaultIndex(elasticsearchIndexName)
+				.defaultType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+				.addAction(idxList)
+				.build();
+		
+		try {
+			JestResult jestResult = jestClient.execute(bulk);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		comments = jakdukDAO.getCommentOnES(new ObjectId(lastComment.getId()));
+		if (comments.size() > 0) {
+			lastComment = comments.get(comments.size() - 1);
+		}
+	}
+	
+	return result;
+}
 	
 	public void encyclopediaWrite(Encyclopedia encyclopedia) {
 		

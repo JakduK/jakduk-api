@@ -10,27 +10,30 @@ import com.jakduk.common.CommonConst;
 public class BoardListInfo {
 
 	private int page = 1;
+	private int size = CommonConst.BOARD_MAX_LIMIT;
 	private String category = CommonConst.BOARD_CATEGORY_NONE;
-
-	public Integer getPage() {
+	
+	public int getPage() {
 		return page;
 	}
-
 	public void setPage(int page) {
 		this.page = page;
 	}
-
+	public int getSize() {
+		return size;
+	}
+	public void setSize(int size) {
+		this.size = size;
+	}
 	public String getCategory() {
 		return category;
 	}
-
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "BoardListInfo [page=" + page + ", category=" + category + "]";
+		return "BoardListInfo [page=" + page + ", size=" + size + ", category=" + category + "]";
 	}
-
 }

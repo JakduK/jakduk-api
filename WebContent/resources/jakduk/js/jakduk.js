@@ -11,6 +11,14 @@ var Jakduk = {
 	FormUsernameLengthMax : 20
 };
 
+function isEmpty(str) {
+	obj = String(str);
+
+	if(obj == null || obj == undefined || obj == 'null' || obj == 'undefined' || obj == '' ) return true;
+
+	else return false;
+}
+
 // 이것을 summernote.js의 insertImage에 넣을것.
 /*
 $image.addClass("img-responsive");

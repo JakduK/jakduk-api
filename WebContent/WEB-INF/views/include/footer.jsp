@@ -22,6 +22,11 @@
                         <li><a href="<c:url value="/about/intro/refresh"/>"><spring:message code="about.site"/></a></li>
                         <li><a href="<c:url value="/board/free/98"/>"><spring:message code="about.site.use.guide"/></a></li>
                     </ul>
+                    
+                    <div class="thumb-headline"><h2><spring:message code="search"/></h2></div>
+                    <ul class="list-unstyled simple-list margin-bottom-20">
+                        <li><a href="<c:url value="/search/refresh"/>"><spring:message code="search"/></a></li>
+                    </ul>                    
                 </div><!--/col-md-3--> 
 
                 <div class="col-sm-3">

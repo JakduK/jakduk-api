@@ -1,8 +1,11 @@
 package com.jakduk.model.simple;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.CommonWriter;
 
@@ -48,6 +51,8 @@ public class BoardFreeOnList {
 	private int views = 0;
 	
 	private BoardStatus status;
+	
+	private List<BoardImage> galleries;
 
 	public String getId() {
 		return id;
@@ -105,12 +110,19 @@ public class BoardFreeOnList {
 		this.status = status;
 	}
 
-	@Override
-	public String toString() {
-		return "BoardFreeOnList [id=" + id + ", writer=" + writer
-				+ ", subject=" + subject + ", seq=" + seq + ", categoryName="
-				+ categoryName + ", views=" + views + ", status=" + status
-				+ "]";
+	public List<BoardImage> getGalleries() {
+		return galleries;
 	}
 
+	public void setGalleries(List<BoardImage> galleries) {
+		this.galleries = galleries;
+	}
+
+	@Override
+	public String toString() {
+		return "BoardFreeOnList [id=" + id + ", writer=" + writer + ", subject=" + subject + ", seq=" + seq
+				+ ", categoryName=" + categoryName + ", views=" + views + ", status=" + status + ", galleries="
+				+ galleries + "]";
+	}
+	
 }

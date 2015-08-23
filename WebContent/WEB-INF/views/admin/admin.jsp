@@ -23,6 +23,8 @@
   <ul class="dropdown-menu" role="menu">
     <li><a href="<c:url value="/admin/board/category/init"/>">Init Board Category</a></li>
     <li><a href="<c:url value="/admin/search/index/init"/>">Init Search Index</a></li>
+    <li><a href="<c:url value="/admin/search/type/init"/>">Init Search Type</a></li>
+    <li><a href="<c:url value="/admin/search/data/init"/>">Init Search Data</a></li>
   </ul>
 </div>
 

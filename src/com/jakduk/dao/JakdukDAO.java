@@ -22,6 +22,7 @@ import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.simple.GalleryOnList;
 
 /**
@@ -451,6 +452,33 @@ public class JakdukDAO {
 		}
 		
 		return posts;
+	}
+	
+	public List<CommentOnES> getCommentOnES(ObjectId commentId) {
+		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
+		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		AggregationOperation limit = Aggregation.limit(CommonConst.ELASTICSEARCH_BULK_LIMIT);
+		
+		Aggregation aggregation;
+		
+		if (commentId != null) {
+			aggregation = Aggregation.newAggregation(match1, sort, limit);
+		} else {
+			aggregation = Aggregation.newAggregation(sort, limit);
+		}
+		
+		AggregationResults<CommentOnES> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommentOnES.class);
+		
+		List<CommentOnES> comments = results.getMappedResults();
+		
+		for (CommentOnES comment : comments) {
+
+			comment.setContent(comment.getContent()
+					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+					.replaceAll("\r|\n|&nbsp;",""));
+		}
+		
+		return comments;
 	}
 	
 }

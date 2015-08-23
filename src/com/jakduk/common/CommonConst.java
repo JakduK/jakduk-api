@@ -24,7 +24,7 @@ public class CommonConst {
 	/**
 	 * 화면에 보여질 목록 갯수
 	 */
-	public final static Integer BOARD_SIZE_LINE_NUMBER = 20;
+	public final static Integer BOARD_MAX_LIMIT = 20;
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
 	public final static Integer HOME_SIZE_POST = 7;
 	public final static Integer HOME_SIZE_GALLERY = 6;
@@ -155,4 +155,7 @@ public class CommonConst {
 	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME = "shortName";
 	
 	public final static int ELASTICSEARCH_BULK_LIMIT = 500;
+	public final static String ELASTICSEARCH_TYPE_BOARD = "board";
+	public final static String ELASTICSEARCH_TYPE_COMMENT = "comment";
+	public final static String ELASTICSEARCH_TYPE_GALLERY = "gallery";
 }

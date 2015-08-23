@@ -29,7 +29,6 @@ import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Sequence;
-import com.jakduk.model.web.BoardPageInfo;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
 
@@ -85,91 +84,6 @@ public class CommonService {
 			nextSeq = sequence.getSeq();
 			return nextSeq;
 		}
-	}
-
-	/**
-	 * 게시판 목록의 페이지에 대한 정보를 넘겨준다.
-	 * @param page 현재 페이지 번호
-	 * @param numberPosts 전체 게시물 갯수
-	 * @param numberPages 전체 페이지 수
-	 * @return BoardPageInfo 객체
-	 */
-	public BoardPageInfo getCountPages(Long page, Long numberPosts, Integer numberPages) {
-		
-		BoardPageInfo boardPageInfo = new BoardPageInfo();
-
-		Long tmpVal = (long) 0;
-		Long totalPages = (long) 1;		
-		Long prevPage = (long) 1;
-		Long nextPage = (long) 1;
-		Long numberPageLine = (long) 1;
-		
-		if ((numberPosts - CommonConst.BOARD_SIZE_LINE_NUMBER) > 0) {
-			tmpVal = (long) (numberPosts / CommonConst.BOARD_SIZE_LINE_NUMBER);
-			
-			if ((numberPosts % CommonConst.BOARD_SIZE_LINE_NUMBER) == 0) {
-				totalPages = tmpVal;
-			} else {
-				totalPages = tmpVal + 1;
-			}
-		}
-		
-		if (totalPages - numberPages > 0) {
-			tmpVal = (long) (totalPages / numberPages);
-			
-			if ((totalPages % numberPages) == 0) {
-				numberPageLine = tmpVal;
-			} else {
-				numberPageLine = tmpVal + 1;
-			}
-		}
-		
-		Long startPage = (page % numberPages) == 0 ? page - numberPages + 1 : page - (page % numberPages) + 1;
-		
-		if (startPage <= 0) {
-			startPage ++;
-		}
-		
-		if (startPage > numberPages) {
-			prevPage = startPage - numberPages;
-		} else {
-			prevPage = (long) -1;
-		}
-		
-		Long endPage = (long) 1;
-		
-		if (totalPages <= numberPages) {
-			endPage = totalPages;
-			nextPage = (long) -1;
-		} else {
-			
-			if (numberPageLine - 1 > 0) {
-				if (((numberPageLine - 1) * numberPages) >= page) {
-					endPage = startPage + numberPages - 1;
-					nextPage = startPage + numberPages;
-				} else {
-					endPage = totalPages;
-					nextPage = (long) -1;
-				}
-			}
-		}
-		
-		/*
-		if ((totalPages - page) > numberPages) {
-			endPage = startPage + numberPages - 1;
-			nextPage = startPage + numberPages;
-		} else {
-			endPage = totalPages;
-			nextPage = (long) -1;
-		}
-		*/
-		
-		boardPageInfo.setStartPage(startPage);
-		boardPageInfo.setEndPage(endPage);
-		boardPageInfo.setPrevPage(prevPage);
-		boardPageInfo.setNextPage(nextPage);
-		
-		return boardPageInfo;
 	}
 	
 	/**

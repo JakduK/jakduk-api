@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <!DOCTYPE html>
@@ -162,7 +163,7 @@
 						<div class="col-sm-4">
 							<c:if test="${notice.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
 							<c:if test="${notice.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-							<c:if test="${!empty galleriesCount[notice.id]}"><span aria-hidden="true" class="icon-picture"></span></c:if>
+							<c:if test="${fn:length(notice.galleries) > 0}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 							<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 								<c:choose>
 									<c:when test="${notice.status.delete == 'delete'}">
@@ -228,7 +229,7 @@
 						<div class="col-sm-4">
 							<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
 							<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
-							<c:if test="${!empty galleriesCount[post.id]}"><span aria-hidden="true" class="icon-picture"></span></c:if>
+							<c:if test="${fn:length(post.galleries) > 0}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 							<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 								<c:choose>
 									<c:when test="${post.status.delete == 'delete'}">
@@ -296,38 +297,13 @@
 		</button>	
 		</c:when>	
 	</c:choose>
-
-	<div>
-		<ul class="pagination">
-		 <c:choose>
-		 	<c:when test="${pageInfo.prevPage == -1}">
-		 		<li class="disabled"><a href="#">&laquo;</a></li>
-		 	</c:when>
-		 	<c:otherwise>
-		 		<li><a href="?page=${pageInfo.prevPage}&category=${boardListInfo.category}">&laquo;</a></li>
-		 	</c:otherwise>
-		 </c:choose>
-		 <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="pageIdx">
-		 	<c:choose>
-		 		<c:when test="${boardListInfo.page == pageIdx}">
-		 			<li class="active"><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
-		 		</c:when>
-		 		<c:otherwise>
-		 			<li><a href="?page=${pageIdx}&category=${boardListInfo.category}">${pageIdx}</a></li>
-		 		</c:otherwise>
-		 	</c:choose>
-		 </c:forEach>
-		 <c:choose>
-		 	<c:when test="${pageInfo.nextPage == -1}">
-		 		<li class="disabled"><a href="#">&raquo;</a></li>
-		 	</c:when>
-		 	<c:otherwise>
-		 		<li><a href="?page=${pageInfo.nextPage}&category=${boardListInfo.category}">&raquo;</a></li>
-		 	</c:otherwise>
-		 </c:choose> 
-		</ul>
+	
+	<div class="text-left" ng-show="totalItems > 0">
+		<pagination ng-model="currentPage" total-items="totalItems" max-size="10" items-per-page="itemsPerPage"
+		previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></pagination>
 	</div>	
 	
+	<!--=== End Content Part ===-->
 	</div>
  
 	<jsp:include page="../include/footer.jsp"/>
@@ -337,10 +313,12 @@
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-animate/angular-animate.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", []);
+var jakdukApp = angular.module("jakdukApp", ["ngAnimate", "ui.bootstrap"]);
 
 jakdukApp.controller("boardCtrl", function($scope, $http) {
 	$scope.dataTopPostConn = "none";
@@ -348,8 +326,20 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 	$scope.topComment = [];
 	
 	angular.element(document).ready(function() {
-		$scope.getDataBestLike();
+		var page = parseInt("${boardListInfo.page}");
+		var size = parseInt("${boardListInfo.size}");
+		var total = Number("${totalPosts}");
 		
+		if (page > 0) {
+			$scope.currentPage = page;
+		} else {
+			$scope.currentPage = 1;			
+		}
+		
+		$scope.totalItems = total;
+		$scope.itemsPerPage = size;
+		
+		$scope.getDataBestLike();
 		App.init();
 	});
 	
@@ -380,13 +370,19 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 			return;
 		}
 		
-		location.href = '<c:url value="/search"/>' + '?q=' + $scope.searchWords.trim();
+		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=PO;"/>';
+	};
+	
+	$scope.pageChanged = function() {
+		var page = $scope.currentPage;
+		
+		location.href = '<c:url value="/board/free?page=' + page + '&category=${boardListInfo.category}"/>';
 	};	
 });
 
 function needLogin() {
 	if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
-		location.href = "<c:url value="/board/free/write"/>";
+		location.href = '<c:url value="/board/free/write"/>';
 	}
 }
 </script>

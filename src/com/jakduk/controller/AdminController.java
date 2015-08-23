@@ -75,6 +75,22 @@ public class AdminController {
 		return "redirect:/admin/settings?message=" + message;
 	}
 	
+	@RequestMapping(value = "/search/type/init")
+	public String initSearchType() {
+
+		String message = adminService.initSearchType();
+		
+		return "redirect:/admin/settings?message=" + message;
+	}
+	
+	@RequestMapping(value = "/search/data/init")
+	public String initSearchData() {
+
+		String message = adminService.initSearchData();
+		
+		return "redirect:/admin/settings?message=" + message;
+	}
+	
 	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.GET)
 	public String encyclopediaWrite(Model model) {
 		model.addAttribute("encyclopedia", new Encyclopedia());

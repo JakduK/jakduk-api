@@ -82,4 +82,10 @@
 /* 게시판 TOP */
 td a {color:#555;}
 
+/* 찾기 */
+.search-block-v2 {
+	padding: 20px 0px 30px;
+	margin-bottom: 20px;
+	}
+
 .max-width-240 {max-width:240px;}

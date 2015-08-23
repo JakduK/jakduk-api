@@ -40,11 +40,12 @@ public class SearchController {
 	@RequestMapping
 	public String root(HttpServletRequest request, Model model,
 			@RequestParam(required = false) String q,
+			@RequestParam(required = false) String w,
 			@RequestParam(required = false, defaultValue = "0") int from,
 			@RequestParam(required = false, defaultValue = "10") int size) {
 		
 		Locale locale = localeResolver.resolveLocale(request);	
-		searchService.getSearchBoard(model, locale, q, from, size);
+		searchService.getSearch(model, locale, q, w, from, size);
 		
 		return "search/search";
 	}
@@ -55,13 +56,14 @@ public class SearchController {
 		return "redirect:/search";
 	}	
 	
-	@RequestMapping(value = "/data/board")
+	@RequestMapping(value = "/data")
 	public void dataBoardList(Model model,
 			@RequestParam(required = true) String q,
+			@RequestParam(required = false) String w,
 			@RequestParam(required = false, defaultValue = "0") int from,
 			@RequestParam(required = false, defaultValue = "10") int size) {
 		
-		searchService.searchDataOfBoard(model, q, from, size);
+		searchService.getDataSearch(model, q, w, from, size);
 		
 	}
 }

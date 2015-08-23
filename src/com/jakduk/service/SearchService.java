@@ -1,5 +1,6 @@
 package com.jakduk.service;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -40,18 +41,28 @@ public class SearchService {
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 
-	public void getSearchBoard(Model model, Locale locale, String q, int from, int size) {
+	public void getSearch(Model model, Locale locale, String q, String w, int from, int size) {
 		model.addAttribute("q", q);
+		model.addAttribute("w", w);
 		model.addAttribute("from", from);
 		model.addAttribute("size", size);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 	}
 	
-	public void searchDataOfBoard(Model model, String q, int from, int size) {
+	public void getDataSearch(Model model, String q, String w, int from, int size) {
 		
 		if (size <= 0) size = 10;
 		
-		model.addAttribute("results", this.searchDocumentBoard(q, from, size));
+		//logger.debug("w=" + w);
+		
+		if (w != null && !w.isEmpty()) {
+			if (w.contains("PO")) {
+				model.addAttribute("posts", this.searchDocumentBoard(q, from, size));				
+			}
+			if (w.contains("CO")) {
+				model.addAttribute("comments", this.searchDocumentComment(q, from, size));				
+			}
+		}
 	}
 	
 	public String searchDocumentBoard(String q, int from, int size) {
@@ -85,7 +96,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(query)
 				.addIndex(elasticsearchIndexName)
-				.addType("board")
+				.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
 				.build();
 		
 		try {
@@ -101,7 +112,7 @@ public class SearchService {
 	}
 	
 	public void createDocumentBoard(BoardFreeOnES boardFreeOnEs) {
-		Index index = new Index.Builder(boardFreeOnEs).index(elasticsearchIndexName).type("board").build();
+		Index index = new Index.Builder(boardFreeOnEs).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_BOARD).build();
 		
 		try {
 			JestResult jestResult = jestClient.execute(index);
@@ -119,7 +130,7 @@ public class SearchService {
         try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
 			        .index(elasticsearchIndexName)
-			        .type("board")
+			        .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
 			        .build());
 			
 			if (logger.isDebugEnabled()) {
@@ -137,4 +148,41 @@ public class SearchService {
 			e.printStackTrace();
 		}
 	}
+	
+public String searchDocumentComment(String q, int from, int size) {
+		
+		String query = "{\n" +
+				"\"from\" : " + from + "," + 
+				"\"size\" : " + size + "," + 
+				"\"query\": {" +
+				"\"match\" : {" +
+				"\"content\" : \"" + q + "\"" + 
+				"}" +
+				"}, " +
+				"\"highlight\" : {" +
+				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
+				"\"post_tags\" : [\"</span>\"]," +
+				"\"fields\" : {\"content\" : {}" +
+				"}" + 
+				"}" +
+				"}";
+
+//		logger.debug("query=" + query);
+
+		Search search = new Search.Builder(query)
+				.addIndex(elasticsearchIndexName)
+				.addType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+				.build();
+		
+		try {
+			SearchResult result = jestClient.execute(search);
+			
+			return result.getJsonObject().toString();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
+	}	
 }

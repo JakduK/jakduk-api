@@ -11,7 +11,7 @@ jakdukApp.controller("headerCtrl", function($scope, $location) {
 			return;
 		}
 		
-		location.href = url + '?q=' + $scope.searchOnHeader.trim();
+		location.href = url + '?q=' + $scope.searchOnHeader.trim() + '&w=PO;CO;GA;';
 	};
 	
 	$scope.btnSearchOnHeader = function() {
