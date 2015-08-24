@@ -55,31 +55,32 @@
     
     	<!--=== Content Part ===-->
 	<div class="container s-results">
-<div class=" margin-bottom-30" ng-show="posts.hits.total > 0">
-	<span class="results-number"><spring:message code="search.post.results" arguments="{{posts.hits.total}}"/></span>
-        
-        <!-- Begin Inner Results -->
-        <div ng-repeat="hit in posts.hits.hits">
-	        <div class="inner-results">
-	            <h3 ng-if="hit.highlight.subject.length > 0"><a href='<c:url value="/board/free/{{hit._source.seq}}"/>' ng-bind-html="hit.highlight.subject[0]"></a></h3>
-	            <h3 ng-if="hit.highlight.subject.length == null"><a href="<c:url value="/board/free/{{hit._source.seq}}"/>">{{hit._source.subject}}</a></h3>
-	            <p ng-if="hit.highlight.content.length > 0" ng-bind-html="hit.highlight.content[0]"></p>
-	            <p ng-if="hit.highlight.content.length == null">{{hit.fields.content_preview[0]}}</p>
-	            <ul class="list-inline down-ul">
-	                <li><i aria-hidden="true" class="icon-user"></i> {{hit._source.writer.username}}</li>
-	                <li>{{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
-	                <li></li>
-	            </ul>    
+		<!-- search results of post -->
+		<div class=" margin-bottom-30" ng-show="posts.hits.total > 0">
+			<span class="results-number"><spring:message code="search.post.results" arguments="{{posts.hits.total}}"/></span>
+	        
+	        <!-- Begin Inner Results -->
+	        <div ng-repeat="hit in posts.hits.hits">
+		        <div class="inner-results">
+		            <h3 ng-if="hit.highlight.subject.length > 0"><a href='<c:url value="/board/free/{{hit._source.seq}}"/>' ng-bind-html="hit.highlight.subject[0]"></a></h3>
+		            <h3 ng-if="hit.highlight.subject.length == null"><a href="<c:url value="/board/free/{{hit._source.seq}}"/>">{{hit._source.subject}}</a></h3>
+		            <p ng-if="hit.highlight.content.length > 0" ng-bind-html="hit.highlight.content[0]"></p>
+		            <p ng-if="hit.highlight.content.length == null">{{hit.fields.content_preview[0]}}</p>
+		            <ul class="list-inline down-ul">
+		                <li><i aria-hidden="true" class="icon-user"></i> {{hit._source.writer.username}}</li>
+		                <li>{{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
+		                <li></li>
+		            </ul>    
+		        </div>
+		        <hr class="padding-5"/>
 	        </div>
-	        <hr class="padding-5"/>
-        </div>
-    </div>
+	    </div>
     
 		<div class="text-left" ng-show="posts.hits.total > 0">
         	<pagination ng-model="currentPage" total-items="posts.hits.total" max-size="10" items-per-page="10"
         	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
         	
-			<div class="text-right col-md-12" ng-show="whereSize > 1">
+			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
 				<ul class="list-unstyled">
 				    <li><a href='<c:url value="/search?q=${q}&w=PO;"/>'>
 				    	<spring:message code="search.more.post.results"/> <i class="fa fa-chevron-right"></i>
@@ -87,6 +88,35 @@
 				</ul>
 			</div>
 		</div>
+		
+		<!-- search results of post -->
+		<div class=" margin-bottom-30" ng-show="comments.hits.total > 0">
+			<span class="results-number"><spring:message code="search.comment.results" arguments="{{comments.hits.total}}"/></span>
+			
+			<div ng-repeat="hit in comments.hits.hits">
+				<div class="inner-results">
+	            <ul class="list-inline up-ul">
+					<li><i aria-hidden="true" class="icon-user"></i> {{hit._source.writer.username}}</li>
+					<li>{{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
+	            </ul>
+	            <p><a href="" ng-bind-html="hit.highlight.content[0]"></a></p>
+	        	</div>		
+        		<hr class="padding-5"/>	
+			</div>
+	    </div>	
+
+		<div class="text-left" ng-show="comments.hits.total > 0">
+        	<pagination ng-model="currentPage" total-items="comments.hits.total" max-size="10" items-per-page="10"
+        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
+        	
+			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
+				<ul class="list-unstyled">
+				    <li><a href='<c:url value="/search?q=${q}&w=PO;"/>'>
+				    	<spring:message code="search.more.comment.results"/> <i class="fa fa-chevron-right"></i>
+				    </a></li>   
+				</ul>
+			</div>
+		</div>	    
     
     </div><!--/container-->		
     <!--=== End Content Part ===-->

@@ -87,5 +87,8 @@ td a {color:#555;}
 	padding: 20px 0px 30px;
 	margin-bottom: 20px;
 	}
+	
+.s-results .inner-results p a {color:#555;}	
+.s-results .inner-results p a:hover {color:#72c02c;}
 
 .max-width-240 {max-width:240px;}

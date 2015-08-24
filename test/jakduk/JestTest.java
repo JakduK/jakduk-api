@@ -3,6 +3,7 @@ package jakduk;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -22,6 +23,7 @@ import com.google.gson.JsonObject;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.service.SearchService;
 
@@ -197,7 +199,7 @@ public class JestTest {
 				"\"query\": {\n" +
 				"\"multi_match\" : {" +
 				"\"fields\" : [\"subject\", \"content\"]," +
-				"\"query\" : \"성남\"" + 
+				"\"query\" : \"테스트\"" + 
 				"}\n" +
 				"}, " +
 				"\"highlight\" : {" +
@@ -210,7 +212,7 @@ public class JestTest {
 
 	Search search = new Search.Builder(query)
 	                // multiple index or types can be added.
-	                .addIndex("articles")
+	                .addIndex("jakduk_test")
 	                .build();
 
 	try {
@@ -270,7 +272,57 @@ public class JestTest {
 	public void search04() {
 		//System.out.println(searchService.searchDocumentBoard("사진", 0, 0));
 		System.out.println(searchService.searchDocumentComment("댓글", 0, 10));
+	}
 	
+	@Test
+	public void search05() {
+		String query = "{\n" +
+				"\"query\": {" +
+				"\"match\" : {" +
+				"\"content\" : \"테스트\"" + 
+				"}" +
+				"}, " +
+				"\"highlight\" : {" +
+				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
+				"\"post_tags\" : [\"</span>\"]," +
+				"\"fields\" : {\"content\" : {}" +
+				"}" + 
+				"}" +
+				"}";
+
+//		logger.debug("query=" + query);
+
+		Search search = new Search.Builder(query)
+				.addIndex("jakduk_test")
+				.addType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+				.build();
+		
+		try {
+			SearchResult result = jestClient.execute(search);
+			
+			JsonObject jsonObject = result.getJsonObject();
+			
+			List<SearchResult.Hit<CommentOnES, Void>> hits = result.getHits(CommentOnES.class);
+			
+			Iterator<SearchResult.Hit<CommentOnES, Void>> hitsItr = hits.iterator();
+			
+			while (hitsItr.hasNext()) {
+				SearchResult.Hit<CommentOnES, Void> itr = hitsItr.next();
+				System.out.println(itr.source.getBoardItem());
+			}
+			
+			/*
+			for (SearchResult.Hit<CommentOnES, Void> hit : hits) {
+				System.out.println(hit.source.getBoardItem());
+			}
+			*/
+			
+			System.out.println("result=" + result.getJsonString());
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 	
 	@Test
