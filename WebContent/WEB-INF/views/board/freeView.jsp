@@ -239,42 +239,41 @@
 
 <!-- 댓글 목록  -->	
 <div class="media margin-bottom-10">
-                	<h4 class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
-<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+	<h4 class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
+		<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+		<button type="button" class="btn btn-link" ng-click="btnRefreshComment()">
+			<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
+		</button>
+	</h4>
 
-<button type="button" class="btn btn-link" ng-click="btnRefreshComment()">
-			  			  	<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
-				</button>
-</h4>
-
-<div class="media-body">
-<div ng-repeat="comment in commentList">
-    <h5 class="media-heading">
-			<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
-			<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
-    </h5>    
-    <p>
-	 							<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>
-	 							<span ng-if="comment.status.device == 'tablet'"><i class="fa fa-tablet fa-lg"></i></span>
-	 							<span ng-bind-html="comment.content"></span>
-		</p>
-	 							
-    							<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'like')">
-							  <span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
-								  <i class="fa fa-thumbs-o-up fa-lg"></i>
-								  {{numberOfCommentLike[comment.id]}}
-							  </span>
-							</button>
-							<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
-								<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
-							  	<i class="fa fa-thumbs-o-down fa-lg"></i>
-							  	{{numberOfCommentDislike[comment.id]}}
-							  </span>
-							</button>							
-<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>							 
-
-    <hr class="padding-5">
-</div>    
+	<div class="media-body">
+		<div id="{{comment.id}}"ng-repeat="comment in commentList">
+			<h5 class="media-heading">
+				<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
+				<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+			</h5>    
+			<p>
+				<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>
+				<span ng-if="comment.status.device == 'tablet'"><i class="fa fa-tablet fa-lg"></i></span>
+				<span ng-bind-html="comment.content"></span>
+			</p>
+			<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-xs" 
+			ng-click="btnCommentFeeling(comment.id, 'like')">
+				<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
+					<i class="fa fa-thumbs-o-up fa-lg"></i>
+					{{numberOfCommentLike[comment.id]}}
+				</span>
+			</button>
+			<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
+				<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
+					<i class="fa fa-thumbs-o-down fa-lg"></i>
+					{{numberOfCommentDislike[comment.id]}}
+				</span>
+			</button>							
+			<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>							 
+		    <hr class="padding-5">
+		</div>
+		
 		<div class="margin-bottom-10" ng-show="commentCount || commentAlert.msg">
 			<button type="button" class="btn-u btn-brd rounded btn-block btn-u-dark" 
 			ng-click="btnMoreComment()" ng-show="commentCount">
@@ -282,12 +281,12 @@
 				<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
 			</button>
 		</div>
-
-	<div class="contex-bg" ng-show="commentAlert.msg">
-		<p class="{{commentAlert.classType}} rounded">{{commentAlert.msg}}</p>
+	
+		<div class="contex-bg" ng-show="commentAlert.msg">
+			<p class="{{commentAlert.classType}} rounded">{{commentAlert.msg}}</p>
+		</div>
 	</div>
-</div>
-                </div>		
+</div>		
                 
 <!-- 댓글 남기기 -->                
 <div class="post-comment">

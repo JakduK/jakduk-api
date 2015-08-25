@@ -1,17 +1,22 @@
 package com.jakduk.service;
 
-import java.io.Console;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -39,6 +44,9 @@ public class SearchService {
 	@Autowired
 	private CommonService commonService;
 	
+	@Autowired
+	private JakdukDAO jakdukDAO;
+	
 	private Logger logger = Logger.getLogger(this.getClass());
 
 	public void getSearch(Model model, Locale locale, String q, String w, int from, int size) {
@@ -60,7 +68,24 @@ public class SearchService {
 				model.addAttribute("posts", this.searchDocumentBoard(q, from, size));				
 			}
 			if (w.contains("CO")) {
-				model.addAttribute("comments", this.searchDocumentComment(q, from, size));				
+				List<ObjectId> ids = new ArrayList<ObjectId>();
+				
+				SearchResult result = this.searchDocumentComment(q, from, size);
+				
+				List<SearchResult.Hit<CommentOnES, Void>> hits = result.getHits(CommentOnES.class);
+				
+				Iterator<SearchResult.Hit<CommentOnES, Void>> hitsItr = hits.iterator();
+				
+				while (hitsItr.hasNext()) {
+					SearchResult.Hit<CommentOnES, Void> itr = hitsItr.next();
+					
+					String id = itr.source.getBoardItem().getId();
+					
+					ids.add(new ObjectId(id));
+				}
+				
+				model.addAttribute("comments", result.getJsonString());
+				model.addAttribute("postsHavingComments", jakdukDAO.getBoardFreeOnSearchComment(ids));
 			}
 		}
 	}
@@ -149,7 +174,7 @@ public class SearchService {
 		}
 	}
 	
-public String searchDocumentComment(String q, int from, int size) {
+public SearchResult searchDocumentComment(String q, int from, int size) {
 		
 		String query = "{\n" +
 				"\"from\" : " + from + "," + 
@@ -177,12 +202,12 @@ public String searchDocumentComment(String q, int from, int size) {
 		try {
 			SearchResult result = jestClient.execute(search);
 			
-			return result.getJsonObject().toString();
+			return result;
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return "";
+			return null;
 		}
 	}	
 }

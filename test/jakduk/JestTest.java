@@ -271,7 +271,7 @@ public class JestTest {
 	@Test
 	public void search04() {
 		//System.out.println(searchService.searchDocumentBoard("사진", 0, 0));
-		System.out.println(searchService.searchDocumentComment("댓글", 0, 10));
+		//System.out.println(searchService.searchDocumentComment("댓글", 0, 10));
 	}
 	
 	@Test

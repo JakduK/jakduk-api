@@ -99,7 +99,17 @@
 					<li><i aria-hidden="true" class="icon-user"></i> {{hit._source.writer.username}}</li>
 					<li>{{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
 	            </ul>
-	            <p><a href="" ng-bind-html="hit.highlight.content[0]"></a></p>
+	            <p><a href='<c:url value="/board/free/{{hit._source.boardItem.seq}}\#{{hit._source.id}}"/>' ng-bind-html="hit.highlight.content[0]"></a></p>
+					<ul class="list-inline up-ul text-overflow">
+						<li>
+							<a href='<c:url value="/board/free/{{hit._source.boardItem.seq}}"/>'>
+								<spring:message code="board.subject"/>
+								: 
+								{{postsHavingComments[hit._source.boardItem.id].subject}}
+							</a>
+						</li>
+					</ul>
+	            
 	        	</div>		
         		<hr class="padding-5"/>	
 			</div>
@@ -111,7 +121,7 @@
         	
 			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
 				<ul class="list-unstyled">
-				    <li><a href='<c:url value="/search?q=${q}&w=PO;"/>'>
+				    <li><a href='<c:url value="/search?q=${q}&w=CO;"/>'>
 				    	<spring:message code="search.more.comment.results"/> <i class="fa fa-chevron-right"></i>
 				    </a></li>   
 				</ul>
@@ -144,6 +154,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 	$scope.comments = {};
 	$scope.where = {};
 	$scope.whereSize = 0;
+	$scope.postsHavingComments = {};
 	
 	angular.element(document).ready(function() {
 		var from = parseInt("${from}");
@@ -242,12 +253,17 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 				
 				if (data.posts != null) {
 					$scope.posts = JSON.parse(data.posts);
-					console.log($scope.posts);
+					//console.log($scope.posts);
 				}
 				
 				if (data.comments != null) {
 					$scope.comments = JSON.parse(data.comments);
 					console.log($scope.comments);
+				}
+				
+				if (data.postsHavingComments != null) {
+					$scope.postsHavingComments = data.postsHavingComments;
+					console.log($scope.postsHavingComments);
 				}
 				
 				$scope.resultsConn = "none";
