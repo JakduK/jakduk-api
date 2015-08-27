@@ -370,7 +370,7 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 			return;
 		}
 		
-		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=PO;"/>';
+		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=PO;CO;"/>';
 	};
 	
 	$scope.pageChanged = function() {

@@ -239,7 +239,7 @@
 
 <!-- 댓글 목록  -->	
 <div class="media margin-bottom-10">
-	<h4 class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
+	<h4 id="comments" class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
 		<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
 		<button type="button" class="btn btn-link" ng-click="btnRefreshComment()">
 			<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
@@ -247,7 +247,7 @@
 	</h4>
 
 	<div class="media-body">
-		<div id="{{comment.id}}"ng-repeat="comment in commentList">
+		<div ng-repeat="comment in commentList">
 			<h5 class="media-heading">
 				<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
 				<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
@@ -397,7 +397,6 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.subject = document.getElementById("subject").value;
 	
 	angular.element(document).ready(function() {
-		App.init();
 	    // 사용할 앱의 Javascript 키를 설정해 주세요.
 	    Kakao.init('${kakaoKey}');
 
@@ -411,7 +410,9 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 		        text: "https://jakduk.com/board/free/${post.seq}",
 		        url: "https://jakduk.com/board/free/${post.seq}"	    	  
 	      }
-	    });		
+	    });
+		
+		App.init();
 	});		
 	
 	$scope.objectIdFromDate = function(date) {
@@ -484,7 +485,6 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 					$scope.dislikeConn = "success";
 					$scope.btnDislike = false;
 				}
-				
 			});
 			reqPromise.error(function(data, status, headers, config) {				
 				$scope.alert.msg = '<spring:message code="common.msg.error.network.unstable"/>';

@@ -41,6 +41,7 @@ import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
 import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.web.AttendanceClubWrite;
 import com.jakduk.model.web.BoardCategoryWrite;
@@ -229,6 +230,27 @@ public String initSearchType() {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		// 매핑 초기화.
+		PutMapping putMapping3 = new PutMapping.Builder(
+        		elasticsearchIndexName,
+        		CommonConst.ELASTICSEARCH_TYPE_GALLERY,
+              "{ \"properties\" : { " +
+              "\"name\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} " +
+              	"}" +
+                "}"
+        ).build();
+
+		try {
+			JestResult jestResult = jestClient.execute(putMapping3);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return result;
 	}
@@ -302,6 +324,40 @@ public String initSearchData() {
 		comments = jakdukDAO.getCommentOnES(new ObjectId(lastComment.getId()));
 		if (comments.size() > 0) {
 			lastComment = comments.get(comments.size() - 1);
+		}
+	}
+	
+	// 사진첩을 엘라스틱 서치에 모두 넣기.
+	List<GalleryOnES> galleries = jakdukDAO.getGalleryOnES(null);
+	GalleryOnES lastGallery = galleries.get(galleries.size() - 1);
+	
+	while (galleries.size() > 0) {
+		List<Index> idxList = new ArrayList<>();
+		
+		for (GalleryOnES gallery : galleries) {
+			idxList.add(new Index.Builder(gallery).build());
+		}
+		
+		Bulk bulk = new Bulk.Builder()
+				.defaultIndex(elasticsearchIndexName)
+				.defaultType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+				.addAction(idxList)
+				.build();
+		
+		try {
+			JestResult jestResult = jestClient.execute(bulk);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.debug(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		galleries = jakdukDAO.getGalleryOnES(new ObjectId(lastGallery.getId()));
+		if (galleries.size() > 0) {
+			lastGallery = galleries.get(galleries.size() - 1);
 		}
 	}
 	

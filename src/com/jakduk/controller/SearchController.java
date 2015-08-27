@@ -53,7 +53,7 @@ public class SearchController {
 	@RequestMapping(value = "/refresh", method = RequestMethod.GET)
 	public String refreshSearch() {
 		
-		return "redirect:/search";
+		return "redirect:/search?w=PO;CO;GA";
 	}	
 	
 	@RequestMapping(value = "/data")

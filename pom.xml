@@ -4,11 +4,11 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk</artifactId>
-  <version>0.4.3-SNAPSHOT</version>
+  <version>0.4.5-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>jakduk</name>
-  <url>http://jakduk.com</url>
+  <url>https://jakduk.com</url>
   <description>K League Community Web Application</description>
 
   <properties>

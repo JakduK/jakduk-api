@@ -59,9 +59,11 @@ public class SearchService {
 	
 	public void getDataSearch(Model model, String q, String w, int from, int size) {
 		
-		if (size <= 0) size = 10;
+		if (logger.isDebugEnabled()) {
+			logger.debug("q=" + q + ", w=" + w + ", from=" + from + ", size=" + size);
+		}
 		
-		//logger.debug("w=" + w);
+		if (size <= 0) size = 10;
 		
 		if (w != null && !w.isEmpty()) {
 			if (w.contains("PO")) {
@@ -86,6 +88,10 @@ public class SearchService {
 				
 				model.addAttribute("comments", result.getJsonString());
 				model.addAttribute("postsHavingComments", jakdukDAO.getBoardFreeOnSearchComment(ids));
+			}
+			if (w.contains("GA")) {
+				SearchResult result = this.searchDocumentGallery(q, from, size);
+				model.addAttribute("galleries", result.getJsonString());
 			}
 		}
 	}
@@ -174,7 +180,7 @@ public class SearchService {
 		}
 	}
 	
-public SearchResult searchDocumentComment(String q, int from, int size) {
+	public SearchResult searchDocumentComment(String q, int from, int size) {
 		
 		String query = "{\n" +
 				"\"from\" : " + from + "," + 
@@ -209,5 +215,54 @@ public SearchResult searchDocumentComment(String q, int from, int size) {
 			e.printStackTrace();
 			return null;
 		}
-	}	
+	}
+	
+	public void createDocumentComment(CommentOnES commentOnES) {
+		Index index = new Index.Builder(commentOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_COMMENT).build();
+		
+		try {
+			JestResult jestResult = jestClient.execute(index);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.error(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+public SearchResult searchDocumentGallery(String q, int from, int size) {
+		String query = "{\n" +
+				"\"from\" : " + from + "," + 
+				"\"size\" : " + size + "," + 
+				"\"query\": {" +
+				"\"match\" : {" +
+				"\"name\" : \"" + q + "\"" + 
+				"}" +
+				"}, " +
+				"\"highlight\" : {" +
+				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
+				"\"post_tags\" : [\"</span>\"]," +
+				"\"fields\" : {\"name\" : {}" +
+				"}" + 
+				"}" +
+				"}";
+
+		Search search = new Search.Builder(query)
+				.addIndex(elasticsearchIndexName)
+				.addType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+				.build();
+		
+		try {
+			SearchResult result = jestClient.execute(search);
+			
+			return result;
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

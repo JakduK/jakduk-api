@@ -23,6 +23,7 @@ import com.jakduk.model.db.Gallery;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
 import com.jakduk.model.simple.GalleryOnList;
 
 /**
@@ -495,6 +496,26 @@ public class JakdukDAO {
 		}
 		
 		return postsM;
+	}
+	
+	public List<GalleryOnES> getGalleryOnES(ObjectId commentId) {
+		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
+		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		AggregationOperation limit = Aggregation.limit(CommonConst.ELASTICSEARCH_BULK_LIMIT);
+		
+		Aggregation aggregation;
+		
+		if (commentId != null) {
+			aggregation = Aggregation.newAggregation(match1, sort, limit);
+		} else {
+			aggregation = Aggregation.newAggregation(sort, limit);
+		}
+		
+		AggregationResults<GalleryOnES> results = mongoTemplate.aggregate(aggregation, "gallery", GalleryOnES.class);
+		
+		List<GalleryOnES> galleries = results.getMappedResults();
+		
+		return galleries;
 	}
 	
 }

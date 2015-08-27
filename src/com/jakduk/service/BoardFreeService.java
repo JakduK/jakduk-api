@@ -47,6 +47,7 @@ import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.embedded.BoardCommentStatus;
 import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.embedded.BoardImage;
@@ -800,6 +801,18 @@ public class BoardFreeService {
 			boardFreeComment.setStatus(status);
 			
 			boardFreeCommentRepository.save(boardFreeComment);
+			
+			// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
+			CommentOnES commentOnES = new CommentOnES();
+			commentOnES.setId(boardFreeComment.getId());
+			commentOnES.setWriter(boardFreeComment.getWriter());
+			commentOnES.setBoardItem(boardFreeComment.getBoardItem());
+			
+			commentOnES.setContent(boardFreeComment.getContent()					
+					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+					.replaceAll("\r|\n|&nbsp;",""));
+			
+			searchService.createDocumentComment(commentOnES);
 		} else {
 			if (logger.isDebugEnabled()) {
 				logger.debug("You can't write comment and need to login.");

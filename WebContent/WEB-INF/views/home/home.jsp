@@ -75,7 +75,7 @@
 			<div class="blog-twitter">
 				<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
 					<strong><span aria-hidden="true" class="icon-user"></span> {{comment.writer.username}}</strong>
-					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}\#{{comment.id}}"/>'>{{comment.content}}</a>
+					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>'>{{comment.content}}</a>
 					<span class="twitter-time"> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
 				</div>
 		    </div>                			

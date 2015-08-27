@@ -56,7 +56,7 @@
     	<!--=== Content Part ===-->
 	<div class="container s-results">
 		<!-- search results of post -->
-		<div class=" margin-bottom-30" ng-show="posts.hits.total > 0">
+		<div class=" margin-bottom-10" ng-show="posts.hits.total > 0">
 			<span class="results-number"><spring:message code="search.post.results" arguments="{{posts.hits.total}}"/></span>
 	        
 	        <!-- Begin Inner Results -->
@@ -90,7 +90,7 @@
 		</div>
 		
 		<!-- search results of post -->
-		<div class=" margin-bottom-30" ng-show="comments.hits.total > 0">
+		<div class=" margin-bottom-10" ng-show="comments.hits.total > 0">
 			<span class="results-number"><spring:message code="search.comment.results" arguments="{{comments.hits.total}}"/></span>
 			
 			<div ng-repeat="hit in comments.hits.hits">
@@ -99,7 +99,7 @@
 					<li><i aria-hidden="true" class="icon-user"></i> {{hit._source.writer.username}}</li>
 					<li>{{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
 	            </ul>
-	            <p><a href='<c:url value="/board/free/{{hit._source.boardItem.seq}}\#{{hit._source.id}}"/>' ng-bind-html="hit.highlight.content[0]"></a></p>
+	            <p><a href='<c:url value="/board/free/{{hit._source.boardItem.seq}}"/>' ng-bind-html="hit.highlight.content[0]"></a></p>
 					<ul class="list-inline up-ul text-overflow">
 						<li>
 							<a href='<c:url value="/board/free/{{hit._source.boardItem.seq}}"/>'>
@@ -127,6 +127,21 @@
 				</ul>
 			</div>
 		</div>	    
+		
+		<!-- search results of post -->
+		<div class=" margin-bottom-10" ng-show="galleries.hits.total > 0">
+			<span class="results-number"><spring:message code="search.gallery.results" arguments="{{galleries.hits.total}}"/></span>
+			
+<ul class="list-unstyled blog-photos margin-bottom-30">
+    <li ng-repeat="hit in galleries.hits.hits">
+    	<a href="#">
+    		<img class="img-responsive hover-effect" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{hit._id}}" alt="{{hit._source.name}}">
+    	</a>
+    </li>
+</ul>
+<hr class="padding-5"/>	                        			
+
+	    </div>			
     
     </div><!--/container-->		
     <!--=== End Content Part ===-->
@@ -150,11 +165,12 @@ var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ngAnimate", "ui.boot
 
 jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 	$scope.resultsConn = "none";
-	$scope.posts = {};
-	$scope.comments = {};
 	$scope.where = {};
 	$scope.whereSize = 0;
+	$scope.posts = {};
+	$scope.comments = {};
 	$scope.postsHavingComments = {};
+	$scope.galleries = {};
 	
 	angular.element(document).ready(function() {
 		var from = parseInt("${from}");
@@ -185,6 +201,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 					$scope.where.galleries = true;
 				}
 			}
+			$scope.$apply(); 
 		} else {
 			$scope.where = {posts : false, comments : false, galleries : false};
 		}
@@ -230,8 +247,6 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 			where += "GA;";
 		}
 		
-		console.log(where);
-		
 		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=' + where + '"/>';
 	};
 	
@@ -241,7 +256,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 			return;
 		}
 		
-		var bUrl = '<c:url value="/search/data.json?q=' + $scope.searchWords + '&w=' + where + '&from=' + from + '&size=' + size + '"/>';
+		var bUrl = '<c:url value="/search/data.json?q=' + encodeURIComponent($scope.searchWords) + '&w=' + where + '&from=' + from + '&size=' + size + '"/>';
 		
 		if ($scope.resultsConn == "none") {
 			
@@ -258,12 +273,17 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 				
 				if (data.comments != null) {
 					$scope.comments = JSON.parse(data.comments);
-					console.log($scope.comments);
+					//console.log($scope.comments);
 				}
 				
 				if (data.postsHavingComments != null) {
 					$scope.postsHavingComments = data.postsHavingComments;
-					console.log($scope.postsHavingComments);
+					//console.log($scope.postsHavingComments);
+				}
+				
+				if (data.galleries != null) {
+					$scope.galleries = JSON.parse(data.galleries);
+					console.log($scope.galleries);
 				}
 				
 				$scope.resultsConn = "none";
