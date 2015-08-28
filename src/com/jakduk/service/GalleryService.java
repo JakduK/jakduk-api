@@ -41,6 +41,8 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardFreeOnGallery;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
 import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
@@ -77,6 +79,9 @@ public class GalleryService {
 	
 	@Autowired
 	private CommonService commonService;
+	
+	@Autowired
+	private SearchService searchService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -326,6 +331,9 @@ public class GalleryService {
 				return HttpServletResponse.SC_NOT_IMPLEMENTED;
 			}
 		}
+		
+		// 엘라스틱 서치 document 삭제.
+		searchService.deleteDocumentBoard(gallery.getId());
 
 		return HttpServletResponse.SC_OK;
 	}	

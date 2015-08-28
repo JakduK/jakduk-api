@@ -17,6 +17,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -90,7 +91,7 @@ public class SearchService {
 				model.addAttribute("postsHavingComments", jakdukDAO.getBoardFreeOnSearchComment(ids));
 			}
 			if (w.contains("GA")) {
-				SearchResult result = this.searchDocumentGallery(q, from, size);
+				SearchResult result = this.searchDocumentGallery(q, from, 10);
 				model.addAttribute("galleries", result.getJsonString());
 			}
 		}
@@ -232,7 +233,7 @@ public class SearchService {
 		}
 	}
 	
-public SearchResult searchDocumentGallery(String q, int from, int size) {
+	public SearchResult searchDocumentGallery(String q, int from, int size) {
 		String query = "{\n" +
 				"\"from\" : " + from + "," + 
 				"\"size\" : " + size + "," + 
@@ -265,4 +266,42 @@ public SearchResult searchDocumentGallery(String q, int from, int size) {
 			return null;
 		}
 	}
+	
+	public void createDocumentGallery(GalleryOnES galleryOnES) {
+		Index index = new Index.Builder(galleryOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_GALLERY).build();
+		
+		try {
+			JestResult jestResult = jestClient.execute(index);
+			
+			if (!jestResult.isSucceeded()) {
+				logger.error(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteDocumentGallery(String id) {
+        try {
+			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
+			        .index(elasticsearchIndexName)
+			        .type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+			        .build());
+			
+			if (logger.isDebugEnabled()) {
+				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
+					logger.debug("gallery id " + id + " is not found. so can't delete it!");
+				}
+			}
+			
+			if (!jestResult.isSucceeded()) {
+				logger.error(jestResult.getErrorMessage());
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
 }

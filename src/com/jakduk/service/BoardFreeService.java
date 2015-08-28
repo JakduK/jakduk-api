@@ -48,6 +48,7 @@ import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
 import com.jakduk.model.embedded.BoardCommentStatus;
 import com.jakduk.model.embedded.BoardHistory;
 import com.jakduk.model.embedded.BoardImage;
@@ -316,6 +317,14 @@ public class BoardFreeService {
 					status.setStatus(CommonConst.GALLERY_STATUS_USE);
 					gallery.setStatus(status);
 					galleryRepository.save(gallery);
+					
+					// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
+					GalleryOnES galleryOnES = new GalleryOnES();
+					galleryOnES.setId(gallery.getId());
+					galleryOnES.setWriter(gallery.getWriter());
+					galleryOnES.setName(gallery.getName());
+					
+					searchService.createDocumentGallery(galleryOnES);
 				}
 			}
 		}
@@ -485,6 +494,14 @@ public class BoardFreeService {
 					status.setStatus(CommonConst.GALLERY_STATUS_USE);
 					gallery.setStatus(status);
 					galleryRepository.save(gallery);
+					
+					// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
+					GalleryOnES galleryOnES = new GalleryOnES();
+					galleryOnES.setId(gallery.getId());
+					galleryOnES.setWriter(gallery.getWriter());
+					galleryOnES.setName(gallery.getName());
+					
+					searchService.createDocumentGallery(galleryOnES);
 				}
 			}
 		}

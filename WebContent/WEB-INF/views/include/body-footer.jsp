@@ -12,6 +12,7 @@
 
 <!-- This script should be under the AngularJS which is creating jakdukApp module. -->
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/navigation-header.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

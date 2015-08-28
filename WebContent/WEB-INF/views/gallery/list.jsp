@@ -75,7 +75,6 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 	
 	angular.element(document).ready(function() {
 		//$scope.getGalleries();
-		App.init();
 		
 		document.getElementById('links').onclick = function (event) {
 		    event = event || window.event;
@@ -85,7 +84,9 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 		        links = this.getElementsByTagName('a');
 		    
 		    blueimp.Gallery(links, options);
-		};		
+		};
+		
+		App.init();
 	});	
 	
 	$scope.getGalleries = function() {
