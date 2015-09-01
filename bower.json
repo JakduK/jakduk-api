@@ -29,6 +29,9 @@
     "jquery-migrate": "~1.2.1",
     "blueimp-gallery": "~2.16.0",
     "angular-animate": "~1.4.4",
-    "angular-bootstrap": "~0.13.3"
+    "angular-bootstrap": "~0.13.3",
+    "angular-bootstrap-lightbox": "~0.8.0",
+    "angular-touch": "~1.4.5",
+    "angular-loading-bar": "~0.8.0"
   }
 }

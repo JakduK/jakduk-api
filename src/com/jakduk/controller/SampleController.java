@@ -145,5 +145,10 @@ public class SampleController {
 	public String pager01(Model model) {
 		return "sample/pager01";
 	}
+	
+	@RequestMapping(value ="/lightbox01")
+	public String lightbox01(Model model) {
+		return "sample/lightbox01";
+	}
 
 }

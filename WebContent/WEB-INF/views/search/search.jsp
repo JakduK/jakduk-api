@@ -10,7 +10,8 @@
 	
     <!-- CSS Page Style -->    
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_search_inner.css">
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/blueimp-gallery/css/blueimp-gallery.min.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/angular-loading-bar/build/loading-bar.min.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.min.css">
     
     <jsp:include page="../include/html-header.jsp"></jsp:include>	
 </head>
@@ -133,31 +134,19 @@
 		<div class=" margin-bottom-10" ng-show="galleries.hits.total > 0">
 			<span class="results-number"><spring:message code="search.gallery.results" arguments="{{galleries.hits.total}}"/></span>
 
-<div class="row" id="links">
-<div class="col-lg-3 col-md-4 col-sm-6" ng-repeat="hit in galleries.hits.hits">
-      <div class="thumbnail">
-	   		<a ng-href="<%=request.getContextPath()%>/gallery/{{hit._id}}" class="fancybox img-hover-v1" title="{{hit._source.name}}"
-	   		ng-click="test($event)">
-				<span><img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{hit._id}}" alt="{{hit._source.name}}"></span>
-			</a>
-         <div class="caption">
-            <h3>{{hit._source.name}}</h3>
-            <p>Updated
-               <span class="text-muted">27 feb at 10:00 am</span>
-            </p>
-         </div>
-      </div>
-   </div>
-</div>
-<!-- The Gallery as lightbox dialog, should be a child element of the document body -->
-<div id="blueimp-gallery" class="blueimp-gallery">
-    <div class="slides"></div>
-    <h3 class="title"></h3>
-    <a class="prev">‹</a>
-    <a class="next">›</a>
-    <a class="close">×</a>
-    <a class="play-pause"></a>
-</div>	
+
+	<div class="row margin-bottom-40">
+                <!-- Begin Easy Block v2 -->                
+                <div class="col-md-3 col-sm-6 md-margin-bottom-20" ng-repeat="hit in galleries.hits.hits">
+                    <div class="simple-block">
+    	<img class="img-responsive img-bordered margin-bottom-10" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{hit._id}}" alt="{{hit._source.name}}"
+    	ng-click="openLightboxModal($index)">
+                        <p>{{hit._source.name}}</p>
+                    </div>  
+                </div>
+                <!-- End Simple Block -->
+            </div>
+
 <hr class="padding-5"/>	                        			
 
 	    </div>			
@@ -174,17 +163,29 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular-animate/angular-animate.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/blueimp-gallery/js/blueimp-gallery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-loading-bar/build/loading-bar.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ngAnimate", "ui.bootstrap"]);
+var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ui.bootstrap", "bootstrapLightbox"]);
 
-jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
+jakdukApp.config(function (LightboxProvider) {
+	LightboxProvider.getImageUrl = function (image) {
+		console.log(image);
+		return '<c:url value="/gallery/' + image._id + '"/>';
+	};
+
+	LightboxProvider.getImageCaption = function (image) {
+		return image._source.name;
+	};	
+});
+
+jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) {
 	$scope.resultsConn = "none";
+	$scope.galleriesConn = "none";
 	$scope.where = {};
 	$scope.whereSize = 0;
 	$scope.posts = {};
@@ -236,25 +237,8 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 		
 		$scope.getResults(where, from, size);
 		
-		document.getElementById('links').onclick = function (event) {
-		    event = event || window.event;
-		    var target = event.target || event.srcElement,
-		        link = target.children[0].src ? target.parentNode : target,
-		        options = {index: link, event: event},
-		        links = this.getElementsByTagName('a');
-		    
-		    console.log("links=" + links);
-		    console.log("event=" + event);
-		    
-		    blueimp.Gallery(links, options);
-		};
-		
 		App.init();
 	});
-	
-	$scope.test = function($event) {
-		console.log(this);
-	}
 	
 	$scope.objectIdFromDate = function(date) {
 		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
@@ -345,6 +329,10 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location) {
 		
 		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=' + '${w}' + '&from=' + from + '"/>';
 	};
+	
+ 	$scope.openLightboxModal = function (index) {
+		Lightbox.openModal($scope.galleries.hits.hits, index);
+	};	
 	
 });
 </script>
