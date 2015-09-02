@@ -79,7 +79,7 @@
 	    </div>
     
 		<div class="text-left" ng-show="posts.hits.total > 0">
-        	<pagination ng-model="currentPage" total-items="posts.hits.total" max-size="10" items-per-page="10"
+        	<pagination ng-model="currentPage" total-items="posts.hits.total" max-size="10" items-per-page="itemsPerPage"
         	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
         	
 			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
@@ -118,7 +118,7 @@
 	    </div>	
 
 		<div class="text-left" ng-show="comments.hits.total > 0">
-        	<pagination ng-model="currentPage" total-items="comments.hits.total" max-size="10" items-per-page="10"
+        	<pagination ng-model="currentPage" total-items="comments.hits.total" max-size="10" items-per-page="itemsPerPage"
         	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
         	
 			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
@@ -134,22 +134,31 @@
 		<div class=" margin-bottom-10" ng-show="galleries.hits.total > 0">
 			<span class="results-number"><spring:message code="search.gallery.results" arguments="{{galleries.hits.total}}"/></span>
 
-
-	<div class="row margin-bottom-40">
-                <!-- Begin Easy Block v2 -->                
-                <div class="col-md-3 col-sm-6 md-margin-bottom-20" ng-repeat="hit in galleries.hits.hits">
-                    <div class="simple-block">
-    	<img class="img-responsive img-bordered margin-bottom-10" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{hit._id}}" alt="{{hit._source.name}}"
-    	ng-click="openLightboxModal($index)">
-                        <p>{{hit._source.name}}</p>
-                    </div>  
-                </div>
-                <!-- End Simple Block -->
-            </div>
-
-<hr class="padding-5"/>	                        			
-
-	    </div>			
+			<div class="row">
+				<!-- Begin Easy Block v2 -->                
+				<div class="col-md-3 col-sm-4 col-xs-6 md-margin-bottom-10" ng-repeat="hit in galleries.hits.hits">
+					<div class="simple-block">
+						<img class="img-responsive img-bordered" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{hit._id}}" alt="{{hit._source.name}}"
+						ng-click="openLightboxModal($index)">
+						<p ng-bind-html="hit.highlight.name[0]"></p>
+					</div>  
+				</div>
+				<!-- End Simple Block -->
+			</div>
+	    </div>
+	    
+		<div class="text-left" ng-show="galleries.hits.total > 0">
+        	<pagination ng-model="currentPage" total-items="galleries.hits.total" max-size="10" items-per-page="itemsPerPageGallery"
+        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
+        	
+			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
+				<ul class="list-unstyled">
+				    <li><a href='<c:url value="/search?q=${q}&w=GA;"/>'>
+				    	<spring:message code="search.more.gallery.results"/> <i class="fa fa-chevron-right"></i>
+				    </a></li>   
+				</ul>
+			</div>
+		</div>	    
     
     </div><!--/container-->		
     <!--=== End Content Part ===-->
@@ -162,6 +171,7 @@
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-touch/angular-touch.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-loading-bar/build/loading-bar.min.js"></script>
@@ -174,7 +184,6 @@ var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ui.bootstrap", "boot
 
 jakdukApp.config(function (LightboxProvider) {
 	LightboxProvider.getImageUrl = function (image) {
-		console.log(image);
 		return '<c:url value="/gallery/' + image._id + '"/>';
 	};
 
@@ -192,17 +201,14 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 	$scope.comments = {};
 	$scope.postsHavingComments = {};
 	$scope.galleries = {};
+	$scope.itemsPerPage = Jakduk.ItemsPerPageOnSearch;
+	$scope.itemsPerPageGallery = Jakduk.ItemsPerPageOnSearchGallery;
+	$scope.isGalleryOnly = false;
 	
 	angular.element(document).ready(function() {
 		var from = parseInt("${from}");
 		var where = "${w}";
-		var size = 10;
-		
-		if (from > 0) {
-			$scope.currentPage = (from + 10) / 10;
-		} else {
-			$scope.currentPage = 1;			
-		}
+		var size = $scope.itemsPerPage;
 		
 		if (!isEmpty(where)) {
 			var arrW = where.split(";");
@@ -227,8 +233,26 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 			$scope.where = {posts : false, comments : false, galleries : false};
 		}
 		
+		if ($scope.where.galleries == true && $scope.where.posts == null && $scope.where.comments == null) {
+			$scope.isGalleryOnly = true;
+		}
+		
+		if (from > 0) {
+			if ($scope.isGalleryOnly == true) {
+				$scope.currentPage = (from + $scope.itemsPerPageGallery) / $scope.itemsPerPageGallery;
+			} else {
+				$scope.currentPage = (from + $scope.itemsPerPage) / $scope.itemsPerPage;	
+			}			
+		} else {
+			$scope.currentPage = 1;			
+		}
+		
 		if ($scope.whereSize == 1) {
-			size = 10;
+			if ($scope.isGalleryOnly == true) {
+				size = $scope.itemsPerPageGallery;
+			} else {
+				size = $scope.itemsPerPage;
+			}
 		} else if ($scope.whereSize == 2) {
 			size = 5;
 		} else if ($scope.whereSize >= 3) {
@@ -322,7 +346,11 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 		var from = $scope.currentPage;
 		
 		if (from > 1) {
-			from = (from - 1) * 10;
+			if ($scope.isGalleryOnly == true) {
+				from = (from - 1) * $scope.itemsPerPageGallery;
+			} else {
+				from = (from - 1) * $scope.itemsPerPage;	
+			}
 		} else {
 			from = 0;
 		}

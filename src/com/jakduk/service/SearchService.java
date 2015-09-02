@@ -91,7 +91,13 @@ public class SearchService {
 				model.addAttribute("postsHavingComments", jakdukDAO.getBoardFreeOnSearchComment(ids));
 			}
 			if (w.contains("GA")) {
-				SearchResult result = this.searchDocumentGallery(q, from, 10);
+				int tempSize = size;
+				
+				if (size < 10) {
+					tempSize = 4;
+				}
+				
+				SearchResult result = this.searchDocumentGallery(q, from, tempSize);
 				model.addAttribute("galleries", result.getJsonString());
 			}
 		}
