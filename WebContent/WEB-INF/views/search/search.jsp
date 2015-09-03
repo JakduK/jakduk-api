@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>    
 <!DOCTYPE html>
@@ -28,7 +27,7 @@
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->	
 	
-<div class="search-block-v2">
+	<div class="search-block-v2">
         <div class="container">
 	        <div class="col-md-6 col-md-offset-3 margin-bottom-10">
 	        	<div class="input-group">
@@ -42,6 +41,7 @@
 					  <input type="checkbox" ng-model="where.galleries"><spring:message code="search.gallery"/>
 					</label>
 	        	</div>
+	        	<span class="text-danger" ng-show="whereAlert">{{whereAlert}}</span>
 	        </div>
             <div class="col-md-6 col-md-offset-3">
                 <div class="input-group">
@@ -49,16 +49,17 @@
                     ng-keypress="($event.which === 13)?btnEnter():return" placeholder='<spring:message code="search.placeholder.words"/>'>
                     <span class="input-group-btn">
                         <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
-                    </span>
+                    </span>                    
                 </div>
+                <span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
             </div>
         </div>    
     </div>
     
-    	<!--=== Content Part ===-->
+    <!--=== Content Part ===-->
 	<div class="container s-results">
 		<!-- search results of post -->
-		<div class=" margin-bottom-10" ng-show="posts.hits.total > 0">
+		<div class="margin-bottom-10" ng-show="posts.hits != null">
 			<span class="results-number"><spring:message code="search.post.results" arguments="{{posts.hits.total}}"/></span>
 	        
 	        <!-- Begin Inner Results -->
@@ -92,7 +93,7 @@
 		</div>
 		
 		<!-- search results of post -->
-		<div class=" margin-bottom-10" ng-show="comments.hits.total > 0">
+		<div class="margin-bottom-10" ng-show="comments.hits != null">
 			<span class="results-number"><spring:message code="search.comment.results" arguments="{{comments.hits.total}}"/></span>
 			
 			<div ng-repeat="hit in comments.hits.hits">
@@ -131,7 +132,7 @@
 		</div>	    
 		
 		<!-- search results of post -->
-		<div class=" margin-bottom-10" ng-show="galleries.hits.total > 0">
+		<div class="margin-bottom-10" ng-show="galleries.hits != null">
 			<span class="results-number"><spring:message code="search.gallery.results" arguments="{{galleries.hits.total}}"/></span>
 
 			<div class="row">
@@ -189,7 +190,24 @@ jakdukApp.config(function (LightboxProvider) {
 
 	LightboxProvider.getImageCaption = function (image) {
 		return image._source.name;
+	};
+	
+	// the modal height calculation has to be changed since our custom template is
+	// taller than the default template
+	LightboxProvider.calculateModalDimensions = function (dimensions) {
+		var width = Math.max(400, dimensions.imageDisplayWidth + 32);
+		
+		if (width >= dimensions.windowWidth - 20 || dimensions.windowWidth < 768) {
+		  width = 'auto';
+		}
+		
+		return {
+		  'width': width,                             // default
+		  'height': 'auto'                            // custom
+		};
 	};	
+	
+	LightboxProvider.templateUrl = "<%=request.getContextPath()%>/resources/jakduk/template/lightbox01.jsp";
 });
 
 jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) {
@@ -204,6 +222,8 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 	$scope.itemsPerPage = Jakduk.ItemsPerPageOnSearch;
 	$scope.itemsPerPageGallery = Jakduk.ItemsPerPageOnSearchGallery;
 	$scope.isGalleryOnly = false;
+	$scope.whereAlert = "";
+	$scope.enterAlert = "";
 	
 	angular.element(document).ready(function() {
 		var from = parseInt("${from}");
@@ -277,29 +297,43 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 	};
 	
 	$scope.btnEnter = function() {
-		if ($scope.searchWords.trim() < 1 || ($scope.where.posts == false && $scope.where.comments == false && $scope.where.galleries == false)) {
-			return;
+		var isValid = true;
+		
+		if ($scope.where.posts != true && $scope.where.comments != true && $scope.where.galleries != true) {
+			$scope.whereAlert = '<spring:message code="search.msg.you.should.select.at.least.one"/>';
+			isValid = false;		
+		} 
+		
+		if ($scope.searchWords.trim() < 1) {
+			$scope.enterAlert = '<spring:message code="search.msg.enter.words.you.want.search.words"/>';
+			isValid = false;
 		}
 		
-		var where = "";
-		
-		if ($scope.where.posts == true) {
-			where += "PO;";
+		if (isValid) {
+			var where = "";
+			
+			if ($scope.where.posts == true) {
+				where += "PO;";
+			}
+			if ($scope.where.comments == true) {
+				where += "CO;";
+			}
+			if ($scope.where.galleries == true) {
+				where += "GA;";
+			}
+			
+			location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=' + where + '"/>';
 		}
-		if ($scope.where.comments == true) {
-			where += "CO;";
-		}
-		if ($scope.where.galleries == true) {
-			where += "GA;";
-		}
-		
-		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=' + where + '"/>';
 	};
 	
 	$scope.getResults = function(where, from, size) {
 		
-		if ($scope.searchWords.trim() < 1) {
+		if ($scope.searchWords.trim() < 1 || 
+				($scope.where.posts != true && $scope.where.comments != true && $scope.where.galleries != true)) {
 			return;
+		} else {
+			$scope.whereAlert = "";
+			$scope.enterAlert = "";
 		}
 		
 		var bUrl = '<c:url value="/search/data.json?q=' + encodeURIComponent($scope.searchWords) + '&w=' + where + '&from=' + from + '&size=' + size + '"/>';
@@ -314,22 +348,18 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 				
 				if (data.posts != null) {
 					$scope.posts = JSON.parse(data.posts);
-					//console.log($scope.posts);
 				}
 				
 				if (data.comments != null) {
 					$scope.comments = JSON.parse(data.comments);
-					//console.log($scope.comments);
 				}
 				
 				if (data.postsHavingComments != null) {
 					$scope.postsHavingComments = data.postsHavingComments;
-					//console.log($scope.postsHavingComments);
 				}
 				
 				if (data.galleries != null) {
 					$scope.galleries = JSON.parse(data.galleries);
-					console.log($scope.galleries);
 				}
 				
 				$scope.resultsConn = "none";
@@ -360,8 +390,13 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 	
  	$scope.openLightboxModal = function (index) {
 		Lightbox.openModal($scope.galleries.hits.hits, index);
-	};	
-	
+	};
+});
+
+jakdukApp.controller("LightboxCtrl", function($scope, $window, Lightbox) {
+	$scope.openNewTab = function() {
+		$window.open(Lightbox.imageUrl);
+	};
 });
 </script>
 
