@@ -5,21 +5,23 @@
     ng-swipe-right="Lightbox.prevImage()">
   <!-- navigation -->
   <div class="lightbox-nav">
-    <p>
     	<button class="btn-u btn-brd btn-u" type="button" ng-click="Lightbox.prevImage()"><i class="fa fa-chevron-left"></i></button>
 		<button class="btn-u btn-brd btn-u" type="button" ng-click="Lightbox.nextImage()"><i class="fa fa-chevron-right"></i></button>
 		<button class="btn-u btn-brd btn-u" aria-hidden="true" ng-click="openNewTab()"><i class="fa fa-external-link"></i></button>
 		<!-- close button -->
 		<button class="btn-u btn-brd btn-u" aria-hidden="true" ng-click="$dismiss()"><i class="fa fa-times"></i></button>
-    </p>
   </div>
+  
+	<div>
+		<strong>{{Lightbox.imageCaption}}</strong>
+</div>
+<div>		
+		<span aria-hidden="true" class="icon-user"></span> {{Lightbox.images[Lightbox.index]._source.writer.username}}
+		&nbsp;
+		{{dateFromObjectId(Lightbox.images[Lightbox.index]._id) | date:dateTimeFormat.dateTime}}
+	</div>
 
   <div class="lightbox-image-container">
-    <!-- caption -->
-    <div class="lightbox-image-caption">
-      <span>{{Lightbox.imageCaption}}</span>
-    </div>
-
     <!-- image -->
     <img ng-if="!Lightbox.isVideo(Lightbox.image)" lightbox-src="{{Lightbox.imageUrl}}">
 

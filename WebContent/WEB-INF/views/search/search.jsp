@@ -71,7 +71,7 @@
 		            <p ng-if="hit.highlight.content.length == null">{{hit.fields.content_preview[0]}}</p>
 		            <ul class="list-inline down-ul">
 		                <li><i aria-hidden="true" class="icon-user"></i> {{hit._source.writer.username}}</li>
-		                <li>{{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
+		                <li>{{dateFromObjectId(hit._id) | date:dateTimeFormat.dateTime}}</li>
 		                <li></li>
 		            </ul>    
 		        </div>
@@ -100,7 +100,7 @@
 				<div class="inner-results">
 	            <ul class="list-inline up-ul">
 					<li><i aria-hidden="true" class="icon-user"></i> {{hit._source.writer.username}}</li>
-					<li>{{dateFromObjectId(hit._id) | date:"${dateTimeFormat.dateTime}"}}</li>
+					<li>{{dateFromObjectId(hit._id) | date:dateTimeFormat.dateTime}}</li>
 	            </ul>
 	            <p><a href='<c:url value="/board/free/{{hit._source.boardItem.seq}}"/>' ng-bind-html="hit.highlight.content[0]"></a></p>
 					<ul class="list-inline up-ul text-overflow">
@@ -131,8 +131,8 @@
 			</div>
 		</div>	    
 		
-		<!-- search results of post -->
-		<div class="margin-bottom-10" ng-show="galleries.hits != null">
+		<!-- search results of gallery -->
+		<div ng-show="galleries.hits != null">
 			<span class="results-number"><spring:message code="search.gallery.results" arguments="{{galleries.hits.total}}"/></span>
 
 			<div class="row">
@@ -192,6 +192,28 @@ jakdukApp.config(function (LightboxProvider) {
 		return image._source.name;
 	};
 	
+	LightboxProvider.calculateImageDimensionLimits = function (dimensions) {
+	    if (dimensions.windowWidth >= 768) {
+	        return {
+	          // 92px = 2 * (30px margin of .modal-dialog
+	          //             + 1px border of .modal-content
+	          //             + 15px padding of .modal-body)
+	          // with the goal of 30px side margins; however, the actual side margins
+	          // will be slightly less (at 22.5px) due to the vertical scrollbar
+	          'maxWidth': dimensions.windowWidth - 92,
+	          'maxHeight': dimensions.windowHeight - 180
+	        };
+	      } else {
+	        return {
+	          // 52px = 2 * (10px margin of .modal-dialog
+	          //             + 1px border of .modal-content
+	          //             + 15px padding of .modal-body)
+	          'maxWidth': dimensions.windowWidth - 52,
+	          'maxHeight': dimensions.windowHeight - 130
+	        };
+	      }
+	};
+	  
 	// the modal height calculation has to be changed since our custom template is
 	// taller than the default template
 	LightboxProvider.calculateModalDimensions = function (dimensions) {
@@ -224,6 +246,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 	$scope.isGalleryOnly = false;
 	$scope.whereAlert = "";
 	$scope.enterAlert = "";
+	$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
 	
 	angular.element(document).ready(function() {
 		var from = parseInt("${from}");
@@ -393,7 +416,25 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 	};
 });
 
+// Lightbox
 jakdukApp.controller("LightboxCtrl", function($scope, $window, Lightbox) {
+	
+	$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
+	
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		if (!isEmpty(objectId)) {
+			return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);	
+		}		
+	};
+	
+	$scope.intFromObjectId = function(objectId) {
+		return parseInt(objectId.substring(0, 8), 16) * 1000;
+	};	
+	
 	$scope.openNewTab = function() {
 		$window.open(Lightbox.imageUrl);
 	};

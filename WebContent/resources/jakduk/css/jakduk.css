@@ -92,6 +92,6 @@ td a {color:#555;}
 .s-results .inner-results p a:hover {color:#72c02c;}
 .s-results .blog-photos li img {max-width:100%; width:auto; height:auto;}
 
-.lightbox-nav {font-size:inherit;}
+.lightbox-nav {font-size:inherit; margin-bottom:5px;}
 
 .max-width-240 {max-width:240px;}

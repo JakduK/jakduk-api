@@ -8,6 +8,9 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,7 +58,12 @@ public class SearchService {
 		model.addAttribute("w", w);
 		model.addAttribute("from", from);
 		model.addAttribute("size", size);
-		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
+		try {
+			model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void getDataSearch(Model model, String q, String w, int from, int size) {
