@@ -213,7 +213,7 @@
 </div>
 	<div class="col-xs-6 text-right">
 		<button class="btn-u btn-brd btn-u-xs rounded" type="button" ng-click="btnUrlCopy()">
-			<spring:message code="common.button.copy.url.to.clipboard"/>
+			<i class="fa fa-anchor"></i>
 		</button>
 		<a id="kakao-link-btn" href="javascript:;">
 	   <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />

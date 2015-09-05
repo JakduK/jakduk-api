@@ -7,7 +7,7 @@
   <div class="lightbox-nav">
     	<button class="btn-u btn-brd btn-u" type="button" ng-click="Lightbox.prevImage()"><i class="fa fa-chevron-left"></i></button>
 		<button class="btn-u btn-brd btn-u" type="button" ng-click="Lightbox.nextImage()"><i class="fa fa-chevron-right"></i></button>
-		<button class="btn-u btn-brd btn-u" aria-hidden="true" ng-click="openNewTab()"><i class="fa fa-external-link"></i></button>
+		<button class="btn-u btn-brd btn-u" aria-hidden="true" ng-click="openNewTab()"><i class="fa fa-clone"></i></button>
 		<!-- close button -->
 		<button class="btn-u btn-brd btn-u" aria-hidden="true" ng-click="$dismiss()"><i class="fa fa-times"></i></button>
   </div>
