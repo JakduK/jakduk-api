@@ -39,15 +39,6 @@
 			<id>springsource-repo</id>
 			<url>http://repo.springsource.org/release</url>
 		</repository>
-		<repository>
-			<id>jboss-repo</id>
-			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
-		</repository>
-	  <repository>
-	    <id>spring-milestone</id>
-	    <name>Spring Maven MILESTONE Repository</name>
-	    <url>http://repo.spring.io/libs-milestone</url>
-	  </repository>
 	</repositories>
 
   <dependencies>

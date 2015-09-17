@@ -13,7 +13,7 @@
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 	
-	<link href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 

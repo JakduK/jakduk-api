@@ -7,10 +7,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title><spring:message code="search"/> &middot; <spring:message code="common.jakduk"/></title>
 	
-    <!-- CSS Page Style -->    
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_search_inner.css">
+	<!-- CSS Page Style -->    
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_search_inner.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/angular-loading-bar/build/loading-bar.min.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.min.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
     
     <jsp:include page="../include/html-header.jsp"></jsp:include>	
 </head>
@@ -48,7 +49,9 @@
                     <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords='${q}'" 
                     ng-keypress="($event.which === 13)?btnEnter():return" placeholder='<spring:message code="search.placeholder.words"/>'>
                     <span class="input-group-btn">
-                        <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
+                        <button class="btn-u ladda-button" type="button" ng-click="btnEnter();" ladda="btnSearch" data-style="expand-right">
+							<i class="fa fa-search"></i>
+                        </button>
                     </span>                    
                 </div>
                 <span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
@@ -57,7 +60,7 @@
     </div>
     
     <!--=== Content Part ===-->
-	<div class="container s-results">
+	<div class="container s-results">	
 		<!-- search results of post -->
 		<div class="margin-bottom-10" ng-show="posts.hits != null">
 			<span class="results-number"><spring:message code="search.post.results" arguments="{{posts.hits.total}}"/></span>
@@ -177,11 +180,14 @@
 <script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-loading-bar/build/loading-bar.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
 
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ui.bootstrap", "bootstrapLightbox"]);
+var jakdukApp = angular.module("jakdukApp", ["ngSanitize", "ui.bootstrap", "bootstrapLightbox", "angular-ladda"]);
 
 jakdukApp.config(function (LightboxProvider) {
 	LightboxProvider.getImageUrl = function (image) {
@@ -247,6 +253,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 	$scope.whereAlert = "";
 	$scope.enterAlert = "";
 	$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
+	$scope.btnSearch = false;
 	
 	angular.element(document).ready(function() {
 		var from = parseInt("${from}");
@@ -302,7 +309,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 			size = 3;
 		}
 		
-		$scope.getResults(where, from, size);
+		$scope.getResults(where, from, size);		
 		
 		App.init();
 	});
@@ -366,6 +373,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 			var reqPromise = $http.get(bUrl);
 			
 			$scope.resultsConn = "loading";
+			$scope.btnSearch = true;
 
 			reqPromise.success(function(data, status, headers, config) {
 				
@@ -386,11 +394,13 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 				}
 				
 				$scope.resultsConn = "none";
+				$scope.btnSearch = false;
 				
 			});
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.resultsConn = "none";
 				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+				$scope.btnSearch = false;
 			});
 		}
 	};
