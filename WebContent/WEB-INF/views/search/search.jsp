@@ -378,6 +378,7 @@ jakdukApp.controller("searchCtrl", function($scope, $http, $location, Lightbox) 
 			reqPromise.success(function(data, status, headers, config) {
 				
 				if (data.posts != null) {
+					console.log("posts=" + data.posts);
 					$scope.posts = JSON.parse(data.posts);
 				}
 				

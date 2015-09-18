@@ -11,7 +11,7 @@
 	<title><spring:message code="gallery"/> &middot; <spring:message code="common.jakduk"/></title>
 
 	<!-- CSS Page Style -->    
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/blueimp-gallery/css/blueimp-gallery.min.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.min.css">
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
@@ -29,25 +29,39 @@
 	<!--=== End Breadcrumbs ===-->
 
 <div class="container content" ng-controller="galleryCtrl">
-	<div id="links" class="row"> 
-		<div class="col-md-4 margin-bottom-10-n" ng-repeat="gallery in galleries">
-	   		<a ng-href="<%=request.getContextPath()%>/gallery/{{gallery.id}}" class="fancybox img-hover-v1" title="{{gallery.name}}">
-				<span><img class="img-responsive" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}"></span>
-			</a>		
-		</div>
-	</div><!--/row-->
 
-<!-- The Gallery as lightbox dialog, should be a child element of the document body -->
-<div id="blueimp-gallery" class="blueimp-gallery">
-    <div class="slides"></div>
-    <h3 class="title"></h3>
-    <a class="prev">‹</a>
-    <a class="next">›</a>
-    <a class="close">×</a>
-    <a class="play-pause"></a>
-</div>	
+	<div class="row">
+		<div class="col-sm-6">
+	       <div class="input-group">
+	           <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''" 
+	           ng-keypress="($event.which === 13)?btnEnter():return" 
+	           placeholder='<spring:message code="search.placeholder.words"/>'>
+	           <span class="input-group-btn">
+	               <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
+	           </span>	           
+	       </div>
+	       <span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
+		</div>	
+	</div>		
+
+	<hr class="padding-5"/>
+
+	<!-- search results of gallery -->
+	<div ng-show="galleries != null">
+		<div class="row">
+			<!-- Begin Easy Block v2 -->                
+			<div class="col-md-3 col-sm-4 col-xs-6 md-margin-bottom-10" ng-repeat="gallery in galleries">
+				<div class="simple-block">
+					<img class="img-responsive img-bordered" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{gallery.id}}" alt="{{gallery.name}}"
+					ng-click="openLightboxModal($index)">
+					<p class="text-overflow max-width-360">{{gallery.name}}</p>
+				</div>  
+			</div>
+			<!-- End Simple Block -->
+		</div>
+	</div>
 	
-<div infinite-scroll="getGalleries()" infinite-scroll-disabled="infiniteDisabled">
+	<div infinite-scroll="getGalleries()" infinite-scroll-disabled="infiniteDisabled">
 </div>        
 </div>
 
@@ -61,30 +75,76 @@
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-lazy-img/release/angular-lazy-img.js"></script>
 <script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/blueimp-gallery/js/blueimp-gallery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-touch/angular-touch.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-loading-bar/build/loading-bar.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["infinite-scroll", "angularLazyImg"]);
+var jakdukApp = angular.module("jakdukApp", ["infinite-scroll", "angularLazyImg", "ui.bootstrap", "bootstrapLightbox"]);
 
-jakdukApp.controller("galleryCtrl", function($scope, $http) {
+jakdukApp.config(function (LightboxProvider) {
+	LightboxProvider.getImageUrl = function (image) {
+		return '<c:url value="/gallery/' + image.id + '"/>';
+	};
+
+	LightboxProvider.getImageCaption = function (image) {
+		return image.name;
+	};
+	
+	LightboxProvider.calculateImageDimensionLimits = function (dimensions) {
+	    if (dimensions.windowWidth >= 768) {
+	        return {
+	          // 92px = 2 * (30px margin of .modal-dialog
+	          //             + 1px border of .modal-content
+	          //             + 15px padding of .modal-body)
+	          // with the goal of 30px side margins; however, the actual side margins
+	          // will be slightly less (at 22.5px) due to the vertical scrollbar
+	          'maxWidth': dimensions.windowWidth - 92,
+	          'maxHeight': dimensions.windowHeight - 180
+	        };
+	      } else {
+	        return {
+	          // 52px = 2 * (10px margin of .modal-dialog
+	          //             + 1px border of .modal-content
+	          //             + 15px padding of .modal-body)
+	          'maxWidth': dimensions.windowWidth - 52,
+	          'maxHeight': dimensions.windowHeight - 130
+	        };
+	      }
+	};
+	  
+	// the modal height calculation has to be changed since our custom template is
+	// taller than the default template
+	LightboxProvider.calculateModalDimensions = function (dimensions) {
+		var width = Math.max(400, dimensions.imageDisplayWidth + 32);
+		
+		if (width >= dimensions.windowWidth - 20 || dimensions.windowWidth < 768) {
+		  width = 'auto';
+		}
+		
+		return {
+		  'width': width,                             // default
+		  'height': 'auto'                            // custom
+		};
+	};	
+	
+	LightboxProvider.templateUrl = "<%=request.getContextPath()%>/resources/jakduk/template/lightbox02.jsp";
+});
+
+jakdukApp.controller("galleryCtrl", function($scope, $http, Lightbox) {
 	$scope.galleriesConn = "none";
 	$scope.galleries = [];
 	$scope.usersLikingCount = [];
 	$scope.usersDislikingCount = [];
 	$scope.infiniteDisabled = false;
+	$scope.enterAlert = "";
 	
 	angular.element(document).ready(function() {
-		//$scope.getGalleries();
-		
-		document.getElementById('links').onclick = function (event) {
-		    event = event || window.event;
-		    var target = event.target || event.srcElement,
-		        link = target.children[0].src ? target.parentNode : target,
-		        options = {index: link, event: event},
-		        links = this.getElementsByTagName('a');
-		    
-		    blueimp.Gallery(links, options);
-		};
+		   if ($("body").height() <= $(window).height()) {
+		        $scope.getGalleries();
+		    }
 		
 		App.init();
 	});	
@@ -94,9 +154,9 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 		var bUrl;
 		if ($scope.galleries.length > 0) {
 			var lastGallery = $scope.galleries[$scope.galleries.length - 1].id;
-			bUrl = '<c:url value="/gallery/data/list.json?id=' + lastGallery + '"/>';
+			bUrl = '<c:url value="/gallery/data/list.json?id=' + lastGallery + '&size=' + Jakduk.ItemsPerPageOnGallery + '"/>';
 		} else {
-			bUrl = '<c:url value="/gallery/data/list.json"/>';
+			bUrl = '<c:url value="/gallery/data/list.json?size=' + Jakduk.ItemsPerPageOnGallery + '"/>';
 		}
 		
 		if ($scope.galleriesConn == "none") {
@@ -110,7 +170,6 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 				data.galleries.forEach(function(gallery) {
 					$scope.galleries.push(gallery);
 				});
-
 				
 				for (var key in data.usersLikingCount) {
 					var value = data.usersLikingCount[key];
@@ -124,10 +183,6 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 				
 				$scope.galleriesConn = "none";
 				
-				if (data.galleries.length < 12) {
-					$scope.infiniteDisabled = true;
-				}
-				
 			});
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.galleriesConn = "none";
@@ -136,10 +191,46 @@ jakdukApp.controller("galleryCtrl", function($scope, $http) {
 		}
 	};
 	
-	$scope.btnMore = function() {
-		
+ 	$scope.openLightboxModal = function (index) {
+		Lightbox.openModal($scope.galleries, index);
 	};
 	
+	$scope.btnEnter = function() {
+		var isValid = true;
+		
+		if ($scope.searchWords.trim() < 1) {
+			$scope.enterAlert = '<spring:message code="search.msg.enter.words.you.want.search.words"/>';
+			isValid = false;
+		}
+		
+		if (isValid) {
+			location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=GA;"/>';	
+		}
+	};	
+});
+
+//Lightbox
+jakdukApp.controller("LightboxCtrl", function($scope, $window, Lightbox) {
+	
+	$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
+	
+	$scope.objectIdFromDate = function(date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	};
+	
+	$scope.dateFromObjectId = function(objectId) {
+		if (!isEmpty(objectId)) {
+			return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);	
+		}		
+	};
+	
+	$scope.intFromObjectId = function(objectId) {
+		return parseInt(objectId.substring(0, 8), 16) * 1000;
+	};	
+	
+	$scope.openNewTab = function() {
+		$window.open(Lightbox.imageUrl);
+	};
 });
 </script>
 

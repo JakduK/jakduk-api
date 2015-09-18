@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,16 +59,21 @@ public class GalleryController {
 	}		
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String list(Model model) {
+	public String list(Model model,
+			HttpServletRequest request) {
+		
+		Locale locale = localeResolver.resolveLocale(request);
+		galleryService.getList(model, locale);
 		
 		return "gallery/list";
 	}
 	
 	@RequestMapping(value = "/data/list", method = RequestMethod.GET)
 	public void dataList(Model model,
-			@RequestParam(required = false) String id) {
+			@RequestParam(required = false) String id,
+			@RequestParam(required = false) int size) {
 		
-		galleryService.getList(model, id);
+		galleryService.getDataList(model, id, size);
 		
 	}
 	

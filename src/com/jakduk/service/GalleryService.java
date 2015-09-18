@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -84,6 +85,15 @@ public class GalleryService {
 	private SearchService searchService;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
+	
+	public void getList(Model model, Locale locale) {
+		try {
+			model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	public Integer uploadImage(Model model, MultipartFile file) {
 		
@@ -338,16 +348,18 @@ public class GalleryService {
 		return HttpServletResponse.SC_OK;
 	}	
 
-	public Model getList(Model model, String id) {
+	public Model getDataList(Model model, String id, int size) {
+		
+		if (size < CommonConst.GALLERY_SIZE) size = CommonConst.GALLERY_SIZE;
 
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 		
 		List<GalleryOnList> galleries;
 		
 		if (id != null && !id.isEmpty()) {
-			galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.GALLERY_SIZE, new ObjectId(id));
+			galleries = jakdukDAO.getGalleryList(Direction.DESC, size, new ObjectId(id));
 		} else {
-			galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.GALLERY_SIZE, null);
+			galleries = jakdukDAO.getGalleryList(Direction.DESC, size, null);
 		}
 		
 		for (GalleryOnList gallery : galleries) {

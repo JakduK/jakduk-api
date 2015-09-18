@@ -125,8 +125,8 @@
 			</c:choose>
 			</div>
 		</div>
-		<div class="col-sm-6">
-	       <div class="input-group margin-bottom-10">
+		<div class="col-sm-6 sm-margin-bottom-10">
+	       <div class="input-group">
 	           <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''" 
 	           ng-keypress="($event.which === 13)?btnEnter():return" 
 	           placeholder='<spring:message code="search.placeholder.words"/>'>
@@ -134,6 +134,7 @@
 	               <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
 	           </span>
 	       </div>
+	       <span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
 		</div>			
 	</div>
 	
@@ -324,6 +325,7 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 	$scope.dataTopPostConn = "none";
 	$scope.topLike = [];
 	$scope.topComment = [];
+	$scope.enterAlert = "";
 	
 	angular.element(document).ready(function() {
 		var page = parseInt("${boardListInfo.page}");
@@ -366,11 +368,17 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnEnter = function() {
+		
+		var isValid = true;
+		
 		if ($scope.searchWords.trim() < 1) {
-			return;
+			$scope.enterAlert = '<spring:message code="search.msg.enter.words.you.want.search.words"/>';
+			isValid = false;
 		}
 		
-		location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=PO;CO;"/>';
+		if (isValid) {
+			location.href = '<c:url value="/search?q=' + $scope.searchWords.trim() + '&w=PO;CO;"/>';	
+		}
 	};
 	
 	$scope.pageChanged = function() {

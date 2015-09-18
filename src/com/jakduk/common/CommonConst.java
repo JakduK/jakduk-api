@@ -32,7 +32,7 @@ public class CommonConst {
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 110;
 	public final static Integer SEARCH_CONTENT_MAX_LENGTH = 200;
 	public final static Integer COMMENT_MAX_SIZE = 30;	
-	public final static Integer GALLERY_SIZE = 12;
+	public final static Integer GALLERY_SIZE = 24;
 	public final static Integer BOARD_TOP_LIMIT = 3;
 
 	/**

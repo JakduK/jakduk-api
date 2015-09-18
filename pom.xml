@@ -13,25 +13,32 @@
 
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.1.6.RELEASE</spring.version>
-		<spring.security.core.version>4.0.1.RELEASE</spring.security.core.version>   	
-		<spring.security.oauth.version>2.0.6.RELEASE</spring.security.oauth.version>
+		<spring.version>4.2.1.RELEASE</spring.version>
+		<spring.security.core.version>4.0.2.RELEASE</spring.security.core.version>   	
+		<spring.security.oauth.version>2.0.7.RELEASE</spring.security.oauth.version>
+		<spring.mobile.device.version>1.1.5.RELEASE</spring.mobile.device.version>
 		<jstl.version>1.2</jstl.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<javax.servlet.jsp-api.version>2.3.1</javax.servlet.jsp-api.version>
-		<com.fasterxml.jackson.version>2.4.4</com.fasterxml.jackson.version>
+		<com.fasterxml.jackson.version>2.6.2</com.fasterxml.jackson.version>
+		
+		<junit.version>4.12</junit.version>
+	
+		<!-- hibernate -->
+		<org.hibernate.validator.version>5.2.1.Final</org.hibernate.validator.version>
+		<org.hibernate.annotations.version>3.5.6-Final</org.hibernate.annotations.version>
 	
 		<!-- Miscellaneous Dependencies -->
 		<log4j-core.version>2.1</log4j-core.version>
-		
-		<org.slf4j-version>1.7.2</org.slf4j-version>
+		<org.slf4j-version>1.7.12</org.slf4j-version>
 			
 		<!-- Mongo DB driver & Spring Data MongoDB -->
-		<spring.data.mongodb.version>1.5.4.RELEASE</spring.data.mongodb.version>
-		<mongodb.driver.version>2.12.3</mongodb.driver.version>
+		<spring.data.mongodb.version>1.8.0.RELEASE</spring.data.mongodb.version>
+		<mongodb.driver.version>3.0.4</mongodb.driver.version>
 		
 		<!-- Elasticsearch -->
-		<elasticsearch.version>1.7.0</elasticsearch.version>
+		<elasticsearch.version>1.7.2</elasticsearch.version>
+		<io.searchbox.version>0.1.7</io.searchbox.version>
   </properties>
 	  
  	<repositories>
@@ -205,16 +212,22 @@
 			<artifactId>spring-security-oauth2</artifactId>
 			<version>${spring.security.oauth.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.mobile</groupId>
+			<artifactId>spring-mobile-device</artifactId>
+			<version>${spring.mobile.device.version}</version>
+		</dependency>
 				
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>4.0.0.GA</version>
+			<version>${org.hibernate.validator.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
-			<version>3.5.6-Final</version>
+			<version>${org.hibernate.annotations.version}</version>
 		</dependency>
 
 		<dependency>
@@ -227,18 +240,12 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>		
-
-		<dependency>
-			<groupId>org.springframework.mobile</groupId>
-			<artifactId>spring-mobile-device</artifactId>
-			<version>1.1.3.RELEASE</version>
-		</dependency>
 		
 		<!-- Test -->				
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -263,26 +270,9 @@
 		<dependency>
 			<groupId>io.searchbox</groupId>
 			<artifactId>jest</artifactId>
-			<version>0.1.6</version>
+			<version>${io.searchbox.version}</version>
 		</dependency>
-
-		<!-- solr -->
-		<!-- 
-		<dependency>
-			<artifactId>solr-solrj</artifactId>
-			<groupId>org.apache.solr</groupId>
-			<version>4.9.0</version>
-			<type>jar</type>
-			<scope>test</scope>
-		</dependency>    
-		<dependency>
-			<artifactId>solr-core</artifactId>
-			<groupId>org.apache.solr</groupId>
-			<version>4.9.0</version>
-			<type>jar</type>
-			<scope>test</scope>
-		</dependency>
-		 -->         
+       
   </dependencies>
   
  	<build>

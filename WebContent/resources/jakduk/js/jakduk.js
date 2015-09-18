@@ -10,7 +10,8 @@ var Jakduk = {
 	FormUsernameLengthMin : 2,
 	FormUsernameLengthMax : 20,
 	ItemsPerPageOnSearch : 10, // 찾기에서 페이지 당 아이템 수
-	ItemsPerPageOnSearchGallery : 12 // 찾기에서 사진첩의 페이지 당 아이템 수
+	ItemsPerPageOnSearchGallery : 12, // 찾기에서 사진첩의 페이지 당 아이템 수
+	ItemsPerPageOnGallery : 24  // 사진첩에서 한번 로딩할때 가져오는 그림의 수
 };
 
 function isEmpty(str) {
