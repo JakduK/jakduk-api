@@ -46,12 +46,16 @@
 	</bean>
 	
 	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-		<property name="mediaTypes">
-			<map>
-				<entry key="atom" value="application/atom+xml" />
-				<entry key="html" value="text/html" />
-				<entry key="json" value="application/json" />
-			</map>
+		<property name="contentNegotiationManager">
+			<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+				<property name="mediaTypes">
+					<value>
+						atom=application/atom+xml
+						html=text/html
+						json=application/json
+					</value>
+				</property>
+			</bean>
 		</property>
 		<property name="viewResolvers">
 			<list>

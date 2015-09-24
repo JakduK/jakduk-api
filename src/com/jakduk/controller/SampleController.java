@@ -150,5 +150,10 @@ public class SampleController {
 	public String lightbox01(Model model) {
 		return "sample/lightbox01";
 	}
+	
+	@RequestMapping(value ="/slick01")
+	public String slick01(Model model) {
+		return "sample/slick01";
+	}
 
 }

@@ -71,7 +71,7 @@ public class GalleryController {
 	@RequestMapping(value = "/data/list", method = RequestMethod.GET)
 	public void dataList(Model model,
 			@RequestParam(required = false) String id,
-			@RequestParam(required = false) int size) {
+			@RequestParam(required = false, defaultValue = "0") int size) {
 		
 		galleryService.getDataList(model, id, size);
 		
