@@ -32,6 +32,7 @@
     "angular-bootstrap-lightbox": "~0.9.0",
     "angular-touch": "~1.4.5",
     "angular-loading-bar": "~0.8.0",
+    "angular-slick-carousel": "~3.1.0",
     "angular-slick": "~0.2.1"
   }
 }

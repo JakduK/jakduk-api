@@ -15,28 +15,25 @@
 
 </head>
 <body>
-<div class="wrapper" ng-controller="sampleCtrl">
+<div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
+	
+	<div class="container content" ng-controller="sampleCtrl">
 
-<slick lazy-load="ondemand" slides-to-show="3" slides-to-scroll="1" class="slider lazy ng-isolate-scope slick-initialized slick-slider">
-	<div class="slick-list draggable" tabindex="0">
-	<div class="slick-track" style="width: 2244px; transform: translate3d(-561px, 0px, 0px); opacity: 1;">
-	<div class="slick-slide slick-cloned" style="width: 187px;" ng-repeat="image in galleries">
-		<div class="image">
-			<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.id}}" class="slick-loading">
-		</div>
+<slick infinite="true" slides-to-show="3" slides-to-scroll="3" init-onload="true" data="dataLoaded">
+  	<div ng-repeat="image in galleries">
+		<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.id}}">
 	</div>
+</slick>
 	
-	<div class="slick-slide slick-cloned" style="width: 187px;">
-	<div class="image"><img data-lazy="images/lazyfonz5.png" class="slick-loading"></div></div>
-	
+ <slick autoplay=true autoplaySpeed=1000 init-onload="true"
+ responsive="miniGalleryResponsive" centerMode=true variableWidth=true centerPadding="20px" data="dataLoaded">  
+	<div ng-repeat="image in galleries">
+		<img ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.id}}">
+	</div>
+</slick>
 
-	</div></div>
-      
-    <button type="button" class="slick-prev" tabindex="-1" style="display: block;">Previous</button><button type="button" class="slick-next" tabindex="-1" style="display: block;">Next</button></slick>
-    <button type="button" class="slick-prev" tabindex="-1" style="display: block;">Previous</button><button type="button" class="slick-next" tabindex="-1" style="display: block;">Next</button>
-</slick>	
-
+</div>
 	
 </div>
 <!-- Bootstrap core JavaScript
@@ -47,11 +44,43 @@
 <script src="<%=request.getContextPath()%>/resources/angular-slick/dist/slick.min.js"></script>
 
 <script type="text/javascript">
+
 var jakdukApp = angular.module('jakdukApp', ['slick']);
 
 jakdukApp.controller('sampleCtrl', function($scope, $http) {
 	$scope.galleriesConn = "none";
-	$scope.galleries = [];    
+	$scope.galleries = [];
+	
+    $scope.miniGalleryResponsive = [
+                                    {
+                                        breakpoint: 1240,
+                                        settings: {
+                                            slidesToShow: 4,
+                                            slidesToScroll: 4
+                                        }
+                                    },
+                                    {
+                                        breakpoint: 800,
+                                        settings: {
+                                            slidesToShow: 3,
+                                            slidesToScroll: 1
+                                        }
+                                    },
+                                    {
+                                        breakpoint: 600,
+                                        settings: {
+                                            slidesToShow: 2,
+                                            slidesToScroll: 1
+                                        }
+                                    },
+                                    {
+                                        breakpoint: 480,
+                                        settings: {
+                                            slidesToShow: 1,
+                                            slidesToScroll: 1
+                                        }
+                                    }
+                                ];
 	
 	angular.element(document).ready(function() {
 		$scope.getGalleries();
@@ -72,6 +101,7 @@ jakdukApp.controller('sampleCtrl', function($scope, $http) {
 				console.log(data);
 				
 				$scope.galleriesConn = "none";
+				$scope.dataLoaded = true;
 				
 			});
 			reqPromise.error(function(data, status, headers, config) {

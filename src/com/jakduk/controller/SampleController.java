@@ -155,5 +155,9 @@ public class SampleController {
 	public String slick01(Model model) {
 		return "sample/slick01";
 	}
-
+	
+	@RequestMapping(value ="/slick02")
+	public String slick02(Model model) {
+		return "sample/slick02";
+	}
 }
