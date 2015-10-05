@@ -150,7 +150,9 @@
     	<input type="hidden" id="subject" value="${post.subject}">
         	<h2>
         	<small>
-				<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if><c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if><c:if test="${galleries != null}"><span aria-hidden="true" class="icon-picture"></span></c:if>
+				<c:if test="${post.status.device == 'mobile'}"><span aria-hidden="true" class=" icon-screen-smartphone"></span></c:if>
+				<c:if test="${post.status.device == 'tablet'}"><span aria-hidden="true" class=" icon-screen-tablet"></span></c:if>
+				<c:if test="${galleries != null}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 			</small>
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
@@ -213,7 +215,7 @@
 </div>
 	<div class="col-xs-6 text-right">
 		<button class="btn-u btn-brd btn-u-xs rounded" type="button" ng-click="btnUrlCopy()">
-			<i class="fa fa-anchor"></i>
+			<i class="icon-link"></i>
 		</button>
 		<a id="kakao-link-btn" href="javascript:;">
 	   <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
@@ -253,8 +255,8 @@
 				<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
 			</h5>    
 			<p>
-				<span ng-if="comment.status.device == 'mobile'"><i class="fa fa-mobile fa-lg"></i></span>
-				<span ng-if="comment.status.device == 'tablet'"><i class="fa fa-tablet fa-lg"></i></span>
+				<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
+				<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
 				<span ng-bind-html="comment.content"></span>
 			</p>
 			<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-xs" 

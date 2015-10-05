@@ -162,8 +162,8 @@
 							<span aria-hidden="true" class="icon-directions visible-xs-inline"></span><spring:message code="board.notice"/>
 						</div>
 						<div class="col-sm-4">
-							<c:if test="${notice.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-							<c:if test="${notice.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+							<c:if test="${notice.status.device == 'mobile'}"><span aria-hidden="true" class="icon-screen-smartphone"></span></c:if>
+							<c:if test="${notice.status.device == 'tablet'}"><span aria-hidden="true" class=" icon-screen-tablet"></span></c:if>
 							<c:if test="${fn:length(notice.galleries) > 0}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 							<a href="<c:url value="/board/free/${notice.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 								<c:choose>
@@ -228,8 +228,8 @@
 							</c:if>
 						</div>
 						<div class="col-sm-4">
-							<c:if test="${post.status.device == 'mobile'}"><i class="fa fa-mobile fa-lg"></i></c:if>
-							<c:if test="${post.status.device == 'tablet'}"><i class="fa fa-tablet fa-lg"></i></c:if>
+							<c:if test="${post.status.device == 'mobile'}"><span aria-hidden="true" class="icon-screen-smartphone"></span></c:if>
+							<c:if test="${post.status.device == 'tablet'}"><span aria-hidden="true" class=" icon-screen-tablet"></span></c:if>
 							<c:if test="${fn:length(post.galleries) > 0}"><span aria-hidden="true" class="icon-picture"></span></c:if>
 							<a href="<c:url value="/board/free/${post.seq}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>">
 								<c:choose>

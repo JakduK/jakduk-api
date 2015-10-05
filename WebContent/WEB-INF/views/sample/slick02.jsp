@@ -30,6 +30,13 @@
 	
 	<div class="container content" ng-controller="sampleCtrl">
 
+<div class="owl-navigation">
+    <div class="customNavigation">
+        <a class="owl-btn prev-v1"><i class="fa fa-angle-left"></i></a>
+        <a class="owl-btn next-v1"><i class="fa fa-angle-right"></i></a>
+    </div>
+</div>
+                    
     <slick settings="slickConfig" ng-if="dataLoaded">
     
     <div ng-repeat="image in galleries">
@@ -37,10 +44,10 @@
 			<img style="width:250px; margin:5px;" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.id}}">
 			<p>abcdef</p>
 		</div>  
-</div>		
-    <button ng-click="slickConfig.method.slickPrev()">slickPrev()</button>
-<button ng-click="slickConfig.method.slickNext()">slickNext()</button>
+</div>	
     </slick>
+<button ng-click="slickConfig.method.slickPrev()">slickPrev()</button>
+<button ng-click="slickConfig.method.slickNext()">slickNext()</button>    
 	
 </div>
 	
