@@ -182,6 +182,7 @@
 				</c:otherwise>
 			</c:choose>            
 			
+	<!-- galleries -->			
 	<c:if test="${galleries != null}">
 	<ul class="list-group">
 	  <li class="list-group-item">
@@ -196,33 +197,34 @@
 	  </li>
 	</ul>	
 	</c:if>					
-	
-<div class="ladda-btn margin-bottom-10">
-<div class="row">
-<div class="col-xs-6">
-<button class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-sm ladda-button" type="button"
-	ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
-	ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro">
-	<i class="fa fa-thumbs-o-up fa-lg"></i>
-   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
-</button>
-<button class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-sm ladda-button" type="button" 
-	ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
-	ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro">
-	<i class="fa fa-thumbs-o-down fa-lg"></i>
-   <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
-</button>
-</div>
-	<div class="col-xs-6 text-right">
-		<button class="btn-u btn-brd btn-u-xs rounded" type="button" ng-click="btnUrlCopy()">
-			<i class="icon-link"></i>
-		</button>
-		<a id="kakao-link-btn" href="javascript:;">
-	   <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
-	  </a>
-	</div>		
 
-</div>
+<!-- buttons -->	
+<div class="ladda-btn margin-bottom-10">
+	<div class="row">
+		<div class="col-xs-6">
+			<button class="btn-u btn-brd rounded btn-u-blue btn-u-sm ladda-button" type="button"
+				ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
+				ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro">
+				<i class="fa fa-thumbs-o-up fa-lg"></i>
+			   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
+			</button>
+			<button class="btn-u btn-brd rounded btn-u-red btn-u-sm ladda-button" type="button" 
+				ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
+				ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro">
+				<i class="fa fa-thumbs-o-down fa-lg"></i>
+			   <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
+			</button>
+		</div>
+		<div class="col-xs-6 text-right">
+			<button class="btn-u btn-brd rounded btn-u-sm ladda-button" type="button" ng-click="btnUrlCopy()">
+				<i class="icon-link"></i>
+			</button>
+			<a id="kakao-link-btn" href="javascript:;">
+				<img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
+			</a>
+		</div>		
+	
+	</div>
 </div>
 
 <div class="alert {{alert.classType}} fade in rounded" ng-show="alert.msg">
@@ -259,14 +261,14 @@
 				<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
 				<span ng-bind-html="comment.content"></span>
 			</p>
-			<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-xs" 
+			<button type="button" class="btn-u btn-brd rounded btn-u-blue btn-u-xs" 
 			ng-click="btnCommentFeeling(comment.id, 'like')">
 				<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
 					<i class="fa fa-thumbs-o-up fa-lg"></i>
 					{{numberOfCommentLike[comment.id]}}
 				</span>
 			</button>
-			<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
+			<button type="button" class="btn-u btn-brd rounded btn-u-red btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
 				<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
 					<i class="fa fa-thumbs-o-down fa-lg"></i>
 					{{numberOfCommentDislike[comment.id]}}
@@ -307,7 +309,7 @@
 				</button>	
 			</c:when>
 			<c:when test="${authRole == 'USER'}">
-				<button type="button" class="btn-u btn-brd btn-brd-hover rounded btn-u-sm ladda-button" 
+				<button type="button" class="btn-u btn-brd rounded btn-u-sm ladda-button" 
 				ng-click="btnWriteComment()" 
 				ladda="writeComment" data-style="expand-right" data-spinner-color="Gainsboro">
 					<span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.write.comment"/>

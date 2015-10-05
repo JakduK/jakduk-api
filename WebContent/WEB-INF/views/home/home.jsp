@@ -151,36 +151,34 @@
             </div>
             <!-- End Right Sidebar -->
             
-	<div class="col-md-12">
-		<!-- 최근 사진 -->
-		<div class="owl-carousel-v1 owl-work-v1 col-sm-12">
-			<div class="headline">
-				<h2 class="pull-left"><spring:message code="home.pictures.latest"/></h2>
-				<div class="owl-navigation">
-					<button style="margin:6px 0px 0px 6px;" class="btn-u btn-u-xs btn-u-default rounded pull-left" type="button" onclick="location.href='<c:url value="/gallery/list"/>'">
-	    				<spring:message code="common.button.more"/>
-	    			</button>
-	    				                     
-					<div class="customNavigation">
-						<a class="owl-btn prev-v2" ng-click="slickConfig.method.slickPrev()"><i class="fa fa-angle-left"></i></a>
-						<a class="owl-btn next-v2" ng-click="slickConfig.method.slickNext()"><i class="fa fa-angle-right"></i></a>
-					</div>
-				</div><!--/navigation-->
-			</div>
-			
-			<slick settings="slickConfig" ng-if="dataLoaded">
-				<div ng-repeat="image in galleriesLatest">
-	    			<div class="simple-block">
-		    			<a ng-href="<%=request.getContextPath()%>/gallery/view/{{image.id}}">
-							<img style="width:225px; margin:5px;" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.id}}">
-						</a>
-						<p class="img-responsive">{{image.name}}</p>
-					</div>  
-					
-				</div>	
-			</slick>			
-        </div> 
-	</div>            
+	<!-- 최근 사진 -->
+	<div class="owl-carousel-v1 owl-work-v1 col-sm-12">
+		<div class="headline">
+			<h2 class="pull-left"><spring:message code="home.pictures.latest"/></h2>
+			<div class="owl-navigation">
+				<button style="margin:6px 0px 0px 6px;" class="btn-u btn-u-xs btn-u-default rounded pull-left" type="button" onclick="location.href='<c:url value="/gallery/list"/>'">
+    				<spring:message code="common.button.more"/>
+    			</button>
+    				                     
+				<div class="customNavigation">
+					<a class="owl-btn prev-v2" ng-click="slickConfig.method.slickPrev()"><i class="fa fa-angle-left"></i></a>
+					<a class="owl-btn next-v2" ng-click="slickConfig.method.slickNext()"><i class="fa fa-angle-right"></i></a>
+				</div>
+			</div><!--/navigation-->
+		</div>
+		
+		<slick settings="slickConfig" ng-if="dataLoaded">
+			<div ng-repeat="image in galleriesLatest">
+    			<div class="simple-block">
+	    			<a ng-href="<%=request.getContextPath()%>/gallery/view/{{image.id}}">
+						<img style="width:225px; margin:5px;" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.id}}">
+					</a>
+					<p class="img-responsive">{{image.name}}</p>
+				</div>  
+				
+			</div>	
+		</slick>			
+       </div> 
             
 	</div>	
 
@@ -192,12 +190,11 @@
 
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
-<!-- JS Implementing Plugins -->
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/smoothScroll.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/scrollbar/js/jquery.mCustomScrollbar.concat.min.js"></script>
-<!-- JS Page Level -->           
-<script src="<%=request.getContextPath()%>/resources/slick-carousel/slick/slick.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular-slick-carousel/dist/angular-slick.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/slick-carousel/slick/slick.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/angular-slick-carousel/dist/angular-slick.min.js"></script>
+
 <script type="text/javascript">
 
 var jakdukApp = angular.module('jakdukApp', ['ngSanitize', 'slickCarousel']);
@@ -213,23 +210,21 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 	$scope.homeDescription = {};
 	
 	$scope.slickConfig = {
-			infinite: false,
-			    autoplay: false,
-			    draggable: true,
-			    //autoplaySpeed: 3000,
-			    slidesToScroll : 2,
-			    arrows : false,
-			    variableWidth: true,
-			    //lazyLoad : 'ondemand',
-			    //centerPadding: '60px',    
-			    method: {},
-			    event: {
-			        beforeChange: function (event, slick, currentSlide, nextSlide) {
-			        },
-			        afterChange: function (event, slick, currentSlide, nextSlide) {
-			        }
-			    }
-			};
+		infinite: false,
+		autoplay: true,
+		draggable: true,
+		autoplaySpeed: 3000,
+		//slidesToScroll : 2,
+		arrows : false,
+		variableWidth: true,
+		lazyLoad : 'ondemand',
+		//centerPadding: '60px',    
+		method: {},
+		event: {
+			beforeChange: function (event, slick, currentSlide, nextSlide) {},
+			afterChange: function (event, slick, currentSlide, nextSlide) {}
+		}
+	};
 	
 	angular.element(document).ready(function() {
 		$scope.refreshEncyclopedia();
@@ -271,7 +266,7 @@ jakdukApp.controller("homeCtrl", function($scope, $http) {
 	};
 	
 	$scope.getDataLatest = function() {
-		var bUrl = '<c:url value="/home/data/latest.json"/>';
+		var bUrl = '<c:url value="/home/data/latest.json" />';
 		
 		if ($scope.dataLatestConn == "none") {
 			

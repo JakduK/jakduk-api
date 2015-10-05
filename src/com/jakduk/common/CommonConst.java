@@ -27,7 +27,7 @@ public class CommonConst {
 	public final static Integer BOARD_MAX_LIMIT = 20;
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
 	public final static Integer HOME_SIZE_POST = 7;
-	public final static Integer HOME_SIZE_GALLERY = 6;
+	public final static Integer HOME_SIZE_GALLERY = 10;
 	public final static Integer RSS_SIZE_ITEM = 800;
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 110;
 	public final static Integer SEARCH_CONTENT_MAX_LENGTH = 200;
