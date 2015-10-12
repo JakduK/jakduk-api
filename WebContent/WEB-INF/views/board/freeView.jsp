@@ -234,7 +234,7 @@
 </div>
 <!--End Blog Post-->   	
 	
-	<hr />
+	<hr class="padding-10"/>
 	
 	<!-- comment -->		
 	<div ng-controller="commentCtrl">
@@ -401,20 +401,31 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.subject = document.getElementById("subject").value;
 	
 	angular.element(document).ready(function() {
+		
+		
 	    // 사용할 앱의 Javascript 키를 설정해 주세요.
 	    Kakao.init('${kakaoKey}');
 
 	    var label = $scope.subject + '\r<spring:message code="board.name.free"/> · <spring:message code="common.jakduk"/>';
 	    
+	    var kakaoLinkContent = {};
+	    kakaoLinkContent.container = '#kakao-link-btn';
+	    kakaoLinkContent.label = label;
+	    
+	    if ("${galleries != null}") {
+	    	kakaoLinkContent.image = {
+		    		src: 'https://jakduk.com/gallery/${galleries[0].id}',
+		    		width: '300',
+		    		height: '200'};	
+	    }
+	    
+	    kakaoLinkContent.webLink = {
+	    		text: 'https://jakduk.com/board/free/${post.seq}',
+		        url: 'https://jakduk.com/board/free/${post.seq}'
+		        };
+	    
 	    // 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
-	    Kakao.Link.createTalkLinkButton({
-	      container: '#kakao-link-btn',
-	      label: label,
-	      webLink: {
-		        text: "https://jakduk.com/board/free/${post.seq}",
-		        url: "https://jakduk.com/board/free/${post.seq}"	    	  
-	      }
-	    });
+	    Kakao.Link.createTalkLinkButton(kakaoLinkContent);
 		
 		App.init();
 	});		
