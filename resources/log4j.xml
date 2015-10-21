@@ -47,7 +47,17 @@
 			<param name="ConversionPattern"
 				value="[%5p] [%t %d{yyyy-MM-dd HH:mm:ss}] (%F:%M:%L) %m%n" />
 		</layout>
-	</appender>	
+	</appender>
+	
+	<appender name="searchDailyRollingFile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/usr/local/tomcat/logs/search.log" />
+		<param name="MaxBackupIndex" value="5" /> <!-- Max 5 files -->
+		<param name="DatePattern" value=".yyyy-MM-ww" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="[%5p] [%t %d{yyyy-MM-dd HH:mm:ss}] (%F:%M:%L) %m%n" />
+		</layout>
+	</appender>
 
 	<appender name="default" class="org.apache.log4j.RollingFileAppender">
 		<param name="File" value="/usr/local/tomcat/logs/default.log" />
@@ -107,7 +117,13 @@
 		<level value="DEBUG" />
 		<appender-ref ref="galleryDailyRollingFile" />
 		<appender-ref ref="console" />
-	</logger>	
+	</logger>
+	
+	<logger name="com.jakduk.service.SearchService" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="searchDailyRollingFile" />
+		<appender-ref ref="console" />
+	</logger>		
 
 	<!-- Root Logger -->
 	<root>
@@ -117,6 +133,7 @@
 		<appender-ref ref="authDailyRollingFile" />
 		<appender-ref ref="boardDailyRollingFile" />
 		<appender-ref ref="galleryDailyRollingFile" />
+		<appender-ref ref="searchDailyRollingFile" />
 	</root>
 
 </log4j:configuration>

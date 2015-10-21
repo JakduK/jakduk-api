@@ -26,7 +26,7 @@ public class FacebookService {
 	
 	public FacebookUser findUser() {
 		
-//		logger.debug("phjang user=" + facebookRestTemplate.getForObject(profileUri, Map.class));
+		//logger.debug("phjang user=" + facebookRestTemplate.getForObject(profileUri, Map.class));
 		FacebookUser facebookUser = facebookRestTemplate.getForObject(profileUri, FacebookUser.class);
 		
 		if(logger.isInfoEnabled()) {
