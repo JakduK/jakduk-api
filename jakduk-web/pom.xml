@@ -3,9 +3,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>${project.groupId}</groupId>
+    <groupId>com.jakduk</groupId>
     <artifactId>jakduk-parent</artifactId>
-    <version>${project.version}</version>
+    <version>0.4.12-SNAPSHOT</version>
   </parent>
   <packaging>war</packaging>
   <artifactId>jakduk-web</artifactId>
