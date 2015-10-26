@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>jakduk-parent</artifactId>
+    <version>${project.version}</version>
+  </parent>
+  <packaging>war</packaging>
+  <artifactId>jakduk-web</artifactId>
+  <name>jakduk-web</name>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+      <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>jakduk-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+ <profiles>
+        <!-- Local server -->
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <env>local</env>
+            </properties>
+        </profile>
+        <!-- Development server -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <env>dev</env>
+            </properties>
+        </profile>
+        <!-- real server -->
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <env>release</env>
+            </properties>
+        </profile>
+    </profiles>  
+  
+</project>
