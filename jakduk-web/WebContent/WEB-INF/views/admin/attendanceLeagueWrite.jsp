@@ -56,6 +56,11 @@ ng-model="average" ng-init="average='${attendanceLeague.average}'"/>
 <form:errors path="numberOfClubs"/>
 <p>
 <input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
+<c:if test="${!empty attendanceLeague}">
+<button type="button" class="btn btn-default" onclick="confirmDelete();">
+	<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
+</button>
+</c:if>
 </p>
 </form:form>
 </div>
@@ -76,6 +81,14 @@ jakdukApp.controller("adminCtrl", function($scope, $filter) {
 	};
 	
 });
+
+function confirmDelete() {
+
+	if (confirm('delete?') == true) {
+		location.href = '<c:url value="/admin/attendance/league/delete/${attendanceLeague.id}"/>';
+	}
+
+}
 
 </script>
 </body>

@@ -328,6 +328,14 @@ public class AdminController {
 		return "redirect:/admin/settings?open=attendanceLeague";
 	}
 	
+	@RequestMapping(value = "/attendance/league/delete/{id}", method = RequestMethod.GET)
+	public String attendanceLeagueDelete(@PathVariable String id) {
+		
+		boolean result = adminService.attendanceLeagueDelete(id);
+		
+		return "redirect:/admin/settings?open=attendanceLeague";
+	}	
+	
 	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.GET)
 	public String attendanceClubWrite(Model model) {
 		

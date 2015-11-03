@@ -653,6 +653,20 @@ public String initSearchData() {
 		attendanceLeagueReposidory.save(attendanceLeague);
 	}
 	
+	public boolean attendanceLeagueDelete(String id) {
+		
+		if (!id.isEmpty()) {
+			AttendanceLeague attendanceLeague = attendanceLeagueReposidory.findOne(id);
+			
+			if (attendanceLeague != null) {
+				attendanceLeagueReposidory.delete(attendanceLeague);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public Model getHomeDescription(Model model, String id) {
 		HomeDescription homeDescription = homeDescriptionReposotiry.findOne(id);
 		

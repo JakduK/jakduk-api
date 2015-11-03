@@ -4,7 +4,7 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk-parent</artifactId>
-  <version>0.4.12-SNAPSHOT</version>
+  <version>0.4.13-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>jakduk</name>
   <url>https://jakduk.com</url>

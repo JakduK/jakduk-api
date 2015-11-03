@@ -20,8 +20,8 @@
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
-			      <li class="active"><spring:message code="stats.attendance.breadcrumbs.club"/></li>
 			      <li><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
+			      <li class="active"><spring:message code="stats.attendance.breadcrumbs.club"/></li>
 		      </ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->

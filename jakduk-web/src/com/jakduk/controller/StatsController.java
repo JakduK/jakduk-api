@@ -69,13 +69,13 @@ public class StatsController {
 	@RequestMapping(value = "/attendance/refresh", method = RequestMethod.GET)
 	public String attendanceRefresh() {
 		
-		return "redirect:/stats/attendance/club";
+		return "redirect:/stats/attendance/league";
 	}	
 	
 	@RequestMapping(value = "/attendance", method = RequestMethod.GET)
 	public String attendance(Model model) {
 		
-		return "redirect:/stats/attendance/club";
+		return "redirect:/stats/attendance/league";
 	}
 	
 	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)

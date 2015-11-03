@@ -24,8 +24,8 @@
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
-			      <li><a href="<c:url value="/stats/attendance/club"/>"><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
 			      <li class="active"><spring:message code="stats.attendance.breadcrumbs.league"/></li>
+			      <li><a href="<c:url value="/stats/attendance/club"/>"><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
       			</ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
@@ -36,10 +36,6 @@
 	
 <div class="cube-portfolio">	
 		<div id="filters-container" class="cbp-l-filters-text content-xs">
-			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':league == 'KL'}" ng-click="changeLeague('KL')"> 
-				<spring:message code="stats.attendance.filter.league"/> 
-			</div> |
 			<div class="cbp-filter-item"
 			ng-class="{'cbp-filter-item-active':league == 'KLCL'}" ng-click="changeLeague('KLCL')"> 
 				<spring:message code="stats.attendance.filter.league.classic"/> 
@@ -87,7 +83,7 @@ var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
 
 jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	$scope.attendancesConn = "none";
-	$scope.league = "KL";
+	$scope.league = "KLCL";
 	$scope.totalSum = 0;
 	$scope.gamesSum = 0;
 	
@@ -287,9 +283,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				series.data = [];
 			}) ;
 			
-			if (league == "KL") {
-				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.title"/>';			
-			} else if (league == "KLCL") {
+			if (league == "KLCL") {
 				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
 			} else if (league == "KLCH") {
 				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
