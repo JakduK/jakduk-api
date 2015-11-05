@@ -196,8 +196,8 @@
 			</c:forEach>    
 	  </li>
 	</ul>	
-	</c:if>					
-
+	</c:if>				
+	
 <!-- buttons -->	
 <div class="ladda-btn margin-bottom-10">
 	<div class="row">
@@ -216,7 +216,10 @@
 			</button>
 		</div>
 		<div class="col-xs-6 text-right">
-			<button class="btn-u btn-brd rounded btn-u-sm ladda-button" type="button" ng-click="btnUrlCopy()">
+			<button clipboard class="btn-u btn-brd rounded btn-u-sm ladda-button" type="button"
+			text="urlToCopy" on-copied="urlCopySuccess()" on-error="urlCopyFail(err)"
+			tooltip-animation="false" uib-tooltip='<spring:message code="board.msg.copy.url.clipboard"/>' tooltip-is-open="tooltipIsOpen"
+			tooltip-trigger="none">
 				<i class="icon-link"></i>
 			</button>
 			<a id="kakao-link-btn" href="javascript:;">
@@ -373,35 +376,36 @@
 	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
 
+<script src="<%=request.getContextPath()%>/resources/angular-animate/angular-animate.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-clipboard/angular-clipboard.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>
 </c:if>
-<script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
-
-<!-- JS Implementing Plugins -->
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
 
+<script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize", "angular-ladda"]);
+var jakdukApp = angular.module("jakdukApp", ["ui.bootstrap", "summernote", "infinite-scroll", "ngSanitize", "angular-ladda", "angular-clipboard"]);
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};
 	$scope.likeConn = "none";
 	$scope.dislikeConn = "none";
 	$scope.subject = document.getElementById("subject").value;
+	$scope.urlToCopy = 'https://jakduk.com/board/free/${post.seq}';
+	$scope.tooltipIsOpen = false;
 	
 	angular.element(document).ready(function() {
-		
 		
 	    // 사용할 앱의 Javascript 키를 설정해 주세요.
 	    Kakao.init('${kakaoKey}');
@@ -412,7 +416,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	    kakaoLinkContent.container = '#kakao-link-btn';
 	    kakaoLinkContent.label = label;
 	    
-	    if ("${galleries != null}") {
+	    if (!isEmpty("${galleries}")) {
 	    	kakaoLinkContent.image = {
 		    		src: 'https://jakduk.com/gallery/${galleries[0].id}',
 		    		width: '300',
@@ -439,7 +443,6 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnFeeling = function(type) {
-		
 		if ("${authRole}" == "ANNONYMOUS") {
 			$scope.alert.msg = '<spring:message code="board.msg.need.login.for.feel"/>';
 			$scope.alert.linkUrl = "<c:url value='/login'/>";
@@ -514,26 +517,17 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 				}
 			});
 		}
-	};	
+	};
 	
-	$scope.btnUrlCopy = function() {
-		var url = "https://jakduk.com/board/free/${post.seq}";
-		
-		if (window.clipboardData){
-		    // IE처리
-		    // 클립보드에 문자열 복사
-		    window.clipboardData.setData('text', url);
-		    
-		    // 클립보드의 내용 가져오기
-		    // window.clipboardData.getData('Text');
-		 
-		    // 클립보드의 내용 지우기
-		    // window.clipboardData.clearData("Text");
-		  }  else {                     
-		    // 비IE 처리    
-		    window.prompt ('<spring:message code="common.msg.copy.to.clipboard"/>', url);  
-		  }
-	};	
+    $scope.urlCopySuccess = function () {    	
+    	$scope.tooltipIsOpen = true;
+    	//$scope.$apply();
+    };
+
+    $scope.urlCopyFail = function (err) {
+        console.error('URL copy Error!', err);
+    };
+	
 });
 
 
