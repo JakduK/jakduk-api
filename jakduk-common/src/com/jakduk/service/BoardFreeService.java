@@ -1,5 +1,6 @@
 package com.jakduk.service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -626,6 +628,23 @@ public class BoardFreeService {
 
 	}
 	
+	public Model getFreeCommentsList(Model model, Locale locale, BoardListInfo boardListInfo) {
+		
+		long totalComments = boardFreeCommentRepository.count();
+
+		model.addAttribute("boardListInfo", boardListInfo);
+		model.addAttribute("totalComments", totalComments);
+		try {
+			model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return model;
+
+	}
+	
 	/**
 	 * 자유게시판 게시물 보기 페이지
 	 * @param model
@@ -1188,6 +1207,26 @@ public class BoardFreeService {
 		
 		model.addAttribute("topLike", boardFreeList);
 		model.addAttribute("topComment", boardFreeCommentList);
+		
+		return HttpServletResponse.SC_OK;		
+	}
+	
+	public Integer getDataFreeCommentsList(Model model, int page, int size) {
+
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Pageable pageable = new PageRequest(page - 1, size, sort);
+		
+		List<BoardFreeComment> comments = boardFreeCommentRepository.findAll(pageable).getContent();
+		
+		List<ObjectId> ids = new ArrayList<ObjectId>();
+		
+		for (BoardFreeComment comment : comments) {
+			String id = comment.getBoardItem().getId();
+			ids.add(new ObjectId(id));
+		}
+
+		model.addAttribute("comments", comments);
+		model.addAttribute("postsHavingComments", jakdukDAO.getBoardFreeOnSearchComment(ids));
 		
 		return HttpServletResponse.SC_OK;		
 	}

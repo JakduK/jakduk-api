@@ -113,7 +113,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				}			
 			},
 			title: {
-				text: '<spring:message code="stats.attendance.league.title"/>'
+				text: '<spring:message code="stats.attendance.league.classic.title"/>'
 			},	        
 			subtitle: {
 				text: 'Source: http://www.kleague.com'

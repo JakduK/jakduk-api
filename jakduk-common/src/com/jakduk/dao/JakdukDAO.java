@@ -2,6 +2,7 @@ package com.jakduk.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -59,6 +60,26 @@ public class JakdukDAO {
 		}
 		
 		return commentCount;
+	}
+	
+	public List<BoardFeelingCount> getBoardFreeUsersFeelingCount(List<Integer> arrSeq) {
+		
+		AggregationOperation project = Aggregation.project("_id").and("seq");
+		AggregationOperation match = Aggregation.match(Criteria.where("seq").in(arrSeq));		
+		Aggregation aggregation = Aggregation.newAggregation(project, match);
+		AggregationResults<BoardFeelingCount> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFeelingCount.class);
+		
+		/*
+		List<CommonCount> boardCommentCount = results.getMappedResults();
+
+		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
+		
+		for (CommonCount item : boardCommentCount) {
+			commentCount.put(item.getId(), item.getCount());
+		}
+		*/
+		
+		return results.getMappedResults();
 	}
 	
 	public HashMap<String, Integer> getBoardFreeUsersLikingCount(List<Integer> arrSeq) {

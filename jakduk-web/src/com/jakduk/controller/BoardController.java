@@ -47,7 +47,7 @@ public class BoardController {
 	@RequestMapping(value = "/free/refresh", method = RequestMethod.GET)
 	public String refreshFree() {
 		
-		return "redirect:/board/free";
+		return "redirect:/board/free/posts";
 	}	
 	
 	@RequestMapping(value = "/free", method = RequestMethod.GET)
@@ -57,7 +57,27 @@ public class BoardController {
 		Locale locale = localeResolver.resolveLocale(request);
 		boardFreeService.getFree(model, locale, boardListInfo);
 		
-		return "board/free";
+		return "board/freePosts";
+	}
+	
+	@RequestMapping(value = "/free/posts", method = RequestMethod.GET)
+	public String freePostsList(@ModelAttribute BoardListInfo boardListInfo, Model model
+			, HttpServletRequest request) {
+		
+		Locale locale = localeResolver.resolveLocale(request);
+		boardFreeService.getFree(model, locale, boardListInfo);
+		
+		return "board/freePosts";
+	}
+	
+	@RequestMapping(value = "/free/comments", method = RequestMethod.GET)
+	public String freeCommentsList(@ModelAttribute BoardListInfo boardListInfo, Model model
+			, HttpServletRequest request) {
+		
+		Locale locale = localeResolver.resolveLocale(request);
+		boardFreeService.getFreeCommentsList(model, locale, boardListInfo);
+		
+		return "board/freeComments";
 	}
 	
 	@RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
@@ -197,5 +217,13 @@ public class BoardController {
 		
 		Integer status = boardFreeService.getDataFreeTopList(model);
 	}		
+	
+	@RequestMapping(value = "/data/free/comments", method = RequestMethod.GET)
+	public void dataFreeCommentsList(Model model,
+			@RequestParam(required = false, defaultValue = "1") int page,
+			@RequestParam(required = false, defaultValue = "20") int size) {
+		
+		Integer status = boardFreeService.getDataFreeCommentsList(model, page, size);
+	}
 
 }

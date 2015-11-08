@@ -1,9 +1,10 @@
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
- .list-group-item { padding: 5px 5px;}
- .panel-heading { padding: 5px 5px;}
- .panel-body { padding:5px;}
- .panel-footer { padding: 5px 5px;}
- .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;}
+.text-gray {color:#777;}
+.list-group-item { padding: 5px 5px;}
+.panel-heading { padding: 5px 5px;}
+.panel-body { padding:5px;}
+.panel-footer { padding: 5px 5px;}
+.panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;}
   
  .blog-twitter .blog-twitter-inner a {
 	color: #555;
@@ -83,6 +84,9 @@ td a {color:#555;}
 
 /* 댓글 */
 .post-comment .panel {margin-bottom:0px;}
+
+/* 최신 댓글 */
+.blog-latest-posts p {margin:0 0px;}
 
 /* 찾기 */
 .search-block-v2 {

@@ -21,6 +21,10 @@
 	<div class="breadcrumbs">
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
+				<ul class="pull-right breadcrumb">
+			      <li class="active"><spring:message code="board.free.breadcrumbs.posts"/></li>
+			      <li><a href="<c:url value="/board/free/comments"/>"><spring:message code="board.free.breadcrumbs.comments"/></a></li>
+      			</ul>						
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->		

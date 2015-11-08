@@ -33,6 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardFeelingCount;
 import com.jakduk.dao.BoardFreeOnBest;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.BoardFree;
@@ -136,7 +137,8 @@ public class BoardTest {
 		arrTemp.add(22);
 		arrTemp.add(23);
 		
-		Map<String, Integer> map = jakdukDAO.getBoardFreeUsersLikingCount(arrTemp);
+		//Map<String, Integer> map = jakdukDAO.getBoardFreeUsersLikingCount(arrTemp);
+		List<BoardFeelingCount> map = jakdukDAO.getBoardFreeUsersFeelingCount(arrTemp);
 		
 		System.out.println("mongoAggregationTest02=" + map);
 	}
