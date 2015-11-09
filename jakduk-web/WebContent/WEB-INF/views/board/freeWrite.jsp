@@ -68,21 +68,18 @@
 		<span class="{{subjectAlert.classType}}" ng-show="subjectAlert.msg">{{subjectAlert.msg}}</span>		
 	</div>
 	
-  <div class="form-group" ng-class="{'has-success':content.length >= 5, 'has-error':content.length < 5}">
-		<div class="row">
-			<div class="col-sm-12">
-				<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
-				<summernote config="options" ng-model="content" on-image-upload="imageUpload(files, editor)" editable="editable"></summernote>
-				<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
-				<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
-			</div>
-		</div>	
-  </div>
+	<div class="form-group" ng-class="{'has-success':content.length >= 5, 'has-error':content.length < 5}">
+		<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
+		<summernote config="options" ng-model="content" on-image-upload="imageUpload(files, editor)" editable="editable"></summernote>
+		<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
+		<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
+	</div>
 
-<div class="page-header" ng-show="storedImages.length > 0 || uploader.queue.length > 0">
-	<h4><spring:message code="board.gallery.list"/></h4>
-</div>
-<div class="row margin-bottom-30">
+	<h4 class="text-primary" ng-show="storedImages.length > 0 || uploader.queue.length > 0">
+		<spring:message code="board.gallery.list"/>
+	</h4>
+
+<div class="row">
 	<!-- sotred Images -->
 	<div class="media col-xs-12 col-sm-4" ng-repeat="item in storedImages">
 	  <div class="media-left media-middle">
@@ -133,6 +130,8 @@
 	  </div>
 	</div>
 </div>
+
+	<hr class="padding-5" ng-show="storedImages.length > 0 || uploader.queue.length > 0"/>
 
 	<div class="form-group">
 		<button type="submit" class="btn-u rounded ladda-button"

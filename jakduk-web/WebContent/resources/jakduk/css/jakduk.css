@@ -1,5 +1,11 @@
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .text-gray {color:#777;}
+
+.padding-5 {margin:10px 0px;}
+.padding-10 {margin:20px 0px;}
+.max-width-240 {max-width:240px;}
+.max-width-300 {max-width:360px;}
+
 .list-group-item { padding: 5px 5px;}
 .panel-heading { padding: 5px 5px;}
 .panel-body { padding:5px;}
@@ -86,7 +92,7 @@ td a {color:#555;}
 .post-comment .panel {margin-bottom:0px;}
 
 /* 최신 댓글 */
-.blog-latest-posts p {margin:0 0px;}
+.blog-latest-posts p {margin:0 0px; font-size:inherit;}
 
 /* 찾기 */
 .search-block-v2 {
@@ -103,8 +109,3 @@ td a {color:#555;}
 
 /* slick */
 .slick-slider {margin-bottom:inherit;}
-
-.padding-5 {margin:10px 0px;}
-.padding-10 {margin:20px 0px;}
-.max-width-240 {max-width:240px;}
-.max-width-300 {max-width:360px;}

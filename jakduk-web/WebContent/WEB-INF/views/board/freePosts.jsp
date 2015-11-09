@@ -14,6 +14,14 @@
 </head>
 
 <body>
+
+<sec:authorize access="isAnonymous()">
+	<c:set var="authRole" value="ANNONYMOUS"/>
+</sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+	<c:set var="authRole" value="USER"/>
+</sec:authorize>
+	
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
@@ -21,23 +29,16 @@
 	<div class="breadcrumbs">
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
-				<ul class="pull-right breadcrumb">
-			      <li class="active"><spring:message code="board.free.breadcrumbs.posts"/></li>
-			      <li><a href="<c:url value="/board/free/comments"/>"><spring:message code="board.free.breadcrumbs.comments"/></a></li>
-      			</ul>						
+			<ul class="pull-right breadcrumb">
+		      <li class="active"><spring:message code="board.free.breadcrumbs.posts"/></li>
+		      <li><a href="<c:url value="/board/free/comments"/>"><spring:message code="board.free.breadcrumbs.comments"/></a></li>
+			</ul>						
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->		
 	
 	<!--=== Content Part ===-->
 	<div class="container content" ng-controller="boardCtrl">
-	
-	<sec:authorize access="isAnonymous()">
-		<c:set var="authRole" value="ANNONYMOUS"/>
-	</sec:authorize>
-	<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-		<c:set var="authRole" value="USER"/>
-	</sec:authorize>
 	
 	<div class="row">
 		<!--Top Likes Rows-->

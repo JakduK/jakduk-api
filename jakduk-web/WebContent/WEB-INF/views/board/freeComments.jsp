@@ -29,10 +29,10 @@
 	<div class="breadcrumbs">
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
-				<ul class="pull-right breadcrumb">
-			      <li><a href="<c:url value="/board/free/posts"/>"><spring:message code="board.free.breadcrumbs.posts"/></a></li>
-			      <li class="active"><spring:message code="board.free.breadcrumbs.comments"/></li>
-      			</ul>						
+			<ul class="pull-right breadcrumb">
+		      <li><a href="<c:url value="/board/free/posts"/>"><spring:message code="board.free.breadcrumbs.posts"/></a></li>
+		      <li class="active"><spring:message code="board.free.breadcrumbs.comments"/></li>
+			</ul>						
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->	
@@ -125,7 +125,7 @@
 		</div>			
 	</div>	
 	
-	<hr/>
+	<hr class="padding-5"/>
 	
 		<!-- search results of post -->
 		<div class="margin-bottom-10">
@@ -141,12 +141,27 @@
 								{{postsHavingComments[comment.boardItem.id].subject}}
 							</a>
 						</p>
+						<p>
+							<button type="button" class="btn btn-xs rounded btn-default" 
+							ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'like')">
+								<i class="fa fa-thumbs-o-up fa-lg" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length"></i>
+								{{numberOfCommentLike[comment.id]}}
+							</button>
+							<button type="button" class="btn btn-xs rounded btn-default" 
+							ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'dislike')">
+								<i class="fa fa-thumbs-o-down fa-lg" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length"></i>
+								{{numberOfCommentDislike[comment.id]}}
+							</button>							
+						</p>
+						<p>
+							<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>
+						</p>
 					</li>
 				</ul>			
 			</div>
 	    </div>		
 	    
-	<hr/>	    
+	<hr class="padding-5"/>	    
 	    
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
@@ -186,6 +201,10 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 	$scope.topLike = [];
 	$scope.topComment = [];
 	$scope.postsHavingComments = {};
+	$scope.commentFeelingConn = {};
+	$scope.commentFeelingAlert = {};
+	$scope.numberOfCommentLike = {};
+	$scope.numberOfCommentDislike = {};
 	$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
 	$scope.itemsPerPage = Jakduk.ItemsPerPageOnBoardComments;
 
@@ -231,7 +250,7 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 			$scope.dataCommentsConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				//console.log(data);
+				console.log(data);
 				
 				if (data.comments != null) {
 					$scope.comments = data.comments;
@@ -271,6 +290,42 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 			});
 		}
 	};
+	
+	$scope.btnCommentFeeling = function(boardId, commentId, status) {
+		
+		var bUrl = '<c:url value="/board/comment/' + status + '/' + boardId + '.json?id=' + commentId + '"/>';
+		var conn = $scope.commentFeelingConn[commentId];
+		
+		if (conn == "none" || conn == null) {
+			var reqPromise = $http.get(bUrl);
+			
+			$scope.commentFeelingConn[commentId] = "loading";
+			
+			reqPromise.success(function(data, status, headers, config) {
+				var message = "";
+				
+				if (data.errorCode == "like") {
+					$scope.numberOfCommentLike[commentId] = data.numberOfLike;
+				} else if (data.errorCode == "dislike") {
+					$scope.numberOfCommentDislike[commentId] = data.numberOfDislike;
+				} else if (data.errorCode == "already") {
+					message = '<spring:message code="board.msg.select.already.like"/>';
+				} else if (data.errorCode == "anonymous") {
+					message = '<spring:message code="board.msg.need.login.for.feel"/>';
+				} else if (data.errorCode == "writer") {
+					message = '<spring:message code="board.msg.you.are.writer"/>';
+				}
+				
+				$scope.commentFeelingAlert[commentId] = message;
+				$scope.commentFeelingConn[commentId] = "ok";
+				
+			});
+			reqPromise.error(function(data, status, headers, config) {
+				$scope.commentFeelingConn[commentId] = "none";
+				$scope.commentFeelingAlert[commentId] = '<spring:message code="common.msg.error.network.unstable"/>';				
+			});
+		}
+	};	
 	
 	$scope.btnEnter = function() {
 		

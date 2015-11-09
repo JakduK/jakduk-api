@@ -24,57 +24,62 @@
 </head>
 
 <body>
-<div class="wrapper">
-	<jsp:include page="../include/navigation-header.jsp"/>
-	
-	<c:set var="summernoteLang" value="en-US"/>
-	
-	<sec:authorize access="isAnonymous()">
-		<c:set var="authRole" value="ANNONYMOUS"/>
-	</sec:authorize>
-	<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
-		<c:set var="authRole" value="USER"/>
-		<sec:authentication property="principal.id" var="accountId"/>
-	</sec:authorize>
-	<sec:authorize access="hasAnyRole('ROLE_ROOT')">
-		<c:set var="authAdminRole" value="ROOT"/>
-	</sec:authorize>		
-	
-	<c:url var="listUrl" value="/board/free">
+
+<c:set var="summernoteLang" value="en-US"/>
+
+<sec:authorize access="isAnonymous()">
+	<c:set var="authRole" value="ANNONYMOUS"/>
+</sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')">
+	<c:set var="authRole" value="USER"/>
+	<sec:authentication property="principal.id" var="accountId"/>
+</sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_ROOT')">
+	<c:set var="authAdminRole" value="ROOT"/>
+</sec:authorize>		
+
+<c:url var="listUrl" value="/board/free">
+	<c:if test="${!empty listInfo.page}">
+		<c:param name="page" value="${listInfo.page}"/>
+	</c:if>
+	<c:if test="${!empty listInfo.category}">
+		<c:param name="category" value="${listInfo.category}"/>
+	</c:if>
+</c:url>
+
+<c:if test="${!empty prev}">
+	<c:url var="prevUrl" value="/board/free/${prev.seq}">
 		<c:if test="${!empty listInfo.page}">
 			<c:param name="page" value="${listInfo.page}"/>
 		</c:if>
 		<c:if test="${!empty listInfo.category}">
 			<c:param name="category" value="${listInfo.category}"/>
 		</c:if>
-	</c:url>
-	
-	<c:if test="${!empty prev}">
-		<c:url var="prevUrl" value="/board/free/${prev.seq}">
-			<c:if test="${!empty listInfo.page}">
-				<c:param name="page" value="${listInfo.page}"/>
-			</c:if>
-			<c:if test="${!empty listInfo.category}">
-				<c:param name="category" value="${listInfo.category}"/>
-			</c:if>
-		</c:url>	
-	</c:if>
-	
-	<c:if test="${!empty next}">
-		<c:url var="nextUrl" value="/board/free/${next.seq}">
-			<c:if test="${!empty listInfo.page}">
-				<c:param name="page" value="${listInfo.page}"/>
-			</c:if>
-			<c:if test="${!empty listInfo.category}">
-				<c:param name="category" value="${listInfo.category}"/>
-			</c:if>
-		</c:url>	
-	</c:if>
+	</c:url>	
+</c:if>
+
+<c:if test="${!empty next}">
+	<c:url var="nextUrl" value="/board/free/${next.seq}">
+		<c:if test="${!empty listInfo.page}">
+			<c:param name="page" value="${listInfo.page}"/>
+		</c:if>
+		<c:if test="${!empty listInfo.category}">
+			<c:param name="category" value="${listInfo.category}"/>
+		</c:if>
+	</c:url>	
+</c:if>
+
+<div class="wrapper">
+	<jsp:include page="../include/navigation-header.jsp"/>
 	
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
 			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
+			<ul class="pull-right breadcrumb">
+				<li><a href="<c:url value="/board/free/posts"/>"><spring:message code="board.free.breadcrumbs.posts"/></a></li>
+				<li><a href="<c:url value="/board/free/comments"/>"><spring:message code="board.free.breadcrumbs.comments"/></a></li>
+			</ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->
 	<!--=== End Breadcrumbs ===-->		
@@ -260,14 +265,14 @@
 				<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
 				<span ng-bind-html="comment.content"></span>
 			</p>
-			<button type="button" class="btn-u btn-brd rounded btn-u-blue btn-u-xs" 
-			ng-click="btnCommentFeeling(comment.id, 'like')">
+			
+			<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'like')">
 				<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
 					<i class="fa fa-thumbs-o-up fa-lg"></i>
 					{{numberOfCommentLike[comment.id]}}
 				</span>
 			</button>
-			<button type="button" class="btn-u btn-brd rounded btn-u-red btn-u-xs" ng-click="btnCommentFeeling(comment.id, 'dislike')">
+			<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'dislike')">
 				<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
 					<i class="fa fa-thumbs-o-down fa-lg"></i>
 					{{numberOfCommentDislike[comment.id]}}
