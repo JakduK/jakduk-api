@@ -1,5 +1,5 @@
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.text-gray {color:#777;}
+.text-gray {color:#999;}
 
 .padding-5 {margin:10px 0px;}
 .padding-10 {margin:20px 0px;}
@@ -11,8 +11,15 @@
 .panel-body { padding:5px;}
 .panel-footer { padding: 5px 5px;}
 .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;}
-  
- .blog-twitter .blog-twitter-inner a {
+
+/* 홈에서 최근 글 */
+.magazine-mini-news h3, .magazine-mini-news h3 a {
+    margin-bottom: 0px;
+}
+.magazine-mini-news .post-author {color:#777;}
+
+/* 홈의 최근 댓글 */  
+.blog-twitter .blog-twitter-inner a {
 	color: #555;
 	text-decoration: none;
 }
@@ -20,6 +27,8 @@
 	color: #72c02c;
 	text-decoration: none;
 }
+
+.blog-twitter .blog-twitter-inner i.fa {font-size:inherit; line-height:ingerit; top:0px; color:#555;}
 
 /* 헤더 */
 .header .topbar ul.loginbar > li > a, 
@@ -30,6 +39,7 @@
 	text-transform: none;
 }
 
+/* 게시물의 댓글 */
 .blog-item .media h5.media-heading {
 	color: #555;
 	position: relative;
@@ -46,16 +56,9 @@
 	color: #72c02c;
 }
 
-.breadcrumbs li .active a {color:#72C02C;}
-
-/* 홈에서 최근 글 */
-.magazine-mini-news h3, .magazine-mini-news h3 a {
-    margin-bottom: 0px;
-}
-.magazine-mini-news .post-author {color:#777;}
-
-/* 홈에서 최근 댓글 */
-.blog-twitter .blog-twitter-inner i.fa {font-size:inherit; line-height:ingerit; top:0px; color:#555;}
+.blog-item .media a {color: #555;}
+.blog-item .media a:hover {color: #72c02c;}
+.media .board-comment a {color: #999;}
 
 /* 로그인, 회원 가입 */
 .reg-page {padding:30px 15px 30px 15px;}
@@ -64,6 +67,7 @@
 
 /* 각 페이지 마다 있는 제목 */
 .breadcrumbs a {color:#666;}
+.breadcrumbs li .active a {color:#72C02C;}
 
 .cube-portfolio {padding-bottom:10px;}
 .tag-box {padding: 10px;}
@@ -105,7 +109,7 @@ td a {color:#555;}
 .s-results .blog-photos li img {max-width:100%; width:auto; height:auto;}
 
 /* lightbox */
-.lightbox-nav {font-size:inherit; margin-bottom:5px;}
+.lightbox-nav {font-size:inherit; margin-bottom:5px; height:inherit;}
 
 /* slick */
 .slick-slider {margin-bottom:inherit;}

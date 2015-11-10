@@ -46,7 +46,7 @@
 		<div class="col-sm-6 sm-margin-bottom-30">
 			<div class="headline">
 				<h2><spring:message code="home.posts.latest"/></h2> 
-				<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free"/>'">
+				<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free/posts"/>'">
 					<spring:message code="common.button.more"/>
 				</button>
 			</div>                        
@@ -73,7 +73,12 @@
                         
 		<!-- 최근 댓글  -->
 		<div class="col-sm-6 sm-margin-bottom-30">
-			<div class="headline"><h2><spring:message code="home.comments.latest"/></h2></div>
+			<div class="headline">
+				<h2><spring:message code="home.comments.latest"/></h2>
+				<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free/comments"/>'">
+					<spring:message code="common.button.more"/>
+				</button>			
+			</div>
 		
 			<div class="blog-twitter">
 				<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">

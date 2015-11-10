@@ -18,7 +18,7 @@
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 	
     <!-- CSS Page Style -->    
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>

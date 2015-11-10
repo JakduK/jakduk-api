@@ -9,9 +9,9 @@
 <head>
 	<title><spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_search_inner.css">
-	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
 </head>
 <body>
 
@@ -38,7 +38,7 @@
 	<!--=== End Breadcrumbs ===-->	
 	
 	<!--=== Content Part ===-->
-	<div class="container content" ng-controller="boardCtrl">
+	<div class="container content blog-item" ng-controller="boardCtrl">
 	
 	<div class="row">
 		<!--Top Likes Rows-->
@@ -127,41 +127,42 @@
 	
 	<hr class="padding-5"/>
 	
-		<!-- search results of post -->
-		<div class="margin-bottom-10">
-			<div>
-				<ul class="list-unstyled blog-latest-posts">
-					<li ng-repeat="comment in comments">
-						<p><i aria-hidden="true" class="icon-user"></i> {{comment.writer.username}}&nbsp;&nbsp;{{dateFromObjectId(comment.id) | date:dateTimeFormat.dateTime}}</p>
-						<p><a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>' ng-bind-html="comment.content"></a></p>
-						<p class="text-overflow">							
-							<a class=text-gray href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>'>
-								<spring:message code="board.subject"/>
-								: 
-								{{postsHavingComments[comment.boardItem.id].subject}}
-							</a>
-						</p>
-						<p>
-							<button type="button" class="btn btn-xs rounded btn-default" 
-							ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'like')">
-								<i class="fa fa-thumbs-o-up fa-lg" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length"></i>
-								{{numberOfCommentLike[comment.id]}}
-							</button>
-							<button type="button" class="btn btn-xs rounded btn-default" 
-							ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'dislike')">
-								<i class="fa fa-thumbs-o-down fa-lg" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length"></i>
-								{{numberOfCommentDislike[comment.id]}}
-							</button>							
-						</p>
-						<p>
-							<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>
-						</p>
-					</li>
-				</ul>			
-			</div>
-	    </div>		
-	    
-	<hr class="padding-5"/>	    
+	<div class="media margin-bottom-10">
+		<div class="media-body">
+			<div ng-repeat="comment in comments">
+				<h5 class="media-heading">
+					<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
+					<span>{{dateFromObjectId(comment.id) | date:dateTimeFormat.dateTime}}</span>
+				</h5>
+				<p>
+					<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
+					<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
+					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>' ng-bind-html="comment.content"></a>
+				</p>					
+				<p class="board-comment text-overflow">							
+					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>'>
+						<spring:message code="board.subject"/>
+						: 
+						{{postsHavingComments[comment.boardItem.id].subject}}
+					</a>
+				</p>
+	
+				<button type="button" class="btn btn-xs rounded btn-default" 
+				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'like')">
+					<i class="fa fa-thumbs-o-up fa-lg" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length"></i>
+					{{numberOfCommentLike[comment.id]}}
+				</button>
+				<button type="button" class="btn btn-xs rounded btn-default" 
+				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'dislike')">
+					<i class="fa fa-thumbs-o-down fa-lg" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length"></i>
+					{{numberOfCommentDislike[comment.id]}}
+				</button>	
+
+				<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>
+				<hr class="padding-5">	
+			</div>	
+		</div>
+	</div>
 	    
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
@@ -250,7 +251,7 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 			$scope.dataCommentsConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				console.log(data);
+				//console.log(data);
 				
 				if (data.comments != null) {
 					$scope.comments = data.comments;
