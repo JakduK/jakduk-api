@@ -139,7 +139,7 @@
 					<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
 					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>' ng-bind-html="comment.content"></a>
 				</p>					
-				<p class="board-comment text-overflow">							
+				<p class="board-comment">							
 					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>'>
 						<spring:message code="board.subject"/>
 						: 
