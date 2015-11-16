@@ -149,6 +149,16 @@ public class JakdukDAO {
 		return footballClubs;
 	}
 	
+	public List<FootballClub> getFootballClubList(String language) {
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("names.language").is(language));		
+		query.fields().include("active").include("origin").include("names.$");		
+		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
+
+		return footballClubs;
+	}
+	
 	public List<GalleryOnList> getGalleryList(Direction direction, Integer size, ObjectId commentId) {
 		
 		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is("use"));

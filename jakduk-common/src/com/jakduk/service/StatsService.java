@@ -1,11 +1,18 @@
 package com.jakduk.service;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.mapping.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -17,6 +24,7 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.dao.SupporterCount;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.repository.AttendanceClubRepository;
 import com.jakduk.repository.AttendanceLeagueRepository;
@@ -145,6 +153,38 @@ public class StatsService {
 			}
 		} else {
 		}
+	}
+	
+	public Integer getAttendanceSeason(Model model, String language) {
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
+		Map<String, String> fcNames = new HashMap<>();
+		
+		for (FootballClub fc : footballClubs) {
+			fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0).getShortName());
+		}
+		
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		
+		try {
+			model.addAttribute("fcNames", new ObjectMapper().writeValueAsString(fcNames));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return HttpServletResponse.SC_OK;
+	}
+	
+	public void getAttendanceSeasonData(Model model, int season, String league) {
+		
+		if (league == null) {
+			league = CommonConst.K_LEAGUE_ABBREVIATION;
+		}
+		
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("average"));
+		List<AttendanceClub> attendances = attendanceClubRepository.findBySeasonAndLeague(season, league, sort);
+		
+		model.addAttribute("attendances", attendances);
 	}
 	
 }

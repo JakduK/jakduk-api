@@ -22,6 +22,7 @@
 				<ul class="pull-right breadcrumb">
 			      <li><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
 			      <li class="active"><spring:message code="stats.attendance.breadcrumbs.club"/></li>
+			      <li><a href="<c:url value="/stats/attendance/season"/>"><spring:message code="stats.attendance.breadcrumbs.season"/></a></li>
 		      </ul>			
 		</div><!--/container-->
 	</div><!--/breadcrumbs-->

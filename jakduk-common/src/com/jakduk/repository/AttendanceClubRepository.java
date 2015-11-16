@@ -16,4 +16,5 @@ import com.jakduk.model.db.FootballClubOrigin;
  */
 public interface AttendanceClubRepository extends MongoRepository<AttendanceClub, String>{
 	List<AttendanceClub> findByClub(FootballClubOrigin club, Sort sort);
+	List<AttendanceClub> findBySeasonAndLeague(Integer season, String league, Sort sort);
 }
