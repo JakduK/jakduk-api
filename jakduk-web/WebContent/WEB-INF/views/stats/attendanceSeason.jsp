@@ -33,24 +33,21 @@
 	
 		<div class="row">
 			<div class="col-xs-8 col-sm-4 col-md-3">	
-				<select class="form-control" ng-model="league" ng-change="changeFootballClub()">
-					<option value="KL"><spring:message code="stats.attendance.filter.league"/></option>
-					<option value="KLCL"><spring:message code="stats.attendance.filter.league.classic"/></option>
-					<option value="KLCH"><spring:message code="stats.attendance.filter.league.challenge"/></option>
+				<select class="form-control" ng-model="season" ng-change="changeSeason()"
+				ng-options='season for season in seasons'>
+					<option value=""><spring:message code="stats.select.season"/></option>
+				</select>
+				<span class="color-blue"><spring:message code="stats.msg.choose.season"/></span>
+			</div>				
+			<div class="col-xs-8 col-sm-4 col-md-3">	
+				<select class="form-control" ng-model="leagueData" ng-change="changeLeague()"
+				ng-options='league.name disable when league.disable for league in leagues[season]'>
+					<option value=""><spring:message code="stats.select.league"/></option>
 				</select>
 				<span class="color-blue"><spring:message code="stats.msg.choose.league"/></span>
 			</div>
-			<div class="col-xs-8 col-sm-4 col-md-3">	
-				<select class="form-control" ng-model="season" ng-change="changeFootballClub()">
-					<option value="2014">2014</option>
-					<option value="2013">2013</option>
-					<option value="2012">2012</option>
-				</select>
-				<span class="color-blue"><spring:message code="stats.msg.choose.season"/></span>
-			</div>			
 		</div>
 				
-		
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
 		<div class="text-right">
@@ -75,18 +72,34 @@
 var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
 
 jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
-	$scope.attendancesConn = "none";	
-	$scope.league = "KL";
-	$scope.season = "2014";
+	var KLId = 'KL';
+	var KLCLId = 'KLCL';
+	var KLCHId = 'KLCH';
+	var KLname = '<spring:message code="stats.attendance.filter.league"/>';
+	var KLCLname = '<spring:message code="stats.attendance.filter.league.classic"/>';
+	var KLCHname = '<spring:message code="stats.attendance.filter.league.challenge"/>';	
+	
+	$scope.leagues = {
+			2012 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname, disable : true}, {id : KLCHId, name : KLCHname, disable : true}],
+			2013 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname}, {id : KLCHId, name : KLCHname}],
+			2014 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname}, {id : KLCHId, name : KLCHname}]
+	};	
+	$scope.seasons = [2012, 2013, 2014];	
+	$scope.attendancesConn = "none";
 	$scope.fcNames = JSON.parse('${fcNames}');
+	$scope.attendances = {};
 	
 	angular.element(document).ready(function() {
+		$scope.season = 2012;
+		$scope.leagueData = $scope.leagues[$scope.season][0];
 		
+		/*
 		var league = "${league}";
 		
 		if (league == "KLCL" || league == "KLCH") {			
 			$scope.league = league;
 		}
+		*/
 		
 		Highcharts.setOptions({
 			lang: {
@@ -190,7 +203,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	});
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/season.json?season=2012' + '&league=' + $scope.league + '"/>';
+		
+		var bUrl = '<c:url value="/stats/data/attendance/season.json?season=' + $scope.season + '&league=' + KLId + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
@@ -201,10 +215,10 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			
 			reqPromise.success(function(data, status, headers, config) {
 				
-				console.log($scope.fcNames);
-				console.log(data);
-				
-				$scope.chartConfig.loading = false;
+				//console.log($scope.fcNames);
+				//console.log(data);
+				$scope.attendances[$scope.season] = data.attendances;					
+				/*
 				var attendances = data.attendances;
 				$scope.chartConfig.options.chart.height = 300 + (attendances.length * 30);
 				
@@ -215,8 +229,11 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 					$scope.chartConfig.series[0].data.push(itemAverage);
 					$scope.chartConfig.series[1].data.push(itemTotal);			
 				});
+				*/
 				
-				$scope.attendancesConn = "none";				
+				$scope.attendancesConn = "none";
+				$scope.chartConfig.loading = false;
+				$scope.refreshData();
 			});
 			
 			reqPromise.error(function(data, status, headers, config) {
@@ -226,9 +243,48 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		}
 	};
 	
-	$scope.changeLeague = function(league) {
+	$scope.refreshData = function() {
+		if (isEmpty($scope.leagueData)) return;
 		
-		if ($scope.league != league) {
+		$scope.chartConfig.series.forEach(function(series) {
+			series.data = [];
+		});
+		
+		var attendances = $scope.attendances[$scope.season];			
+		
+		//console.log(attendances);
+		
+		attendances.forEach(function(attendance) {
+			//console.log(attendance);
+			
+			if ($scope.leagueData.id == KLId || $scope.leagueData.id == attendance.league) {
+				var itemTotal = [$scope.fcNames[attendance.club.id], attendance.total];
+				var itemAverage = [$scope.fcNames[attendance.club.id], attendance.average];
+				
+				$scope.chartConfig.series[0].data.push(itemAverage);
+				$scope.chartConfig.series[1].data.push(itemTotal);
+			}			
+		});
+		
+		$scope.chartConfig.options.chart.height = 300 + ($scope.chartConfig.series[0].data.length * 30);	
+		
+	};
+	
+	$scope.changeSeason = function() {
+		console.log($scope.leagueData);
+		
+		if ($scope.season != null) {
+			if (isEmpty($scope.attendances[$scope.season])) {
+				$scope.getAttendance();
+			} else {
+				console.log($scope.season);	
+				$scope.refreshData();
+			}			
+		}
+		
+
+		/*
+		if ($scope.season != season) {
 			$scope.chartConfig.series.forEach(function(series) {
 				series.data = [];
 			}) ;
@@ -240,8 +296,34 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			}
 			
 			$scope.league = league;
-			$scope.getAttendance();			
+			$scope.getAttendance();
 		}
+		*/
+	};	
+	
+	$scope.changeLeague = function() {
+		
+		if ($scope.leagueData != null) {
+			console.log($scope.leagueData);		
+			$scope.refreshData();
+		}
+
+		/*
+		if ($scope.season != season) {
+			$scope.chartConfig.series.forEach(function(series) {
+				series.data = [];
+			}) ;
+			
+			if (league == "KLCL") {
+				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
+			} else if (league == "KLCH") {
+				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
+			}
+			
+			$scope.league = league;
+			$scope.getAttendance();
+		}
+		*/
 	};	
 	
 	$scope.btnUrlCopy = function() {

@@ -182,7 +182,13 @@ public class StatsService {
 		}
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("average"));
-		List<AttendanceClub> attendances = attendanceClubRepository.findBySeasonAndLeague(season, league, sort);
+		List<AttendanceClub> attendances = null;
+		
+		if (league.equals(CommonConst.K_LEAGUE_ABBREVIATION)) {
+			attendances = attendanceClubRepository.findBySeason(season, sort);
+		} else {
+			attendances = attendanceClubRepository.findBySeasonAndLeague(season, league, sort);
+		}
 		
 		model.addAttribute("attendances", attendances);
 	}

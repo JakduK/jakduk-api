@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.StatsService;
 
@@ -125,7 +126,7 @@ public class StatsController {
 	@RequestMapping(value = "/data/attendance/season", method = RequestMethod.GET)
 	public void dataAttendanceSeason(Model model,			
 			@RequestParam(required = false) int season,
-			@RequestParam(required = false) String league){
+			@RequestParam(required = false, defaultValue = CommonConst.K_LEAGUE_ABBREVIATION) String league){
 		
 		statsService.getAttendanceSeasonData(model, season, league);
 	}	
