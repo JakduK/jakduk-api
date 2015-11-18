@@ -40,8 +40,11 @@
 				<span class="color-blue"><spring:message code="stats.msg.choose.season"/></span>
 			</div>				
 			<div class="col-xs-8 col-sm-4 col-md-3">	
-				<select class="form-control" ng-model="leagueData" ng-change="changeLeague()"
+				<select class="form-control" ng-model="leagueId" ng-change="changeLeague()"
+				ng-options='key as value.name disable when value.disable for (key, value) in leagues[season]'>
+				<!-- 
 				ng-options='league.name disable when league.disable for league in leagues[season]'>
+				 -->
 					<option value=""><spring:message code="stats.select.league"/></option>
 				</select>
 				<span class="color-blue"><spring:message code="stats.msg.choose.league"/></span>
@@ -79,19 +82,29 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	var KLCLname = '<spring:message code="stats.attendance.filter.league.classic"/>';
 	var KLCHname = '<spring:message code="stats.attendance.filter.league.challenge"/>';	
 	
+	/*
 	$scope.leagues = {
 			2012 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname, disable : true}, {id : KLCHId, name : KLCHname, disable : true}],
 			2013 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname}, {id : KLCHId, name : KLCHname}],
 			2014 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname}, {id : KLCHId, name : KLCHname}]
+	};
+	*/
+	
+	$scope.leagues = {
+			2012 : {'KL' : {name : KLname}, 'KLCL' : {name : KLCLname, disable : true}, 'KLCH' : {name : KLCHname, disable : true}},
+			2013 : {'KL' : {name : KLname}, 'KLCL' : {name : KLCLname}, 'KLCH' : {name : KLCHname}},
+			2014 : {'KL' : {name : KLname}, 'KLCL' : {name : KLCLname}, 'KLCH' : {name : KLCHname}}
 	};	
-	$scope.seasons = [2012, 2013, 2014];	
+	$scope.seasons = [2012, 2013, 2014];
+	
 	$scope.attendancesConn = "none";
 	$scope.fcNames = JSON.parse('${fcNames}');
 	$scope.attendances = {};
+	$scope.rememberLeague = null;
 	
 	angular.element(document).ready(function() {
 		$scope.season = 2012;
-		$scope.leagueData = $scope.leagues[$scope.season][0];
+		$scope.leagueId = KLId;
 		
 		/*
 		var league = "${league}";
@@ -244,7 +257,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	};
 	
 	$scope.refreshData = function() {
-		if (isEmpty($scope.leagueData)) return;
+		if (isEmpty($scope.leagueId)) return;
 		
 		$scope.chartConfig.series.forEach(function(series) {
 			series.data = [];
@@ -257,7 +270,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		attendances.forEach(function(attendance) {
 			//console.log(attendance);
 			
-			if ($scope.leagueData.id == KLId || $scope.leagueData.id == attendance.league) {
+			if ($scope.leagueId == KLId || $scope.leagueId == attendance.league) {
 				var itemTotal = [$scope.fcNames[attendance.club.id], attendance.total];
 				var itemAverage = [$scope.fcNames[attendance.club.id], attendance.average];
 				
@@ -271,13 +284,12 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	};
 	
 	$scope.changeSeason = function() {
-		console.log($scope.leagueData);
+		$scope.rememberLeague = $scope.leagueId;
 		
 		if ($scope.season != null) {
 			if (isEmpty($scope.attendances[$scope.season])) {
 				$scope.getAttendance();
 			} else {
-				console.log($scope.season);	
 				$scope.refreshData();
 			}			
 		}
@@ -302,10 +314,17 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	};	
 	
 	$scope.changeLeague = function() {
+		console.log('changeLeague' + $scope.rememberLeague);		
 		
-		if ($scope.leagueData != null) {
-			console.log($scope.leagueData);		
+		if ($scope.leagueId != null) {
+			console.log($scope.leagueId);		
 			$scope.refreshData();
+		} else {
+			if ($scope.rememberLeague != null) {
+				$scope.leagueId = $scope.rememberLeague;
+				//console.log($scope.leagueId);
+				$scope.rememberLeague = null;
+			}
 		}
 
 		/*
