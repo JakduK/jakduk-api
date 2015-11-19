@@ -99,12 +99,14 @@ public class StatsController {
 	
 	@RequestMapping(value = "/attendance/season", method = RequestMethod.GET)
 	public String attendanceSeason(Model model,
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			@RequestParam(required = false) int season,
+			@RequestParam(required = false, defaultValue = CommonConst.K_LEAGUE_ABBREVIATION) String league) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, null);
 		
-		Integer status = statsService.getAttendanceSeason(model, language);
+		Integer status = statsService.getAttendanceSeason(model, language, season, league);
 		
 		return "stats/attendanceSeason";
 	}	

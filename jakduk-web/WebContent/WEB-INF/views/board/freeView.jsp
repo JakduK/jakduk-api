@@ -221,7 +221,7 @@
 			</button>
 		</div>
 		<div class="col-xs-6 text-right">
-			<button class="btn-u btn-brd rounded btn-u-sm ladda-button" type="button" ng-click="btnUrlCopy()">
+			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()">
 				<i class="icon-link"></i>
 			</button>
 			<a id="kakao-link-btn" href="javascript:;">

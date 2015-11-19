@@ -37,27 +37,26 @@
 				ng-options='season for season in seasons'>
 					<option value=""><spring:message code="stats.select.season"/></option>
 				</select>
-				<span class="color-blue"><spring:message code="stats.msg.choose.season"/></span>
+				<span class="color-blue" ng-class="{'hidden':season}"><spring:message code="stats.msg.choose.season"/></span>
 			</div>				
 			<div class="col-xs-8 col-sm-4 col-md-3">	
 				<select class="form-control" ng-model="leagueId" ng-change="changeLeague()"
 				ng-options='key as value.name disable when value.disable for (key, value) in leagues[season]'>
-				<!-- 
-				ng-options='league.name disable when league.disable for league in leagues[season]'>
-				 -->
 					<option value=""><spring:message code="stats.select.league"/></option>
 				</select>
-				<span class="color-blue"><spring:message code="stats.msg.choose.league"/></span>
+				<span class="color-blue" ng-class="{'hidden':leagueId}"><spring:message code="stats.msg.choose.league"/></span>
 			</div>
 		</div>
 				
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
 		<div class="text-right">
-			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()">
-				<spring:message code="common.button.copy.url.to.clipboard"/>
-			</button>
-		    <a id="kakao-link-btn" href="" ng-click="sendLink()">
+			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
+			tooltip-popup-close-delay='1000' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
+				<i class="icon-link"></i>
+			</button>	
+		    <a id="kakao-link-btn" href="" ng-click="sendLink()"
+		    tooltip-popup-close-delay='500' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
 		      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
 		    </a>
 		</div>		
@@ -71,24 +70,17 @@
 <script src="<%=request.getContextPath()%>/resources/highcharts/highcharts.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts/modules/exporting.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts-ng/dist/highcharts-ng.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
+var jakdukApp = angular.module("jakdukApp", ["highcharts-ng", "ui.bootstrap"]);
 
-jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
+jakdukApp.controller('statsCtrl', function($scope, $http) {
 	var KLId = 'KL';
 	var KLCLId = 'KLCL';
 	var KLCHId = 'KLCH';
 	var KLname = '<spring:message code="stats.attendance.filter.league"/>';
 	var KLCLname = '<spring:message code="stats.attendance.filter.league.classic"/>';
 	var KLCHname = '<spring:message code="stats.attendance.filter.league.challenge"/>';	
-	
-	/*
-	$scope.leagues = {
-			2012 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname, disable : true}, {id : KLCHId, name : KLCHname, disable : true}],
-			2013 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname}, {id : KLCHId, name : KLCHname}],
-			2014 : [{id : KLId, name : KLname}, {id : KLCLId, name : KLCLname}, {id : KLCHId, name : KLCHname}]
-	};
-	*/
 	
 	$scope.leagues = {
 			2012 : {'KL' : {name : KLname}, 'KLCL' : {name : KLCLname, disable : true}, 'KLCH' : {name : KLCHname, disable : true}},
@@ -101,18 +93,33 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	$scope.fcNames = JSON.parse('${fcNames}');
 	$scope.attendances = {};
 	$scope.rememberLeague = null;
+	  $scope.dynamicTooltip = 'Hello, World!';
+	  $scope.dynamicTooltipText = 'dynamic';
 	
 	angular.element(document).ready(function() {
-		$scope.season = 2012;
-		$scope.leagueId = KLId;
-		
-		/*
+		var season = Number("${season}");
 		var league = "${league}";
 		
-		if (league == "KLCL" || league == "KLCH") {			
-			$scope.league = league;
+		if ($scope.seasons.indexOf(season) >= 0) {
+			$scope.season = season;
+		} else {
+			$scope.season = 2014;
 		}
-		*/
+		
+		var leagueKeys = [];
+		for (var key1 in $scope.leagues[$scope.season]) {
+			var key2 = $scope.leagues[$scope.season][key1];
+			
+			if (key2.disable != true) {
+				leagueKeys.push(key1);
+			}
+		}
+		
+		if (leagueKeys.indexOf(league) >= 0) {			
+			$scope.leagueId = league;
+		} else {
+			$scope.leagueId = KLId;
+		}
 		
 		Highcharts.setOptions({
 			lang: {
@@ -132,7 +139,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 					}
 				},
 				title: {
-					text: '<spring:message code="stats.attendance.league.classic.title"/>'
+					text: '<spring:message code="stats.attendance"/>'
 				},	        
 				subtitle: {
 					text: 'Source: http://www.kleague.com'
@@ -227,23 +234,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			$scope.attendancesConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				
-				//console.log($scope.fcNames);
-				//console.log(data);
 				$scope.attendances[$scope.season] = data.attendances;					
-				/*
-				var attendances = data.attendances;
-				$scope.chartConfig.options.chart.height = 300 + (attendances.length * 30);
-				
-				attendances.forEach(function(attendance) {
-					var itemTotal = [$scope.fcNames[attendance.club.id], attendance.total];
-					var itemAverage = [$scope.fcNames[attendance.club.id], attendance.average];
-					
-					$scope.chartConfig.series[0].data.push(itemAverage);
-					$scope.chartConfig.series[1].data.push(itemTotal);			
-				});
-				*/
-				
+
 				$scope.attendancesConn = "none";
 				$scope.chartConfig.loading = false;
 				$scope.refreshData();
@@ -265,11 +257,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		
 		var attendances = $scope.attendances[$scope.season];			
 		
-		//console.log(attendances);
-		
 		attendances.forEach(function(attendance) {
-			//console.log(attendance);
-			
 			if ($scope.leagueId == KLId || $scope.leagueId == attendance.league) {
 				var itemTotal = [$scope.fcNames[attendance.club.id], attendance.total];
 				var itemAverage = [$scope.fcNames[attendance.club.id], attendance.average];
@@ -279,6 +267,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			}			
 		});
 		
+		$scope.chartConfig.title.text = $scope.season + ' ' + $scope.leagues[$scope.season][$scope.leagueId].name 
+			+ ' <spring:message code="stats.attendance"/>';
 		$scope.chartConfig.options.chart.height = 300 + ($scope.chartConfig.series[0].data.length * 30);	
 		
 	};
@@ -293,24 +283,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				$scope.refreshData();
 			}			
 		}
-		
-
-		/*
-		if ($scope.season != season) {
-			$scope.chartConfig.series.forEach(function(series) {
-				series.data = [];
-			}) ;
-			
-			if (league == "KLCL") {
-				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
-			} else if (league == "KLCH") {
-				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
-			}
-			
-			$scope.league = league;
-			$scope.getAttendance();
-		}
-		*/
 	};	
 	
 	$scope.changeLeague = function() {
@@ -322,31 +294,13 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		} else {
 			if ($scope.rememberLeague != null) {
 				$scope.leagueId = $scope.rememberLeague;
-				//console.log($scope.leagueId);
 				$scope.rememberLeague = null;
 			}
 		}
-
-		/*
-		if ($scope.season != season) {
-			$scope.chartConfig.series.forEach(function(series) {
-				series.data = [];
-			}) ;
-			
-			if (league == "KLCL") {
-				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
-			} else if (league == "KLCH") {
-				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
-			}
-			
-			$scope.league = league;
-			$scope.getAttendance();
-		}
-		*/
 	};	
 	
 	$scope.btnUrlCopy = function() {
-		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.league;
+		var url = "https://jakduk.com/stats/attendance/season?season=" + $scope.season + '&league=' + $scope.leagueId;
 		
 		if (window.clipboardData){
 		    // IE처리
@@ -365,8 +319,9 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	};
 	
 	$scope.sendLink = function() {
-		var label = $scope.chartConfig.title.text + '\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>';
-		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.league;
+		var label = $scope.chartConfig.title.text 
+			+ '\r<spring:message code="stats.attendance.season.title"/> · <spring:message code="stats"/> · <spring:message code="common.jakduk"/>';
+		var url = "https://jakduk.com/stats/attendance/season?season=" + $scope.season + '&league=' + $scope.leagueId;
 		
 	    Kakao.Link.sendTalkLink({
 			label: label,

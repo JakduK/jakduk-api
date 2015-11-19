@@ -155,7 +155,7 @@ public class StatsService {
 		}
 	}
 	
-	public Integer getAttendanceSeason(Model model, String language) {
+	public Integer getAttendanceSeason(Model model, String language, int season, String league) {
 		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
 		Map<String, String> fcNames = new HashMap<>();
 		
@@ -164,6 +164,14 @@ public class StatsService {
 		}
 		
 		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		
+		if (season != 0) {
+			model.addAttribute("season", season);
+		}
+		
+		if (league != null && !league.isEmpty()) {
+			model.addAttribute("league", league);
+		}
 		
 		try {
 			model.addAttribute("fcNames", new ObjectMapper().writeValueAsString(fcNames));
