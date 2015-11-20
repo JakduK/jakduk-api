@@ -46,8 +46,8 @@
 		
 		<div class="tag-box tag-box-v4 margin-bottom-20">
 			<h2>{{chartConfig.title.text}}</h2>
-			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
 			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>	
+			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
 		</div>
 		
 		<div class="text-right">
@@ -203,9 +203,9 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			},
 			{
 				name: '<spring:message code="stats.attendance.average"/>',	
-      yAxis: 1,	                
-      type: 'spline',
-      data: [],
+		      yAxis: 1,	                
+		      type: 'spline',
+		      data: [],
 				dataLabels: {
 					enabled: true,
 					format: '{point.y:,.0f} <spring:message code="stats.attendance.people"/>'
@@ -279,18 +279,25 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 		});
 				
 		var attendances = $scope.attendances[$scope.leagueId];
+		var totalSum = 0;
+		var gamesSum = 0;
 		
 		attendances.forEach(function(attendance) {
 			var itemTotal = [attendance.season, attendance.total];
 			var itemAverage = [attendance.season, attendance.average];
 			var itemGames = [attendance.season, attendance.games];
 			var itemNumberOfClubs = [attendance.season, attendance.numberOfClubs];
+			totalSum += attendance.total;
+			gamesSum += attendance.games;
 			
 			$scope.chartConfig.series[0].data.push(itemTotal);
 			$scope.chartConfig.series[1].data.push(itemAverage);
 			$scope.chartConfig.series[2].data.push(itemGames);
 			$scope.chartConfig.series[3].data.push(itemNumberOfClubs);
 		});
+		
+		$scope.totalSum = totalSum;
+		$scope.gamesSum = gamesSum;
 		
 		if ($scope.leagueId == KLCLId) {
 			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			

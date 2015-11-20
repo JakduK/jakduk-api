@@ -103,15 +103,8 @@ public class StatsService {
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 		
 		List<AttendanceLeague> attendances = attendanceLeagueRepository.findByLeague(league, sort);
-		Stream<AttendanceLeague> sAttendances = attendances.stream();
-		Integer totalSum = sAttendances.mapToInt(AttendanceLeague::getTotal).sum();
-		sAttendances = attendances.stream();
-		Integer gamesSum = sAttendances.mapToInt(AttendanceLeague::getGames).sum();
 		
 		model.addAttribute("attendances", attendances);
-		model.addAttribute("totalSum", totalSum);
-		model.addAttribute("gamesSum", gamesSum);
-		
 	}
 	
 	public Integer getAttendanceClub(Model model, String clubOrigin) {
