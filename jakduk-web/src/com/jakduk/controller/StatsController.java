@@ -67,17 +67,35 @@ public class StatsController {
 		statsService.getSupportersData(model, language);
 	}
 
+	@RequestMapping(value = "/attendance", method = RequestMethod.GET)
+	public String attendance(Model model) {
+		
+		return "redirect:/stats/attendance/league";
+	}
+	
 	@RequestMapping(value = "/attendance/refresh", method = RequestMethod.GET)
 	public String attendanceRefresh() {
 		
 		return "redirect:/stats/attendance/league";
 	}	
 	
-	@RequestMapping(value = "/attendance", method = RequestMethod.GET)
-	public String attendance(Model model) {
+	@RequestMapping(value = "/attendance/league/refresh", method = RequestMethod.GET)
+	public String attendanceLeagueRefresh() {
 		
 		return "redirect:/stats/attendance/league";
-	}
+	}	
+	
+	
+	@RequestMapping(value = "/attendance/club/refresh", method = RequestMethod.GET)
+	public String attendanceClubRefresh() {
+		
+		return "redirect:/stats/attendance/club";
+	}	
+	@RequestMapping(value = "/attendance/season/refresh", method = RequestMethod.GET)
+	public String attendanceSeasonRefresh() {
+		
+		return "redirect:/stats/attendance/season";
+	}	
 	
 	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
 	public String attendanceLeague(Model model,
@@ -100,7 +118,7 @@ public class StatsController {
 	@RequestMapping(value = "/attendance/season", method = RequestMethod.GET)
 	public String attendanceSeason(Model model,
 			HttpServletRequest request,
-			@RequestParam(required = false) int season,
+			@RequestParam(required = false, defaultValue = "0") int season,
 			@RequestParam(required = false, defaultValue = CommonConst.K_LEAGUE_ABBREVIATION) String league) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
@@ -127,7 +145,7 @@ public class StatsController {
 	
 	@RequestMapping(value = "/data/attendance/season", method = RequestMethod.GET)
 	public void dataAttendanceSeason(Model model,			
-			@RequestParam(required = false) int season,
+			@RequestParam(required = false, defaultValue = "0") int season,
 			@RequestParam(required = false, defaultValue = CommonConst.K_LEAGUE_ABBREVIATION) String league){
 		
 		statsService.getAttendanceSeasonData(model, season, league);

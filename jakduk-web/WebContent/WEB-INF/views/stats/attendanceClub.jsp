@@ -7,7 +7,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="stats.attendance.club.title"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="stats.attendance.club.title"/> &middot; <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
@@ -18,7 +18,7 @@
 		<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
+			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/club/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
 			      <li><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
 			      <li class="active"><spring:message code="stats.attendance.breadcrumbs.club"/></li>
@@ -44,16 +44,19 @@
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
 		<div class="tag-box tag-box-v4 margin-bottom-20">
+			<h2>{{chartConfig.title.text}}</h2>
+			<p><spring:message code="stats.msg.total.number.of.attendance.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
 			<p><spring:message code="stats.msg.total.number.of.attendance.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
 			<p><spring:message code="stats.msg.total.number.of.attendance.average" arguments="<strong>{{average | number:0}}</strong>"/></p>	
-			<p><spring:message code="stats.msg.total.number.of.attendance.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
 		</div>
 		
 		<div class="text-right">
-			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()">
-				<spring:message code="common.button.copy.url.to.clipboard"/>
+			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
+				<i class="icon-link"></i>
 			</button>
-		    <a id="kakao-link-btn" href="" ng-click="sendLink()">
+		    <a id="kakao-link-btn" href="" ng-click="sendLink()"
+		    tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
 		      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
 		    </a>
 		</div>		
@@ -62,21 +65,17 @@
 	<jsp:include page="../include/footer.jsp"/>	
 </div>
 
-<!-- Bootstrap core JavaScript
-  ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/highcharts/highcharts.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts/modules/exporting.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts-ng/dist/highcharts-ng.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
+var jakdukApp = angular.module("jakdukApp", ["highcharts-ng", "ui.bootstrap"]);
 
-jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
+jakdukApp.controller('statsCtrl', function($scope, $http) {
 	
 	$scope.footballClubsConn = "none";
 	$scope.attendancesConn = "none";

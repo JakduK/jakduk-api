@@ -7,7 +7,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="stats.supporters"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="stats.supporters"/> &middot; <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/css/cubeportfolio.min.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/custom/custom-cubeportfolio.css">
@@ -46,37 +46,36 @@
 	 <highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 
 <div class="tag-box tag-box-v4 margin-bottom-20">
+	<h2>{{chartConfig.title.text}}</h2>
 	<p><spring:message code="stats.msg.total.number.of.members" arguments="<strong>{{usersTotal}}</strong>"/></p>
 	<p><spring:message code="stats.msg.total.number.of.supporters" arguments="<strong>{{supportersTotal}}</strong>"/></p>	
 </div>
 
-<div class="text-right">
-<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()">
-	<spring:message code="common.button.copy.url.to.clipboard"/>
-</button>
-    <a id="kakao-link-btn" href="" ng-click="sendLink()">
-      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
-    </a>
-</div>
+		<div class="text-right">
+			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
+				<i class="icon-link"></i>
+			</button>
+		    <a id="kakao-link-btn" href="" ng-click="sendLink()"
+		    tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
+		      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
+		    </a>
+		</div>
 	 
 	</div>
 	
 	<jsp:include page="../include/footer.jsp"/>	
 </div>
 
-<!-- Bootstrap core JavaScript
-  ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/highcharts/highcharts.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts/modules/exporting.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts-ng/dist/highcharts-ng.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
+var jakdukApp = angular.module("jakdukApp", ["highcharts-ng", "ui.bootstrap"]);
 
 jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.supportersConn = "none";

@@ -7,10 +7,7 @@
 <html ng-app="jakdukApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><spring:message code="stats.attendance.league.title"/> - <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
-	
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/css/cubeportfolio.min.css">
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/custom/custom-cubeportfolio.css">	
+	<title><spring:message code="stats.attendance.league.title"/> &middot; <spring:message code="stats"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
@@ -35,31 +32,31 @@
 	<!--=== Content Part ===-->
 	<div class="container content">
 	
-<div class="cube-portfolio">	
-		<div id="filters-container" class="cbp-l-filters-text content-xs">
-			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':league == 'KLCL'}" ng-click="changeLeague('KLCL')"> 
-				<spring:message code="stats.attendance.filter.league.classic"/> 
-			</div> |
-			<div class="cbp-filter-item"
-			ng-class="{'cbp-filter-item-active':league == 'KLCH'}" ng-click="changeLeague('KLCH')"> 
-				<spring:message code="stats.attendance.filter.league.challenge"/> 
-			</div>			
-		</div><!--/end Filters Container-->
-</div>  	
+		<div class="row">
+			<div class="col-xs-8 col-sm-4 col-md-3">	
+				<select class="form-control" ng-model="leagueId" ng-change="changeLeague()"
+				ng-options='key as value.name disable when value.disable for (key, value) in leagues'>
+					<option value=""><spring:message code="stats.select.league"/></option>
+				</select>
+				<span class="color-blue" ng-class="{'hidden':leagueId}"><spring:message code="stats.msg.choose.league"/></span>
+			</div>
+		</div>	
 	
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
 		<div class="tag-box tag-box-v4 margin-bottom-20">
-			<p><spring:message code="stats.msg.total.number.of.attendance.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
-			<p><spring:message code="stats.msg.total.number.of.attendance.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>	
+			<h2>{{chartConfig.title.text}}</h2>
+			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
+			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>	
 		</div>
 		
 		<div class="text-right">
-			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()">
-				<spring:message code="common.button.copy.url.to.clipboard"/>
+			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
+				<i class="icon-link"></i>
 			</button>
-		    <a id="kakao-link-btn" href="" ng-click="sendLink()">
+		    <a id="kakao-link-btn" href="" ng-click="sendLink()"
+		    tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
 		      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
 		    </a>
 		</div>		
@@ -72,29 +69,41 @@
   ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/highcharts/highcharts.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts/modules/exporting.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts-ng/dist/highcharts-ng.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 
 <script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", ["highcharts-ng"]);
+var jakdukApp = angular.module("jakdukApp", ["highcharts-ng", "ui.bootstrap"]);
 
-jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
+jakdukApp.controller('statsCtrl', function($scope, $http) {
+	var KLCLId = 'KLCL';
+	var KLCHId = 'KLCH';
+	var KLname = '<spring:message code="stats.attendance.filter.league"/>';
+	var KLCLname = '<spring:message code="stats.attendance.filter.league.classic"/>';
+	var KLCHname = '<spring:message code="stats.attendance.filter.league.challenge"/>';	
+	
+	$scope.leagues = {'KLCL' : {name : KLCLname}, 'KLCH' : {name : KLCHname}};
+	
 	$scope.attendancesConn = "none";
-	$scope.league = "KLCL";
+	$scope.attendances = {};
 	$scope.totalSum = 0;
 	$scope.gamesSum = 0;
 	
 	angular.element(document).ready(function() {
-		
 		var league = "${league}";
 		
-		if (league == "KLCL" || league == "KLCH") {			
-			$scope.league = league;
+		var leagueKeys = Object.keys($scope.leagues);
+		
+		if (leagueKeys.indexOf(league) >= 0) {			
+			$scope.leagueId = league;
+		} else {
+			$scope.leagueId = KLCLId;
 		}
+		
+		console.log()
 		
 		Highcharts.setOptions({
 			lang: {
@@ -140,7 +149,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 					formatter: function() {
 						return Highcharts.numberFormat(this.value,0);
 					}					
-				},
+				},				
+				opposite: true
 			}, 
 			{ // Average yAxis
 				labels: {
@@ -151,8 +161,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				},
 				title: {
 					text: '<spring:message code="stats.attendance.average"/>'
-				},
-				opposite: true
+				}
 			},
 			{ // Games yAxis
 				labels: {
@@ -163,7 +172,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			 	},
 				title: {
 					text: '<spring:message code="stats.attendance.games"/>'
-				}								
+				},
+				opposite: true						
 			},                 
 			{ // Number Of Clubs yAxis
 				labels: {
@@ -174,8 +184,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			 	},
 				title: {
 					text: '<spring:message code="stats.attendance.number.of.clubs"/>'
-				},
-				opposite: true				
+				}			
 			}],       			
 			series: [{
 				name: '<spring:message code="stats.attendance.total"/>',
@@ -225,8 +234,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 				}
 			}],
 			
-    loading: true,
-    credits:{enabled:true}
+    	loading: true,
+    	credits:{enabled:true}
 		};		
 
 		 // 사용할 앱의 Javascript 키를 설정해 주세요.
@@ -238,7 +247,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	});
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/league.json?league=' + $scope.league + '"/>';
+		var bUrl = '<c:url value="/stats/data/attendance/league.json?league=' + $scope.leagueId + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
@@ -248,26 +257,11 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 			$scope.attendancesConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
+				$scope.attendances[$scope.leagueId] = data.attendances;
 				
 				$scope.chartConfig.loading = false;
-				$scope.totalSum = data.totalSum;
-				$scope.gamesSum = data.gamesSum;
-				var attendances = data.attendances;
-				$scope.chartConfig.options.chart.height = 300 + (attendances.length * 30);
-				
-				attendances.forEach(function(attendance) {
-					var itemTotal = [attendance.season, attendance.total];
-					var itemAverage = [attendance.season, attendance.average];
-					var itemGames = [attendance.season, attendance.games];
-					var itemNumberOfClubs = [attendance.season, attendance.numberOfClubs];
-					
-					$scope.chartConfig.series[0].data.push(itemTotal);
-					$scope.chartConfig.series[1].data.push(itemAverage);
-					$scope.chartConfig.series[2].data.push(itemGames);
-					$scope.chartConfig.series[3].data.push(itemNumberOfClubs);
-				});
-				
-				$scope.attendancesConn = "none";				
+				$scope.attendancesConn = "none";	
+				$scope.refreshData();
 			});
 			
 			reqPromise.error(function(data, status, headers, config) {
@@ -277,26 +271,49 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 		}
 	};
 	
-	$scope.changeLeague = function(league) {
+	$scope.refreshData = function() {
+		if (isEmpty($scope.leagueId)) return;
 		
-		if ($scope.league != league) {
-			$scope.chartConfig.series.forEach(function(series) {
-				series.data = [];
-			}) ;
+		$scope.chartConfig.series.forEach(function(series) {
+			series.data = [];
+		});
+				
+		var attendances = $scope.attendances[$scope.leagueId];
+		
+		attendances.forEach(function(attendance) {
+			var itemTotal = [attendance.season, attendance.total];
+			var itemAverage = [attendance.season, attendance.average];
+			var itemGames = [attendance.season, attendance.games];
+			var itemNumberOfClubs = [attendance.season, attendance.numberOfClubs];
 			
-			if (league == "KLCL") {
-				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
-			} else if (league == "KLCH") {
-				$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
-			}
-			
-			$scope.league = league;
-			$scope.getAttendance();			
+			$scope.chartConfig.series[0].data.push(itemTotal);
+			$scope.chartConfig.series[1].data.push(itemAverage);
+			$scope.chartConfig.series[2].data.push(itemGames);
+			$scope.chartConfig.series[3].data.push(itemNumberOfClubs);
+		});
+		
+		if ($scope.leagueId == KLCLId) {
+			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.classic.title"/>';			
+		} else if ($scope.leagueId == KLCHId) {
+			$scope.chartConfig.title.text = '<spring:message code="stats.attendance.league.challenge.title"/>';
 		}
+		
+		$scope.chartConfig.options.chart.height = 300 + (attendances.length * 30);	
+		
+	};	
+	
+	$scope.changeLeague = function() {
+		if ($scope.leagueId != null) {
+			if (isEmpty($scope.attendances[$scope.leagueId])) {
+				$scope.getAttendance();
+			} else {
+				$scope.refreshData();
+			}			
+		}		
 	};	
 	
 	$scope.btnUrlCopy = function() {
-		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.league;
+		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.leagueId;
 		
 		if (window.clipboardData){
 		    // IE처리
@@ -316,7 +333,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http, $filter) {
 	
 	$scope.sendLink = function() {
 		var label = $scope.chartConfig.title.text + '\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>';
-		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.league;
+		var url = "https://jakduk.com/stats/attendance/league?league=" + $scope.leagueId;
 		
 	    Kakao.Link.sendTalkLink({
 			label: label,

@@ -18,7 +18,7 @@
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
+			<h1 class="pull-left"><a href="<c:url value="/stats/attendance/season/refresh"/>"><spring:message code="stats.attendance"/></a></h1>
 				<ul class="pull-right breadcrumb">
 			      <li><a href="<c:url value="/stats/attendance/league"/>"><spring:message code="stats.attendance.breadcrumbs.league"/></a></li>
 			      <li><a href="<c:url value="/stats/attendance/club"/>"><spring:message code="stats.attendance.breadcrumbs.club"/></a></li>
@@ -50,13 +50,21 @@
 				
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
 		
+		<div class="tag-box tag-box-v4 margin-bottom-20">
+			<h2>{{chartConfig.title.text}}</h2>
+			<p><spring:message code="stats.msg.total.number.of.clubs" arguments="<strong>{{chartConfig.series[0].data.length | number:0}}</strong>"/></p>
+			<p><spring:message code="stats.msg.total.number.of.attendance.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
+			<p><spring:message code="stats.msg.total.number.of.attendance.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
+			<p><spring:message code="stats.msg.total.number.of.attendance.average" arguments="<strong>{{average | number:0}}</strong>"/></p>	
+		</div>			
+		
 		<div class="text-right">
 			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
-			tooltip-popup-close-delay='1000' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
 				<i class="icon-link"></i>
 			</button>	
 		    <a id="kakao-link-btn" href="" ng-click="sendLink()"
-		    tooltip-popup-close-delay='500' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
+		    tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
 		      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
 		    </a>
 		</div>		
@@ -93,8 +101,9 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.fcNames = JSON.parse('${fcNames}');
 	$scope.attendances = {};
 	$scope.rememberLeague = null;
-	  $scope.dynamicTooltip = 'Hello, World!';
-	  $scope.dynamicTooltipText = 'dynamic';
+	$scope.totalSum = 0;
+	$scope.gamesSum = 0;
+	$scope.average = 0;
 	
 	angular.element(document).ready(function() {
 		var season = Number("${season}");
@@ -166,6 +175,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 							return Highcharts.numberFormat(this.value,0);
 						}					
 					},
+					opposite: true					
 				}, 
 				{ // Average yAxis
 					min: 0,
@@ -178,8 +188,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 						formatter: function() {
 							return Highcharts.numberFormat(this.value,0);
 						}
-					},					
-					opposite: true
+					}
 				}],       			
 				series: [{
 					name: '<spring:message code="stats.attendance.total"/>',
@@ -254,22 +263,29 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 		$scope.chartConfig.series.forEach(function(series) {
 			series.data = [];
 		});
-		
-		var attendances = $scope.attendances[$scope.season];			
+				
+		var attendances = $scope.attendances[$scope.season];
+		var totalSum = 0;
+		var gamesSum = 0;
 		
 		attendances.forEach(function(attendance) {
 			if ($scope.leagueId == KLId || $scope.leagueId == attendance.league) {
 				var itemTotal = [$scope.fcNames[attendance.club.id], attendance.total];
 				var itemAverage = [$scope.fcNames[attendance.club.id], attendance.average];
+				totalSum += attendance.total;
+				gamesSum += attendance.games;
 				
-				$scope.chartConfig.series[0].data.push(itemAverage);
-				$scope.chartConfig.series[1].data.push(itemTotal);
-			}			
+				$scope.chartConfig.series[0].data.push(itemTotal);
+				$scope.chartConfig.series[1].data.push(itemAverage);
+			}
+			$scope.totalSum = totalSum;
+			$scope.average = totalSum / gamesSum;
+			$scope.gamesSum = gamesSum;
 		});
 		
 		$scope.chartConfig.title.text = $scope.season + ' ' + $scope.leagues[$scope.season][$scope.leagueId].name 
 			+ ' <spring:message code="stats.attendance"/>';
-		$scope.chartConfig.options.chart.height = 300 + ($scope.chartConfig.series[0].data.length * 30);	
+		$scope.chartConfig.options.chart.height = 300 + ($scope.chartConfig.series[0].data.length * 35);	
 		
 	};
 	
@@ -286,16 +302,9 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	};	
 	
 	$scope.changeLeague = function() {
-		console.log('changeLeague' + $scope.rememberLeague);		
 		
 		if ($scope.leagueId != null) {
-			console.log($scope.leagueId);		
 			$scope.refreshData();
-		} else {
-			if ($scope.rememberLeague != null) {
-				$scope.leagueId = $scope.rememberLeague;
-				$scope.rememberLeague = null;
-			}
 		}
 	};	
 	
@@ -320,7 +329,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	
 	$scope.sendLink = function() {
 		var label = $scope.chartConfig.title.text 
-			+ '\r<spring:message code="stats.attendance.season.title"/> · <spring:message code="stats"/> · <spring:message code="common.jakduk"/>';
+			+ '\r<spring:message code="stats"/> · <spring:message code="common.jakduk"/>';
 		var url = "https://jakduk.com/stats/attendance/season?season=" + $scope.season + '&league=' + $scope.leagueId;
 		
 	    Kakao.Link.sendTalkLink({
