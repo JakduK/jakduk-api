@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
-	<title><spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="board.free.breadcrumbs.comments"/> &middot; <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
@@ -28,7 +28,7 @@
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
+			<h1 class="pull-left"><a href="<c:url value="/board/free/comments/refresh"/>"><spring:message code="board.name.free"/></a></h1>
 			<ul class="pull-right breadcrumb">
 		      <li><a href="<c:url value="/board/free/posts"/>"><spring:message code="board.free.breadcrumbs.posts"/></a></li>
 		      <li class="active"><spring:message code="board.free.breadcrumbs.comments"/></li>
@@ -97,20 +97,20 @@
 	
 	<div class="row">
 		<div class="col-sm-6 margin-bottom-10">
-			<div class="btn-group">
 			<c:choose>
 				<c:when test="${authRole == 'ANNONYMOUS'}">
-				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
+				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'">
 					<span aria-hidden="true" class="icon-pencil"></span>
 				</button>	
 				</c:when>
 				<c:when test="${authRole == 'USER'}">
-				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
+				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
 					<span aria-hidden="true" class="icon-pencil"></span>
 				</button>	
 				</c:when>	
 			</c:choose>
-			</div>
 		</div>
 		<div class="col-sm-6 sm-margin-bottom-10">
 	       <div class="input-group">
@@ -148,12 +148,14 @@
 				</p>
 	
 				<button type="button" class="btn btn-xs rounded btn-default" 
-				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'like')">
+				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'like')"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 					<i class="fa fa-thumbs-o-up fa-lg" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length"></i>
 					{{numberOfCommentLike[comment.id]}}
 				</button>
 				<button type="button" class="btn btn-xs rounded btn-default" 
-				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'dislike')">
+				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'dislike')"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 					<i class="fa fa-thumbs-o-down fa-lg" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length"></i>
 					{{numberOfCommentDislike[comment.id]}}
 				</button>	
@@ -166,20 +168,22 @@
 	    
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
-		<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
-			<span aria-hidden="true" class="icon-pencil"></span>
-		</button>	
+			<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+				<span aria-hidden="true" class="icon-pencil"></span>
+			</button>	
 		</c:when>
 		<c:when test="${authRole == 'USER'}">
-		<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<span aria-hidden="true" class="icon-pencil"></span>
-		</button>	
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+				<span aria-hidden="true" class="icon-pencil"></span>
+			</button>	
 		</c:when>	
 	</c:choose>	    
 	    
 		<div class="text-left">
-        	<pagination ng-model="currentPage" total-items="totalItems" max-size="10" items-per-page="itemsPerPage"
-        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></pagination>
+        	<uib-pagination ng-model="currentPage" total-items="totalItems" max-size="10" items-per-page="itemsPerPage"
+        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></uib-pagination>
 		</div>	    
 	
 	<!--=== End Content Part ===-->

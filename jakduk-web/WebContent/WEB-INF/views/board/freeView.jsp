@@ -86,79 +86,90 @@
 	
 	<!--=== Content Part ===-->
 	<div class="container content blog-page blog-item">	
-	<div class="margin-bottom-10">
-	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"><i class="fa fa-list"></i></button>
 	
-	<c:choose>
-		<c:when test="${!empty prevUrl}">
-			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"><i class="fa fa-chevron-left"></i></button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
-		</c:otherwise>
-	</c:choose>
-	<c:choose>
-		<c:when test="${!empty nextUrl}">
-			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"><i class="fa fa-chevron-right"></i></button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>		
-		</c:otherwise>
-	</c:choose>	
-	
-	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-		<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
-		</button>
-		<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
-			<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
-		</button>	
-	</c:if>
-	
-	<c:choose>
-		<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
-				<spring:message code="common.button.set.as.notice"/>
+		<!-- Buttons -->
+		<div class="margin-bottom-10">
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.list"/>'>
+				<i class="fa fa-list"></i>
 			</button>
-		</c:when>
-		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
-				<spring:message code="common.button.cancel.notice"/>
-			</button>		
-		</c:when>
-	</c:choose>
-</div>
+		
+			<c:choose>
+				<c:when test="${!empty prevUrl}">
+					<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"
+					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.prev"/>'>
+						<i class="fa fa-chevron-left"></i>
+					</button>		
+				</c:when>
+				<c:otherwise>
+					<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
+				</c:otherwise>
+			</c:choose>
+			<c:choose>
+				<c:when test="${!empty nextUrl}">
+					<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"
+					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.next"/>'>
+						<i class="fa fa-chevron-right"></i>
+					</button>		
+				</c:when>
+				<c:otherwise>
+					<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>		
+				</c:otherwise>
+			</c:choose>	
+		
+			<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
+				<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+					<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
+				</button>
+				<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
+					<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
+				</button>	
+			</c:if>
+		
+			<c:choose>
+				<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
+					<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
+						<spring:message code="common.button.set.as.notice"/>
+					</button>
+				</c:when>
+				<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
+					<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+						<spring:message code="common.button.cancel.notice"/>
+					</button>		
+				</c:when>
+			</c:choose>
+		</div> <!-- End Buttons -->
 
-	<c:choose>	
-		<c:when test="${result == 'setNotice'}">
-			<div class="contex-bg"><p class="bg-success rounded"><spring:message code="board.msg.set.as.notice"/></p></div>		
-		</c:when>	
-		<c:when test="${result == 'cancelNotice'}">
-			<div class="contex-bg"><p class="bg-success rounded"><spring:message code="board.msg.cancel.notice"/></p></div>
-		</c:when>
-		<c:when test="${result == 'alreadyNotice'}">
-			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.already.notice"/></p></div>
-		</c:when>
-		<c:when test="${result == 'alreadyNotNotice'}">
-			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.already.not.notice"/></p></div>
-		</c:when>		
-		<c:when test="${result == 'existComment'}">
-			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.can.not.delete.post"/></p></div>
-		</c:when>
-		<c:when test="${result == 'emptyComment'}">
-			<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.can.not.delete.post.except.comment"/></p></div>
-		</c:when>
-	</c:choose>
+		<c:choose>	
+			<c:when test="${result == 'setNotice'}">
+				<div class="contex-bg"><p class="bg-success rounded"><spring:message code="board.msg.set.as.notice"/></p></div>		
+			</c:when>	
+			<c:when test="${result == 'cancelNotice'}">
+				<div class="contex-bg"><p class="bg-success rounded"><spring:message code="board.msg.cancel.notice"/></p></div>
+			</c:when>
+			<c:when test="${result == 'alreadyNotice'}">
+				<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.already.notice"/></p></div>
+			</c:when>
+			<c:when test="${result == 'alreadyNotNotice'}">
+				<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.already.not.notice"/></p></div>
+			</c:when>		
+			<c:when test="${result == 'existComment'}">
+				<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.can.not.delete.post"/></p></div>
+			</c:when>
+			<c:when test="${result == 'emptyComment'}">
+				<div class="contex-bg"><p class="bg-danger rounded"><spring:message code="board.msg.error.can.not.delete.post.except.comment"/></p></div>
+			</c:when>
+		</c:choose>
 	
-        <!--Blog Post-->        
-    	<div class="blog margin-bottom-20" ng-controller="boardFreeCtrl">
-    	<input type="hidden" id="subject" value="${post.subject}">
+		<!--Blog Post-->        
+		<div class="blog margin-bottom-20" ng-controller="boardFreeCtrl">
+    		<input type="hidden" id="subject" value="${post.subject}">
         	<h2>
-        	<small>
-				<c:if test="${post.status.device == 'mobile'}"><span aria-hidden="true" class=" icon-screen-smartphone"></span></c:if>
-				<c:if test="${post.status.device == 'tablet'}"><span aria-hidden="true" class=" icon-screen-tablet"></span></c:if>
-				<c:if test="${galleries != null}"><span aria-hidden="true" class="icon-picture"></span></c:if>
-			</small>
+	        	<small>
+					<c:if test="${post.status.device == 'mobile'}"><span aria-hidden="true" class=" icon-screen-smartphone"></span></c:if>
+					<c:if test="${post.status.device == 'tablet'}"><span aria-hidden="true" class=" icon-screen-tablet"></span></c:if>
+					<c:if test="${galleries != null}"><span aria-hidden="true" class="icon-picture"></span></c:if>
+				</small>
 				<c:choose>
 					<c:when test="${post.status.delete == 'delete'}">
 						<spring:message code="board.msg.deleted"/>
@@ -167,16 +178,15 @@
 						${post.subject}
 					</c:otherwise>
 				</c:choose>
-				
-	  		<c:if test="${!empty category}"><small><span aria-hidden="true" class="icon-directions"></span><spring:message code="${category.resName}"/></small></c:if>        	
+	  			<c:if test="${!empty category}"><small><span aria-hidden="true" class="icon-directions"></span><spring:message code="${category.resName}"/></small></c:if>        	
         	</h2>
-            <div class="blog-post-tags">
-                <ul class="list-unstyled list-inline blog-info">
-                    <li><span aria-hidden="true" class="icon-user"></span> ${post.writer.username}</li>
-                    <li>{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
-                    <li><span aria-hidden="true" class="icon-eye"></span> ${post.views}</li>
-                </ul>                    
-            </div>
+			<div class="blog-post-tags">
+               <ul class="list-unstyled list-inline blog-info">
+                   <li><span aria-hidden="true" class="icon-user"></span> ${post.writer.username}</li>
+                   <li>{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
+                   <li><span aria-hidden="true" class="icon-eye"></span> ${post.views}</li>
+               </ul>                    
+           </div>
             
 			<c:choose>
 				<c:when test="${post.status.delete == 'delete'}">
@@ -187,192 +197,208 @@
 				</c:otherwise>
 			</c:choose>            
 			
-	<!-- galleries -->			
-	<c:if test="${galleries != null}">
-	<ul class="list-group">
-	  <li class="list-group-item">
-	  <strong><spring:message code="board.gallery.list"/></strong>
-			<c:forEach items="${galleries}" var="gallery">
-				<div>
-					<span aria-hidden="true" class="icon-paper-clip"></span>
-					<a href="<c:url value="/gallery/view/${gallery.id}"/>">${gallery.name}</a> | 
-					<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
+			<!-- galleries -->			
+			<c:if test="${galleries != null}">
+				<ul class="list-group">
+					<li class="list-group-item">
+						<strong><spring:message code="board.gallery.list"/></strong>
+						<c:forEach items="${galleries}" var="gallery">
+							<div>
+								<span aria-hidden="true" class="icon-paper-clip"></span>
+								<a href="<c:url value="/gallery/view/${gallery.id}"/>">${gallery.name}</a> | 
+								<fmt:formatNumber value="${gallery.size/1024}" pattern=".00"/> KB
+							</div>
+						</c:forEach>    
+					</li>
+				</ul>	
+			</c:if>				
+	
+			<!-- buttons -->	
+			<div class="ladda-btn margin-bottom-10">
+				<div class="row">
+					<div class="col-xs-6">
+						<button class="btn-u btn-brd rounded btn-u-blue btn-u-sm ladda-button" type="button"
+							ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
+							ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro"
+							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
+							<i class="fa fa-thumbs-o-up fa-lg"></i>
+						   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
+						</button>
+						<button class="btn-u btn-brd rounded btn-u-red btn-u-sm ladda-button" type="button" 
+							ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
+							ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro"
+							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
+							<i class="fa fa-thumbs-o-down fa-lg"></i>
+						   <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
+						</button>
+					</div>
+					<div class="col-xs-6 text-right">
+						<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
+						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
+							<i class="icon-link"></i>
+						</button>
+						<a id="kakao-link-btn" href="javascript:;"
+						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
+							<img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
+						</a>
+					</div>		
 				</div>
-			</c:forEach>    
-	  </li>
-	</ul>	
-	</c:if>				
-	
-<!-- buttons -->	
-<div class="ladda-btn margin-bottom-10">
-	<div class="row">
-		<div class="col-xs-6">
-			<button class="btn-u btn-brd rounded btn-u-blue btn-u-sm ladda-button" type="button"
-				ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
-				ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro">
-				<i class="fa fa-thumbs-o-up fa-lg"></i>
-			   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
-			</button>
-			<button class="btn-u btn-brd rounded btn-u-red btn-u-sm ladda-button" type="button" 
-				ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
-				ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro">
-				<i class="fa fa-thumbs-o-down fa-lg"></i>
-			   <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
-			</button>
-		</div>
-		<div class="col-xs-6 text-right">
-			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()">
-				<i class="icon-link"></i>
-			</button>
-			<a id="kakao-link-btn" href="javascript:;">
-				<img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
-			</a>
-		</div>		
-	</div>
-</div>
+			</div>
 
-<div class="alert {{alert.classType}} fade in rounded" ng-show="alert.msg">
-	{{alert.msg}} <a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl">{{alert.linkLabel}}</a>
-</div>
+			<div class="alert {{alert.classType}} fade in rounded" ng-show="alert.msg">
+				{{alert.msg}} <a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl">{{alert.linkLabel}}</a>
+			</div>
 
-</div>
-<!--End Blog Post-->   	
+		</div> <!--End Blog Post-->
 	
-	<hr class="padding-10"/>
+		<hr class="padding-10"/>
 	
-	<!-- comment -->		
-	<div ng-controller="commentCtrl">
+		<!-- comment -->		
+		<div ng-controller="commentCtrl">
 	
-	<input type="hidden" id="commentCount" value="{{commentCount}}">
+			<input type="hidden" id="commentCount" value="{{commentCount}}">
 
-<!-- 댓글 목록  -->	
-<div class="media margin-bottom-10">
-	<h4 id="comments" class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
-		<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
-		<button type="button" class="btn btn-link" ng-click="btnRefreshComment()">
-			<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
-		</button>
-	</h4>
-
-	<div class="media-body">
-		<div ng-repeat="comment in commentList">
-			<h5 class="media-heading">
-				<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
-				<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
-			</h5>    
-			<p>
-				<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
-				<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
-				<span ng-bind-html="comment.content"></span>
-			</p>
+			<!-- 댓글 목록  -->	
+			<div class="media margin-bottom-10">
+				<h4 id="comments" class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
+					<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+					<button type="button" class="btn btn-link" ng-click="btnRefreshComment()"
+					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.refresh.comments"/>'>
+						<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
+					</button>
+				</h4>
 			
-			<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'like')">
-				<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
-					<i class="fa fa-thumbs-o-up fa-lg"></i>
-					{{numberOfCommentLike[comment.id]}}
-				</span>
-			</button>
-			<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'dislike')">
-				<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
-					<i class="fa fa-thumbs-o-down fa-lg"></i>
-					{{numberOfCommentDislike[comment.id]}}
-				</span>
-			</button>							
-			<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>							 
-		    <hr class="padding-5">
-		</div>
-		
-		<div class="margin-bottom-10" ng-show="commentCount || commentAlert.msg">
-			<button type="button" class="btn-u btn-brd rounded btn-block btn-u-dark" 
-			ng-click="btnMoreComment()" ng-show="commentCount">
-				<spring:message code="common.button.load.comment"/> <i class="fa fa-angle-down"></i>
-				<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
-			</button>
-		</div>
-	
-		<div class="contex-bg" ng-show="commentAlert.msg">
-			<p class="{{commentAlert.classType}} rounded">{{commentAlert.msg}}</p>
-		</div>
-	</div>
-</div>		
+				<div class="media-body">
+					<div ng-repeat="comment in commentList">
+						<h5 class="media-heading">
+							<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
+							<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+						</h5>    
+						<p>
+							<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
+							<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
+							<span ng-bind-html="comment.content"></span>
+						</p>
+						
+						<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'like')"
+						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
+							<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
+								<i class="fa fa-thumbs-o-up fa-lg"></i>
+								{{numberOfCommentLike[comment.id]}}
+							</span>
+						</button>
+						<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'dislike')"
+						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
+							<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
+								<i class="fa fa-thumbs-o-down fa-lg"></i>
+								{{numberOfCommentDislike[comment.id]}}
+							</span>
+						</button>							
+						<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>							 
+					    <hr class="padding-5">
+					</div>
+					
+					<div class="margin-bottom-10" ng-show="commentCount || commentAlert.msg">
+						<button type="button" class="btn-u btn-brd rounded btn-block btn-u-dark" 
+						ng-click="btnMoreComment()" ng-show="commentCount">
+							<spring:message code="common.button.load.comment"/> <i class="fa fa-angle-down"></i>
+							<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
+						</button>
+					</div>
+				
+					<div class="contex-bg" ng-show="commentAlert.msg">
+						<p class="{{commentAlert.classType}} rounded">{{commentAlert.msg}}</p>
+					</div>
+				</div>
+			</div>		
                 
-<!-- 댓글 남기기 -->                
-<div class="post-comment">
-	<h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
-	<div class="margin-bottom-10">            
-		<summernote config="options" on-focus="focus(evt)" 
-		ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
-		<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
-	</div>				  
-
-	<div class="margin-bottom-10">
-		<c:choose>
-			<c:when test="${authRole == 'ANNONYMOUS'}">
-				<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled">
-					<span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.write.comment"/>
-				</button>	
-			</c:when>
-			<c:when test="${authRole == 'USER'}">
-				<button type="button" class="btn-u btn-brd rounded btn-u-sm ladda-button" 
-				ng-click="btnWriteComment()" 
-				ladda="writeComment" data-style="expand-right" data-spinner-color="Gainsboro">
-					<span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.write.comment"/>
-				</button>				
-			</c:when>
-		</c:choose>	
-		{{summernote.content.length}} / {{boardCommentContentLengthMax}}			          
-	</div>
-	<div>
-		<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
-	</div>	
-</div>                
+			<!-- 댓글 남기기 -->                
+			<div class="post-comment">
+				<h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
+				<div class="margin-bottom-10">            
+					<summernote config="options" on-focus="focus(evt)" 
+					ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
+					<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
+				</div>				  
+			
+				<div class="margin-bottom-10">
+					<c:choose>
+						<c:when test="${authRole == 'ANNONYMOUS'}">
+							<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled">
+								<span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.write.comment"/>
+							</button>	
+						</c:when>
+						<c:when test="${authRole == 'USER'}">
+							<button type="button" class="btn-u btn-brd rounded btn-u-sm ladda-button" 
+							ng-click="btnWriteComment()" 
+							ladda="writeComment" data-style="expand-right" data-spinner-color="Gainsboro">
+								<span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.write.comment"/>
+							</button>				
+						</c:when>
+					</c:choose>	
+					{{summernote.content.length}} / {{boardCommentContentLengthMax}}			          
+				</div>
+				<div>
+					<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
+				</div>	
+			</div>                
 	
-	</div>
+		</div> <!-- End Comment -->
 	
-	<div class="margin-bottom-10">
-	<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"><i class="fa fa-list"></i></button>
-	
-	<c:choose>
-		<c:when test="${!empty prevUrl}">
-			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"><i class="fa fa-chevron-left"></i></button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
-		</c:otherwise>
-	</c:choose>
-	<c:choose>
-		<c:when test="${!empty nextUrl}">
-			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"><i class="fa fa-chevron-right"></i></button>		
-		</c:when>
-		<c:otherwise>
-			<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>		
-		</c:otherwise>
-	</c:choose>	
-	
-	<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-		<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
-			<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
-		</button>
-		<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
-			<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
-		</button>	
-	</c:if>
-	
-	<c:choose>
-		<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
-				<spring:message code="common.button.set.as.notice"/>
+		<!-- Buttons -->
+		<div class="margin-bottom-10">
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${listUrl}'"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.list"/>'>
+				<i class="fa fa-list"></i>
 			</button>
-		</c:when>
-		<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-			<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
-				<spring:message code="common.button.cancel.notice"/>
-			</button>		
-		</c:when>
-	</c:choose>
-	</div>
+		
+			<c:choose>
+				<c:when test="${!empty prevUrl}">
+					<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${prevUrl}'"
+					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.prev"/>'>
+						<i class="fa fa-chevron-left"></i>
+					</button>		
+				</c:when>
+				<c:otherwise>
+					<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-left text-muted"></i></button>
+				</c:otherwise>
+			</c:choose>
+			<c:choose>
+				<c:when test="${!empty nextUrl}">
+					<button type="button" class="btn-u btn-brd rounded" onclick="location.href='${nextUrl}'"
+					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.next"/>'>
+						<i class="fa fa-chevron-right"></i>
+					</button>		
+				</c:when>
+				<c:otherwise>
+					<button type="button" class="btn-u btn-brd rounded btn-u-default disabled" disabled="disabled"><i class="fa fa-chevron-right text-muted"></i></button>		
+				</c:otherwise>
+			</c:choose>	
+		
+			<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
+				<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+					<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
+				</button>
+				<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
+					<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
+				</button>	
+			</c:if>
+		
+			<c:choose>
+				<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
+					<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
+						<spring:message code="common.button.set.as.notice"/>
+					</button>
+				</c:when>
+				<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
+					<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
+						<spring:message code="common.button.cancel.notice"/>
+					</button>		
+				</c:when>
+			</c:choose>
+		</div> <!-- End Buttons -->
 	
-	</div>	
+	</div>	<!-- End Content Part -->
 	
 	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
@@ -389,11 +415,12 @@
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
 
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 <script type="text/javascript">
 
-var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize", "angular-ladda"]);
+var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize", "angular-ladda", 'ui.bootstrap']);
 
 jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	$scope.alert = {};

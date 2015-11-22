@@ -83,8 +83,8 @@
 	    </div>
     
 		<div class="text-left" ng-show="posts.hits.total > 0">
-        	<pagination ng-model="currentPage" total-items="posts.hits.total" max-size="10" items-per-page="itemsPerPage"
-        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
+        	<uib-pagination ng-model="currentPage" total-items="posts.hits.total" max-size="10" items-per-page="itemsPerPage"
+        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></uib-pagination>
         	
 			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
 				<ul class="list-unstyled">
@@ -122,8 +122,8 @@
 	    </div>	
 
 		<div class="text-left" ng-show="comments.hits.total > 0">
-        	<pagination ng-model="currentPage" total-items="comments.hits.total" max-size="10" items-per-page="itemsPerPage"
-        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
+        	<uib-pagination ng-model="currentPage" total-items="comments.hits.total" max-size="10" items-per-page="itemsPerPage"
+        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></uib-pagination>
         	
 			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
 				<ul class="list-unstyled">
@@ -152,8 +152,8 @@
 	    </div>
 	    
 		<div class="text-left" ng-show="galleries.hits.total > 0">
-        	<pagination ng-model="currentPage" total-items="galleries.hits.total" max-size="10" items-per-page="itemsPerPageGallery"
-        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></pagination>
+        	<uib-pagination ng-model="currentPage" total-items="galleries.hits.total" max-size="10" items-per-page="itemsPerPageGallery"
+        	previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()" ng-show="whereSize == 1"></uib-pagination>
         	
 			<div class="text-right col-md-12 margin-bottom-10" ng-show="whereSize > 1">
 				<ul class="list-unstyled">

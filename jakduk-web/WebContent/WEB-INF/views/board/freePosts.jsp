@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
-	<title><spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
+	<title><spring:message code="board.free.breadcrumbs.posts"/> &middot; <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
@@ -28,7 +28,7 @@
 	<!--=== Breadcrumbs ===-->
 	<div class="breadcrumbs">
 		<div class="container">
-			<h1 class="pull-left"><a href="<c:url value="/board/free/refresh"/>"><spring:message code="board.name.free"/></a></h1>
+			<h1 class="pull-left"><a href="<c:url value="/board/free/posts/refresh"/>"><spring:message code="board.name.free"/></a></h1>
 			<ul class="pull-right breadcrumb">
 		      <li class="active"><spring:message code="board.free.breadcrumbs.posts"/></li>
 		      <li><a href="<c:url value="/board/free/comments"/>"><spring:message code="board.free.breadcrumbs.comments"/></a></li>
@@ -97,38 +97,37 @@
 
 	<div class="row">
 		<div class="col-sm-6 margin-bottom-10">
-			<div class="btn-group">
-				<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
-					<c:choose>
-						<c:when test="${boardListInfo.category != 'none'}">
-							<spring:message code="${categorys[boardListInfo.category]}"/>
-						</c:when>
-						<c:otherwise>
-							<spring:message code="board.category"/>
-						</c:otherwise>
-					</c:choose>		
-					<i class="fa fa-angle-down"></i>
-				</button>
-				<ul class="dropdown-menu" role="menu">
-					<c:forEach items="${categorys}" var="category">
-						<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
-					</c:forEach>
-				</ul>
-			</div>
-			<div class="btn-group">
+			<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.category.init"/>'>
+				<c:choose>
+					<c:when test="${boardListInfo.category != 'none'}">
+						<spring:message code="${categorys[boardListInfo.category]}"/>
+					</c:when>
+					<c:otherwise>
+						<spring:message code="board.category"/>
+					</c:otherwise>
+				</c:choose>		
+				<i class="fa fa-angle-down"></i>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<c:forEach items="${categorys}" var="category">
+					<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
+				</c:forEach>
+			</ul>
 			<c:choose>
 				<c:when test="${authRole == 'ANNONYMOUS'}">
-				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
+				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
 					<span aria-hidden="true" class="icon-pencil"></span>
 				</button>	
 				</c:when>
 				<c:when test="${authRole == 'USER'}">
-				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
+				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
 					<span aria-hidden="true" class="icon-pencil"></span>
 				</button>	
 				</c:when>	
 			</c:choose>
-			</div>
 		</div>
 		<div class="col-sm-6 sm-margin-bottom-10">
 	       <div class="input-group">
@@ -293,20 +292,22 @@
 
 	<c:choose>
 		<c:when test="${authRole == 'ANNONYMOUS'}">
-		<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();">
-			<span aria-hidden="true" class="icon-pencil"></span>
-		</button>	
+			<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+				<span aria-hidden="true" class="icon-pencil"></span>
+			</button>	
 		</c:when>
 		<c:when test="${authRole == 'USER'}">
-		<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'">
-			<span aria-hidden="true" class="icon-pencil"></span>
-		</button>	
+			<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
+			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+				<span aria-hidden="true" class="icon-pencil"></span>
+			</button>	
 		</c:when>	
 	</c:choose>
 	
 	<div class="text-left" ng-show="totalItems > 0">
-		<pagination ng-model="currentPage" total-items="totalItems" max-size="10" items-per-page="itemsPerPage"
-		previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></pagination>
+		<uib-pagination ng-model="currentPage" total-items="totalItems" max-size="10" items-per-page="itemsPerPage"
+		previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></uib-pagination>
 	</div>	
 	
 	<!--=== End Content Part ===-->
@@ -321,7 +322,6 @@
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-animate/angular-animate.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["ngAnimate", "ui.bootstrap"]);

@@ -41,13 +41,25 @@ public class BoardController {
 	@RequestMapping
 	public String root() {
 		
-		return "redirect:/board/free";
+		return "redirect:/board/free/posts";
 	}
 
 	@RequestMapping(value = "/free/refresh", method = RequestMethod.GET)
-	public String refreshFree() {
+	public String freeRefresh() {
 		
 		return "redirect:/board/free/posts";
+	}	
+	
+	@RequestMapping(value = "/free/posts/refresh", method = RequestMethod.GET)
+	public String freePostsRefresh() {
+		
+		return "redirect:/board/free/posts";
+	}	
+	
+	@RequestMapping(value = "/free/comments/refresh", method = RequestMethod.GET)
+	public String freeCommentsRefresh() {
+		
+		return "redirect:/board/free/comments";
 	}	
 	
 	@RequestMapping(value = "/free", method = RequestMethod.GET)
