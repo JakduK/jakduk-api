@@ -75,7 +75,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="<c:url value="/"/>">
-                        <img id="logo-header" src="<%=request.getContextPath()%>/resources/jakduk/img/jakduk_logo_01.png" alt="Logo">
+                        <img id="logo-header" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_A_kr.png" alt="Logo">
                     </a>
                 </div>		
 

@@ -7,7 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <meta name="author" content="">
-<link rel="shortcut icon" href="../../assets/ico/favicon.ico">
+<link rel="shortcut icon" href="<%=request.getContextPath()%>/resources/jakduk/img/logo_16.png" sizes="16x16">
+<link rel="shortcut icon" href="<%=request.getContextPath()%>/resources/jakduk/img/logo_32.png" sizes="32x32">
+<link rel="shortcut icon" href="<%=request.getContextPath()%>/resources/jakduk/img/logo_196.png" sizes="196x196">
 
 <!-- CSS Global Compulsory -->
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrap.min.css">    

@@ -10,7 +10,9 @@
             <div class="row">
                 <!-- About -->
                 <div class="col-sm-3 md-margin-bottom-20">
-                    <a href="<c:url value="/"/>"><strong><spring:message code="common.jakduk"/></strong></a>
+                    <a href="<c:url value="/"/>">
+							<img id="logo-footer" class="footer-logo" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_B_kr.png" alt="footer-logo">
+                    </a>
                     <p><spring:message code="common.jakduk.description"/></p>    
                 </div><!--/col-md-3-->
                 <!-- End About -->                    
