@@ -97,8 +97,7 @@
 
 	<div class="row">
 		<div class="col-sm-6 margin-bottom-10">
-			<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown"
-			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.category.init"/>'>
+			<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
 				<c:choose>
 					<c:when test="${boardListInfo.category != 'none'}">
 						<spring:message code="${categorys[boardListInfo.category]}"/>

@@ -73,7 +73,7 @@
 .tag-box {padding: 10px;}
 
 /* 홈의 상단*/
-.image-block {background: url(../img/bg_img.jpeg) no-repeat;}
+.image-block {background: url(../img/bg_img.jpeg) repeat;}
 .image-block .company-description {padding:10px 10px; margin:15px auto;}
 .image-block .company-description h2 {margin-bottom:5px;}
 .image-block .company-description h3 {margin-bottom:5px;}
