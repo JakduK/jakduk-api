@@ -156,7 +156,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			 	},
 				title: {
 					text: '<spring:message code="stats.attendance.games"/>'
-				}								
+				},
+				opposite: true
 			}],       			
 			series: [{
 				name: '<spring:message code="stats.attendance.total"/>',

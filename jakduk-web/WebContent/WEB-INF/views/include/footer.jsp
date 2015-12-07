@@ -2,20 +2,28 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>    
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
     
 <!--=== Footer v3 ===-->
 <div id="footer-v3" class="footer-v3">
-    <div class="footer">
-        <div class="container">
-            <div class="row">
-                <!-- About -->
-                <div class="col-sm-3 md-margin-bottom-20">
-                    <a href="<c:url value="/"/>">
-							<img id="logo-footer" class="footer-logo" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_B_kr.png" alt="footer-logo">
-                    </a>
-                    <p><spring:message code="common.jakduk.description"/></p>    
-                </div><!--/col-md-3-->
-                <!-- End About -->                    
+	<div class="footer">
+		<div class="container">
+			<div class="row">
+				<!-- About -->
+				<div class="col-sm-3 md-margin-bottom-20">
+					<a href="<c:url value="/"/>">
+						<c:choose>
+							<c:when test="${fn:contains(pageContext.response.locale.language, 'ko')}">
+								<img id="logo-footer" class="footer-logo" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_B_kr.png" alt="footer-logo">
+							</c:when>
+							<c:otherwise>
+								<img id="logo-footer" class="footer-logo" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_B_en.png" alt="footer-logo">
+							</c:otherwise>
+						</c:choose>                  
+					</a>
+					<p><spring:message code="common.jakduk.description"/></p>    
+				</div> <!--/col-md-3-->
+				<!-- End About -->                    
 
                 <!-- Simple List -->
                 <div class="col-sm-3">
@@ -61,7 +69,7 @@
                 <!-- Terms Info-->
                 <div class="col-md-8">
                     <p>
-						<a href="https://github.com/Pyohwan"><spring:message code="common.msg.project.jakduk"/></a> @ 2014 | 
+						<a href="https://github.com/Pyohwan/JakduK"><spring:message code="common.msg.project.jakduk"/></a> @ 2014 | 
 						<a href="mailto:phjang1983@daum.net"><spring:message code="common.msg.mail.to.administrator"/></a>
                     </p>
                 </div>

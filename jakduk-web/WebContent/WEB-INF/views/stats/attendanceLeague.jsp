@@ -172,8 +172,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			 	},
 				title: {
 					text: '<spring:message code="stats.attendance.games"/>'
-				},
-				opposite: true						
+				}										
 			},                 
 			{ // Number Of Clubs yAxis
 				labels: {
@@ -184,7 +183,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			 	},
 				title: {
 					text: '<spring:message code="stats.attendance.number.of.clubs"/>'
-				}			
+				},
+				opposite: true
 			}],       			
 			series: [{
 				name: '<spring:message code="stats.attendance.total"/>',

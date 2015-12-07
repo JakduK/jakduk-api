@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!--=== Header ===-->    
 <div class="header-v5" ng-controller="headerCtrl">
@@ -11,7 +12,8 @@
 	    <div class="search-open">
 	        <div class="container">
 	            <input type="text" class="form-control" ng-model="searchOnHeader" ng-init="searchOnHeader=''"
-	            ng-keypress="($event.which === 13)?btnEnterOnHeaderSearch('<c:url value="/search"/>'):return" placeholder='<spring:message code="search.placeholder.words"/>'
+	            ng-keypress="($event.which === 13)?btnEnterOnHeaderSearch('<c:url value="/search"/>'):return" 
+	            placeholder='<spring:message code="search.placeholder.words"/>'
 	            focus="searchFocusOnHeader">
 	            <div class="search-close"><i class="icon-close"></i></div>
 	        </div>    
@@ -25,8 +27,8 @@
 						<li>
 							<a><i class="fa fa-globe"></i> <spring:message code="common.language"/></a>
 						<ul class="language">
-							<li><a href="?lang=ko"><spring:message code="common.language.korean"/></a></li>
-						<li><a href="?lang=en"><spring:message code="common.language.english"/></a></li>
+							<li><a href="?lang=ko_kr"><spring:message code="common.language.korean"/></a></li>
+						<li><a href="?lang=en_US"><spring:message code="common.language.english"/></a></li>
 							</ul>
 						</li>                        
                     </ul><!--/end left-topbar-->
@@ -59,55 +61,57 @@
 	                </ul>
 	            </div>
 	        </div>
-	    </div><!--/container-->
+	    </div> <!--/container-->
 	</div>
 	<!-- End Topbar v3 -->
 
 	<!-- Navbar -->
 	<div class="navbar navbar-default mega-menu" role="navigation">
 		<div class="container">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="<c:url value="/"/>">
-                        <img id="logo-header" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_A_kr.png" alt="Logo">
-                    </a>
-                </div>		
-
-<div class="collapse navbar-collapse navbar-responsive-collapse">
-			<ul class="nav navbar-nav">                
-				<li ng-class="{active:isActive('<c:url value="/home"/>')}">
-					<a href="<c:url value="/home"/>"><spring:message code="common.home"/></a>
-				</li>
-				<li ng-class="{active:isActive('<c:url value="/board"/>')}">
-					<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
-				</li>
-				<li ng-class="{active:isActive('<c:url value="/gallery"/>')}">
-					<a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
-				</li>
-				<li class="dropdown" ng-class="{active:isActive('<c:url value="/stats"/>')}">
-					<a href="<c:url value="/stats"/>" class="dropdown-toggle" data-toggle="dropdown">
-						<spring:message code="stats"/>						
-					</a>					
-					<ul class="dropdown-menu">
-						<li ng-class="{active:isActive('<c:url value="/stats/supporters"/>')}"><a href="<c:url value="/stats/supporters"/>"><spring:message code="stats.supporters"/></a></li>
-						<li ng-class="{active:isActive('<c:url value="/stats/attendance"/>')}"><a href="<c:url value="/stats/attendance"/>"><spring:message code="stats.attendance"/></a></li>
-					</ul>					
-				</li>
-			</ul>
-	</div>		
-		</div>
-        </div>            
-        <!-- End Navbar -->
-    </div>
-    <!--=== End Header v5 ===-->
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="<c:url value="/"/>">
+					<c:choose>
+						<c:when test="${fn:contains(pageContext.response.locale.language, 'ko')}">
+							<img id="logo-header" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_A_kr.png" alt="Logo">
+						</c:when>
+						<c:otherwise>
+							<img id="logo-header" src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_A_en.png" alt="Logo">
+						</c:otherwise>
+					</c:choose>
+				</a>
+			</div>
+			<div class="collapse navbar-collapse navbar-responsive-collapse">
+				<ul class="nav navbar-nav">                
+					<li ng-class="{active:isActive('<c:url value="/home"/>')}">
+						<a href="<c:url value="/home"/>"><spring:message code="common.home"/></a>
+					</li>
+					<li ng-class="{active:isActive('<c:url value="/board"/>')}">
+						<a href="<c:url value="/board"/>"><spring:message code="board"/></a>
+					</li>
+					<li ng-class="{active:isActive('<c:url value="/gallery"/>')}">
+						<a href="<c:url value="/gallery"/>"><spring:message code="gallery"/></a>
+					</li>
+					<li class="dropdown" ng-class="{active:isActive('<c:url value="/stats"/>')}">
+						<a href="<c:url value="/stats"/>" class="dropdown-toggle" data-toggle="dropdown">
+							<spring:message code="stats"/>						
+						</a>					
+						<ul class="dropdown-menu">
+							<li ng-class="{active:isActive('<c:url value="/stats/supporters"/>')}"><a href="<c:url value="/stats/supporters"/>"><spring:message code="stats.supporters"/></a></li>
+							<li ng-class="{active:isActive('<c:url value="/stats/attendance"/>')}"><a href="<c:url value="/stats/attendance"/>"><spring:message code="stats.attendance"/></a></li>
+						</ul>					
+					</li>
+				</ul>
+			</div>		
+		</div> <!-- Navbar container -->
+	</div> <!-- End Navbar -->            
+</div>
+<!--=== End Header v5 ===-->
 
 <script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
-<script type="text/javascript">
-
-</script>
