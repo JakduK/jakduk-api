@@ -19,25 +19,25 @@
 	        </div>    
 	    </div>
 	
-	    <div class="container">
-	        <div class="row">
-	            <div class="col-sm-6">
-	                <!-- Topbar Navigation -->
-                    <ul class="left-topbar">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-6">
+					<!-- Topbar Navigation -->
+					<ul class="left-topbar">
 						<li>
 							<a><i class="fa fa-globe"></i> <spring:message code="common.language"/></a>
-						<ul class="language">
-							<li><a href="?lang=ko_kr"><spring:message code="common.language.korean"/></a></li>
-						<li><a href="?lang=en_US"><spring:message code="common.language.english"/></a></li>
+							<ul class="language">
+								<li><a href="?lang=ko_kr"><spring:message code="common.language.korean"/></a></li>
+								<li><a href="?lang=en_US"><spring:message code="common.language.english"/></a></li>
 							</ul>
 						</li>                        
-                    </ul><!--/end left-topbar-->
-	            </div>
-	            <div class="col-sm-6">
-	                <ul class="list-inline right-topbar pull-right">
+					</ul> <!--/end left-topbar-->
+				</div>
+				<div class="col-sm-6">
+					<ul class="list-inline right-topbar pull-right">
 						<sec:authorize access="isAnonymous()">
 							<li><a href="<c:url value="/login"/>"><spring:message code="common.login"/></a></li>
-			  			</sec:authorize>		  
+		  				</sec:authorize>
 						<sec:authorize access="isAuthenticated()">
 							<sec:authentication property="principal.username" var="accountName"/>
 							<sec:authentication property="principal.type" var="userType"/>
@@ -58,10 +58,10 @@
 							<li><a href="<c:url value="/logout"/>"><spring:message code="common.logout"/></a></li>
 				 		</sec:authorize>				  			              
 						<li ng-click="btnSearchOnHeader()"><i class="search fa fa-search search-button"></i></li>
-	                </ul>
-	            </div>
-	        </div>
-	    </div> <!--/container-->
+					</ul>
+				</div>
+			</div>
+		</div> <!--/container-->
 	</div>
 	<!-- End Topbar v3 -->
 

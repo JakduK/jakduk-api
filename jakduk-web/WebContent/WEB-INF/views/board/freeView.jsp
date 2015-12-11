@@ -118,7 +118,7 @@
 			</c:choose>	
 		
 			<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-				<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+				<button type="button" class="btn-u rounded" onclick="confirmEdit();">
 					<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
 				</button>
 				<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
@@ -376,7 +376,7 @@
 			</c:choose>	
 		
 			<c:if test="${authRole != 'ANNONYMOUS' && accountId == post.writer.userId}">
-				<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/free/edit/${post.seq}"/>'">
+				<button type="button" class="btn-u rounded" onclick="confirmEdit();">
 					<i class="fa fa-pencil-square-o"></i> <spring:message code="common.button.edit"/>
 				</button>
 				<button type="button" class="btn-u btn-u-default rounded" onclick="confirmDelete();">
@@ -770,6 +770,12 @@ function confirmDelete() {
 		if (confirm('<spring:message code="board.msg.confirm.delete.post"/>') == true) {
 			location.href = '<c:url value="/board/free/delete/${post.seq}?type=all"/>';
 		}
+	}
+}
+
+function confirmEdit() {
+	if (confirm('<spring:message code="board.msg.confirm.edit.post"/>') == true) {
+		location.href = '<c:url value="/board/free/edit/${post.seq}"/>';
 	}
 }
 </script>
