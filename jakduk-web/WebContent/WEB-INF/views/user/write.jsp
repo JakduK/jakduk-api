@@ -55,8 +55,7 @@
 				<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>' 
 				ng-init="email='${userWrite.email}'" ng-model="email" 
 				ng-blur="onEmail()" ng-change="validationEmail()"
-				ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"
-				ng-pattern="/^((?:(?:(?:[a-zA-Z0-9][\.\-\+_]?)*)[a-zA-Z0-9])+){3,}\@((?:(?:(?:[a-zA-Z0-9][\.\-_]?){1,20})[a-zA-Z0-9])+)\.([a-zA-Z0-9]{2,6})$/"/>
+				ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
 				<span class="glyphicon form-control-feedback" 
 				ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'ok'}"></span>					
 				<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
@@ -292,7 +291,7 @@ jakdukApp.controller("writeCtrl", function($scope, $http) {
 				$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
 			} else if ($scope.userWrite.email.$error.minlength || $scope.userWrite.email.$error.maxlength) {
 				$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.email"/>'};
-			} else if ($scope.userWrite.email.$error.pattern) {
+			} else {
 				$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.check.mail.format"/>'};
 			}
 		} else {

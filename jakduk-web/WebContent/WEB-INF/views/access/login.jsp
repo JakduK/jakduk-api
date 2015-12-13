@@ -52,8 +52,7 @@
 						'has-error':loginForm.j_username.$invalid}">
 						<span class="input-group-addon"><i class="fa fa-user"></i></span>
 							<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
-							ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" 
-							ng-pattern="/^((?:(?:(?:[a-zA-Z0-9][\.\-\+_]?)*)[a-zA-Z0-9])+){3,}\@((?:(?:(?:[a-zA-Z0-9][\.\-_]?){1,20})[a-zA-Z0-9])+)\.([a-zA-Z0-9]{2,6})$/" autofocus>
+							ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" autofocus>
 							<span class="glyphicon form-control-feedback" 
 							ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
 						</div>
@@ -173,7 +172,7 @@ jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
 				$scope.errorEmail = '<spring:message code="common.msg.required"/>'; 
 			} else if ($scope.loginForm.j_username.$error.minlength || $scope.loginForm.j_username.$error.maxlength) {
 				$scope.errorEmail = '<spring:message code="Size.userWrite.email"/>';
-			} else if ($scope.loginForm.j_username.$error.pattern) {
+			} else {
 				$scope.errorEmail = '<spring:message code="user.msg.check.mail.format"/>';
 			}
 		} else {

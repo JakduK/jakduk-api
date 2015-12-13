@@ -34,7 +34,7 @@
 			
 		<!-- Mongo DB driver & Spring Data MongoDB -->
 		<spring.data.mongodb.version>1.8.0.RELEASE</spring.data.mongodb.version>
-		<mongodb.driver.version>3.0.4</mongodb.driver.version>
+		<mongodb.driver.version>2.14.0</mongodb.driver.version>
 		
 		<!-- Elasticsearch -->
 		<elasticsearch.version>1.7.2</elasticsearch.version>
@@ -140,6 +140,11 @@
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-webmvc</artifactId>
 		    <version>${spring.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.jongo</groupId>
+		    <artifactId>jongo</artifactId>
+		    <version>1.2</version>
 		</dependency>		
 
 		<!-- JSON -->

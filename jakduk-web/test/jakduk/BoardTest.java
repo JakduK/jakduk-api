@@ -1,5 +1,6 @@
 package jakduk;
 
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +23,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
+import org.jongo.Jongo;
+import org.jongo.MongoCollection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,9 @@ import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -272,4 +278,23 @@ public class BoardTest {
 		
 		System.out.println("boardFreeList2=" + boardFreeList);
 	}		
+	
+	@Test
+	public void query01() {
+		try {
+			DB db = new MongoClient().getDB("jakduk_test");
+			Jongo jongo = new Jongo(db);
+			MongoCollection boardFreeC = jongo.getCollection("boardFree");
+			
+			BoardFree boardFree = boardFreeC.findOne("{seq:1}").as(BoardFree.class);
+			System.out.println("boardFree=" + boardFree);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		
+		
+	}
 }
