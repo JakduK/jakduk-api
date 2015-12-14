@@ -1,6 +1,5 @@
 package jakduk;
 
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -45,7 +45,6 @@ import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 
 /**
@@ -70,6 +69,12 @@ public class BoardTest {
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private MongoClient mongoClient;
+	
+	@Autowired
+	private MongoDbFactory mongoDbFactory;
 	
 	@Test
 	public void test01() throws ParseException {
@@ -281,20 +286,21 @@ public class BoardTest {
 	
 	@Test
 	public void query01() {
-		try {
-			DB db = new MongoClient().getDB("jakduk_test");
-			Jongo jongo = new Jongo(db);
-			MongoCollection boardFreeC = jongo.getCollection("boardFree");
-			
-			BoardFree boardFree = boardFreeC.findOne("{seq:1}").as(BoardFree.class);
-			System.out.println("boardFree=" + boardFree);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		System.out.println(mongoDbFactory.getDb().collectionExists("boardFree"));
+		DB db = mongoClient.getDB("jakduk_test");
+		System.out.println(db.collectionExists("boardFree"));
+		Jongo jongo = new Jongo(mongoDbFactory.getDb());
+		System.out.println(jongo);
+		MongoCollection boardFreeC = jongo.getCollection("boardFree");
+		
+		System.out.println(boardFreeC);
+		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);			
+		
+		Iterator<Map> boardFree = boardFreeC.aggregate("{$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
+				.as(Map.class);
+		
+		while (boardFree.hasNext()) {
+			System.out.println(boardFree.next());				
 		}
-
-		
-		
-		
 	}
 }
