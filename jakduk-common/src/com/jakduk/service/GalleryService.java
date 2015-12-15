@@ -39,12 +39,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeOnGallery;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.simple.BoardFreeOnGallery;
 import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.repository.GalleryRepository;
 

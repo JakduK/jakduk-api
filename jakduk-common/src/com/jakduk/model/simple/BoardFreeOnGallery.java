@@ -1,4 +1,4 @@
-package com.jakduk.dao;
+package com.jakduk.model.simple;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -6,14 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.jakduk.model.embedded.CommonWriter;
 
 /**
-* @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
-* @company  : http://jakduk.com
-* @date     : 2015. 8. 25.
-* @desc     :
-*/
+ * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
+ * @company  : http://jakduk.com
+ * @date     : 2015. 1. 26.
+ * @desc     :
+ */
 
 @Document(collection = "boardFree")
-public class BoardFreeOnSearchComment {
+public class BoardFreeOnGallery {
 	
 	/**
 	 * ID
@@ -21,6 +21,11 @@ public class BoardFreeOnSearchComment {
 	@Id
 	private String id;
 
+	/**
+	 * 작성자
+	 */
+	private CommonWriter writer;
+	
 	/**
 	 * 글 제목
 	 */
@@ -37,6 +42,14 @@ public class BoardFreeOnSearchComment {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public CommonWriter getWriter() {
+		return writer;
+	}
+
+	public void setWriter(CommonWriter writer) {
+		this.writer = writer;
 	}
 
 	public String getSubject() {
@@ -57,6 +70,8 @@ public class BoardFreeOnSearchComment {
 
 	@Override
 	public String toString() {
-		return "BoardFreeOnSearchComment [id=" + id + ", subject=" + subject + ", seq=" + seq + "]";
+		return "BoardFreeOnGallery [id=" + id + ", writer=" + writer
+				+ ", subject=" + subject + ", seq=" + seq + "]";
 	}
+
 }

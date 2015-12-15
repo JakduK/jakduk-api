@@ -29,12 +29,10 @@
 	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate"
 		c:mongo-ref="mongo" c:databaseName="${mongo.db.name}" />
 		
+	<!-- 		
 	<bean id="mongoClient" class="com.mongodb.MongoClient">
 		<constructor-arg value="${mongo.host.name}" type="java.lang.String"/>
 		<constructor-arg value="${mongo.host.port}" type="int"/>
 	</bean>
-	
-	<!-- Service for initializing MongoDB with sample data using MongoTemplate -->
-	<!-- <bean id="initMongoService" class="org.sab.sampleqa.service.init.InitMongoService" 
-		init-method="init" /> -->
+	 -->
 </beans>

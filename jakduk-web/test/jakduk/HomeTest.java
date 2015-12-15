@@ -14,9 +14,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
-import com.jakduk.dao.UserOnHome;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
+import com.jakduk.model.simple.UserOnHome;
 import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
 

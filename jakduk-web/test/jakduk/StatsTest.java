@@ -14,10 +14,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.dao.JakdukDAO;
-import com.jakduk.dao.SupporterCount;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.embedded.FootballClubName;
+import com.jakduk.model.etc.SupporterCount;
 import com.jakduk.repository.AttendanceClubRepository;
 
 /**

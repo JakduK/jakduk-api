@@ -1,9 +1,11 @@
-package com.jakduk.dao;
+package com.jakduk.model.simple;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardStatus;
 
+@Document(collection = "boardFree")
 public class BoardFreeOnBest {
 	
 	@Id

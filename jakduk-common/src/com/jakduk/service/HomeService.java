@@ -24,15 +24,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeOnRSS;
 import com.jakduk.dao.JakdukDAO;
-import com.jakduk.dao.UserOnHome;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.model.simple.BoardFreeOnHome;
+import com.jakduk.model.simple.BoardFreeOnRSS;
 import com.jakduk.model.simple.GalleryOnList;
+import com.jakduk.model.simple.UserOnHome;
 import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
 import com.jakduk.repository.BoardFreeRepository;

@@ -30,22 +30,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFeelingCount;
-import com.jakduk.dao.BoardFreeOnBest;
-import com.jakduk.dao.JakdukDAO;
+import com.jakduk.dao.BoardDAO;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.etc.BoardFeelingCount;
+import com.jakduk.model.simple.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -65,16 +62,10 @@ public class BoardTest {
 	BoardFreeCommentRepository boardFreeCommentRepository;
 	
 	@Autowired
-	JakdukDAO jakdukDAO;
+	BoardDAO boardDAO;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	
-	@Autowired
-	private MongoClient mongoClient;
-	
-	@Autowired
-	private MongoDbFactory mongoDbFactory;
 	
 	@Test
 	public void test01() throws ParseException {
@@ -135,7 +126,7 @@ public class BoardTest {
 		arrTemp.add(22);
 		arrTemp.add(23);
 		
-		Map<String, Integer> map = jakdukDAO.getBoardFreeCommentCount(arrTemp);
+		Map<String, Integer> map = boardDAO.getBoardFreeCommentCount(arrTemp);
 		
 		System.out.println("mongoAggregationTest01=" + map);
 	}
@@ -143,13 +134,13 @@ public class BoardTest {
 	@Test
 	public void mongoAggregationTest02() {
 		
-		ArrayList<Integer> arrTemp = new ArrayList<Integer>();
-		arrTemp.add(21);
-		arrTemp.add(22);
-		arrTemp.add(23);
+		ArrayList<ObjectId> arrTemp = new ArrayList<ObjectId>();
+		arrTemp.add(new ObjectId("54b160d33d96e261974f2cf7"));
+		arrTemp.add(new ObjectId("54b2084c3d96e16b0f139cab"));
+		arrTemp.add(new ObjectId("54b2330a3d96026a3de8d3fd"));
 		
 		//Map<String, Integer> map = jakdukDAO.getBoardFreeUsersLikingCount(arrTemp);
-		List<BoardFeelingCount> map = jakdukDAO.getBoardFreeUsersFeelingCount(arrTemp);
+		List<BoardFeelingCount> map = boardDAO.getBoardFreeUsersFeelingCount(arrTemp);
 		
 		System.out.println("mongoAggregationTest02=" + map);
 	}
@@ -172,7 +163,7 @@ public class BoardTest {
 		arrTemp.add(29);
 		arrTemp.add(30);
 		
-		HashMap<String, Integer> galleriesCount = jakdukDAO.getBoardFreeGalleriesCount(arrTemp);
+		HashMap<String, Integer> galleriesCount = boardDAO.getBoardFreeGalleriesCount(arrTemp);
 		System.out.println("getGalleriesCount01=" + galleriesCount);
 	}
 	
@@ -182,7 +173,7 @@ public class BoardTest {
 		Integer boardSeq = 13;
 		ObjectId commentId = new ObjectId("54b916d73d965cb1dbdd4af6");
 		
-		List<BoardFreeComment> comments = jakdukDAO.getBoardFreeComment(boardSeq, null);
+		List<BoardFreeComment> comments = boardDAO.getBoardFreeComment(boardSeq, null);
 		
 		System.out.println("getFreeComment=" + comments);
 		
@@ -217,7 +208,7 @@ public class BoardTest {
 		
 		System.out.println("objectId=" + new ObjectId(Date.from(instant)));
 		
-		HashMap<String, Integer> boardFreeCount = jakdukDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+		HashMap<String, Integer> boardFreeCount = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
 		
 		System.out.println("boardFreeCount=" + boardFreeCount);
 		
@@ -231,7 +222,7 @@ public class BoardTest {
 			ids.add(objId);
 		}
 		
-		List<BoardFreeOnBest> boardFreeList = jakdukDAO.getBoardFreeListOfTop(ids);
+		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeListOfTop(ids);
 		
 		for (BoardFreeOnBest boardFree : boardFreeList) {
 			String id = boardFree.getId();
@@ -256,7 +247,7 @@ public class BoardTest {
 		
 		System.out.println("objectId=" + new ObjectId(Date.from(instant)));
 		
-		HashMap<String, Integer> boardFreeCount = jakdukDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
+		HashMap<String, Integer> boardFreeCount = boardDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
 		
 		System.out.println("boardFreeCount2=" + boardFreeCount);
 		
@@ -270,7 +261,7 @@ public class BoardTest {
 			ids.add(objId);
 		}
 		
-		List<BoardFreeOnBest> boardFreeList = jakdukDAO.getBoardFreeListOfTop(ids);
+		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeListOfTop(ids);
 		
 		for (BoardFreeOnBest boardFree : boardFreeList) {
 			String id = boardFree.getId();
@@ -286,10 +277,9 @@ public class BoardTest {
 	
 	@Test
 	public void query01() {
-		System.out.println(mongoDbFactory.getDb().collectionExists("boardFree"));
-		DB db = mongoClient.getDB("jakduk_test");
-		System.out.println(db.collectionExists("boardFree"));
-		Jongo jongo = new Jongo(mongoDbFactory.getDb());
+		
+		System.out.println(mongoTemplate.getDb().getCollectionNames());
+		Jongo jongo = new Jongo(mongoTemplate.getDb());
 		System.out.println(jongo);
 		MongoCollection boardFreeC = jongo.getCollection("boardFree");
 		

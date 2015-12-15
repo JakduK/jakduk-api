@@ -1,7 +1,6 @@
-package com.jakduk.dao;
+package com.jakduk.model.etc;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -9,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @date     : 2014. 12. 30.
  * @desc     :
  */
-@Document
+
 public class CommonCount {
 
 	@Id

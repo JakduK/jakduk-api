@@ -67,7 +67,7 @@ public class BoardController {
 			, HttpServletRequest request) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
-		boardFreeService.getFree(model, locale, boardListInfo);
+		boardFreeService.getFreePostsList(model, locale, boardListInfo);
 		
 		return "board/freePosts";
 	}
@@ -77,7 +77,7 @@ public class BoardController {
 			, HttpServletRequest request) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
-		boardFreeService.getFree(model, locale, boardListInfo);
+		boardFreeService.getFreePostsList(model, locale, boardListInfo);
 		
 		return "board/freePosts";
 	}

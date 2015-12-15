@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardDAO;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
@@ -49,7 +50,7 @@ public class SearchService {
 	private CommonService commonService;
 	
 	@Autowired
-	private JakdukDAO jakdukDAO;
+	private BoardDAO boardDAO;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 
@@ -96,7 +97,7 @@ public class SearchService {
 				}
 				
 				model.addAttribute("comments", result.getJsonString());
-				model.addAttribute("postsHavingComments", jakdukDAO.getBoardFreeOnSearchComment(ids));
+				model.addAttribute("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
 			}
 			if (w.contains("GA")) {
 				int tempSize = size;

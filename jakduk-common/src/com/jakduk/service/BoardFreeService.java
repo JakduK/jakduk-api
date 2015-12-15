@@ -41,9 +41,7 @@ import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardFreeOnBest;
-import com.jakduk.dao.BoardFreeOnFreeView;
-import com.jakduk.dao.JakdukDAO;
+import com.jakduk.dao.BoardDAO;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
@@ -59,7 +57,8 @@ import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
-import com.jakduk.model.simple.BoardFreeOnComment;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.model.web.BoardListInfo;
@@ -91,7 +90,7 @@ public class BoardFreeService {
 	private GalleryRepository galleryRepository;
 	
 	@Autowired
-	private JakdukDAO jakdukDAO;
+	private BoardDAO boardDAO;
 	
 	@Autowired
 	private CommonService commonService;
@@ -544,7 +543,7 @@ public class BoardFreeService {
 	 * @param boardListInfo
 	 * @return
 	 */
-	public Model getFree(Model model, Locale locale, BoardListInfo boardListInfo) {
+	public Model getFreePostsList(Model model, Locale locale, BoardListInfo boardListInfo) {
 
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
@@ -609,9 +608,9 @@ public class BoardFreeService {
 			categorys.put(category.getName(), category.getResName());
 		}
 
-		HashMap<String, Integer> commentCount = jakdukDAO.getBoardFreeCommentCount(seqs);
-		HashMap<String, Integer> usersLikingCount = jakdukDAO.getBoardFreeUsersLikingCount(seqs);
-		HashMap<String, Integer> usersDislikingCount = jakdukDAO.getBoardFreeUsersDislikingCount(seqs);
+		HashMap<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
+		HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
+		HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
 
 		model.addAttribute("posts", posts);
 		model.addAttribute("notices", notices);
@@ -692,9 +691,9 @@ public class BoardFreeService {
 				}
 			}
 			
-			BoardFreeOnFreeView prevPost = jakdukDAO.getBoardFreeById(new ObjectId(boardFree.getId())
+			BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
 				, boardListInfo.getCategory(), Sort.Direction.ASC);
-			BoardFreeOnFreeView nextPost = jakdukDAO.getBoardFreeById(new ObjectId(boardFree.getId())
+			BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
 			, boardListInfo.getCategory(), Sort.Direction.DESC);
 			
 			//# URL 에서 URI 를 제거, 필요 값만 사용(프로토콜, 호스트, 포트)
@@ -806,7 +805,7 @@ public class BoardFreeService {
 		BoardFreeComment boardFreeComment = new BoardFreeComment();
 		
 		if (!commonService.isAnonymousUser()) {
-			BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
+			BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 			
 			BoardItem boardItem = new BoardItem();
 			boardItem.setId(boardFreeOnComment.getId());
@@ -857,7 +856,7 @@ public class BoardFreeService {
 	}
 	
 	public void getFreeComment(Model model, int seq, String commentId) {
-		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
+		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
 		BoardItem boardItem = new BoardItem();
 		boardItem.setId(boardFreeOnComment.getId());
@@ -866,9 +865,9 @@ public class BoardFreeService {
 		List<BoardFreeComment> comments;
 		
 		if (commentId != null && !commentId.isEmpty()) {
-			comments  = jakdukDAO.getBoardFreeComment(seq, new ObjectId(commentId));
+			comments  = boardDAO.getBoardFreeComment(seq, new ObjectId(commentId));
 		} else {
-			comments  = jakdukDAO.getBoardFreeComment(seq, null);
+			comments  = boardDAO.getBoardFreeComment(seq, null);
 		}
 		
 		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
@@ -878,7 +877,7 @@ public class BoardFreeService {
 	}
 	
 	public void getFreeCommentCount(Model model, int seq) {
-		BoardFreeOnComment boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
+		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
 		
 		BoardItem boardItem = new BoardItem();
 		boardItem.setId(boardFreeOnComment.getId());
@@ -1160,8 +1159,8 @@ public class BoardFreeService {
 		LocalDate date = LocalDate.now().minusWeeks(1);
 		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
 		
-		HashMap<String, Integer> boardFreeCount = jakdukDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
-		HashMap<String, Integer> boardFreeCommentCount = jakdukDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
+		HashMap<String, Integer> boardFreeCount = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+		HashMap<String, Integer> boardFreeCommentCount = boardDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
 		
 		ArrayList<ObjectId> likeIds = new ArrayList<ObjectId>();
 		ArrayList<ObjectId> commentIds = new ArrayList<ObjectId>();
@@ -1176,7 +1175,7 @@ public class BoardFreeService {
 			likeIds.add(objId);
 		}
 		
-		List<BoardFreeOnBest> boardFreeList = jakdukDAO.getBoardFreeListOfTop(likeIds);
+		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeListOfTop(likeIds);
 		
 		for (BoardFreeOnBest boardFree : boardFreeList) {
 			String id = boardFree.getId();
@@ -1194,7 +1193,7 @@ public class BoardFreeService {
 			commentIds.add(objId);
 		}
 		
-		List<BoardFreeOnBest> boardFreeCommentList = jakdukDAO.getBoardFreeListOfTop(commentIds);
+		List<BoardFreeOnBest> boardFreeCommentList = boardDAO.getBoardFreeListOfTop(commentIds);
 		
 		for (BoardFreeOnBest boardFree : boardFreeCommentList) {
 			String id = boardFree.getId();
@@ -1226,7 +1225,7 @@ public class BoardFreeService {
 		}
 
 		model.addAttribute("comments", comments);
-		model.addAttribute("postsHavingComments", jakdukDAO.getBoardFreeOnSearchComment(ids));
+		model.addAttribute("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
 		
 		return HttpServletResponse.SC_OK;		
 	}

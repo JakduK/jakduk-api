@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Document(collection = "boardFree")
-public class BoardFreeOnComment {
+public class BoardFreeOfMinimum {
 	
 	@Id
 	private String id;

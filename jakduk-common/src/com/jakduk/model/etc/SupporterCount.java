@@ -1,6 +1,4 @@
-package com.jakduk.dao;
-
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.jakduk.model.etc;
 
 import com.jakduk.model.db.FootballClub;
 
@@ -11,7 +9,6 @@ import com.jakduk.model.db.FootballClub;
  * @desc     :
  */
 
-@Document
 public class SupporterCount {
 	
 	private FootballClub supportFC;
