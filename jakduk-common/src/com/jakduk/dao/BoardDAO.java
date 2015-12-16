@@ -42,6 +42,9 @@ public class BoardDAO {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	
+	@Autowired
+	private JongoR jongoR;
+	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
 	public HashMap<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
@@ -66,8 +69,8 @@ public class BoardDAO {
 	
 	public List<BoardFeelingCount> getBoardFreeUsersFeelingCount(List<ObjectId> arrId) {
 		
-		Jongo jongo = new Jongo(mongoTemplate.getDb());
-		MongoCollection boardFreeC = jongo.getCollection("boardFree");
+		//Jongo jongo = new Jongo(mongoTemplate.getDb());
+		MongoCollection boardFreeC = jongoR.getJongo().getCollection("boardFree");
 		
 		System.out.println(boardFreeC);
 		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);			

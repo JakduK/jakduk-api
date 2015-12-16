@@ -57,6 +57,7 @@ import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOnList;
@@ -548,6 +549,7 @@ public class BoardFreeService {
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
 		ArrayList<Integer> seqs = new ArrayList<Integer>();
+		ArrayList<ObjectId> ids = new ArrayList<ObjectId>();
 		Long totalPosts = (long) 0;
 
 		Integer page = boardListInfo.getPage();
@@ -587,6 +589,7 @@ public class BoardFreeService {
 			createDate.put(tempId, objId.getDate());
 
 			seqs.add(tempSeq);
+			ids.add(objId);
 		}
 
 		for (BoardFreeOnList tempNotice : notices) {
@@ -597,6 +600,7 @@ public class BoardFreeService {
 			createDate.put(tempId, objId.getDate());
 
 			seqs.add(tempSeq);
+			ids.add(objId);
 		}
 
 		List<BoardCategory> boardCategorys = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
@@ -609,8 +613,10 @@ public class BoardFreeService {
 		}
 
 		HashMap<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
-		HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
-		HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
+		List<BoardFeelingCount> boardFeelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
+		
+		//HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
+		//HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
 
 		model.addAttribute("posts", posts);
 		model.addAttribute("notices", notices);
@@ -618,13 +624,11 @@ public class BoardFreeService {
 		model.addAttribute("boardListInfo", boardListInfo);
 		model.addAttribute("totalPosts", totalPosts);
 		model.addAttribute("commentCount", commentCount);
-		model.addAttribute("usersLikingCount", usersLikingCount);
-		model.addAttribute("usersDislikingCount", usersDislikingCount);
+		model.addAttribute("boardFeelingCount", boardFeelingCount);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 
 		return model;
-
 	}
 	
 	public Model getFreeCommentsList(Model model, Locale locale, BoardListInfo boardListInfo) {
@@ -1220,8 +1224,10 @@ public class BoardFreeService {
 		List<ObjectId> ids = new ArrayList<ObjectId>();
 		
 		for (BoardFreeComment comment : comments) {
-			String id = comment.getBoardItem().getId();
-			ids.add(new ObjectId(id));
+			if (comment.getBoardItem() != null) {
+				String id = comment.getBoardItem().getId();
+				ids.add(new ObjectId(id));	
+			}
 		}
 
 		model.addAttribute("comments", comments);
