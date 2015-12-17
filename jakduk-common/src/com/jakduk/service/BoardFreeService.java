@@ -613,7 +613,7 @@ public class BoardFreeService {
 		}
 
 		HashMap<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
-		//List<BoardFeelingCount> boardFeelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
+		List<BoardFeelingCount> boardFeelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
 		
 		HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
 		HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);

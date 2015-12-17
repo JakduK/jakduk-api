@@ -21,8 +21,9 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.bson.types.ObjectId;
-import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
+import com.jakduk.dao.JongoR;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.etc.BoardFeelingCount;
@@ -66,6 +68,9 @@ public class BoardTest {
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Resource
+	private JongoR jongoR;
 	
 	@Test
 	public void test01() throws ParseException {
@@ -135,9 +140,9 @@ public class BoardTest {
 	public void mongoAggregationTest02() {
 		
 		ArrayList<ObjectId> arrTemp = new ArrayList<ObjectId>();
-		arrTemp.add(new ObjectId("54b160d33d96e261974f2cf7"));
-		arrTemp.add(new ObjectId("54b2084c3d96e16b0f139cab"));
-		arrTemp.add(new ObjectId("54b2330a3d96026a3de8d3fd"));
+		arrTemp.add(new ObjectId("546acf6ce4b0435fdb763b5b"));
+		arrTemp.add(new ObjectId("546ad256e4b044392aaae78e"));
+		arrTemp.add(new ObjectId("54f92d89e4b0b8b005a783f9"));
 		
 		//Map<String, Integer> map = jakdukDAO.getBoardFreeUsersLikingCount(arrTemp);
 		List<BoardFeelingCount> map = boardDAO.getBoardFreeUsersFeelingCount(arrTemp);
@@ -276,12 +281,12 @@ public class BoardTest {
 	}		
 	
 	@Test
-	public void query01() {
+	public void jongo01() {
 		
 		System.out.println(mongoTemplate.getDb().getCollectionNames());
-		Jongo jongo = new Jongo(mongoTemplate.getDb());
-		System.out.println(jongo);
-		MongoCollection boardFreeC = jongo.getCollection("boardFree");
+		//Jongo jongo = new Jongo(mongoTemplate.getDb());
+		System.out.println(jongoR);
+		MongoCollection boardFreeC = jongoR.getJongo().getCollection("boardFree");
 		
 		System.out.println(boardFreeC);
 		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);			

@@ -14,9 +14,11 @@ public class JongoR {
 
 	public JongoR(MongoTemplate mongoTemplate) {
 		jongo = new Jongo(mongoTemplate.getDb());
+		System.out.println("phjang jongo constructor");
 	}
 
 	public Jongo getJongo() {
+		System.out.println("phjang get jongo");
 		return jongo;
 	}
 

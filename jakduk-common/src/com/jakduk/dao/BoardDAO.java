@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -42,7 +44,7 @@ public class BoardDAO {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	
-	@Autowired
+	@Resource
 	private JongoR jongoR;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
