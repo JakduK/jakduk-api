@@ -164,12 +164,9 @@
 	<c:set var="summernoteLang" value="ko-KR"/>
 </c:if>
 
-<!-- JS Implementing Plugins -->
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
@@ -214,24 +211,25 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	});
 	
 	var contentValue = document.getElementById("content").value
-	$scope.content = contentValue ? contentValue : '♪';
+	$scope.content = contentValue ? contentValue : '';
 	
 	$scope.options = {
 		height: 0,
+		placeholder: '<spring:message code="board.msg.write.text.here"/>',
 		lang : "${summernoteLang}",
 		toolbar: [
-      ['style', ['style']],
-      ['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
-      ['fontname', ['fontname']],
-//      ['fontsize', ['fontsize']], // Still buggy
-      ['color', ['color']],
-      ['para', ['ul', 'ol', 'paragraph']],
-//      ['height', ['height']],
-      ['table', ['table']],
-      ['insert', ['link', 'picture', 'video', 'hr']],
-      ['view', ['fullscreen', 'codeview']],
-      ['help', ['help']]			          
-			]
+			['style', ['style']],
+			['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
+			['fontname', ['fontname']],
+			// ['fontsize', ['fontsize']], // Still buggy
+			['color', ['color']],
+			['para', ['ul', 'ol', 'paragraph']],
+			// ['height', ['height']],
+			['table', ['table']],
+			['insert', ['link', 'picture', 'video', 'hr']],
+			['view', ['fullscreen', 'codeview']],
+			['help', ['help']]			          
+		]
 	};
 	
 	$scope.uploader = new FileUploader({		

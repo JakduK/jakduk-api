@@ -613,10 +613,10 @@ public class BoardFreeService {
 		}
 
 		HashMap<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
-		List<BoardFeelingCount> boardFeelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
+		//List<BoardFeelingCount> boardFeelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
 		
-		//HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
-		//HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
+		HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
+		HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
 
 		model.addAttribute("posts", posts);
 		model.addAttribute("notices", notices);
@@ -624,7 +624,9 @@ public class BoardFreeService {
 		model.addAttribute("boardListInfo", boardListInfo);
 		model.addAttribute("totalPosts", totalPosts);
 		model.addAttribute("commentCount", commentCount);
-		model.addAttribute("boardFeelingCount", boardFeelingCount);
+		//model.addAttribute("boardFeelingCount", boardFeelingCount);
+		model.addAttribute("usersLikingCount", usersLikingCount);
+		model.addAttribute("usersDislikingCount", usersDislikingCount);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 

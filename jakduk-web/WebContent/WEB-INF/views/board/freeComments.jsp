@@ -318,7 +318,7 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 				} else if (data.errorCode == "anonymous") {
 					message = '<spring:message code="board.msg.need.login.for.feel"/>';
 				} else if (data.errorCode == "writer") {
-					message = '<spring:message code="board.msg.you.are.writer"/>';
+					message = "<spring:message code='board.msg.you.are.writer'/>";
 				}
 				
 				$scope.commentFeelingAlert[commentId] = message;

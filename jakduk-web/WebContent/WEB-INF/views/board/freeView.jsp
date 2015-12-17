@@ -317,7 +317,7 @@
 				<h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
 				<div class="margin-bottom-10">            
 					<summernote config="options" on-focus="focus(evt)" 
-					ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
+					ng-model="summernote.content" ng-init="summernote={content:'', seq:'${post.seq}'}"></summernote>
 					<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
 				</div>				  
 			
@@ -473,7 +473,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 			$scope.alert.classType = "alert-warning";
 			return;
 		} else if ("${accountId}" == "${post.writer.userId}") {
-			$scope.alert.msg = '<spring:message code="board.msg.you.are.writer"/>';
+			$scope.alert.msg = "<spring:message code='board.msg.you.are.writer'/>";
 			$scope.alert.classType = "alert-warning";
 			return;
 		}
@@ -502,7 +502,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 					mType = "alert-success";
 					$scope.numberOfLike = data.numberOfLike;
 				} else if (data.errorCode == "dislike") {
-					message = '<spring:message code="board.msg.select.dislike"/>';
+					message = "<spring:message code='board.msg.select.dislike'/>";
 					mType = "alert-success";
 					$scope.numberOfDislike = data.numberOfDislike;
 				} else if (data.errorCode == "already") {
@@ -512,7 +512,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 					message = '<spring:message code="board.msg.need.login.for.feel"/>';
 					mType = "alert-warning";
 				} else if (data.errorCode == "writer") {
-					message = '<spring:message code="board.msg.you.are.writer"/>';
+					message = "<spring:message code='board.msg.you.are.writer'/>";
 					mType = "alert-warning";
 				}
 				
@@ -584,15 +584,16 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 
 	// summernote config
 	$scope.options = {
-			height: 0,
-			lang : "${summernoteLang}",
-			toolbar: [
-	      ['font', ['bold']],
-	      // ['fontsize', ['fontsize']], // Still buggy
-	      ['color', ['color']],
-	      ['insert', ['link']],
-	      ['help', ['help']]			          
-				]};	
+		placeholder: '<spring:message code="board.msg.write.text.here"/>',
+		lang : "${summernoteLang}",
+		toolbar: [
+			['font', ['bold']],
+			// ['fontsize', ['fontsize']], // Still buggy
+			['color', ['color']],
+			['insert', ['link']],
+			['help', ['help']]			          
+		]
+	};	
 	
 	$scope.focus = function(e) { 
 		if ("${authRole}" == "ANNONYMOUS") {
@@ -653,7 +654,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 				$scope.btnMoreComment();
 				
-				$scope.summernote.content = "♪";
+				$scope.summernote.content = "";
 				$scope.commentAlert = {};
 				$scope.summernoteAlert = {};
 				$scope.writeCommentAlert = {};
@@ -744,7 +745,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 				} else if (data.errorCode == "anonymous") {
 					message = '<spring:message code="board.msg.need.login.for.feel"/>';
 				} else if (data.errorCode == "writer") {
-					message = '<spring:message code="board.msg.you.are.writer"/>';
+					message = "<spring:message code='board.msg.you.are.writer'/>";
 				}
 				
 				$scope.commentFeelingAlert[commentId] = message;
