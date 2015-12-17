@@ -283,7 +283,7 @@ public class BoardTest {
 		System.out.println(jongo);
 		MongoCollection boardFreeC = jongo.getCollection("boardFree");
 		
-		System.out.println(boardFreeC);
+		System.out.println("test=" + boardFreeC);
 		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);			
 		
 		Iterator<Map> boardFree = boardFreeC.aggregate("{$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
