@@ -316,8 +316,8 @@
 			<div class="post-comment">
 				<h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
 				<div class="margin-bottom-10">            
-					<summernote config="options" on-focus="focus(evt)" 
-					ng-model="summernote.content" ng-init="summernote={content:'', seq:'${post.seq}'}"></summernote>
+					<summernote config="options" on-keyUp="focus(evt)" 
+					ng-model="summernote.content" ng-init="summernote={content:'♪', seq:'${post.seq}'}"></summernote>
 					<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
 				</div>				  
 			
@@ -584,7 +584,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 
 	// summernote config
 	$scope.options = {
-		placeholder: '<spring:message code="board.msg.write.text.here"/>',
+		height : 0,
+		//placeholder: '<spring:message code="board.msg.write.text.here"/>',		
 		lang : "${summernoteLang}",
 		toolbar: [
 			['font', ['bold']],
@@ -654,7 +655,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			reqPromise.success(function(data, status, headers, config) {
 				$scope.btnMoreComment();
 				
-				$scope.summernote.content = "";
+				$scope.summernote.content = "♪";
 				$scope.commentAlert = {};
 				$scope.summernoteAlert = {};
 				$scope.writeCommentAlert = {};

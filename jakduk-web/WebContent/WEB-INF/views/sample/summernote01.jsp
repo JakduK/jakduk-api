@@ -26,7 +26,7 @@
 		<p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
 	</div>
 
- <summernote on-image-upload="imageUpload(files, editor)" editable="editable"></summernote>
+ <summernote on-image-upload="imageUpload(files, editor)" editable="editable" config="options"></summernote>
 
 <input type="file" nv-file-select uploader="uploader"/><br/>
 <ul>
@@ -94,7 +94,7 @@ jakdukApp.controller("sampleCtrl", function($scope, $http, FileUploader) {
 	$scope.imageList = {};
 	
     $scope.options = {
-            height: 150,
+            height: 0,
             toolbar: [
               ['style', ['bold', 'italic', 'underline', 'clear']],
               ['fontsize', ['fontsize']],

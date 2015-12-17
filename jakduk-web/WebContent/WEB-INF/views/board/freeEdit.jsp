@@ -159,12 +159,10 @@
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/dist/angular-file-upload.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/summernote/plugin/summernote-ext-video.js"></script>
 <c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 	<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 	<c:set var="summernoteLang" value="ko-KR"/>
 </c:if>
-<!-- JS Implementing Plugins -->
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
@@ -214,7 +212,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	
 	$scope.options = {
 		height: 0,
-		placeholder: '<spring:message code="board.msg.write.text.here"/>',
+		//placeholder: '<spring:message code="board.msg.write.text.here"/>',
 		lang : "${summernoteLang}",
 		toolbar: [
 			['style', ['style']],
