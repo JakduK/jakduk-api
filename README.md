@@ -10,7 +10,7 @@ The word ‘K LEAGUE JAKDU KING’ is formed by combining ‘K LEAGUE’, ‘JAK
 
 
 ### License
-There is no license yet, meaning that anyone can use and modify it at no cost.
+The MIT License (MIT)
 
 ### IDE
 This project is based on Eclipse. You can import the project using git clone.
