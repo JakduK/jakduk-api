@@ -74,7 +74,7 @@ public class BoardFreeService {
 	
 	@Value("${kakao.javascript.key}")
 	private String kakaoJavascriptKey;
-	
+
 	@Autowired
 	private BoardFreeRepository boardFreeRepository;
 	
@@ -193,7 +193,6 @@ public class BoardFreeService {
 	
 	/**
 	 * 자유게시판 글쓰기 데이터 DB에 삽입
-	 * @param boardFree
 	 */
 	public Integer write(HttpServletRequest request, BoardFreeWrite boardFreeWrite) {
 		
@@ -613,10 +612,10 @@ public class BoardFreeService {
 		}
 
 		HashMap<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
-		List<BoardFeelingCount> boardFeelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
+		Map<String, BoardFeelingCount> feelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
 		
-		HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
-		HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
+		//HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
+		//HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
 
 		model.addAttribute("posts", posts);
 		model.addAttribute("notices", notices);
@@ -624,9 +623,9 @@ public class BoardFreeService {
 		model.addAttribute("boardListInfo", boardListInfo);
 		model.addAttribute("totalPosts", totalPosts);
 		model.addAttribute("commentCount", commentCount);
-		//model.addAttribute("boardFeelingCount", boardFeelingCount);
-		model.addAttribute("usersLikingCount", usersLikingCount);
-		model.addAttribute("usersDislikingCount", usersDislikingCount);
+		model.addAttribute("feelingCount", feelingCount);
+		//model.addAttribute("usersLikingCount", usersLikingCount);
+		//model.addAttribute("usersDislikingCount", usersDislikingCount);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 
@@ -725,7 +724,7 @@ public class BoardFreeService {
 	 * 게시물 좋아요 싫어요
 	 * @param model
 	 * @param seq
-	 * @param status
+	 * @param feeling
 	 * @return
 	 */
 	public Model setUsersFeelings(Model model, int seq, String feeling) {

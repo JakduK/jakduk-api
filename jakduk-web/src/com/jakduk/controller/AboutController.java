@@ -27,7 +27,7 @@ import com.jakduk.service.CommonService;
 @Controller
 @RequestMapping("/about")
 public class AboutController {
-	
+
 	@Autowired
 	private CommonService commonService;
 	
@@ -41,7 +41,7 @@ public class AboutController {
 		
 		return "redirect:/about/intro";
 	}
-	
+
 	@RequestMapping(value = "/intro/refresh", method = RequestMethod.GET)
 	public String refreshIntro() {
 		
