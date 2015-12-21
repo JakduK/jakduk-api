@@ -1,6 +1,5 @@
 package jakduk;
 
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,25 +8,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import org.bson.types.ObjectId;
-import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +34,7 @@ import com.jakduk.dao.JongoR;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.etc.BoardFeelingCount;
-import com.jakduk.model.simple.BoardFreeOnBest;
+import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
@@ -155,6 +144,16 @@ public class BoardTest {
 		
 		System.out.println("mongoAggregationTest02=" + map);
 	}
+
+	@Test
+	public void getBoardFreeCountOfLikeBest01() {
+		LocalDate date = LocalDate.now().minusWeeks(1);
+		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+
+		List<BoardFreeOnBest> posts = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+
+		System.out.println("getBoardFreeCountOfLikeBest01=" + posts);
+	}
 	
 	@Test
 	public void getNoticeList01() {
@@ -207,48 +206,9 @@ public class BoardTest {
 		System.out.println("isNumeric=" + pattern.matcher(val04).matches());
 		System.out.println("isNumeric=" + pattern.matcher(val05).matches());
 	}
-	
-	@Test
-	public void newDate01() {
-		
-		LocalDate date = LocalDate.now().minusWeeks(1);
-		
-		System.out.println("date=" + date.format(DateTimeFormatter.BASIC_ISO_DATE));
-		
-		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-		
-		System.out.println("objectId=" + new ObjectId(Date.from(instant)));
-		
-		HashMap<String, Integer> boardFreeCount = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
-		
-		System.out.println("boardFreeCount=" + boardFreeCount);
-		
-		ArrayList<ObjectId> ids = new ArrayList<ObjectId>();
 
-		Iterator<?> iterator = boardFreeCount.entrySet().iterator();
-		
-		while (iterator.hasNext()) {
-			Entry<String, Integer> entry = (Entry<String, Integer>) iterator.next();
-			ObjectId objId = new ObjectId(entry.getKey().toString());
-			ids.add(objId);
-		}
-		
-		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeListOfTop(ids);
-		
-		for (BoardFreeOnBest boardFree : boardFreeList) {
-			String id = boardFree.getId();
-			Integer count = boardFreeCount.get(id);
-			boardFree.setCount(count);
-		}
-		
-		boardFreeList = boardFreeList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
-				.collect(Collectors.toList());
-		
-		System.out.println("boardFreeList=" + boardFreeList);
-	}	
-	
 	@Test
-	public void newDate02() {
+	public void getBoardFreeCountOfCommentBest01() {
 		
 		LocalDate date = LocalDate.now().minusWeeks(1);
 		
@@ -275,15 +235,20 @@ public class BoardTest {
 		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeListOfTop(ids);
 		
 		for (BoardFreeOnBest boardFree : boardFreeList) {
-			String id = boardFree.getId();
+			String id = boardFree.getId().toString();
 			Integer count = boardFreeCount.get(id);
 			boardFree.setCount(count);
 		}
-		
-		boardFreeList = boardFreeList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
+
+		Comparator<BoardFreeOnBest> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
+		Comparator<BoardFreeOnBest> byView = (b1, b2) -> b2.getViews() - b1.getViews();
+
+		boardFreeList = boardFreeList.stream()
+				.sorted(byCount.thenComparing(byView))
+				.limit(CommonConst.BOARD_TOP_LIMIT)
 				.collect(Collectors.toList());
 		
-		System.out.println("boardFreeList2=" + boardFreeList);
+		System.out.println("getBoardFreeCountOfCommentBest01=" + boardFreeList);
 	}		
 	
 	@Test

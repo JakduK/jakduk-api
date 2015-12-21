@@ -6,14 +6,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -59,7 +52,7 @@ import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.GalleryStatus;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.jakduk.model.simple.BoardFreeOnBest;
+import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.model.web.BoardListInfo;
@@ -613,9 +606,6 @@ public class BoardFreeService {
 
 		HashMap<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
 		Map<String, BoardFeelingCount> feelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
-		
-		//HashMap<String, Integer> usersLikingCount = boardDAO.getBoardFreeUsersLikingCount(seqs);
-		//HashMap<String, Integer> usersDislikingCount = boardDAO.getBoardFreeUsersDislikingCount(seqs);
 
 		model.addAttribute("posts", posts);
 		model.addAttribute("notices", notices);
@@ -624,8 +614,6 @@ public class BoardFreeService {
 		model.addAttribute("totalPosts", totalPosts);
 		model.addAttribute("commentCount", commentCount);
 		model.addAttribute("feelingCount", feelingCount);
-		//model.addAttribute("usersLikingCount", usersLikingCount);
-		//model.addAttribute("usersDislikingCount", usersDislikingCount);
 		model.addAttribute("createDate", createDate);
 		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 
@@ -1153,62 +1141,44 @@ public class BoardFreeService {
 		
 		return HttpServletResponse.SC_OK;
 	}
-	
-	/**
-	 * 구조를 바꾸고 싶다. 너무 복잡하다.
-	 * @param model
-	 * @return
-	 */
+
 	public Integer getDataFreeTopList(Model model) {
 		
 		LocalDate date = LocalDate.now().minusWeeks(1);
 		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-		
-		HashMap<String, Integer> boardFreeCount = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+
+		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
 		HashMap<String, Integer> boardFreeCommentCount = boardDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
 		
-		ArrayList<ObjectId> likeIds = new ArrayList<ObjectId>();
 		ArrayList<ObjectId> commentIds = new ArrayList<ObjectId>();
 
-		Iterator<?> likeIterator = boardFreeCount.entrySet().iterator();
 		Iterator<?> commentIterator = boardFreeCommentCount.entrySet().iterator();
-		
-		// 좋아요 많은 글 뽑아내기
-		while (likeIterator.hasNext()) {
-			Entry<String, Integer> entry = (Entry<String, Integer>) likeIterator.next();
-			ObjectId objId = new ObjectId(entry.getKey().toString());
-			likeIds.add(objId);
-		}
-		
-		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeListOfTop(likeIds);
-		
-		for (BoardFreeOnBest boardFree : boardFreeList) {
-			String id = boardFree.getId();
-			Integer count = boardFreeCount.get(id);
-			boardFree.setCount(count);
-		}
-		
-		boardFreeList = boardFreeList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
-				.collect(Collectors.toList());
-		
-		// 댓글 많은 글 뽑아내기
+
+		// 댓글 많은 글 id 뽑아내기
 		while (commentIterator.hasNext()) {
 			Entry<String, Integer> entry = (Entry<String, Integer>) commentIterator.next();
 			ObjectId objId = new ObjectId(entry.getKey().toString());
 			commentIds.add(objId);
 		}
-		
+
+		// commentIds를 파라미터로 다시 글을 가져온다.
 		List<BoardFreeOnBest> boardFreeCommentList = boardDAO.getBoardFreeListOfTop(commentIds);
 		
 		for (BoardFreeOnBest boardFree : boardFreeCommentList) {
-			String id = boardFree.getId();
+			String id = boardFree.getId().toString();
 			Integer count = boardFreeCommentCount.get(id);
 			boardFree.setCount(count);
 		}
-		
-		boardFreeCommentList = boardFreeCommentList.stream().sorted((h1, h2) -> h2.getCount() - h1.getCount())
+
+		// sort and limit
+		Comparator<BoardFreeOnBest> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
+		Comparator<BoardFreeOnBest> byView = (b1, b2) -> b2.getViews() - b1.getViews();
+
+		boardFreeCommentList = boardFreeCommentList.stream()
+				.sorted(byCount.thenComparing(byView))
+				.limit(CommonConst.BOARD_TOP_LIMIT)
 				.collect(Collectors.toList());
-		
+
 		model.addAttribute("topLike", boardFreeList);
 		model.addAttribute("topComment", boardFreeCommentList);
 		

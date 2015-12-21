@@ -1,14 +1,15 @@
-package com.jakduk.model.simple;
+package com.jakduk.model.etc;
 
+import org.bson.types.ObjectId;
+import org.jongo.marshall.jackson.oid.MongoId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.embedded.BoardStatus;
 
-@Document(collection = "boardFree")
 public class BoardFreeOnBest {
-	
-	@Id
+
+	@MongoId //see NewAnnotationsCompatibilitySuiteTest for more informations
 	private String id;
 	
 	private int seq;
@@ -17,7 +18,7 @@ public class BoardFreeOnBest {
 	
 	private String subject;
 	
-	private Integer count;
+	private int count;
 	
 	private int views;
 
@@ -53,11 +54,11 @@ public class BoardFreeOnBest {
 		this.subject = subject;
 	}
 
-	public Integer getCount() {
+	public int getCount() {
 		return count;
 	}
 
-	public void setCount(Integer count) {
+	public void setCount(int count) {
 		this.count = count;
 	}
 
@@ -69,11 +70,18 @@ public class BoardFreeOnBest {
 		this.views = views;
 	}
 
+
+
 	@Override
 	public String toString() {
-		return "BoardFreeOnBest [id=" + id + ", seq=" + seq + ", status="
-				+ status + ", subject=" + subject + ", count=" + count
-				+ ", views=" + views + "]";
+		return "BoardFreeOnBest{" +
+				"id='" + id + '\'' +
+				", seq=" + seq +
+				", status=" + status +
+				", subject='" + subject + '\'' +
+				", count=" + count +
+				", views=" + views +
+				'}';
 	}
 
 }

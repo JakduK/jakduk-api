@@ -10,7 +10,6 @@ import javax.annotation.Resource;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -28,7 +27,7 @@ import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.CommonCount;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.jakduk.model.simple.BoardFreeOnBest;
+import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOnSearchComment;
 
 /**
@@ -127,27 +126,22 @@ public class BoardDAO {
 		
 		return comments;
 	}
-	
-	public HashMap<String, Integer> getBoardFreeCountOfLikeBest(ObjectId commentId) {
-		AggregationOperation unwind = Aggregation.unwind("usersLiking");
-		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
-		AggregationOperation group = Aggregation.group("_id").count().as("count");
-		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
-		AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_TOP_LIMIT);
-		
-		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, group, sort, limit);
-		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFree", CommonCount.class);
-		
-		List<CommonCount> boardFreeCount = results.getMappedResults();
-		
-		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
-		
-		for (CommonCount item : boardFreeCount) {
-			commentCount.put(item.getId(), item.getCount());
-		}
-		
-		return commentCount;
+
+	public List<BoardFreeOnBest> getBoardFreeCountOfLikeBest(ObjectId commentId) {
+
+		MongoCollection boardFreeC = jongoR.getJongo().getCollection("boardFree");
+
+		Iterator<BoardFreeOnBest> iPosts = boardFreeC.aggregate("{$match:{_id:{$gt:#}}}", commentId)
+				.and("{$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}}")
+				.and("{$sort:{count:-1, views:-1}}")
+				.and("{$limit:#}", CommonConst.BOARD_TOP_LIMIT)
+				.as(BoardFreeOnBest.class);
+
+		List<BoardFreeOnBest> toList = IteratorUtils.toList(iPosts);
+
+		return toList;
 	}
+
 	
 	public List<BoardFreeOnBest> getBoardFreeListOfTop(List<ObjectId> arrId) {
 		
@@ -165,8 +159,8 @@ public class BoardDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(commentId));
 		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
-		AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_TOP_LIMIT);
-		Aggregation aggregation = Aggregation.newAggregation(match1, group, sort, limit);
+		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_TOP_LIMIT);
+		Aggregation aggregation = Aggregation.newAggregation(match1, group, sort/*, limit*/);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
 		
 		List<CommonCount> boardFreeCount = results.getMappedResults();
