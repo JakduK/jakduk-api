@@ -262,6 +262,7 @@ public class BoardTest {
 		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);
 
 		Iterator<Map> boardFree = boardFreeC.aggregate("{$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
+				.and("{$limit:#}", CommonConst.BOARD_TOP_LIMIT)
                 .as(Map.class);
 
 		while (boardFree.hasNext()) {

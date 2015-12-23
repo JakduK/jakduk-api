@@ -20,6 +20,9 @@ import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
+import com.jakduk.model.db.*;
+import com.jakduk.model.web.*;
+import com.jakduk.repository.*;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -31,31 +34,10 @@ import org.springframework.ui.Model;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.AttendanceClub;
-import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.db.BoardCategory;
-import com.jakduk.model.db.Encyclopedia;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
 import com.jakduk.model.embedded.FootballClubName;
-import com.jakduk.model.web.AttendanceClubWrite;
-import com.jakduk.model.web.BoardCategoryWrite;
-import com.jakduk.model.web.FootballClubWrite;
-import com.jakduk.model.web.ThumbnailSizeWrite;
-import com.jakduk.repository.AttendanceClubRepository;
-import com.jakduk.repository.AttendanceLeagueRepository;
-import com.jakduk.repository.BoardCategoryRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.EncyclopediaRepository;
-import com.jakduk.repository.FootballClubOriginRepository;
-import com.jakduk.repository.FootballClubRepository;
-import com.jakduk.repository.GalleryRepository;
-import com.jakduk.repository.HomeDescriptionRepository;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -118,6 +100,9 @@ public class AdminService {
 	
 	@Autowired
 	private AttendanceClubRepository attendanceClubRepository;
+
+	@Autowired
+	private JakduScheduleRepository jakduScheduleRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -740,6 +725,33 @@ public String initSearchData() {
 		attendanceClub.setAverage(attendanceClubWrite.getAverage());
 		
 		attendanceClubRepository.save(attendanceClub);
-	}	
+	}
+
+	public void getJakduScheduleWrite(Model model) {
+		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+
+		model.addAttribute("footballClubs", footballClubs);
+		model.addAttribute("jakduScheduleWrite", new JakduScheduleWrite());
+	}
+
+	public void jakduScheduleWrite(JakduScheduleWrite jakduScheduleWrite) {
+		JakduSchedule jakduSchedule = new JakduSchedule();
+
+		FootballClubOrigin home = footballClubOriginRepository.findOne(jakduScheduleWrite.getHome());
+		FootballClubOrigin away = footballClubOriginRepository.findOne(jakduScheduleWrite.getAway());
+
+		jakduSchedule.setHome(home);
+		jakduSchedule.setAway(away);
+
+		if (jakduSchedule.getId().isEmpty()) {
+			jakduSchedule.setId(null);
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("jakduSchedule=" + jakduSchedule);
+		}
+
+		jakduScheduleRepository.save(jakduSchedule);
+	}
 	
 }

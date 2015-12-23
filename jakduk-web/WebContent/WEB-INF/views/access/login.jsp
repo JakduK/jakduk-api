@@ -119,34 +119,30 @@
 
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-cookies/angular-cookies.min.js"></script>
-
-<!-- JS Implementing Plugins -->
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["ngCookies", "angular-ladda"]);
 
-jakdukApp.controller("loginCtrl", function($scope, $cookieStore) {
+jakdukApp.controller("loginCtrl", function($scope, $cookies) {
 	$scope.emailLengthMin = Jakduk.FormEmailLengthMin;
 	$scope.emailLengthMax = Jakduk.FormEmailLengthMax;
 	$scope.passwordLengthMin = Jakduk.FormPasswordLengthMin;
 	$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
 
-	// angular.ready()함수에서는 안된다. 마우스 클릭하니 이메일이 들어간다.
-	var email = $cookieStore.get("email");
-	var remember = $cookieStore.get("remember");
-	
-	if (remember != null && email != null && remember == "1") {
+	// angular.ready()함수에서는 안된다. 마우스 클릭하니 그제서야 이메일이 들어간다.
+	var email = $cookies.get("email");
+	var remember = $cookies.get("remember");
+
+	if (!isEmpty(email) && !isEmpty(remember) && remember == "1") {
 		$scope.email = email;
 		$scope.remember = true;
 	}
-	
+
 	angular.element(document).ready(function() {
 		App.init();
 	});

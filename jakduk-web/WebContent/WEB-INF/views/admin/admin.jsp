@@ -7,6 +7,8 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 <head>
+	<title>ADMIN PAGE &middot; <spring:message code="common.jakduk"/></title>
+
 	<jsp:include page="../include/html-header.jsp"/>
 </head>
 <body>
@@ -16,7 +18,7 @@
   <h4>JakduK Admin Page.</h4>
 </div>
 <div class="btn-group">
-  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
     Init Data
     <span class="caret"></span>
   </button>  
@@ -29,7 +31,7 @@
 </div>
 
 <div class="btn-group">
-  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
     Write Data
     <span class="caret"></span>
   </button>  
@@ -42,11 +44,12 @@
     <li><a href="<c:url value="/admin/home/description/write"/>">Home Description Write</a></li>
     <li><a href="<c:url value="/admin/attendance/league/write"/>">Attendance League Write</a></li>
     <li><a href="<c:url value="/admin/attendance/club/write"/>">Attendance Club Write</a></li>
+	<li><a href="<c:url value="/admin/jakdu/schedule/write"/>">Jakdu Schedule Write</a></li>
   </ul>
 </div>
 
 <div class="btn-group">
-  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
     Get Data
     <span class="caret"></span>
   </button>  
@@ -182,7 +185,6 @@
 </table>
 </div>
 		
-		<jsp:include page="../include/footer.jsp"/>
 	</div>
 <!-- Bootstrap core JavaScript================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->

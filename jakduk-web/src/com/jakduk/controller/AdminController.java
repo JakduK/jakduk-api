@@ -2,6 +2,8 @@ package com.jakduk.controller;
 
 import javax.validation.Valid;
 
+import com.jakduk.model.db.*;
+import com.jakduk.model.web.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,14 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.db.Encyclopedia;
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.web.AttendanceClubWrite;
-import com.jakduk.model.web.BoardCategoryWrite;
-import com.jakduk.model.web.FootballClubWrite;
-import com.jakduk.model.web.ThumbnailSizeWrite;
 import com.jakduk.service.AdminService;
 
 /**
@@ -363,6 +357,27 @@ public class AdminController {
 		adminService.attendanceClubWrite(attendanceClubWrite);
 
 		return "redirect:/admin/settings?open=attendanceClub";
-	}	
+	}
+
+	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.GET)
+	public String jakduScheduleWrite(Model model) {
+
+		adminService.getJakduScheduleWrite(model);
+
+		return "admin/jakduScheduleWrite";
+	}
+
+	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.POST)
+	public String jakduScheduleWrite(@Valid JakduScheduleWrite jakduScheduleWrite, BindingResult result) {
+
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/jakduScheduleWrite";
+		}
+
+		adminService.jakduScheduleWrite(jakduScheduleWrite);
+
+		return "redirect:/admin/settings?open=jakduSchedule";
+	}
 
 }
