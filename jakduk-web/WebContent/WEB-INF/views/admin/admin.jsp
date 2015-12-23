@@ -15,7 +15,7 @@
 	<div class="container" ng-controller="adminCtrl">
 	
 	<div class="page-header">
-  <h4>JakduK Admin Page.</h4>
+  <h4>JakduK Admin Page</h4>
 </div>
 <div class="btn-group">
   <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
@@ -61,6 +61,7 @@
     <li><a ng-click="getData('homeDescription')">Get Home Description</a></li>
     <li><a ng-click="getData('attendanceLeague')">Get Attendance League</a></li>
     <li><a ng-click="getData('attendanceClub')">Get Attendance Club</a></li>
+	<li><a ng-click="getData('jakduSchedule')">Get Jakdu Schedule</a></li>
   </ul>
 </div>
 
@@ -184,8 +185,22 @@
 </tr>
 </table>
 </div>
-		
-	</div>
+
+		<div ng-show="jakduSchedules.length > 0">
+			<h4>Jakdu Schedule</h4>
+			<table class="table">
+				<tr>
+					<th>id</th><th>Date</th><th>Home</th><th>Away</th>
+				</tr>
+				<tr ng-repeat="jakduSchedule in jakduSchedules">
+					<td><a href="<c:url value="/admin/jakdu/schedule/write/{{jakduSchedule.id}}"/>">{{jakduSchedule.id}}</a></td>
+					<td>{{jakduSchedule.date}}</td>
+					<td>{{jakduSchedule.home.name}}</td>
+					<td>{{jakduSchedule.away.name}}</td>
+				</tr>
+			</table>
+		</div>
+	</div> <!-- ./container -->
 <!-- Bootstrap core JavaScript================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
@@ -205,6 +220,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.attendanceLeagues = [];
 	$scope.attendanceClubs = [];
 	$scope.homeDescriptions = [];
+	$scope.jakduSchedules = [];
 	
 	angular.element(document).ready(function() {
 		if ("${open}" != null && "${open}" != "") {
@@ -229,6 +245,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 			bUrl = '<c:url value="/admin/data/attendance/club.json"/>';
 		} else if (type == "homeDescription") {
 			bUrl = '<c:url value="/admin/data/home/description.json"/>';
+		} else if (type == "jakduSchedule") {
+			bUrl = '<c:url value="/admin/data/jakdu/schedule.json"/>';
 		}
 		
 		if ($scope.dataConn == "none") {
@@ -255,6 +273,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 					$scope.attendanceClubs = data.attendanceClubs;
 				} else if (type == "homeDescription") {
 					$scope.homeDescriptions = data.homeDescriptions;
+				} else if (type == "jakduSchedule") {
+					$scope.jakduSchedules = data.jakduSchedules;
 				}
 				
 				$scope.dataConn = "none";
@@ -298,6 +318,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		$scope.attendanceLeagues = [];
 		$scope.attendanceClubs = [];
 		$scope.homeDescriptions = [];
+		$scope.jakduSchedules = [];
 	};
 	
 });

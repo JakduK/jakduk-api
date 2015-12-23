@@ -743,8 +743,8 @@ public String initSearchData() {
 		jakduSchedule.setHome(home);
 		jakduSchedule.setAway(away);
 
-		if (jakduSchedule.getId().isEmpty()) {
-			jakduSchedule.setId(null);
+		if (jakduScheduleWrite.getId().isEmpty()) {
+			jakduScheduleWrite.setId(null);
 		}
 
 		if (logger.isDebugEnabled()) {
@@ -753,5 +753,13 @@ public String initSearchData() {
 
 		jakduScheduleRepository.save(jakduSchedule);
 	}
-	
+
+	public Model getJakduScheduleList(Model model) {
+		List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll();
+
+		model.addAttribute("jakduSchedules", jakduSchedules);
+
+		return model;
+	}
+
 }

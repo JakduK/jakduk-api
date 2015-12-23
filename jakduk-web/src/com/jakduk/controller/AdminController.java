@@ -102,7 +102,7 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.POST)
-	public String encyclopediaWriteSubmit(@Valid Encyclopedia encyclopedia, BindingResult result) {
+	public String encyclopediaWrite(@Valid Encyclopedia encyclopedia, BindingResult result) {
 		
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
@@ -112,6 +112,12 @@ public class AdminController {
 		adminService.encyclopediaWrite(encyclopedia);
 		
 		return "redirect:/admin/settings?open=encyclopedia";
+	}
+
+	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
+	public void dataEncyclopedia(Model model) {
+
+		adminService.getEncyclopediaList(model);
 	}
 	
 	@RequestMapping(value = "/footballclub/write", method = RequestMethod.GET)
@@ -142,6 +148,12 @@ public class AdminController {
 
 		return "redirect:/admin/settings?open=fc";
 	}
+
+	@RequestMapping(value = "/footballclub", method = RequestMethod.GET)
+	public void dataFootballClub(Model model) {
+
+		adminService.getFootballClubList(model);
+	}
 	
 	@RequestMapping(value = "/footballclub/origin/write", method = RequestMethod.GET)
 	public String footballClubOriginWrite(Model model) {
@@ -169,6 +181,12 @@ public class AdminController {
 		adminService.footballClubOriginWrite(footballClubOrigin);
 
 		return "redirect:/admin/settings?open=fcOrigin";
+	}
+
+	@RequestMapping(value = "/footballclub/origin", method = RequestMethod.GET)
+	public void dataFootballClubOrigin(Model model) {
+
+		adminService.getFootballClubOriginList(model);
 	}
 	
 	@RequestMapping(value = "/board/category/write", method = RequestMethod.GET)
@@ -199,50 +217,13 @@ public class AdminController {
 
 		return "redirect:/admin/settings?open=boardCategory";
 	}
-	
-	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
-	public void encyclopedia(Model model) {
-		
-		adminService.getEncyclopediaList(model);
-	}
-	
-	@RequestMapping(value = "/footballclub/origin", method = RequestMethod.GET)
-	public void footballClubOrigin(Model model) {
-		
-		adminService.getFootballClubOriginList(model);
-	}
-	
-	@RequestMapping(value = "/footballclub", method = RequestMethod.GET)
-	public void footballClub(Model model) {
-		
-		adminService.getFootballClubList(model);
-	}
-	
+
 	@RequestMapping(value = "/board/category", method = RequestMethod.GET)
-	public void boardCategory(Model model) {
-		
+	public void dataBoardCategory(Model model) {
+
 		adminService.getBoardCategoryList(model);
 	}
 	
-	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
-	public void leagueAttendanceLeague(Model model,
-			@RequestParam(required = false) String league) {
-		
-		adminService.getAttendanceLeagueList(model, league);
-	}
-	
-	@RequestMapping(value = "/data/attendance/club", method = RequestMethod.GET)
-	public void dataAttendanceClub(Model model) {
-		
-		adminService.getAttendanceClubList(model);
-	}	
-	
-	@RequestMapping(value = "/data/home/description", method = RequestMethod.GET)
-	public void dataHomeDescription(Model model) {
-		
-		adminService.getHomeDescriptionList(model);
-	}
-
 	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.GET)
 	public String thumbnailSizeWrite(Model model) {
 		
@@ -292,7 +273,13 @@ public class AdminController {
 		adminService.homeDescriptionWrite(homeDescription);
 
 		return "redirect:/admin/settings?open=homeDescription";
-	}		
+	}
+
+	@RequestMapping(value = "/data/home/description", method = RequestMethod.GET)
+	public void dataHomeDescription(Model model) {
+
+		adminService.getHomeDescriptionList(model);
+	}
 	
 	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)
 	public String attendanceLeagueWrite(Model model) {
@@ -328,7 +315,14 @@ public class AdminController {
 		boolean result = adminService.attendanceLeagueDelete(id);
 		
 		return "redirect:/admin/settings?open=attendanceLeague";
-	}	
+	}
+
+	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
+	public void dataAttendanceLeague(Model model,
+									 @RequestParam(required = false) String league) {
+
+		adminService.getAttendanceLeagueList(model, league);
+	}
 	
 	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.GET)
 	public String attendanceClubWrite(Model model) {
@@ -359,6 +353,12 @@ public class AdminController {
 		return "redirect:/admin/settings?open=attendanceClub";
 	}
 
+	@RequestMapping(value = "/data/attendance/club", method = RequestMethod.GET)
+	public void dataAttendanceClub(Model model) {
+
+		adminService.getAttendanceClubList(model);
+	}
+
 	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.GET)
 	public String jakduScheduleWrite(Model model) {
 
@@ -369,7 +369,6 @@ public class AdminController {
 
 	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.POST)
 	public String jakduScheduleWrite(@Valid JakduScheduleWrite jakduScheduleWrite, BindingResult result) {
-
 		if (result.hasErrors()) {
 			logger.debug("result=" + result);
 			return "admin/jakduScheduleWrite";
@@ -378,6 +377,12 @@ public class AdminController {
 		adminService.jakduScheduleWrite(jakduScheduleWrite);
 
 		return "redirect:/admin/settings?open=jakduSchedule";
+	}
+
+	@RequestMapping(value = "/data/jakdu/schedule", method = RequestMethod.GET)
+	public void dataJakduSchedule(Model model) {
+
+		adminService.getJakduScheduleList(model);
 	}
 
 }
