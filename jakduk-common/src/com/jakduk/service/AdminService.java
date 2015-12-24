@@ -734,17 +734,34 @@ public String initSearchData() {
 		model.addAttribute("jakduScheduleWrite", new JakduScheduleWrite());
 	}
 
-	public void jakduScheduleWrite(JakduScheduleWrite jakduScheduleWrite) {
+	public void getJakduScheduleWrite(Model model, String id) {
+		JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
+		logger.debug("jakduSchedule=" + jakduSchedule);
+		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+
+		JakduScheduleWrite jakduScheduleWrite = new JakduScheduleWrite();
+		jakduScheduleWrite.setId(jakduSchedule.getId());
+		jakduScheduleWrite.setHome(jakduSchedule.getHome().getId());
+		jakduScheduleWrite.setAway(jakduSchedule.getAway().getId());
+
+		model.addAttribute("footballClubs", footballClubs);
+		model.addAttribute("jakduScheduleWrite", jakduScheduleWrite);
+	}
+
+	public void writeJakduSchedule(JakduScheduleWrite jakduScheduleWrite) {
 		JakduSchedule jakduSchedule = new JakduSchedule();
 
 		FootballClubOrigin home = footballClubOriginRepository.findOne(jakduScheduleWrite.getHome());
 		FootballClubOrigin away = footballClubOriginRepository.findOne(jakduScheduleWrite.getAway());
 
+		jakduSchedule.setDate(jakduScheduleWrite.getDate());
 		jakduSchedule.setHome(home);
 		jakduSchedule.setAway(away);
 
 		if (jakduScheduleWrite.getId().isEmpty()) {
-			jakduScheduleWrite.setId(null);
+			jakduSchedule.setId(null);
+		} else {
+			jakduSchedule.setId(jakduScheduleWrite.getId());
 		}
 
 		if (logger.isDebugEnabled()) {
@@ -752,6 +769,21 @@ public String initSearchData() {
 		}
 
 		jakduScheduleRepository.save(jakduSchedule);
+	}
+
+	public boolean deleteAttendanceLeague(String id) {
+
+		if (!id.isEmpty()) {
+			JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
+
+			if (jakduSchedule != null) {
+				jakduScheduleRepository.delete(jakduSchedule);
+				logger.debug("delete JakduSchedule=" + jakduSchedule);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public Model getJakduScheduleList(Model model) {

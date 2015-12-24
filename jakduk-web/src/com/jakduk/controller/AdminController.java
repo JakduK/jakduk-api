@@ -367,6 +367,14 @@ public class AdminController {
 		return "admin/jakduScheduleWrite";
 	}
 
+	@RequestMapping(value = "/jakdu/schedule/write/{id}", method = RequestMethod.GET)
+	public String jakduScheduleWrite(@PathVariable String id, Model model) {
+
+		adminService.getJakduScheduleWrite(model, id);
+
+		return "admin/jakduScheduleWrite";
+	}
+
 	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.POST)
 	public String jakduScheduleWrite(@Valid JakduScheduleWrite jakduScheduleWrite, BindingResult result) {
 		if (result.hasErrors()) {
@@ -374,7 +382,15 @@ public class AdminController {
 			return "admin/jakduScheduleWrite";
 		}
 
-		adminService.jakduScheduleWrite(jakduScheduleWrite);
+		adminService.writeJakduSchedule(jakduScheduleWrite);
+
+		return "redirect:/admin/settings?open=jakduSchedule";
+	}
+
+	@RequestMapping(value = "/jakdu/schedule/delete/{id}", method = RequestMethod.GET)
+	public String jakduScheduleDelete(@PathVariable String id) {
+
+		boolean result = adminService.deleteAttendanceLeague(id);
 
 		return "redirect:/admin/settings?open=jakduSchedule";
 	}

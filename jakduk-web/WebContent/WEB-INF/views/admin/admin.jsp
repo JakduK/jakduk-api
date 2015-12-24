@@ -15,7 +15,7 @@
 	<div class="container" ng-controller="adminCtrl">
 	
 	<div class="page-header">
-  <h4>JakduK Admin Page</h4>
+  <h4><a href="<c:url value="/home/"/>">JakduK Admin Page</a></h4>
 </div>
 <div class="btn-group">
   <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
@@ -194,7 +194,7 @@
 				</tr>
 				<tr ng-repeat="jakduSchedule in jakduSchedules">
 					<td><a href="<c:url value="/admin/jakdu/schedule/write/{{jakduSchedule.id}}"/>">{{jakduSchedule.id}}</a></td>
-					<td>{{jakduSchedule.date}}</td>
+					<td>{{jakduSchedule.date | date:'short' }}</td>
 					<td>{{jakduSchedule.home.name}}</td>
 					<td>{{jakduSchedule.away.name}}</td>
 				</tr>

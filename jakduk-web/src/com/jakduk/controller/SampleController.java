@@ -166,4 +166,9 @@ public class SampleController {
 	public String slick02(Model model) {
 		return "sample/slick02";
 	}
+
+	@RequestMapping(value ="/date01")
+	public String date01(Model model) {
+		return "sample/date01";
+	}
 }

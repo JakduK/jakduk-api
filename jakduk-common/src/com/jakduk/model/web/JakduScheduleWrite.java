@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by pyohwan on 15. 12. 24.
@@ -18,8 +19,8 @@ public class JakduScheduleWrite {
     @Id
     private String id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp date;
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
     @NotEmpty
     private String home;
@@ -35,11 +36,11 @@ public class JakduScheduleWrite {
         this.id = id;
     }
 
-    public Timestamp getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

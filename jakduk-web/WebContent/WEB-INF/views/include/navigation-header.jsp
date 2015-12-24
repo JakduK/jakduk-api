@@ -107,6 +107,9 @@
 							<li ng-class="{active:isActive('<c:url value="/stats/attendance"/>')}"><a href="<c:url value="/stats/attendance"/>"><spring:message code="stats.attendance"/></a></li>
 						</ul>					
 					</li>
+					<li ng-class="{active:isActive('<c:url value="/jakdu"/>')}">
+						<a href="<c:url value="/jakdu"/>"><spring:message code="jakdu"/></a>
+					</li>
 				</ul>
 			</div>		
 		</div> <!-- Navbar container -->

@@ -21,8 +21,8 @@ public class JakduSchedule {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private String id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp date;
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
     private FootballClubOrigin home;
 
@@ -36,11 +36,11 @@ public class JakduSchedule {
         this.id = id;
     }
 
-    public Timestamp getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
