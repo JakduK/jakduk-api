@@ -25,25 +25,28 @@
             <form:hidden path="id"/>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <label class="control-label">DATE</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="mytime" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)"
-                               ng-required="true" close-text="Close" />
+                        <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="mytime" is-open="status.opened" min-date="minDate" max-date="maxDate"
+                               datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                         </span>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <label class="control-label">TIME</label>
                     <uib-timepicker ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" show-spinners="false"/>
                 </div>
-            </div>
-            <form:input path="date" ng-model="mytime"/>
-            <pre class="alert alert-info">Date is: {{mytime | date:'short' }}</pre>
 
-            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <form:input path="date" ng-model="mytime" cssClass="form-control"/>
+                    </div>
+                </div>
+                <form:errors path="date"/>
+
                 <div class="col-sm-6">
                     <div class="form-group">
                         <label for="home" class="control-label">HOME TEAM</label>
@@ -52,17 +55,76 @@
                                 <form:option value="${club.id}" label="${club.name}"/>
                             </c:forEach>
                         </form:select>
+                        <form:errors path="home"/>
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <label for="away" class="control-label">AWAY TEAM</label>
-                    <form:select path="away" cssClass="form-control">
-                        <c:forEach items="${footballClubs}" var="club">
-                            <form:option value="${club.id}" label="${club.name}"/>
-                        </c:forEach>
-                    </form:select>
+                    <div class="form-group">
+                        <label for="away" class="control-label">AWAY TEAM</label>
+                        <form:select path="away" cssClass="form-control">
+                            <c:forEach items="${footballClubs}" var="club">
+                                <form:option value="${club.id}" label="${club.name}"/>
+                            </c:forEach>
+                        </form:select>
+                        <form:errors path="away"/>
+                    </div>
                 </div>
-
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label">FIRST HALF SCORE</label>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <form:input path="homeFirstHalf" cssClass="form-control" placeholder="HOME"/>
+                        </div>
+                        <div class="col-sm-6">
+                            <form:input path="awayFirstHalf" cssClass="form-control" placeholder="AWAY"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="control-label">SECOND HALF SCORE</label>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <form:input path="homeSecondHalf" cssClass="form-control" placeholder="HOME"/>
+                        </div>
+                        <div class="col-sm-6">
+                            <form:input path="awaySecondHalf" cssClass="form-control" placeholder="AWAY"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="control-label">OVERTIME SCORE</label>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <form:input path="homeOvertime" cssClass="form-control" placeholder="HOME"/>
+                        </div>
+                        <div class="col-sm-6">
+                            <form:input path="awayOvertime" cssClass="form-control" placeholder="AWAY"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="control-label">PENALTY SHOOT OUT SCORE</label>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <form:input path="homePenaltyShootOut" cssClass="form-control" placeholder="HOME"/>
+                        </div>
+                        <div class="col-sm-6">
+                            <form:input path="awayPenaltyShootOut" cssClass="form-control" placeholder="AWAY"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="checkbox">
+                        <label>
+                            <form:checkbox path="fullTime"/>
+                            FullTime
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
@@ -77,42 +139,49 @@
         </form:form>
     </div>
 
-<!-- Bootstrap core JavaScript================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-<script type="text/javascript">
+    <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/angular/angular.min.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+    <script type="text/javascript">
 
-    var jakdukApp = angular.module("jakdukApp", ['ui.bootstrap']);
+        var jakdukApp = angular.module("jakdukApp", ['ui.bootstrap']);
 
-    jakdukApp.controller("adminCtrl", function($scope) {
-        $scope.format = 'yyyy/MM/dd';
-        $scope.mytime = new Date();
-        $scope.status = {
-            opened: false
-        };
+        jakdukApp.controller("adminCtrl", function($scope) {
+            var time = '${jakduScheduleWrite.date.time}';
 
-        $scope.hstep = 1;
-        $scope.mstep = 15;
+            if (!isEmpty(time))
+                $scope.mytime = new Date(parseInt(time));
+            else
+                $scope.mytime = new Date();
 
-        angular.element(document).ready(function() {
+            $scope.mytime.setSeconds(0);
+
+            $scope.format = 'yyyy/MM/dd';
+            $scope.status = {
+                opened: false
+            };
+
+            $scope.hstep = 1;
+            $scope.mstep = 15;
+
+            angular.element(document).ready(function() {
+            });
+
+            $scope.open = function($event) {
+                $scope.status.opened = true;
+            };
         });
 
-        $scope.open = function($event) {
-            $scope.status.opened = true;
-        };
-    });
-
-    function confirmDelete() {
-        if (confirm('delete?') == true) {
-            location.href = '<c:url value="/admin/jakdu/schedule/delete/${jakduScheduleWrite.id}"/>';
+        function confirmDelete() {
+            if (confirm('delete?') == true) {
+                location.href = '<c:url value="/admin/jakdu/schedule/delete/${jakduScheduleWrite.id}"/>';
+            }
         }
-    }
 
-</script>
+    </script>
 
-<jsp:include page="../include/body-footer.jsp"/>
+    <jsp:include page="../include/body-footer.jsp"/>
 
 </body>
 </html>

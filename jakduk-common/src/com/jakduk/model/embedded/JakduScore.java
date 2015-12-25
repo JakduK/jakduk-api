@@ -1,32 +1,9 @@
-package com.jakduk.model.web;
-
-import com.jakduk.model.db.FootballClub;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.data.annotation.Id;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.sql.Timestamp;
-import java.util.Date;
+package com.jakduk.model.embedded;
 
 /**
- * Created by pyohwan on 15. 12. 24.
+ * Created by pyohwan on 15. 12. 25.
  */
-public class JakduScheduleWrite {
-
-    @Id
-    private String id;
-
-    @Temporal(TemporalType.DATE)
-    private Date date;
-
-    @NotEmpty
-    private String home;
-
-    @NotEmpty
-    private String away;
+public class JakduScore {
 
     private Integer homeFirstHalf;
 
@@ -43,40 +20,6 @@ public class JakduScheduleWrite {
     private Integer homePenaltyShootOut;
 
     private Integer awayPenaltyShootOut;
-
-    private boolean fullTime;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public String getHome() {
-        return home;
-    }
-
-    public void setHome(String home) {
-        this.home = home;
-    }
-
-    public String getAway() {
-        return away;
-    }
-
-    public void setAway(String away) {
-        this.away = away;
-    }
 
     public Integer getHomeFirstHalf() {
         return homeFirstHalf;
@@ -142,22 +85,10 @@ public class JakduScheduleWrite {
         this.awayPenaltyShootOut = awayPenaltyShootOut;
     }
 
-    public boolean isFullTime() {
-        return fullTime;
-    }
-
-    public void setFullTime(boolean fullTime) {
-        this.fullTime = fullTime;
-    }
-
     @Override
     public String toString() {
-        return "JakduScheduleWrite{" +
-                "id='" + id + '\'' +
-                ", date=" + date +
-                ", home='" + home + '\'' +
-                ", away='" + away + '\'' +
-                ", homeFirstHalf=" + homeFirstHalf +
+        return "JakduScore{" +
+                "homeFirstHalf=" + homeFirstHalf +
                 ", awayFirstHalf=" + awayFirstHalf +
                 ", homeSecondHalf=" + homeSecondHalf +
                 ", awaySecondHalf=" + awaySecondHalf +
@@ -165,8 +96,6 @@ public class JakduScheduleWrite {
                 ", awayOvertime=" + awayOvertime +
                 ", homePenaltyShootOut=" + homePenaltyShootOut +
                 ", awayPenaltyShootOut=" + awayPenaltyShootOut +
-                ", fullTime=" + fullTime +
                 '}';
     }
-
 }

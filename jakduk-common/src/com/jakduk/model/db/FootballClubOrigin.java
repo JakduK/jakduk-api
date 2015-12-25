@@ -15,6 +15,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class FootballClubOrigin {
+
+	enum CLUB_TYPE {
+		FOOTBALL_CLUB,
+		NATIONAL_TEAM
+	}
+
+	enum AGE_TYPE {
+		UNDER_15,
+		UNDER_17,
+		UNDER_20,
+		UNDER_23,
+		SENIOR
+	}
+
+	enum SEX_TYPE {
+		MEN,
+		WOMEN
+	}
 	
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;

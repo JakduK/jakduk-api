@@ -21,6 +21,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 
 import com.jakduk.model.db.*;
+import com.jakduk.model.embedded.JakduScore;
 import com.jakduk.model.web.*;
 import com.jakduk.repository.*;
 import org.apache.log4j.Logger;
@@ -737,12 +738,35 @@ public String initSearchData() {
 	public void getJakduScheduleWrite(Model model, String id) {
 		JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
 		logger.debug("jakduSchedule=" + jakduSchedule);
+		JakduScore jakduScore = jakduSchedule.getScore();
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 
 		JakduScheduleWrite jakduScheduleWrite = new JakduScheduleWrite();
+		jakduScheduleWrite.setDate(jakduSchedule.getDate());
 		jakduScheduleWrite.setId(jakduSchedule.getId());
 		jakduScheduleWrite.setHome(jakduSchedule.getHome().getId());
 		jakduScheduleWrite.setAway(jakduSchedule.getAway().getId());
+		jakduScheduleWrite.setFullTime(jakduSchedule.isFullTime());
+
+		if (jakduScore != null) {
+			if (jakduScore.getHomeFirstHalf() != null)
+				jakduScheduleWrite.setHomeFirstHalf(jakduScore.getHomeFirstHalf());
+			if (jakduScore.getAwayFirstHalf() != null)
+				jakduScheduleWrite.setAwayFirstHalf(jakduScore.getAwayFirstHalf());
+			if (jakduScore.getHomeSecondHalf() != null)
+				jakduScheduleWrite.setHomeSecondHalf(jakduScore.getHomeSecondHalf());
+			if (jakduScore.getAwaySecondHalf() != null)
+				jakduScheduleWrite.setAwaySecondHalf(jakduScore.getAwaySecondHalf());
+			if (jakduScore.getHomeOvertime() != null)
+				jakduScheduleWrite.setHomeOvertime(jakduScore.getHomeOvertime());
+			if (jakduScore.getAwayOvertime() != null)
+				jakduScheduleWrite.setAwayOvertime(jakduScore.getAwayOvertime());
+			if (jakduScore.getHomePenaltyShootOut() != null)
+				jakduScheduleWrite.setHomePenaltyShootOut(jakduScore.getHomePenaltyShootOut());
+			if (jakduScore.getAwayPenaltyShootOut() != null)
+				jakduScheduleWrite.setAwayPenaltyShootOut(jakduScore.getAwayPenaltyShootOut());
+
+		}
 
 		model.addAttribute("footballClubs", footballClubs);
 		model.addAttribute("jakduScheduleWrite", jakduScheduleWrite);
@@ -754,6 +778,33 @@ public String initSearchData() {
 		FootballClubOrigin home = footballClubOriginRepository.findOne(jakduScheduleWrite.getHome());
 		FootballClubOrigin away = footballClubOriginRepository.findOne(jakduScheduleWrite.getAway());
 
+		if (jakduScheduleWrite.isFullTime()) {
+			JakduScore jakduScore = new JakduScore();
+
+			if (jakduScheduleWrite.getHomeFirstHalf() != null && jakduScheduleWrite.getAwayFirstHalf() != null) {
+				jakduScore.setHomeFirstHalf(jakduScheduleWrite.getHomeFirstHalf());
+				jakduScore.setAwayFirstHalf(jakduScheduleWrite.getAwayFirstHalf());
+			}
+
+			if (jakduScheduleWrite.getHomeSecondHalf() != null && jakduScheduleWrite.getAwaySecondHalf() != null) {
+				jakduScore.setHomeSecondHalf(jakduScheduleWrite.getHomeSecondHalf());
+				jakduScore.setAwaySecondHalf(jakduScheduleWrite.getAwaySecondHalf());
+			}
+
+			if (jakduScheduleWrite.getHomeOvertime() != null && jakduScheduleWrite.getAwayOvertime() != null) {
+				jakduScore.setHomeOvertime(jakduScheduleWrite.getHomeOvertime());
+				jakduScore.setAwayOvertime(jakduScheduleWrite.getAwayOvertime());
+			}
+
+			if (jakduScheduleWrite.getHomePenaltyShootOut() != null && jakduScheduleWrite.getAwayPenaltyShootOut() != null) {
+				jakduScore.setHomePenaltyShootOut(jakduScheduleWrite.getHomePenaltyShootOut());
+				jakduScore.setAwayPenaltyShootOut(jakduScheduleWrite.getAwayPenaltyShootOut());
+			}
+
+			jakduSchedule.setScore(jakduScore);
+		}
+
+		jakduSchedule.setFullTime(jakduScheduleWrite.isFullTime());
 		jakduSchedule.setDate(jakduScheduleWrite.getDate());
 		jakduSchedule.setHome(home);
 		jakduSchedule.setAway(away);

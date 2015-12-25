@@ -1,6 +1,8 @@
 package com.jakduk.model.db;
 
+import com.jakduk.model.embedded.JakduScore;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
@@ -24,9 +26,15 @@ public class JakduSchedule {
     @Temporal(TemporalType.DATE)
     private Date date;
 
+    @DBRef
     private FootballClubOrigin home;
 
+    @DBRef
     private FootballClubOrigin away;
+
+    private JakduScore score;
+
+    private boolean fullTime;
 
     public String getId() {
         return id;
@@ -60,6 +68,22 @@ public class JakduSchedule {
         this.away = away;
     }
 
+    public JakduScore getScore() {
+        return score;
+    }
+
+    public void setScore(JakduScore score) {
+        this.score = score;
+    }
+
+    public boolean isFullTime() {
+        return fullTime;
+    }
+
+    public void setFullTime(boolean fullTime) {
+        this.fullTime = fullTime;
+    }
+
     @Override
     public String toString() {
         return "JakduSchedule{" +
@@ -67,6 +91,8 @@ public class JakduSchedule {
                 ", date=" + date +
                 ", home=" + home +
                 ", away=" + away +
+                ", score=" + score +
+                ", fullTime=" + fullTime +
                 '}';
     }
 }
