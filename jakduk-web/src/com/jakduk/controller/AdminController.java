@@ -123,7 +123,7 @@ public class AdminController {
 	@RequestMapping(value = "/footballclub/write", method = RequestMethod.GET)
 	public String footballClubWrite(Model model) {
 		
-		adminService.getFootballClubWrite(model);
+		adminService.getFootballClub(model);
 		
 		return "admin/footballClubWrite";
 	}
@@ -131,7 +131,7 @@ public class AdminController {
 	@RequestMapping(value = "/footballclub/write/{id}", method = RequestMethod.GET)
 	public String footballClubWrite(@PathVariable String id, Model model) {
 		
-		adminService.getFootballClubWrite(model, id);
+		adminService.getFootballClub(model, id);
 		
 		return "admin/footballClubWrite";
 	}
@@ -144,7 +144,7 @@ public class AdminController {
 			return "admin/footballClubWrite";
 		}
 		
-		adminService.footballClubWrite(footballClubWrite);
+		adminService.writeFootballClub(footballClubWrite);
 
 		return "redirect:/admin/settings?open=fc";
 	}
@@ -399,7 +399,41 @@ public class AdminController {
 	@RequestMapping(value = "/data/jakdu/schedule", method = RequestMethod.GET)
 	public void dataJakduSchedule(Model model) {
 
-		adminService.getJakduScheduleList(model);
+		adminService.getDataJakduScheduleList(model);
+	}
+
+	@RequestMapping(value = "/competition/write", method = RequestMethod.GET)
+	public String competitionWrite(Model model) {
+
+		adminService.getCompetition(model);
+
+		return "admin/competitionWrite";
+	}
+
+	@RequestMapping(value = "/competition/write/{id}", method = RequestMethod.GET)
+	public String competitionWrite(@PathVariable String id, Model model) {
+
+		adminService.getCompetition(model, id);
+
+		return "admin/competitionWrite";
+	}
+
+	@RequestMapping(value = "/competition/write", method = RequestMethod.POST)
+	public String competitionWrite(@Valid CompetitionWrite competitionWrite, BindingResult result) {
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/competitionWrite";
+		}
+
+		adminService.writeCompetition(competitionWrite);
+
+		return "redirect:/admin/settings?open=competition";
+	}
+
+	@RequestMapping(value = "/data/competition", method = RequestMethod.GET)
+	public void dataCompetition(Model model) {
+
+		adminService.getDataCompetitionList(model);
 	}
 
 }

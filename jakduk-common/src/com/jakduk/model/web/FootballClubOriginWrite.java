@@ -18,9 +18,9 @@ public class FootballClubOriginWrite {
 
     private CommonConst.CLUB_TYPE clubType;
 
-    private CommonConst.CLUB_AGE_TYPE age;
+    private CommonConst.CLUB_AGE age;
 
-    private CommonConst.CLUB_SEX_TYPE sex;
+    private CommonConst.CLUB_SEX sex;
 
     public String getId() {
         return id;
@@ -46,19 +46,19 @@ public class FootballClubOriginWrite {
         this.clubType = clubType;
     }
 
-    public CommonConst.CLUB_AGE_TYPE getAge() {
+    public CommonConst.CLUB_AGE getAge() {
         return age;
     }
 
-    public void setAge(CommonConst.CLUB_AGE_TYPE age) {
+    public void setAge(CommonConst.CLUB_AGE age) {
         this.age = age;
     }
 
-    public CommonConst.CLUB_SEX_TYPE getSex() {
+    public CommonConst.CLUB_SEX getSex() {
         return sex;
     }
 
-    public void setSex(CommonConst.CLUB_SEX_TYPE sex) {
+    public void setSex(CommonConst.CLUB_SEX sex) {
         this.sex = sex;
     }
 

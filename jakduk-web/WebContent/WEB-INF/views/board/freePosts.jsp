@@ -95,54 +95,55 @@
 		<!--End Top Comments Rows-->
 	</div>
 
-	<div class="row">
-		<div class="col-sm-6 margin-bottom-10">
-			<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
+		<!-- Top Buttons -->
+		<div class="row">
+			<div class="col-sm-6 margin-bottom-10">
+				<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
+					<c:choose>
+						<c:when test="${boardListInfo.category != 'none'}">
+							<spring:message code="${categorys[boardListInfo.category]}"/>
+						</c:when>
+						<c:otherwise>
+							<spring:message code="board.category"/>
+						</c:otherwise>
+					</c:choose>
+					<i class="fa fa-angle-down"></i>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<c:forEach items="${categorys}" var="category">
+						<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
+					</c:forEach>
+				</ul>
 				<c:choose>
-					<c:when test="${boardListInfo.category != 'none'}">
-						<spring:message code="${categorys[boardListInfo.category]}"/>
+					<c:when test="${authRole == 'ANNONYMOUS'}">
+					<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
+					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+						<span aria-hidden="true" class="icon-pencil"></span>
+					</button>
 					</c:when>
-					<c:otherwise>
-						<spring:message code="board.category"/>
-					</c:otherwise>
+					<c:when test="${authRole == 'USER'}">
+					<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
+					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+						<span aria-hidden="true" class="icon-pencil"></span>
+					</button>
+					</c:when>
 				</c:choose>
-				<i class="fa fa-angle-down"></i>
-			</button>
-			<ul class="dropdown-menu" role="menu">
-				<c:forEach items="${categorys}" var="category">
-					<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
-				</c:forEach>
-			</ul>
-			<c:choose>
-				<c:when test="${authRole == 'ANNONYMOUS'}">
-				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
-				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
-					<span aria-hidden="true" class="icon-pencil"></span>
-				</button>
-				</c:when>
-				<c:when test="${authRole == 'USER'}">
-				<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
-				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
-					<span aria-hidden="true" class="icon-pencil"></span>
-				</button>
-				</c:when>
-			</c:choose>
+			</div>
+			<div class="col-sm-6 sm-margin-bottom-10">
+			   <div class="input-group">
+				   <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''"
+				   ng-keypress="($event.which === 13)?btnEnter():return"
+				   placeholder='<spring:message code="search.placeholder.words"/>'>
+				   <span class="input-group-btn">
+					   <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
+				   </span>
+			   </div>
+			   <span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
+			</div>
 		</div>
-		<div class="col-sm-6 sm-margin-bottom-10">
-	       <div class="input-group">
-	           <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''"
-	           ng-keypress="($event.which === 13)?btnEnter():return"
-	           placeholder='<spring:message code="search.placeholder.words"/>'>
-	           <span class="input-group-btn">
-	               <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
-	           </span>
-	       </div>
-	       <span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
-		</div>
-	</div>
+		<!-- End Top Buttons -->
 
 	<div class="panel panel-u">
-	  <!-- Default panel contents -->
 	  <div class="panel-heading hidden-xs">
 	  	<div class="row">
 	  		<div class="col-sm-2"><spring:message code="board.number"/> | <spring:message code="board.category"/></div>

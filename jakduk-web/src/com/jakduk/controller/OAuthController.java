@@ -45,46 +45,6 @@ public class OAuthController {
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	@RequestMapping(value = "/daum/callback2", method = RequestMethod.GET)
-	public String daumCallback(Model model,
-			@RequestParam(value = "code") String authCode) {
-		
-		String token_url = "https://apis.daum.net/oauth2/token";
-		String client_id = "1234567890";
-		String client_secret = "75fba1";
-		
-		URI url = null;
-		try {
-			url = new URI(token_url);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("grant_type", "authorization_code");
-		params.put("code", authCode);
-		params.put("client_id", client_id);
-		params.put("client_secret", client_secret);
-		params.put("redirect_uri", "http://localhost:8080/jakduk/oauth/daum/callback03");
-		
-		RestTemplate restTemplate = new RestTemplate();
-		@SuppressWarnings("unchecked")
-		Map<String, Object> accessToken = (Map<String, Object>) restTemplate.postForObject(url, params, Map.class);
-		
-		logger.debug("accessToken=" + accessToken);
-		
-		String atk = (String) accessToken.get("access_token");
-		Integer exp = (Integer) accessToken.get("expires_in");
-		
-		model.addAttribute("accessToken", atk);
-		model.addAttribute("expiresIn", exp);
-		
-		logger.debug("accessToken=" + accessToken);
-		logger.debug("model=" + model);
-		
-		return "home/oauth02";
-	}
-	
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)
 	public String profile(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,

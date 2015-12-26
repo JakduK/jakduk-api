@@ -145,7 +145,7 @@ public class CommonConst {
 	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte
 	
 	/**
-	 * K리그 줄임말.
+	 * K리그 줄임말. 삭제 되어야 한다. Competition 클래스를 만들었다.
 	 */
 	public final static String K_LEAGUE_ABBREVIATION = "KL";
 	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
@@ -164,7 +164,7 @@ public class CommonConst {
 		NATIONAL_TEAM
 	}
 
-	public enum CLUB_AGE_TYPE {
+	public enum CLUB_AGE {
 		UNDER_14,
 		UNDER_17,
 		UNDER_20,
@@ -172,7 +172,7 @@ public class CommonConst {
 		SENIOR
 	}
 
-	public enum CLUB_SEX_TYPE {
+	public enum CLUB_SEX {
 		MEN,
 		WOMEN
 	}

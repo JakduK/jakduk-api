@@ -22,6 +22,7 @@ import javax.imageio.ImageIO;
 
 import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.JakduScore;
+import com.jakduk.model.embedded.Name;
 import com.jakduk.model.web.*;
 import com.jakduk.repository.*;
 import org.apache.log4j.Logger;
@@ -104,6 +105,9 @@ public class AdminService {
 
 	@Autowired
 	private JakduScheduleRepository jakduScheduleRepository;
+
+	@Autowired
+	private CompetitionRepository competitionRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -366,7 +370,7 @@ public String initSearchData() {
 		encyclopediaRepository.save(encyclopedia);
 	}
 	
-	public Model getFootballClubWrite(Model model) {
+	public Model getFootballClub(Model model) {
 		
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 		
@@ -376,7 +380,7 @@ public String initSearchData() {
 		return model;
 	}
 	
-	public Model getFootballClubWrite(Model model, String id) {
+	public Model getFootballClub(Model model, String id) {
 		
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 		FootballClub fc = footballClubRepository.findOne(id);
@@ -401,7 +405,7 @@ public String initSearchData() {
 		return model;
 	}
 	
-	public void footballClubWrite(FootballClubWrite footballClubWrite) {
+	public void writeFootballClub(FootballClubWrite footballClubWrite) {
 		FootballClub footballClub = new FootballClub();
 		
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOne(footballClubWrite.getOrigin());
@@ -493,20 +497,16 @@ public String initSearchData() {
 		footballClubOriginRepository.save(footballClubOrigin);
 	}
 
-	public Model dataFootballClubOriginList(Model model) {
+	public void dataFootballClubOriginList(Model model) {
 		List<FootballClubOrigin> fcOrigins = footballClubOriginRepository.findAll();
 
 		model.addAttribute("fcOrigins", fcOrigins);
-
-		return model;
 	}
 
-	public Model getFootballClubList(Model model) {
+	public void getFootballClubList(Model model) {
 		List<FootballClub> fcs = footballClubRepository.findAll();
 		
 		model.addAttribute("fcs", fcs);
-		
-		return model;
 	}
 	
 	public Model getBoardCategoryList(Model model) {
@@ -742,7 +742,6 @@ public String initSearchData() {
 
 	public void getJakduScheduleWrite(Model model, String id) {
 		JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
-		logger.debug("jakduSchedule=" + jakduSchedule);
 		JakduScore jakduScore = jakduSchedule.getScore();
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 
@@ -833,12 +832,68 @@ public String initSearchData() {
 		return false;
 	}
 
-	public Model getJakduScheduleList(Model model) {
+	public Model getDataJakduScheduleList(Model model) {
 		List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll();
 
 		model.addAttribute("jakduSchedules", jakduSchedules);
 
 		return model;
+	}
+
+	public void getCompetition(Model model) {
+		model.addAttribute("competitionWrite", new CompetitionWrite());
+	}
+
+	public void getCompetition(Model model, String id) {
+		Competition competition = competitionRepository.findOne(id);
+		CompetitionWrite competitionWrite = new CompetitionWrite();
+		competitionWrite.setId(competition.getId());
+		competitionWrite.setCode(competition.getCode());
+
+		for (Name name : competition.getNames()) {
+			if (name.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+				competitionWrite.setFullNameKr(name.getFullName());
+				competitionWrite.setShortNameKr(name.getShortName());
+			} else if (name.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+				competitionWrite.setFullNameEn(name.getFullName());
+				competitionWrite.setShortNameEn(name.getShortName());
+			}
+		}
+
+		model.addAttribute("competitionWrite", competitionWrite);
+	}
+
+	public void writeCompetition(CompetitionWrite competitionWrite) {
+		Competition competition = new Competition();
+
+		if (competitionWrite.getId().isEmpty()) {
+			competition.setId(null);
+		} else {
+			competition.setId(competitionWrite.getId());
+		}
+
+		competition.setCode(competitionWrite.getCode());
+
+		ArrayList<Name> names = new ArrayList<Name>();
+		Name nameKr = new Name();
+		Name nameEn = new Name();
+		nameKr.setLanguage(Locale.KOREAN.getLanguage());
+		nameKr.setShortName(competitionWrite.getShortNameKr());
+		nameKr.setFullName(competitionWrite.getFullNameKr());
+		nameEn.setLanguage(Locale.ENGLISH.getLanguage());
+		nameEn.setShortName(competitionWrite.getShortNameEn());
+		nameEn.setFullName(competitionWrite.getFullNameEn());
+		names.add(nameKr);
+		names.add(nameEn);
+		competition.setNames(names);
+
+		competitionRepository.save(competition);
+	}
+
+	public void getDataCompetitionList(Model model) {
+		List<Competition> competitions = competitionRepository.findAll();
+
+		model.addAttribute("competitions", competitions);
 	}
 
 }
