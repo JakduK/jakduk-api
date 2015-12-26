@@ -1,11 +1,16 @@
 package jakduk;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.repository.FootballClubOriginRepository;
+import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,6 +41,9 @@ public class HomeTest {
 	
 	@Autowired
 	BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
+
+	@Autowired
+	FootballClubOriginRepository footballClubOriginRepository;
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
@@ -70,9 +78,18 @@ public class HomeTest {
 	
 	@Test
 	public void getFootballClubList() {
-		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList("ko", CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME);
-		
+
+		List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(CommonConst.CLUB_TYPE.FOOTBALL_CLUB);
+		System.out.println("fcos=" + fcos);
+
+		List<ObjectId> ids = new ArrayList<ObjectId>();
+
+		for (FootballClubOrigin fco : fcos) {
+			String id = fco.getId();
+			ids.add(new ObjectId(id));
+		}
+
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(ids, "ko", CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME);
 		System.out.println("getFootballClubList=" + footballClubs);
 	}
 

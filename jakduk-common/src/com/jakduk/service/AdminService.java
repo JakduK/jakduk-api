@@ -430,16 +430,7 @@ public String initSearchData() {
 		
 		footballClubRepository.save(footballClub);
 	}
-	
-	public void footballClubOriginWrite(FootballClubOrigin footballClubOrigin) {
 
-		if (footballClubOrigin.getId().isEmpty()) {
-			footballClubOrigin.setId(null);
-		}
-		
-		footballClubOriginRepository.save(footballClubOrigin);
-	}
-	
 	public void boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
 		BoardCategory boardCategory = new BoardCategory();
 		
@@ -479,23 +470,37 @@ public String initSearchData() {
 		
 		return model;
 	}
-	
-	public Model getFootballClubOriginList(Model model) {
-		List<FootballClubOrigin> fcOrigins = footballClubOriginRepository.findAll();
-		
-		model.addAttribute("fcOrigins", fcOrigins);
-		
+
+	public Model getFootballClubOrigin(Model model) {
+		model.addAttribute("footballClubOrigin", new FootballClubOrigin());
 		return model;
 	}
-	
+
 	public Model getFootballClubOrigin(Model model, String id) {
 		FootballClubOrigin fcOrigin = footballClubOriginRepository.findOne(id);
-		
+
 		model.addAttribute("footballClubOrigin", fcOrigin);
-		
+
 		return model;
 	}
-	
+
+	public void writeFootballClubOrigin(FootballClubOrigin footballClubOrigin) {
+
+		if (footballClubOrigin.getId().isEmpty()) {
+			footballClubOrigin.setId(null);
+		}
+
+		footballClubOriginRepository.save(footballClubOrigin);
+	}
+
+	public Model dataFootballClubOriginList(Model model) {
+		List<FootballClubOrigin> fcOrigins = footballClubOriginRepository.findAll();
+
+		model.addAttribute("fcOrigins", fcOrigins);
+
+		return model;
+	}
+
 	public Model getFootballClubList(Model model) {
 		List<FootballClub> fcs = footballClubRepository.findAll();
 		
@@ -746,25 +751,21 @@ public String initSearchData() {
 		jakduScheduleWrite.setId(jakduSchedule.getId());
 		jakduScheduleWrite.setHome(jakduSchedule.getHome().getId());
 		jakduScheduleWrite.setAway(jakduSchedule.getAway().getId());
-		jakduScheduleWrite.setFullTime(jakduSchedule.isFullTime());
+		jakduScheduleWrite.setTimeUp(jakduSchedule.isTimeUp());
 
 		if (jakduScore != null) {
-			if (jakduScore.getHomeFirstHalf() != null)
-				jakduScheduleWrite.setHomeFirstHalf(jakduScore.getHomeFirstHalf());
-			if (jakduScore.getAwayFirstHalf() != null)
-				jakduScheduleWrite.setAwayFirstHalf(jakduScore.getAwayFirstHalf());
-			if (jakduScore.getHomeSecondHalf() != null)
-				jakduScheduleWrite.setHomeSecondHalf(jakduScore.getHomeSecondHalf());
-			if (jakduScore.getAwaySecondHalf() != null)
-				jakduScheduleWrite.setAwaySecondHalf(jakduScore.getAwaySecondHalf());
-			if (jakduScore.getHomeOvertime() != null)
-				jakduScheduleWrite.setHomeOvertime(jakduScore.getHomeOvertime());
-			if (jakduScore.getAwayOvertime() != null)
-				jakduScheduleWrite.setAwayOvertime(jakduScore.getAwayOvertime());
-			if (jakduScore.getHomePenaltyShootOut() != null)
-				jakduScheduleWrite.setHomePenaltyShootOut(jakduScore.getHomePenaltyShootOut());
-			if (jakduScore.getAwayPenaltyShootOut() != null)
-				jakduScheduleWrite.setAwayPenaltyShootOut(jakduScore.getAwayPenaltyShootOut());
+			if (jakduScore.getHomeFullTime() != null)
+				jakduScheduleWrite.setHomeFullTime(jakduScore.getHomeFullTime());
+			if (jakduScore.getAwayFullTime() != null)
+				jakduScheduleWrite.setAwayFullTime(jakduScore.getAwayFullTime());
+			if (jakduScore.getHomeOverTime() != null)
+				jakduScheduleWrite.setHomeOverTime(jakduScore.getHomeOverTime());
+			if (jakduScore.getAwayOverTime() != null)
+				jakduScheduleWrite.setAwayOverTime(jakduScore.getAwayOverTime());
+			if (jakduScore.getHomePenaltyShootout() != null)
+				jakduScheduleWrite.setHomePenaltyShootout(jakduScore.getHomePenaltyShootout());
+			if (jakduScore.getAwayPenaltyShootout() != null)
+				jakduScheduleWrite.setAwayPenaltyShootout(jakduScore.getAwayPenaltyShootout());
 
 		}
 
@@ -778,33 +779,28 @@ public String initSearchData() {
 		FootballClubOrigin home = footballClubOriginRepository.findOne(jakduScheduleWrite.getHome());
 		FootballClubOrigin away = footballClubOriginRepository.findOne(jakduScheduleWrite.getAway());
 
-		if (jakduScheduleWrite.isFullTime()) {
+		if (jakduScheduleWrite.isTimeUp()) {
 			JakduScore jakduScore = new JakduScore();
 
-			if (jakduScheduleWrite.getHomeFirstHalf() != null && jakduScheduleWrite.getAwayFirstHalf() != null) {
-				jakduScore.setHomeFirstHalf(jakduScheduleWrite.getHomeFirstHalf());
-				jakduScore.setAwayFirstHalf(jakduScheduleWrite.getAwayFirstHalf());
+			if (jakduScheduleWrite.getHomeFullTime() != null && jakduScheduleWrite.getAwayFullTime() != null) {
+				jakduScore.setHomeFullTime(jakduScheduleWrite.getHomeFullTime());
+				jakduScore.setAwayFullTime(jakduScheduleWrite.getAwayFullTime());
 			}
 
-			if (jakduScheduleWrite.getHomeSecondHalf() != null && jakduScheduleWrite.getAwaySecondHalf() != null) {
-				jakduScore.setHomeSecondHalf(jakduScheduleWrite.getHomeSecondHalf());
-				jakduScore.setAwaySecondHalf(jakduScheduleWrite.getAwaySecondHalf());
+			if (jakduScheduleWrite.getHomeOverTime() != null && jakduScheduleWrite.getAwayOverTime() != null) {
+				jakduScore.setHomeOverTime(jakduScheduleWrite.getHomeOverTime());
+				jakduScore.setAwayOverTime(jakduScheduleWrite.getAwayOverTime());
 			}
 
-			if (jakduScheduleWrite.getHomeOvertime() != null && jakduScheduleWrite.getAwayOvertime() != null) {
-				jakduScore.setHomeOvertime(jakduScheduleWrite.getHomeOvertime());
-				jakduScore.setAwayOvertime(jakduScheduleWrite.getAwayOvertime());
-			}
-
-			if (jakduScheduleWrite.getHomePenaltyShootOut() != null && jakduScheduleWrite.getAwayPenaltyShootOut() != null) {
-				jakduScore.setHomePenaltyShootOut(jakduScheduleWrite.getHomePenaltyShootOut());
-				jakduScore.setAwayPenaltyShootOut(jakduScheduleWrite.getAwayPenaltyShootOut());
+			if (jakduScheduleWrite.getHomePenaltyShootout() != null && jakduScheduleWrite.getAwayPenaltyShootout() != null) {
+				jakduScore.setHomePenaltyShootout(jakduScheduleWrite.getHomePenaltyShootout());
+				jakduScore.setAwayPenaltyShootout(jakduScheduleWrite.getAwayPenaltyShootout());
 			}
 
 			jakduSchedule.setScore(jakduScore);
 		}
 
-		jakduSchedule.setFullTime(jakduScheduleWrite.isFullTime());
+		jakduSchedule.setTimeUp(jakduScheduleWrite.isTimeUp());
 		jakduSchedule.setDate(jakduScheduleWrite.getDate());
 		jakduSchedule.setHome(home);
 		jakduSchedule.setAway(away);

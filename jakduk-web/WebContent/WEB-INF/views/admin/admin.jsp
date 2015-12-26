@@ -15,8 +15,9 @@
 	<div class="container" ng-controller="adminCtrl">
 	
 	<div class="page-header">
-  <h4><a href="<c:url value="/home/"/>">JakduK Admin Page</a></h4>
-</div>
+  		<h4><a href="<c:url value="/home/"/>">JakduK Admin Page</a></h4>
+	</div>
+
 <div class="btn-group">
   <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
     Init Data
@@ -85,17 +86,21 @@
 </table>
 </div>
 
-<div ng-show="fcOrigins.length > 0">
-<h4>Football Club Origin</h4>
-<table class="table">
-<tr>
-	<th>Name</th>
-</tr>
-<tr ng-repeat="fcOrigin in fcOrigins">
-	<td><a href="<c:url value="/admin/footballclub/origin/write/{{fcOrigin.id}}"/>">{{fcOrigin.name}}</a></td>
-</tr>
-</table>
-</div>
+		<div ng-show="fcOrigins.length > 0">
+			<h4>Football Club Origin</h4>
+			<table class="table">
+				<tr>
+					<th>Name</th><th>Club Type</th><th>Age</th><th>Sex</th>
+				</tr>
+				<tr ng-repeat="fcOrigin in fcOrigins">
+					<td><a href="<c:url value="/admin/footballclub/origin/write/{{fcOrigin.id}}"/>">{{fcOrigin.name}}</a></td>
+					<td>{{fcOrigin.clubType}}</td>
+					<td>{{fcOrigin.age}}</td>
+					<td>{{fcOrigin.sex}}</td>
+				</tr>
+			</table>
+		</div>
+
 
 <div ng-show="fcs.length > 0">
 <h4>Football Club</h4>
@@ -190,13 +195,21 @@
 			<h4>Jakdu Schedule</h4>
 			<table class="table">
 				<tr>
-					<th>id</th><th>Date</th><th>Home</th><th>Away</th>
+					<th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Score</th><th>isTimeUp</th>
 				</tr>
 				<tr ng-repeat="jakduSchedule in jakduSchedules">
 					<td><a href="<c:url value="/admin/jakdu/schedule/write/{{jakduSchedule.id}}"/>">{{jakduSchedule.id}}</a></td>
 					<td>{{jakduSchedule.date | date:'short' }}</td>
 					<td>{{jakduSchedule.home.name}}</td>
 					<td>{{jakduSchedule.away.name}}</td>
+					<td>
+						<span ng-if="jakduSchedule.score">
+							<span ng-if="jakduSchedule.score.homeFullTime && jakduSchedule.score.awayFullTime">FT {{jakduSchedule.score.homeFullTime}} : {{jakduSchedule.score.awayFullTime}}</span>
+							<span ng-if="jakduSchedule.score.homeOverTime && jakduSchedule.score.awayOverTime">OT {{jakduSchedule.score.homeOverTime}} : {{jakduSchedule.score.awayOverTime}}</span>
+							<span ng-if="jakduSchedule.score.homePenaltyShootout && jakduSchedule.score.awayPenaltyShootout">P {{jakduSchedule.score.homePenaltyShootout}} : {{jakduSchedule.score.awayPenaltyShootout}}</span>
+						</span>
+					</td>
+					<td>{{jakduSchedule.timeUp}}</td>
 				</tr>
 			</table>
 		</div>

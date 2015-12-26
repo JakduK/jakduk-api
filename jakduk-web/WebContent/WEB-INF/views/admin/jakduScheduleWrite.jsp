@@ -19,7 +19,11 @@
 </head>
 <body>
     <div class="container" ng-controller="adminCtrl">
-        <h4>Write JakduSchedule.</h4>
+
+        <div class="page-header">
+            <h4>Write JakduSchedule.</h4>
+        </div>
+
         <c:set var="contextPath" value="<%=request.getContextPath()%>"/>
         <form:form commandName="jakduScheduleWrite" action="${contextPath}/admin/jakdu/schedule/write" method="POST">
             <form:hidden path="id"/>
@@ -71,47 +75,36 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-3">
-                    <label class="control-label">FIRST HALF SCORE</label>
+                <div class="col-sm-4">
+                    <label class="control-label">FULL TIME SCORE</label>
                     <div class="row">
                         <div class="col-sm-6">
-                            <form:input path="homeFirstHalf" cssClass="form-control" placeholder="HOME"/>
+                            <form:input path="homeFullTime" cssClass="form-control" placeholder="HOME"/>
                         </div>
                         <div class="col-sm-6">
-                            <form:input path="awayFirstHalf" cssClass="form-control" placeholder="AWAY"/>
+                            <form:input path="awayFullTime" cssClass="form-control" placeholder="AWAY"/>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
-                    <label class="control-label">SECOND HALF SCORE</label>
+                <div class="col-sm-4">
+                    <label class="control-label">OVER TIME SCORE</label>
                     <div class="row">
                         <div class="col-sm-6">
-                            <form:input path="homeSecondHalf" cssClass="form-control" placeholder="HOME"/>
+                            <form:input path="homeOverTime" cssClass="form-control" placeholder="HOME"/>
                         </div>
                         <div class="col-sm-6">
-                            <form:input path="awaySecondHalf" cssClass="form-control" placeholder="AWAY"/>
+                            <form:input path="awayOverTime" cssClass="form-control" placeholder="AWAY"/>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
-                    <label class="control-label">OVERTIME SCORE</label>
+                <div class="col-sm-4">
+                    <label class="control-label">PENALTY SHOOTOUT SCORE</label>
                     <div class="row">
                         <div class="col-sm-6">
-                            <form:input path="homeOvertime" cssClass="form-control" placeholder="HOME"/>
+                            <form:input path="homePenaltyShootout" cssClass="form-control" placeholder="HOME"/>
                         </div>
                         <div class="col-sm-6">
-                            <form:input path="awayOvertime" cssClass="form-control" placeholder="AWAY"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <label class="control-label">PENALTY SHOOT OUT SCORE</label>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <form:input path="homePenaltyShootOut" cssClass="form-control" placeholder="HOME"/>
-                        </div>
-                        <div class="col-sm-6">
-                            <form:input path="awayPenaltyShootOut" cssClass="form-control" placeholder="AWAY"/>
+                            <form:input path="awayPenaltyShootout" cssClass="form-control" placeholder="AWAY"/>
                         </div>
                     </div>
                 </div>
@@ -120,8 +113,8 @@
                 <div class="col-sm-12">
                     <div class="checkbox">
                         <label>
-                            <form:checkbox path="fullTime"/>
-                            FullTime
+                            <form:checkbox path="timeUp"/>
+                            isTimeUp?
                         </label>
                     </div>
                 </div>

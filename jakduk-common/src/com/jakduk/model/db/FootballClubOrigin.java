@@ -3,6 +3,7 @@ package com.jakduk.model.db;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
+import com.jakduk.common.CommonConst;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,28 +17,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class FootballClubOrigin {
 
-	enum CLUB_TYPE {
-		FOOTBALL_CLUB,
-		NATIONAL_TEAM
-	}
-
-	enum AGE_TYPE {
-		UNDER_15,
-		UNDER_17,
-		UNDER_20,
-		UNDER_23,
-		SENIOR
-	}
-
-	enum SEX_TYPE {
-		MEN,
-		WOMEN
-	}
-	
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
 	private String name;
+
+	private CommonConst.CLUB_TYPE clubType;
+
+	private CommonConst.CLUB_AGE_TYPE age;
+
+	private CommonConst.CLUB_SEX_TYPE sex;
 
 	public String getId() {
 		return id;
@@ -55,9 +44,38 @@ public class FootballClubOrigin {
 		this.name = name;
 	}
 
-	@Override
-	public String toString() {
-		return "FootballClubOrigin [id=" + id + ", name=" + name + "]";
+	public CommonConst.CLUB_TYPE getClubType() {
+		return clubType;
 	}
 
+	public void setClubType(CommonConst.CLUB_TYPE clubType) {
+		this.clubType = clubType;
+	}
+
+	public CommonConst.CLUB_AGE_TYPE getAge() {
+		return age;
+	}
+
+	public void setAge(CommonConst.CLUB_AGE_TYPE age) {
+		this.age = age;
+	}
+
+	public CommonConst.CLUB_SEX_TYPE getSex() {
+		return sex;
+	}
+
+	public void setSex(CommonConst.CLUB_SEX_TYPE sex) {
+		this.sex = sex;
+	}
+
+	@Override
+	public String toString() {
+		return "FootballClubOrigin{" +
+				"id='" + id + '\'' +
+				", name='" + name + '\'' +
+				", clubType=" + clubType +
+				", age=" + age +
+				", sex=" + sex +
+				'}';
+	}
 }

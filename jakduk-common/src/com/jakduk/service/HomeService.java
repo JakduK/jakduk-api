@@ -12,6 +12,8 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.repository.*;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +35,6 @@ import com.jakduk.model.simple.BoardFreeOnHome;
 import com.jakduk.model.simple.BoardFreeOnRSS;
 import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.model.simple.UserOnHome;
-import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
-import com.jakduk.repository.BoardFreeOnHomeRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.EncyclopediaRepository;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -67,12 +65,12 @@ public class HomeService {
 	
 	@Autowired
 	private BoardFreeOnHomeRepository boardFreeOnHomeRepository;
-	
-	@Autowired
-	private BoardFreeRepository boardFreeRepository;
-	
+
 	@Autowired
 	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
+
+	@Autowired
+	private FootballClubOriginRepository footballClubOriginRepository;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -236,8 +234,16 @@ public class HomeService {
 	}	
 	
 	public Integer getDataFootballClubs(Model model, String language) {
+
+		List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(CommonConst.CLUB_TYPE.FOOTBALL_CLUB);
+		List<ObjectId> ids = new ArrayList<ObjectId>();
+
+		for (FootballClubOrigin fco : fcos) {
+			String id = fco.getId();
+			ids.add(new ObjectId(id));
+		}
 		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(ids, language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
 		
 		model.addAttribute("footballClubs", footballClubs);
 		

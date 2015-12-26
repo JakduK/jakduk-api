@@ -34,7 +34,7 @@ public class JakduSchedule {
 
     private JakduScore score;
 
-    private boolean fullTime;
+    private boolean timeUp;
 
     public String getId() {
         return id;
@@ -76,12 +76,12 @@ public class JakduSchedule {
         this.score = score;
     }
 
-    public boolean isFullTime() {
-        return fullTime;
+    public boolean isTimeUp() {
+        return timeUp;
     }
 
-    public void setFullTime(boolean fullTime) {
-        this.fullTime = fullTime;
+    public void setTimeUp(boolean timeUp) {
+        this.timeUp = timeUp;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class JakduSchedule {
                 ", home=" + home +
                 ", away=" + away +
                 ", score=" + score +
-                ", fullTime=" + fullTime +
+                ", timeUp=" + timeUp +
                 '}';
     }
 }

@@ -52,10 +52,11 @@ public class JakdukDAO {
 	 * @param language
 	 * @return
 	 */
-	public List<FootballClub> getFootballClubList(String language, String sortProperties) {
+	public List<FootballClub> getFootballClubList(List<ObjectId> ids, String language, String sortProperties) {
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where("names.language").is(language));
+		query.addCriteria(Criteria.where("origin.$id").in(ids));
 		query.fields().include("active").include("origin").include("names.$");
 		query.with(new Sort(Sort.Direction.DESC, "names.fullName"));
 		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);

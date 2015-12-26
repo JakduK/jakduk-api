@@ -5,97 +5,75 @@ package com.jakduk.model.embedded;
  */
 public class JakduScore {
 
-    private Integer homeFirstHalf;
+    private Integer homeFullTime;
 
-    private Integer awayFirstHalf;
+    private Integer awayFullTime;
 
-    private Integer homeSecondHalf;
+    private Integer homeOverTime;
 
-    private Integer awaySecondHalf;
+    private Integer awayOverTime;
 
-    private Integer homeOvertime;
+    private Integer homePenaltyShootout;
 
-    private Integer awayOvertime;
+    private Integer awayPenaltyShootout;
 
-    private Integer homePenaltyShootOut;
-
-    private Integer awayPenaltyShootOut;
-
-    public Integer getHomeFirstHalf() {
-        return homeFirstHalf;
+    public Integer getHomeFullTime() {
+        return homeFullTime;
     }
 
-    public void setHomeFirstHalf(Integer homeFirstHalf) {
-        this.homeFirstHalf = homeFirstHalf;
+    public void setHomeFullTime(Integer homeFullTime) {
+        this.homeFullTime = homeFullTime;
     }
 
-    public Integer getAwayFirstHalf() {
-        return awayFirstHalf;
+    public Integer getAwayFullTime() {
+        return awayFullTime;
     }
 
-    public void setAwayFirstHalf(Integer awayFirstHalf) {
-        this.awayFirstHalf = awayFirstHalf;
+    public void setAwayFullTime(Integer awayFullTime) {
+        this.awayFullTime = awayFullTime;
     }
 
-    public Integer getHomeSecondHalf() {
-        return homeSecondHalf;
+    public Integer getHomeOverTime() {
+        return homeOverTime;
     }
 
-    public void setHomeSecondHalf(Integer homeSecondHalf) {
-        this.homeSecondHalf = homeSecondHalf;
+    public void setHomeOverTime(Integer homeOverTime) {
+        this.homeOverTime = homeOverTime;
     }
 
-    public Integer getAwaySecondHalf() {
-        return awaySecondHalf;
+    public Integer getAwayOverTime() {
+        return awayOverTime;
     }
 
-    public void setAwaySecondHalf(Integer awaySecondHalf) {
-        this.awaySecondHalf = awaySecondHalf;
+    public void setAwayOverTime(Integer awayOverTime) {
+        this.awayOverTime = awayOverTime;
     }
 
-    public Integer getHomeOvertime() {
-        return homeOvertime;
+    public Integer getHomePenaltyShootout() {
+        return homePenaltyShootout;
     }
 
-    public void setHomeOvertime(Integer homeOvertime) {
-        this.homeOvertime = homeOvertime;
+    public void setHomePenaltyShootout(Integer homePenaltyShootout) {
+        this.homePenaltyShootout = homePenaltyShootout;
     }
 
-    public Integer getAwayOvertime() {
-        return awayOvertime;
+    public Integer getAwayPenaltyShootout() {
+        return awayPenaltyShootout;
     }
 
-    public void setAwayOvertime(Integer awayOvertime) {
-        this.awayOvertime = awayOvertime;
-    }
-
-    public Integer getHomePenaltyShootOut() {
-        return homePenaltyShootOut;
-    }
-
-    public void setHomePenaltyShootOut(Integer homePenaltyShootOut) {
-        this.homePenaltyShootOut = homePenaltyShootOut;
-    }
-
-    public Integer getAwayPenaltyShootOut() {
-        return awayPenaltyShootOut;
-    }
-
-    public void setAwayPenaltyShootOut(Integer awayPenaltyShootOut) {
-        this.awayPenaltyShootOut = awayPenaltyShootOut;
+    public void setAwayPenaltyShootout(Integer awayPenaltyShootout) {
+        this.awayPenaltyShootout = awayPenaltyShootout;
     }
 
     @Override
     public String toString() {
         return "JakduScore{" +
-                "homeFirstHalf=" + homeFirstHalf +
-                ", awayFirstHalf=" + awayFirstHalf +
-                ", homeSecondHalf=" + homeSecondHalf +
-                ", awaySecondHalf=" + awaySecondHalf +
-                ", homeOvertime=" + homeOvertime +
-                ", awayOvertime=" + awayOvertime +
-                ", homePenaltyShootOut=" + homePenaltyShootOut +
-                ", awayPenaltyShootOut=" + awayPenaltyShootOut +
+                "homeFullTime=" + homeFullTime +
+                ", awayFullTime=" + awayFullTime +
+                ", homeOverTime=" + homeOverTime +
+                ", awayOverTime=" + awayOverTime +
+                ", homePenaltyShootout=" + homePenaltyShootout +
+                ", awayPenaltyShootout=" + awayPenaltyShootout +
                 '}';
     }
 }

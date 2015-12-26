@@ -158,4 +158,22 @@ public class CommonConst {
 	public final static String ELASTICSEARCH_TYPE_BOARD = "board";
 	public final static String ELASTICSEARCH_TYPE_COMMENT = "comment";
 	public final static String ELASTICSEARCH_TYPE_GALLERY = "gallery";
+
+	public enum CLUB_TYPE {
+		FOOTBALL_CLUB,
+		NATIONAL_TEAM
+	}
+
+	public enum CLUB_AGE_TYPE {
+		UNDER_14,
+		UNDER_17,
+		UNDER_20,
+		UNDER_23,
+		SENIOR
+	}
+
+	public enum CLUB_SEX_TYPE {
+		MEN,
+		WOMEN
+	}
 }

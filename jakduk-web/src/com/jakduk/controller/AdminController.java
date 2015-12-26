@@ -157,7 +157,8 @@ public class AdminController {
 	
 	@RequestMapping(value = "/footballclub/origin/write", method = RequestMethod.GET)
 	public String footballClubOriginWrite(Model model) {
-		model.addAttribute("footballClubOrigin", new FootballClubOrigin());
+
+		adminService.getFootballClubOrigin(model);
 		
 		return "admin/footballClubOriginWrite";
 	}
@@ -178,7 +179,7 @@ public class AdminController {
 			return "admin/footballClubOriginWrite";
 		}
 		
-		adminService.footballClubOriginWrite(footballClubOrigin);
+		adminService.writeFootballClubOrigin(footballClubOrigin);
 
 		return "redirect:/admin/settings?open=fcOrigin";
 	}
@@ -186,7 +187,7 @@ public class AdminController {
 	@RequestMapping(value = "/footballclub/origin", method = RequestMethod.GET)
 	public void dataFootballClubOrigin(Model model) {
 
-		adminService.getFootballClubOriginList(model);
+		adminService.dataFootballClubOriginList(model);
 	}
 	
 	@RequestMapping(value = "/board/category/write", method = RequestMethod.GET)
