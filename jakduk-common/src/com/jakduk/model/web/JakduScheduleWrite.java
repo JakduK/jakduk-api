@@ -40,6 +40,9 @@ public class JakduScheduleWrite {
 
     private Integer awayPenaltyShootout;
 
+    @NotEmpty
+    private String competition;
+
     private boolean timeUp;
 
     public String getId() {
@@ -122,6 +125,14 @@ public class JakduScheduleWrite {
         this.awayPenaltyShootout = awayPenaltyShootout;
     }
 
+    public String getCompetition() {
+        return competition;
+    }
+
+    public void setCompetition(String competition) {
+        this.competition = competition;
+    }
+
     public boolean isTimeUp() {
         return timeUp;
     }
@@ -143,6 +154,7 @@ public class JakduScheduleWrite {
                 ", awayOverTime=" + awayOverTime +
                 ", homePenaltyShootout=" + homePenaltyShootout +
                 ", awayPenaltyShootout=" + awayPenaltyShootout +
+                ", competition='" + competition + '\'' +
                 ", timeUp=" + timeUp +
                 '}';
     }

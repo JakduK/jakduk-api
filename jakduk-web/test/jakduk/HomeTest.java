@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.service.CommonService;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +45,9 @@ public class HomeTest {
 
 	@Autowired
 	FootballClubOriginRepository footballClubOriginRepository;
+
+	@Autowired
+	CommonService commonService;
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
@@ -79,17 +83,8 @@ public class HomeTest {
 	@Test
 	public void getFootballClubList() {
 
-		List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(CommonConst.CLUB_TYPE.FOOTBALL_CLUB);
-		System.out.println("fcos=" + fcos);
+		List<FootballClub> footballClubs = commonService.getFootballClubs("ko", CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.shortName);
 
-		List<ObjectId> ids = new ArrayList<ObjectId>();
-
-		for (FootballClubOrigin fco : fcos) {
-			String id = fco.getId();
-			ids.add(new ObjectId(id));
-		}
-
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(ids, "ko", CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME);
 		System.out.println("getFootballClubList=" + footballClubs);
 	}
 

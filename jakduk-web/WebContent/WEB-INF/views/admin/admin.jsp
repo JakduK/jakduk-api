@@ -194,13 +194,14 @@
 			<h4>Jakdu Schedule</h4>
 			<table class="table">
 				<tr>
-					<th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Score</th><th>isTimeUp</th>
+					<th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Competition</th><th>Score</th><th>isTimeUp</th>
 				</tr>
 				<tr ng-repeat="jakduSchedule in jakduSchedules">
 					<td><a href="<c:url value="/admin/jakdu/schedule/write/{{jakduSchedule.id}}"/>">{{jakduSchedule.id}}</a></td>
 					<td>{{jakduSchedule.date | date:'short' }}</td>
 					<td>{{jakduSchedule.home.name}}</td>
 					<td>{{jakduSchedule.away.name}}</td>
+					<td>{{jakduSchedule.competition.code}}</td>
 					<td>
 						<span ng-if="jakduSchedule.score">
 							<span ng-if="jakduSchedule.score.homeFullTime && jakduSchedule.score.awayFullTime">FT {{jakduSchedule.score.homeFullTime}} : {{jakduSchedule.score.awayFullTime}}</span>

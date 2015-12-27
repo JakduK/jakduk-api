@@ -73,7 +73,19 @@
                         <form:errors path="away"/>
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="competition" class="control-label">COMPETITION</label>
+                        <form:select path="competition" cssClass="form-control">
+                            <c:forEach items="${competitions}" var="competition">
+                                <form:option value="${competition.id}" label="${competition.code}"/>
+                            </c:forEach>
+                        </form:select>
+                        <form:errors path="competition"/>
+                    </div>
+                </div>
             </div>
+
             <div class="row">
                 <div class="col-sm-4">
                     <label class="control-label">FULL TIME SCORE</label>
@@ -109,6 +121,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-sm-12">
                     <div class="checkbox">

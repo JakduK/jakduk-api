@@ -6,11 +6,10 @@ import java.util.List;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
+import com.jakduk.model.embedded.LocalName;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.jakduk.model.embedded.FootballClubName;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -35,7 +34,7 @@ public class FootballClub implements Serializable {
 
 	private String active;
 	
-	private List<FootballClubName> names;
+	private List<LocalName> names;
 
 	public String getId() {
 		return id;
@@ -44,7 +43,7 @@ public class FootballClub implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	public FootballClubOrigin getOrigin() {
 		return origin;
 	}
@@ -52,7 +51,7 @@ public class FootballClub implements Serializable {
 	public void setOrigin(FootballClubOrigin origin) {
 		this.origin = origin;
 	}
-	
+
 	public String getActive() {
 		return active;
 	}
@@ -61,11 +60,11 @@ public class FootballClub implements Serializable {
 		this.active = active;
 	}
 
-	public List<FootballClubName> getNames() {
+	public List<LocalName> getNames() {
 		return names;
 	}
 
-	public void setNames(List<FootballClubName> names) {
+	public void setNames(List<LocalName> names) {
 		this.names = names;
 	}
 

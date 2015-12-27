@@ -22,7 +22,7 @@ import javax.imageio.ImageIO;
 
 import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.JakduScore;
-import com.jakduk.model.embedded.Name;
+import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.*;
 import com.jakduk.repository.*;
 import org.apache.log4j.Logger;
@@ -39,7 +39,6 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.embedded.FootballClubName;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -389,7 +388,7 @@ public String initSearchData() {
 		fcWrite.setActive(fc.getActive());
 		fcWrite.setOrigin(fc.getOrigin().getName());
 		
-		for (FootballClubName fcName : fc.getNames()) {
+		for (LocalName fcName : fc.getNames()) {
 			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
 				fcWrite.setFullNameKr(fcName.getFullName());
 				fcWrite.setShortNameKr(fcName.getShortName());
@@ -419,9 +418,9 @@ public String initSearchData() {
 			footballClub.setId(footballClubWrite.getId());
 		}
 		
-		ArrayList<FootballClubName> names = new ArrayList<FootballClubName>();
-		FootballClubName footballClubNameKr = new FootballClubName();
-		FootballClubName footballClubNameEn = new FootballClubName();
+		ArrayList<LocalName> names = new ArrayList<LocalName>();
+		LocalName footballClubNameKr = new LocalName();
+		LocalName footballClubNameEn = new LocalName();
 		footballClubNameKr.setLanguage(Locale.KOREAN.getLanguage());
 		footballClubNameKr.setShortName(footballClubWrite.getShortNameKr());
 		footballClubNameKr.setFullName(footballClubWrite.getFullNameKr());
@@ -735,7 +734,9 @@ public String initSearchData() {
 
 	public void getJakduScheduleWrite(Model model) {
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+		List<Competition> competitions = competitionRepository.findAll();
 
+		model.addAttribute("competitions", competitions);
 		model.addAttribute("footballClubs", footballClubs);
 		model.addAttribute("jakduScheduleWrite", new JakduScheduleWrite());
 	}
@@ -743,13 +744,14 @@ public String initSearchData() {
 	public void getJakduScheduleWrite(Model model, String id) {
 		JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
 		JakduScore jakduScore = jakduSchedule.getScore();
-		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 
 		JakduScheduleWrite jakduScheduleWrite = new JakduScheduleWrite();
 		jakduScheduleWrite.setDate(jakduSchedule.getDate());
 		jakduScheduleWrite.setId(jakduSchedule.getId());
 		jakduScheduleWrite.setHome(jakduSchedule.getHome().getId());
 		jakduScheduleWrite.setAway(jakduSchedule.getAway().getId());
+		if (jakduSchedule.getCompetition() != null)
+			jakduScheduleWrite.setCompetition(jakduSchedule.getCompetition().getCode());
 		jakduScheduleWrite.setTimeUp(jakduSchedule.isTimeUp());
 
 		if (jakduScore != null) {
@@ -768,6 +770,10 @@ public String initSearchData() {
 
 		}
 
+		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
+		List<Competition> competitions = competitionRepository.findAll();
+
+		model.addAttribute("competitions", competitions);
 		model.addAttribute("footballClubs", footballClubs);
 		model.addAttribute("jakduScheduleWrite", jakduScheduleWrite);
 	}
@@ -777,6 +783,7 @@ public String initSearchData() {
 
 		FootballClubOrigin home = footballClubOriginRepository.findOne(jakduScheduleWrite.getHome());
 		FootballClubOrigin away = footballClubOriginRepository.findOne(jakduScheduleWrite.getAway());
+		Competition competition = competitionRepository.findOne(jakduScheduleWrite.getCompetition());
 
 		if (jakduScheduleWrite.isTimeUp()) {
 			JakduScore jakduScore = new JakduScore();
@@ -803,6 +810,7 @@ public String initSearchData() {
 		jakduSchedule.setDate(jakduScheduleWrite.getDate());
 		jakduSchedule.setHome(home);
 		jakduSchedule.setAway(away);
+		jakduSchedule.setCompetition(competition);
 
 		if (jakduScheduleWrite.getId().isEmpty()) {
 			jakduSchedule.setId(null);
@@ -850,7 +858,7 @@ public String initSearchData() {
 		competitionWrite.setId(competition.getId());
 		competitionWrite.setCode(competition.getCode());
 
-		for (Name name : competition.getNames()) {
+		for (LocalName name : competition.getNames()) {
 			if (name.getLanguage().equals(Locale.KOREAN.getLanguage())) {
 				competitionWrite.setFullNameKr(name.getFullName());
 				competitionWrite.setShortNameKr(name.getShortName());
@@ -874,9 +882,9 @@ public String initSearchData() {
 
 		competition.setCode(competitionWrite.getCode());
 
-		ArrayList<Name> names = new ArrayList<Name>();
-		Name nameKr = new Name();
-		Name nameEn = new Name();
+		ArrayList<LocalName> names = new ArrayList<LocalName>();
+		LocalName nameKr = new LocalName();
+		LocalName nameEn = new LocalName();
 		nameKr.setLanguage(Locale.KOREAN.getLanguage());
 		nameKr.setShortName(competitionWrite.getShortNameKr());
 		nameKr.setFullName(competitionWrite.getFullNameKr());

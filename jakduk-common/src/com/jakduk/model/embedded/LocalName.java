@@ -3,7 +3,7 @@ package com.jakduk.model.embedded;
 /**
  * Created by pyohwan on 15. 12. 26.
  */
-public class Name {
+public class LocalName {
 
     private String language;
 
@@ -37,7 +37,7 @@ public class Name {
 
     @Override
     public String toString() {
-        return "Name{" +
+        return "LocalName{" +
                 "language='" + language + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", shortName='" + shortName + '\'' +

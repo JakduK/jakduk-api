@@ -150,14 +150,16 @@ public class CommonConst {
 	public final static String K_LEAGUE_ABBREVIATION = "KL";
 	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
 	public final static String K_LEAGUE_CHALLENGE_ABBREVIATION = "KLCH";
-	
-	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME = "fullName";
-	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME = "shortName";
-	
+
 	public final static int ELASTICSEARCH_BULK_LIMIT = 500;
 	public final static String ELASTICSEARCH_TYPE_BOARD = "board";
 	public final static String ELASTICSEARCH_TYPE_COMMENT = "comment";
 	public final static String ELASTICSEARCH_TYPE_GALLERY = "gallery";
+
+	public enum NAME_TYPE {
+		fullName,
+		shortName
+	}
 
 	public enum CLUB_TYPE {
 		FOOTBALL_CLUB,

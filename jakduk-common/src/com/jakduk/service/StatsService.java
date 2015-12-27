@@ -46,6 +46,9 @@ public class StatsService {
 	
 	@Autowired
 	private JakdukDAO jakdukDAO;
+
+	@Autowired
+	private CommonService commonService;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -149,9 +152,10 @@ public class StatsService {
 	}
 	
 	public Integer getAttendanceSeason(Model model, String language, int season, String league) {
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language);
 		Map<String, String> fcNames = new HashMap<>();
-		
+
+		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
 		for (FootballClub fc : footballClubs) {
 			fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0).getShortName());
 		}

@@ -1,6 +1,6 @@
 package com.jakduk.model.db;
 
-import com.jakduk.model.embedded.Name;
+import com.jakduk.model.embedded.LocalName;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,7 +21,7 @@ public class Competition {
 
     private String code;
 
-    private List<Name> names;
+    private List<LocalName> names;
 
     public String getId() {
         return id;
@@ -39,11 +39,11 @@ public class Competition {
         this.code = code;
     }
 
-    public List<Name> getNames() {
+    public List<LocalName> getNames() {
         return names;
     }
 
-    public void setNames(List<Name> names) {
+    public void setNames(List<LocalName> names) {
         this.names = names;
     }
 

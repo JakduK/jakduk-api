@@ -1,5 +1,6 @@
 package com.jakduk.controller;
 
+import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,9 @@ public class JakduController {
 
     @Resource
     LocaleResolver localeResolver;
+
+    @Autowired
+    private CommonService commonService;
 
     @Autowired
     private JakduService jakduService;
@@ -51,9 +55,13 @@ public class JakduController {
 
     @RequestMapping(value = "/data/schedule", method = RequestMethod.GET)
     public void dataAttendanceClub(Model model,
+                                   HttpServletRequest request,
                                    @RequestParam(required = false, defaultValue = "1") int page,
                                    @RequestParam(required = false, defaultValue = "20") int size) {
 
-        jakduService.getDataScheduleList(model, page, size);
+        Locale locale = localeResolver.resolveLocale(request);
+        String language = commonService.getLanguageCode(locale, null);
+
+        jakduService.getDataScheduleList(model, language, page, size);
     }
 }

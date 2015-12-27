@@ -235,16 +235,8 @@ public class HomeService {
 	
 	public Integer getDataFootballClubs(Model model, String language) {
 
-		List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(CommonConst.CLUB_TYPE.FOOTBALL_CLUB);
-		List<ObjectId> ids = new ArrayList<ObjectId>();
+		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
 
-		for (FootballClubOrigin fco : fcos) {
-			String id = fco.getId();
-			ids.add(new ObjectId(id));
-		}
-		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(ids, language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
-		
 		model.addAttribute("footballClubs", footballClubs);
 		
 		return HttpServletResponse.SC_OK;		

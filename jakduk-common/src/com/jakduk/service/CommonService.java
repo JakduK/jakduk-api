@@ -2,17 +2,19 @@ package com.jakduk.service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.repository.FootballClubOriginRepository;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,6 +33,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Sequence;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.SequenceRepository;
+import org.springframework.ui.Model;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -41,15 +44,18 @@ import com.jakduk.repository.SequenceRepository;
 
 @Service
 public class CommonService {
+
+	@Autowired
+	private MongoTemplate mongoTemplate;
 	
 	@Autowired
 	private SequenceRepository sequenceRepository;
 	
 	@Autowired
-	private MongoTemplate mongoTemplate;
-	
+	private FootballClubOriginRepository footballClubOriginRepository;
+
 	@Autowired
-	private FootballClubRepository footballClubRepository;
+	private JakdukDAO jakdukDAO;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -90,10 +96,10 @@ public class CommonService {
 	 * 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
 	 * @param request
 	 * @param response
-	 * @param boardName 게시판 이름. CommonConst.BOARD_NAME_XXXX
-	 * @param seq 게시물 번호
-	 * @return 쿠키를 새로 저장했다면 true, 아니면 false. 
-	 */
+	 * @param prefix
+	 * @param id
+     * @return 쿠키를 새로 저장했다면 true, 아니면 false.
+     */
 	public Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, String prefix, String id) {
 		
 		Boolean findSameCookie = false;
@@ -256,6 +262,21 @@ public class CommonService {
 
 		Pattern pattern = Pattern.compile("[+-]?\\d+");
 		return pattern.matcher(str).matches();
+	}
+
+	public List<FootballClub> getFootballClubs(String language, CommonConst.CLUB_TYPE clubType, CommonConst.NAME_TYPE sortNameType) {
+
+		List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(clubType);
+		List<ObjectId> ids = new ArrayList<ObjectId>();
+
+		for (FootballClubOrigin fco : fcos) {
+			String id = fco.getId();
+			ids.add(new ObjectId(id));
+		}
+
+		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(ids, language, sortNameType);
+
+		return footballClubs;
 	}
     
 }

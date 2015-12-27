@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.jakduk.model.embedded.LocalName;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.etc.SupporterCount;
 import com.jakduk.repository.AttendanceClubRepository;
 
@@ -55,16 +55,6 @@ public class StatsTest {
 		List<AttendanceClub> attendances = attendanceClubRepository.findBySeasonAndLeague(2013, "KLCL", sort);
 		
 		System.out.println("attendances=" + attendances);
-	}
-	
-	@Test
-	public void getAttendance02() {
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList("en");
-		Map<String, List<FootballClubName>> results = footballClubs.stream()
-				.collect(Collectors.toMap(FootballClub::getId, FootballClub::getNames));
-		
-		System.out.println("footballClubs=" + footballClubs);
-		System.out.println("results=" + results);
 	}
 
 }

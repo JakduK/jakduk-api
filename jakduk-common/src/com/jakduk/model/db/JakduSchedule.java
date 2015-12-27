@@ -32,6 +32,9 @@ public class JakduSchedule {
     @DBRef
     private FootballClubOrigin away;
 
+    @DBRef
+    private Competition competition;
+
     private JakduScore score;
 
     private boolean timeUp;
@@ -68,6 +71,14 @@ public class JakduSchedule {
         this.away = away;
     }
 
+    public Competition getCompetition() {
+        return competition;
+    }
+
+    public void setCompetition(Competition competition) {
+        this.competition = competition;
+    }
+
     public JakduScore getScore() {
         return score;
     }
@@ -91,6 +102,7 @@ public class JakduSchedule {
                 ", date=" + date +
                 ", home=" + home +
                 ", away=" + away +
+                ", competition=" + competition +
                 ", score=" + score +
                 ", timeUp=" + timeUp +
                 '}';

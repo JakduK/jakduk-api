@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jakduk.model.db.*;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
@@ -52,33 +49,23 @@ public class JakdukDAO {
 	 * @param language
 	 * @return
 	 */
-	public List<FootballClub> getFootballClubList(List<ObjectId> ids, String language, String sortProperties) {
+	public List<FootballClub> getFootballClubList(List<ObjectId> ids, String language, CommonConst.NAME_TYPE sortNameType) {
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where("names.language").is(language));
 		query.addCriteria(Criteria.where("origin.$id").in(ids));
 		query.fields().include("active").include("origin").include("names.$");
-		query.with(new Sort(Sort.Direction.DESC, "names.fullName"));
+		//query.with(new Sort(Sort.Direction.DESC, "names.fullName"));
 		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
-		
-		switch (sortProperties) {
-		case CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME:
+
+		switch (sortNameType) {
+		case fullName:
 			footballClubs.sort((f1, f2) -> f1.getNames().get(0).getFullName().compareTo(f2.getNames().get(0).getFullName()));			
 			break;
-		case CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME:
+		case shortName:
 			footballClubs.sort((f1, f2) -> f1.getNames().get(0).getShortName().compareTo(f2.getNames().get(0).getShortName()));			
 			break;			
 		}
-
-		return footballClubs;
-	}
-	
-	public List<FootballClub> getFootballClubList(String language) {
-
-		Query query = new Query();
-		query.addCriteria(Criteria.where("names.language").is(language));		
-		query.fields().include("active").include("origin").include("names.$");		
-		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
 
 		return footballClubs;
 	}
@@ -112,29 +99,6 @@ public class JakdukDAO {
 		
 		return posts;
 	}
-	
-/*
-	public HashMap<String, BoardFreeOnGallery> getBoardFreeOnGallery(List<ObjectId> arrId) {
-		
-		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrId));
-		Aggregation aggregation = Aggregation.newAggregation(match);
-		AggregationResults<BoardFreeOnGallery> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnGallery.class);
-		
-		List<BoardFreeOnGallery> posts = results.getMappedResults();
-		
-		HashMap<String, BoardFreeOnGallery> postsOnGallery = new HashMap<String, BoardFreeOnGallery>();
-		
-		for (BoardFreeOnGallery post : posts) {
-			BoardFreeOnGallery postOnGallery = new BoardFreeOnGallery();
-			postOnGallery.setId(post.getId());
-			postOnGallery.setSeq(post.getSeq());
-			postOnGallery.setSubject(post.getSubject());
-			postsOnGallery.put(post.getId(), postOnGallery);
-		}
-		
-		return postsOnGallery;
-	}
-*/
 
 	/**
 	 * 사진첩 보기의 앞, 뒤 사진을 가져온다.
@@ -332,6 +296,21 @@ public class JakdukDAO {
 		List<GalleryOnES> galleries = results.getMappedResults();
 		
 		return galleries;
+	}
+
+	public List<Competition> getCompetitionList(List<ObjectId> ids, String language) {
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("_id").in(ids));
+		query.addCriteria(Criteria.where("names.language").is(language));
+		query.fields().include("code").include("names.$");
+		//query.with(new Sort(Sort.Direction.DESC, "date"));
+		//query.skip(skip);
+		//query.limit(size);
+
+		List<Competition> competitions = mongoTemplate.find(query, Competition.class);
+
+		return competitions;
 	}
 	
 }
