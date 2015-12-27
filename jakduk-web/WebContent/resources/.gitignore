@@ -5,13 +5,11 @@
 /angular-sanitize/
 /angular-summernote/
 /bootstrap/
-/es5-shim/
 /font-awesome/
 /jquery/
 /ng-infinite-scroller-origin/
 /summernote/
 /fontawesome/
-/d3/
 /ladda/
 /angular-ladda/
 /spin.js/
@@ -19,7 +17,6 @@
 /highcharts/
 /highcharts-ng/
 /jquery-migrate/
-/angular-owl-carousel/
 /blueimp-gallery/
 /angular-animate/
 /ui-bootstrap/
@@ -30,4 +27,3 @@
 /angular-slick/
 /slick-carousel/
 /angular-slick-carousel/
-/angular-clipboard/

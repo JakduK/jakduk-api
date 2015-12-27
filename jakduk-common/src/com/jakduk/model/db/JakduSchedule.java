@@ -1,6 +1,8 @@
 package com.jakduk.model.db;
 
+import com.jakduk.model.embedded.JakduScore;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
@@ -21,12 +23,21 @@ public class JakduSchedule {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private String id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp date;
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
+    @DBRef
     private FootballClubOrigin home;
 
+    @DBRef
     private FootballClubOrigin away;
+
+    @DBRef
+    private Competition competition;
+
+    private JakduScore score;
+
+    private boolean timeUp;
 
     public String getId() {
         return id;
@@ -36,11 +47,11 @@ public class JakduSchedule {
         this.id = id;
     }
 
-    public Timestamp getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -60,6 +71,30 @@ public class JakduSchedule {
         this.away = away;
     }
 
+    public Competition getCompetition() {
+        return competition;
+    }
+
+    public void setCompetition(Competition competition) {
+        this.competition = competition;
+    }
+
+    public JakduScore getScore() {
+        return score;
+    }
+
+    public void setScore(JakduScore score) {
+        this.score = score;
+    }
+
+    public boolean isTimeUp() {
+        return timeUp;
+    }
+
+    public void setTimeUp(boolean timeUp) {
+        this.timeUp = timeUp;
+    }
+
     @Override
     public String toString() {
         return "JakduSchedule{" +
@@ -67,6 +102,9 @@ public class JakduSchedule {
                 ", date=" + date +
                 ", home=" + home +
                 ", away=" + away +
+                ", competition=" + competition +
+                ", score=" + score +
+                ", timeUp=" + timeUp +
                 '}';
     }
 }

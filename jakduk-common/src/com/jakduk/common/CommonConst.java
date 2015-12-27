@@ -145,17 +145,37 @@ public class CommonConst {
 	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte
 	
 	/**
-	 * K리그 줄임말.
+	 * K리그 줄임말. 삭제 되어야 한다. Competition 클래스를 만들었다.
 	 */
 	public final static String K_LEAGUE_ABBREVIATION = "KL";
 	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
 	public final static String K_LEAGUE_CHALLENGE_ABBREVIATION = "KLCH";
-	
-	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME = "fullName";
-	public final static String FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME = "shortName";
-	
+
 	public final static int ELASTICSEARCH_BULK_LIMIT = 500;
 	public final static String ELASTICSEARCH_TYPE_BOARD = "board";
 	public final static String ELASTICSEARCH_TYPE_COMMENT = "comment";
 	public final static String ELASTICSEARCH_TYPE_GALLERY = "gallery";
+
+	public enum NAME_TYPE {
+		fullName,
+		shortName
+	}
+
+	public enum CLUB_TYPE {
+		FOOTBALL_CLUB,
+		NATIONAL_TEAM
+	}
+
+	public enum CLUB_AGE {
+		UNDER_14,
+		UNDER_17,
+		UNDER_20,
+		UNDER_23,
+		SENIOR
+	}
+
+	public enum CLUB_SEX {
+		MEN,
+		WOMEN
+	}
 }

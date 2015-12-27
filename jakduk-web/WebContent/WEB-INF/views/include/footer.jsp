@@ -57,8 +57,12 @@
                         <li><a href="<c:url value="/stats/supporters/refresh"/>"><spring:message code="stats.supporters"/></a></li>
                         <li><a href="<c:url value="/stats/attendance/refresh"/>"><spring:message code="stats.attendance"/></a></li>
                     </ul>
+
+                    <div class="thumb-headline"><h2><spring:message code="jakdu"/></h2></div>
+                    <ul class="list-unstyled simple-list">
+                        <li><a href="<c:url value="/jakdu/schedule/refresh"/>"><spring:message code="jakdu.schedule"/></a></li>
+                    </ul>
                 </div><!--/col-md-3-->
-                <!-- End Simple List -->                        
             </div>
         </div> 
     </div><!--/footer-->

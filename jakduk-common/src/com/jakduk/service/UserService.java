@@ -3,7 +3,11 @@ package com.jakduk.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.embedded.LocalName;
+import com.jakduk.repository.FootballClubOriginRepository;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -25,7 +29,6 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.FootballClubName;
 import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.OAuthUserOnLogin;
@@ -57,6 +60,9 @@ public class UserService {
 	
 	@Autowired
 	private FootballClubRepository footballClubRepository;
+
+	@Autowired
+	private FootballClubOriginRepository footballClubOriginRepository;
 	
 	@Autowired
 	private JakdukDAO jakdukDAO;
@@ -103,9 +109,9 @@ public class UserService {
 	}
 	
 	public Model getUserWrite(Model model, String language) {
-		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
-		
+
+		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
 		model.addAttribute("userWrite", new UserWrite());
 		model.addAttribute("footballClubs", footballClubs);
 		
@@ -201,9 +207,9 @@ public class UserService {
 	}
 	
 	public Model getOAuthWriteDetails(Model model, String language) {
-		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
-		
+
+		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			CommonUserDetails userDetails = (CommonUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
@@ -304,9 +310,9 @@ public class UserService {
 		FootballClub footballClub = user.getSupportFC();
 		
 		if (footballClub != null) {
-			List<FootballClubName> names = footballClub.getNames();
+			List<LocalName> names = footballClub.getNames();
 			
-			for (FootballClubName name : names) {
+			for (LocalName name : names) {
 				if (name.getLanguage().equals(language)) {
 					userProfileInfo.setFootballClubName(name);
 				}		
@@ -322,8 +328,8 @@ public class UserService {
 	public Model getUserProfileUpdate(Model model, String language) {
 
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-			
-			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
+
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
 			
 			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			UserProfile userProfile = userRepository.userProfileFindById(authUser.getId());
@@ -451,9 +457,9 @@ public class UserService {
 			FootballClub footballClub = profile.getSupportFC();
 
 			if (footballClub != null) {
-				List<FootballClubName> names = footballClub.getNames();
+				List<LocalName> names = footballClub.getNames();
 				
-				for (FootballClubName name : names) {
+				for (LocalName name : names) {
 					if (name.getLanguage().equals(language)) {
 						profileInfo.setFootballClubName(name);
 					}		
@@ -471,8 +477,8 @@ public class UserService {
 	public Model getOAuthProfileUpdate(Model model, String language) {
 		
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-			
-			List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(language, CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_FULLNAME);
+
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
 			
 			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

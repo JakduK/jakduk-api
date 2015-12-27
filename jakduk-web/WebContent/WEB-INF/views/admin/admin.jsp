@@ -13,61 +13,61 @@
 </head>
 <body>
 	<div class="container" ng-controller="adminCtrl">
-	
-	<div class="page-header">
-  <h4>JakduK Admin Page</h4>
-</div>
-<div class="btn-group">
-  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-    Init Data
-    <span class="caret"></span>
-  </button>  
-  <ul class="dropdown-menu" role="menu">
-    <li><a href="<c:url value="/admin/board/category/init"/>">Init Board Category</a></li>
-    <li><a href="<c:url value="/admin/search/index/init"/>">Init Search Index</a></li>
-    <li><a href="<c:url value="/admin/search/type/init"/>">Init Search Type</a></li>
-    <li><a href="<c:url value="/admin/search/data/init"/>">Init Search Data</a></li>
-  </ul>
-</div>
+		<div class="page-header">
+			<h4><a href="<c:url value="/home/"/>">JakduK Admin Page</a></h4>
+		</div>
 
-<div class="btn-group">
-  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-    Write Data
-    <span class="caret"></span>
-  </button>  
-  <ul class="dropdown-menu" role="menu">
-    <li><a href="<c:url value="/admin/encyclopedia/write"/>">Encyclopedia Write</a></li>
-    <li><a href="<c:url value="/admin/footballclub/origin/write"/>">Football Club Origin Write</a></li>
-    <li><a href="<c:url value="/admin/footballclub/write"/>">Football Club Write</a></li>
-    <li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
-    <li><a href="<c:url value="/admin/thumbnail/size/write"/>">Thumbnail Size Write</a></li>
-    <li><a href="<c:url value="/admin/home/description/write"/>">Home Description Write</a></li>
-    <li><a href="<c:url value="/admin/attendance/league/write"/>">Attendance League Write</a></li>
-    <li><a href="<c:url value="/admin/attendance/club/write"/>">Attendance Club Write</a></li>
-	<li><a href="<c:url value="/admin/jakdu/schedule/write"/>">Jakdu Schedule Write</a></li>
-  </ul>
-</div>
+		<div class="btn-group">
+		  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+			Init Data
+			<span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" role="menu">
+			<li><a href="<c:url value="/admin/board/category/init"/>">Init Board Category</a></li>
+			<li><a href="<c:url value="/admin/search/index/init"/>">Init Search Index</a></li>
+			<li><a href="<c:url value="/admin/search/type/init"/>">Init Search Type</a></li>
+			<li><a href="<c:url value="/admin/search/data/init"/>">Init Search Data</a></li>
+		  </ul>
+		</div>
 
-<div class="btn-group">
-  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-    Get Data
-    <span class="caret"></span>
-  </button>  
-  <ul class="dropdown-menu" role="menu">
-    <li><a ng-click="getData('encyclopedia')">Get Encyclopedia</a></li>
-    <li><a ng-click="getData('fcOrigin')"/>Get Football Club Origin</a></li>
-    <li><a ng-click="getData('fc')">Get Football Club</a></li>
-    <li><a ng-click="getData('boardCategory')">Get Board Category</a></li>
-    <li><a ng-click="getData('homeDescription')">Get Home Description</a></li>
-    <li><a ng-click="getData('attendanceLeague')">Get Attendance League</a></li>
-    <li><a ng-click="getData('attendanceClub')">Get Attendance Club</a></li>
-	<li><a ng-click="getData('jakduSchedule')">Get Jakdu Schedule</a></li>
-  </ul>
-</div>
+		<div class="btn-group">
+			<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+				Write Data <span class="caret"></span>
+		  	</button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a href="<c:url value="/admin/encyclopedia/write"/>">Encyclopedia Write</a></li>
+				<li><a href="<c:url value="/admin/footballclub/origin/write"/>">Football Club Origin Write</a></li>
+				<li><a href="<c:url value="/admin/footballclub/write"/>">Football Club Write</a></li>
+				<li><a href="<c:url value="/admin/board/category/write"/>">Board Category Write</a></li>
+				<li><a href="<c:url value="/admin/thumbnail/size/write"/>">Thumbnail Size Write</a></li>
+				<li><a href="<c:url value="/admin/home/description/write"/>">Home Description Write</a></li>
+				<li><a href="<c:url value="/admin/attendance/league/write"/>">Attendance League Write</a></li>
+				<li><a href="<c:url value="/admin/attendance/club/write"/>">Attendance Club Write</a></li>
+				<li><a href="<c:url value="/admin/jakdu/schedule/write"/>">Jakdu Schedule Write</a></li>
+				<li><a href="<c:url value="/admin/competition/write"/>">Competition Write</a></li>
+			</ul>
+		</div>
 
-<c:if test="${not empty message}">
-	<div class="span6 offset2 alert">${message}</div>
-</c:if>
+		<div class="btn-group">
+			<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+				Get Data <span class="caret"></span>
+		  	</button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a ng-click="getData('encyclopedia')">Get Encyclopedia</a></li>
+				<li><a ng-click="getData('fcOrigin')"/>Get Football Club Origin</a></li>
+				<li><a ng-click="getData('fc')">Get Football Club</a></li>
+				<li><a ng-click="getData('boardCategory')">Get Board Category</a></li>
+				<li><a ng-click="getData('homeDescription')">Get Home Description</a></li>
+				<li><a ng-click="getData('attendanceLeague')">Get Attendance League</a></li>
+				<li><a ng-click="getData('attendanceClub')">Get Attendance Club</a></li>
+				<li><a ng-click="getData('jakduSchedule')">Get Jakdu Schedule</a></li>
+				<li><a ng-click="getData('competition')">Get Competition</a></li>
+			</ul>
+		</div>
+
+		<c:if test="${not empty message}">
+			<div class="span6 offset2 alert">${message}</div>
+		</c:if>
 
 <div ng-show="encyclopedias.length > 0">
 <h4>Encyclopedia</h4>
@@ -85,17 +85,21 @@
 </table>
 </div>
 
-<div ng-show="fcOrigins.length > 0">
-<h4>Football Club Origin</h4>
-<table class="table">
-<tr>
-	<th>Name</th>
-</tr>
-<tr ng-repeat="fcOrigin in fcOrigins">
-	<td><a href="<c:url value="/admin/footballclub/origin/write/{{fcOrigin.id}}"/>">{{fcOrigin.name}}</a></td>
-</tr>
-</table>
-</div>
+		<div ng-show="fcOrigins.length > 0">
+			<h4>Football Club Origin</h4>
+			<table class="table">
+				<tr>
+					<th>Name</th><th>Club Type</th><th>Age</th><th>Sex</th>
+				</tr>
+				<tr ng-repeat="fcOrigin in fcOrigins">
+					<td><a href="<c:url value="/admin/footballclub/origin/write/{{fcOrigin.id}}"/>">{{fcOrigin.name}}</a></td>
+					<td>{{fcOrigin.clubType}}</td>
+					<td>{{fcOrigin.age}}</td>
+					<td>{{fcOrigin.sex}}</td>
+				</tr>
+			</table>
+		</div>
+
 
 <div ng-show="fcs.length > 0">
 <h4>Football Club</h4>
@@ -190,16 +194,40 @@
 			<h4>Jakdu Schedule</h4>
 			<table class="table">
 				<tr>
-					<th>id</th><th>Date</th><th>Home</th><th>Away</th>
+					<th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Competition</th><th>Score</th><th>isTimeUp</th>
 				</tr>
 				<tr ng-repeat="jakduSchedule in jakduSchedules">
 					<td><a href="<c:url value="/admin/jakdu/schedule/write/{{jakduSchedule.id}}"/>">{{jakduSchedule.id}}</a></td>
-					<td>{{jakduSchedule.date}}</td>
+					<td>{{jakduSchedule.date | date:'short' }}</td>
 					<td>{{jakduSchedule.home.name}}</td>
 					<td>{{jakduSchedule.away.name}}</td>
+					<td>{{jakduSchedule.competition.code}}</td>
+					<td>
+						<span ng-if="jakduSchedule.score">
+							<span ng-if="jakduSchedule.score.homeFullTime && jakduSchedule.score.awayFullTime">FT {{jakduSchedule.score.homeFullTime}} : {{jakduSchedule.score.awayFullTime}}</span>
+							<span ng-if="jakduSchedule.score.homeOverTime && jakduSchedule.score.awayOverTime">OT {{jakduSchedule.score.homeOverTime}} : {{jakduSchedule.score.awayOverTime}}</span>
+							<span ng-if="jakduSchedule.score.homePenaltyShootout && jakduSchedule.score.awayPenaltyShootout">P {{jakduSchedule.score.homePenaltyShootout}} : {{jakduSchedule.score.awayPenaltyShootout}}</span>
+						</span>
+					</td>
+					<td>{{jakduSchedule.timeUp}}</td>
 				</tr>
 			</table>
 		</div>
+
+		<div ng-show="competitions.length > 0">
+			<h4>Competitions</h4>
+			<table class="table">
+				<tr>
+					<th>Code</th><th>Names</th>
+				</tr>
+				<tr ng-repeat="competition in competitions">
+					<td><a href="<c:url value="/admin/competition/write/{{competition.id}}"/>">{{competition.code}}</a></td>
+					<td><div ng-repeat="name in competition.names">Lang={{name.language}} F.N.={{name.fullName}} S.N.={{name.shortName}}</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+
 	</div> <!-- ./container -->
 <!-- Bootstrap core JavaScript================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
@@ -221,6 +249,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.attendanceClubs = [];
 	$scope.homeDescriptions = [];
 	$scope.jakduSchedules = [];
+	$scope.competitions = [];
 	
 	angular.element(document).ready(function() {
 		if ("${open}" != null && "${open}" != "") {
@@ -247,6 +276,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 			bUrl = '<c:url value="/admin/data/home/description.json"/>';
 		} else if (type == "jakduSchedule") {
 			bUrl = '<c:url value="/admin/data/jakdu/schedule.json"/>';
+		} else if (type == "competition") {
+			bUrl = '<c:url value="/admin/data/competition.json"/>';
 		}
 		
 		if ($scope.dataConn == "none") {
@@ -275,6 +306,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 					$scope.homeDescriptions = data.homeDescriptions;
 				} else if (type == "jakduSchedule") {
 					$scope.jakduSchedules = data.jakduSchedules;
+				} else if (type == "competition") {
+					$scope.competitions = data.competitions;
 				}
 				
 				$scope.dataConn = "none";
@@ -319,6 +352,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		$scope.attendanceClubs = [];
 		$scope.homeDescriptions = [];
 		$scope.jakduSchedules = [];
+		$scope.competitions = [];
 	};
 	
 });

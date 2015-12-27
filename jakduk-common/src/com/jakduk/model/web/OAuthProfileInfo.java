@@ -1,6 +1,6 @@
 package com.jakduk.model.web;
 
-import com.jakduk.model.embedded.FootballClubName;
+import com.jakduk.model.embedded.LocalName;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -14,7 +14,7 @@ public class OAuthProfileInfo {
 	
 	private String about;
 	
-	private FootballClubName footballClubName;
+	private LocalName footballClubName;
 
 	public String getUsername() {
 		return username;
@@ -32,11 +32,11 @@ public class OAuthProfileInfo {
 		this.about = about;
 	}
 
-	public FootballClubName getFootballClubName() {
+	public LocalName getFootballClubName() {
 		return footballClubName;
 	}
 
-	public void setFootballClubName(FootballClubName footballClubName) {
+	public void setFootballClubName(LocalName footballClubName) {
 		this.footballClubName = footballClubName;
 	}
 

@@ -1,11 +1,17 @@
 package jakduk;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.service.CommonService;
+import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,6 +42,12 @@ public class HomeTest {
 	
 	@Autowired
 	BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
+
+	@Autowired
+	FootballClubOriginRepository footballClubOriginRepository;
+
+	@Autowired
+	CommonService commonService;
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
@@ -70,9 +82,9 @@ public class HomeTest {
 	
 	@Test
 	public void getFootballClubList() {
-		
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList("ko", CommonConst.FOOTBALL_CLUB_SORT_PROPERTIES_SHORTNAME);
-		
+
+		List<FootballClub> footballClubs = commonService.getFootballClubs("ko", CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.shortName);
+
 		System.out.println("getFootballClubList=" + footballClubs);
 	}
 
