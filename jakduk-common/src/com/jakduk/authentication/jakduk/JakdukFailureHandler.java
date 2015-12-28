@@ -46,11 +46,9 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 			String email = request.getParameter("j_username");
 			
 			commonService.setCookie(response, CommonConst.COOKIE_EMAIL, email, path);
-			
 			commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
 		} else {
 			commonService.releaseCookie(response, CommonConst.COOKIE_EMAIL, path);
-			
 			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
 		}
 		

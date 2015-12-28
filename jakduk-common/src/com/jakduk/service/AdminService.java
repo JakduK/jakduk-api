@@ -386,7 +386,7 @@ public String initSearchData() {
 		FootballClubWrite fcWrite = new FootballClubWrite();
 		fcWrite.setId(fc.getId());
 		fcWrite.setActive(fc.getActive());
-		fcWrite.setOrigin(fc.getOrigin().getName());
+		fcWrite.setOrigin(fc.getOrigin().getId());
 		
 		for (LocalName fcName : fc.getNames()) {
 			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
