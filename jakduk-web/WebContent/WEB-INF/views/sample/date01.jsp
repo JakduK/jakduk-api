@@ -38,6 +38,7 @@
         </div>
 
 
+        {{clientId}}
 
     </div>
 
@@ -49,7 +50,12 @@
 
     var jakdukApp = angular.module('jakdukApp', ['ui.bootstrap']);
 
-    jakdukApp.controller('sampleCtrl', function($scope) {
+    jakdukApp.factory('clientId', function() {
+        return 'a12345654321x';
+    });
+
+    jakdukApp.controller('sampleCtrl', function($scope, clientId) {
+        $scope.clientId = clientId;
         $scope.format = 'yyyy/MM/dd';
         $scope.mytime = new Date();
         $scope.status = {

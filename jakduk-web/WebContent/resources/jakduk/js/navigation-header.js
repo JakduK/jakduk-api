@@ -2,9 +2,14 @@
  * navagation-header에서 쓰임. 
  */
 jakdukApp.controller("headerCtrl", function($scope, $location) {
-	$scope.isActive = function(viewLocation) {
-		return $location.absUrl().match(viewLocation);
-	}
+
+    var prefixPath = new String($location.protocol() + '://' + $location.host() + ':' + $location.port());
+    var absUrl = $location.absUrl();
+    var path = absUrl.slice(prefixPath.length);
+
+    $scope.isActive = function(viewLocation) {
+        return path.match(viewLocation);
+    };
 	
 	$scope.btnEnterOnHeaderSearch = function(url) {
 		if ($scope.searchOnHeader.trim() < 1) {

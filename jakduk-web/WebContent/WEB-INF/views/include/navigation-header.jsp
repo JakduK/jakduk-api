@@ -87,6 +87,7 @@
 					</c:choose>
 				</a>
 			</div>
+
 			<div class="collapse navbar-collapse navbar-responsive-collapse">
 				<ul class="nav navbar-nav">                
 					<li ng-class="{active:isActive('<c:url value="/home"/>')}">
