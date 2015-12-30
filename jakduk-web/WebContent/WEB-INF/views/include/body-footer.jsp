@@ -21,13 +21,13 @@
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
   var userId = "${accountName}";
-  
+
   if (isEmpty(userId)) {
 	  ga('create', 'UA-59051176-1', 'auto');
   } else {
 	  ga('create', 'UA-59051176-1', {'userId' : userId});
-	  
+
   }
-  
+
   ga('send', 'pageview');
 </script>

@@ -132,7 +132,7 @@
 			<div ng-repeat="comment in comments">
 				<h5 class="media-heading">
 					<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
-					<span>{{dateFromObjectId(comment.id) | date:dateTimeFormat.dateTime}}</span>
+					<span>{{jakdukFactory.dateFromObjectId(comment.id) | date:dateTimeFormat.dateTime}}</span>
 				</h5>
 				<p>
 					<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
@@ -188,7 +188,7 @@
 	
 	<!--=== End Content Part ===-->
 	</div>
-	
+
 	<jsp:include page="../include/footer.jsp"/>
 </div> <!-- End wrapper -->
 
@@ -199,7 +199,22 @@
 <script type="text/javascript">
 var jakdukApp = angular.module('jakdukApp', ['ngSanitize', 'ui.bootstrap']);
 
-jakdukApp.controller("boardCtrl", function($scope, $http) {
+jakdukApp.factory('jakdukFactory', function() {
+	return {
+		objectIdFromDate : function (date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+		},
+		dateFromObjectId : function (objectId) {
+			return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+		},
+		intFromObjectId : function (objectId) {
+			return parseInt(objectId.substring(0, 8), 16) * 1000;
+		}
+	}
+});
+
+jakdukApp.controller("boardCtrl", function($scope, $http, jakdukFactory) {
+	$scope.jakdukFactory = jakdukFactory;
 	$scope.dataCommentsConn = "none";
 	$scope.dataTopPostConn = "none";
 	$scope.comments = [];
@@ -232,19 +247,7 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 		
 		App.init();
 	});
-	
-	$scope.objectIdFromDate = function(date) {
-		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
-	};
-	
-	$scope.dateFromObjectId = function(objectId) {
-		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
-	};
-	
-	$scope.intFromObjectId = function(objectId) {
-		return parseInt(objectId.substring(0, 8), 16) * 1000;
-	};
-	
+
 	$scope.getDataCommentsList = function(page, size) {
 		var bUrl = '<c:url value="/board/data/free/comments.json?page=' + page + '&size=' + size + '"/>';
 		
