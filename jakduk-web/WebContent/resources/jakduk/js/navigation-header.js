@@ -3,7 +3,9 @@
  */
 jakdukApp.controller("headerCtrl", function($scope, $location) {
 
-    var prefixPath = new String($location.protocol() + '://' + $location.host() + ':' + $location.port());
+    var port = $location.port();
+    var prefix = $location.protocol() + '://' + $location.host();
+    var prefixPath = (port == 80 || port == 443) ? prefix : prefix + ':' + $location.port();
     var absUrl = $location.absUrl();
     var path = absUrl.slice(prefixPath.length);
 
