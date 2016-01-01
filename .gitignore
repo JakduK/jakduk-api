@@ -1,9 +1,11 @@
 *.class
 # Java and Eclipse
 target/
+.idea/
 .classpath
 .settings
 .project
+*.iml
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
