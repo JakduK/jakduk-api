@@ -1,5 +1,5 @@
 /* 
-* Version: 1.7
+* Version: 1.8
 * Blue Color: #3498db; 
 * Blue Hover Color: #2980b9; 
 * Additional color: #deeffc;
@@ -79,8 +79,27 @@ a.read-more:hover {
 	}
 }
 
+/*Dark version*/
+@media (max-width: 991px) {
+	.header.header-dark .navbar-nav .dropdown > a:hover {
+		color: #3498db;
+	}
+}
+
+@media (min-width: 992px) {
+	.header.header-dark .navbar-nav > li > a:hover,
+	.header.header-dark .navbar-nav > .active > a {
+		color: #3498db !important;
+	}
+}
+
 /* Headers v1
 ------------------------------------*/
+/*Fix hover color for the little icons v1.9*/
+.header-v1 .topbar-v1 .top-v1-data li a:hover i {
+	color: #3498db;
+}
+
 .header-v1 .navbar-default .navbar-nav > .active > a,
 .header-v1 .navbar-default .navbar-nav > li > a:hover,
 .header-v1 .navbar-default .navbar-nav > li > a:focus {
@@ -204,6 +223,10 @@ a.read-more:hover {
 
 /* Headers v4
 ------------------------------------*/
+/*Fix hover color for the little icons v1.9*/
+.topbar-v1 .top-v1-data li a:hover i {
+	color: #3498db;
+}
 .header-v4 .navbar-default .navbar-nav > li > a:hover, 
 .header-v4 .navbar-default .navbar-nav > .active > a {
   border-color: #3498db;
@@ -244,9 +267,12 @@ a.read-more:hover {
 
 /* Headers v5
 ------------------------------------*/
-.header-v5 .navbar-default .navbar-nav > li > a:hover,
-.header-v5 .navbar-default .navbar-nav > .active > a {
-  border-top: 2px solid #3498db;
+/*bug fixed v1.9*/
+@media (min-width: 992px) {
+	.header-v5 .navbar-default .navbar-nav > li > a:hover,
+	.header-v5 .navbar-default .navbar-nav > .active > a {
+	  border-top: 2px solid #3498db;
+	}
 }
 .header-v5 .navbar-default .navbar-nav > .active > a {
   color: #3498db;
@@ -279,11 +305,26 @@ a.read-more:hover {
   color: #3498db;
 }
 
+/*bug fixed v1.9*/
+.header-v5 .subtotal .subtotal-cost {
+    color: #3498db !important;
+}
+
+/*bug fixed v1.9*/
+@media (max-width: 991px) {
+    /*Responsive code for max-width: 991px*/
+	.header-v5 .navbar-default .navbar-nav > .active > a,
+    .header-v5 .navbar-default .navbar-nav > .active > a:hover,
+    .header-v5 .navbar-default .navbar-nav > .active > a:focus {
+        background: #3498db !important;
+    }
+}
 /* Shopping cart
 ------------------------------------*/
-.header-v5 .shop-badge.badge-icons i {
+/*Keeping the cart gray v1.9*/
+/*.header-v5 .shop-badge.badge-icons i {
   color: #3498db;
-}
+}*/
 .header-v5 .shop-badge span.badge-sea {
   background:  #3498db;
 }
@@ -457,7 +498,7 @@ a.read-more:hover {
 
 /* Buttons Color */
 .btn-u-split.dropdown-toggle {
-   border-right: solid 1px #2980b9;
+   border-left: solid 1px #2980b9;
 }
 
 /* Bordered Buttons */
@@ -506,10 +547,10 @@ a.read-more:hover {
 
 /* Blockquote */
 blockquote:hover {
-	border-right-color:#3498db; 
+	border-left-color:#3498db; 
 }
 .hero {
-	border-right-color: #3498db;
+	border-left-color: #3498db;
 }
 blockquote.hero.hero-default {
   background: #3498db;
@@ -761,7 +802,7 @@ ul.blog-tags a:hover {
 
 /* Tag Boxes v2 */
 .tag-box-v2 {
-	border-right: solid 2px #3498db;
+	border-left: solid 2px #3498db;
 }
 
 /* Tag Boxes v7 */
@@ -922,10 +963,10 @@ blockquote.text-right:hover {
 
 /* Green Left Bordered Funny Box */
 .funny-boxes-left-green {
-  border-right: solid 2px #3498db;
+  border-left: solid 2px #3498db;
 }
 .funny-boxes-left-green:hover {
-  border-right-color: #3498db;
+  border-left-color: #3498db;
 }
 
 /* Testimonials Default
@@ -1085,14 +1126,14 @@ i.icon-bg-u {
 .pricing:hover h4 {
 	color:#3498db;
 }
+.pricing-head h3 {
+	background:#3498db;
+	text-shadow: 0 1px 0 #2980b9;	
+}
 .pricing-head h4 {
 	color:#999;
 	background:#fcfcfc;
 	border-bottom:solid 1px #deeffc;
-}
-.pricing-mega-v1 .pricing-head h3 {
-	background:#3498db;
-	text-shadow: 0 1px 0 #2980b9;	
 }
 	
 /* Pricing Content */
@@ -1128,7 +1169,7 @@ i.icon-bg-u {
 .pricing-mega-v1 .pricing-head h3,
 .pricing-mega-v2 .pricing-head h3,
 .pricing-mega-v3 .pricing-head h3 {
-	text-shadow: 0 -1px 0 #2980b9;
+	text-shadow: 0 1px 0 #2980b9;
 }
 
 /* Pricing Table Mega v1 Version
@@ -1484,4 +1525,72 @@ i.icon-bg-u {
 ------------------------------------*/
 .blog-trending h3 a:hover {
 	color: #3498db !important;
+}
+
+/*Blog Thumb Colors
+------------------------------------*/
+.blog-thumb .blog-thumb-hover:hover:after {
+  background: rgba(52, 152, 219, 0.9);
+}
+.blog-grid .blog-grid-grad i:hover {
+  background: rgba(52, 152, 219, 1);
+}
+
+/*Footer Theme Color
+------------------------------------*/
+.footer-v8 .footer .column-one a:hover {
+	color: #3498db;
+}
+.footer-v8 .footer .tags-v4 a:hover {
+	border-color: #3498db;
+	background-color: #3498db;
+}
+.footer-v8 .footer .footer-lists li a:hover {
+	color: #3498db;
+}
+.footer-v8 .footer .latest-news h3 a:hover {
+	color: #3498db;
+}
+.footer-v8 .footer .input-group-btn .input-btn {
+	background: #3498db;
+}
+.footer-v8 .footer .social-icon-list li i:hover {
+	background: #3498db;
+	border-color: #3498db;
+}
+
+/*Header Theme Color
+------------------------------------*/
+.header-v8 .dropdown-menu {
+	border-top: solid 3px #3498db;
+}
+.header-v8 .dropdown-menu .active > a,
+.header-v8 .dropdown-menu li > a:hover {
+	color: #3498db;
+}
+.header-v8 .navbar-nav .open .dropdown-menu > li > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > li > a:focus {
+	color: #3498db;
+}
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a,
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a:focus {
+	color: #3498db;
+}
+
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a,
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+	color: #3498db;
+}
+.header-v8 .navbar-nav > li > a:hover {
+	color: #3498db;
+}
+.header-v8 .navbar-nav > .active > a,
+.header-v8 .navbar-nav > .active > a:hover,
+.header-v8 .navbar-nav > .active > a:focus {
+	color: #3498db !important;
+}
+.header-v8 .mega-menu .mega-menu-fullwidth .dropdown-link-list li a:hover {
+	color: #3498db;
 }

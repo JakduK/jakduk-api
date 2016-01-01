@@ -1547,3 +1547,9 @@
 		color: #72c02c;
 	}
 }
+
+/*added v1.9*/
+.boxed-layout.header-fixed .header-v6.header-sticky {
+    right: inherit;
+    width: inherit;
+}

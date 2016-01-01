@@ -372,7 +372,7 @@
 .header-v5 {
     z-index: 99;
     position: relative;
-    border-bottom: solid 2px #eee;
+    /*border-bottom: solid 2px #eee;*/ /*removed in v1.9*/
 }
 
 .header-v5 .navbar {
@@ -599,7 +599,7 @@
     }
 
     .header-v5 .navbar-default .navbar-nav > li > a {
-        line-height: 29px;
+        line-height: 35px;
         padding: 23px 18px 24px;
     }
 
@@ -1004,8 +1004,9 @@
     width: 90%;
 }
 
+/*Fixed in v1.9*/
 .header-fixed .header-v5.header-fixed-shrink .navbar-nav > li > .dropdown-menu {
-    margin-top: -8px;
+    margin-top: -15px;
 }
 
 /*Badge List*/
@@ -1040,4 +1041,19 @@
         margin-top: 35px;
         padding: 14px 17px 16px;
     }
+}
+
+/*Label Danger Shop added v1.9*/
+.label.label-danger-shop {
+  color: #fff;
+  font-size: 9px;
+  padding: 1px 5px;
+  background: #c9253c;
+  text-transform: uppercase;
+}
+
+/*added v1.9*/
+.boxed-layout.header-fixed .header-v5.header-sticky {
+    right: inherit;
+    width: inherit;
 }

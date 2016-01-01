@@ -5,6 +5,8 @@
 	position: relative;
 	min-height: 300px;
 	background: url(../../img/bg/11.jpg) 70% 40% no-repeat;
+  background-size: cover;
+  background-position: center center;	
 }
 
 .job-img .job-banner {

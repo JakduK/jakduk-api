@@ -1,13 +1,31 @@
-/*   
+/*
  * Template Name: Unify - Responsive Bootstrap Template
  * Description: Business, Corporate, Portfolio, E-commerce, Blog and One Page Template.
- * Version: 1.8
+ * Version: 1.9
  * Author: @htmlstream
  * Website: http://htmlstream.com
-*/
 
-/*Parallax Slider (Main)
-------------------------------------*/
+[-----*** TABLE OF CONTENT ***-----]
+
+1- Parallax Slider (Main)
+2- Master Slider
+3- Revolution Slider
+4- Layer Slider
+5- Sequence Slider (Home Page)
+6- Clients Carousel
+7- Pie Chart
+8- Counter
+9- Back To Top
+10- Owl Carousel
+	10.1- Recent Works (Owl Carousel)
+	10.2- Parallax Twitter (Owl Carousel)
+	10.3- Clients Section (Owl Carousel)
+	10.4- Owl Video
+-----------------------------------------------------------------------*/
+
+/*--------------------------------------------------
+    [1. Parallax Slider (Main)]
+----------------------------------------------------*/
 .slider-inner .da-slider {
    box-shadow: none;
    border-bottom: 2px solid #ddd;
@@ -20,7 +38,7 @@
 @media (max-width: 450px) {
    .da-slide p {
       display:none;
-   }   
+   }
 }
 
 @media (max-width: 900px) {
@@ -30,8 +48,9 @@
    }
 }
 
-/*Master Slider
-------------------------------------*/
+/*--------------------------------------------------
+    [2. Master Slider]
+----------------------------------------------------*/
 .ms-promo-info {
   font-size: 45px;
   font-weight: 300;
@@ -42,7 +61,7 @@
 
 .ms-promo-info-in {
   font-size: 60px;
-  font-weight: 600;  
+  font-weight: 600;
 }
 
 .ms-promo-sub {
@@ -61,8 +80,9 @@
   padding: 7px;
 }
 
-/*Revolution Slider
-------------------------------------*/
+/*--------------------------------------------------
+    [3. Revolution Slider]
+----------------------------------------------------*/
 .tp-dottedoverlay {
   z-index: 1 !important;
 }
@@ -90,7 +110,7 @@
 
 .tp-banner-container a.re-btn-brd:hover {
   color: #555;
-  background: #fff; 
+  background: #fff;
 }
 
 /*Fullwidth*/
@@ -119,7 +139,7 @@
   content: ' ';
   position: absolute;
   background: rgba(0,0,0,0.3);
-} 
+}
 
 .revolution-ch1 {
   color: #fff;
@@ -145,7 +165,7 @@
   left: 50%;
   width: 70px;
   height: 2px;
-  content: ' '; 
+  content: ' ';
   bottom: -20px;
   background: #fff;
   margin-left: -35px;
@@ -254,8 +274,9 @@
   }
 }
 
-/*Layer Slider
-------------------------------------*/
+/*--------------------------------------------------
+    [4. Layer Slider]
+----------------------------------------------------*/
 .layer_slider {
    overflow: hidden;
 }
@@ -264,8 +285,9 @@
    border-radius: 100px !important;
 }
 
-/*Sequence Slider (Home Page)
-------------------------------------*/
+/*--------------------------------------------------
+    [5. Sequence Slider (Home Page)]
+----------------------------------------------------*/
 @media (max-width: 900px) {
    #sequence-theme .info {
       top:80px !important;
@@ -288,15 +310,16 @@
    }
 }
 
-/*Clients Carousel
-------------------------------------*/
+/*--------------------------------------------------
+    [6. Clients Carousel]
+----------------------------------------------------*/
 .clients {
   border: 0;
   overflow: hidden;
-  margin-top: 10px;      
-  margin-bottom: 30px;  
+  margin-top: 10px;
+  margin-bottom: 30px;
   box-shadow:none !important;
-  margin-bottom: 0 !important;    
+  margin-bottom: 0 !important;
 }
 .clients li {
   overflow: hidden;
@@ -313,7 +336,7 @@
   display: none;
   position: absolute;
 }
-.clients li:hover img.color-img { 
+.clients li:hover img.color-img {
   display: block;
 }
 .clients li img {
@@ -325,8 +348,9 @@
   filter: none;
 }
 
-/*Pie Chart
-------------------------------------*/
+/*--------------------------------------------------
+    [7. Pie Chart]
+----------------------------------------------------*/
 .pie-progress-charts .inner-pchart {
   text-align: center;
 }
@@ -347,8 +371,9 @@
   }
 }
 
-/*Counter
-------------------------------------*/
+/*--------------------------------------------------
+    [8. Counter]
+----------------------------------------------------*/
 .counters {
   color: #555;
   text-align: center;
@@ -382,12 +407,12 @@
 }
 
 .counters span.counter-icon i:after {
-   width: 0; 
+   width: 0;
    height: 0;
    left: 38%;
-   content: " "; 
+   content: " ";
    bottom: -7px;
-   display: block; 
+   display: block;
    position: absolute;
    border-top: 7px solid #72c02c;
    border-left: 7px solid transparent;
@@ -400,8 +425,9 @@
    border-color: #000;
 }
 
-/*Back To Top
-------------------------------------*/
+/*--------------------------------------------------
+    [9. Back To Top]
+----------------------------------------------------*/
 #topcontrol {
   color: #fff;
   z-index: 99;
@@ -433,8 +459,9 @@
   transition: all 0.3s ease-in-out;
 }
 
-/*Owl Carousel
-------------------------------------*/
+/*--------------------------------------------------
+    [10. Owl Carousel]
+----------------------------------------------------*/
 .owl-btn {
   color: #777;
   cursor: pointer;
@@ -671,12 +698,12 @@
 .testimonials-v3 .owl-buttons .owl-next {
   padding: 13px;
   position: relative;
-  margin: 15px 2px 0; 
+  margin: 15px 2px 0;
     background: #f5f5f5;
-  display: inline-block;  
+  display: inline-block;
 }
 
-.testimonials-v3 .owl-buttons .owl-prev:after, 
+.testimonials-v3 .owl-buttons .owl-prev:after,
 .testimonials-v3 .owl-buttons .owl-next:after {
     top: 0;
     color: #bbb;
@@ -697,7 +724,7 @@
   content: "\f105";
 }
 
-.testimonials-v3 .owl-buttons .owl-prev:hover:after, 
+.testimonials-v3 .owl-buttons .owl-prev:hover:after,
 .testimonials-v3 .owl-buttons .owl-next:hover:after {
   color: #fff;
 }
@@ -708,7 +735,7 @@
   -webkit-transition: background 0.4s ease-in-out;
   -moz-transition: background 0.4s ease-in-out;
   -o-transition: background 0.4s ease-in-out;
-  transition: background 0.4s ease-in-out;  
+  transition: background 0.4s ease-in-out;
 }
 
 /*Recent Works (Owl Carousel)
@@ -787,14 +814,14 @@
   text-align: center;
   background: #333 url(../img/bg/19.jpg) 50% 0 fixed;
   background-size: cover;
-  background-position: center center;    
+  background-position: center center;
 }
 
 .parallax-twitter:after {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(0,0,0,0.5);
@@ -804,7 +831,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: url(../img/patterns/gridtile.png) repeat;
@@ -858,14 +885,14 @@
   position: relative;
   background: #333 url(../img/bg/7.jpg) 50% fixed;
   background-size: cover;
-  background-position: center center;    
+  background-position: center center;
 }
 
 .clients-section:after {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(0,0,0,0.8);
@@ -875,7 +902,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: url(../img/patterns/gridtile.png) repeat;

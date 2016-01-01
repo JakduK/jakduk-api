@@ -1,5 +1,5 @@
 /* 
-* Version: 1.7
+* Version: 1.8
 * Light Color: #95a5a6; 
 * Light Hover Color: #7f8c8d; 
 * Additional color: #f0f0f0;
@@ -81,6 +81,11 @@ a.read-more:hover {
 
 /* Headers v1
 ------------------------------------*/
+/*Fix hover color for the little icons v1.9*/
+.header-v1 .topbar-v1 .top-v1-data li a:hover i {
+	color: #95a5a6;
+}
+
 .header-v1 .navbar-default .navbar-nav > .active > a,
 .header-v1 .navbar-default .navbar-nav > li > a:hover,
 .header-v1 .navbar-default .navbar-nav > li > a:focus {
@@ -204,6 +209,10 @@ a.read-more:hover {
 
 /* Headers v4
 ------------------------------------*/
+/*Fix hover color for the little icons v1.9*/
+.topbar-v1 .top-v1-data li a:hover i {
+	color: #95a5a6;
+}
 .header-v4 .navbar-default .navbar-nav > li > a:hover, 
 .header-v4 .navbar-default .navbar-nav > .active > a {
   border-color: #95a5a6;
@@ -244,9 +253,12 @@ a.read-more:hover {
 
 /* Headers v5
 ------------------------------------*/
-.header-v5 .navbar-default .navbar-nav > li > a:hover,
-.header-v5 .navbar-default .navbar-nav > .active > a {
-  border-top: 2px solid #95a5a6;
+/*bug fixed v1.9*/
+@media (min-width: 992px) {
+	.header-v5 .navbar-default .navbar-nav > li > a:hover,
+	.header-v5 .navbar-default .navbar-nav > .active > a {
+	  border-top: 2px solid #95a5a6;
+	}
 }
 .header-v5 .navbar-default .navbar-nav > .active > a {
   color: #95a5a6;
@@ -279,11 +291,27 @@ a.read-more:hover {
   color: #95a5a6;
 }
 
+/*bug fixed v1.9*/
+.header-v5 .subtotal .subtotal-cost {
+    color: #95a5a6;
+}
+
+/*bug fixed v1.9*/
+@media (max-width: 991px) {
+    /*Responsive code for max-width: 991px*/
+	.header-v5 .navbar-default .navbar-nav > .active > a,
+    .header-v5 .navbar-default .navbar-nav > .active > a:hover,
+    .header-v5 .navbar-default .navbar-nav > .active > a:focus {
+        background: #95a5a6 !important;
+    }
+}
+
 /* Shopping cart
 ------------------------------------*/
-.header-v5 .shop-badge.badge-icons i {
+/*Keeping the cart gray v1.9*/
+/*.header-v5 .shop-badge.badge-icons i {
   color: #95a5a6;
-}
+}*/
 .header-v5 .shop-badge span.badge-sea {
   background:  #95a5a6;
 }
@@ -1484,4 +1512,72 @@ i.icon-bg-u {
 ------------------------------------*/
 .blog-trending h3 a:hover {
 	color: #95a5a6 !important;
+}
+
+/*Blog Thumb Colors
+------------------------------------*/
+.blog-thumb .blog-thumb-hover:hover:after {
+  background: rgba(149, 165, 166, 0.9);
+}
+.blog-grid .blog-grid-grad i:hover {
+  background: rgba(149, 165, 166, 1);
+}
+
+/*Footer Theme Color
+------------------------------------*/
+.footer-v8 .footer .column-one a:hover {
+	color: #95a5a6;
+}
+.footer-v8 .footer .tags-v4 a:hover {
+	border-color: #95a5a6;
+	background-color: #95a5a6;
+}
+.footer-v8 .footer .footer-lists li a:hover {
+	color: #95a5a6;
+}
+.footer-v8 .footer .latest-news h3 a:hover {
+	color: #95a5a6;
+}
+.footer-v8 .footer .input-group-btn .input-btn {
+	background: #95a5a6;
+}
+.footer-v8 .footer .social-icon-list li i:hover {
+	background: #95a5a6;
+	border-color: #95a5a6;
+}
+
+/*Header Theme Color
+------------------------------------*/
+.header-v8 .dropdown-menu {
+	border-top: solid 3px #95a5a6;
+}
+.header-v8 .dropdown-menu .active > a,
+.header-v8 .dropdown-menu li > a:hover {
+	color: #95a5a6;
+}
+.header-v8 .navbar-nav .open .dropdown-menu > li > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > li > a:focus {
+	color: #95a5a6;
+}
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a,
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a:focus {
+	color: #95a5a6;
+}
+
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a,
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+	color: #95a5a6;
+}
+.header-v8 .navbar-nav > li > a:hover {
+	color: #95a5a6;
+}
+.header-v8 .navbar-nav > .active > a,
+.header-v8 .navbar-nav > .active > a:hover,
+.header-v8 .navbar-nav > .active > a:focus {
+	color: #95a5a6 !important;
+}
+.header-v8 .mega-menu .mega-menu-fullwidth .dropdown-link-list li a:hover {
+	color: #95a5a6;
 }

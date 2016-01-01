@@ -38,7 +38,7 @@
 	text-decoration: none;
 }
 
-.blog-twitter .blog-twitter-inner i.fa {font-size:inherit; line-height:ingerit; top:0px; color:#555;}
+.blog-twitter .blog-twitter-inner i.fa {font-size:inherit; line-height:inherit; top:0px; color:#555;}
 
 /* 헤더 */
 .header .topbar ul.loginbar > li > a, 

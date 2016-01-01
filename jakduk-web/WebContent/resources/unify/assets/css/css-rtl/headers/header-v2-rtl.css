@@ -913,3 +913,9 @@ topbar including in mobile version*/
 		top: 22px;
 	}
 }
+
+/*added v1.9*/
+.boxed-layout.header-fixed .header-v2.header-sticky {
+    right: inherit;
+    width: inherit;
+}

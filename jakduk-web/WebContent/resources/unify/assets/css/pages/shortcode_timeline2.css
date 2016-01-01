@@ -164,3 +164,7 @@
 	}	
 }
 
+/*timeline-v2 within tab-v2 issue issue fix*/
+.timeline-v2 > li .cbp_tmlabel.equal-height-column {
+    height: auto !important;
+}

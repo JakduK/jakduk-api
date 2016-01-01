@@ -23,13 +23,23 @@ var StyleSwitcher = function () {
             });
 
             var setColor = function (color, data_header) {
+                // jQuery('#style_color').attr("href", "../assets/css/css-rtl/theme-colors/" + color + ".css");
+                // if(data_header == 'light'){
+                //     jQuery('.logo img').attr("src", "../assets/img/themes/logo1-" + color + ".png");
+                //     jQuery('#logo-footer').attr("src", "../assets/img/themes/logo2-" + color + ".png");
+                //     if (!jQuery(".navbar-brand img[src~='logo3-']")) {
+                //         jQuery('.navbar-brand img').attr("src", "../assets/img/themes/logo1-" + color + ".png");
+                //     }
+                // } else if(data_header == 'dark'){
+                //     jQuery('.logo img').attr("src", "../assets/img/themes/logo1-" + color + ".png");
+                //     jQuery('#logo-footer').attr("src", "../assets/img/themes/logo2-" + color + ".png");
+                // }
+                // Fixed in v1.9
                 jQuery('#style_color').attr("href", "../assets/css/css-rtl/theme-colors/" + color + ".css");
                 if(data_header == 'light'){
                     jQuery('.logo img').attr("src", "../assets/img/themes/logo1-" + color + ".png");
                     jQuery('#logo-footer').attr("src", "../assets/img/themes/logo2-" + color + ".png");
-                    if (!jQuery(".navbar-brand img[src~='logo3-']")) {
-                        jQuery('.navbar-brand img').attr("src", "../assets/img/themes/logo1-" + color + ".png");
-                    }
+                    jQuery('.navbar-brand img').attr("src", "../assets/img/themes/logo1-" + color + ".png");
                 } else if(data_header == 'dark'){
                     jQuery('.logo img').attr("src", "../assets/img/themes/logo1-" + color + ".png");
                     jQuery('#logo-footer').attr("src", "../assets/img/themes/logo2-" + color + ".png");
