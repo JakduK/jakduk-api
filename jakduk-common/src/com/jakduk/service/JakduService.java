@@ -56,14 +56,14 @@ public class JakduService {
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
 
-        Map<String, String> fcNames = new HashMap<>();
+        Map<String, LocalName> fcNames = new HashMap<>();
         Map<String, LocalName> competitionNames = new HashMap<>();
 
         List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(new ArrayList<>(fcIds), language, CommonConst.NAME_TYPE.fullName);
         List<Competition> competitions = jakdukDAO.getCompetitionList(new ArrayList<>(competitionIds), language);
 
         for (FootballClub fc : footballClubs) {
-            fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0).getShortName());
+            fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0));
         }
 
         for (Competition competition : competitions) {
