@@ -133,12 +133,13 @@ body.dark .topbar-v1 .top-v1-data li i {
 	color: #999;
 }
 
+/*fixed in v1.9*/
 /*Navigation*/
-body.dark .header .navbar-nav > li > a,
+/*body.dark .header .navbar-nav > li > a,
 body.dark .header-v1 .navbar-default .navbar-nav > li > a,
 body.dark .header-v3 .navbar-default .navbar-nav > li > a {
 	color: #999;
-}
+}*/
 
 body.dark .header .navbar-nav .open > a,
 body.dark .header .navbar-nav .open > a:hover,
@@ -185,7 +186,8 @@ body.dark .header .dropdown-menu,
 body.dark .header-v1 .dropdown-menu,
 body.dark .header-v2 .dropdown-menu,
 body.dark .header-v3 .dropdown-menu,
-body.dark .header-v4 .dropdown-menu {
+body.dark .header-v4 .dropdown-menu,
+body.dark .header-v5 .dropdown-menu {
 	background: #222;
 	border-bottom-color: #202020;
 }
@@ -194,7 +196,8 @@ body.dark .header .dropdown-menu li a,
 body.dark .header-v1 .dropdown-menu li a,
 body.dark .header-v2 .dropdown-menu li a,
 body.dark .header-v3 .dropdown-menu li a,
-body.dark .header-v4 .dropdown-menu li a {
+body.dark .header-v4 .dropdown-menu li a,
+body.dark .header-v5.dropdown-menu li a {
 	color: #999;
 	border-bottom-color: #303030;
 }
@@ -208,7 +211,9 @@ body.dark .header-v2 .dropdown-menu li > a:hover,
 body.dark .header-v3 .dropdown-menu .active > a, 
 body.dark .header-v3 .dropdown-menu li > a:hover,
 body.dark .header-v4 .dropdown-menu .active > a, 
-body.dark .header-v4 .dropdown-menu li > a:hover {
+body.dark .header-v4 .dropdown-menu li > a:hover,
+body.dark .header-v5 .dropdown-menu .active > a, 
+body.dark .header-v5 .dropdown-menu li > a:hover {
 	color: #999 !important;
 	background: #303030 !important;
 }
@@ -378,10 +383,12 @@ body.dark .header-v4 .dropdown-menu li > a:hover {
 
 /*Header Fixed (Shrink)
 ------------------------------------*/
+/*fixed in v1.9*/
 body.dark.header-fixed .header.header-fixed-shrink,
 body.dark.header-fixed .header-v1.header-fixed-shrink,
 body.dark.header-fixed .header-v2.header-fixed-shrink,
-body.dark.header-fixed .header-v3.header-fixed-shrink {
+body.dark.header-fixed .header-v3.header-fixed-shrink,
+body.dark.header-fixed .header-v5.header-fixed-shrink {
 	box-shadow: 0 0 3px #000;
 	background: rgba(0,0,0,0.9);
 }
@@ -389,7 +396,8 @@ body.dark.header-fixed .header-v3.header-fixed-shrink {
 body.dark.header-fixed .header.header-fixed-shrink .search-open,
 body.dark.header-fixed .header-v1.header-fixed-shrink .navbar .search-open,
 body.dark.header-fixed .header-v2.header-fixed-shrink .navbar .search-open,
-body.dark.header-fixed .header-v3.header-fixed-shrink .navbar .search-open {
+body.dark.header-fixed .header-v3.header-fixed-shrink .navbar .search-open,
+body.dark.header-fixed .header-v5.header-fixed-shrink .navbar .search-open {
 	box-shadow: none;
 	background: rgba(0,0,0,0.9);
 }
@@ -408,6 +416,17 @@ body.dark.header-fixed .header-v2.header-fixed-shrink .navbar-nav > li > a {
     body.dark .header-v4 .mega-menu .equal-height-in {
         border-left-color: #333;
     }
+}
+
+/*Added v1.9*/
+/*Header v5 
+------------------------------------*/
+body.dark .header-v5 .badge-open {
+    background: #222 none repeat scroll 0% 0%;
+}
+
+body.dark .header-v5 .subtotal {
+    background: #222 none repeat scroll 0% 0%;
 }
 
 /*Header v6
@@ -541,9 +560,9 @@ body.dark .header-v6 .shopping-cart-open span.shc-total {
 	body.dark.header-fixed .header-v6.header-fixed-shrink .navbar-brand img.default-logo {
 		display: inherit;
 	}
-
+	/*fixed in v1.9*/
 	body.dark.header-fixed .header-v6.header-fixed-shrink .navbar-brand img.shrink-logo {
-		/*display: none;*/
+		display: none;
 	}
 
 	/*Navbar*/
@@ -1480,12 +1499,13 @@ body.dark .nav > li.active > a:focus {
 /*Progress Bar
 ------------------------------------*/
 body.dark .progress {
-	background: #292929;
+	background: #777777;
 }
 
 body.dark .progress-bar-dark {
-	background: #202020;
+	background: #555555;
 }
+
 
 /*Image Bordered
 ------------------------------------*/
@@ -1824,11 +1844,17 @@ body.dark .sky-form {
 	border-color: #555;
 }
 
+/*Bug fixed v1.9*/
 body.dark .sky-form header,
 body.dark .sky-form fieldset,
 body.dark .sky-form footer {
-	background: #222;
+	/*background: #222;*/
 	border-color: #555;
+}
+
+/*Bug fixed v1.9*/
+body.dark .sky-form.contact-style fieldset {
+    background: #252525 none repeat scroll 0% 0%;
 }
 
 body.dark .sky-form header {
@@ -2420,6 +2446,12 @@ body.dark .search-block form.page-search-form .checkbox {
 
 /*Search Results
 ------------------------------------*/
+/*added v1.9*/
+body.dark .search-block {
+    background: #202020;
+	border-color: #303030;
+}
+
 body.dark .search-block-v2 {
 	background: #202020;
 	border-color: #303030;
@@ -2569,11 +2601,11 @@ body.dark .blog-post-tags ul.blog-tags a {
 	color: #999;
 	background: #292929;
 }
-
+/*quick fix added in v1.9*/
 body.dark ul.blog-tags a:hover,
 body.dark .blog-post-tags ul.blog-tags a:hover {
 	color: #fff;
-	background: #72c02c;
+	/*background: #72c02c;*/
 }
  
 body.dark ul.blog-tags a i {
@@ -2796,6 +2828,11 @@ body.dark .footer-v1 address,
 body.dark .footer-v1 .link-list a, 
 body.dark .footer-v1 .link-list i {
 	color: #999;
+}
+
+/*Bugs fixed v1.9*/
+body.dark .footer-v6 .contacts {
+	background: none;
 }
 
 /*Copyright (Default)

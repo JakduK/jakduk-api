@@ -10,7 +10,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html>
-<html ng-app="jakdukApp">
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><spring:message code="jakdu.schedule"/> &middot; <spring:message code="jakdu"/> &middot; <spring:message code="common.jakduk"/></title>

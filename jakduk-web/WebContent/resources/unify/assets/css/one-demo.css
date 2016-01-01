@@ -1,0 +1,61 @@
+/* Styles of uniques blocks which dependent of content/image/design. */
+
+/* Promo */
+.just-photo-1 {
+  background-image: url(../temp/test-images/promo.jpg);
+}
+.just-photo-2 {
+  background-image: url(../temp/collage.jpg);
+}
+#promo-parallax {
+	background-image: url(../temp/test-images/picjumbo.com@iphone-6-in-girls-hands.jpg);
+}
+.bootstrap-slider1 {
+	background-image: url(../temp/test-images/flickr.com-search-envato.jpg);
+}
+.bootstrap-slider2 {
+	background-image: url(../temp/test-images/flickr.com-search-envato-2.jpg);
+}
+.section-cook {
+	background-image: url(../temp/test-images/food/jeshoots.com@preparing-food-in-the-kitchen-free-photo.jpg);
+}
+.info-section5 {
+  background: #ebeae6 url(../temp/test-images/card-advantages.png) no-repeat 95% 100%;
+}
+.get-client {
+	background: url(../temp/test-images/pexels.com@photo-996.jpg) no-repeat fixed 50% 0 #333;
+}
+.demo-image1 {
+	background-image: url(../temp/test-images/s3.amazonaws.com@StartupStockPhotos@20140808_StartupStockPhotos@93.jpg);
+	background-position: 50% 30%;
+}
+.demo-image2 {
+	background-image: url(../temp/0/pexels.com@photo@2769.jpg);
+}
+.demo-image3 {
+	background-image: url(../temp/test-images/imcreator.com@free@business@gamestorming-workshop.jpg);
+}
+.demo-image4 {
+	background-image: url(../temp/test-images/flickr.com*photos*125303894@N06*14202195290*in*set-72157645103818634.jpg);
+}
+.demo-image5 {
+	background-image: url(../temp/test-images/one-page.jpg);
+}
+.demo-image6 {
+	background-image: url(../temp/test-images/imcreator.com@free@business@mac.jpg);
+}
+.demo-image7 {
+	background-image: url(../temp/test-images/ununsplash.imgix.net@46@yzS7SdLJRRWKRPmVD0La_creditcard.jpg);
+}
+.demo-image8 {
+	background-image: url(../temp/test-images/pexels.com-photo-1714.jpg);
+}
+.demo-image9 {
+	background-image: url(../temp/test-images/video-newyork.jpg);
+}
+.demo-image10 {
+	background-image: url(../temp/test-images/video-iphone.jpg);
+}
+.demo-image11 {
+	background-image: url(../img/bg/img1.jpg);
+}

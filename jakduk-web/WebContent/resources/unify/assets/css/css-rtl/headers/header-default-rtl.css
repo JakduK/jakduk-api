@@ -1095,3 +1095,9 @@
 		top: 60px;
 	}
 }
+
+/*added v1.9*/
+.boxed-layout.header-fixed .header.header-sticky {
+    right: inherit;
+    width: inherit;
+}

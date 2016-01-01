@@ -1,5 +1,5 @@
 /* 
-* Version: 1.7
+* Version: 1.8
 * Aqua Color: #27d7e7; 
 * Aqua Hover Color: #26bac8; 
 * Additional color: #d5eef0;
@@ -81,6 +81,11 @@ a.read-more:hover {
 
 /* Headers v1
 ------------------------------------*/
+/*Fix hover color for the little icons v1.9*/
+.header-v1 .topbar-v1 .top-v1-data li a:hover i {
+	color: #27d7e7;
+}
+
 .header-v1 .navbar-default .navbar-nav > .active > a,
 .header-v1 .navbar-default .navbar-nav > li > a:hover,
 .header-v1 .navbar-default .navbar-nav > li > a:focus {
@@ -204,6 +209,10 @@ a.read-more:hover {
 
 /* Headers v4
 ------------------------------------*/
+/*Fix hover color for the little icons v1.9*/
+.topbar-v1 .top-v1-data li a:hover i {
+	color: #27d7e7;
+}
 .header-v4 .navbar-default .navbar-nav > li > a:hover, 
 .header-v4 .navbar-default .navbar-nav > .active > a {
   border-color: #27d7e7;
@@ -244,9 +253,12 @@ a.read-more:hover {
 
 /* Headers v5
 ------------------------------------*/
-.header-v5 .navbar-default .navbar-nav > li > a:hover,
-.header-v5 .navbar-default .navbar-nav > .active > a {
-  border-top: 2px solid #27d7e7;
+/*bug fixed v1.9*/
+@media (min-width: 992px) {
+	.header-v5 .navbar-default .navbar-nav > li > a:hover,
+	.header-v5 .navbar-default .navbar-nav > .active > a {
+	  border-top: 2px solid #27d7e7;
+	}
 }
 .header-v5 .navbar-default .navbar-nav > .active > a {
   color: #27d7e7;
@@ -279,11 +291,27 @@ a.read-more:hover {
   color: #27d7e7;
 }
 
+/*bug fixed v1.9*/
+.header-v5 .subtotal .subtotal-cost {
+    color: #27d7e7;
+}
+
+/*bug fixed v1.9*/
+@media (max-width: 991px) {
+    /*Responsive code for max-width: 991px*/
+	.header-v5 .navbar-default .navbar-nav > .active > a,
+    .header-v5 .navbar-default .navbar-nav > .active > a:hover,
+    .header-v5 .navbar-default .navbar-nav > .active > a:focus {
+        background: #27d7e7 !important;
+    }
+}
+
 /* Shopping cart
 ------------------------------------*/
-.header-v5 .shop-badge.badge-icons i {
+/*Keeping the cart gray v1.9*/
+/*.header-v5 .shop-badge.badge-icons i {
   color: #27d7e7;
-}
+}*/
 .header-v5 .shop-badge span.badge-sea {
   background:  #27d7e7;
 }
@@ -1485,3 +1513,72 @@ i.icon-bg-u {
 .blog-trending h3 a:hover {
 	color: #27d7e7 !important;
 }
+
+/*Blog Thumb Colors
+------------------------------------*/
+.blog-thumb .blog-thumb-hover:hover:after {
+  background: rgba(39, 215, 231, 0.9);
+}
+.blog-grid .blog-grid-grad i:hover {
+  background: rgba(39, 215, 231, 1);
+}
+
+/*Footer Theme Color
+------------------------------------*/
+.footer-v8 .footer .column-one a:hover {
+	color: #27d7e7;
+}
+.footer-v8 .footer .tags-v4 a:hover {
+	border-color: #27d7e7;
+	background-color: #27d7e7;
+}
+.footer-v8 .footer .footer-lists li a:hover {
+	color: #27d7e7;
+}
+.footer-v8 .footer .latest-news h3 a:hover {
+	color: #27d7e7;
+}
+.footer-v8 .footer .input-group-btn .input-btn {
+	background: #27d7e7;
+}
+.footer-v8 .footer .social-icon-list li i:hover {
+	background: #27d7e7;
+	border-color: #27d7e7;
+}
+
+/*Header Theme Color
+------------------------------------*/
+.header-v8 .dropdown-menu {
+	border-top: solid 3px #27d7e7;
+}
+.header-v8 .dropdown-menu .active > a,
+.header-v8 .dropdown-menu li > a:hover {
+	color: #27d7e7;
+}
+.header-v8 .navbar-nav .open .dropdown-menu > li > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > li > a:focus {
+	color: #27d7e7;
+}
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a,
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > .active > a:focus {
+	color: #27d7e7;
+}
+
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a,
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a:hover,
+.header-v8 .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+	color: #27d7e7;
+}
+.header-v8 .navbar-nav > li > a:hover {
+	color: #27d7e7;
+}
+.header-v8 .navbar-nav > .active > a,
+.header-v8 .navbar-nav > .active > a:hover,
+.header-v8 .navbar-nav > .active > a:focus {
+	color: #27d7e7 !important;
+}
+.header-v8 .mega-menu .mega-menu-fullwidth .dropdown-link-list li a:hover {
+	color: #27d7e7;
+}
+

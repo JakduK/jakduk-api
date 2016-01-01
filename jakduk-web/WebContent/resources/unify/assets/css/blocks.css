@@ -1,13 +1,188 @@
-/*   
+/*
  * Template Name: Unify - Responsive Bootstrap Template
  * Description: Business, Corporate, Portfolio, E-commerce, Blog and One Page Template.
- * Version: 1.8
+ * Version: 1.9
  * Author: @htmlstream
  * Website: http://htmlstream.com
 */
 
-/*Breadcrumbs
-------------------------------------*/ 
+/*[-----*** TABLE OF CONTENT ***-----]
+
+1- Promo Blocks
+2- Breadcrumbs
+  2.1- Breadcrumbs v1
+  2.2- Breadcrumbs v2
+  2.3- Breadcrumbs v3
+3- Image Hover Effects
+4- Block Grid
+  4.1-Block Grid v1
+  4.2-Block Grid v2
+5- Services Box v1
+6- Service Block
+  6.1- Service Block v1
+  6.2- Service Block v2
+  6.3- Service Block v3
+  6.4- Service Block v4
+  6.5- Service Block v5
+  6.6- Service Block v6
+  6.7- Service Block v7
+  6.8- Service Block v8
+7- Process
+8- Team
+8.1- Team v1
+8.2- Team v2
+8.3- Team v3
+8.4- Team v4
+8.5- Team v5
+8.6- Team v6
+8.7- Team v7
+9- Call To Action
+  9.1- Call To Action v1
+  9.2- Call To Action v2
+10- Portfolio Box
+  10.1- Portfolio Box v1
+11- Portfolio Feature v2
+12- Thumbnail
+13- Image Backgrounds
+  13.1- Image Backgrounds v1
+  13.2- Image Backgrounds v2
+14- Parallax Quote
+15- Parallax Team
+16- Parallax Counter
+  16.1- Parallax Counter v1
+  16.2- Parallax Counter v2
+  16.3- Parallax Counter v3
+  16.4- Parallax Counter v4
+17- Flat Background Block
+18- Flat Testimonials
+19- Testimonials
+  19.1- Testimonials v4
+  19.2- Testimonials v5
+  19.3- Testimonials v6
+20- Featured Blog
+21- Blog Comments
+22- Quote
+22.1- Quote v2
+23- Team Social
+24- Box Shadows
+25- Interactive Slider
+  25.1- Interactive Slider v1
+  25.2- Interactive Slider v2
+26- Blog Trending
+27- Blog Latest Posts
+28- Blog Photostream
+29- Newsletter
+30- Blog Post Quote
+31- Blog Post Author
+32- Blog Comments
+33- News
+  33.1- News v1
+  33.2- News v2
+  33.3- News v3
+34- Blog Grid
+35- Blog Thumb
+36- Shop-subscribe
+-------------------------------------------------------------*/
+
+/*--------------------------------------------------
+    [1. Promo Blocks]
+----------------------------------------------------*/
+/*Promo Background Images*/
+.promo-bg-pattern-v1-dark {
+  background: url(../img/patterns/5.png) repeat;
+}
+
+.promo-bg-pattern-v1-light {
+  background: url(../img/patterns/16.png) repeat;
+}
+
+/*Promo Background Images*/
+.promo-bg-img-v1 {
+  background: url(../img/bg/img1.jpg) no-repeat;
+  background-size: cover;
+}
+.promo-bg-img-v2 {
+  background: url(../img/bg/img5.jpg) no-repeat;
+  background-size: cover;
+}
+.promo-bg-img-v3 {
+  background: url(../img/bg/img10.jpg) no-repeat;
+  background-size: cover;
+}
+.promo-bg-img-v4 {
+  background: url(../img/bg/img11.jpg) no-repeat;
+  background-size: cover;
+}
+.promo-bg-img-v5 {
+  background: url(../img/bg/img6.jpg) no-repeat;
+  background-size: cover;
+}
+
+/*Promo Background Fixed*/
+.promo-bg-fixed {
+  background-attachment: fixed;
+}
+
+/*Promo Texts v1*/
+.promo-text-v1 {
+  padding: 3px 0;
+  font-size: 20px;
+  font-weight: 600;
+  display: inline-block;
+  border-bottom: solid 2px #fff;
+}
+
+.promo-text-v1.color-dark {
+  border-color: #555;
+}
+
+/*Promo Texts v2*/
+.promo-text-v2 {
+  font-size: 55px;
+  font-weight: 600;
+  line-height: 63px;
+}
+
+/*Promo Video Icon*/
+.promo-video-icon-wrap {
+  width: 64px;
+  height: 64px;
+  font-size: 18px;
+  line-height: 70px;
+  display: inline-block;
+  transition: all .3s ease-in-out;
+}
+
+.promo-video-icon-wrap:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.promo-video-icon-wrap.color-light {
+  color: #333;
+  background: rgba(255,255,255,1);
+}
+.promo-video-icon-wrap.color-light:hover {
+  background: rgba(255,255,255,.9);
+}
+
+.promo-video-icon-wrap.color-dark {
+  color: #fff;
+  background: rgba(0,0,0,.8);
+}
+.promo-video-icon-wrap.color-dark:hover {
+  color: #fff;
+  background: rgba(0,0,0,.9);
+}
+
+.promo-video-icon {
+  left: 3px;
+  position: relative;
+}
+
+/*--------------------------------------------------
+    [2. Breadcrumbs]
+----------------------------------------------------*/
 /*Default Breadcrumbs*/
 .breadcrumbs {
   overflow: hidden;
@@ -16,13 +191,18 @@
   background: url(../img/patterns/breadcrumbs.png) repeat;
 }
 
+.video-business-img1 {
+  background: url(../video/youtube-business/video-business-img1.jpg) no-repeat center;
+  background-size: cover; /*Scales the background image to be as large as possible*/
+}
+
 .breadcrumbs h1 {
   color: #666;
   font-size: 22px;
   margin-top: 8px;
 }
 
-.breadcrumb { 
+.breadcrumb {
   top: 10px;
   padding-right: 0;
   background: none;
@@ -59,11 +239,11 @@
 .breadcrumbs.breadcrumbs-light {
   background: #222;
   padding: 30px 0 20px;
-  border-bottom: solid 3px #777;  
+  border-bottom: solid 3px #777;
 }
 
 .breadcrumbs.breadcrumbs-light {
-  background: #f7f7f7;  
+  background: #f7f7f7;
   border-bottom: 1px solid #eee;
 }
 
@@ -100,17 +280,17 @@
 }
 
 /*Breadcrumbs v1 and v3
-------------------------------------*/ 
+------------------------------------*/
 .breadcrumbs-v1,
 .breadcrumbs-v3 {
   -webkit-transition: all 0.8s ease-in-out;
   -moz-transition: all 0.8s ease-in-out;
   -o-transition: all 0.8s ease-in-out;
-  transition: all 0.8s ease-in-out; 
+  transition: all 0.8s ease-in-out;
 }
 
 /*Breadcrumbs v1
-------------------------------------*/ 
+------------------------------------*/
 .breadcrumbs-v1 {
   padding: 100px 0;
   position: relative;
@@ -122,7 +302,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(0,0,0,0.15);
@@ -137,7 +317,7 @@
 
 .breadcrumbs-v1 span {
   font-size: 24px;
-  font-weight: 200; 
+  font-weight: 200;
   margin-bottom: 5px;
   display: inline-block;
 }
@@ -161,7 +341,7 @@
 }
 
 /*Breadcrumbs v2
-------------------------------------*/ 
+------------------------------------*/
 .breadcrumbs-v2 {
   text-align: center;
   position: relative;
@@ -193,7 +373,7 @@
 }
 
 /*Breadcrumbs v3
-------------------------------------*/ 
+------------------------------------*/
 .breadcrumbs-v3 {
   z-index: 1;
   padding: 100px 0;
@@ -270,8 +450,9 @@
   }
 }
 
-/*Image Hover Effects
-------------------------------------*/
+/*--------------------------------------------------
+    [3. Image Hover Effects]
+----------------------------------------------------*/
 /*Image Hover v1*/
 .img-hover-v1 span {
   display: block;
@@ -309,16 +490,19 @@
 }
 
 /*Image Hover v2*/
-.img-hover-v2 img { 
+.img-hover-v2 img {
   filter: grayscale(100%);
-  -webkit-filter: grayscale(100%); 
+  -webkit-filter: grayscale(100%);
 }
 
-.img-hover-v2:hover img { 
+.img-hover-v2:hover img {
   filter: grayscale(0);
-  -webkit-filter: grayscale(0); 
+  -webkit-filter: grayscale(0);
 }
 
+/*--------------------------------------------------
+    [4. Block Grid]
+----------------------------------------------------*/
 /*Block Grid v1
 ------------------------------------*/
 .block-grid-v1 {
@@ -328,7 +512,7 @@
   -webkit-transition: all 0.4s ease-in-out;
   -moz-transition: all 0.4s ease-in-out;
   -o-transition: all 0.4s ease-in-out;
-  transition: all 0.4s ease-in-out;  
+  transition: all 0.4s ease-in-out;
 }
 
 .block-grid-v1:hover {
@@ -356,7 +540,7 @@
 }
 
 .block-grid-v1.content-boxes-v1 h3 {
-  margin-bottom: 0; 
+  margin-bottom: 0;
 }
 
 .block-grid-v1.content-boxes-v1 h3 a {
@@ -380,7 +564,7 @@
 .block-grid-v1-add-info {
   margin: 0;
   padding-top: 15px;
-  border-top: solid 1px #eee; 
+  border-top: solid 1px #eee;
 }
 
 .block-grid-v1-add-info li {
@@ -417,7 +601,7 @@
    -webkit-transition: all 0.4s ease-in-out;
    -moz-transition: all 0.4s ease-in-out;
    -o-transition: all 0.4s ease-in-out;
-   transition: all 0.4s ease-in-out;  
+   transition: all 0.4s ease-in-out;
 }
 
 .block-grid-v2 li:hover .block-grid-v2-info {
@@ -435,6 +619,9 @@
   font-size: 16px;
 }
 
+/*--------------------------------------------------
+    [5. Services Box]
+----------------------------------------------------*/
 /*Services Box v1
 ------------------------------------*/
 .service-box-v1 .service-block {
@@ -456,7 +643,7 @@
   bottom: -15px;
   position: absolute;
   margin-left: -25px;
-  background: #72c02c; 
+  background: #72c02c;
 }
 
 .service-box-v1 ul {
@@ -479,6 +666,9 @@
   border-top: none;
 }
 
+/*--------------------------------------------------
+    [6. Service Block ]
+----------------------------------------------------*/
 /*Service Block v1
 ------------------------------------*/
 .service-block-v1 {
@@ -766,6 +956,9 @@
   background: #72c02c;
 }
 
+/*--------------------------------------------------
+    [7. Process]
+----------------------------------------------------*/
 /*Process v1
 ------------------------------------*/
 .process-v1 .process-in {
@@ -781,7 +974,7 @@
   background: #72c02c;
   margin-bottom: 15px;
   display: inline-block;
-  border: solid 9px #fff; 
+  border: solid 9px #fff;
 }
 
 .process-v1 .process-in > li i:after {
@@ -828,6 +1021,9 @@
   }
 }
 
+/*--------------------------------------------------
+    [8. Team]
+----------------------------------------------------*/
 /*Team v1
 ------------------------------------*/
 .team-v1 ul {
@@ -873,7 +1069,7 @@
   transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
-  -webkit-transition: all 0.2s ease-in-out; 
+  -webkit-transition: all 0.2s ease-in-out;
 }
 
 .team-v1 li:hover > .team-img ul {
@@ -894,7 +1090,7 @@
   transition: all 0.1s ease-in-out;
   -o-transition: all 0.1s ease-in-out;
   -moz-transition: all 0.1s ease-in-out;
-  -webkit-transition: all 0.1s ease-in-out; 
+  -webkit-transition: all 0.1s ease-in-out;
 }
 
 .team-v1 li > .team-img li i.fa-twitter:hover {
@@ -943,7 +1139,7 @@
   width: 40px;
   content: " ";
   position: absolute;
-  background: #bbb; 
+  background: #bbb;
   transition: all 0.4s ease-in-out;
   -o-transition: all 0.4s ease-in-out;
   -moz-transition: all 0.4s ease-in-out;
@@ -952,7 +1148,7 @@
 
 .team-v1 li:hover > p:before {
   width: 100%;
-  background: #72c02c; 
+  background: #72c02c;
 }
 
 /*Team v2
@@ -1075,7 +1271,7 @@
   width: 100%;
 }
 
-/*Team Hover Gradient*/ 
+/*Team Hover Gradient*/
 .team-v3 .team-hover {
   left: 0;
   top: 60%;
@@ -1091,7 +1287,7 @@
   transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
-  -webkit-transition: all 0.2s ease-in-out; 
+  -webkit-transition: all 0.2s ease-in-out;
 }
 
 .team-v3 .team-img:hover .team-hover {
@@ -1246,7 +1442,7 @@
   margin-bottom: 20px;
 }
 
-/*Team Hover Gradient*/ 
+/*Team Hover Gradient*/
 .team-v5 .team-hover {
   left: 0;
   top: 60%;
@@ -1261,7 +1457,7 @@
   transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
-  -webkit-transition: all 0.2s ease-in-out; 
+  -webkit-transition: all 0.2s ease-in-out;
 }
 
 .team-v5 .team-img:hover .team-hover {
@@ -1394,12 +1590,12 @@
 .team-v7 .team-arrow-left:before {
   left: -25px;
   border-width: 20px 25px 20px 0;
-  border-color: transparent #fff transparent transparent;  
+  border-color: transparent #fff transparent transparent;
 }
 
 /*Team Info Media Queries*/
 @media (max-width: 991px) {
-  /*Team Arrows*/  
+  /*Team Arrows*/
   .team-v7 .team-arrow-left:before,
   .team-v7 .team-arrow-right:before {
     top: auto;
@@ -1422,6 +1618,9 @@
   }
 }
 
+/*--------------------------------------------------
+    [9. Call To Action]
+----------------------------------------------------*/
 /*Call To Action v1
 ------------------------------------*/
 .call-action-v1 p {
@@ -1429,6 +1628,10 @@
   font-size: 18px;
   font-weight: 200;
   margin-bottom: 0;
+}
+
+.call-action-v1.call-action-v1-boxed {
+  padding: 0 25px;
 }
 
 .call-action-v1 .call-action-v1-box {
@@ -1444,6 +1647,7 @@
 }
 
 .call-action-v1 .call-action-v1-in.inner-btn {
+  padding-top: 1px;
   min-width: 250px;
   text-align: right;
 }
@@ -1484,8 +1688,9 @@
   }
 }
 
-/*Portfolio Box
-------------------------------------*/
+/*--------------------------------------------------
+    [10. Portfolio Box]
+----------------------------------------------------*/
 /*Portfolio Box*/
 @media (min-width: 991px) and (max-width: 1199px) {
   .portfolio-box {
@@ -1558,7 +1763,7 @@
   transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
-  -webkit-transition: all 0.3s ease-in-out;   
+  -webkit-transition: all 0.3s ease-in-out;
 }
 
 .portfolio-box .portfolio-box-in i {
@@ -1627,7 +1832,7 @@
   transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
-  -webkit-transition: all 0.3s ease-in-out;   
+  -webkit-transition: all 0.3s ease-in-out;
 }
 
 .portfolio-box-v1 li img {
@@ -1668,7 +1873,7 @@
   margin-top: 20px;
   position: relative;
   margin-bottom: 20px;
-  text-transform: uppercase; 
+  text-transform: uppercase;
 }
 
 .portfolio-box-v1 .portfolio-box-v1-in h3:after {
@@ -1677,7 +1882,7 @@
   width: 40px;
   content: " ";
   bottom: -10px;
-  background: #fff; 
+  background: #fff;
   margin-left: -20px;
   position: absolute;
 }
@@ -1697,8 +1902,9 @@
   -webkit-backface-visibility: hidden; /*For Chrome*/
 }
 
-/*Portfolio Feature v2
-------------------------------------*/
+/*--------------------------------------------------
+    [11. Portfolio Feature v2]
+----------------------------------------------------*/
 .portfolio-box-v2 {
     margin: 0 0 60px;
 }
@@ -1733,7 +1939,7 @@
   transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
-  -webkit-transition: all 0.3s ease-in-out;   
+  -webkit-transition: all 0.3s ease-in-out;
 }
 
 .portfolio-box-v2 li img {
@@ -1783,9 +1989,12 @@
 }
 
 .portfolio-box-v2 .portfolio-box-v2-in i:hover {
-    background: #72c02c; 
+    background: #72c02c;
 }
 
+/*--------------------------------------------------
+    [12. Thumbnail]
+----------------------------------------------------*/
 /*Thumbnail v1
 ------------------------------------*/
 .thumbnails-v1 .thumbnail-img {
@@ -1808,6 +2017,9 @@
   text-transform: uppercase;
 }
 
+/*--------------------------------------------------
+    [13. Image Backgrounds]
+----------------------------------------------------*/
 /*Image Backgrounds v1
 ------------------------------------*/
 .bg-image-v1 {
@@ -1815,14 +2027,15 @@
   height: auto;
   padding: 50px 0;
   position: relative;
-  background: url(../img/bg/11.jpg) repeat fixed; 
+  background: url(../img/bg/11.jpg) repeat fixed;
+  background-size: cover;
 }
 
 .bg-image-v1:before {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(0,0,0,0.5);
@@ -1842,7 +2055,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(255,255,255,0.7);
@@ -1853,7 +2066,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(0,0,0,0.5);
@@ -1864,8 +2077,9 @@
   color: #eee !important;
 }
 
-/*Parallax Quote
-------------------------------------*/
+/*--------------------------------------------------
+    [14. Parallax Quote]
+----------------------------------------------------*/
 .parallax-quote {
   color: #fff;
   padding: 100px 0;
@@ -1878,7 +2092,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(0,0,0,0.8);
@@ -1888,7 +2102,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: url(../img/patterns/gridtile.png) repeat;
@@ -1898,7 +2112,7 @@
 .parallax-quote-in {
   z-index: 1;
   padding: 0 80px;
-  position: relative; 
+  position: relative;
 }
 
 .parallax-quote-in p {
@@ -1948,7 +2162,7 @@
 .parallax-quote-light .parallax-quote-in {
   background: #fff;
   padding: 30px 80px;
-  border-bottom: solid 2px #ddd; 
+  border-bottom: solid 2px #ddd;
 }
 
 .parallax-quote-light .parallax-quote-in p {
@@ -1975,10 +2189,11 @@
   }
 }
 
-/*Parallax Team
-------------------------------------*/
+/*--------------------------------------------------
+    [15. Parallax Team]
+----------------------------------------------------*/
 .parallax-team {
-  background: url(../img/team/faces.jpg) 50% 0 repeat fixed;  
+  background: url(../img/team/faces.jpg) 50% 0 repeat fixed;
 }
 
 .parallax-team,
@@ -1991,7 +2206,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(255,255,255,0.9);
@@ -1999,7 +2214,7 @@
 
 /*Parallax Team*/
 .parallax-team {
-  background: url(../img/team/faces.jpg) 50% 0 repeat fixed;  
+  background: url(../img/team/faces.jpg) 50% 0 repeat fixed;
 }
 
 .parallax-team,
@@ -2011,8 +2226,9 @@
   background: rgba(0,0,0,0.8);
 }
 
-/*Parallax Counter
-------------------------------------*/
+/*--------------------------------------------------
+    [16. Parallax Counter]
+----------------------------------------------------*/
 .parallax-bg {
   background: url(../img/patterns/5.png) repeat fixed;
 }
@@ -2038,6 +2254,7 @@
 .parallax-counter span.counter {
   font-size: 48px;
 }
+
 
 /*Parallax Counter v1
 ------------------------------------*/
@@ -2086,7 +2303,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   content: " ";
   position: absolute;
   background: rgba(0,0,0,0.02);
@@ -2094,7 +2311,7 @@
 
 .parallax-counter-v2 .counters {
   padding: 20px 0;
-  border-bottom: solid 2px #ddd; 
+  border-bottom: solid 2px #ddd;
   background: rgba(255,255,255,0.9);
 }
 
@@ -2248,8 +2465,9 @@
   text-transform: uppercase;
 }
 
-/*Flat Background Block
-------------------------------------*/
+/*--------------------------------------------------
+    [17. Flat Background Block]
+----------------------------------------------------*/
 .flat-bg-block-v1 {
   padding: 40px 0;
   background: url(../img/patterns/16.png) repeat;
@@ -2289,10 +2507,11 @@
   }
 }
 
-/*Flat Testimonials
-------------------------------------*/
+/*--------------------------------------------------
+    [18. Flat Testimonials]
+----------------------------------------------------*/
 .flat-testimonials {
-  padding: 50px 0; 
+  padding: 50px 0;
   background-color: #333;
 }
 
@@ -2343,10 +2562,13 @@
   padding-left: 5px;
 }
 
+/*--------------------------------------------------
+    [19. Testimonials]
+----------------------------------------------------*/
 /*Testimonials v4
 ------------------------------------*/
 .testimonials-v4 {
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .testimonials-v4 .testimonials-v4-in {
@@ -2477,7 +2699,7 @@
     -webkit-transition: all 0.4s ease-in-out;
     -moz-transition: all 0.4s ease-in-out;
     -o-transition: all 0.4s ease-in-out;
-    transition: all 0.4s ease-in-out;  
+    transition: all 0.4s ease-in-out;
 }
 
 .testimonials-v6 .testimonials-info:hover {
@@ -2512,8 +2734,9 @@
   }
 }
 
-/*Featured Blog
-------------------------------------*/
+/*--------------------------------------------------
+    [20. Featured Blog]
+----------------------------------------------------*/
 .featured-blog h2 {
   font-size: 18px;
   margin: 0 0 25px;
@@ -2561,7 +2784,7 @@
   width: 100%;
 }
 
-/*Team Hover Gradient*/ 
+/*Team Hover Gradient*/
 .featured-blog .featured-img i {
   top: 60%;
   left: 50%;
@@ -2575,7 +2798,7 @@
   transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
-  -webkit-transition: all 0.2s ease-in-out; 
+  -webkit-transition: all 0.2s ease-in-out;
 }
 
 .featured-blog .featured-img:hover i {
@@ -2604,8 +2827,9 @@
   -webkit-transition: all 0.2s ease-in-out;
 }
 
-/*Blog Comments
-------------------------------------*/
+/*--------------------------------------------------
+    [21. Blog Comments]
+----------------------------------------------------*/
 .blog-comments img {
   width: 80px;
   height: auto;
@@ -2667,8 +2891,9 @@
   }
 }
 
-/*Quote
-------------------------------------*/
+/*--------------------------------------------------
+    [22. Quote]
+----------------------------------------------------*/
 .quote-v1 {
   padding: 60px 0;
   text-align: center;
@@ -2735,8 +2960,9 @@
   font-weight: 400;
 }
 
-/*Team Social
-------------------------------------*/
+/*--------------------------------------------------
+    [23. Team Social]
+----------------------------------------------------*/
 .social-icons-v1 i {
   color: #555;
   width: 33px;
@@ -2758,10 +2984,16 @@
   -webkit-transition: all 0.2s ease-in-out;
 }
 
-/*Box Shadows
-------------------------------------*/
+.social-icons-v1--dark i {
+  color: #fff;
+  background: #333;
+}
+
+/*--------------------------------------------------
+    [24. Box Shadows]
+----------------------------------------------------*/
 .shadow-wrapper {
-  z-index: 1;  
+  z-index: 1;
   position: relative;
 }
 
@@ -2781,7 +3013,7 @@
   bottom: 15px;
   max-width: 300px;
   background: #999;
-  position: absolute; 
+  position: absolute;
 }
 
  /*Effect 1*/
@@ -2821,6 +3053,14 @@
   -webkit-transform: rotate(3deg);
 }
 
+/*Effect 5*/
+.shadow-effect-5 {
+  box-shadow: 0 0 2px #ccc;
+}
+
+/*--------------------------------------------------
+    [25. Interactive Slider]
+----------------------------------------------------*/
 /*Interactive Slider v1
 ------------------------------------*/
 .interactive-slider-v1 {
@@ -2894,6 +3134,10 @@
   background-position: center center;
 }
 
+.interactive-slider-v2-md {
+  padding: 250px 0;
+}
+
 .interactive-slider-v2.img-v1 {
   background: url(../img/bg/25.jpg) no-repeat;
   background-size: cover;
@@ -2906,6 +3150,24 @@
   background-position: center center;
 }
 
+.interactive-slider-v2.img-v3 {
+  background: url(../img/bg/img8.jpg) no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.interactive-slider-v2.img-v4 {
+  background: url(../img/bg/img9.jpg) no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.interactive-slider-v2.intro-promo-img {
+  background: url(../img/intro/promo.jpg) no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
 .interactive-slider-v2:after {
   top: 0;
   left: 0;
@@ -2914,7 +3176,14 @@
   height: 100%;
   content: " ";
   position: absolute;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,.4);
+}
+
+.intro-promo-cover-dark:after {
+  background: rgba(0,0,0,.8);
+}
+.intro-promo-cover-light:after {
+  background: rgba(255,255,255,.9);
 }
 
 .interactive-slider-v2 h1 {
@@ -2940,8 +3209,9 @@
   }
 }
 
-/*Blog Trending
-------------------------------------*/
+/*--------------------------------------------------
+    [26. Blog Trending]
+----------------------------------------------------*/
 .blog-trending li {
   margin-bottom: 20px;
 }
@@ -2961,8 +3231,9 @@
   color: #72c02c;
 }
 
-/*Blog Latest Posts
-------------------------------------*/
+/*--------------------------------------------------
+    [27. Blog Latest Posts]
+----------------------------------------------------*/
 .blog-latest-posts li {
   margin-top: 15px;
   padding-top: 15px;
@@ -2995,8 +3266,9 @@
   font-size: 12px;
 }
 
-/*Blog Photostream
-------------------------------------*/
+/*--------------------------------------------------
+    [28. Blog Photostream]
+----------------------------------------------------*/
 .blog-photostream {
   margin-right: -5px;
 }
@@ -3012,8 +3284,9 @@
   height: auto;
 }
 
-/*Newsletter
-------------------------------------*/
+/*--------------------------------------------------
+    [29. Newsletter]
+----------------------------------------------------*/
 .blog-newsletter p {
   color: #555;
   margin-bottom: 15px;
@@ -3027,8 +3300,9 @@
   box-shadow: none;
 }
 
-/*Blog Post Quote
-------------------------------------*/
+/*--------------------------------------------------
+    [30. Blog Post Quote]
+----------------------------------------------------*/
 .blog-post-quote {
   padding: 35px 60px;
   background: #fff;
@@ -3048,7 +3322,7 @@
 @media (max-width: 768px) {
   .blog-post-quote {
     padding: 35px 25px;
-  } 
+  }
 
   .blog-post-quote p {
     font-size: 26px;
@@ -3059,7 +3333,7 @@
 .blog-post-quote p:before,
 .blog-post-quote p:after {
   top: -3px;
-  font-size: 30px;  
+  font-size: 30px;
   position: relative;
 }
 
@@ -3079,8 +3353,9 @@
   font-weight: 200;
 }
 
-/*Blog Post Author
-------------------------------------*/
+/*--------------------------------------------------
+    [31. Blog Post Author]
+----------------------------------------------------*/
 .blog-author {
   padding: 20px;
   background: #fff;
@@ -3113,8 +3388,9 @@
   color: #555;
 }
 
-/*Blog Comments
-------------------------------------*/
+/*--------------------------------------------------
+    [32. Blog Comments]
+----------------------------------------------------*/
 .blog-comments img {
   width: 80px;
   height: auto;
@@ -3176,6 +3452,9 @@
   }
 }
 
+/*--------------------------------------------------
+    [33. News]
+----------------------------------------------------*/
 /*News v1
 ------------------------------------*/
 .news-section {
@@ -3388,7 +3667,7 @@
 }
 
 .news-v3 .news-v3-in-sm .post-shares {
-  margin: 20px 0 0 -5px;  
+  margin: 20px 0 0 -5px;
 }
 
 .news-v3 .post-shares li {
@@ -3440,7 +3719,7 @@
 
 
 /*--------------------------------------------------
-[Blog Grid]
+    [34. Blog Grid]
 ----------------------------------------------------*/
 
 .blog-grid img {
@@ -3546,7 +3825,7 @@
 
 
 /*--------------------------------------------------
-[Blog Thumb]
+    [35. Blog Thumb]
 ----------------------------------------------------*/
 
 .blog-thumb {
@@ -3667,4 +3946,72 @@
 .blog-thumb.blog-thumb-circle .blog-thumb-hover .hover-grad {
   font-size: 15px;
   margin-top: -10px;
+}
+
+/*Blog Thumb Colors
+------------------------------------*/
+.blog-thumb .blog-thumb-hover:hover:after {
+  background: rgba(114,192,44,0.9);
+}
+.blog-grid .blog-grid-grad i:hover {
+  background: rgba(114,192,44,1);
+}
+
+/*--------------------------------------------------
+    [36. Shop-subscribe]
+----------------------------------------------------*/
+.shop-subscribe {
+  padding: 25px 0;
+}
+
+.shop-subscribe h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 200;
+  text-transform: uppercase;
+}
+
+/*Input Form Control*/
+.shop-subscribe input {
+  border-color: #fff;
+  border-right: none;
+  background: transparent;
+}
+
+.shop-subscribe .form-control {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 200;
+}
+
+.shop-subscribe .form-control:focus {
+  box-shadow: none;
+  border-color: #fff;
+}
+
+.shop-subscribe .form-control::-moz-placeholder {
+  color: #fff;
+}
+.shop-subscribe .form-control:-ms-input-placeholder {
+  color: #fff;
+}
+.shop-subscribe .form-control::-webkit-input-placeholder {
+  color: #fff;
+}
+
+.shop-subscribe .input-group-btn {
+  border-color: #fff;
+  background: transparent;
+}
+
+.shop-subscribe .input-group-btn .btn {
+  border: 1px solid #fff;
+  background: transparent;
+}
+
+.shop-subscribe .input-group-btn i {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 200;
 }

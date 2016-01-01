@@ -115,17 +115,20 @@ var OwlCarousel = function () {
             });
 			 
 
-            //Owl Slider v5
-            /*jQuery(document).ready(function() {
+            //Owl Slider v5 fixed in v1.9
+            jQuery(document).ready(function() {
             var owl5 = jQuery(".owl-slider-v5");
                 owl5.owlCarousel({
+                    rtl: true,
                     items:1,
+                    dotsClass: "owl-pagination",
+                    dotClass: "owl-page",
                     itemsDesktop : [1000,1],
                     itemsDesktopSmall : [900,1],
                     itemsTablet: [600,1],
                     itemsMobile : [479,1]
                 });
-            });*/
+            });
 
 
             //Owl Slider v6

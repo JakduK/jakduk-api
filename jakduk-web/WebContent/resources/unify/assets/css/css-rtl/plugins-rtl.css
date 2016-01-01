@@ -488,10 +488,11 @@
   margin-bottom: 20px;
 }
 
-.owl-carousel-v5 .owl-controls .owl-page.active span,
-.owl-carousel-v5 .owl-controls.clickable .owl-page:hover span {
-  background: #72c02c;
-}
+/*Redundant code see line 528*/
+/*.owl-carousel-v5 .owl-controls .owl-page.active span,
+.owl-carousel-v5 .owl-controls .owl-page:hover span {
+
+}*/
 
 .owl-carousel-v5 .owl-controls .owl-page span {
   margin: 5px 3px !important;
@@ -524,10 +525,14 @@
   text-align: center !important;
 }
 
+/*fixed in v1.9*/
 .owl-theme .owl-controls .owl-page.active span,
-.owl-theme .owl-controls.clickable .owl-page:hover span {
+.owl-theme .owl-controls .owl-page:hover span {
   opacity: 1;
   filter: Alpha(Opacity=100);/*IE7 fix*/
+  background: #72c02c;
+  cursor: pointer;
+  opacity: 1;
 }
 
 .owl-theme .owl-controls .owl-page {
