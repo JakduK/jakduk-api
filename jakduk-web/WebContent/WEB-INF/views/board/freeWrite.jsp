@@ -151,9 +151,7 @@
 
 <jsp:include page="../include/footer.jsp"/>
 </div> <!-- /.container -->
-<!-- Bootstrap core JavaScript
-  ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
+
 <script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-file-upload/dist/angular-file-upload.min.js"></script>
@@ -369,8 +367,9 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.images = JSON.stringify(tempImages);
 			}
 			
-			//editor.insertImage($scope.editable, imageUrl);
-			$(".summernote").summernote("insertImage", imageUrl, fileItem.newName); 
+			$(".summernote").summernote("insertImage", imageUrl, function($image) {
+				$image.addClass("img-responsive");
+			});
 		} else {
 			console.log("status=" + status)
 			console.log("upload image failed.");
@@ -381,8 +380,9 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.insertImage = function(item) {
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
 
-		//editor.insertImage($scope.editable, imageUrl);
-		$(".summernote").summernote("insertImage", imageUrl, item.name);
+		$(".summernote").summernote("insertImage", imageUrl, function($image) {
+			$image.addClass("img-responsive");
+		});
 	};	
 
 	$scope.imageUpload = function(files, editor) {
