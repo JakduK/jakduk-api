@@ -31,6 +31,7 @@
 		<intercept-url pattern="/check/**" access="permitAll" requires-channel="https"/>
 		<intercept-url pattern="/**" requires-channel="https"/>
 		<intercept-url pattern="/board/*/write" access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')"/>
+		<intercept-url pattern="/jakdu/write" access="hasAnyRole('ROLE_USER_01', 'ROLE_USER_02', 'ROLE_USER_03')"/>
 		<intercept-url pattern="/admin/**" access="hasRole('ROLE_ROOT')"/>
 		<intercept-url pattern="/logout" access="permitAll" />
 		<intercept-url pattern="/home" access="permitAll" />

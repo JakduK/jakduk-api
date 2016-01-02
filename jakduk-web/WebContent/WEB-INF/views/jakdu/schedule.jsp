@@ -26,7 +26,7 @@
     <!--=== Breadcrumbs ===-->
     <div class="breadcrumbs">
         <div class="container">
-            <h1 class="pull-left"><a href="<c:url value="/jakdu/schdule/refresh"/>"><spring:message code="jakdu.schedule"/></a></h1>
+            <h1 class="pull-left"><a href="<c:url value="/jakdu/schedule/refresh"/>"><spring:message code="jakdu.schedule"/></a></h1>
         </div><!--/container-->
     </div><!--/breadcrumbs-->
     <!--=== End Breadcrumbs ===-->
@@ -35,6 +35,18 @@
 
     <!--=== Content Part ===-->
     <div class="container content">
+
+        <!-- Top Buttons -->
+        <div class="row">
+            <div class="col-sm-6 margin-bottom-10">
+                <button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/jakdu/write"/>'"
+                        tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+                    <span aria-hidden="true" class="icon-pencil"></span>
+                </button>
+            </div>
+        </div>
+        <!-- End Top Buttons -->
+
 
         <div class="panel panel-u">
             <div class="panel-heading hidden-xs">
@@ -55,14 +67,16 @@
                             {{competitionNames[schedule.competition.id].fullName}}
                         </div>
                         <div class="col-sm-4">
-                            {{fcNames[schedule.home.id]}}
-                            <span ng-if="!schedule.timeUp">VS</span>
+                            <span class="visible-xs">{{fcNames[schedule.home.id].shortName}}</span>
+                            <span class="hidden-xs">{{fcNames[schedule.home.id].fullName}}</span>
+                            <span class="color-grey" ng-if="!schedule.timeUp">VS</span>
                             <span ng-if="schedule.timeUp">
-                                <span ng-if="schedule.score">
+                                <strong ng-if="schedule.score">
                                     {{schedule.score.homeFullTime}} : {{schedule.score.awayFullTime}}
-                                </span>
+                                </strong>
                             </span>
-                            {{fcNames[schedule.away.id]}}
+                            <span class="visible-xs">{{fcNames[schedule.away.id].shortName}}</span>
+                            <span class="hidden-xs">{{fcNames[schedule.away.id].fullName}}</span>
                         </div>
                     </div>
                 </li>
@@ -77,8 +91,9 @@
 </div>
 
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script type="text/javascript">
-    var jakdukApp = angular.module("jakdukApp", []);
+    var jakdukApp = angular.module("jakdukApp", ["ui.bootstrap"]);
 
     jakdukApp.controller('jakduCtrl', function($scope, $http) {
         $scope.dataSchedulesConn = "none";

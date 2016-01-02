@@ -1,6 +1,6 @@
 package com.jakduk.model.db;
 
-import com.jakduk.model.embedded.JakduScore;
+import com.jakduk.model.embedded.JakduScheduleScore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -35,7 +34,7 @@ public class JakduSchedule {
     @DBRef
     private Competition competition;
 
-    private JakduScore score;
+    private JakduScheduleScore score;
 
     private boolean timeUp;
 
@@ -79,11 +78,11 @@ public class JakduSchedule {
         this.competition = competition;
     }
 
-    public JakduScore getScore() {
+    public JakduScheduleScore getScore() {
         return score;
     }
 
-    public void setScore(JakduScore score) {
+    public void setScore(JakduScheduleScore score) {
         this.score = score;
     }
 

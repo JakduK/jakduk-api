@@ -3,7 +3,7 @@ package com.jakduk.model.embedded;
 /**
  * Created by pyohwan on 15. 12. 25.
  */
-public class JakduScore {
+public class JakduScheduleScore {
 
     private Integer homeFullTime;
 
@@ -67,7 +67,7 @@ public class JakduScore {
 
     @Override
     public String toString() {
-        return "JakduScore{" +
+        return "JakduScheduleScore{" +
                 "homeFullTime=" + homeFullTime +
                 ", awayFullTime=" + awayFullTime +
                 ", homeOverTime=" + homeOverTime +
