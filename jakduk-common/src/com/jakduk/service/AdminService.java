@@ -21,7 +21,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 
 import com.jakduk.model.db.*;
-import com.jakduk.model.embedded.JakduScore;
+import com.jakduk.model.embedded.JakduScheduleScore;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.*;
 import com.jakduk.repository.*;
@@ -743,7 +743,7 @@ public String initSearchData() {
 
 	public void getJakduScheduleWrite(Model model, String id) {
 		JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
-		JakduScore jakduScore = jakduSchedule.getScore();
+		JakduScheduleScore jakduScore = jakduSchedule.getScore();
 
 		JakduScheduleWrite jakduScheduleWrite = new JakduScheduleWrite();
 		jakduScheduleWrite.setDate(jakduSchedule.getDate());
@@ -786,7 +786,7 @@ public String initSearchData() {
 		Competition competition = competitionRepository.findOne(jakduScheduleWrite.getCompetition());
 
 		if (jakduScheduleWrite.isTimeUp()) {
-			JakduScore jakduScore = new JakduScore();
+			JakduScheduleScore jakduScore = new JakduScheduleScore();
 
 			if (jakduScheduleWrite.getHomeFullTime() != null && jakduScheduleWrite.getAwayFullTime() != null) {
 				jakduScore.setHomeFullTime(jakduScheduleWrite.getHomeFullTime());
