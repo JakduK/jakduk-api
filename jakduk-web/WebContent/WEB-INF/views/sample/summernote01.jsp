@@ -72,10 +72,7 @@
       <input type="file" name="file">
       <input type="submit">
 </form>  
- <small>dfsdfsdfds</small>
- <h4><small>dfsdfsdfds</small></h5>
- 
- 
+
 </div>
 	
 <jsp:include page="../include/footer.jsp"/>

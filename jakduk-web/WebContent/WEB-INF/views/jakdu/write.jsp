@@ -39,42 +39,49 @@
     <!--=== Content Part ===-->
     <div class="container content">
 
-        <form:form modelAttribute="jakdus" name="jakdus" action="${contextPath}/jakdu/write" method="POST" cssClass="form-horizontal">
-            <c:forEach items="${jakdus}" var="jakdu" varStatus="status">
+        <form:form commandName="jakduWriteList" name="jakduWriteList" action="${contextPath}/jakdu/write" method="POST" cssClass="form-horizontal"
+                   ng-submit="onSubmit($event)">
+            <c:forEach items="${jakduWriteList.jakdus}" var="jakdu" varStatus="status">
 
                 <div class="row">
                     <div class="col-sm-4">
-                            <label class="col-sm-2 control-label"><spring:message code="common.date"/></label>
-                            <div class="col-sm-10">
+                            <label class="col-sm-3 control-label"><spring:message code="common.date"/></label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static"><fmt:formatDate value="${jakdu.schedule.date}" pattern="${dateTimeFormat.dateTime}" /></p>
                             </div>
                     </div>
                     <div class="col-sm-4">
-                            <label class="col-sm-2 control-label"><spring:message code="common.competition"/></label>
-                            <div class="col-sm-10">
+                            <label class="col-sm-3 control-label"><spring:message code="common.competition"/></label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static">${competitionNames[jakdu.schedule.competition.id].fullName}</p>
                             </div>
                     </div>
                     <div class="col-sm-4">
-                            <label class="col-sm-2 control-label"><spring:message code="jakdu.match"/></label>
-                            <div class="col-sm-10">
-                                <p class="form-control-static">${fcNames[jakdu.schedule.home.id].fullName} VS ${fcNames[jakdu.schedule.away.id].fullName}</p>
+                            <label class="col-sm-3 control-label"><spring:message code="jakdu.match"/></label>
+                            <div class="col-sm-9">
+                                <p class="form-control-static">${fcNames[jakdu.schedule.home.id].shortName} VS ${fcNames[jakdu.schedule.away.id].shortName}</p>
                             </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="col-sm-1 control-label"><spring:message code="jakdu.expect.score"/></label>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="jakduWriteList.jakdus[${status.index}].homeScore" value="${jakdu.homeScore}">
+                                <option value=""><spring:message code="board.placeholder.expect.home.score"/></option>
+                                <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="jakduWriteList.jakdus[${status.index}].awayScore" value="${jakdu.awayScore}">
+                                <option value=""><spring:message code="board.placeholder.expect.away.score"/></option>
+                                <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
+                            </select>
+                        </div>
 
-                <div class="form-group">
-                    <label class="sr-only" for="exampleInputEmail3">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail3" placeholder="Email">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="sr-only" for="exampleInputPassword3">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword3" placeholder="Password">
-                </div>
-
-                <div class="form-group">
-                    <input class="form-control" name="jakdus[${status.index}].homeScore" value="${jakdu.homeScore}"/>
-                </div>
+                <hr/>
             </c:forEach>
 
             <button type="submit">Submit</button>
@@ -82,6 +89,7 @@
         </form:form>
 
 
+        {{jakduWriteList}}
 
     </div> <!--=== End Content Part ===-->
 
@@ -93,12 +101,22 @@
 <script type="text/javascript">
     var jakdukApp = angular.module("jakdukApp", ["ui.bootstrap"]);
 
-    jakdukApp.controller('jakduCtrl', function($scope, $http) {
+    jakdukApp.controller('jakduCtrl', function($scope) {
+        $scope.rangeScore = [];
+
+        for (i = 0 ; i < 19 ; i++) {
+            $scope.rangeScore.push(i);
+        }
 
         angular.element(document).ready(function() {
+
             App.init();
         });
 
+        $scope.onSubmit = function(event) {
+
+            console.log($scope.jakduWriteList.$valid);
+        };
     });
 </script>
 

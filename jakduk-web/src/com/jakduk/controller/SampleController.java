@@ -1,13 +1,20 @@
 package com.jakduk.controller;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/sample")
 public class SampleController {
-	
+
+	private Logger logger = Logger.getLogger(this.getClass());
+
 	@RequestMapping(value = "/summernote01")
 	public String summernote01(Model model) {
 		
@@ -171,4 +178,17 @@ public class SampleController {
 	public String date01(Model model) {
 		return "sample/date01";
 	}
+
+	@RequestMapping(value ="/rest01", method = RequestMethod.GET)
+	public String rest01(Model model) {
+		return "sample/rest01";
+	}
+
+	@RequestMapping(value ="/rest01", method = RequestMethod.POST)
+	public String rest01(@RequestBody Map body) {
+		logger.debug(body);
+
+		return "sample/rest01";
+	}
+
 }

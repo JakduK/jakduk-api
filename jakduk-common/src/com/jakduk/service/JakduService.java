@@ -6,6 +6,7 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.web.JakduWriteList;
 import com.jakduk.repository.JakduScheduleRepository;
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -103,6 +104,7 @@ public class JakduService {
         String language = commonService.getLanguageCode(locale, null);
 
         Set<ObjectId> fcIds = new HashSet<>();
+        JakduWriteList jakduWriteList = new JakduWriteList();
         List<Jakdu> jakdus = new ArrayList<>();
         Set<ObjectId> competitionIds = new HashSet<>();
         List<JakduSchedule> schedules = jakduScheduleRepository.findByTimeUpOrderByDateAsc(false);
@@ -119,6 +121,8 @@ public class JakduService {
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
 
+        jakduWriteList.setJakdus(jakdus);
+
         Map<String, LocalName> fcNames = new HashMap<>();
         Map<String, LocalName> competitionNames = new HashMap<>();
 
@@ -134,7 +138,7 @@ public class JakduService {
         }
 
         model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-        model.addAttribute("jakdus", jakdus);
+        model.addAttribute("jakduWriteList", jakduWriteList);
         model.addAttribute("fcNames", fcNames);
         model.addAttribute("competitionNames", competitionNames);
     }

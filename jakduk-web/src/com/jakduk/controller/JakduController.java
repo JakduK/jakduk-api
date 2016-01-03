@@ -83,9 +83,10 @@ public class JakduController {
     }
 
     @RequestMapping(value = "/write", method = RequestMethod.POST)
-    public String write(@Valid JakduWriteList jakdus, BindingResult result, SessionStatus sessionStatus) {
+    public String write(
+            @RequestParam(required = false) String content,JakduWriteList jakduWriteList, BindingResult result, SessionStatus sessionStatus) {
 
-        logger.debug("jakdus=" + jakdus);
+        logger.debug("jakduWriteList=" + jakduWriteList);
 
         if (result.hasErrors()) {
             if (logger.isDebugEnabled()) {
