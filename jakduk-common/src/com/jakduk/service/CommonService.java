@@ -1,18 +1,15 @@
 package com.jakduk.service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.jakduk.authentication.common.CommonUserDetails;
+import com.jakduk.authentication.common.OAuthPrincipal;
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
+import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.Sequence;
 import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.repository.SequenceRepository;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +23,20 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.jakduk.authentication.common.CommonUserDetails;
-import com.jakduk.authentication.common.OAuthPrincipal;
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.Sequence;
-import com.jakduk.repository.FootballClubRepository;
-import com.jakduk.repository.SequenceRepository;
-import org.springframework.ui.Model;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -187,10 +190,14 @@ public class CommonService {
 	}
 	
 	public void setCookie(HttpServletResponse response, String name, String value, String path) {
-		Cookie cookie = new Cookie(name, value);
-		cookie.setMaxAge(CommonConst.COOKIE_EMAIL_MAX_AGE); // a day
-		cookie.setPath(path);
-		response.addCookie(cookie);		
+		try {
+			Cookie cookie = new Cookie(name, URLEncoder.encode(value, "UTF-8"));
+			cookie.setMaxAge(CommonConst.COOKIE_EMAIL_MAX_AGE); // a day
+			cookie.setPath(path);
+			response.addCookie(cookie);
+		} catch (UnsupportedEncodingException e) {
+			logger.error(e);
+		}
 	}
 	
 	public void releaseCookie(HttpServletResponse response, String name, String path) {
