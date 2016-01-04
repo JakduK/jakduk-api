@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -106,14 +102,14 @@ public class HomeService {
 	}
 	
 	public Model getBoardLatest(Model model) {
-		
+
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
 		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_POST, sort);
 		
 		List<BoardFreeOnHome> posts = boardFreeOnHomeRepository.findAll(pageable).getContent();
 		
 		model.addAttribute("posts", posts);
-		
+
 		return model;
 	}
 	
@@ -227,8 +223,11 @@ public class HomeService {
 	public Model getHomeDescription(Model model) {
 		
 		HomeDescription homeDescription = jakdukDAO.getHomeDescription();
-		
-		model.addAttribute("homeDescription", homeDescription);
+
+		if (homeDescription == null)
+			model.addAttribute("homeDescription", new HashMap());
+		else
+			model.addAttribute("homeDescription", homeDescription);
 		
 		return model;
 	}	
