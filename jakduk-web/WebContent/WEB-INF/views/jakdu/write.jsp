@@ -39,30 +39,33 @@
     <!--=== Content Part ===-->
     <div class="container content">
 
-        <form:form commandName="jakduWriteList" name="jakduWriteList" action="${contextPath}/jakdu/write" method="POST" cssClass="form-horizontal"
-                   ng-submit="onSubmit($event)">
-            <c:forEach items="${jakduWriteList.jakdus}" var="jakdu" varStatus="status">
+        <form class="form-horizontal" ng-submit="onSubmit($event)">
+
+            <div class="row" ng-repeat="jakdu in jakdus">
 
                 <div class="row">
                     <div class="col-sm-4">
-                            <label class="col-sm-3 control-label"><spring:message code="common.date"/></label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static"><fmt:formatDate value="${jakdu.schedule.date}" pattern="${dateTimeFormat.dateTime}" /></p>
-                            </div>
+                        <label class="col-sm-3 control-label"><spring:message code="common.date"/></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{jakdu.schedule.date | date:dateTimeFormat.dateTime}}</p>
+                        </div>
                     </div>
                     <div class="col-sm-4">
-                            <label class="col-sm-3 control-label"><spring:message code="common.competition"/></label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static">${competitionNames[jakdu.schedule.competition.id].fullName}</p>
-                            </div>
+                        <label class="col-sm-3 control-label"><spring:message code="common.competition"/></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{competitionNames[jakdu.schedule.competition.id].fullName}}</p>
+                        </div>
                     </div>
                     <div class="col-sm-4">
-                            <label class="col-sm-3 control-label"><spring:message code="jakdu.match"/></label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static">${fcNames[jakdu.schedule.home.id].shortName} VS ${fcNames[jakdu.schedule.away.id].shortName}</p>
-                            </div>
+                        <label class="col-sm-3 control-label"><spring:message code="jakdu.match"/></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{fcNames[jakdu.schedule.home.id].shortName}} VS {{fcNames[jakdu.schedule.away.id].shortName}}</p>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <c:forEach items="${jakduWriteList.jakdus}" var="jakdu" varStatus="status">
+
                 <div class="row">
                     <div class="col-sm-12">
                         <label class="col-sm-1 control-label"><spring:message code="jakdu.expect.score"/></label>
@@ -86,12 +89,12 @@
 
             <button type="submit">Submit</button>
 
-        </form:form>
+        </form>
 
 
         {{jakduWriteList}}
 
-    </div> <!--=== End Content Part ===-->
+    </form> <!--=== End Content Part ===-->
 
     <jsp:include page="../include/footer.jsp"/>
 </div>
@@ -101,14 +104,20 @@
 <script type="text/javascript">
     var jakdukApp = angular.module("jakdukApp", ["ui.bootstrap"]);
 
-    jakdukApp.controller('jakduCtrl', function($scope) {
+    jakdukApp.controller('jakduCtrl', function($scope, $http) {
         $scope.rangeScore = [];
+        $scope.dataJakdusConn = "none";
+        $scope.dateTimeFormat = {};
+        $scope.jakdus = [];
+        $scope.competitionNames = {};
+        $scope.fcNames = {};
 
         for (i = 0 ; i < 19 ; i++) {
             $scope.rangeScore.push(i);
         }
 
         angular.element(document).ready(function() {
+            $scope.getDataJakdus();
 
             App.init();
         });
@@ -116,6 +125,44 @@
         $scope.onSubmit = function(event) {
 
             console.log($scope.jakduWriteList.$valid);
+        };
+
+        $scope.getDataJakdus = function() {
+            var bUrl = '<c:url value="/jakdu/data" />';
+
+            if ($scope.dataJakdusConn == "none") {
+
+                var reqPromise = $http.get(bUrl);
+
+                $scope.dataJakdusConn = "loading";
+
+                reqPromise.success(function(data, status, headers, config) {
+
+                    console.log(data);
+
+                    if (data.dateTimeFormat != null) {
+                        $scope.dateTimeFormat = data.dateTimeFormat;
+                    }
+
+                    if (data.jakdus != null) {
+                        $scope.jakdus = data.jakdus;
+                    }
+
+                    if (data.competitionNames != null) {
+                        $scope.competitionNames = data.competitionNames;
+                    }
+
+                    if (data.fcNames != null) {
+                        $scope.fcNames = data.fcNames;
+                    }
+
+                    $scope.dataJakdusConn = "none";
+                });
+                reqPromise.error(function(data, status, headers, config) {
+                    $scope.dataJakdusConn = "none";
+                    $scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+                });
+            }
         };
     });
 </script>
