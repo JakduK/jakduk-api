@@ -6,7 +6,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!--=== Header ===-->    
-<div class="header-v5" ng-controller="headerCtrl">
+<div class="header-v5 header-sticky header-fixed-shrink" ng-controller="headerCtrl">
 	<!-- Topbar v3 -->
 	<div class="topbar-v3">
 	    <div class="search-open">

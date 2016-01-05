@@ -5,7 +5,8 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <!DOCTYPE html>
-<html ng-app="jakdukApp">
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<title><spring:message code="board.free.breadcrumbs.comments"/> &middot; <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	
@@ -13,7 +14,8 @@
 	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
 </head>
-<body>
+
+<body class="header-fixed">
 
 <sec:authorize access="isAnonymous()">
 	<c:set var="authRole" value="ANNONYMOUS"/>

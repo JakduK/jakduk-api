@@ -6,7 +6,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
-<html ng-app="jakdukApp">
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<title><spring:message code="board.write"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
@@ -17,7 +18,7 @@
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 
-<body>
+<body class="header-fixed">
 <div class="wrapper">
 <jsp:include page="../include/navigation-header.jsp"/>
 
