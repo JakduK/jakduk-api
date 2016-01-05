@@ -19,7 +19,8 @@
     <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
-<body>
+<body class="header-fixed">
+
 <div class="wrapper" ng-controller="jakduCtrl">
     <jsp:include page="../include/navigation-header.jsp"/>
 

@@ -1,5 +1,4 @@
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.text-gray {color:#999;}
 
 .padding-5 {margin:10px 0px;}
 .padding-10 {margin:20px 0px;}
@@ -20,6 +19,11 @@
 
 .topbar-v3 ul.left-topbar > li > a {
 	font-size: 14px;
+}
+
+/* 상단 네비게이션 메뉴 */
+.header-v5 .navbar-header {
+	margin-right:inherit;
 }
 
 /* 홈에서 최근 글 */
