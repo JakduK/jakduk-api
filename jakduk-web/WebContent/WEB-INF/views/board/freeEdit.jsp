@@ -367,9 +367,15 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.images = JSON.stringify(tempImages);
 			}
 
+			// summernote 0.7.0
+			$(".summernote").summernote("insertImage", imageUrl, fileItem.newName);
+
+			// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+			/*
 			$(".summernote").summernote("insertImage", imageUrl, function($image) {
 				$image.addClass("img-responsive");
 			});
+			*/
 		} else {
 			console.log("upload image failed. status=" + status);
 		}
@@ -379,9 +385,15 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.insertImage = function(item) {
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
 
+		// summernote 0.7.0
+		$(".summernote").summernote("insertImage", imageUrl, item.name);
+
+		// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+		/*
 		$(".summernote").summernote("insertImage", imageUrl, function($image) {
 			$image.addClass("img-responsive");
 		});
+		*/
 	};	
 	
 	// angular-summernote method

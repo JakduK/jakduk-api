@@ -346,10 +346,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	
 	// 이미지 업로드를 완료.
 	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-		console.log('onCompleteItem fileItem=', fileItem);
-		//console.log('onCompleteItem status=', status);
-		//console.log('onCompleteItem headers=', headers);
-		
+
 		if (status == 200) {
 			var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.image.id;
 
@@ -366,10 +363,16 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				tempImages.push(imageInfo);
 				$scope.images = JSON.stringify(tempImages);
 			}
-			
+
+			// summernote 0.7.0
+			$(".summernote").summernote("insertImage", imageUrl, fileItem.newName);
+
+			// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+			/*
 			$(".summernote").summernote("insertImage", imageUrl, function($image) {
 				$image.addClass("img-responsive");
 			});
+			*/
 		} else {
 			console.log("status=" + status)
 			console.log("upload image failed.");
@@ -380,9 +383,15 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.insertImage = function(item) {
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
 
+		// summernote 0.7.0
+		$(".summernote").summernote("insertImage", imageUrl, item.name);
+
+		// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+		/*
 		$(".summernote").summernote("insertImage", imageUrl, function($image) {
 			$image.addClass("img-responsive");
 		});
+		*/
 	};	
 
 	$scope.imageUpload = function(files, editor) {
