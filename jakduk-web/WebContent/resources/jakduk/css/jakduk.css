@@ -12,18 +12,9 @@
 .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;}
 
 /* 상단 네비게이션 */
-.topbar-v3 .right-topbar li,
-.topbar-v3 .right-topbar li a {
-	font-size: 14px;
-}
-
-.topbar-v3 ul.left-topbar > li > a {
-	font-size: 14px;
-}
-
-/* 상단 네비게이션 메뉴 */
-.header-v5 .navbar-header {
-	margin-right:inherit;
+.header .topbar ul.loginbar > li > a,
+.header .topbar ul.loginbar > li > a:hover {
+	font-size: 12px;
 }
 
 /* 홈에서 최근 글 */
