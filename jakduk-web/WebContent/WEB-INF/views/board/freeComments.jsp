@@ -12,7 +12,8 @@
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 	
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css">
 </head>
 
 <body class="header-fixed">
@@ -101,8 +102,8 @@
 		<div class="col-sm-6 margin-bottom-10">
 			<c:choose>
 				<c:when test="${authRole == 'ANNONYMOUS'}">
-				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();
-				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'">
+				<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
 					<span aria-hidden="true" class="icon-pencil"></span>
 				</button>	
 				</c:when>
@@ -149,13 +150,13 @@
 					</a>
 				</p>
 	
-				<button type="button" class="btn btn-xs rounded btn-default" 
+				<button type="button" class="btn btn-xs rounded btn-dropbox"
 				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'like')"
 				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 					<i class="fa fa-thumbs-o-up fa-lg" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length"></i>
 					{{numberOfCommentLike[comment.id]}}
 				</button>
-				<button type="button" class="btn btn-xs rounded btn-default" 
+				<button type="button" class="btn btn-xs rounded btn-weibo"
 				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'dislike')"
 				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 					<i class="fa fa-thumbs-o-down fa-lg" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length"></i>

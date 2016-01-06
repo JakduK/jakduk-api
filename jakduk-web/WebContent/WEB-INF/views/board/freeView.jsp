@@ -22,6 +22,7 @@
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">	
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css">
 </head>
 
 <body class="header-fixed">
@@ -218,14 +219,14 @@
 			<div class="ladda-btn margin-bottom-10">
 				<div class="row">
 					<div class="col-xs-6">
-						<button class="btn-u btn-brd rounded btn-u-blue btn-u-sm ladda-button" type="button"
+						<button class="btn btn-u-sm ladda-button btn-dropbox" type="button"
 							ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
 							ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 							<i class="fa fa-thumbs-o-up fa-lg"></i>
 						   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
 						</button>
-						<button class="btn-u btn-brd rounded btn-u-red btn-u-sm ladda-button" type="button" 
+						<button class="btn btn-u-sm ladda-button btn-weibo" type="button"
 							ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
 							ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
@@ -234,7 +235,7 @@
 						</button>
 					</div>
 					<div class="col-xs-6 text-right">
-						<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
+						<button class="btn btn-android" type="button" ng-click="btnUrlCopy()"
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
 							<i class="icon-link"></i>
 						</button>
@@ -261,7 +262,7 @@
 
 			<!-- 댓글 목록  -->	
 			<div class="media margin-bottom-10">
-				<h4 id="comments" class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">		  
+				<h4 id="comments" class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
 					<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
 					<button type="button" class="btn btn-link" ng-click="btnRefreshComment()"
 					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.refresh.comments"/>'>
@@ -281,14 +282,14 @@
 							<span ng-bind-html="comment.content"></span>
 						</p>
 						
-						<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'like')"
+						<button type="button" class="btn btn-xs rounded btn-dropbox" ng-click="btnCommentFeeling(comment.id, 'like')"
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 							<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
 								<i class="fa fa-thumbs-o-up fa-lg"></i>
 								{{numberOfCommentLike[comment.id]}}
 							</span>
 						</button>
-						<button type="button" class="btn btn-xs rounded btn-default" ng-click="btnCommentFeeling(comment.id, 'dislike')"
+						<button type="button" class="btn btn-xs rounded btn-weibo" ng-click="btnCommentFeeling(comment.id, 'dislike')"
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 							<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
 								<i class="fa fa-thumbs-o-down fa-lg"></i>
