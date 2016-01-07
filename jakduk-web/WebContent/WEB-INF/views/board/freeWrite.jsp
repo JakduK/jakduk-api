@@ -176,16 +176,7 @@ window.onbeforeunload = function(e) {
 	}
 };
 
-function isEmpty(str) {
-	obj = String(str);
-
-	if(obj == null || obj == undefined || obj == 'null' || obj == 'undefined' || obj == '' ) return true;
-
-	else return false;
-}
-
 var submitted = false;
-//var editor = $.summernote.eventHandler.getEditor();
 var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
@@ -205,12 +196,12 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.storedImages.push(entry);
 				$scope.$apply();
 			}) ;
-		}		
+		}
 	});
-	
-	var contentValue = document.getElementById("content").value
+
+	var contentValue = document.getElementById("content").value;
 	$scope.content = contentValue ? contentValue : '♪';
-	
+
 	$scope.options = {
 		height: 0,
 		//placeholder: '<spring:message code="board.msg.write.text.here"/>',
@@ -226,11 +217,11 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			['table', ['table']],
 			['insert', ['link', 'picture', 'video', 'hr']],
 			['view', ['fullscreen', 'codeview']],
-			['help', ['help']]			          
+			['help', ['help']]
 		]
 	};
-	
-	$scope.uploader = new FileUploader({		
+
+	$scope.uploader = new FileUploader({
 		url:'<c:url value="/gallery/upload.json"/>',
 		autoUpload:true,
 		method:"POST"
