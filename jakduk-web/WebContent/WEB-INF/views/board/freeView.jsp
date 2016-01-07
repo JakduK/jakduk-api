@@ -235,7 +235,7 @@
 						</button>
 					</div>
 					<div class="col-xs-6 text-right">
-						<button class="btn btn-android" type="button" ng-click="btnUrlCopy()"
+						<button class="btn btn-u-sm rounded btn-android" type="button" ng-click="btnUrlCopy()"
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
 							<i class="icon-link"></i>
 						</button>
@@ -262,14 +262,18 @@
 
 			<!-- 댓글 목록  -->	
 			<div class="media margin-bottom-10">
-				<h4 id="comments" class="text-primary" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
-					<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+
+				<h2 class="heading-sm text-primary">
+					<i class="fa fa-comments"></i>
+					<span id="comments" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
+						<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+					</span>
 					<button type="button" class="btn btn-link" ng-click="btnRefreshComment()"
-					tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.refresh.comments"/>'>
+							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.refresh.comments"/>'>
 						<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
 					</button>
-				</h4>
-			
+				</h2>
+
 				<div class="media-body">
 					<div ng-repeat="comment in commentList">
 						<h5 class="media-heading">
