@@ -106,6 +106,9 @@ public class AdminService {
 	private JakduScheduleRepository jakduScheduleRepository;
 
 	@Autowired
+	private JakduScheduleGroupRepository jakduScheduleGroupRepository;
+
+	@Autowired
 	private CompetitionRepository competitionRepository;
 
 	private Logger logger = Logger.getLogger(this.getClass());
@@ -844,6 +847,43 @@ public String initSearchData() {
 		List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll();
 
 		model.addAttribute("jakduSchedules", jakduSchedules);
+
+		return model;
+	}
+
+	public void getJakduScheduleGroupWrite(Model model) {
+		model.addAttribute("jakduScheduleGroupWrite", new JakduScheduleGroupWrite());
+	}
+
+	public void writeJakduScheduleGroup(JakduScheduleGroupWrite jakduScheduleGroupWrite) {
+		JakduScheduleGroup jakduScheduleGroup = new JakduScheduleGroup();
+
+		jakduScheduleGroup.setOpenDate(jakduScheduleGroupWrite.getOpenDate());
+		jakduScheduleGroup.setState(jakduScheduleGroupWrite.getState());
+
+		if (jakduScheduleGroupWrite.isNextSeq()) {
+			jakduScheduleGroup.setSeq(commonService.getNextSequence(CommonConst.SEQ_JAKDU_SCHEDULE_GROUP));
+		} else {
+			jakduScheduleGroup.setSeq(jakduScheduleGroupWrite.getSeq());
+		}
+
+		if (jakduScheduleGroupWrite.getId().isEmpty()) {
+			jakduScheduleGroup.setId(null);
+		} else {
+			jakduScheduleGroup.setId(jakduScheduleGroupWrite.getId());
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("jakduScheduleGroup=" + jakduScheduleGroup);
+		}
+
+		jakduScheduleGroupRepository.save(jakduScheduleGroup);
+	}
+
+	public Model getDataJakduScheduleGroupList(Model model) {
+		List<JakduScheduleGroup> jakduScheduleGroups = jakduScheduleGroupRepository.findAll();
+
+		model.addAttribute("jakduScheduleGroups", jakduScheduleGroups);
 
 		return model;
 	}

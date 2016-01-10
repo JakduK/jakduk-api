@@ -20,7 +20,9 @@ public class CommonConst {
 	 */
 	public final static String ENCYCLOPEDIA_EN = "encyclopediaEn";
 	public final static String ENCYCLOPEDIA_KO = "encyclopediaKo";
-	
+
+	public final static String SEQ_JAKDU_SCHEDULE_GROUP = "JAKDU_SCHEDULE_GROUP";
+
 	/**
 	 * 화면에 보여질 목록 갯수
 	 */
@@ -177,5 +179,12 @@ public class CommonConst {
 	public enum CLUB_SEX {
 		MEN,
 		WOMEN
+	}
+
+	public enum JAKDU_GROUP_STATE {
+		SCHEDULE,	// 경기 예정
+		STANDBY,	// 대기중
+		PLAYING,	// 진행중
+		TIMEUP		// 경기 종료
 	}
 }

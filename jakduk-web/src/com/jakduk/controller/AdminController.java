@@ -402,6 +402,32 @@ public class AdminController {
 		adminService.getDataJakduScheduleList(model);
 	}
 
+	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.GET)
+	public String jakduScheduleGroupWrite(Model model) {
+
+		adminService.getJakduScheduleGroupWrite(model);
+
+		return "admin/jakduScheduleGroupWrite";
+	}
+
+	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.POST)
+	public String jakduScheduleGroupWrite(@Valid JakduScheduleGroupWrite jakduScheduleGroupWrite, BindingResult result) {
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/jakduScheduleGroupWrite";
+		}
+
+		adminService.writeJakduScheduleGroup(jakduScheduleGroupWrite);
+
+		return "redirect:/admin/settings?open=jakduScheduleGroup";
+	}
+
+	@RequestMapping(value = "/data/jakdu/schedule/group", method = RequestMethod.GET)
+	public void dataJakduScheduleGroup(Model model) {
+
+		adminService.getDataJakduScheduleGroupList(model);
+	}
+
 	@RequestMapping(value = "/competition/write", method = RequestMethod.GET)
 	public String competitionWrite(Model model) {
 

@@ -44,6 +44,7 @@
 				<li><a href="<c:url value="/admin/attendance/league/write"/>">Attendance League Write</a></li>
 				<li><a href="<c:url value="/admin/attendance/club/write"/>">Attendance Club Write</a></li>
 				<li><a href="<c:url value="/admin/jakdu/schedule/write"/>">Jakdu Schedule Write</a></li>
+				<li><a href="<c:url value="/admin/jakdu/schedule/group/write"/>">Jakdu Schedule Group Write</a></li>
 				<li><a href="<c:url value="/admin/competition/write"/>">Competition Write</a></li>
 			</ul>
 		</div>
@@ -61,6 +62,7 @@
 				<li><a ng-click="getData('attendanceLeague')">Get Attendance League</a></li>
 				<li><a ng-click="getData('attendanceClub')">Get Attendance Club</a></li>
 				<li><a ng-click="getData('jakduSchedule')">Get Jakdu Schedule</a></li>
+				<li><a ng-click="getData('jakduScheduleGroup')">Get Jakdu Schedule Group</a></li>
 				<li><a ng-click="getData('competition')">Get Competition</a></li>
 			</ul>
 		</div>
@@ -214,6 +216,21 @@
 			</table>
 		</div>
 
+		<div ng-show="jakduScheduleGroups.length > 0">
+			<h4>Jakdu Schedule</h4>
+			<table class="table">
+				<tr>
+					<th>id</th><th>Seq</th><th>State</th><th>OpenDate</th>
+				</tr>
+				<tr ng-repeat="jakduScheduleGroup in jakduScheduleGroups">
+					<td><a href="<c:url value="/admin/jakdu/schedule/group/write/{{jakduScheduleGroup.id}}"/>">{{jakduScheduleGroup.id}}</a></td>
+					<td>{{jakduScheduleGroup.seq}}</td>
+					<td>{{jakduScheduleGroup.state}}</td>
+					<td>{{jakduScheduleGroup.openDate | date:'short' }}</td>
+				</tr>
+			</table>
+		</div>
+
 		<div ng-show="competitions.length > 0">
 			<h4>Competitions</h4>
 			<table class="table">
@@ -249,6 +266,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 	$scope.attendanceClubs = [];
 	$scope.homeDescriptions = [];
 	$scope.jakduSchedules = [];
+	$scope.jakduScheduleGroups = [];
 	$scope.competitions = [];
 	
 	angular.element(document).ready(function() {
@@ -276,6 +294,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 			bUrl = '<c:url value="/admin/data/home/description.json"/>';
 		} else if (type == "jakduSchedule") {
 			bUrl = '<c:url value="/admin/data/jakdu/schedule.json"/>';
+		} else if (type == "jakduScheduleGroup") {
+			bUrl = '<c:url value="/admin/data/jakdu/schedule/group.json"/>';
 		} else if (type == "competition") {
 			bUrl = '<c:url value="/admin/data/competition.json"/>';
 		}
@@ -306,6 +326,8 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 					$scope.homeDescriptions = data.homeDescriptions;
 				} else if (type == "jakduSchedule") {
 					$scope.jakduSchedules = data.jakduSchedules;
+				} else if (type == "jakduScheduleGroup") {
+					$scope.jakduScheduleGroups = data.jakduScheduleGroups;
 				} else if (type == "competition") {
 					$scope.competitions = data.competitions;
 				}
@@ -352,6 +374,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		$scope.attendanceClubs = [];
 		$scope.homeDescriptions = [];
 		$scope.jakduSchedules = [];
+		$scope.jakduScheduleGroup = [];
 		$scope.competitions = [];
 	};
 	

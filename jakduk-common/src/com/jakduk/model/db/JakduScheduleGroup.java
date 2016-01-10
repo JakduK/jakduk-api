@@ -6,6 +6,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
 
 /**
  * Created by pyohwan on 16. 1. 10.
@@ -21,6 +24,9 @@ public class JakduScheduleGroup {
     private int seq;
 
     private CommonConst.JAKDU_GROUP_STATE state;
+
+    @Temporal(TemporalType.DATE)
+    private Date openDate;
 
     public String getId() {
         return id;
@@ -46,12 +52,21 @@ public class JakduScheduleGroup {
         this.state = state;
     }
 
+    public Date getOpenDate() {
+        return openDate;
+    }
+
+    public void setOpenDate(Date openDate) {
+        this.openDate = openDate;
+    }
+
     @Override
     public String toString() {
         return "JakduScheduleGroup{" +
                 "id='" + id + '\'' +
                 ", seq=" + seq +
                 ", state=" + state +
+                ", openDate=" + openDate +
                 '}';
     }
 }
