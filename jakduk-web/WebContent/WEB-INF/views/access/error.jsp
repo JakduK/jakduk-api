@@ -4,14 +4,15 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html>
-<html>
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<title><spring:message code="common.error"/> &middot; <spring:message code="common.jakduk"/></title>
 
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
-<body>
+<body class="header-fixed">
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 

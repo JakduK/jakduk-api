@@ -2,13 +2,14 @@
     pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html>
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 <jsp:include page="../include/html-header.jsp"></jsp:include>
 
 <link href="<%=request.getContextPath()%>/resources/bootstrap/dist/css/bootstrapApp.css" rel="stylesheet">
 </head>
-<body>
+<body class="header-fixed">
 	<h1 id="banner">Unauthorized</h1>
 	<hr/>
 	

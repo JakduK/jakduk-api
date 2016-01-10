@@ -6,7 +6,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
-<html ng-app="jakdukApp">
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<title><spring:message code="board.write"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
@@ -17,7 +18,7 @@
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 
-<body>
+<body class="header-fixed">
 <div class="wrapper">
 <jsp:include page="../include/navigation-header.jsp"/>
 
@@ -175,16 +176,7 @@ window.onbeforeunload = function(e) {
 	}
 };
 
-function isEmpty(str) {
-	obj = String(str);
-
-	if(obj == null || obj == undefined || obj == 'null' || obj == 'undefined' || obj == '' ) return true;
-
-	else return false;
-}
-
 var submitted = false;
-//var editor = $.summernote.eventHandler.getEditor();
 var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"]);
 
 jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
@@ -204,12 +196,12 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.storedImages.push(entry);
 				$scope.$apply();
 			}) ;
-		}		
+		}
 	});
-	
-	var contentValue = document.getElementById("content").value
+
+	var contentValue = document.getElementById("content").value;
 	$scope.content = contentValue ? contentValue : '♪';
-	
+
 	$scope.options = {
 		height: 0,
 		//placeholder: '<spring:message code="board.msg.write.text.here"/>',
@@ -225,11 +217,11 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			['table', ['table']],
 			['insert', ['link', 'picture', 'video', 'hr']],
 			['view', ['fullscreen', 'codeview']],
-			['help', ['help']]			          
+			['help', ['help']]
 		]
 	};
-	
-	$scope.uploader = new FileUploader({		
+
+	$scope.uploader = new FileUploader({
 		url:'<c:url value="/gallery/upload.json"/>',
 		autoUpload:true,
 		method:"POST"
@@ -346,10 +338,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	
 	// 이미지 업로드를 완료.
 	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-		console.log('onCompleteItem fileItem=', fileItem);
-		//console.log('onCompleteItem status=', status);
-		//console.log('onCompleteItem headers=', headers);
-		
+
 		if (status == 200) {
 			var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.image.id;
 
@@ -366,10 +355,16 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				tempImages.push(imageInfo);
 				$scope.images = JSON.stringify(tempImages);
 			}
-			
+
+			// summernote 0.7.0
+			$(".summernote").summernote("insertImage", imageUrl, fileItem.newName);
+
+			// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+			/*
 			$(".summernote").summernote("insertImage", imageUrl, function($image) {
 				$image.addClass("img-responsive");
 			});
+			*/
 		} else {
 			console.log("status=" + status)
 			console.log("upload image failed.");
@@ -380,9 +375,15 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.insertImage = function(item) {
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
 
+		// summernote 0.7.0
+		$(".summernote").summernote("insertImage", imageUrl, item.name);
+
+		// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+		/*
 		$(".summernote").summernote("insertImage", imageUrl, function($image) {
 			$image.addClass("img-responsive");
 		});
+		*/
 	};	
 
 	$scope.imageUpload = function(files, editor) {

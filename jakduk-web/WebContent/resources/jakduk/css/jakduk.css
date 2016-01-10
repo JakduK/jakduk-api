@@ -1,5 +1,4 @@
 .text-overflow {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.text-gray {color:#999;}
 
 .padding-5 {margin:10px 0px;}
 .padding-10 {margin:20px 0px;}
@@ -13,13 +12,9 @@
 .panel-footer .alert { margin-top: 10px; margin-bottom: 0px; padding: 8px;}
 
 /* 상단 네비게이션 */
-.topbar-v3 .right-topbar li,
-.topbar-v3 .right-topbar li a {
-	font-size: 14px;
-}
-
-.topbar-v3 ul.left-topbar > li > a {
-	font-size: 14px;
+.header .topbar ul.loginbar > li > a,
+.header .topbar ul.loginbar > li > a:hover {
+	font-size: 12px;
 }
 
 /* 홈에서 최근 글 */

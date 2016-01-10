@@ -7,13 +7,14 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <!DOCTYPE html>
-<html ng-app="jakdukApp">
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<title><spring:message code="board.free.breadcrumbs.posts"/> &middot; <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
-<body>
+<body class="header-fixed">
 
 <sec:authorize access="isAnonymous()">
 	<c:set var="authRole" value="ANNONYMOUS"/>
@@ -98,7 +99,7 @@
 		<!-- Top Buttons -->
 		<div class="row">
 			<div class="col-sm-6 margin-bottom-10">
-				<button type="button" class="btn-u btn-brd rounded dropdown-toggle" data-toggle="dropdown">
+				<button type="button" class="btn-u rounded dropdown-toggle" data-toggle="dropdown">
 					<c:choose>
 						<c:when test="${boardListInfo.category != 'none'}">
 							<spring:message code="${categorys[boardListInfo.category]}"/>

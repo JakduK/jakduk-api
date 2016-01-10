@@ -22,7 +22,8 @@
 
 </head>
 
-<body>
+<body class="header-fixed">
+
 <div class="wrapper" ng-controller="jakduCtrl">
     <jsp:include page="../include/navigation-header.jsp"/>
 

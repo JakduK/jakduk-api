@@ -6,7 +6,8 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
  
 <!DOCTYPE html>
-<html ng-app="jakdukApp">
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>${gallery.name} - <spring:message code="gallery"/> &middot; <spring:message code="common.jakduk"/></title>
@@ -17,7 +18,8 @@
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 
-<body>
+<body class="header-fixed">
+
 <div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	

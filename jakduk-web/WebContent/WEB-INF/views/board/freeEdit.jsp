@@ -6,7 +6,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
-<html ng-app="jakdukApp">
+<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<title><spring:message code="board.edit"/> &middot; <spring:message code="common.jakduk"/></title>
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
@@ -17,7 +18,7 @@
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 </head>
 
-<body>
+<body class="header-fixed">
 	<div class="wrapper">
 	<jsp:include page="../include/navigation-header.jsp"/>
 	
@@ -367,9 +368,15 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 				$scope.images = JSON.stringify(tempImages);
 			}
 
+			// summernote 0.7.0
+			$(".summernote").summernote("insertImage", imageUrl, fileItem.newName);
+
+			// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+			/*
 			$(".summernote").summernote("insertImage", imageUrl, function($image) {
 				$image.addClass("img-responsive");
 			});
+			*/
 		} else {
 			console.log("upload image failed. status=" + status);
 		}
@@ -379,9 +386,15 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.insertImage = function(item) {
 		var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
 
+		// summernote 0.7.0
+		$(".summernote").summernote("insertImage", imageUrl, item.name);
+
+		// angular-summernote 0.7.1 버전 나오면 활성화 할것.
+		/*
 		$(".summernote").summernote("insertImage", imageUrl, function($image) {
 			$image.addClass("img-responsive");
 		});
+		*/
 	};	
 	
 	// angular-summernote method
