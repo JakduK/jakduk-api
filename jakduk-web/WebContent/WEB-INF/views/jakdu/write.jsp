@@ -40,41 +40,42 @@
     <!--=== Content Part ===-->
     <div class="container content">
 
-        <form:form commandName="jakduWriteList" name="jakduWriteList" action="${contextPath}/jakdu/write" method="POST" cssClass="form-horizontal"
-                   ng-submit="onSubmit($event)">
-            <c:forEach items="${jakduWriteList.jakdus}" var="jakdu" varStatus="status">
+        <div class="form-horizontal">
+
+            <div class="row" ng-repeat="jakdu in jakdus">
 
                 <div class="row">
                     <div class="col-sm-4">
-                            <label class="col-sm-3 control-label"><spring:message code="common.date"/></label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static"><fmt:formatDate value="${jakdu.schedule.date}" pattern="${dateTimeFormat.dateTime}" /></p>
-                            </div>
+                        <label class="col-sm-3 control-label"><spring:message code="common.date"/></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{jakdu.schedule.date | date:dateTimeFormat.dateTime}}</p>
+                        </div>
                     </div>
                     <div class="col-sm-4">
-                            <label class="col-sm-3 control-label"><spring:message code="common.competition"/></label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static">${competitionNames[jakdu.schedule.competition.id].fullName}</p>
-                            </div>
+                        <label class="col-sm-3 control-label"><spring:message code="common.competition"/></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{competitionNames[jakdu.schedule.competition.id].fullName}}</p>
+                        </div>
                     </div>
                     <div class="col-sm-4">
-                            <label class="col-sm-3 control-label"><spring:message code="jakdu.match"/></label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static">${fcNames[jakdu.schedule.home.id].shortName} VS ${fcNames[jakdu.schedule.away.id].shortName}</p>
-                            </div>
+                        <label class="col-sm-3 control-label"><spring:message code="jakdu.match"/></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{fcNames[jakdu.schedule.home.id].shortName}} VS {{fcNames[jakdu.schedule.away.id].shortName}}</p>
+                        </div>
                     </div>
                 </div>
+
                 <div class="row">
-                    <div class="col-sm-12">
-                        <label class="col-sm-1 control-label"><spring:message code="jakdu.expect.score"/></label>
-                        <div class="col-sm-3">
-                            <select class="form-control" name="jakduWriteList.jakdus[${status.index}].homeScore" value="${jakdu.homeScore}">
+                    <div class="col-sm-6">
+                        <label class="col-sm-2 control-label"><spring:message code="jakdu.expect.score"/></label>
+                        <div class="col-sm-5">
+                            <select class="form-control" ng-model="jakdu.homeScore">
                                 <option value=""><spring:message code="board.placeholder.expect.home.score"/></option>
                                 <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
                             </select>
                         </div>
-                        <div class="col-sm-3">
-                            <select class="form-control" name="jakduWriteList.jakdus[${status.index}].awayScore" value="${jakdu.awayScore}">
+                        <div class="col-sm-5">
+                            <select class="form-control" ng-model="jakdu.awayScore">
                                 <option value=""><spring:message code="board.placeholder.expect.away.score"/></option>
                                 <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
                             </select>
@@ -82,17 +83,13 @@
 
                     </div>
                 </div>
-                <hr/>
-            </c:forEach>
+            </div>
 
-            <button type="submit">Submit</button>
+            <button class="btn-u" type="button" ng-click="btnTest()">Button Default</button>
 
-        </form:form>
+        </div>
 
-
-        {{jakduWriteList}}
-
-    </div> <!--=== End Content Part ===-->
+    </form> <!--=== End Content Part ===-->
 
     <jsp:include page="../include/footer.jsp"/>
 </div>
@@ -102,21 +99,84 @@
 <script type="text/javascript">
     var jakdukApp = angular.module("jakdukApp", ["ui.bootstrap"]);
 
-    jakdukApp.controller('jakduCtrl', function($scope) {
+    jakdukApp.controller('jakduCtrl', function($scope, $http) {
         $scope.rangeScore = [];
+        $scope.dataJakdusConn = "none";
+        $scope.dateTimeFormat = {};
+        $scope.jakdus = [];
+        $scope.competitionNames = {};
+        $scope.fcNames = {};
 
         for (i = 0 ; i < 19 ; i++) {
             $scope.rangeScore.push(i);
         }
 
+        // http config
+        var headers = {
+            "Content-Type" : "application/json"
+        };
+
+        var config = {
+            headers:headers
+        };
+
         angular.element(document).ready(function() {
+            $scope.getDataJakdus();
 
             App.init();
         });
 
-        $scope.onSubmit = function(event) {
+        $scope.btnTest = function() {
+            var bUrl = '<c:url value="/sample/rest01"/>';
+            var reqData = {};
+            reqData.jakdus = $scope.jakdus;
 
-            console.log($scope.jakduWriteList.$valid);
+            var reqPromise = $http.post(bUrl, reqData, config);
+
+            reqPromise.success(function(data, status, headers, config) {
+                console.log("success");
+            });
+            reqPromise.error(function(data, status, headers, config) {
+                console.log("error=" + status);
+            });
+        };
+
+        $scope.getDataJakdus = function() {
+            var bUrl = '<c:url value="/jakdu/data" />';
+
+            if ($scope.dataJakdusConn == "none") {
+
+                var reqPromise = $http.get(bUrl);
+
+                $scope.dataJakdusConn = "loading";
+
+                reqPromise.success(function(data, status, headers, config) {
+
+                    console.log(data);
+
+                    if (data.dateTimeFormat != null) {
+                        $scope.dateTimeFormat = data.dateTimeFormat;
+                    }
+
+                    if (data.jakdus != null) {
+                        $scope.jakdus = data.jakdus;
+                    }
+
+                    if (data.competitionNames != null) {
+                        $scope.competitionNames = data.competitionNames;
+                    }
+
+                    if (data.fcNames != null) {
+                        $scope.fcNames = data.fcNames;
+                    }
+
+                    $scope.dataJakdusConn = "none";
+                });
+                reqPromise.error(function(data, status, headers, config) {
+                    $scope.dataJakdusConn = "none";
+                    $scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+                });
+            }
         };
     });
 </script>

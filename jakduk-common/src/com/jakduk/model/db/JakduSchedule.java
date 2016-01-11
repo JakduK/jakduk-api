@@ -22,6 +22,9 @@ public class JakduSchedule {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private String id;
 
+    @DBRef
+    private JakduScheduleGroup group;
+
     @Temporal(TemporalType.DATE)
     private Date date;
 
@@ -44,6 +47,14 @@ public class JakduSchedule {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public JakduScheduleGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(JakduScheduleGroup group) {
+        this.group = group;
     }
 
     public Date getDate() {
@@ -98,6 +109,7 @@ public class JakduSchedule {
     public String toString() {
         return "JakduSchedule{" +
                 "id='" + id + '\'' +
+                ", group=" + group +
                 ", date=" + date +
                 ", home=" + home +
                 ", away=" + away +

@@ -85,16 +85,17 @@ public class JakduService {
         model.addAttribute("schedules", jakduSchedules);
     }
 
-    public void getWrite(Model model, Locale locale) {
+    public Map getWrite(Locale locale) {
+
+        Map<String, Object> result = new HashMap<>();
 
         CommonPrincipal principal = userService.getCommonPrincipal();
         String accountId = principal.getId();
         String accountUsername = principal.getUsername();
         String accountType = principal.getType();
 
-        if (accountId == null) {
-            return;
-        }
+        if (accountId == null)
+            return result;
 
         CommonWriter writer = new CommonWriter();
         writer.setUserId(accountId);
@@ -104,7 +105,6 @@ public class JakduService {
         String language = commonService.getLanguageCode(locale, null);
 
         Set<ObjectId> fcIds = new HashSet<>();
-        JakduWriteList jakduWriteList = new JakduWriteList();
         List<Jakdu> jakdus = new ArrayList<>();
         Set<ObjectId> competitionIds = new HashSet<>();
         List<JakduSchedule> schedules = jakduScheduleRepository.findByTimeUpOrderByDateAsc(false);
@@ -121,8 +121,6 @@ public class JakduService {
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
 
-        jakduWriteList.setJakdus(jakdus);
-
         Map<String, LocalName> fcNames = new HashMap<>();
         Map<String, LocalName> competitionNames = new HashMap<>();
 
@@ -137,9 +135,11 @@ public class JakduService {
             competitionNames.put(competition.getId(), competition.getNames().get(0));
         }
 
-        model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-        model.addAttribute("jakduWriteList", jakduWriteList);
-        model.addAttribute("fcNames", fcNames);
-        model.addAttribute("competitionNames", competitionNames);
+        result.put("dateTimeFormat", commonService.getDateTimeFormat(locale));
+        result.put("jakdus", jakdus);
+        result.put("fcNames", fcNames);
+        result.put("competitionNames", competitionNames);
+
+        return result;
     }
 }

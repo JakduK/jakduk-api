@@ -75,6 +75,13 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
+                        <label for="groupSeq" class="control-label">GROUP SEQ</label>
+                        <form:input path="groupSeq" cssClass="form-control" placeholder="GROUP SEQ"/>
+                        <form:errors path="groupSeq"/>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
                         <label for="competition" class="control-label">COMPETITION</label>
                         <form:select path="competition" cssClass="form-control">
                             <c:forEach items="${competitions}" var="competition">

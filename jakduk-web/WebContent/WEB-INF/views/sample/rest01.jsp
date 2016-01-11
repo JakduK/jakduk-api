@@ -41,7 +41,7 @@
 
         // http config
         var headers = {
-            "Content-Type" : "application/x-www-form-urlencoded"
+            "Content-Type" : "application/json"
         };
 
         var config = {

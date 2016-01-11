@@ -43,7 +43,17 @@ public class JakduScheduleWrite {
     @NotEmpty
     private String competition;
 
+    private int groupSeq;
+
     private boolean timeUp;
+
+    public Integer getAwayOverTime() {
+        return awayOverTime;
+    }
+
+    public void setAwayOverTime(Integer awayOverTime) {
+        this.awayOverTime = awayOverTime;
+    }
 
     public String getId() {
         return id;
@@ -101,14 +111,6 @@ public class JakduScheduleWrite {
         this.homeOverTime = homeOverTime;
     }
 
-    public Integer getAwayOverTime() {
-        return awayOverTime;
-    }
-
-    public void setAwayOverTime(Integer awayOverTime) {
-        this.awayOverTime = awayOverTime;
-    }
-
     public Integer getHomePenaltyShootout() {
         return homePenaltyShootout;
     }
@@ -133,6 +135,14 @@ public class JakduScheduleWrite {
         this.competition = competition;
     }
 
+    public int getGroupSeq() {
+        return groupSeq;
+    }
+
+    public void setGroupSeq(int groupSeq) {
+        this.groupSeq = groupSeq;
+    }
+
     public boolean isTimeUp() {
         return timeUp;
     }
@@ -155,6 +165,7 @@ public class JakduScheduleWrite {
                 ", homePenaltyShootout=" + homePenaltyShootout +
                 ", awayPenaltyShootout=" + awayPenaltyShootout +
                 ", competition='" + competition + '\'' +
+                ", groupSeq=" + groupSeq +
                 ", timeUp=" + timeUp +
                 '}';
     }

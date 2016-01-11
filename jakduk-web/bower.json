@@ -28,7 +28,7 @@
     "highcharts-ng": "~0.0.8",
     "jquery-migrate": "~1.2.1",
     "angular-animate": "~1.4.4",
-    "angular-bootstrap": "~0.14.0",
+    "angular-bootstrap": "~1.0.0",
     "angular-bootstrap-lightbox": "~0.10.0",
     "angular-touch": "~1.4.5",
     "angular-loading-bar": "~0.8.0",

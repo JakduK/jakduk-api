@@ -391,7 +391,7 @@ public class AdminController {
 	@RequestMapping(value = "/jakdu/schedule/delete/{id}", method = RequestMethod.GET)
 	public String jakduScheduleDelete(@PathVariable String id) {
 
-		boolean result = adminService.deleteAttendanceLeague(id);
+		boolean result = adminService.deleteJakduSchedule(id);
 
 		return "redirect:/admin/settings?open=jakduSchedule";
 	}
@@ -400,6 +400,48 @@ public class AdminController {
 	public void dataJakduSchedule(Model model) {
 
 		adminService.getDataJakduScheduleList(model);
+	}
+
+	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.GET)
+	public String jakduScheduleGroupWrite(Model model) {
+
+		adminService.getJakduScheduleGroupWrite(model);
+
+		return "admin/jakduScheduleGroupWrite";
+	}
+
+	@RequestMapping(value = "/jakdu/schedule/group/write/{id}", method = RequestMethod.GET)
+	public String jakduScheduleGroupWrite(@PathVariable String id, Model model) {
+
+		adminService.getJakduScheduleGroupWrite(model, id);
+
+		return "admin/jakduScheduleGroupWrite";
+	}
+
+	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.POST)
+	public String jakduScheduleGroupWrite(@Valid JakduScheduleGroupWrite jakduScheduleGroupWrite, BindingResult result) {
+		if (result.hasErrors()) {
+			logger.debug("result=" + result);
+			return "admin/jakduScheduleGroupWrite";
+		}
+
+		adminService.writeJakduScheduleGroup(jakduScheduleGroupWrite);
+
+		return "redirect:/admin/settings?open=jakduScheduleGroup";
+	}
+
+	@RequestMapping(value = "jakdu/schedule/group/delete/{id}", method = RequestMethod.GET)
+	public String jakduScheduleGroupDelete(@PathVariable String id) {
+
+		boolean result = adminService.deleteJakduScheduleGroup(id);
+
+		return "redirect:/admin/settings?open=jakduScheduleGroup";
+	}
+
+	@RequestMapping(value = "/data/jakdu/schedule/group", method = RequestMethod.GET)
+	public void dataJakduScheduleGroup(Model model) {
+
+		adminService.getDataJakduScheduleGroupList(model);
 	}
 
 	@RequestMapping(value = "/competition/write", method = RequestMethod.GET)

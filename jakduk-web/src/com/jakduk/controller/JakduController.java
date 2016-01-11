@@ -4,6 +4,7 @@ import com.jakduk.model.web.JakduWriteList;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,13 +12,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by pyohwan on 15. 12. 23.
@@ -73,13 +77,19 @@ public class JakduController {
     }
 
     @RequestMapping(value = "/write", method = RequestMethod.GET)
-    public String write(Model model
-            , HttpServletRequest request) {
-
-        Locale locale = localeResolver.resolveLocale(request);
-        jakduService.getWrite(model, locale);
+    public String write() {
 
         return "jakdu/write";
+    }
+
+    @RequestMapping(value = "/data", method = RequestMethod.GET)
+    @ResponseBody
+    public Map data(HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+        Map<String, Object> result = jakduService.getWrite(locale);
+
+        return result;
     }
 
     @RequestMapping(value = "/write", method = RequestMethod.POST)
