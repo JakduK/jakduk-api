@@ -30,6 +30,8 @@ import org.bson.types.ObjectId;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -738,10 +740,14 @@ public String initSearchData() {
 	public void getJakduScheduleWrite(Model model) {
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 		List<Competition> competitions = competitionRepository.findAll();
+		JakduScheduleGroup jakduScheduleGroup = jakdukDAO.getJakduScheduleGroupOrderBySeq();
+
+		JakduScheduleWrite jakduScheduleWrite = new JakduScheduleWrite();
+		jakduScheduleWrite.setGroupSeq(jakduScheduleGroup.getSeq());
 
 		model.addAttribute("competitions", competitions);
 		model.addAttribute("footballClubs", footballClubs);
-		model.addAttribute("jakduScheduleWrite", new JakduScheduleWrite());
+		model.addAttribute("jakduScheduleWrite", jakduScheduleWrite);
 	}
 
 	public void getJakduScheduleWrite(Model model, String id) {
@@ -753,6 +759,8 @@ public String initSearchData() {
 		jakduScheduleWrite.setId(jakduSchedule.getId());
 		jakduScheduleWrite.setHome(jakduSchedule.getHome().getId());
 		jakduScheduleWrite.setAway(jakduSchedule.getAway().getId());
+		if (jakduSchedule.getGroup() != null)
+			jakduScheduleWrite.setGroupSeq(jakduSchedule.getGroup().getSeq());
 		if (jakduSchedule.getCompetition() != null)
 			jakduScheduleWrite.setCompetition(jakduSchedule.getCompetition().getCode());
 		jakduScheduleWrite.setTimeUp(jakduSchedule.isTimeUp());
@@ -787,6 +795,7 @@ public String initSearchData() {
 		FootballClubOrigin home = footballClubOriginRepository.findOne(jakduScheduleWrite.getHome());
 		FootballClubOrigin away = footballClubOriginRepository.findOne(jakduScheduleWrite.getAway());
 		Competition competition = competitionRepository.findOne(jakduScheduleWrite.getCompetition());
+		JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findBySeq(jakduScheduleWrite.getGroupSeq());
 
 		if (jakduScheduleWrite.isTimeUp()) {
 			JakduScheduleScore jakduScore = new JakduScheduleScore();
@@ -814,6 +823,7 @@ public String initSearchData() {
 		jakduSchedule.setHome(home);
 		jakduSchedule.setAway(away);
 		jakduSchedule.setCompetition(competition);
+		jakduSchedule.setGroup(jakduScheduleGroup);
 
 		if (jakduScheduleWrite.getId().isEmpty()) {
 			jakduSchedule.setId(null);
@@ -828,7 +838,7 @@ public String initSearchData() {
 		jakduScheduleRepository.save(jakduSchedule);
 	}
 
-	public boolean deleteAttendanceLeague(String id) {
+	public boolean deleteJakduSchedule(String id) {
 
 		if (!id.isEmpty()) {
 			JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
@@ -844,7 +854,8 @@ public String initSearchData() {
 	}
 
 	public Model getDataJakduScheduleList(Model model) {
-		List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll();
+		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll(sort);
 
 		model.addAttribute("jakduSchedules", jakduSchedules);
 
@@ -853,6 +864,19 @@ public String initSearchData() {
 
 	public void getJakduScheduleGroupWrite(Model model) {
 		model.addAttribute("jakduScheduleGroupWrite", new JakduScheduleGroupWrite());
+	}
+
+	public void getJakduScheduleGroupWrite(Model model, String id) {
+		JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findOne(id);
+
+		JakduScheduleGroupWrite jakduScheduleGroupWrite = new JakduScheduleGroupWrite();
+		jakduScheduleGroupWrite.setId(jakduScheduleGroup.getId());
+		jakduScheduleGroupWrite.setSeq(jakduScheduleGroup.getSeq());
+		jakduScheduleGroupWrite.setState(jakduScheduleGroup.getState());
+		jakduScheduleGroupWrite.setOpenDate(jakduScheduleGroup.getOpenDate());
+		jakduScheduleGroupWrite.setNextSeq(false);
+
+		model.addAttribute("jakduScheduleGroupWrite", jakduScheduleGroupWrite);
 	}
 
 	public void writeJakduScheduleGroup(JakduScheduleGroupWrite jakduScheduleGroupWrite) {
@@ -878,6 +902,21 @@ public String initSearchData() {
 		}
 
 		jakduScheduleGroupRepository.save(jakduScheduleGroup);
+	}
+
+	public boolean deleteJakduScheduleGroup(String id) {
+
+		if (!id.isEmpty()) {
+			JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findOne(id);
+
+			if (jakduScheduleGroup != null) {
+				jakduScheduleGroupRepository.delete(jakduScheduleGroup);
+				logger.debug("delete jakduScheduleGroup=" + jakduScheduleGroup);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public Model getDataJakduScheduleGroupList(Model model) {

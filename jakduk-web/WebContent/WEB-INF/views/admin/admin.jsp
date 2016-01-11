@@ -196,13 +196,14 @@
 			<h4>Jakdu Schedule</h4>
 			<table class="table">
 				<tr>
-					<th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Competition</th><th>Score</th><th>isTimeUp</th>
+					<th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Group</th><th>Competition</th><th>Score</th><th>isTimeUp</th>
 				</tr>
 				<tr ng-repeat="jakduSchedule in jakduSchedules">
 					<td><a href="<c:url value="/admin/jakdu/schedule/write/{{jakduSchedule.id}}"/>">{{jakduSchedule.id}}</a></td>
 					<td>{{jakduSchedule.date | date:'short' }}</td>
 					<td>{{jakduSchedule.home.name}}</td>
 					<td>{{jakduSchedule.away.name}}</td>
+					<td>{{jakduSchedule.group.seq}}</td>
 					<td>{{jakduSchedule.competition.code}}</td>
 					<td>
 						<span ng-if="jakduSchedule.score">
@@ -217,7 +218,7 @@
 		</div>
 
 		<div ng-show="jakduScheduleGroups.length > 0">
-			<h4>Jakdu Schedule</h4>
+			<h4>Jakdu Schedule Group</h4>
 			<table class="table">
 				<tr>
 					<th>id</th><th>Seq</th><th>State</th><th>OpenDate</th>
@@ -374,7 +375,7 @@ jakdukApp.controller("adminCtrl", function($scope, $http) {
 		$scope.attendanceClubs = [];
 		$scope.homeDescriptions = [];
 		$scope.jakduSchedules = [];
-		$scope.jakduScheduleGroup = [];
+		$scope.jakduScheduleGroups = [];
 		$scope.competitions = [];
 	};
 	

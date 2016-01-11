@@ -312,5 +312,16 @@ public class JakdukDAO {
 
 		return competitions;
 	}
+
+	public JakduScheduleGroup getJakduScheduleGroupOrderBySeq() {
+
+		Query query = new Query();
+		query.with(new Sort(Direction.DESC, "seq"));
+		query.limit(1);
+
+		JakduScheduleGroup jakduScheduleGroup = mongoTemplate.findOne(query, JakduScheduleGroup.class);
+
+		return jakduScheduleGroup;
+	}
 	
 }

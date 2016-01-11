@@ -391,7 +391,7 @@ public class AdminController {
 	@RequestMapping(value = "/jakdu/schedule/delete/{id}", method = RequestMethod.GET)
 	public String jakduScheduleDelete(@PathVariable String id) {
 
-		boolean result = adminService.deleteAttendanceLeague(id);
+		boolean result = adminService.deleteJakduSchedule(id);
 
 		return "redirect:/admin/settings?open=jakduSchedule";
 	}
@@ -410,6 +410,14 @@ public class AdminController {
 		return "admin/jakduScheduleGroupWrite";
 	}
 
+	@RequestMapping(value = "/jakdu/schedule/group/write/{id}", method = RequestMethod.GET)
+	public String jakduScheduleGroupWrite(@PathVariable String id, Model model) {
+
+		adminService.getJakduScheduleGroupWrite(model, id);
+
+		return "admin/jakduScheduleGroupWrite";
+	}
+
 	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.POST)
 	public String jakduScheduleGroupWrite(@Valid JakduScheduleGroupWrite jakduScheduleGroupWrite, BindingResult result) {
 		if (result.hasErrors()) {
@@ -418,6 +426,14 @@ public class AdminController {
 		}
 
 		adminService.writeJakduScheduleGroup(jakduScheduleGroupWrite);
+
+		return "redirect:/admin/settings?open=jakduScheduleGroup";
+	}
+
+	@RequestMapping(value = "jakdu/schedule/group/delete/{id}", method = RequestMethod.GET)
+	public String jakduScheduleGroupDelete(@PathVariable String id) {
+
+		boolean result = adminService.deleteJakduScheduleGroup(id);
 
 		return "redirect:/admin/settings?open=jakduScheduleGroup";
 	}
