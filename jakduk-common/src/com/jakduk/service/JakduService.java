@@ -47,7 +47,7 @@ public class JakduService {
 
     public void getDataScheduleList(Model model, String language, int page, int size) {
 
-        Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
         Pageable pageable = new PageRequest(page - 1, size, sort);
 
         Set<ObjectId> fcIds = new HashSet<>();

@@ -65,7 +65,7 @@ public class JakduController {
     }
 
     @RequestMapping(value = "/data/schedule", method = RequestMethod.GET)
-    public void dataAttendanceClub(Model model,
+    public void dataSchedule(Model model,
                                    HttpServletRequest request,
                                    @RequestParam(required = false, defaultValue = "1") int page,
                                    @RequestParam(required = false, defaultValue = "20") int size) {
