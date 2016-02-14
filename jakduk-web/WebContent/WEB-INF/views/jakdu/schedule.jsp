@@ -48,36 +48,40 @@
         </div>
         <!-- End Top Buttons -->
 
-
-        <div class="panel panel-u">
-            <div class="panel-heading hidden-xs">
+        <div class="panel panel-default" ng-repeat="schedule in schedules">
+            <div class="panel-heading">
                 <div class="row">
-                    <div class="col-sm-4"><spring:message code="common.date"/></div>
-                    <div class="col-sm-4"><spring:message code="common.competition"/></div>
-                    <div class="col-sm-4"><spring:message code="jakdu.match"/></div>
+                    <div class="col-xs-8">
+                        {{schedule.date | date:"${dateTimeFormat.dateTime}"}}
+                    </div>
+                    <div class="col-xs-4">
+                        {{competitionNames[schedule.competition.id].fullName}}
+                    </div>
                 </div>
             </div> <!-- /panel-heading -->
 
             <ul class="list-group">
-                <li class="list-group-item" ng-repeat="schedule in schedules">
+                <li class="list-group-item">
                     <div class="row">
-                        <div class="col-sm-4">
-                            {{schedule.date | date:"${dateTimeFormat.dateTime}"}}
-                        </div>
-                        <div class="col-sm-4">
-                            {{competitionNames[schedule.competition.id].fullName}}
-                        </div>
-                        <div class="col-sm-4">
+                        <div class="col-xs-3">
                             <span class="visible-xs">{{fcNames[schedule.home.id].shortName}}</span>
                             <span class="hidden-xs">{{fcNames[schedule.home.id].fullName}}</span>
-                            <span class="color-grey" ng-if="!schedule.timeUp">VS</span>
-                            <span ng-if="schedule.timeUp">
-                                <strong ng-if="schedule.score">
-                                    {{schedule.score.homeFullTime}} : {{schedule.score.awayFullTime}}
-                                </strong>
-                            </span>
+                        </div>
+                        <div class="col-xs-3">
+                            <strong>{{schedule.score.homeFullTime}}</strong>
+                            <span class="color-grey" ng-if="schedule.timeUp"><spring:message code="jakdu.match.state.timeup"/></span>
+                            <span class="color-grey" ng-if="!schedule.timeUp"><spring:message code="jakdu.match.state.schedule"/></span>
+                            <strong>{{schedule.score.awayFullTime}}</strong>
+                        </div>
+                        <div class="col-xs-3">
                             <span class="visible-xs">{{fcNames[schedule.away.id].shortName}}</span>
                             <span class="hidden-xs">{{fcNames[schedule.away.id].fullName}}</span>
+                        </div>
+                        <div class="col-xs-3">
+                            <button type="button" class="btn-u btn-u-xs rounded" ng-click="btnGoJakdu(schedule.id)"
+                                    tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
+                                <spring:message code="common.button.go.jakdu"/>
+                            </button>
                         </div>
                     </div>
                 </li>
@@ -144,6 +148,10 @@
                 });
             }
         };
+
+        $scope.btnGoJakdu = function(id) {
+            location.href='<c:url value="/jakdu/write/' + id + '"/>';
+        }
 
     });
 </script>
