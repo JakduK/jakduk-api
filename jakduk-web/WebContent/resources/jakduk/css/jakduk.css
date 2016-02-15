@@ -118,3 +118,8 @@ td a {color:#555;}
 
 /* slick */
 .slick-slider {margin-bottom:inherit;}
+
+/* workaround default height for summernote's editable area */
+.note-editor.note-frame .note-editing-area .note-editable {
+	min-height: 50px;
+}
