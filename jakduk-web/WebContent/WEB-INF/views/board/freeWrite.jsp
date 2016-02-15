@@ -186,6 +186,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	$scope.buttonAlert = {};
 	$scope.storedImages = [];
 	$scope.subject = document.getElementById("subject_temp").value;
+	$scope.content = '';
 	
 	angular.element(document).ready(function() {
 		App.init();
@@ -198,9 +199,6 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 			}) ;
 		}
 	});
-
-	var contentValue = document.getElementById("content").value;
-	$scope.content = contentValue ? contentValue : '♪';
 
 	$scope.options = {
 		height: 0,
