@@ -200,7 +200,7 @@ jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
 	});
 
 	var contentValue = document.getElementById("content").value;
-	$scope.content = contentValue ? contentValue : '♪';
+	$scope.content = contentValue ? contentValue : '';
 
 	$scope.options = {
 		height: 0,
