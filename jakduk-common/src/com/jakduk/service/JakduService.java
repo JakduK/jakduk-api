@@ -85,7 +85,18 @@ public class JakduService {
         model.addAttribute("schedules", jakduSchedules);
     }
 
-    public Map getWrite(Locale locale) {
+    public Map getDataSchedule(String id) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
+
+        result.put("jakduSchedule", jakduSchedule);
+
+        return result;
+    }
+
+    public Map getDataWrite(Locale locale) {
 
         Map<String, Object> result = new HashMap<>();
 
@@ -141,5 +152,10 @@ public class JakduService {
         result.put("competitionNames", competitionNames);
 
         return result;
+    }
+
+    public void getView(Model model, String id) {
+
+        model.addAttribute("id", id);
     }
 }

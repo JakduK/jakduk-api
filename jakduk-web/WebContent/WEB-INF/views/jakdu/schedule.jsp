@@ -80,7 +80,7 @@
                         <div class="col-xs-3">
                             <button type="button" class="btn-u btn-u-xs rounded" ng-click="btnGoJakdu(schedule.id)"
                                     tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
-                                <spring:message code="common.button.go.jakdu"/>
+                                <spring:message code="common.button.view"/>
                             </button>
                         </div>
                     </div>
@@ -150,8 +150,8 @@
         };
 
         $scope.btnGoJakdu = function(id) {
-            location.href='<c:url value="/jakdu/write/' + id + '"/>';
-        }
+            location.href='<c:url value="/jakdu/schedule/' + id + '"/>';
+        };
 
     });
 </script>

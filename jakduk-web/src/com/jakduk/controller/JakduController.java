@@ -4,22 +4,17 @@ import com.jakduk.model.web.JakduWriteList;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -76,6 +71,22 @@ public class JakduController {
         jakduService.getDataScheduleList(model, language, page, size);
     }
 
+    @RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
+    public String schedule(@PathVariable String id, Model model) throws IOException {
+        jakduService.getView(model, id);
+
+        return "jakdu/ScheduleView";
+    }
+
+    @RequestMapping(value = "/data/schedule/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public Map dataSchedule(@PathVariable String id) {
+
+        Map<String, Object> result = jakduService.getDataSchedule(id);
+
+        return result;
+    }
+
     @RequestMapping(value = "/write", method = RequestMethod.GET)
     public String write() {
 
@@ -87,7 +98,7 @@ public class JakduController {
     public Map data(HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        Map<String, Object> result = jakduService.getWrite(locale);
+        Map<String, Object> result = jakduService.getDataWrite(locale);
 
         return result;
     }
