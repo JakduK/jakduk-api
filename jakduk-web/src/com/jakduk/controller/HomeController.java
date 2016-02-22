@@ -39,7 +39,7 @@ public class HomeController {
 	@RequestMapping
 	public String root() {
 		
-		return "redirect:home";
+		return "redirect:/home";
 	}
 	
 	@RequestMapping(value = "/home")

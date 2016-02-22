@@ -51,7 +51,7 @@
 
 						<div class="input-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid, 
 						'has-error':loginForm.j_username.$invalid}">
-						<span class="input-group-addon"><i class="fa fa-user"></i></span>
+						<span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span>
 							<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
 							ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" autofocus>
 							<span class="glyphicon form-control-feedback" 
@@ -63,7 +63,7 @@
 						
 						<div class="input-group has-feedback"
 						ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
-							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+							<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
 							<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>'
 							ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
 							<span class="glyphicon form-control-feedback" 
@@ -97,14 +97,14 @@
 						</a>
 </p>
 						<h5><spring:message code="user.msg.register.oauth"/></h5>
-							<div class="row">
-								<div class="col-xs-3 col-md-3">
-									<a href="<c:url value="/oauth/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
+							<div class="clearfix">
+								<div class="pull-left">
+									<a class="btn btn-link" href="<c:url value="/oauth/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
 										<i class="fa fa-facebook-square fa-3x text-primary"></i>
 									</a>
 								</div>
-								<div class="col-xs-3 col-md-3">
-									<a href="<c:url value="/oauth/callback?type=daum&loginRedirect=${loginRedirect}"/>">
+								<div class="pull-left">
+									<a class="btn btn-link" href="<c:url value="/oauth/callback?type=daum&loginRedirect=${loginRedirect}"/>">
 										<img src="<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png" style="width: 40px; height: 40px;"  alt="Daum">
 									</a>
 									</div>  
