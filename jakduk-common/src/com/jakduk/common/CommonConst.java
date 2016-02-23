@@ -187,4 +187,12 @@ public class CommonConst {
 		PLAYING,	// 진행중
 		TIMEUP		// 경기 종료
 	}
+
+	public enum RESET_PASSWORD_RESULT {
+		NONE,
+		CODE_OK,
+		SEND_OK,
+		CHANGE_OK,
+		INVALID
+	}
 }

@@ -48,39 +48,42 @@
 								<h2><spring:message code="user.sign.in.header"/></h2>
 							</div>
 
-							<div class="input-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid,
-						'has-error':loginForm.j_username.$invalid}">
-								<span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span>
-								<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>' ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" autofocus>
-							<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
-							</div>
-							<div class="margin-bottom-20">
-								<span class="text-danger" ng-model="errorEmail" ng-show="errorEmail">{{errorEmail}}</span>
-							</div>
-
-							<div class="input-group has-feedback"
-								ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
-								<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
-								<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>' ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
-							<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>
-							</div>
-							<div class="margin-bottom-20">
-								<span class="text-danger" ng-model="errorPassword" ng-show="errorPassword">{{errorPassword}}</span>
+							<div class="form-group">
+								<div class="input-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid,
+							'has-error':loginForm.j_username.$invalid}">
+									<span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span>
+									<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>' ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" autofocus>
+								<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
+								</div>
+								<p class="text-danger" ng-model="errorEmail" ng-show="errorEmail" ng-bind="errorEmail"></p>
 							</div>
 
-							<div class="row">
-								<div class="col-md-8 checkbox">
+							<div class="form-group">
+								<div class="input-group has-feedback"
+									ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
+									<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
+									<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>' ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
+								<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>
+								</div>
+								<p class="text-danger" ng-model="errorPassword" ng-show="errorPassword" ng-bind="errorPassword"></p>
+							</div>
+
+							<div class="form-group">
+								<div class="checkbox">
 									<label>
 										<input type="checkbox" name="remember" ng-model="remember">
 										<spring:message code="user.email.remember"/>
 									</label>
 								</div>
-								<div class="col-md-4">
-									<button type="submit" class="btn-u rounded pull-right ladda-button" ladda="btnSubmit" data-style="expand-right">
-										<spring:message code="user.sign.in"/>
-									</button>
-								</div>
 							</div>
+
+							<button type="submit" class="btn btn-u rounded btn-block ladda-button" ladda="btnSubmit" data-style="expand-right">
+								<spring:message code="user.sign.in"/>
+							</button>
+
+							<a class="btn btn-info btn-block rounded ladda-button" href="<%=request.getContextPath()%>/reset_password">
+								<spring:message code="user.sign.forgot.password"/>
+							</a>
 
 							<hr>
 

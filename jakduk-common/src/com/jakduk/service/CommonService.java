@@ -252,7 +252,7 @@ public class CommonService {
 	public Boolean isRedirectUrl(String url) {
 		Boolean result = true;
 		
-		String[] deny = {"login", "logout", "j_spring", "write", "admin"};
+		String[] deny = {"login", "logout", "j_spring", "write", "admin", "resetpassword"};
 		
 		for(int idx = 0 ; idx < deny.length ; idx++) {
 			if (url.contains(deny[idx])) {
