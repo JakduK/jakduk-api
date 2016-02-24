@@ -60,10 +60,15 @@
 		<p class="text-info"><strong><spring:message code="common.msg.error.show.error.to.administrator"/></strong></p>
 		<button class="btn btn-default" onclick="location.href='<c:url value="/home"/>'"><spring:message code="common.button.home"/></button>
 		<button class="btn btn-default" onclick="history.back()"><spring:message code="common.button.previous.page"/></button>
-	</div>
+
+	</div><!-- /.container -->
 	<jsp:include page="../include/footer.jsp"/>
-	<script>angular.module('jakdukApp',[]);</script>
-	<script src="<%=request.getContextPath()%>/resources/jakduk/js/navigation-header.js"></script>
+
 </div><!-- /.wrapper -->
+
+<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+<script>angular.module('jakdukApp',[]);</script>
+
+<jsp:include page="../include/body-footer.jsp"/>
 </body>
 </html>

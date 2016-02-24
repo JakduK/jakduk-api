@@ -41,7 +41,7 @@
 	
 	<jsp:include page="../include/footer.jsp"/>
 
-</div><!-- /.container -->
+</div><!-- /.wrapper -->
 
 <!-- Bootstrap core JavaScript
   ================================================== -->

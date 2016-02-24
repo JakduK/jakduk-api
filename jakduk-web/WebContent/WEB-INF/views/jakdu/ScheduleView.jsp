@@ -16,6 +16,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><spring:message code="jakdu.view"/> &middot; <spring:message code="jakdu"/> &middot; <spring:message code="common.jakduk"/></title>
 
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/line-icons-pro/styles.css">
+
     <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
@@ -36,12 +38,19 @@
     <div class="container content">
 
         <div class="row">
-            <div class="col-xs-6 content-boxes-v6 md">
-                <i class="rounded-x icon-link"></i>
+            <div class="col-xs-4 content-boxes-v6 md">
+                <img src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_A_en.png" alt="Logo">
                 <h1 class="title-v3-md text-uppercase margin-bottom-10">{{jakduSchedule.home.name}}</h1>
                 <p>At vero eos et accusato odio dignissimos ducimus qui blanditiis praesentium voluptatum.</p>
             </div>
-            <div class="col-xs-6 content-boxes-v6 md-margin-bottom-50">
+            <div class="col-xs-4 md-margin-bottom-50">
+                <div class="service-block-v1 md-margin-bottom-50">
+                    <i class="rounded-x icon-sport-119"></i>
+                    <h3 class="title-v3-bg text-uppercase">{{jakduSchedule.score.homeFullTime}} : {{jakduSchedule.score.awayFullTime}}</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse non tincidunt neque.</p>
+                </div>
+            </div>
+            <div class="col-xs-4 content-boxes-v6 md-margin-bottom-50">
                 <i class="rounded-x icon-paper-plane"></i>
                 <h2 class="title-v3-md text-uppercase margin-bottom-10">{{jakduSchedule.away.name}}</h2>
                 <p>At vero eos et accusato odio dignissimos ducimus qui blanditiis praesentium voluptatum.</p>

@@ -42,7 +42,7 @@ public class AccessController {
 
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	@RequestMapping(value = "/login")
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String login(HttpServletRequest request,
 			Model model,
 			@RequestParam(required = false) String result,
@@ -61,7 +61,7 @@ public class AccessController {
 		return "access/login";
 	}
 
-	@RequestMapping(value = "/logout/success")
+	@RequestMapping(value = "/logout/success", method = RequestMethod.GET)
 	public String logoutSuccess(HttpServletRequest request) {
 		
 		String redirctUrl = "/";
@@ -81,11 +81,11 @@ public class AccessController {
 		return "access/denied";
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/reset_password")
+	@RequestMapping(value = "/reset_password", method = RequestMethod.GET)
 	public String resetPassword(
 			Model model,
-			@RequestParam(value = "code", required = false) String code
-	) {
+			@RequestParam(value = "code", required = false) String code) {
+
 		if (Objects.nonNull(code)) {
 			Token token = tokenRepository.findByCode(code);
 			if ((Objects.isNull(token) || !token.getCode().equals(code))) {
@@ -105,7 +105,7 @@ public class AccessController {
 		return "access/resetPassword";
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/reset_password")
+	@RequestMapping(value = "/reset_password", method = RequestMethod.POST)
 	public String sendResetPassword(
 			Model model,
 			@RequestParam(value = "j_useremail") String email
@@ -116,7 +116,7 @@ public class AccessController {
 		return "access/resetPassword";
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/confirm_password")
+	@RequestMapping(value = "/confirm_password", method = RequestMethod.POST)
 	public String updatePassword(
 		Model model,
 		@RequestParam(value = "j_password") String password,

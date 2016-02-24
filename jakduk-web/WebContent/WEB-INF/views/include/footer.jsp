@@ -73,8 +73,9 @@
                 <!-- Terms Info-->
                 <div class="col-md-8">
                     <p>
-						<a href="https://github.com/Pyohwan/JakduK"><spring:message code="common.msg.project.jakduk"/></a> @ 2014 | 
-						<a href="mailto:phjang1983@daum.net"><spring:message code="common.msg.mail.to.administrator"/></a>
+						<a href="https://github.com/Pyohwan/JakduK"><i class="fa fa-github"></i> JakduK</a> |
+                        <a href="https://jakduk.slack.com"><i class="fa fa-slack"></i> JakduK</a> |
+						<a href="mailto:phjang1983@daum.net"><i class="fa fa-envelope-o"></i> <spring:message code="common.msg.mail.to.administrator"/></a>
                     </p>
                 </div>
                 <!-- End Terms Info-->
