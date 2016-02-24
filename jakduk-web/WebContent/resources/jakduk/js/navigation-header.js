@@ -1,7 +1,7 @@
 /**
  * navagation-header에서 쓰임. 
  */
-jakdukApp.controller("headerCtrl", function($scope, $location) {
+angular.module('jakdukApp').controller("headerCtrl", function($scope, $location) {
 
     var port = $location.port();
     var prefix = $location.protocol() + '://' + $location.host();
@@ -30,7 +30,7 @@ jakdukApp.controller("headerCtrl", function($scope, $location) {
  * focus directive
  * http://fiddle.jshell.net/ubenzer/9FSL4/8/
  */
-jakdukApp.directive('focus', function($timeout, $parse) {
+angular.module('jakdukApp').directive('focus', function($timeout, $parse) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {

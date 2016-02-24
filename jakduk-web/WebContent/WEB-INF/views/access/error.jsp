@@ -62,6 +62,8 @@
 		<button class="btn btn-default" onclick="history.back()"><spring:message code="common.button.previous.page"/></button>
 	</div>
 	<jsp:include page="../include/footer.jsp"/>
+	<script>angular.module('jakdukApp',[]);</script>
+	<script src="<%=request.getContextPath()%>/resources/jakduk/js/navigation-header.js"></script>
 </div><!-- /.wrapper -->
 </body>
 </html>

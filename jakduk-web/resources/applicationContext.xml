@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop 
-		http://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/beans 
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context 
 		http://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/util 
-		http://www.springframework.org/schema/util/spring-util.xsd
-		http://www.springframework.org/schema/mvc 
-		http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd">
 
 	<!--  
 	<context:property-placeholder location="classpath*:*.properties" />
@@ -32,10 +25,11 @@
 
 	<!-- Imports datasource configuration -->
 	<import resource="config/db/mongo-data.xml" />
-	
+
 	<bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="locations">
 			<list>
+				<value>classpath:/config/smtp/email.properties</value>
 				<value>classpath:/config/db/mongo.properties</value>
 				<value>classpath:/config/storage/file.properties</value>
 				<value>classpath:/config/kakao/kakao.properties</value>
@@ -43,5 +37,28 @@
 			</list>
     	</property>	
 	</bean>
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${smtp.host}" />
+		<property name="port" value="${smtp.port}" />
+		<property name="username" value="${smtp.username}" />
+		<property name="password" value="${smtp.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.smtp.ssl.trust">smtp.gmail.com</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="tokenTerminationTrigger" class="com.jakduk.trigger.TokenTerminationTrigger" init-method="init">
+		<property name="span" value="5"/>
+	</bean>
+	<task:scheduler id="tokenTerminatorScheduler"/>
+	<task:executor id="tokenTerminator" pool-size="2"/>
+	<task:scheduled-tasks scheduler="tokenTerminatorScheduler">
+		<task:scheduled ref="tokenTerminationTrigger" method="terminateToken" cron="0 */5 * * * *"/>
+	</task:scheduled-tasks>
 
 </beans>

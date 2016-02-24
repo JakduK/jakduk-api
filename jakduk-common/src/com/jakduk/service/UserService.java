@@ -443,7 +443,17 @@ public class UserService {
 			logger.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
 		}
 	}
-	
+
+	public void userPasswordUpdateByEmail(String email, String password) {
+		User user = userRepository.findByEmail(email);
+		user.setPassword(password);
+		this.create(user);
+
+		if (logger.isInfoEnabled()) {
+			logger.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
+		}
+	}
+
 	public Model getOAuthProfile(Model model, String language, Integer status) {
 
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
