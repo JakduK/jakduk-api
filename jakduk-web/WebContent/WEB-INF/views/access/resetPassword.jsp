@@ -23,7 +23,7 @@
 
 			<div class="row">
 				<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-					<form action="<c:out value="${action}"/>" class="reg-page" name="resetForm" method="POST" ng-submit="onSubmit($event)">
+					<form action="<c:out value="${action}"/>" class="reg-page" name="resetForm" method="POST" ng-submit="resetForm.j_password.$valid && onSubmit($event)">
 						<div class="reg-header">
 							<h2><spring:message code="${title}"/></h2>
 						</div>
