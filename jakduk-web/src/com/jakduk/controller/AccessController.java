@@ -107,8 +107,8 @@ public class AccessController {
 
 	@RequestMapping(value = "/reset_password", method = RequestMethod.POST)
 	public String sendResetPassword(
-			Model model,
-			@RequestParam(value = "j_useremail") String email
+		Model model,
+		@RequestParam(value = "j_useremail") String email
 	) throws UnsupportedEncodingException {
 		emailService.sendResetPassword(email);
 		model.addAttribute("title", "user.sign.reset.password");
