@@ -9,6 +9,7 @@ import com.jakduk.service.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,10 +108,12 @@ public class AccessController {
 
 	@RequestMapping(value = "/reset_password", method = RequestMethod.POST)
 	public String sendResetPassword(
+		HttpServletRequest request,
 		Model model,
 		@RequestParam(value = "j_useremail") String email
 	) throws UnsupportedEncodingException {
-		emailService.sendResetPassword(email);
+		String host = UrlUtils.buildFullRequestUrl(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), null);
+		emailService.sendResetPassword(host, request.getLocale(), email);
 		model.addAttribute("title", "user.sign.reset.password");
 		model.addAttribute("result", CommonConst.RESET_PASSWORD_RESULT.SEND_OK);
 		return "access/resetPassword";

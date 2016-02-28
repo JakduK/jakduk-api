@@ -47,9 +47,13 @@
 			<props>
 				<prop key="mail.smtp.auth">true</prop>
 				<prop key="mail.smtp.starttls.enable">true</prop>
-				<prop key="mail.smtp.ssl.trust">smtp.gmail.com</prop>
+				<prop key="mail.smtp.ssl.trust">${smtp.host}</prop>
 			</props>
 		</property>
+	</bean>
+
+	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="resourceLoaderPath" value="classpath:/templates/email"/>
 	</bean>
 
 	<bean id="tokenTerminationTrigger" class="com.jakduk.trigger.TokenTerminationTrigger" init-method="init">
