@@ -211,6 +211,12 @@
 		<script type="text/javascript">
 			angular.module('jakdukApp', ['ngSanitize', 'slickCarousel'])
 				.controller("homeCtrl", function ($scope, $http) {
+					$scope.refreshEncyclopedia = refreshEncyclopedia;
+					$scope.getDataLatest = getDataLatest;
+					$scope.objectIdFromDate = objectIdFromDate;
+					$scope.dateFromObjectId = dateFromObjectId;
+					$scope.intFromObjectId = intFromObjectId;
+
 					$scope.encyclopedia = {};
 					$scope.encyclopediaConn = "none";
 					$scope.dataLatestConn = "none";
@@ -239,15 +245,10 @@
 						}
 					};
 
-					angular.element(document).ready(function () {
-						$scope.refreshEncyclopedia();
-						$scope.getDataLatest();
+					refreshEncyclopedia();
+					getDataLatest();
 
-						App.init();
-						App.initScrollBar();
-					});
-
-					$scope.refreshEncyclopedia = function () {
+					function refreshEncyclopedia() {
 						var bUrl = '<c:url value="/home/jumbotron.json?lang=${pageContext.response.locale}"/>';
 
 						if ($scope.encyclopediaConn == "none") {
@@ -276,9 +277,9 @@
 								$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 							});
 						}
-					};
+					}
 
-					$scope.getDataLatest = function () {
+					function getDataLatest() {
 						var bUrl = '<c:url value="/home/data/latest.json" />';
 
 						if ($scope.dataLatestConn == "none") {
@@ -303,24 +304,29 @@
 								$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 							});
 						}
-					};
+					}
 
-					$scope.objectIdFromDate = function (date) {
+					function objectIdFromDate(date) {
 						return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
-					};
+					}
 
-					$scope.dateFromObjectId = function (objectId) {
+					function dateFromObjectId(objectId) {
 						return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
-					};
+					}
 
-					$scope.intFromObjectId = function (objectId) {
+					function intFromObjectId(objectId) {
 						return parseInt(objectId.substring(0, 8), 16) * 1000;
-					};
+					}
 				});
-
 		</script>
 
 		<jsp:include page="../include/body-footer.jsp"/>
 
+		<script type="text/javascript">
+			$(document).ready(function() {
+				App.init();
+				App.initScrollBar();
+			});
+		</script>
 	</body>
 </html>
