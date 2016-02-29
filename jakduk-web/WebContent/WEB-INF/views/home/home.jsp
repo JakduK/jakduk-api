@@ -47,25 +47,26 @@
 		<div class="col-sm-6 sm-margin-bottom-30">
 			<div class="headline">
 				<h2><spring:message code="home.posts.latest"/></h2> 
-				<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free/posts"/>'">
+				<a class="btn-u btn-u-xs btn-u-default rounded" href="<c:url value="/board/free/posts"/>">
 					<spring:message code="common.button.more"/>
-				</button>
+				</a>
 			</div>                        
 		
 			<!-- Trending -->
 			<ul class="list-unstyled blog-trending">
 				<li ng-repeat="post in postsLatest">
 					<h3 ng-switch="post.status.delete">
-						<a ng-switch-when="delete" href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
-						<a ng-switch-default href="<c:url value="/board/free/{{post.seq}}"/>">{{post.subject}}</a>
+						<a ng-switch-when="delete" ng-href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+						<a ng-switch-default ng-href="<c:url value="/board/free/{{post.seq}}"/>" ng-bind="post.subject"></a>
 					</h3>
 					<small>
-						<span aria-hidden="true" class="icon-user"></span> {{post.writer.username}}
+						<span aria-hidden="true" class="icon-user"></span>
+						<span ng-bind="post.writer.username"></span>
 						&nbsp;
-						<span ng-if="${timeNow} > intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.date}"}}</span>
-						<span ng-if="${timeNow} <= intFromObjectId(post.id)">{{dateFromObjectId(post.id) | date:"${dateTimeFormat.time}"}}</span>
+						<span ng-if="${timeNow} > intFromObjectId(post.id)" ng-bind="dateFromObjectId(post.id) | date:'${dateTimeFormat.date}'"></span>
+						<span ng-if="${timeNow} <= intFromObjectId(post.id)" ng-bind="dateFromObjectId(post.id) | date:'${dateTimeFormat.time}'"></span>
 						&nbsp;
-						<span aria-hidden="true" class="icon-eye"></span> {{post.views}}							
+						<span aria-hidden="true" class="icon-eye"></span> <span ng-bind="post.views"></span>
 					</small>                        
 				</li>
 			</ul>
@@ -76,16 +77,16 @@
 		<div class="col-sm-6 sm-margin-bottom-30">
 			<div class="headline">
 				<h2><spring:message code="home.comments.latest"/></h2>
-				<button class="btn-u btn-u-xs btn-u-default rounded" type="button" onclick="location.href='<c:url value="/board/free/comments"/>'">
+				<a class="btn-u btn-u-xs btn-u-default rounded" href="<c:url value="/board/free/comments"/>">
 					<spring:message code="common.button.more"/>
-				</button>			
+				</a>
 			</div>
 		
 			<div class="blog-twitter">
 				<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
-					<strong><span aria-hidden="true" class="icon-user"></span> {{comment.writer.username}}</strong>
-					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>'>{{comment.content}}</a>
-					<span class="twitter-time"> {{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+					<strong><span aria-hidden="true" class="icon-user"></span> <span ng-bind="comment.writer.username"></span></strong>
+					<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>' ng-bind="comment.content"></a>
+					<span class="twitter-time" ng-bind="dateFromObjectId(comment.id) | date:'${dateTimeFormat.dateTime}'"></span>
 				</div>
 		    </div>                			
 		</div> 
@@ -108,12 +109,11 @@
 <div class="carousel slide testimonials testimonials-v2" id="testimonials-1">
                     <div class="carousel-inner">
                         <div class="item" ng-repeat="user in usersLatest" ng-class="{'active':$index == 0}">
-                            <p>{{user.about}}</p>
+                            <p ng-bind="user.about"></p>
                             <div class="testimonial-info">
                                 <span class="testimonial-author">
-                                    <i aria-hidden="true" class="icon-user-follow"></i> {{user.username}}
-                                    <em><i class="fa fa-futbol-o"></i>
-                                    {{user.supportFC.names[0].fullName}}</em>
+                                    <i aria-hidden="true" class="icon-user-follow"></i> <span ng-bind="user.username"></span>
+                                    <em><i class="fa fa-futbol-o"></i><span ng-bind="user.supportFC.names[0].fullName"></span></em>
                                 </span>
                             </div>
                         </div>                    
@@ -135,8 +135,8 @@
 	<!--  백과사전  -->                
 	<div class="shadow-wrapper col-md-12 col-sm-6">
 		<div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
-			<h2>{{encyclopedia.subject}} <span class="label rounded label-orange">{{encyclopedia.kind}}</span></h2>
-			<p>{{encyclopedia.content}}</p>
+			<h2><span ng-bind="encyclopedia.subject"></span> <span class="label rounded label-orange" ng-bind="encyclopedia.kind"></span></h2>
+			<p ng-bind="encyclopedia.content"></p>
 			<!-- 		   
 			<button class="btn-u btn-brd btn-brd-hover rounded btn-u-sea" type="button" ng-click="refreshEncyclopedia()">
 				<i class="fa fa-refresh"></i>
@@ -162,9 +162,9 @@
 		<div class="headline">
 			<h2 class="pull-left"><spring:message code="home.pictures.latest"/></h2>
 			<div class="owl-navigation">
-				<button style="margin:6px 0px 0px 6px;" class="btn-u btn-u-xs btn-u-default rounded pull-left" type="button" onclick="location.href='<c:url value="/gallery/list"/>'">
+				<a style="margin:6px 0px 0px 6px;" class="btn-u btn-u-xs btn-u-default rounded pull-left" href="<c:url value="/gallery/list"/>">
     				<spring:message code="common.button.more"/>
-    			</button>
+    			</a>
     				                     
 				<div class="customNavigation">
 					<a class="owl-btn prev-v2" ng-click="slickConfig.method.slickPrev()"><i class="fa fa-angle-left"></i></a>
@@ -179,7 +179,7 @@
 	    			<a ng-href="<%=request.getContextPath()%>/gallery/view/{{image.id}}">
 						<img style="width:225px; margin:5px;" ng-src="<%=request.getContextPath()%>/gallery/thumbnail/{{image.id}}">
 					</a>
-					<p class="img-responsive">{{image.name}}</p>
+					<p class="img-responsive" ng-bind="image.name"></p>
 				</div>  
 				
 			</div>	
@@ -202,10 +202,8 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/angular-slick-carousel/dist/angular-slick.min.js"></script>
 
 <script type="text/javascript">
-
-var jakdukApp = angular.module('jakdukApp', ['ngSanitize', 'slickCarousel']);
-
-jakdukApp.controller("homeCtrl", function($scope, $http) {
+angular.module('jakdukApp', ['ngSanitize', 'slickCarousel'])
+	.controller("homeCtrl", function($scope, $http) {
 	$scope.encyclopedia = {};
 	$scope.encyclopediaConn = "none";
 	$scope.dataLatestConn = "none";
