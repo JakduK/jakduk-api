@@ -23,7 +23,7 @@
 
 			<div class="row">
 				<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-					<form action="<c:out value="${action}"/>" class="reg-page" name="resetForm" method="POST" ng-submit="resetForm.j_password.$valid && onSubmit($event)">
+					<form action="<c:out value="${action}"/>" class="reg-page" name="resetForm" method="POST" ng-submit="onSubmit($event)">
 						<div class="reg-header">
 							<h2><spring:message code="${title}"/></h2>
 						</div>
@@ -42,7 +42,7 @@
 									<div class="input-group has-feedback" ng-class="{'has-success':resetForm.j_password.$valid,
 						'has-error':resetForm.j_password.$invalid}">
 										<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
-										<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.password.new"/>' ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
+										<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.password.new"/>' ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax" autofocus>
 										<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':resetForm.j_password.$valid, 'glyphicon-remove':resetForm.j_password.$invalid}"></span>
 									</div>
 									<p class="text-danger" ng-model="errorPassword" ng-show="errorPassword" ng-bind="errorPassword"></p>
