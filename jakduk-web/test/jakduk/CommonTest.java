@@ -1,5 +1,6 @@
 package jakduk;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,11 @@ public class CommonTest {
 	
 	@Test
 	public void urlTest() {
-		
-		System.out.println(commonService.isRedirectUrl("http://localhost:8080/jakduk/about/intro"));
-		System.out.println(commonService.isRedirectUrl("http://localhost:8080/jakduk/login"));
-		System.out.println(commonService.isRedirectUrl("http://localhost:8080/jakduk/board/free/write"));
+
+		Assert.assertTrue(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/about/intro"));
+		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/login"));
+		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/board/free/write"));
+		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/reset_password"));
 	}
 	
 }

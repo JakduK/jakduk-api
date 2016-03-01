@@ -13,6 +13,7 @@ import com.jakduk.repository.SequenceRepository;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -59,6 +60,9 @@ public class CommonService {
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
+
+	@Value("${deny.redirect.url}")
+	private String denyRedirectUrl;
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
@@ -252,7 +256,7 @@ public class CommonService {
 	public Boolean isRedirectUrl(String url) {
 		Boolean result = true;
 		
-		String[] deny = {"login", "logout", "j_spring", "write", "admin", "reset_password", "confirm_password"};
+		String[] deny = denyRedirectUrl.split(",");
 		
 		for(int idx = 0 ; idx < deny.length ; idx++) {
 			if (url.contains(deny[idx])) {
