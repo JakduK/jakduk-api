@@ -17,6 +17,7 @@
     <title><spring:message code="jakdu.view"/> &middot; <spring:message code="jakdu"/> &middot; <spring:message code="common.jakduk"/></title>
 
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/line-icons-pro/styles.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
 
     <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
@@ -38,22 +39,48 @@
     <div class="container content">
 
         <div class="row">
-            <div class="col-xs-4 content-boxes-v6 md">
-                <img src="<%=request.getContextPath()%>/resources/jakduk/img/logo_type_A_en.png" alt="Logo">
+            <div class="col-xs-4 content-boxes-v6">
+                <i class="rounded-x  icon-sport-011 "></i>
                 <h1 class="title-v3-md text-uppercase margin-bottom-10">{{jakduSchedule.home.name}}</h1>
-                <p>At vero eos et accusato odio dignissimos ducimus qui blanditiis praesentium voluptatum.</p>
+                <p>Home</p>
             </div>
-            <div class="col-xs-4 md-margin-bottom-50">
-                <div class="service-block-v1 md-margin-bottom-50">
+            <div class="col-xs-4">
+                <div class="service-block-v1">
                     <i class="rounded-x icon-sport-119"></i>
                     <h3 class="title-v3-bg text-uppercase">{{jakduSchedule.score.homeFullTime}} : {{jakduSchedule.score.awayFullTime}}</h3>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse non tincidunt neque.</p>
+                    <p>Score</p>
                 </div>
             </div>
-            <div class="col-xs-4 content-boxes-v6 md-margin-bottom-50">
-                <i class="rounded-x icon-paper-plane"></i>
+            <div class="col-xs-4 content-boxes-v6">
+                <i class="rounded-x  icon-sport-011 "></i>
                 <h2 class="title-v3-md text-uppercase margin-bottom-10">{{jakduSchedule.away.name}}</h2>
-                <p>At vero eos et accusato odio dignissimos ducimus qui blanditiis praesentium voluptatum.</p>
+                <p>Away</p>
+            </div>
+            <div class="col-xs-12">
+                <!--Tag Box v6-->
+                <div class="tag-box tag-box-v6">
+                    <h2><spring:message code="jakdu.expect.score"/></h2>
+                    <div class="row">
+                        <div class="col-xs-6 margin-bottom-10">
+                            <select class="form-control" ng-model="myJakdu.homeScore">
+                                <option value=""><spring:message code="board.placeholder.expect.home.score"/></option>
+                                <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-model="myJakdu.awayScore">
+                                <option value=""><spring:message code="board.placeholder.expect.away.score"/></option>
+                                <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-u btn-u-blue rounded ladda-button"
+                            ng-click="btnGoJakdu()"
+                            ladda="goJakdu" data-style="expand-right" data-spinner-color="Gainsboro">
+                        <span aria-hidden="true" class="icon-pencil"></span> <spring:message code="common.button.go.jakdu"/>
+                    </button>
+                </div>
+                <!--End Tag Box v6-->
             </div>
         </div>
 
@@ -64,12 +91,30 @@
 
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
+<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
 <script type="text/javascript">
-    var jakdukApp = angular.module("jakdukApp", ["ui.bootstrap"]);
+    var jakdukApp = angular.module("jakdukApp", ["ui.bootstrap", "angular-ladda"]);
 
     jakdukApp.controller('jakduCtrl', function($scope, $http) {
-        $scope.dataScheduleConn = "none";
-        $scope.jakduSchedule = {};
+        $scope.rangeScore = [];             // 선택할 수 있는 점수 목록
+        $scope.dataScheduleConn = "none";   // 작두 데이터 커넥션 상태
+        $scope.jakduSchedule = {};          // 작두 데이터
+        $scope.myJakdu = {};                // 내 작두 데이터
+
+        for (i = 0 ; i < 19 ; i++) {
+            $scope.rangeScore.push(i);
+        }
+
+        // http config
+        var headers = {
+            "Content-Type" : "application/json"
+        };
+
+        var config = {
+            headers:headers
+        };
 
         angular.element(document).ready(function() {
             $scope.getDataSchedule();
@@ -99,6 +144,30 @@
                     $scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
                 });
             }
+        };
+
+        $scope.btnGoJakdu = function() {
+            var bUrl = '<c:url value="/jakdu/go/jakdu"/>';
+            var reqData = {};
+
+            if (isEmpty($scope.myJakdu.homeScore) || isEmpty($scope.myJakdu.awayScore)) {
+                return;
+            }
+
+            reqData.myJakdu = $scope.myJakdu;
+            reqData.jakduScheduleId = "${id}";
+
+            var reqPromise = $http.post(bUrl, reqData, config);
+            $scope.goJakdu = true;
+
+            reqPromise.success(function(data, status, headers, config) {
+                console.log("success");
+                $scope.goJakdu = false;
+            });
+            reqPromise.error(function(data, status, headers, config) {
+                console.log("error=" + status);
+                $scope.goJakdu = false;
+            });
         };
 
     });

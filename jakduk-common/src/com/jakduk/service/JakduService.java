@@ -7,7 +7,9 @@ import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.JakduWriteList;
+import com.jakduk.repository.JakduRepository;
 import com.jakduk.repository.JakduScheduleRepository;
+import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,11 @@ public class JakduService {
 
     @Autowired
     private JakduScheduleRepository jakduScheduleRepository;
+
+    @Autowired
+    private JakduRepository jakduRepository;
+
+    private Logger logger = Logger.getLogger(this.getClass());
 
     public void getSchedule(Model model, Locale locale) {
 
@@ -157,5 +164,49 @@ public class JakduService {
     public void getView(Model model, String id) {
 
         model.addAttribute("id", id);
+    }
+
+    public boolean setMyJakdu(String jakduScheduleId, Map<String, String> myJakdu) {
+
+        CommonPrincipal principal = userService.getCommonPrincipal();
+        String accountId = principal.getId();
+        String username = principal.getUsername();
+        String type = principal.getType();
+
+        if (accountId == null) {
+            logger.debug("not allow.");
+            //return HttpServletResponse.SC_UNAUTHORIZED;
+            return false;
+        }
+
+        CommonWriter writer = new CommonWriter();
+        writer.setUserId(accountId);
+        writer.setUsername(username);
+        writer.setType(type);
+
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(jakduScheduleId);
+
+        if (Objects.isNull(jakduSchedule)) {
+            logger.debug("jakduSchedule is null.");
+            return false;
+        }
+
+        Jakdu existJakdu = jakduRepository.findByScheduleAndWriter(jakduSchedule, writer);
+
+        if (!Objects.isNull(existJakdu)) {
+            logger.debug("exist Jakdu.");
+            return false;
+        }
+
+        Jakdu jakdu = new Jakdu();
+        jakdu.setSchedule(jakduSchedule);
+        jakdu.setWriter(writer);
+
+        jakdu.setHomeScore(Integer.parseInt(myJakdu.get("homeScore")));
+        jakdu.setAwayScore(Integer.parseInt(myJakdu.get("awayScore")));
+
+        jakduRepository.save(jakdu);
+
+        return true;
     }
 }

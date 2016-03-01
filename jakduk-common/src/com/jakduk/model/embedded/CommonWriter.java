@@ -43,8 +43,11 @@ public class CommonWriter {
 
 	@Override
 	public String toString() {
-		return "BoardWriter [userId=" + userId + ", username=" + username
-				+ ", type=" + type + "]";
+		return "CommonWriter{" +
+				"userId='" + userId + '\'' +
+				", username='" + username + '\'' +
+				", type='" + type + '\'' +
+				'}';
 	}
 
 }

@@ -15,8 +15,10 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 15. 12. 23.
@@ -120,5 +122,37 @@ public class JakduController {
         sessionStatus.setComplete();
 
         return "redirect:/jakdu/schedule";
+    }
+
+    @RequestMapping(value ="/go/jakdu", method = RequestMethod.POST)
+    public Map goJakdu(@RequestBody Map<Object,Object> map) {
+
+        Map result = new HashMap<>();
+
+        if (Objects.isNull(map)) {
+            result.put("result", Boolean.FALSE);
+            return result;
+        }
+
+        logger.debug("map" + map);
+
+        Map<String, String> myJakdu = (Map<String, String>) map.get("myJakdu");
+        String jakduScheduleId = (String) map.get("jakduScheduleId");
+
+        if (Objects.isNull(myJakdu) || Objects.isNull(jakduScheduleId)) {
+            result.put("result", Boolean.FALSE);
+            return result;
+        }
+
+        boolean returnVal = jakduService.setMyJakdu(jakduScheduleId, myJakdu);
+
+        if (!returnVal) {
+            result.put("result", Boolean.FALSE);
+            return result;
+        }
+
+        result.put("result", Boolean.TRUE);
+
+        return result;
     }
 }
