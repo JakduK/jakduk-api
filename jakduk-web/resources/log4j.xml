@@ -59,6 +59,16 @@
 		</layout>
 	</appender>
 
+	<appender name="emailDailyRollingFile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/usr/local/tomcat/logs/email.log" />
+		<param name="MaxBackupIndex" value="5" /> <!-- Max 5 files -->
+		<param name="DatePattern" value=".yyyy-MM-ww" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				   value="[%5p] [%t %d{yyyy-MM-dd HH:mm:ss}] (%F:%M:%L) %m%n" />
+		</layout>
+	</appender>
+
 	<appender name="default" class="org.apache.log4j.RollingFileAppender">
 		<param name="File" value="/usr/local/tomcat/logs/default.log" />
 		<param name="MaxBackupIndex" value="5" /> <!-- Max 5 files -->
@@ -123,7 +133,13 @@
 		<level value="DEBUG" />
 		<appender-ref ref="searchDailyRollingFile" />
 		<appender-ref ref="console" />
-	</logger>		
+	</logger>
+
+	<logger name="com.jakduk.service.EmailService" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="emailDailyRollingFile" />
+		<appender-ref ref="console" />
+	</logger>
 
 	<!-- Root Logger -->
 	<root>
@@ -134,6 +150,7 @@
 		<appender-ref ref="boardDailyRollingFile" />
 		<appender-ref ref="galleryDailyRollingFile" />
 		<appender-ref ref="searchDailyRollingFile" />
+		<appender-ref ref="emailDailyRollingFile" />
 	</root>
 
 </log4j:configuration>

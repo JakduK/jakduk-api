@@ -26,8 +26,6 @@ import java.util.UUID;
 @Service
 public class EmailService {
 
-	private Logger logger = Logger.getLogger(this.getClass());
-
 	@Autowired
 	private UserRepository userRepository;
 
@@ -49,9 +47,15 @@ public class EmailService {
 	@Value("${email.url.static.resource}")
 	private String staticResourceUrl;
 
+	private Logger logger = Logger.getLogger(this.getClass());
+
 	public void sendResetPassword(String host, Locale locale, String email) {
 		if (Objects.isNull(userRepository.findByEmail(email))) {
 			return;
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("send email to reset password. email is " + email);
 		}
 
 		try {
