@@ -12,7 +12,5 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 public class JakdukAuthenticationProvider extends DaoAuthenticationProvider {
 	
 	private Logger logger = Logger.getLogger(this.getClass());
-	
-	
 
 }

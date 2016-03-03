@@ -11,34 +11,33 @@
   <description>K League Community Web Application</description>
 
   <properties>
-  		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.2.4.RELEASE</spring.version>
-		<spring.security.core.version>4.0.2.RELEASE</spring.security.core.version>
-		<!-- version 2.0.7 is not working in facebook auth -->	
-		<spring.security.oauth.version>2.0.8.RELEASE</spring.security.oauth.version>
-		<spring.mobile.device.version>1.1.4.RELEASE</spring.mobile.device.version>
-		<jstl.version>1.2</jstl.version>
-		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
-		<javax.servlet.jsp-api.version>2.3.1</javax.servlet.jsp-api.version>
-		<com.fasterxml.jackson.version>2.6.4</com.fasterxml.jackson.version>
-		
-		<junit.version>4.12</junit.version>
-	
-		<!-- hibernate -->
-		<org.hibernate.validator.version>5.2.2.Final</org.hibernate.validator.version>
-		<org.hibernate.annotations.version>3.5.6-Final</org.hibernate.annotations.version>
-	
-		<!-- Miscellaneous Dependencies -->
-		<log4j-core.version>2.5</log4j-core.version>
-		<org.slf4j-version>1.7.12</org.slf4j-version>
-			
-		<!-- Mongo DB driver & Spring Data MongoDB -->
-		<spring.data.mongodb.version>1.8.0.RELEASE</spring.data.mongodb.version>
-		<mongodb.driver.version>2.14.0</mongodb.driver.version>
-		
-		<!-- Elasticsearch -->
-		<elasticsearch.version>1.7.2</elasticsearch.version>
-		<io.searchbox.version>1.0.0</io.searchbox.version>
+	  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	  <spring.version>4.2.4.RELEASE</spring.version>
+	  <spring.security.core.version>4.0.2.RELEASE</spring.security.core.version>
+	  <!-- version 2.0.7 is not working in facebook auth -->
+	  <spring.security.oauth.version>2.0.8.RELEASE</spring.security.oauth.version>
+	  <spring.mobile.device.version>1.1.4.RELEASE</spring.mobile.device.version>
+	  <jstl.version>1.2</jstl.version>
+	  <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+	  <javax.servlet.jsp-api.version>2.3.1</javax.servlet.jsp-api.version>
+	  <com.fasterxml.jackson.version>2.6.4</com.fasterxml.jackson.version>
+	  <junit.version>4.12</junit.version>
+	  <org.hibernate.validator.version>5.2.2.Final</org.hibernate.validator.version>
+	  <org.hibernate.annotations.version>3.5.6-Final</org.hibernate.annotations.version>
+	  <org.projectlombok.version>1.6.6</org.projectlombok.version>
+
+	  <!-- Miscellaneous Dependencies -->
+	  <log4j-core.version>2.5</log4j-core.version>
+	  <org.slf4j-version>1.7.12</org.slf4j-version>
+
+	  <!-- Mongo DB driver & Spring Data MongoDB -->
+	  <spring.data.mongodb.version>1.8.0.RELEASE</spring.data.mongodb.version>
+	  <mongodb.driver.version>2.14.0</mongodb.driver.version>
+
+	  <!-- Elasticsearch -->
+	  <elasticsearch.version>1.7.2</elasticsearch.version>
+	  <io.searchbox.version>1.0.0</io.searchbox.version>
+
   </properties>
 	  
  	<repositories>
@@ -301,6 +300,14 @@
 			<artifactId>jest</artifactId>
 			<version>${io.searchbox.version}</version>
 		</dependency>
+
+	  <!-- lombok -->
+	  <dependency>
+		  <groupId>org.projectlombok</groupId>
+		  <artifactId>lombok</artifactId>
+		  <version>${org.projectlombok.version}</version>
+		  <scope>provided</scope>
+	  </dependency>
        
   </dependencies>
   
