@@ -26,9 +26,10 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.map.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;

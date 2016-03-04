@@ -1,5 +1,6 @@
 package com.jakduk.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
@@ -11,7 +12,6 @@ import com.jakduk.repository.JakduRepository;
 import com.jakduk.repository.JakduScheduleRepository;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

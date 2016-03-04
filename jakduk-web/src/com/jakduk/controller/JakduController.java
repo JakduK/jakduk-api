@@ -3,6 +3,7 @@ package com.jakduk.controller;
 import com.jakduk.model.web.JakduWriteList;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,7 @@ import java.util.Objects;
 
 @Controller
 @RequestMapping("/jakdu")
+@Slf4j
 public class JakduController {
 
     @Resource
@@ -36,8 +38,6 @@ public class JakduController {
 
     @Autowired
     private JakduService jakduService;
-
-    private Logger logger = Logger.getLogger(this.getClass());
 
     @RequestMapping
     public String root() {
@@ -80,40 +80,19 @@ public class JakduController {
         return "jakdu/ScheduleView";
     }
 
-    @RequestMapping(value = "/data/schedule/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    public Map dataSchedule(@PathVariable String id) {
-
-        Map<String, Object> result = jakduService.getDataSchedule(id);
-
-        return result;
-    }
-
     @RequestMapping(value = "/write", method = RequestMethod.GET)
     public String write() {
 
         return "jakdu/write";
     }
 
-    @RequestMapping(value = "/data", method = RequestMethod.GET)
-    @ResponseBody
-    public Map data(HttpServletRequest request) {
-
-        Locale locale = localeResolver.resolveLocale(request);
-        Map<String, Object> result = jakduService.getDataWrite(locale);
-
-        return result;
-    }
-
     @RequestMapping(value = "/write", method = RequestMethod.POST)
     public String write(
             @RequestParam(required = false) String content,JakduWriteList jakduWriteList, BindingResult result, SessionStatus sessionStatus) {
 
-        logger.debug("jakduWriteList=" + jakduWriteList);
-
         if (result.hasErrors()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("result=" + result);
+            if (log.isDebugEnabled()) {
+                log.debug("result=" + result);
             }
             return "jakdu/write";
         }
@@ -124,35 +103,5 @@ public class JakduController {
         return "redirect:/jakdu/schedule";
     }
 
-    @RequestMapping(value ="/go/jakdu", method = RequestMethod.POST)
-    public Map goJakdu(@RequestBody Map<Object,Object> map) {
 
-        Map result = new HashMap<>();
-
-        if (Objects.isNull(map)) {
-            result.put("result", Boolean.FALSE);
-            return result;
-        }
-
-        logger.debug("map" + map);
-
-        Map<String, String> myJakdu = (Map<String, String>) map.get("myJakdu");
-        String jakduScheduleId = (String) map.get("jakduScheduleId");
-
-        if (Objects.isNull(myJakdu) || Objects.isNull(jakduScheduleId)) {
-            result.put("result", Boolean.FALSE);
-            return result;
-        }
-
-        boolean returnVal = jakduService.setMyJakdu(jakduScheduleId, myJakdu);
-
-        if (!returnVal) {
-            result.put("result", Boolean.FALSE);
-            return result;
-        }
-
-        result.put("result", Boolean.TRUE);
-
-        return result;
-    }
 }
