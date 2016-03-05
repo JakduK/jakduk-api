@@ -53,10 +53,10 @@
 								</div>
 
 								<!-- Trending -->
-								<ul class="list-unstyled blog-trending">
+								<ul class="ng-cloak list-unstyled blog-trending">
 									<li ng-repeat="post in postsLatest">
 										<h3 ng-switch="post.status.delete">
-											<a ng-switch-when="delete" ng-href="<c:url value="/board/free/{{post.seq}}"/>"><spring:message code="board.msg.deleted"/></a>
+											<a ng-switch-when="delete"><spring:message code="board.msg.deleted"/></a>
 											<a ng-switch-default ng-href="<c:url value="/board/free/{{post.seq}}"/>" ng-bind="post.subject"></a>
 										</h3>
 										<small>
@@ -82,7 +82,7 @@
 									</a>
 								</div>
 
-								<div class="blog-twitter">
+								<div class="blog-twitter ng-cloak">
 									<div class="blog-twitter-inner" ng-repeat="comment in commentsLatest">
 										<strong>
 											<span aria-hidden="true" class="icon-user"></span>
@@ -224,7 +224,7 @@
 					$scope.usersLatest = [];
 					$scope.commentsLatest = [];
 					$scope.galleriesLatest = [];
-					$scope.homeDescription = {};
+					$scope.homeDescription = '<spring:message code="common.now.loading"/>...';
 
 					$scope.slickConfig = {
 						infinite: false,
