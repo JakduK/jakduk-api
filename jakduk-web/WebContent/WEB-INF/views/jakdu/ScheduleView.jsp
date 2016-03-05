@@ -147,14 +147,15 @@
         };
 
         $scope.btnGoJakdu = function() {
-            var bUrl = '<c:url value="/jakdu/go/jakdu"/>';
+            var bUrl = '<c:url value="/jakdu/myJakdu"/>';
             var reqData = {};
 
             if (isEmpty($scope.myJakdu.homeScore) || isEmpty($scope.myJakdu.awayScore)) {
                 return;
             }
 
-            reqData.myJakdu = $scope.myJakdu;
+            reqData.homeScore = $scope.myJakdu.homeScore;
+            reqData.awayScore = $scope.myJakdu.awayScore;
             reqData.jakduScheduleId = "${id}";
 
             var reqPromise = $http.post(bUrl, reqData, config);
@@ -165,7 +166,7 @@
                 $scope.goJakdu = false;
             });
             reqPromise.error(function(data, status, headers, config) {
-                console.log("error=" + status);
+                alert(data.message);
                 $scope.goJakdu = false;
             });
         };

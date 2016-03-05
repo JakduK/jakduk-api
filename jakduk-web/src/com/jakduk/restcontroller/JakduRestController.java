@@ -1,18 +1,16 @@
-package com.jakduk.controller.rest;
+package com.jakduk.restcontroller;
 
+import com.jakduk.model.db.Jakdu;
 import com.jakduk.service.JakduService;
+import com.jakduk.model.web.MyJakduRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by pyohwan on 16. 3. 4.
@@ -49,37 +47,18 @@ public class JakduRestController {
     }
 
     // 작두 타기
-    @RequestMapping(value ="/go/jakdu", method = RequestMethod.POST)
-    public Map goJakdu(@RequestBody Map<Object,Object> map) {
+    @RequestMapping(value ="/myJakdu", method = RequestMethod.POST)
+    public Jakdu goJakdu(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
 
-        Map result = new HashMap<>();
+        Locale locale = localeResolver.resolveLocale(request);
 
-        if (Objects.isNull(map)) {
-            result.put("result", Boolean.FALSE);
-            return result;
+        if (Objects.isNull(myJakdu)) {
+            ResourceBundle bundle = ResourceBundle.getBundle("messages.common", locale);
+            throw new IllegalArgumentException(bundle.getString("common.msg.invalid.parameter.exception"));
         }
 
+        Jakdu jakdu = jakduService.setMyJakdu(locale, myJakdu);
 
-
-        log.debug("map" + map);
-
-        Map<String, String> myJakdu = (Map<String, String>) map.get("myJakdu");
-        String jakduScheduleId = (String) map.get("jakduScheduleId");
-
-        if (Objects.isNull(myJakdu) || Objects.isNull(jakduScheduleId)) {
-            result.put("result", Boolean.FALSE);
-            return result;
-        }
-
-        boolean returnVal = jakduService.setMyJakdu(jakduScheduleId, myJakdu);
-
-        if (!returnVal) {
-            result.put("result", Boolean.FALSE);
-            return result;
-        }
-
-        result.put("result", Boolean.TRUE);
-
-        return result;
+        return jakdu;
     }
 }

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
+import com.jakduk.exception.RepositoryExistException;
 import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.LocalName;
-import com.jakduk.model.web.JakduWriteList;
+import com.jakduk.model.web.MyJakduRequest;
 import com.jakduk.repository.JakduRepository;
 import com.jakduk.repository.JakduScheduleRepository;
 import org.apache.log4j.Logger;
@@ -16,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
@@ -166,17 +167,20 @@ public class JakduService {
         model.addAttribute("id", id);
     }
 
-    public boolean setMyJakdu(String jakduScheduleId, Map<String, String> myJakdu) {
-
+    /**
+     * 작두 타기 입력
+     * @param locale
+     * @param myJakdu
+     */
+    public Jakdu setMyJakdu(Locale locale, MyJakduRequest myJakdu) {
         CommonPrincipal principal = userService.getCommonPrincipal();
         String accountId = principal.getId();
         String username = principal.getUsername();
         String type = principal.getType();
 
         if (accountId == null) {
-            logger.debug("not allow.");
-            //return HttpServletResponse.SC_UNAUTHORIZED;
-            return false;
+            ResourceBundle bundle = ResourceBundle.getBundle("messages.common", locale);
+            throw new AccessDeniedException(bundle.getString("common.msg.access.denied.exception"));
         }
 
         CommonWriter writer = new CommonWriter();
@@ -184,29 +188,29 @@ public class JakduService {
         writer.setUsername(username);
         writer.setType(type);
 
-        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(jakduScheduleId);
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
 
         if (Objects.isNull(jakduSchedule)) {
-            logger.debug("jakduSchedule is null.");
-            return false;
+            ResourceBundle bundle = ResourceBundle.getBundle("messages.jakdu", locale);
+            throw new NoSuchElementException(bundle.getString("jakdu.msg.not.found.jakdu.schedule.exception"));
         }
 
         Jakdu existJakdu = jakduRepository.findByScheduleAndWriter(jakduSchedule, writer);
 
         if (!Objects.isNull(existJakdu)) {
-            logger.debug("exist Jakdu.");
-            return false;
+            ResourceBundle bundle = ResourceBundle.getBundle("messages.jakdu", locale);
+            throw new RepositoryExistException(bundle.getString("jakdu.msg.already.join.jakdu.exception"));
         }
 
         Jakdu jakdu = new Jakdu();
         jakdu.setSchedule(jakduSchedule);
         jakdu.setWriter(writer);
 
-        jakdu.setHomeScore(Integer.parseInt(myJakdu.get("homeScore")));
-        jakdu.setAwayScore(Integer.parseInt(myJakdu.get("awayScore")));
+        jakdu.setHomeScore(myJakdu.getHomeScore());
+        jakdu.setAwayScore(myJakdu.getAwayScore());
 
         jakduRepository.save(jakdu);
 
-        return true;
+        return jakdu;
     }
 }
