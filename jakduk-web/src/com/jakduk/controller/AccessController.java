@@ -1,11 +1,12 @@
 package com.jakduk.controller;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.Token;
-import com.jakduk.repository.TokenRepository;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.EmailService;
-import com.jakduk.service.UserService;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.Token;
+import com.jakduk.repository.TokenRepository;
+import com.jakduk.service.CommonService;
+import com.jakduk.service.EmailService;
+import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping()
