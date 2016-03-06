@@ -114,7 +114,7 @@
 										<div class="item" ng-repeat="user in usersLatest" ng-class="{'active':$index == 0}">
 											<p ng-bind="user.about"></p>
 											<div class="testimonial-info">
-												<span class="testimonial-author clearfix">
+												<span class="testimonial-author">
 													<i aria-hidden="true" class="icon-user-follow"></i>
 													<span class="latest-user-name" ng-bind="user.username"></span>
 													<em class="latest-user-club">
