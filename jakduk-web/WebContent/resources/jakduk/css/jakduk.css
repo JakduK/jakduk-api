@@ -123,3 +123,8 @@ td a {color:#555;}
 .note-editor.note-frame .note-editing-area .note-editable {
 	min-height: 50px;
 }
+
+.testimonial-info > .testimonial-author > .latest-user-name,
+.testimonial-info > .testimonial-author > .latest-user-club > span {
+	top: 0;
+}
