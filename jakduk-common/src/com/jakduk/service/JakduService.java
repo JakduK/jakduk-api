@@ -11,6 +11,7 @@ import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.MyJakduRequest;
 import com.jakduk.repository.JakduRepository;
 import com.jakduk.repository.JakduScheduleRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import java.util.*;
  */
 
 @Service
+@Slf4j
 public class JakduService {
 
     @Autowired
@@ -45,8 +47,6 @@ public class JakduService {
 
     @Autowired
     private JakduRepository jakduRepository;
-
-    private Logger logger = Logger.getLogger(this.getClass());
 
     public void getSchedule(Model model, Locale locale) {
 
