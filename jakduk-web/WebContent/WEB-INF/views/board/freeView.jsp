@@ -276,10 +276,11 @@
 
 				<div class="media-body ng-cloak">
 					<div ng-repeat="comment in commentList">
-						<h5 class="media-heading">
-							<i aria-hidden="true" class="icon-user"></i><span ng-bind="comment.writer.username"></span>
-							<span ng-bind="dateFromObjectId(comment.id) | date:'${dateTimeFormat.dateTime}'"></span>
-						</h5>    
+						<h6 class="clearfix">
+							<i aria-hidden="true" class="icon-user"></i>
+							<span ng-bind="comment.writer.username"></span>
+							<span class="pull-right" ng-bind="dateFromObjectId(comment.id) | date:'${dateTimeFormat.dateTime}'"></span>
+						</h6>
 						<p>
 							<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
 							<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
