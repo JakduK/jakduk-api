@@ -11,7 +11,7 @@
 	<title><spring:message code="board.free.breadcrumbs.comments"/> &middot; <spring:message code="board.name.free"/> &middot; <spring:message code="common.jakduk"/></title>
 	
 	<jsp:include page="../include/html-header.jsp"></jsp:include>
-	
+
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/blog.css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css">
 </head>
@@ -42,7 +42,7 @@
 	
 	<!--=== Content Part ===-->
 	<div class="container content blog-item" ng-controller="boardCtrl">
-	
+
 	<div class="row">
 		<!--Top Likes Rows-->
 		<div class="col-md-6">

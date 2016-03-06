@@ -4,7 +4,6 @@ import com.jakduk.model.web.JakduWriteList;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,10 +15,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by pyohwan on 15. 12. 23.
@@ -77,7 +73,7 @@ public class JakduController {
     public String schedule(@PathVariable String id, Model model) throws IOException {
         jakduService.getView(model, id);
 
-        return "jakdu/ScheduleView";
+        return "jakdu/scheduleView";
     }
 
     @RequestMapping(value = "/write", method = RequestMethod.GET)

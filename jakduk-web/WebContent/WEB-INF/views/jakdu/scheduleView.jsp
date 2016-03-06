@@ -16,15 +16,15 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><spring:message code="jakdu.view"/> &middot; <spring:message code="jakdu"/> &middot; <spring:message code="common.jakduk"/></title>
 
+    <jsp:include page="../include/html-header.jsp"></jsp:include>
+
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/line-icons-pro/styles.css">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
-
-    <jsp:include page="../include/html-header.jsp"></jsp:include>
 </head>
 
 <body class="header-fixed">
 
-<div class="wrapper" ng-controller="jakduCtrl">
+<div class="wrapper">
     <jsp:include page="../include/navigation-header.jsp"/>
 
     <!--=== Breadcrumbs ===-->
@@ -36,7 +36,7 @@
     <!--=== End Breadcrumbs ===-->
 
     <!--=== Content Part ===-->
-    <div class="container content">
+    <div class="container content" ng-controller="jakduCtrl">
 
         <div class="row">
             <div class="col-xs-4 content-boxes-v6">
@@ -59,19 +59,36 @@
             <div class="col-xs-12">
                 <!--Tag Box v6-->
                 <div class="tag-box tag-box-v6">
-                    <h2><spring:message code="jakdu.expect.score"/></h2>
                     <div class="row">
                         <div class="col-xs-6 margin-bottom-10">
-                            <select class="form-control" ng-model="myJakdu.homeScore">
-                                <option value=""><spring:message code="board.placeholder.expect.home.score"/></option>
-                                <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
-                            </select>
+                            <h2><spring:message code="jakdu.expect.score"/></h2>
+                            <div class="btn-group">
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="0">0</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="1">1</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="2">2</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="3">3</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="4">4</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="5">5</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="6">6</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="7">7</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="8">8</label>
+                                <label class="btn-u" ng-model="myHomeScore" uib-btn-radio="9">9</label>
+                            </div>
                         </div>
                         <div class="col-xs-6">
-                            <select class="form-control" ng-model="myJakdu.awayScore">
-                                <option value=""><spring:message code="board.placeholder.expect.away.score"/></option>
-                                <option ng-repeat="opt in rangeScore" value="{{opt}}">{{opt}}</option>
-                            </select>
+                            <h2><spring:message code="jakdu.expect.score"/></h2>
+                            <div class="btn-group">
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="0">0</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="1">1</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="2">2</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="3">3</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="4">4</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="5">5</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="6">6</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="7">7</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="8">8</label>
+                                <label class="btn-u" ng-model="myAwayScore" uib-btn-radio="9">9</label>
+                            </div>
                         </div>
                     </div>
                     <button type="button" class="btn-u btn-u-blue rounded ladda-button"
@@ -101,11 +118,6 @@
         $scope.rangeScore = [];             // 선택할 수 있는 점수 목록
         $scope.dataScheduleConn = "none";   // 작두 데이터 커넥션 상태
         $scope.jakduSchedule = {};          // 작두 데이터
-        $scope.myJakdu = {};                // 내 작두 데이터
-
-        for (i = 0 ; i < 19 ; i++) {
-            $scope.rangeScore.push(i);
-        }
 
         // http config
         var headers = {
@@ -117,9 +129,8 @@
         };
 
         angular.element(document).ready(function() {
-            $scope.getDataSchedule();
 
-            App.init();
+            $scope.getDataSchedule();
         });
 
         $scope.getDataSchedule = function() {
@@ -150,12 +161,12 @@
             var bUrl = '<c:url value="/jakdu/myJakdu"/>';
             var reqData = {};
 
-            if (isEmpty($scope.myJakdu.homeScore) || isEmpty($scope.myJakdu.awayScore)) {
+            if (isEmpty($scope.myHomeScore) || isEmpty($scope.myAwayScore)) {
                 return;
             }
 
-            reqData.homeScore = $scope.myJakdu.homeScore;
-            reqData.awayScore = $scope.myJakdu.awayScore;
+            reqData.homeScore = $scope.myHomeScore;
+            reqData.awayScore = $scope.myAwayScore;
             reqData.jakduScheduleId = "${id}";
 
             var reqPromise = $http.post(bUrl, reqData, config);
@@ -175,6 +186,12 @@
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        App.init();
+    });
+</script>
 
 </body>
 </html>

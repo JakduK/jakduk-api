@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequestMapping("/sample")
 public class SampleController {
 
@@ -185,6 +185,7 @@ public class SampleController {
 	}
 
 	@RequestMapping(value ="/rest01", method = RequestMethod.POST)
+	@ResponseBody
 	public Map rest01(@RequestBody Map<Object,Object> map) {
 		logger.debug(map);
 
@@ -192,5 +193,10 @@ public class SampleController {
 		result.put("result", Boolean.TRUE);
 
 		return result;
+	}
+
+	@RequestMapping(value = "/button01", method = RequestMethod.GET)
+	public String button01() {
+		return "sample/button01";
 	}
 }
