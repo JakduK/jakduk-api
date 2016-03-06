@@ -185,7 +185,7 @@
 			<div class="blog-post-tags">
                <ul class="list-unstyled list-inline blog-info">
                    <li><span aria-hidden="true" class="icon-user"></span> ${post.writer.username}</li>
-                   <li>{{dateFromObjectId("${post.id}") | date:"${dateTimeFormat.dateTime}"}}</li>
+                   <li ng-bind="dateFromObjectId('${post.id}') | date:'${dateTimeFormat.dateTime}'"></li>
                    <li><span aria-hidden="true" class="icon-eye"></span> ${post.views}</li>
                </ul>                    
            </div>
@@ -224,14 +224,14 @@
 							ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 							<i class="fa fa-thumbs-o-up fa-lg"></i>
-						   <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
+						   <span ng-hide="likeConn == 'connecting'" ng-bind="numberOfLike"></span>
 						</button>
 						<button class="btn btn-u-sm ladda-button btn-weibo" type="button"
 							ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
 							ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 							<i class="fa fa-thumbs-o-down fa-lg"></i>
-						   <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
+						   <span ng-hide="dislikeConn == 'connecting'" ng-bind="numberOfDislike"></span>
 						</button>
 					</div>
 					<div class="col-xs-6 text-right">
@@ -247,7 +247,7 @@
 				</div>
 			</div>
 
-			<div class="alert {{alert.classType}} fade in rounded" ng-show="alert.msg">
+			<div class="alert {{alert.classType}} fade in rounded ng-cloak" ng-show="alert.msg">
 				{{alert.msg}} <a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl">{{alert.linkLabel}}</a>
 			</div>
 
@@ -266,7 +266,7 @@
 				<h2 class="heading-sm text-primary">
 					<i class="fa fa-comments"></i>
 					<span id="comments" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
-						<spring:message code="board.msg.comment.count" arguments="{{commentCount}}"/>
+						<spring:message code="board.msg.comment.count" arguments="<span ng-bind=\"commentCount\"></span>"/>
 					</span>
 					<button type="button" class="btn btn-link" ng-click="btnRefreshComment()"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.refresh.comments"/>'>
@@ -274,11 +274,11 @@
 					</button>
 				</h2>
 
-				<div class="media-body">
+				<div class="media-body ng-cloak">
 					<div ng-repeat="comment in commentList">
 						<h5 class="media-heading">
-							<i aria-hidden="true" class="icon-user"></i>{{comment.writer.username}}
-							<span>{{dateFromObjectId(comment.id) | date:"${dateTimeFormat.dateTime}"}}</span>
+							<i aria-hidden="true" class="icon-user"></i><span ng-bind="comment.writer.username"></span>
+							<span ng-bind="dateFromObjectId(comment.id) | date:'${dateTimeFormat.dateTime}'"></span>
 						</h5>    
 						<p>
 							<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
@@ -290,17 +290,17 @@
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 							<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
 								<i class="fa fa-thumbs-o-up fa-lg"></i>
-								{{numberOfCommentLike[comment.id]}}
+								<span ng-bind="numberOfCommentLike[comment.id]"></span>
 							</span>
 						</button>
 						<button type="button" class="btn btn-xs rounded btn-weibo" ng-click="btnCommentFeeling(comment.id, 'dislike')"
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 							<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
 								<i class="fa fa-thumbs-o-down fa-lg"></i>
-								{{numberOfCommentDislike[comment.id]}}
+								<span ng-bind="numberOfCommentDislike[comment.id]"></span>
 							</span>
 						</button>							
-						<div class="text-danger" ng-show="commentFeelingConn[comment.id]">{{commentFeelingAlert[comment.id]}}</div>							 
+						<div class="text-danger" ng-show="commentFeelingConn[comment.id]" ng-bind="commentFeelingAlert[comment.id]"></div>
 					    <hr class="padding-5">
 					</div>
 					
@@ -313,7 +313,7 @@
 					</div>
 				
 					<div class="contex-bg" ng-show="commentAlert.msg">
-						<p class="{{commentAlert.classType}} rounded">{{commentAlert.msg}}</p>
+						<p class="{{commentAlert.classType}} rounded" ng-bind="commentAlert.msg"></p>
 					</div>
 				</div>
 			</div>		
@@ -324,7 +324,7 @@
 				<div class="margin-bottom-10">            
 					<summernote config="options" on-keyUp="focus(evt)" 
 					ng-model="summernote.content" ng-init="summernote={content:'', seq:'${post.seq}'}"></summernote>
-					<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg">{{summernoteAlert.msg}}</span>
+					<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg" ng-bind="summernoteAlert.msg"></span>
 				</div>				  
 			
 				<div class="margin-bottom-10">
@@ -342,10 +342,10 @@
 							</button>				
 						</c:when>
 					</c:choose>	
-					{{summernote.content.length}} / {{boardCommentContentLengthMax}}			          
+					<span class="ng-cloak">{{summernote.content.length}} / {{boardCommentContentLengthMax}}</span>
 				</div>
 				<div>
-					<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg">{{writeCommentAlert.msg}}</span>
+					<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg" ng-bind="writeCommentAlert.msg"></span>
 				</div>	
 			</div>                
 	

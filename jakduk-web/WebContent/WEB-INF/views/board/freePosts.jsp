@@ -48,7 +48,7 @@
                    <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-thumbs-o-up"></i>
                    <span><spring:message code="board.top.likes"/></span>
                </h2>
-		       <table class="table table-hover">
+		       <table class="table table-hover ng-cloak">
 					<tbody>
 						<tr ng-repeat="post in topLike">
 							<td class="text-overflow max-width-240">
@@ -74,7 +74,7 @@
                    <i class="icon-custom rounded-x icon-sm icon-color-u fa fa-comment-o"></i>
                    <span><spring:message code="board.top.comments"/></span>
                </h2>
-	  			<table class="table table-hover">
+	  			<table class="table table-hover ng-cloak">
 	      			<tbody>
 						<tr ng-repeat="post in topComment">
 							<td class="text-overflow max-width-240">
@@ -97,8 +97,8 @@
 	</div>
 
 		<!-- Top Buttons -->
-		<div class="row">
-			<div class="col-sm-6 margin-bottom-10">
+		<div class="row margin-bottom-10">
+			<div class="col-sm-6">
 				<button type="button" class="btn-u rounded dropdown-toggle" data-toggle="dropdown">
 					<c:choose>
 						<c:when test="${boardListInfo.category != 'none'}">
@@ -130,7 +130,7 @@
 					</c:when>
 				</c:choose>
 			</div>
-			<div class="col-sm-6 sm-margin-bottom-10">
+			<div class="col-sm-6">
 			   <div class="input-group">
 				   <input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''"
 				   ng-keypress="($event.which === 13)?btnEnter():return"
@@ -139,7 +139,6 @@
 					   <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
 				   </span>
 			   </div>
-			   <span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
 			</div>
 		</div>
 		<!-- End Top Buttons -->
@@ -331,7 +330,6 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 	$scope.dataTopPostConn = "none";
 	$scope.topLike = [];
 	$scope.topComment = [];
-	$scope.enterAlert = "";
 
 	angular.element(document).ready(function() {
 		var page = parseInt("${boardListInfo.page}");
@@ -378,7 +376,6 @@ jakdukApp.controller("boardCtrl", function($scope, $http) {
 		var isValid = true;
 
 		if ($scope.searchWords.trim() < 1) {
-			$scope.enterAlert = '<spring:message code="search.msg.enter.words.you.want.search.words"/>';
 			isValid = false;
 		}
 
