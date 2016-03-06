@@ -114,10 +114,13 @@
 										<div class="item" ng-repeat="user in usersLatest" ng-class="{'active':$index == 0}">
 											<p ng-bind="user.about"></p>
 											<div class="testimonial-info">
-												<span class="testimonial-author">
+												<span class="testimonial-author clearfix">
 													<i aria-hidden="true" class="icon-user-follow"></i>
-													<span ng-bind="user.username"></span>
-													<em><i class="fa fa-futbol-o"></i><span ng-bind="user.supportFC.names[0].fullName"></span></em>
+													<span class="latest-user-name" ng-bind="user.username"></span>
+													<em class="latest-user-club">
+														<i class="fa fa-futbol-o"></i>
+														<span ng-bind="user.supportFC.names[0].fullName"></span>
+													</em>
 												</span>
 											</div>
 										</div>
