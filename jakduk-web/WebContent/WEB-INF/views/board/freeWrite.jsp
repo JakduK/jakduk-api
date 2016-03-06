@@ -10,7 +10,7 @@
 <!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 <head>
 	<title><spring:message code="board.write"/> &middot; <spring:message code="common.jakduk"/></title>
-	<jsp:include page="../include/html-header.jsp"></jsp:include>
+	<jsp:include page="../include/html-header.jsp"/>
 	
 	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 	
@@ -53,7 +53,7 @@
 				</c:forEach>
 			</form:select>
 			<form:errors path="categoryName" cssClass="text-danger" element="span" ng-hide="categoryAlert.msg"/>
-			<span class="{{categoryAlert.classType}}" ng-show="categoryAlert.msg">{{categoryAlert.msg}}</span>
+			<span class="{{categoryAlert.classType}}" ng-show="categoryAlert.msg" ng-bind="categoryAlert.msg"></span>
 			</div>
 		</div>
 	</div>
@@ -66,21 +66,21 @@
 		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFreeWrite.subject.$valid, 
 		'glyphicon-remove':boardFreeWrite.subject.$invalid}"></span>
 		<form:errors path="subject" cssClass="text-danger" element="span" ng-hide="subjectAlert.msg"/>
-		<span class="{{subjectAlert.classType}}" ng-show="subjectAlert.msg">{{subjectAlert.msg}}</span>		
+		<span class="{{subjectAlert.classType}}" ng-show="subjectAlert.msg" ng-bind="subjectAlert.msg"></span>
 	</div>
 	
 	<div class="form-group" ng-class="{'has-success':content.length >= 5, 'has-error':content.length < 5}">
 		<label for="content" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.content"/></label>
 		<summernote config="options" ng-model="content" on-image-upload="imageUpload(files, editor)" editable="editable"></summernote>
 		<form:errors path="content" cssClass="text-danger" element="span" ng-hide="contentAlert.msg"/>
-		<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg">{{contentAlert.msg}}</span>
+		<span class="{{contentAlert.classType}}" ng-show="contentAlert.msg" ng-bind="contentAlert.msg"></span>
 	</div>
 
-	<h4 class="text-primary" ng-show="storedImages.length > 0 || uploader.queue.length > 0">
+	<h4 class="text-primary ng-cloak" ng-show="storedImages.length > 0 || uploader.queue.length > 0">
 		<spring:message code="board.gallery.list"/>
 	</h4>
 
-<div class="row">
+<div class="row ng-cloak">
 	<!-- sotred Images -->
 	<div class="media col-xs-12 col-sm-4" ng-repeat="item in storedImages">
 	  <div class="media-left media-middle">
@@ -143,7 +143,7 @@
 			<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
 		</button>
 		<div>
-		<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg">{{buttonAlert.msg}}</span>
+		<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg" ng-bind="buttonAlert.msg"></span>
 		</div>	
 	</div>	  
 </form:form>
@@ -168,277 +168,275 @@
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 <script type="text/javascript">
+	angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"])
+		.controller('FreeWriteCtrl', function($scope, $http, $window, $document, FileUploader) {
+			var document = $document[0];
 
-window.onbeforeunload = function(e) {
-	if (!submitted) {
-		(e || window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
-		return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
-	}
-};
+			$scope.categoryAlert = {};
+			$scope.subjectAlert = {};
+			$scope.contentAlert = {};
+			$scope.buttonAlert = {};
+			$scope.storedImages = [];
+			$scope.subject = document.getElementById("subject_temp").value;
 
-var submitted = false;
-var jakdukApp = angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"]);
+			$window.onbeforeunload = function(e) {
+				if ($scope.boardFreeWrite.$dirty) {
+					(e || $window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+					return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
+				}
+			};
 
-jakdukApp.controller('FreeWriteCtrl', function($scope, $http, FileUploader) {
-	$scope.categoryAlert = {};
-	$scope.subjectAlert = {};
-	$scope.contentAlert = {};
-	$scope.buttonAlert = {};
-	$scope.storedImages = [];
-	$scope.subject = document.getElementById("subject_temp").value;
-	
-	angular.element(document).ready(function() {
-		App.init();
-		
-		if (!isEmpty($scope.images)) {
-			var objImages = JSON.parse($scope.images);
-			objImages.forEach(function(entry) {
-				$scope.storedImages.push(entry);
-				$scope.$apply();
-			}) ;
-		}
-	});
+			angular.element(document).ready(function() {
+				App.init();
 
-	var contentValue = document.getElementById("content").value;
-	$scope.content = contentValue ? contentValue : '';
-
-	$scope.options = {
-		height: 0,
-		//placeholder: '<spring:message code="board.msg.write.text.here"/>',
-		lang : "${summernoteLang}",
-		toolbar: [
-			['style', ['style']],
-			['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
-			['fontname', ['fontname']],
-			// ['fontsize', ['fontsize']], // Still buggy
-			['color', ['color']],
-			['para', ['ul', 'ol', 'paragraph']],
-			// ['height', ['height']],
-			['table', ['table']],
-			['insert', ['link', 'picture', 'video', 'hr']],
-			['view', ['fullscreen', 'codeview']],
-			['help', ['help']]
-		]
-	};
-
-	$scope.uploader = new FileUploader({
-		url:'<c:url value="/gallery/upload.json"/>',
-		autoUpload:true,
-		method:"POST"
-	});
-	
-	// 이미 등록된 이미지들 가져오기.
-	$scope.onGalleryItem = function(fileItem, type) {
-		if (!isEmpty($scope.images)) {
-			var tempImages = JSON.parse($scope.images);
-			var rmIdx = -1;
-			
-			tempImages.forEach(function(entry, index) {
-				if (entry.uid == fileItem.uid) {
-					rmIdx = index;							
+				if (!isEmpty($scope.images)) {
+					var objImages = JSON.parse($scope.images);
+					objImages.forEach(function(entry) {
+						$scope.storedImages.push(entry);
+						$scope.$apply();
+					}) ;
 				}
 			});
-			
-			if (rmIdx != -1) {
-				if (type == 'queue') {
-					var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};				
-				} else if (type == 'stored') {
-					var imageInfo = {uid:fileItem.uid, name:fileItem.name, fileName:fileItem.fileName, size:fileItem.size};
-				}
-				
-				tempImages.splice(rmIdx, 1, imageInfo);
-				$scope.images = JSON.stringify(tempImages);
-				console.log("fileItem updated(queue). fileInfo=", imageInfo);
-			}
-		}
-	};
-	
-	// 이미 등록된 이미지 삭제.
-	$scope.removeStoredItem = function(fileItem) {
-		if (fileItem.uid != null) {
-			var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
-			
-			var reqPromise = $http.get(bUrl);
-			
-			reqPromise.success(function(data, status, headers, config) {
 
-				if (!isEmpty($scope.storedImages)) {
-					var rmIdx = -1;
-					
-					$scope.storedImages.forEach(function(entry, index) {
-						if (entry.uid == fileItem.uid) {
-							rmIdx = index;							
-						}
-					});
-					
-					if (rmIdx != -1) {
-						$scope.storedImages.splice(rmIdx, 1);
-					}
-				}				
-				
+			var contentValue = document.getElementById("content").value;
+			$scope.content = contentValue ? contentValue : '';
+
+			$scope.options = {
+				height: 0,
+				//placeholder: '<spring:message code="board.msg.write.text.here"/>',
+				lang : "${summernoteLang}",
+				toolbar: [
+					['style', ['style']],
+					['font', ['bold', 'italic', 'underline', /*'superscript', 'subscript', */'strikethrough', 'clear']],
+					['fontname', ['fontname']],
+					// ['fontsize', ['fontsize']], // Still buggy
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					// ['height', ['height']],
+					['table', ['table']],
+					['insert', ['link', 'picture', 'video', 'hr']],
+					['view', ['fullscreen', 'codeview']],
+					['help', ['help']]
+				]
+			};
+
+			$scope.uploader = new FileUploader({
+				url:'<c:url value="/gallery/upload.json"/>',
+				autoUpload:true,
+				method:"POST"
+			});
+
+			// 이미 등록된 이미지들 가져오기.
+			$scope.onGalleryItem = function(fileItem, type) {
 				if (!isEmpty($scope.images)) {
 					var tempImages = JSON.parse($scope.images);
 					var rmIdx = -1;
-					
+
 					tempImages.forEach(function(entry, index) {
 						if (entry.uid == fileItem.uid) {
-							rmIdx = index;							
+							rmIdx = index;
 						}
 					});
-					
+
 					if (rmIdx != -1) {
-						tempImages.splice(rmIdx, 1);
+						if (type == 'queue') {
+							var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};
+						} else if (type == 'stored') {
+							var imageInfo = {uid:fileItem.uid, name:fileItem.name, fileName:fileItem.fileName, size:fileItem.size};
+						}
+
+						tempImages.splice(rmIdx, 1, imageInfo);
+						$scope.images = JSON.stringify(tempImages);
+						console.log("fileItem updated(queue). fileInfo=", imageInfo);
+					}
+				}
+			};
+
+			// 이미 등록된 이미지 삭제.
+			$scope.removeStoredItem = function(fileItem) {
+				if (fileItem.uid != null) {
+					var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
+
+					var reqPromise = $http.get(bUrl);
+
+					reqPromise.success(function(data, status, headers, config) {
+
+						if (!isEmpty($scope.storedImages)) {
+							var rmIdx = -1;
+
+							$scope.storedImages.forEach(function(entry, index) {
+								if (entry.uid == fileItem.uid) {
+									rmIdx = index;
+								}
+							});
+
+							if (rmIdx != -1) {
+								$scope.storedImages.splice(rmIdx, 1);
+							}
+						}
+
+						if (!isEmpty($scope.images)) {
+							var tempImages = JSON.parse($scope.images);
+							var rmIdx = -1;
+
+							tempImages.forEach(function(entry, index) {
+								if (entry.uid == fileItem.uid) {
+									rmIdx = index;
+								}
+							});
+
+							if (rmIdx != -1) {
+								tempImages.splice(rmIdx, 1);
+								$scope.images = JSON.stringify(tempImages);
+							}
+						}
+
+						console.log("fileItem removed(stored). status="+status);
+					});
+					reqPromise.error(function(data, status, headers, config) {
+						console.log("remove(stored) image failed.");
+					});
+				}
+			};
+
+			// 지금 업로드한 이미지를 큐에서 삭제.
+			$scope.removeQueueItem = function(fileItem) {
+
+				if (fileItem.uid != null) {
+					var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
+
+					var reqPromise = $http.get(bUrl);
+
+					reqPromise.success(function(data, status, headers, config) {
+
+						fileItem.remove();
+
+						if (!isEmpty($scope.images)) {
+							var tempImages = JSON.parse($scope.images);
+							var rmIdx = -1;
+
+							tempImages.forEach(function(entry, index) {
+								if (entry.uid == fileItem.uid) {
+									rmIdx = index;
+								}
+							});
+
+							if (rmIdx != -1) {
+								tempImages.splice(rmIdx, 1);
+								$scope.images = JSON.stringify(tempImages);
+							}
+							console.log("fileItem removed(queue). status="+status);
+						}
+
+					});
+					reqPromise.error(function(data, status, headers, config) {
+						console.log("remove(queue) image failed.");
+					});
+				}
+			};
+
+			// 이미지 업로드를 완료.
+			$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
+
+				if (status == 200) {
+					var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.image.id;
+
+					fileItem.uid = response.image.id;
+
+					var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};
+
+					if (!isEmpty($scope.images)) {
+						var tempImages = JSON.parse($scope.images);
+						tempImages.push(imageInfo);
+						$scope.images = JSON.stringify(tempImages);
+					} else {
+						var tempImages = [];
+						tempImages.push(imageInfo);
 						$scope.images = JSON.stringify(tempImages);
 					}
-				}				
-				
-				console.log("fileItem removed(stored). status="+status);
-			});
-			reqPromise.error(function(data, status, headers, config) {
-				console.log("remove(stored) image failed.");
-			});
-		}
-	};
-	
-	// 지금 업로드한 이미지를 큐에서 삭제.
-	$scope.removeQueueItem = function(fileItem) {
-		
-		if (fileItem.uid != null) {
-			var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
-			
-			var reqPromise = $http.get(bUrl);
-			
-			reqPromise.success(function(data, status, headers, config) {
-				
-				fileItem.remove();
-				
+
+					$(".summernote").summernote("insertImage", imageUrl, function($image) {
+						$image.addClass("img-responsive");
+					});
+				} else {
+					console.log("status=" + status)
+					console.log("upload image failed.");
+				}
+			};
+
+			// 에디터 아래의 이미지 업로드 버튼을 누를 때.
+			$scope.insertImage = function(item) {
+				var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
+
+				$(".summernote").summernote("insertImage", imageUrl, function($image) {
+					$image.addClass("img-responsive");
+				});
+			};
+
+			$scope.imageUpload = function(files, editor) {
+		//			$scope.$apply();
+		//	$scope.editable.focus();
+					$scope.uploader.addToQueue(files);
+						};
+
+			$scope.onSubmit = function(event) {
+				if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+					$scope.validationGalleries();
+					$scope.btnSubmit = true;
+				} else {
+					$scope.validationCategory();
+					$scope.validationSubject();
+					$scope.validationContent();
+
+					$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
+					event.preventDefault();
+				}
+			};
+
+			$scope.validationCategory = function() {
+				if ($scope.boardFreeWrite.categoryName.$invalid) {
+					$scope.categoryAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
+				} else {
+					$scope.categoryAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+				}
+			};
+
+			$scope.validationSubject = function() {
+				if ($scope.boardFreeWrite.subject.$invalid) {
+					if ($scope.boardFreeWrite.subject.$error.required) {
+						$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
+					} else if ($scope.boardFreeWrite.subject.$error.minlength || $scope.boardFreeWrite.subject.$error.maxlength) {
+						$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFreeWrite.subject"/>'};
+					}
+				} else {
+					$scope.subjectAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+				}
+			};
+
+			$scope.validationContent = function() {
+				if ($scope.content.length < Jakduk.SummernoteContentsMinSize) {
+					$scope.contentAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFreeWrite.content"/>'};
+				} else {
+					$scope.contentAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
+				}
+			};
+
+			$scope.validationGalleries = function() {
 				if (!isEmpty($scope.images)) {
 					var tempImages = JSON.parse($scope.images);
 					var rmIdx = -1;
-					
+
 					tempImages.forEach(function(entry, index) {
-						if (entry.uid == fileItem.uid) {
-							rmIdx = index;							
+						if (entry.name != null && (entry.name.length < 2 || entry.name.length > 50)) {
+							entry.name = "";
 						}
 					});
-					
-					if (rmIdx != -1) {
-						tempImages.splice(rmIdx, 1);
-						$scope.images = JSON.stringify(tempImages);
-					}
-					console.log("fileItem removed(queue). status="+status);
+
+					$scope.images = JSON.stringify(tempImages);
 				}
-				
-			});
-			reqPromise.error(function(data, status, headers, config) {
-				console.log("remove(queue) image failed.");
-			});
-		}
-	};
-	
-	// 이미지 업로드를 완료.
-	$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
+			};
 
-		if (status == 200) {
-			var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.image.id;
-
-			fileItem.uid = response.image.id;
-			
-			var imageInfo = {uid:fileItem.uid, name:fileItem.newName, fileName:fileItem.file.name, size:fileItem.file.size};
-			
-			if (!isEmpty($scope.images)) {
-				var tempImages = JSON.parse($scope.images);
-				tempImages.push(imageInfo);
-				$scope.images = JSON.stringify(tempImages);
-			} else {
-				var tempImages = [];
-				tempImages.push(imageInfo);
-				$scope.images = JSON.stringify(tempImages);
-			}
-
-			$(".summernote").summernote("insertImage", imageUrl, function($image) {
-				$image.addClass("img-responsive");
-			});
-		} else {
-			console.log("status=" + status)
-			console.log("upload image failed.");
-		}
-	};	
-	
-	// 에디터 아래의 이미지 업로드 버튼을 누를 때.
-	$scope.insertImage = function(item) {
-		var imageUrl = "<%=request.getContextPath()%>/gallery/" + item.uid;
-
-		$(".summernote").summernote("insertImage", imageUrl, function($image) {
-			$image.addClass("img-responsive");
-		});
-	};
-
-	$scope.imageUpload = function(files, editor) {
-//			$scope.$apply();
-//	$scope.editable.focus();
-			$scope.uploader.addToQueue(files);
-	      };	
-	
-	$scope.onSubmit = function(event) {
-		if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
-			$scope.validationGalleries();
-			submitted = true;
-			$scope.btnSubmit = true;
-		} else {
-			$scope.validationCategory();
-			$scope.validationSubject();
-			$scope.validationContent();
-			
-			$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
-			event.preventDefault();
-		}
-	};
-	
-	$scope.validationCategory = function() {
-		if ($scope.boardFreeWrite.categoryName.$invalid) {
-			$scope.categoryAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-		} else {
-			$scope.categoryAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
-		}
-	};
-	
-	$scope.validationSubject = function() {
-		if ($scope.boardFreeWrite.subject.$invalid) {
-			if ($scope.boardFreeWrite.subject.$error.required) {
-				$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-			} else if ($scope.boardFreeWrite.subject.$error.minlength || $scope.boardFreeWrite.subject.$error.maxlength) {
-				$scope.subjectAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFreeWrite.subject"/>'};
-			}				
-		} else {
-			$scope.subjectAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
-		}
-	};		
-	
-	$scope.validationContent = function() {
-		if ($scope.content.length < Jakduk.SummernoteContentsMinSize) {
-			$scope.contentAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.boardFreeWrite.content"/>'};
-		} else {
-			$scope.contentAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
-		}
-	};
-	
-	$scope.validationGalleries = function() {
-		if (!isEmpty($scope.images)) {
-			var tempImages = JSON.parse($scope.images);
-			var rmIdx = -1;
-			
-			tempImages.forEach(function(entry, index) {
-				if (entry.name != null && (entry.name.length < 2 || entry.name.length > 50)) {
-					entry.name = "";
-				}
-			});
-			
-			$scope.images = JSON.stringify(tempImages);
-		}		
-	};
-	
-});
+	});
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
