@@ -135,11 +135,10 @@
 	<hr class="padding-5" ng-show="storedImages.length > 0 || uploader.queue.length > 0"/>
 
 	<div class="form-group">
-		<button type="submit" class="btn-u rounded ladda-button"
-		ladda="btnSubmit" data-style="expand-right">
+		<button type="submit" class="btn-u rounded ladda-button" ladda="btnSubmit" data-style="expand-right">
 			<span class="glyphicon glyphicon-upload"></span> <spring:message code="common.button.write"/>
 		</button>		
-		<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board"/>'">
+		<button type="button" class="btn-u btn-u-default rounded" ng-click="onDiscard()">
 			<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
 		</button>
 		<div>
@@ -170,7 +169,11 @@
 <script type="text/javascript">
 	angular.module("jakdukApp", ["summernote", "angularFileUpload", "angular-ladda"])
 		.controller('FreeWriteCtrl', function($scope, $http, $window, $document, FileUploader) {
-			var document = $document[0];
+			var document = $document[0],
+				isSubmitted;
+
+			$scope.onSubmit = onSubmit;
+			$scope.onDiscard = onDiscard;
 
 			$scope.categoryAlert = {};
 			$scope.subjectAlert = {};
@@ -180,7 +183,7 @@
 			$scope.subject = document.getElementById("subject_temp").value;
 
 			$window.onbeforeunload = function(e) {
-				if ($scope.boardFreeWrite.$dirty) {
+				if (!isSubmitted && $scope.boardFreeWrite.$dirty) {
 					(e || $window.event).returnValue = '<spring:message code="common.msg.are.you.sure.leave.page"/>';
 					return '<spring:message code="common.msg.are.you.sure.leave.page"/>';
 				}
@@ -379,20 +382,6 @@
 					$scope.uploader.addToQueue(files);
 						};
 
-			$scope.onSubmit = function(event) {
-				if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
-					$scope.validationGalleries();
-					$scope.btnSubmit = true;
-				} else {
-					$scope.validationCategory();
-					$scope.validationSubject();
-					$scope.validationContent();
-
-					$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
-					event.preventDefault();
-				}
-			};
-
 			$scope.validationCategory = function() {
 				if ($scope.boardFreeWrite.categoryName.$invalid) {
 					$scope.categoryAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
@@ -435,6 +424,26 @@
 					$scope.images = JSON.stringify(tempImages);
 				}
 			};
+
+			function onSubmit(event) {
+				if ($scope.boardFreeWrite.$valid && $scope.content.length >= Jakduk.SummernoteContentsMinSize) {
+					isSubmitted = true;
+					$scope.btnSubmit = true;
+					$scope.validationGalleries();
+				} else {
+					isSubmitted = false;
+					$scope.validationCategory();
+					$scope.validationSubject();
+					$scope.validationContent();
+
+					$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
+					event.preventDefault();
+				}
+			}
+
+			function onDiscard() {
+				$window.location.href = '<c:url value="/board"/>';
+			}
 
 	});
 </script>
