@@ -2,9 +2,11 @@ package com.jakduk.restcontroller;
 
 import com.jakduk.common.RestError;
 import com.jakduk.exception.RepositoryExistException;
-import com.jakduk.exception.SampleException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.NoSuchElementException;
 
@@ -26,7 +28,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public RestError illegalArgumentException(SampleException e) {
+    public RestError illegalArgumentException(IllegalArgumentException e) {
         RestError restError = new RestError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return  restError;
     }
@@ -34,7 +36,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public RestError noSuchElementException(SampleException e) {
+    public RestError noSuchElementException(NoSuchElementException e) {
         RestError restError = new RestError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         return  restError;
     }

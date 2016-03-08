@@ -16,7 +16,7 @@
   "dependencies": {
     "angular": ">=1.5.0",
     "angular-file-upload": ">=2.2.0",
-    "angular-summernote": ">=0.7.0",
+    "angular-summernote": "~0.7.1",
     "angular-sanitize": ">=1.4.4",
     "ng-infinite-scroller-origin": ">=1.2.0",
     "angular-cookies": ">=1.4.4",
