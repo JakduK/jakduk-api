@@ -128,3 +128,13 @@ td a {color:#555;}
 .testimonial-info > .testimonial-author > .latest-user-club > span {
 	top: 0;
 }
+
+.jakduk-number-pad {
+	width: 122px;
+}
+.jakduk-number-pad-row > * {
+	width: 38px;
+	text-align: center;
+	padding: 6px;
+	margin: 2px 0;
+}
