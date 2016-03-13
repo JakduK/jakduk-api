@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.mobile.device.Device;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,12 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -289,5 +285,33 @@ public class CommonService {
 
 		return footballClubs;
 	}
-    
+
+	/**
+	 * ResourceBundle에서 메시지 가져오기.
+	 * @param locale
+	 * @param bundle
+	 * @param getString
+     * @return
+     */
+	public String getResourceBundleMessage(Locale locale, String bundle, String getString) {
+		ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
+		return resourceBundle.getString(getString);
+	}
+
+	/**
+	 * 모바일 디바이스 정보 가져오기.
+	 * @param device
+	 * @return
+     */
+	public String getDeviceInfo(Device device) {
+		if (device.isNormal()) {
+			return CommonConst.DEVICE_TYPE_NORMAL;
+		} else if (device.isMobile()) {
+			return CommonConst.DEVICE_TYPE_MOBILE;
+		} else if (device.isTablet()) {
+			return CommonConst.DEVICE_TYPE_TABLET;
+		} else {
+			return CommonConst.DEVICE_TYPE_NORMAL;
+		}
+	}
 }

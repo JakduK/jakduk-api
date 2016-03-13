@@ -3,10 +3,7 @@ package com.jakduk.restcontroller;
 import com.jakduk.common.RestError;
 import com.jakduk.exception.RepositoryExistException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
@@ -14,16 +11,8 @@ import java.util.NoSuchElementException;
  * Created by pyohwan on 16. 3. 4.
  */
 
-@ControllerAdvice(value = "com.jakduk.restcontroller")
+@ControllerAdvice(value = "com.jakduk.restcontroller", annotations = RestController.class)
 public class RestExceptionHandler {
-
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    @ResponseBody
-    public RestError runtimeException(RuntimeException e) {
-        RestError restError = new RestError(HttpStatus.METHOD_NOT_ALLOWED.value(), e.getMessage());
-        return  restError;
-    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -49,6 +38,12 @@ public class RestExceptionHandler {
         return  restError;
     }
 
-
+    @ExceptionHandler({RuntimeException.class, Exception.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public RestError runtimeException(RuntimeException e) {
+        RestError restError = new RestError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        return  restError;
+    }
 }
 

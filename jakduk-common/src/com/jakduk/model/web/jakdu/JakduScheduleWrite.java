@@ -1,4 +1,4 @@
-package com.jakduk.model.web;
+package com.jakduk.model.web.jakdu;
 
 import com.jakduk.model.db.FootballClub;
 import org.hibernate.validator.constraints.NotEmpty;

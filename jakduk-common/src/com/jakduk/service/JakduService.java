@@ -6,22 +6,32 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.exception.RepositoryExistException;
 import com.jakduk.model.db.*;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.JakduCommentOnES;
+import com.jakduk.model.embedded.BoardCommentStatus;
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.LocalName;
-import com.jakduk.model.web.MyJakduRequest;
-import com.jakduk.repository.JakduRepository;
-import com.jakduk.repository.JakduScheduleRepository;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
+import com.jakduk.model.web.jakdu.MyJakduRequest;
+import com.jakduk.repository.jakdu.JakduCommentRepository;
+import com.jakduk.repository.jakdu.JakduRepository;
+import com.jakduk.repository.jakdu.JakduScheduleRepository;
+import io.searchbox.core.Search;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -43,10 +53,16 @@ public class JakduService {
     private UserService userService;
 
     @Autowired
-    private JakduScheduleRepository jakduScheduleRepository;
+    private SearchService searchService;
 
     @Autowired
     private JakduRepository jakduRepository;
+
+    @Autowired
+    private JakduScheduleRepository jakduScheduleRepository;
+
+    @Autowired
+    private JakduCommentRepository jakduCommentRepository;
 
     public void getSchedule(Model model, Locale locale) {
 
@@ -175,42 +191,81 @@ public class JakduService {
     public Jakdu setMyJakdu(Locale locale, MyJakduRequest myJakdu) {
         CommonPrincipal principal = userService.getCommonPrincipal();
         String accountId = principal.getId();
-        String username = principal.getUsername();
-        String type = principal.getType();
 
         if (accountId == null) {
-            ResourceBundle bundle = ResourceBundle.getBundle("messages.common", locale);
-            throw new AccessDeniedException(bundle.getString("common.msg.access.denied.exception"));
+            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.access.denied.exception"));
         }
 
-        CommonWriter writer = new CommonWriter();
-        writer.setUserId(accountId);
-        writer.setUsername(username);
-        writer.setType(type);
+        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType());
 
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
 
         if (Objects.isNull(jakduSchedule)) {
-            ResourceBundle bundle = ResourceBundle.getBundle("messages.jakdu", locale);
-            throw new NoSuchElementException(bundle.getString("jakdu.msg.not.found.jakdu.schedule.exception"));
+            throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
         }
 
         Jakdu existJakdu = jakduRepository.findByScheduleAndWriter(jakduSchedule, writer);
 
         if (!Objects.isNull(existJakdu)) {
-            ResourceBundle bundle = ResourceBundle.getBundle("messages.jakdu", locale);
-            throw new RepositoryExistException(bundle.getString("jakdu.msg.already.join.jakdu.exception"));
+            throw new RepositoryExistException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.already.join.jakdu.exception"));
         }
 
         Jakdu jakdu = new Jakdu();
         jakdu.setSchedule(jakduSchedule);
         jakdu.setWriter(writer);
-
         jakdu.setHomeScore(myJakdu.getHomeScore());
         jakdu.setAwayScore(myJakdu.getAwayScore());
 
         jakduRepository.save(jakdu);
 
         return jakdu;
+    }
+
+    /**
+     * 댓글 작성.
+     * @param locale
+     * @param request
+     */
+    public JakduComment setComment(Locale locale, JakduCommentWriteRequest request) {
+
+        CommonPrincipal principal = userService.getCommonPrincipal();
+        String accountId = principal.getId();
+
+        if (accountId == null) {
+            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.access.denied.exception"));
+        }
+
+        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType());
+
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(request.getId());
+
+        if (Objects.isNull(jakduSchedule)) {
+            throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+        }
+
+        BoardCommentStatus status = new BoardCommentStatus();
+        status.setDevice(request.getDevice());
+
+        JakduComment jakduComment = new JakduComment();
+
+        jakduComment.setWriter(writer);
+        jakduComment.setContents(request.getContents());
+        jakduComment.setJakduScheduleId(request.getId());
+        jakduComment.setStatus(status);
+
+        jakduCommentRepository.save(jakduComment);
+
+        // 엘라스틱 서치 도큐먼트 생성을 위한 객체.
+        JakduCommentOnES jakduCommentOnES = new JakduCommentOnES();
+        jakduCommentOnES.setId(jakduComment.getId());
+        jakduCommentOnES.setWriter(jakduComment.getWriter());
+        jakduCommentOnES.setJakduScheduleId(jakduComment.getJakduScheduleId());
+        jakduCommentOnES.setContents(jakduComment.getContents()
+                .replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+                .replaceAll("\r|\n|&nbsp;",""));
+
+        searchService.createDocumentJakduComment(jakduCommentOnES);
+
+        return jakduComment;
     }
 }

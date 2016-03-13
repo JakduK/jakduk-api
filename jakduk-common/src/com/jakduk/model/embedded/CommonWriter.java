@@ -1,5 +1,8 @@
 package com.jakduk.model.embedded;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -9,45 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Document
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CommonWriter {
 	
 	private String userId;
-	
 	private String username;
-	
 	private String type;
-	
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return "CommonWriter{" +
-				"userId='" + userId + '\'' +
-				", username='" + username + '\'' +
-				", type='" + type + '\'' +
-				'}';
-	}
 
 }

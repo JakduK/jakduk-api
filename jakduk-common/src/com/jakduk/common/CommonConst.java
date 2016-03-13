@@ -156,6 +156,7 @@ public class CommonConst {
 	public final static int ELASTICSEARCH_BULK_LIMIT = 500;
 	public final static String ELASTICSEARCH_TYPE_BOARD = "board";
 	public final static String ELASTICSEARCH_TYPE_COMMENT = "comment";
+	public final static String ELASTICSEARCH_TYPE_JAKDU_COMMENT = "jakduComment";
 	public final static String ELASTICSEARCH_TYPE_GALLERY = "gallery";
 
 	public enum NAME_TYPE {

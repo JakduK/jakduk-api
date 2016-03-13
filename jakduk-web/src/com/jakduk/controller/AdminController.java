@@ -4,6 +4,8 @@ import javax.validation.Valid;
 
 import com.jakduk.model.db.*;
 import com.jakduk.model.web.*;
+import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleWrite;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

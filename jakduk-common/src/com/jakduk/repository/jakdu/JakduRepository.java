@@ -1,4 +1,4 @@
-package com.jakduk.repository;
+package com.jakduk.repository.jakdu;
 
 import com.jakduk.model.db.Jakdu;
 import com.jakduk.model.db.JakduSchedule;

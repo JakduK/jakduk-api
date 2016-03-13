@@ -144,7 +144,7 @@
 		<div>
 		<span class="{{buttonAlert.classType}}" ng-show="buttonAlert.msg" ng-bind="buttonAlert.msg"></span>
 		</div>	
-	</div>	  
+	</div>
 </form:form>
 
 </div>
@@ -377,10 +377,8 @@
 			};
 
 			$scope.imageUpload = function(files, editor) {
-		//			$scope.$apply();
-		//	$scope.editable.focus();
 					$scope.uploader.addToQueue(files);
-						};
+			};
 
 			$scope.validationCategory = function() {
 				if ($scope.boardFreeWrite.categoryName.$invalid) {

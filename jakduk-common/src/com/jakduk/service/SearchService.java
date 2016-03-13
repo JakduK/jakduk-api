@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.model.elasticsearch.JakduCommentOnES;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 
@@ -231,13 +232,13 @@ public class SearchService {
 			return null;
 		}
 	}
-	
+
 	public void createDocumentComment(CommentOnES commentOnES) {
 		Index index = new Index.Builder(commentOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_COMMENT).build();
-		
+
 		try {
 			JestResult jestResult = jestClient.execute(index);
-			
+
 			if (!jestResult.isSucceeded()) {
 				logger.error(jestResult.getErrorMessage());
 			}
@@ -246,7 +247,59 @@ public class SearchService {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
+		Index index = new Index.Builder(jakduCommentOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_COMMENT).build();
+
+		try {
+			JestResult jestResult = jestClient.execute(index);
+
+			if (!jestResult.isSucceeded()) {
+				logger.error(jestResult.getErrorMessage());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public SearchResult searchDocumentJakduComment(String q, int from, int size) {
+
+		String query = "{\n" +
+				"\"from\" : " + from + "," +
+				"\"size\" : " + size + "," +
+				"\"query\": {" +
+				"\"match\" : {" +
+				"\"content\" : \"" + q + "\"" +
+				"}" +
+				"}, " +
+				"\"highlight\" : {" +
+				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
+				"\"post_tags\" : [\"</span>\"]," +
+				"\"fields\" : {\"content\" : {}" +
+				"}" +
+				"}" +
+				"}";
+
+//		logger.debug("query=" + query);
+
+		Search search = new Search.Builder(query)
+				.addIndex(elasticsearchIndexName)
+				.addType(CommonConst.ELASTICSEARCH_TYPE_JAKDU_COMMENT)
+				.build();
+
+		try {
+			SearchResult result = jestClient.execute(search);
+
+			return result;
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	public SearchResult searchDocumentGallery(String q, int from, int size) {
 		String query = "{\n" +
 				"\"from\" : " + from + "," + 

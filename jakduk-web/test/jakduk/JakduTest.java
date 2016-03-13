@@ -3,7 +3,7 @@ package jakduk;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Competition;
 import com.jakduk.model.db.JakduSchedule;
-import com.jakduk.repository.JakduScheduleRepository;
+import com.jakduk.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;

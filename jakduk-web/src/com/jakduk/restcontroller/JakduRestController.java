@@ -1,10 +1,15 @@
 package com.jakduk.restcontroller;
 
 import com.jakduk.model.db.Jakdu;
+import com.jakduk.model.db.JakduComment;
+import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
+import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
-import com.jakduk.model.web.MyJakduRequest;
+import com.jakduk.model.web.jakdu.MyJakduRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -27,6 +32,9 @@ public class JakduRestController {
     @Autowired
     private JakduService jakduService;
 
+    @Autowired
+    private CommonService commonService;
+
     // /jakdu/write에서 쓰이는데 안쓸것 같다.
     @RequestMapping(value = "/data", method = RequestMethod.GET)
     public Map data(HttpServletRequest request) {
@@ -48,17 +56,34 @@ public class JakduRestController {
 
     // 작두 타기
     @RequestMapping(value ="/myJakdu", method = RequestMethod.POST)
-    public Jakdu goJakdu(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
+    public Jakdu myJakduWrite(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
 
         if (Objects.isNull(myJakdu)) {
-            ResourceBundle bundle = ResourceBundle.getBundle("messages.common", locale);
-            throw new IllegalArgumentException(bundle.getString("common.msg.invalid.parameter.exception"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.invalid.parameter.exception"));
         }
 
         Jakdu jakdu = jakduService.setMyJakdu(locale, myJakdu);
 
         return jakdu;
+    }
+
+    // 작두 댓글 달기
+    @RequestMapping(value ="/schedule/comment", method = RequestMethod.POST)
+    public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest, HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+
+        if (Objects.isNull(jakduCommentWriteRequest)) {
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.invalid.parameter.exception"));
+        }
+
+        Device device = DeviceUtils.getCurrentDevice(request);
+        jakduCommentWriteRequest.setDevice(commonService.getDeviceInfo(device));
+
+        JakduComment jakduComment = jakduService.setComment(locale, jakduCommentWriteRequest);
+
+        return jakduComment;
     }
 }
