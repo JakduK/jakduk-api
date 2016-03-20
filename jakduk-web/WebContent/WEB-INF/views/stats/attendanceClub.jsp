@@ -222,8 +222,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 		if ($scope.clubOrigin != "") {
 			$scope.getAttendance();			
 		}
-		
-		App.init();
 	});
 	
 	$scope.getFootballClubs = function(cb) {
@@ -339,6 +337,12 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		App.init();
+	});
+</script>
 
 </body>
 </html>

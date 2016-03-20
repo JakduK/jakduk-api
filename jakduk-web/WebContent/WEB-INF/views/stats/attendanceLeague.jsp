@@ -240,7 +240,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	});
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/league.json?league=' + $scope.leagueId + '"/>';
+		var bUrl = '<c:url value="/stats/data/attendance/league/' + $scope.leagueId + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
@@ -250,18 +250,16 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			$scope.attendancesConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				console.log($scope.attendances);
+				$scope.attendances[$scope.leagueId] = data;
 
-				$scope.attendances[$scope.leagueId] = data.attendances;
-				
 				$scope.chartConfig.loading = false;
-				$scope.attendancesConn = "none";	
+				$scope.attendancesConn = "none";
 				$scope.refreshData();
 			});
 			
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.attendancesConn = "none";
-				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+				console.error(data.message);
 			});
 		}
 	};
@@ -272,7 +270,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 		$scope.chartConfig.series.forEach(function(series) {
 			series.data = [];
 		});
-				
+
 		var attendances = $scope.attendances[$scope.leagueId];
 		var totalSum = 0;
 		var gamesSum = 0;

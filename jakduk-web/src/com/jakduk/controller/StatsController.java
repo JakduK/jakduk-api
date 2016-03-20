@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +28,10 @@ import com.jakduk.service.StatsService;
 @Controller
 @RequestMapping("/stats")
 public class StatsController {
-	
+
+	@Value("${kakao.javascript.key}")
+	private String kakaoJavascriptKey;
+
 	@Autowired
 	private CommonService commonService;
 	
@@ -100,17 +104,25 @@ public class StatsController {
 	@RequestMapping(value = "/attendance/league", method = RequestMethod.GET)
 	public String attendanceLeague(Model model,
 			@RequestParam(required = false) String league) {
-		
-		Integer status = statsService.getAttendanceLeague(model, league);
-		
+
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+
+		if (league != null && !league.isEmpty()) {
+			model.addAttribute("league", league);
+		}
+
 		return "stats/attendanceLeague";
 	}	
 	
 	@RequestMapping(value = "/attendance/club", method = RequestMethod.GET)
 	public String attendanceClub(Model model,
 			@RequestParam(required = false) String clubOrigin) {
-		
-		Integer status = statsService.getAttendanceClub(model, clubOrigin);
+
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+
+		if (clubOrigin != null && !clubOrigin.isEmpty()) {
+			model.addAttribute("clubOrigin", clubOrigin);
+		}
 		
 		return "stats/attendanceClub";
 	}	
@@ -128,21 +140,7 @@ public class StatsController {
 		
 		return "stats/attendanceSeason";
 	}	
-	
-	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
-	public void dataLeagueAttendance(Model model,
-			@RequestParam(required = false) String league) {
-		
-		statsService.getAttendanceLeagueData(model, league);
-	}
-	
-	@RequestMapping(value = "/data/attendance/club", method = RequestMethod.GET)
-	public void dataAttendanceClub(Model model,
-			@RequestParam(required = false) String clubOrigin) {
-		
-		statsService.getAttendanceClubData(model, clubOrigin);
-	}	
-	
+
 	@RequestMapping(value = "/data/attendance/season", method = RequestMethod.GET)
 	public void dataAttendanceSeason(Model model,			
 			@RequestParam(required = false, defaultValue = "0") int season,

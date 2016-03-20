@@ -22,7 +22,6 @@ import java.util.Locale;
 
 @RestController
 @RequestMapping("")
-@Slf4j
 public class HomeRestController {
 
     @Resource

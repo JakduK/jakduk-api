@@ -1,19 +1,14 @@
 package com.jakduk.service;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.mapping.Set;
+import com.jakduk.model.web.stats.AttendanceClubResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -86,21 +81,10 @@ public class StatsService {
 		model.addAttribute("supportersTotal", supportersTotal);
 		model.addAttribute("usersTotal", usersTotal.intValue());
 	}
-	
-	public Integer getAttendanceLeague(Model model, String league) {
+
+	public List<AttendanceLeague> getAttendanceLeague(String league) {
 		
-		model.addAttribute("kakaoKey", kakaoJavascriptKey);
-		
-		if (league != null && !league.isEmpty()) {
-			model.addAttribute("league", league);
-		}
-		
-		return HttpServletResponse.SC_OK;
-	}	
-	
-	public void getAttendanceLeagueData(Model model, String league) {
-		
-		if (league == null) {
+		if (Objects.isNull(league)) {
 			league = CommonConst.K_LEAGUE_ABBREVIATION;
 		}
 		
@@ -108,48 +92,37 @@ public class StatsService {
 		
 		List<AttendanceLeague> attendances = attendanceLeagueRepository.findByLeague(league, sort);
 		
-		model.addAttribute("attendances", attendances);
+		return attendances;
 	}
 	
-	public Integer getAttendanceClub(Model model, String clubOrigin) {
-		
-		model.addAttribute("kakaoKey", kakaoJavascriptKey);
-		
-		if (clubOrigin != null && !clubOrigin.isEmpty()) {
-			model.addAttribute("clubOrigin", clubOrigin);
+	public AttendanceClubResponse getAttendanceClubData(Locale locale, String clubOrigin) {
+
+		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findByName(clubOrigin);
+
+		if (Objects.isNull(footballClubOrigin))
+			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "stats.msg.not.found.football.origin.exception"));
+
+		AttendanceClubResponse response = new AttendanceClubResponse();
+
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+
+		List<AttendanceClub> attendance = attendanceClubRepository.findByClub(footballClubOrigin, sort);
+
+		Integer totalSum = attendance.stream().mapToInt(AttendanceClub::getTotal).sum();
+		Integer matchSum = attendance.stream().mapToInt(AttendanceClub::getGames).sum();
+
+		Integer average = 0;
+
+		if (totalSum != 0 && matchSum != 0) {
+			average = totalSum / matchSum;
 		}
-		
-		return HttpServletResponse.SC_OK;
-	}
-	
-	public void getAttendanceClubData(Model model, String clubOrigin) {
-		
-		FootballClubOrigin footballClubOrigin;
-		
-		if (clubOrigin != null && !clubOrigin.isEmpty()) {
-			footballClubOrigin = footballClubOriginRepository.findByName(clubOrigin);
-			
-			Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-			
-			if (footballClubOrigin != null) {
-				List<AttendanceClub> attendances = attendanceClubRepository.findByClub(footballClubOrigin, sort);
-				Stream<AttendanceClub> sAttendances = attendances.stream();
-				Integer totalSum = sAttendances.mapToInt(AttendanceClub::getTotal).sum();
-				sAttendances = attendances.stream();
-				Integer gamesSum = sAttendances.mapToInt(AttendanceClub::getGames).sum();
-				Integer average = 0;
-				
-				if (totalSum != 0 && gamesSum != 0) {
-					average = totalSum / gamesSum;
-				}
-				
-				model.addAttribute("attendances", attendances);
-				model.addAttribute("totalSum", totalSum);
-				model.addAttribute("gamesSum", gamesSum);
-				model.addAttribute("average", average);
-			}
-		} else {
-		}
+
+		response.setAttendance(attendance);
+		response.setTotalSum(totalSum);
+		response.setMatchSum(matchSum);
+		response.setAverage(average);
+
+		return response;
 	}
 	
 	public Integer getAttendanceSeason(Model model, String language, int season, String league) {

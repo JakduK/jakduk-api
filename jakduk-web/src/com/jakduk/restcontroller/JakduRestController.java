@@ -23,7 +23,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/jakdu")
-@Slf4j
 public class JakduRestController {
 
     @Resource
