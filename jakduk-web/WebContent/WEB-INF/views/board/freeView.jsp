@@ -247,7 +247,7 @@
 				</div>
 			</div>
 
-			<div class="alert {{alert.classType}} fade in rounded ng-cloak" ng-show="alert.msg">
+			<div class="alert fade in rounded ng-cloak" ng-class="alert.classType" ng-show="alert.msg">
 				{{alert.msg}} <a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl">{{alert.linkLabel}}</a>
 			</div>
 
