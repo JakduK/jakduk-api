@@ -33,6 +33,10 @@
 	
 	<!--=== Content Part ===-->
 	<div class="container content">
+
+		<div class="alert fade in rounded ng-cloak" ng-class="alert.classType" ng-show="alert.msg">
+			{{alert.msg}}
+		</div>
 	
 		<div class="row">
 			<div class="col-xs-8 col-sm-4 col-md-3">	
@@ -48,7 +52,7 @@
 		
 		<div class="tag-box tag-box-v4 margin-bottom-20">
 			<h2>{{chartConfig.title.text}}</h2>
-			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>	
+			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.matches" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
 			<p><spring:message code="stats.msg.total.number.of.attendance.alltime.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
 		</div>
 		
@@ -88,6 +92,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	
 	$scope.attendancesConn = "none";
 	$scope.attendances = {};
+	$scope.alert = {};
 	$scope.totalSum = 0;
 	$scope.gamesSum = 0;
 	
@@ -167,7 +172,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 					}
 			 	},
 				title: {
-					text: '<spring:message code="stats.attendance.games"/>'
+					text: '<spring:message code="stats.attendance.matches"/>'
 				}										
 			},                 
 			{ // Number Of Clubs yAxis
@@ -208,14 +213,14 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 				}
 			},
 			{
-				name: '<spring:message code="stats.attendance.games"/>',
+				name: '<spring:message code="stats.attendance.matches"/>',
 				yAxis: 2,
 				visible: false,
 				type: 'spline',
 				data: [],
 				dataLabels: {
 					enabled: true,
-					format: '{point.y:,.0f} <spring:message code="stats.attendance.game"/>',
+					format: '{point.y:,.0f} <spring:message code="stats.attendance.match"/>',
 				}
 			},
 			{
@@ -240,7 +245,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	});
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/league/' + $scope.leagueId + '"/>';
+		var bUrl = '<c:url value="/api/stats/attendance/league/' + $scope.leagueId + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
@@ -259,7 +264,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.attendancesConn = "none";
-				console.error(data.message);
+				$scope.alert.msg = data.message;
+				$scope.alert.classType = "alert-danger";
 			});
 		}
 	};

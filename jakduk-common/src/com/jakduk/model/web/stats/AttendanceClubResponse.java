@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 public class AttendanceClubResponse {
-    private List<AttendanceClub> attendance;
+    private List<AttendanceClub> attendances;
     private Integer totalSum;
     private Integer matchSum;
     private Integer average;

@@ -34,35 +34,40 @@
 	<!--=== Content Part ===-->
 	<div class="container content">
 
-<div class="row">
-	<div class="col-xs-8 col-sm-4 col-md-3">	
-		<select class="form-control" ng-model="footballClub" ng-options="opt.names[0].fullName for opt in footballClubs"
-		ng-change="changeFootballClub()">
-			<option value=""><spring:message code="stats.select.football.club"/></option>
-		</select>
-	</div>
-</div>
-<span class="color-blue" ng-class="{'hidden':clubOrigin != ''}"><spring:message code="stats.msg.choose.football.club"/></span>
-	
+		<div class="alert fade in rounded ng-cloak" ng-class="alert.classType" ng-show="alert.msg">
+			{{alert.msg}}
+		</div>
+
+		<div class="row">
+			<div class="col-xs-8 col-sm-4 col-md-3">
+				<select class="form-control" ng-model="footballClub" ng-options="opt.names[0].fullName for opt in footballClubs"
+				ng-change="changeFootballClub()">
+					<option value=""><spring:message code="stats.select.football.club"/></option>
+				</select>
+			</div>
+		</div>
+
+		<span class="color-blue" ng-class="{'hidden':clubOrigin != ''}"><spring:message code="stats.msg.choose.football.club"/></span>
+
 		<highchart id="chart1" config="chartConfig" class="margin-bottom-10"></highchart>
-		
+
 		<div class="tag-box tag-box-v4 margin-bottom-20">
 			<h2>{{chartConfig.title.text}}</h2>
-			<p><spring:message code="stats.msg.total.number.of.attendance.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
+			<p><spring:message code="stats.msg.total.number.of.attendance.matches" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
 			<p><spring:message code="stats.msg.total.number.of.attendance.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
-			<p><spring:message code="stats.msg.total.number.of.attendance.average" arguments="<strong>{{average | number:0}}</strong>"/></p>	
+			<p><spring:message code="stats.msg.total.number.of.attendance.average" arguments="<strong>{{average | number:0}}</strong>"/></p>
 		</div>
-		
+
 		<div class="text-right">
 			<button class="btn-u btn-brd rounded btn-u-xs" type="button" ng-click="btnUrlCopy()"
-			tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.copy.to.clipboard"/>'>
 				<i class="icon-link"></i>
 			</button>
-		    <a id="kakao-link-btn" href="" ng-click="sendLink()"
-		    tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
-		      <img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
-		    </a>
-		</div>		
+			<a id="kakao-link-btn" href="" ng-click="sendLink()"
+				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.msg.send.to.kakao"/>'>
+				<img src="<%=request.getContextPath()%>/resources/kakao/icon/kakaolink_btn_small.png" />
+			</a>
+		</div>
 	</div>
 	
 	<jsp:include page="../include/footer.jsp"/>	
@@ -82,7 +87,9 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	
 	$scope.footballClubsConn = "none";
 	$scope.attendancesConn = "none";
+	$scope.attendances = {};
 	$scope.footballClubs = [];
+	$scope.alert = {};
 	$scope.clubOrigin = "";
 	$scope.totalSum = 0;
 	$scope.gamesSum = 0;
@@ -136,7 +143,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 					formatter: function() {
 						return Highcharts.numberFormat(this.value,0);
 					}					
-				},
+				}
 			}, 
 			{ // Average yAxis
 				labels: {
@@ -158,7 +165,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 					}
 			 	},
 				title: {
-					text: '<spring:message code="stats.attendance.games"/>'
+					text: '<spring:message code="stats.attendance.matches"/>'
 				},
 				opposite: true
 			}],       			
@@ -191,23 +198,23 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 				}
 			},
 			{
-				name: '<spring:message code="stats.attendance.games"/>',
+				name: '<spring:message code="stats.attendance.matches"/>',
 				yAxis: 2,
 				type: 'spline',
 				data: [],
 				dataLabels: {
 					enabled: true,
-					format: '{point.y:,.0f} <spring:message code="stats.attendance.game"/>',
+					format: '{point.y:,.0f} <spring:message code="stats.attendance.match"/>',
 				}
 			}],
-			
-	    loading: true,
-	    credits:{enabled:true}
+			loading: true,
+			credits:{enabled:true}
 		};		
 
 		 // 사용할 앱의 Javascript 키를 설정해 주세요.
 		Kakao.init('${kakaoKey}');
-		
+
+		// 축구단 목록을 가져와서 콜백 함수로 highchart의 제목을 바꾼다.
 		$scope.getFootballClubs(function() {
 			$scope.footballClubs.forEach(function(value, index) {
 				
@@ -216,7 +223,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 					$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
 				}
 			});
-			
 		});
 		
 		if ($scope.clubOrigin != "") {
@@ -225,7 +231,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	});
 	
 	$scope.getFootballClubs = function(cb) {
-		var bUrl = '<c:url value="/data/footballClubs.json"/>';
+		var bUrl = '<c:url value="/api/football/clubs"/>';
 		
 		if ($scope.footballClubsConn == "none") {
 			
@@ -235,8 +241,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			$scope.footballClubsConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				
-				$scope.footballClubs = data.footballClubs;
+				$scope.footballClubs = data;
 				$scope.footballClubsConn = "none";
 				cb();
 			});
@@ -249,20 +254,17 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	};
 	
 	$scope.changeFootballClub = function() {
-		
-		if ($scope.footballClub != null && $scope.clubOrigin != $scope.footballClub.origin.name) {
-			$scope.chartConfig.series.forEach(function(series) {
-				series.data = [];
-			}) ;
-			
-			$scope.clubOrigin = $scope.footballClub.origin.name;
-			$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
-			$scope.getAttendance();			
+		$scope.clubOrigin = $scope.footballClub.origin.name;
+
+		if (isEmpty($scope.attendances[$scope.clubOrigin])) {
+			$scope.getAttendance();
+		} else {
+			$scope.refreshData();
 		}
 	};
 	
 	$scope.getAttendance = function() {
-		var bUrl = '<c:url value="/stats/data/attendance/club.json?clubOrigin=' + $scope.clubOrigin + '"/>';
+		var bUrl = '<c:url value="/api/stats/attendance/club/' + $scope.clubOrigin + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
@@ -272,35 +274,54 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			$scope.attendancesConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				
+				$scope.attendances[$scope.clubOrigin] = data;
+
 				$scope.chartConfig.loading = false;
-				$scope.totalSum = data.totalSum;
-				$scope.gamesSum = data.gamesSum;
-				$scope.average = data.average;
-				var attendances = data.attendances;
-				
-				if (attendances != null) {
-					attendances.forEach(function(attendance) {
-						var itemTotal = [attendance.season, attendance.total];
-						var itemAverage = [attendance.season, attendance.average];
-						var itemGames = [attendance.season, attendance.games];
-						
-						$scope.chartConfig.series[0].data.push(itemTotal);
-						$scope.chartConfig.series[1].data.push(itemAverage);
-						$scope.chartConfig.series[2].data.push(itemGames);
-					});
-				}
-				
-				$scope.attendancesConn = "none";				
+				$scope.attendancesConn = "none";
+				$scope.refreshData();
 			});
 			
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.attendancesConn = "none";
-				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+				$scope.alert.msg = data.message;
+				$scope.alert.classType = "alert-danger";
 			});
 		}
 	};
-	
+
+	$scope.refreshData = function() {
+		if (isEmpty($scope.clubOrigin)) return;
+
+		$scope.chartConfig.series.forEach(function(series) {
+			series.data = [];
+		});
+
+		var attendances = $scope.attendances[$scope.clubOrigin];
+		var totalSum = 0;
+		var gamesSum = 0;
+
+		if (attendances != null) {
+			attendances.forEach(function(attendance) {
+				var itemTotal = [attendance.season, attendance.total];
+				var itemAverage = [attendance.season, attendance.average];
+				var itemGames = [attendance.season, attendance.games];
+
+				totalSum += attendance.total;
+				gamesSum += attendance.games;
+
+				$scope.chartConfig.series[0].data.push(itemTotal);
+				$scope.chartConfig.series[1].data.push(itemAverage);
+				$scope.chartConfig.series[2].data.push(itemGames);
+			});
+		}
+
+		$scope.totalSum = totalSum;
+		$scope.gamesSum = gamesSum;
+		$scope.average = totalSum / gamesSum;
+
+		$scope.chartConfig.title.text = $scope.footballClub.names[0].fullName + ' <spring:message code="stats.attendance.club.title"/>';
+	};
+
 	$scope.btnUrlCopy = function() {
 		var url = "https://jakduk.com/stats/attendance/club?clubOrigin=" + $scope.clubOrigin;
 		

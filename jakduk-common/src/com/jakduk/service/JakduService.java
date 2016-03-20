@@ -6,32 +6,25 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.exception.RepositoryExistException;
 import com.jakduk.model.db.*;
-import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.JakduCommentOnES;
 import com.jakduk.model.embedded.BoardCommentStatus;
-import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.LocalName;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
 import com.jakduk.repository.jakdu.JakduCommentRepository;
 import com.jakduk.repository.jakdu.JakduRepository;
 import com.jakduk.repository.jakdu.JakduScheduleRepository;
-import io.searchbox.core.Search;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -193,7 +186,7 @@ public class JakduService {
         String accountId = principal.getId();
 
         if (accountId == null) {
-            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.access.denied.exception"));
+            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
         }
 
         CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType());
@@ -232,7 +225,7 @@ public class JakduService {
         String accountId = principal.getId();
 
         if (accountId == null) {
-            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.access.denied.exception"));
+            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
         }
 
         CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType());

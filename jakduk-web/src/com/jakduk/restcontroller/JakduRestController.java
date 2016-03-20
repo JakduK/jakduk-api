@@ -6,7 +6,6 @@ import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
@@ -60,7 +59,7 @@ public class JakduRestController {
         Locale locale = localeResolver.resolveLocale(request);
 
         if (Objects.isNull(myJakdu)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.invalid.parameter.exception"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
         }
 
         Jakdu jakdu = jakduService.setMyJakdu(locale, myJakdu);
@@ -75,7 +74,7 @@ public class JakduRestController {
         Locale locale = localeResolver.resolveLocale(request);
 
         if (Objects.isNull(jakduCommentWriteRequest)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.invalid.parameter.exception"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
         }
 
         Device device = DeviceUtils.getCurrentDevice(request);

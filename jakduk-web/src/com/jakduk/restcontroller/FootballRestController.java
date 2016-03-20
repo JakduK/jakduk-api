@@ -1,19 +1,18 @@
 package com.jakduk.restcontroller;
 
-import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
 import com.jakduk.service.CommonService;
-import com.jakduk.service.HomeService;
-import lombok.extern.slf4j.Slf4j;
+import com.jakduk.service.FootballService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -21,8 +20,8 @@ import java.util.Locale;
  */
 
 @RestController
-@RequestMapping("/api")
-public class HomeRestController {
+@RequestMapping("/api/football")
+public class FootballRestController {
 
     @Resource
     LocaleResolver localeResolver;
@@ -31,17 +30,16 @@ public class HomeRestController {
     private CommonService commonService;
 
     @Autowired
-    private HomeService homeService;
+    private FootballService footballService;
 
-    @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
-    public Encyclopedia getEncyclopedia(HttpServletRequest request,
-                            @RequestParam(required = false) String lang) {
+    @RequestMapping(value = "/clubs", method = RequestMethod.GET)
+    public List<FootballClub> dataFootballClubs(Model model, HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        String language = commonService.getLanguageCode(locale, lang);
+        String language = commonService.getLanguageCode(locale, null);
 
-        Encyclopedia encyclopedia = homeService.getEncyclopedia(language);
+        List<FootballClub> footballClubs = footballService.getFootballClubs(language);
 
-        return encyclopedia;
+        return footballClubs;
     }
 }

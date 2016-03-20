@@ -33,6 +33,10 @@
 	
 	<!--=== Content Part ===-->
 	<div class="container content">
+
+		<div class="alert fade in rounded ng-cloak" ng-class="alert.classType" ng-show="alert.msg">
+			{{alert.msg}}
+		</div>
 	
 		<div class="row">
 			<div class="col-xs-8 col-sm-4 col-md-3">	
@@ -56,7 +60,7 @@
 		<div class="tag-box tag-box-v4 margin-bottom-20">
 			<h2>{{chartConfig.title.text}}</h2>
 			<p><spring:message code="stats.msg.total.number.of.clubs" arguments="<strong>{{chartConfig.series[0].data.length | number:0}}</strong>"/></p>
-			<p><spring:message code="stats.msg.total.number.of.attendance.games" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
+			<p><spring:message code="stats.msg.total.number.of.attendance.matches" arguments="<strong>{{gamesSum | number:0}}</strong>"/></p>
 			<p><spring:message code="stats.msg.total.number.of.attendance.total" arguments="<strong>{{totalSum | number:0}}</strong>"/></p>
 			<p><spring:message code="stats.msg.total.number.of.attendance.average" arguments="<strong>{{average | number:0}}</strong>"/></p>	
 		</div>			
@@ -103,6 +107,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	$scope.attendancesConn = "none";
 	$scope.fcNames = JSON.parse('${fcNames}');
 	$scope.attendances = {};
+	$scope.alert = {};
 	$scope.rememberLeague = null;
 	$scope.totalSum = 0;
 	$scope.gamesSum = 0;
@@ -221,22 +226,19 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 						}
 					}
 				}],
-				
-	    	loading: true,
-	    	credits:{enabled:true}
+				loading: true,
+				credits:{enabled:true}
 		};		
 		
 		// 사용할 앱의 Javascript 키를 설정해 주세요.
 		Kakao.init('${kakaoKey}');
 		
 		$scope.getAttendance();
-		
-		App.init();
 	});
 	
 	$scope.getAttendance = function() {
 		
-		var bUrl = '<c:url value="/stats/data/attendance/season.json?season=' + $scope.season + '&league=' + KLId + '"/>';
+		var bUrl = '<c:url value="/api/stats/attendance/season/' + $scope.season + '?league=' + KLId + '"/>';
 		
 		if ($scope.attendancesConn == "none") {
 			
@@ -246,7 +248,7 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			$scope.attendancesConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				$scope.attendances[$scope.season] = data.attendances;					
+				$scope.attendances[$scope.season] = data;
 
 				$scope.attendancesConn = "none";
 				$scope.chartConfig.loading = false;
@@ -255,7 +257,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.attendancesConn = "none";
-				$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+				$scope.alert.msg = data.message;
+				$scope.alert.classType = "alert-danger";
 			});
 		}
 	};
@@ -348,5 +351,12 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		App.init();
+	});
+</script>
+
 </body>
 </html>

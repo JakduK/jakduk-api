@@ -36,7 +36,7 @@ public class GalleryController {
 	
 	@Autowired
 	private GalleryService galleryService;
-	
+
 	@Autowired
 	private CommonService commonService;
 	
@@ -103,24 +103,7 @@ public class GalleryController {
 			//response.sendError(status);
 		}
 	}		
-	
-	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public void uploadImage(Model model,
-			@RequestParam(required = true) MultipartFile file) {
-		
-		if (file.isEmpty()) {
-		}
-		
-		Integer status = galleryService.uploadImage(model, file);
-	}
-	
-	@RequestMapping(value = "/remove/{id}", method = RequestMethod.GET)
-	public void removeImage(@PathVariable String id, Model model) {
-		
-		Integer status = galleryService.removeImage(model, id);
-		
-	}
-	
+
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
 	public String view(@PathVariable String id, Model model
 			, HttpServletRequest request, HttpServletResponse response) throws IOException {

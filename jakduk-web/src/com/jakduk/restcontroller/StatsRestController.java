@@ -1,12 +1,12 @@
 package com.jakduk.restcontroller;
 
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.web.stats.AttendanceClubResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.StatsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -35,24 +35,39 @@ public class StatsRestController {
     private CommonService commonService;
 
     @RequestMapping(value = "/attendance/league/{league}", method = RequestMethod.GET)
-    public List<AttendanceLeague> dataLeagueAttendance(@PathVariable String league) {
+    public List<AttendanceLeague> getAttendancesLeague(@PathVariable String league,
+                                                       HttpServletRequest request) {
 
-        List<AttendanceLeague> attendanceList = statsService.getAttendanceLeague(league);
+        Locale locale = localeResolver.resolveLocale(request);
 
-        return attendanceList;
+        if (Objects.isNull(league) || league.isEmpty())
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+
+        List<AttendanceLeague> attendances = statsService.getAttendanceLeague(league);
+
+        return attendances;
     }
 
     @RequestMapping(value = "/attendance/club/{clubOrigin}", method = RequestMethod.GET)
-    public AttendanceClubResponse getAttendanceClub(@PathVariable String clubOrigin,
-                                   HttpServletRequest request) {
+    public List<AttendanceClub> getAttendancesClub(@PathVariable String clubOrigin,
+                                                  HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
 
         if (Objects.isNull(clubOrigin) || clubOrigin.isEmpty())
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.msg.invalid.parameter.exception"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
 
-        AttendanceClubResponse response = statsService.getAttendanceClubData(locale, clubOrigin);
+        List<AttendanceClub> attendances = statsService.getAttendanceClub(locale, clubOrigin);
 
-        return response;
+        return attendances;
+    }
+
+    @RequestMapping(value = "/attendance/season/{season}", method = RequestMethod.GET)
+    public List<AttendanceClub> dataAttendanceSeason(@PathVariable Integer season,
+                                     @RequestParam(required = false, defaultValue = CommonConst.K_LEAGUE_ABBREVIATION) String league){
+
+        List<AttendanceClub> attendances = statsService.getAttendancesSeason(season, league);
+
+        return attendances;
     }
 }

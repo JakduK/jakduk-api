@@ -252,7 +252,7 @@
 					getDataLatest();
 
 					function refreshEncyclopedia() {
-						var bUrl = '<c:url value="/home/encyclopedia?lang=${pageContext.response.locale}"/>';
+						var bUrl = '<c:url value="/api/home/encyclopedia?lang=${pageContext.response.locale}"/>';
 
 						if ($scope.encyclopediaConn == "none") {
 

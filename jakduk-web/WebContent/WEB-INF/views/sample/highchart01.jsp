@@ -96,7 +96,7 @@ jakdukApp.controller('sampleCtrl', function($scope, $http) {
 						}
 				 	},
 					title: {
-						text: '<spring:message code="stats.attendance.games"/>'
+						text: '<spring:message code="stats.attendance.matches"/>'
 					}								
 				},                 
 				{ // Number Of Clubs yAxis

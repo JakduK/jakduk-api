@@ -203,8 +203,6 @@ function isEmpty(str) {
 			};
 
 			angular.element(document).ready(function() {
-				App.init();
-
 				if (!isEmpty($scope.images)) {
 					var objImages = JSON.parse($scope.images);
 					objImages.forEach(function(entry) {
@@ -235,7 +233,7 @@ function isEmpty(str) {
 
 			// angular-file-upload methods
 			$scope.uploader = new FileUploader({
-				url:'<c:url value="/gallery/upload.json"/>',
+				url:'<c:url value="/api/gallery"/>',
 				autoUpload:true,
 				method:"POST"
 			});
@@ -269,9 +267,9 @@ function isEmpty(str) {
 			// 이미 등록된 이미지 삭제.
 			$scope.removeStoredItem = function(fileItem) {
 				if (fileItem.uid != null) {
-					var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
+					var bUrl = '<c:url value="/api/gallery/' + fileItem.uid + '"/>';
 
-					var reqPromise = $http.get(bUrl);
+					var reqPromise = $http.delete(bUrl);
 
 					reqPromise.success(function(data, status, headers, config) {
 
@@ -308,7 +306,7 @@ function isEmpty(str) {
 						console.log("fileItem removed(stored). status=" + status);
 					});
 					reqPromise.error(function(data, status, headers, config) {
-						console.log("remove(stored) image failed. status=" + status);
+						console.error(data.message);
 					});
 				}
 			};
@@ -317,9 +315,9 @@ function isEmpty(str) {
 			$scope.removeQueueItem = function(fileItem) {
 
 				if (fileItem.uid != null) {
-					var bUrl = '<c:url value="/gallery/remove/' + fileItem.uid + '"/>';
+					var bUrl = '<c:url value="/api/gallery/' + fileItem.uid + '"/>';
 
-					var reqPromise = $http.get(bUrl);
+					var reqPromise = $http.delete(bUrl);
 
 					reqPromise.success(function(data, status, headers, config) {
 
@@ -346,7 +344,7 @@ function isEmpty(str) {
 
 					});
 					reqPromise.error(function(data, status, headers, config) {
-						console.log("remove(queue) image failed. status=" + status);
+						console.error(data.message);
 					});
 				}
 			};
@@ -355,9 +353,9 @@ function isEmpty(str) {
 			$scope.uploader.onCompleteItem = function(fileItem, response, status, headers) {
 
 				if (status == 200) {
-					var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.image.id;
+					var imageUrl = "<%=request.getContextPath()%>/gallery/" + response.id;
 
-					fileItem.uid = response.image.id;
+					fileItem.uid = response.id;
 
 					var imageInfo = {uid:fileItem.uid, name:fileItem.file.name, size:fileItem.file.size};
 
@@ -375,7 +373,7 @@ function isEmpty(str) {
 						$image.addClass("img-responsive");
 					});
 				} else {
-					console.log("upload image failed. status=" + status);
+					console.error(data.message);
 				}
 			};
 
@@ -463,6 +461,12 @@ function isEmpty(str) {
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			App.init();
+		});
+	</script>
 
 </body>
 </html>

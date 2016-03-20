@@ -135,15 +135,6 @@ public class HomeController {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		Integer status = homeService.getRss(response, locale, messageSource);
-	}		
-	
-	@RequestMapping(value = "/data/footballClubs", method = RequestMethod.GET)
-	public void dataFootballClubs(Model model, HttpServletRequest request) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, null);
-		
-		Integer status = homeService.getDataFootballClubs(model, language);	
-	}	
+	}
 
 }

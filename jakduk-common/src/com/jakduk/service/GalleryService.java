@@ -15,18 +15,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.exception.UnauthorizedAccessException;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 
@@ -94,11 +90,11 @@ public class GalleryService {
 		}
 	}
 	
-	public Integer uploadImage(Model model, MultipartFile file) {
+	public Gallery uploadImage(Locale locale, MultipartFile file) {
 		
 		try {
 			Gallery gallery = new Gallery();
-			
+
 			CommonPrincipal principal = userService.getCommonPrincipal();
 			String userid = principal.getId();
 			String username = principal.getUsername();
@@ -109,11 +105,11 @@ public class GalleryService {
 			writer.setUsername(username);
 			writer.setType(type);
 			gallery.setWriter(writer);
-			
+
 			GalleryStatus status = new GalleryStatus();
 			status.setStatus(CommonConst.GALLERY_STATUS_TEMP);
 			gallery.setStatus(status);
-			
+
 			gallery.setFileName(file.getOriginalFilename());
 			gallery.setFileSize(file.getSize());
 			gallery.setSize(file.getSize());
@@ -121,7 +117,7 @@ public class GalleryService {
 			// 사진 포맷.
 			String formatName = "jpg";
 			String splitContentType[] = file.getContentType().split("/");
-			
+
 			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
 				formatName = splitContentType[1];
 				gallery.setContentType(file.getContentType());
@@ -130,30 +126,30 @@ public class GalleryService {
 			}
 
 			galleryRepository.save(gallery);
-			
+
 			// 폴더 생성.
 			ObjectId objId = new ObjectId(gallery.getId());
 			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-			
-			Path imageDirPath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), 
+
+			Path imageDirPath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()),
 					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
-			
-			Path thumbDirPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), 
+
+			Path thumbDirPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()),
 					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
-			
+
 			if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS)) {
 					Files.createDirectories(imageDirPath);
 			}
-			
+
 			if (Files.notExists(thumbDirPath, LinkOption.NOFOLLOW_LINKS)) {
 				Files.createDirectories(thumbDirPath);
 			}
-			
+
 			// 사진 경로.
 			Path imageFilePath = imageDirPath.resolve(gallery.getId());
 			Path thumbFilePath = thumbDirPath.resolve(gallery.getId());
-			
+
 			// 사진 저장.
 			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
 				if (CommonConst.GALLERY_MAXIUM_CAPACITY > file.getSize()) {
@@ -164,21 +160,21 @@ public class GalleryService {
 					double ratio = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) file.getSize();
 					int ratioWidth = (int)(bi.getWidth() * ratio);
 					int ratioHeight = (int)(bi.getHeight() * ratio);
-					
+
 					BufferedImage bufferIm = new BufferedImage(ratioWidth, ratioHeight, BufferedImage.TYPE_INT_RGB);
 					Image tempImg = bi.getScaledInstance(ratioWidth, ratioHeight, Image.SCALE_AREA_AVERAGING);
 					Graphics2D g2 = bufferIm.createGraphics();
 					g2.drawImage(tempImg, 0, 0, ratioWidth, ratioHeight, null);
-					
+
 					ImageIO.write(bufferIm, formatName, imageFilePath.toFile());
-					
+
 					BasicFileAttributes attr = Files.readAttributes(imageFilePath, BasicFileAttributes.class);
-					
+
 					gallery.setSize(attr.size());
 					galleryRepository.save(gallery);
 				}
 			}
-			
+
 			// 썸네일 만들기.
 			if (Files.notExists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
 				//BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
@@ -187,25 +183,19 @@ public class GalleryService {
 				Image tempImg = bi.getScaledInstance(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, Image.SCALE_AREA_AVERAGING);
 				Graphics2D g2 = bufferIm.createGraphics();
 				g2.drawImage(tempImg, 0, 0, CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, null);
-				
+
 				ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
 			}
-		
+
 			if (logger.isDebugEnabled()) {
 				logger.debug("gallery info=" + gallery);
 			}
-			
-			model.addAttribute("image", gallery);
-			
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-			return HttpServletResponse.SC_NOT_IMPLEMENTED;
+
+			return gallery;
+
 		} catch (IOException e) {
-			e.printStackTrace();
-			return HttpServletResponse.SC_NOT_IMPLEMENTED;
+			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.gallery", "gallery.exception.io"));
 		}
-		
-		return HttpServletResponse.SC_OK;
 	}
 	
 	public Integer getImage(HttpServletResponse response, String id) {
@@ -289,31 +279,30 @@ public class GalleryService {
 	
 	/**
 	 * 사진 삭제.
-	 * @param model
 	 * @param id
 	 * @return
 	 */
-	public Integer removeImage(Model model, String id) {
+	public void removeImage(Locale locale, String id) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 
-		if (accountId == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
+		if (Objects.isNull(accountId)) {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 		}
 		
 		Gallery gallery = galleryRepository.findOne(id);
 		
-		if (gallery == null) {
-			return HttpServletResponse.SC_NOT_FOUND;
+		if (Objects.isNull(gallery)) {
+			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
 		}
 		
-		if (gallery.getWriter() == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
+		if (Objects.isNull(gallery.getWriter())) {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 		}
 		
 		if (!accountId.equals(gallery.getWriter().getUserId())) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 		}
 		
 		ObjectId objId = new ObjectId(gallery.getId());
@@ -336,15 +325,12 @@ public class GalleryService {
 				galleryRepository.delete(gallery);
 				
 			} catch (IOException e) {
-				e.printStackTrace();
-				return HttpServletResponse.SC_NOT_IMPLEMENTED;
+				throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.gallery", "gallery.exception.io"));
 			}
 		}
 		
 		// 엘라스틱 서치 document 삭제.
 		searchService.deleteDocumentBoard(gallery.getId());
-
-		return HttpServletResponse.SC_OK;
 	}	
 
 	public Model getDataList(Model model, String id, int size) {

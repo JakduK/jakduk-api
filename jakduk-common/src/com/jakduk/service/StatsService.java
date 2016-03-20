@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletResponse;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.model.web.stats.AttendanceClubResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,7 @@ public class StatsService {
 		return attendances;
 	}
 	
-	public AttendanceClubResponse getAttendanceClubData(Locale locale, String clubOrigin) {
+	public List<AttendanceClub> getAttendanceClub(Locale locale, String clubOrigin) {
 
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findByName(clubOrigin);
 
@@ -106,26 +107,12 @@ public class StatsService {
 
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 
-		List<AttendanceClub> attendance = attendanceClubRepository.findByClub(footballClubOrigin, sort);
+		List<AttendanceClub> attendances = attendanceClubRepository.findByClub(footballClubOrigin, sort);
 
-		Integer totalSum = attendance.stream().mapToInt(AttendanceClub::getTotal).sum();
-		Integer matchSum = attendance.stream().mapToInt(AttendanceClub::getGames).sum();
-
-		Integer average = 0;
-
-		if (totalSum != 0 && matchSum != 0) {
-			average = totalSum / matchSum;
-		}
-
-		response.setAttendance(attendance);
-		response.setTotalSum(totalSum);
-		response.setMatchSum(matchSum);
-		response.setAverage(average);
-
-		return response;
+		return attendances;
 	}
 	
-	public Integer getAttendanceSeason(Model model, String language, int season, String league) {
+	public void getAttendancesSeason(Locale locale, Model model, String language, int season, String league) {
 		Map<String, String> fcNames = new HashMap<>();
 
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
@@ -143,23 +130,16 @@ public class StatsService {
 		if (league != null && !league.isEmpty()) {
 			model.addAttribute("league", league);
 		}
-		
+
 		try {
 			model.addAttribute("fcNames", new ObjectMapper().writeValueAsString(fcNames));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.parsing.or.generating"));
 		}
-		
-		return HttpServletResponse.SC_OK;
 	}
 	
-	public void getAttendanceSeasonData(Model model, int season, String league) {
-		
-		if (league == null) {
-			league = CommonConst.K_LEAGUE_ABBREVIATION;
-		}
-		
+	public List<AttendanceClub> getAttendancesSeason(Integer season, String league) {
+
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("average"));
 		List<AttendanceClub> attendances = null;
 		
@@ -169,7 +149,7 @@ public class StatsService {
 			attendances = attendanceClubRepository.findBySeasonAndLeague(season, league, sort);
 		}
 		
-		model.addAttribute("attendances", attendances);
+		return attendances;
 	}
 	
 }

@@ -231,15 +231,6 @@ public class HomeService {
 			model.addAttribute("homeDescription", homeDescription);
 		
 		return model;
-	}	
-	
-	public Integer getDataFootballClubs(Model model, String language) {
-
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		model.addAttribute("footballClubs", footballClubs);
-		
-		return HttpServletResponse.SC_OK;		
 	}
 	
 }
