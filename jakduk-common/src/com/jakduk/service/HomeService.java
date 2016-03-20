@@ -92,13 +92,14 @@ public class HomeService {
 		return model;
 	}
 	
-	public void getJumbotron(Model model, String language) {
+	public Encyclopedia getEncyclopedia(String language) {
 		
 		Integer count = encyclopediaRepository.countByLanguage(language);
 		int random = (int)(Math.random() * count) + 1;
 		Encyclopedia encyclopedia = encyclopediaRepository.findOneBySeqAndLanguage(random, language);
-		
-		model.addAttribute("encyclopedia", encyclopedia);
+
+		return encyclopedia;
+
 	}
 	
 	public Model getBoardLatest(Model model) {

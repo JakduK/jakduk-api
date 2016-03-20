@@ -252,7 +252,7 @@
 					getDataLatest();
 
 					function refreshEncyclopedia() {
-						var bUrl = '<c:url value="/home/jumbotron.json?lang=${pageContext.response.locale}"/>';
+						var bUrl = '<c:url value="/home/encyclopedia?lang=${pageContext.response.locale}"/>';
 
 						if ($scope.encyclopediaConn == "none") {
 
@@ -261,15 +261,15 @@
 							$scope.encyclopediaConn = "loading";
 
 							reqPromise.success(function (data, status, headers, config) {
-								if (data.encyclopedia != null) {
-									if (data.encyclopedia.kind == "player") {
+								if (data != null) {
+									if (data.kind == "player") {
 										$scope.encyclopedia.kind = '<spring:message code="home.kind.best.player"/>';
 									} else if (data.encyclopedia.kind == "book") {
 										$scope.encyclopedia.kind = '<spring:message code="home.kind.recommend.book"/>';
 									}
 
-									$scope.encyclopedia.subject = data.encyclopedia.subject;
-									$scope.encyclopedia.content = data.encyclopedia.content;
+									$scope.encyclopedia.subject = data.subject;
+									$scope.encyclopedia.content = data.content;
 								}
 
 								$scope.encyclopediaConn = "none";
@@ -277,7 +277,7 @@
 							});
 							reqPromise.error(function (data, status, headers, config) {
 								$scope.encyclopediaConn = "none";
-								$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+								console.error(data.error);
 							});
 						}
 					}

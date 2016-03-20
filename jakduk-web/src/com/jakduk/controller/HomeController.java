@@ -51,20 +51,7 @@ public class HomeController {
 		
 		return "home/home";
 	}
-	
-	@RequestMapping(value = "/home/jumbotron", method = RequestMethod.GET)
-	public String jumbotron(HttpServletRequest request, HttpServletResponse response,			
-			@RequestParam(required = false) String lang,
-			Model model) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-		
-		homeService.getJumbotron(model, language);
-		
-		return "home/jumbotron";
-	}
-	
+
 	@RequestMapping(value = "/check/user/email")
 	public void checkEmail(Model model,
 			@RequestParam(required = true) String email) {

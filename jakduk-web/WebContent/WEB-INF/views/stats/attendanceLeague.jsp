@@ -67,9 +67,6 @@
 	<jsp:include page="../include/footer.jsp"/>	
 </div>
 
-<!-- Bootstrap core JavaScript
-  ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/highcharts/highcharts.js"></script>
@@ -96,7 +93,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 	
 	angular.element(document).ready(function() {
 		var league = "${league}";
-		
 		var leagueKeys = Object.keys($scope.leagues);
 		
 		if (leagueKeys.indexOf(league) >= 0) {			
@@ -104,8 +100,6 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 		} else {
 			$scope.leagueId = KLCLId;
 		}
-		
-		console.log()
 		
 		Highcharts.setOptions({
 			lang: {
@@ -235,17 +229,14 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 					format: '{point.y:,.0f}',
 				}
 			}],
-			
-    	loading: true,
-    	credits:{enabled:true}
+			loading: true,
+			credits:{enabled:true}
 		};		
 
 		 // 사용할 앱의 Javascript 키를 설정해 주세요.
 		Kakao.init('${kakaoKey}');
 		
 		$scope.getAttendance();
-		
-		App.init();
 	});
 	
 	$scope.getAttendance = function() {
@@ -259,6 +250,8 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 			$scope.attendancesConn = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
+				console.log($scope.attendances);
+
 				$scope.attendances[$scope.leagueId] = data.attendances;
 				
 				$scope.chartConfig.loading = false;
@@ -357,6 +350,12 @@ jakdukApp.controller('statsCtrl', function($scope, $http) {
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		App.init();
+	});
+</script>
 
 </body>
 </html>

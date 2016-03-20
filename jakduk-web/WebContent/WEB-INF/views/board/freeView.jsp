@@ -425,6 +425,7 @@
 <script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/kakao/js/kakao.min.js"></script>
 <script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
+
 <script type="text/javascript">
 
 var jakdukApp = angular.module("jakdukApp", ["summernote", "infinite-scroll", "ngSanitize", "angular-ladda", 'ui.bootstrap']);
@@ -460,8 +461,6 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 	    
 	    // 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
 		Kakao.Link.createTalkLinkButton(kakaoLinkContent);
-		
-		App.init();
 	});		
 	
 	$scope.objectIdFromDate = function(date) {
@@ -790,6 +789,12 @@ function confirmEdit() {
 </script>
 
 <jsp:include page="../include/body-footer.jsp"/>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		App.init();
+	});
+</script>
 
 </body>
 </html>
