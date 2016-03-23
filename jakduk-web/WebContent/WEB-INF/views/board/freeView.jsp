@@ -220,14 +220,14 @@
 				<div class="row">
 					<div class="col-xs-6">
 						<button class="btn btn-u-sm ladda-button btn-dropbox" type="button"
-							ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
+							ng-click="btnFeeling('LIKE')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
 							ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 							<i class="fa fa-thumbs-o-up fa-lg"></i>
 						   <span ng-hide="likeConn == 'connecting'" ng-bind="numberOfLike"></span>
 						</button>
 						<button class="btn btn-u-sm ladda-button btn-weibo" type="button"
-							ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
+							ng-click="btnFeeling('DISLIKE')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
 							ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 							<i class="fa fa-thumbs-o-down fa-lg"></i>
@@ -265,7 +265,7 @@
 
 				<h2 class="heading-sm text-primary">
 					<i class="fa fa-comments"></i>
-					<span id="comments" infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
+					<span infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
 						<spring:message code="board.msg.comment.count" arguments="<span ng-bind=\"commentCount\"></span>"/>
 					</span>
 					<button type="button" class="btn btn-link" ng-click="btnRefreshComment()"
@@ -275,7 +275,7 @@
 				</h2>
 
 				<div class="media-body ng-cloak">
-					<div ng-repeat="comment in commentList">
+					<div ng-repeat="comment in comments">
 						<h6 class="clearfix">
 							<i aria-hidden="true" class="icon-user"></i>
 							<span ng-bind="comment.writer.username"></span>
@@ -287,14 +287,14 @@
 							<span ng-bind-html="comment.content"></span>
 						</p>
 						
-						<button type="button" class="btn btn-xs rounded btn-dropbox" ng-click="btnCommentFeeling(comment.id, 'like')"
+						<button type="button" class="btn btn-xs rounded btn-dropbox" ng-click="btnCommentFeeling(comment.id, 'LIKE')"
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 							<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
 								<i class="fa fa-thumbs-o-up fa-lg"></i>
 								<span ng-bind="numberOfCommentLike[comment.id]"></span>
 							</span>
 						</button>
-						<button type="button" class="btn btn-xs rounded btn-weibo" ng-click="btnCommentFeeling(comment.id, 'dislike')"
+						<button type="button" class="btn btn-xs rounded btn-weibo" ng-click="btnCommentFeeling(comment.id, 'DISLIKE')"
 						tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 							<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
 								<i class="fa fa-thumbs-o-down fa-lg"></i>
@@ -484,7 +484,7 @@ jakdukApp.controller("boardFreeCtrl", function($scope, $http) {
 			return;
 		}
 		
-		var bUrl = '<c:url value="/board/' + type + '/${post.seq}.json"/>';
+		var bUrl = '<c:url value="/board/free/${post.seq}/' + type + '.json"/>';
 		
 		if ($scope.likeConn == "none" && $scope.dislikeConn == "none") {
 			
@@ -573,7 +573,7 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	$scope.boardCommentContentLengthMin = Jakduk.BoardCommentContentLengthMin;
 	$scope.boardCommentContentLengthMax = Jakduk.BoardCommentContentLengthMax;
 	
-	$scope.commentList = [];
+	$scope.comments = [];
 	$scope.commentAlert = {};
 	$scope.summernoteAlert = {};
 	$scope.commentFeelingConn = {};
@@ -701,9 +701,9 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 					}				
 				} else {	// 댓글을 1개 이상 가져왔을 때
 					if (type == "init" || type == "btnRefreshComment") {
-						$scope.commentList = data.comments;
+						$scope.comments = data.comments;
 					} else if (type == "btnMoreComment" || type == "btnWriteComment") {
-						$scope.commentList = $scope.commentList.concat(data.comments);
+						$scope.comments = $scope.comments.concat(data.comments);
 					}
 				}
 				
@@ -716,8 +716,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	};
 	
 	$scope.btnMoreComment = function() {
-		if ($scope.commentList.length > 0) {
-			var lastComment = $scope.commentList[$scope.commentList.length - 1];
+		if ($scope.comments.length > 0) {
+			var lastComment = $scope.comments[$scope.comments.length - 1];
 			$scope.loadComments("btnMoreComment", lastComment.id);
 		} else {
 			$scope.loadComments("btnMoreComment", "");			
@@ -726,13 +726,13 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 	
 	$scope.btnRefreshComment = function() {
 		$scope.commentAlert = {};
-		$scope.commentList = [];
+		$scope.comments = [];
 		$scope.loadComments("btnRefreshComment", "");
 	};
 	
 	$scope.btnCommentFeeling = function(commentId, status) {
 		
-		var bUrl = '<c:url value="/board/comment/' + status + '/${post.seq}.json?id=' + commentId + '"/>';
+		var bUrl = '<c:url value="/board/comment/' + commentId + '/' + status + '.json"/>';
 		var conn = $scope.commentFeelingConn[commentId];
 		
 		if (conn == "none" || conn == null) {

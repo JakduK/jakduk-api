@@ -95,8 +95,10 @@ public class CommonConst {
 	/**
 	 * 글의 좋아요, 싫어요
 	 */
-	public final static String FEELING_TYPE_LIKE = "like";
-	public final static String FEELING_TYPE_DISLIKE = "dislike";
+	public enum FEELING_TYPE {
+		LIKE,
+		DISLIKE
+	}
 	
 	public final static String PRINCIPAL_ANONYMOUSUSER = "anonymousUser";
 	

@@ -605,7 +605,7 @@ public class BoardFreeService {
 			categorys.put(category.getName(), category.getResName());
 		}
 
-		HashMap<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
+		Map<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
 		Map<String, BoardFeelingCount> feelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
 
 		model.addAttribute("posts", posts);
@@ -716,7 +716,7 @@ public class BoardFreeService {
 	 * @param feeling
 	 * @return
 	 */
-	public Model setUsersFeelings(Model model, int seq, String feeling) {
+	public Model setUsersFeelings(Model model, int seq, CommonConst.FEELING_TYPE feeling) {
 		
 		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
@@ -768,18 +768,18 @@ public class BoardFreeService {
 				boardUser.setId(new ObjectId().toString());
 
 				switch (feeling) {
-				case CommonConst.FEELING_TYPE_LIKE:
-					usersLiking.add(boardUser);
-					boardFree.setUsersLiking(usersLiking);
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
-					break;
-				case CommonConst.FEELING_TYPE_DISLIKE:
-					usersDisliking.add(boardUser);
-					boardFree.setUsersDisliking(usersDisliking);
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
-					break;
-				default:
-					break;
+					case LIKE:
+						usersLiking.add(boardUser);
+						boardFree.setUsersLiking(usersLiking);
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE;
+						break;
+					case DISLIKE:
+						usersDisliking.add(boardUser);
+						boardFree.setUsersDisliking(usersDisliking);
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
+						break;
+					default:
+						break;
 				}
 				
 				boardFreeRepository.save(boardFree);
@@ -882,7 +882,7 @@ public class BoardFreeService {
 		model.addAttribute("count", count);
 	}
 	
-	public Model setUsersCommentFeelings(Model model, int seq, String id, String feeling) {
+	public Model setUsersCommentFeelings(Model model, String commentId, CommonConst.FEELING_TYPE feeling) {
 		
 		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
@@ -890,7 +890,7 @@ public class BoardFreeService {
 		String userid = principal.getId();
 		String username = principal.getUsername();
 		
-		BoardFreeComment boardComment = boardFreeCommentRepository.findById(id);
+		BoardFreeComment boardComment = boardFreeCommentRepository.findById(commentId);
 		CommonWriter writer = boardComment.getWriter();
 
 		List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
@@ -935,18 +935,18 @@ public class BoardFreeService {
 				boardUser.setId(new ObjectId().toString());
 
 				switch (feeling) {
-				case CommonConst.FEELING_TYPE_LIKE:
-					usersLiking.add(boardUser);
-					boardComment.setUsersLiking(usersLiking);
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
-					break;
-				case CommonConst.FEELING_TYPE_DISLIKE:
-					usersDisliking.add(boardUser);
-					boardComment.setUsersDisliking(usersDisliking);
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
-					break;
-				default:
-					break;
+					case LIKE:
+						usersLiking.add(boardUser);
+						boardComment.setUsersLiking(usersLiking);
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE;
+						break;
+					case DISLIKE:
+						usersDisliking.add(boardUser);
+						boardComment.setUsersDisliking(usersDisliking);
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
+						break;
+					default:
+						break;
 				}
 				
 				boardFreeCommentRepository.save(boardComment);

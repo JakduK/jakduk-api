@@ -2,6 +2,7 @@ package jakduk;
 
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Competition;
+import com.jakduk.model.db.JakduComment;
 import com.jakduk.model.db.JakduSchedule;
 import com.jakduk.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
@@ -48,5 +49,11 @@ public class JakduTest {
         List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll(pageable).getContent();
 
         System.out.println("jakduSchedules=" + jakduSchedules);
+    }
+
+    @Test
+    public void getJakduComments() {
+        List<JakduComment> comments = jakdukDAO.getJakduComments("567be7d8e4b06364b1618e0b", null);
+        System.out.println("comments=" + comments);
     }
 }

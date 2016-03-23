@@ -99,13 +99,13 @@
    <div class="row">
 <div class="col-xs-6">
 <button class="btn-u btn-brd btn-brd-hover rounded btn-u-blue btn-u-sm ladda-button" type="button"
-	ng-click="btnFeeling('like')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
+	ng-click="btnFeeling('LIKE')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
 	ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro">
 	<i class="fa fa-thumbs-o-up fa-lg"></i>
    <span ng-hide="likeConn == 'connecting'">{{numberOfLike}}</span>      
 </button>
 <button class="btn-u btn-brd btn-brd-hover rounded btn-u-red btn-u-sm ladda-button" type="button" 
-	ng-click="btnFeeling('dislike')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
+	ng-click="btnFeeling('DISLIKE')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
 	ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro">
 	<i class="fa fa-thumbs-o-down fa-lg"></i>
    <span ng-hide="dislikeConn == 'connecting'">{{numberOfDislike}}</span>      
@@ -211,7 +211,7 @@ jakdukApp.controller("galleryController", function($scope, $http) {
 			return;
 		}
 		
-		var bUrl = '<c:url value="/gallery/' + type + '/${gallery.id}.json"/>';
+		var bUrl = '<c:url value="/gallery/${gallery.id}/' + type + '.json"/>';
 		
 		if ($scope.likeConn == "none" && $scope.dislikeConn == "none") {
 			

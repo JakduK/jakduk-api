@@ -113,18 +113,14 @@ public class BoardController {
 		return "board/freeView";
 	}
 	
-	@RequestMapping(value = "/like/{seq}")
-	public void setFreeLike(@PathVariable int seq, Model model) {
+	@RequestMapping(value = "/free/{seq}/{feeling}")
+	public void setFreeFeeling(@PathVariable Integer seq,
+							   @PathVariable CommonConst.FEELING_TYPE feeling,
+							   Model model) {
 		
-		boardFreeService.setUsersFeelings(model, seq, CommonConst.FEELING_TYPE_LIKE);
+		boardFreeService.setUsersFeelings(model, seq, feeling);
 	}
-	
-	@RequestMapping(value = "/dislike/{seq}")
-	public void setFreeDislike(@PathVariable int seq, Model model) {
-		
-		boardFreeService.setUsersFeelings(model, seq, CommonConst.FEELING_TYPE_DISLIKE);
-	}
-	
+
 	@RequestMapping(value = "/free/comment/write", method = RequestMethod.POST)
 	public void freeCommentWrite(Model model,
 			HttpServletRequest request,
@@ -136,8 +132,8 @@ public class BoardController {
 	
 	@RequestMapping(value = "/free/comment/{seq}", method = RequestMethod.GET)
 	public void freeComment(@PathVariable int seq,
-			Model model,			
-			@RequestParam(required = false) String commentId) {
+							@RequestParam(required = false) String commentId,
+							Model model) {
 		
 		boardFreeService.getFreeComment(model, seq, commentId);
 		
@@ -151,20 +147,14 @@ public class BoardController {
 		
 	}
 	
-	@RequestMapping(value = "/comment/like/{seq}")
-	public void setFreeCommentLike(@PathVariable int seq, Model model,
-			@RequestParam(required = true) String id) {
+	@RequestMapping(value = "/comment/{commentId}/{feeling}")
+	public void setFreeCommentFeeling(@PathVariable String commentId,
+									  @PathVariable CommonConst.FEELING_TYPE feeling,
+									  Model model) {
 		
-		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.FEELING_TYPE_LIKE);
+		boardFreeService.setUsersCommentFeelings(model, commentId, feeling);
 	}
-	
-	@RequestMapping(value = "/comment/dislike/{seq}")
-	public void setFreeCommentDislike(@PathVariable int seq, Model model,
-			@RequestParam(required = true) String id) {
-		
-		boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.FEELING_TYPE_DISLIKE);
-	}
-	
+
 	@RequestMapping(value = "/free/delete/{seq}", method = RequestMethod.GET)
 	public String deleteFree(@PathVariable int seq, Model model,
 			HttpServletResponse response,

@@ -400,7 +400,7 @@ public class GalleryService {
 		return HttpServletResponse.SC_OK;
 	}
 	
-	public Model setUserFeeling(Model model, String id, String feeling) {
+	public Model setUserFeeling(Model model, String id, CommonConst.FEELING_TYPE feeling) {
 		
 		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
@@ -450,18 +450,18 @@ public class GalleryService {
 				feelingUser.setId(new ObjectId().toString());
 
 				switch (feeling) {
-				case CommonConst.FEELING_TYPE_LIKE:
-					usersLiking.add(feelingUser);
-					gallery.setUsersLiking(usersLiking);
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE; 
-					break;
-				case CommonConst.FEELING_TYPE_DISLIKE:
-					usersDisliking.add(feelingUser);
-					gallery.setUsersDisliking(usersDisliking);
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
-					break;
-				default:
-					break;
+					case LIKE:
+						usersLiking.add(feelingUser);
+						gallery.setUsersLiking(usersLiking);
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE;
+						break;
+					case DISLIKE:
+						usersDisliking.add(feelingUser);
+						gallery.setUsersDisliking(usersDisliking);
+						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
+						break;
+					default:
+						break;
 				}
 				
 				galleryRepository.save(gallery);

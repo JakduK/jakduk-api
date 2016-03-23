@@ -8,9 +8,12 @@ import com.jakduk.exception.RepositoryExistException;
 import com.jakduk.model.db.*;
 import com.jakduk.model.elasticsearch.JakduCommentOnES;
 import com.jakduk.model.embedded.BoardCommentStatus;
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
+import com.jakduk.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
 import com.jakduk.repository.jakdu.JakduCommentRepository;
 import com.jakduk.repository.jakdu.JakduRepository;
@@ -260,5 +263,24 @@ public class JakduService {
         searchService.createDocumentJakduComment(jakduCommentOnES);
 
         return jakduComment;
+    }
+
+    public JakduCommentsResponse getComments(String jakduScheduleId, String commentId) {
+
+        List<JakduComment> comments;
+
+        if (Objects.nonNull(commentId) && !commentId.isEmpty()) {
+            comments  = jakdukDAO.getJakduComments(jakduScheduleId, new ObjectId(commentId));
+        } else {
+            comments  = jakdukDAO.getJakduComments(jakduScheduleId, null);
+        }
+
+        Integer count = jakduCommentRepository.countByJakduScheduleId(jakduScheduleId);
+
+        JakduCommentsResponse response = new JakduCommentsResponse();
+        response.setComments(comments);
+        response.setCount(count);
+
+        return response;
     }
 }

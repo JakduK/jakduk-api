@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -48,7 +49,7 @@ public class BoardDAO {
 	
 	private Logger logger = Logger.getLogger(this.getClass());
 	
-	public HashMap<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
+	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("boardItem.seq").in(arrSeq));
 		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
@@ -56,15 +57,11 @@ public class BoardDAO {
 		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
-		
-		List<CommonCount> boardCommentCount = results.getMappedResults();
 
-		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
-		
-		for (CommonCount item : boardCommentCount) {
-			commentCount.put(item.getId(), item.getCount());
-		}
-		
+		List<CommonCount> numberOfItems = results.getMappedResults();
+
+		Map<String, Integer> commentCount = numberOfItems.stream().collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+
 		return commentCount;
 	}
 

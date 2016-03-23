@@ -1,14 +1,17 @@
 package com.jakduk.restcontroller;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Jakdu;
 import com.jakduk.model.db.JakduComment;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
+import com.jakduk.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -83,5 +86,24 @@ public class JakduRestController {
         JakduComment jakduComment = jakduService.setComment(locale, jakduCommentWriteRequest);
 
         return jakduComment;
+    }
+
+    // 작두 댓글 목록
+    @RequestMapping(value = "/schedule/comments/{jakduScheduleId}", method = RequestMethod.GET)
+    public JakduCommentsResponse getComments(@PathVariable String jakduScheduleId,
+                                             @RequestParam(required = false) String commentId) {
+
+        JakduCommentsResponse response = jakduService.getComments(jakduScheduleId, commentId);
+
+        return response;
+    }
+
+    @RequestMapping(value = "/schedule/comment/{id}/{commentId}/{feeling}")
+    public void setCommentFeeling(@PathVariable String id,
+                                  @PathVariable String commentId,
+                                  @PathVariable CommonConst.FEELING_TYPE feeling
+                                  ) {
+
+        //boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.FEELING_TYPE_LIKE);
     }
 }

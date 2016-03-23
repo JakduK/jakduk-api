@@ -120,16 +120,11 @@ public class GalleryController {
 		return "gallery/view";		
 	}	
 	
-	@RequestMapping(value = "/like/{id}")
-	public void setGalleryLike(@PathVariable String id, Model model) {
+	@RequestMapping(value = "/{id}/{feeling}")
+	public void setGalleryFeeling(@PathVariable String id,
+								  @PathVariable CommonConst.FEELING_TYPE feeling,
+								  Model model) {
 		
-		galleryService.setUserFeeling(model, id, CommonConst.FEELING_TYPE_LIKE);
+		galleryService.setUserFeeling(model, id, feeling);
 	}
-	
-	@RequestMapping(value = "/dislike/{id}")
-	public void setGalleryDislike(@PathVariable String id, Model model) {
-		
-		galleryService.setUserFeeling(model, id, CommonConst.FEELING_TYPE_DISLIKE);
-	}	
-
 }

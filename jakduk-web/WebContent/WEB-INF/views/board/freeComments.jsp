@@ -151,13 +151,13 @@
 				</p>
 	
 				<button type="button" class="btn btn-xs rounded btn-dropbox"
-				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'like')"
+				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'LIKE')"
 				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 					<i class="fa fa-thumbs-o-up fa-lg" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length"></i>
 					{{numberOfCommentLike[comment.id]}}
 				</button>
 				<button type="button" class="btn btn-xs rounded btn-weibo"
-				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'dislike')"
+				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'DISLIKE')"
 				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 					<i class="fa fa-thumbs-o-down fa-lg" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length"></i>
 					{{numberOfCommentDislike[comment.id]}}
@@ -303,8 +303,9 @@ jakdukApp.controller("boardCtrl", function($scope, $http, jakdukFactory) {
 	};
 	
 	$scope.btnCommentFeeling = function(boardId, commentId, status) {
-		
-		var bUrl = '<c:url value="/board/comment/' + status + '/' + boardId + '.json?id=' + commentId + '"/>';
+
+		var bUrl = '<c:url value="/board/comment/' + commentId + '/' + status + '.json"/>';
+
 		var conn = $scope.commentFeelingConn[commentId];
 		
 		if (conn == "none" || conn == null) {

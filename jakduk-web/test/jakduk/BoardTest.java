@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.mongodb.MongoClient;
 import org.bson.types.ObjectId;
 import org.jongo.MongoCollection;
@@ -270,5 +271,13 @@ public class BoardTest {
         }
 
 
+	}
+
+	@Test
+	public void 자유게시판_댓글목록() {
+		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(58);
+		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
+
+		System.out.println(CommonConst.FEELING_TYPE.DISLIKE);
 	}
 }

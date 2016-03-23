@@ -3,6 +3,7 @@ package com.jakduk.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.jakduk.model.db.*;
 import org.apache.log4j.Logger;
@@ -322,6 +323,27 @@ public class JakdukDAO {
 		JakduScheduleGroup jakduScheduleGroup = mongoTemplate.findOne(query, JakduScheduleGroup.class);
 
 		return jakduScheduleGroup;
+	}
+
+	public List<JakduComment> getJakduComments(String jakduScheduleId, ObjectId commentId) {
+		AggregationOperation match1 = Aggregation.match(Criteria.where("jakduScheduleId").is(jakduScheduleId));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
+		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
+		AggregationOperation limit = Aggregation.limit(CommonConst.COMMENT_MAX_SIZE);
+
+		Aggregation aggregation;
+
+		if (Objects.nonNull(commentId)) {
+			aggregation = Aggregation.newAggregation(match1, match2, sort, limit);
+		} else {
+			aggregation = Aggregation.newAggregation(match1, sort, limit);
+		}
+
+		AggregationResults<JakduComment> results = mongoTemplate.aggregate(aggregation, "jakduComment", JakduComment.class);
+
+		List<JakduComment> comments = results.getMappedResults();
+
+		return comments;
 	}
 	
 }
