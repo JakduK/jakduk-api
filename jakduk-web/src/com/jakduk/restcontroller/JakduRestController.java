@@ -3,15 +3,17 @@ package com.jakduk.restcontroller;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Jakdu;
 import com.jakduk.model.db.JakduComment;
+import com.jakduk.model.db.JakduSchedule;
+import com.jakduk.model.web.UserFeelingResponse;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
+import com.jakduk.model.web.jakdu.JakduScheduleResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -24,7 +26,7 @@ import java.util.*;
  */
 
 @RestController
-@RequestMapping("/jakdu")
+@RequestMapping("/api/jakdu")
 public class JakduRestController {
 
     @Resource
@@ -46,8 +48,22 @@ public class JakduRestController {
         return result;
     }
 
+    // 작두 일정 목록
+    @RequestMapping(value = "/schedule", method = RequestMethod.GET)
+    public JakduScheduleResponse dataSchedule(HttpServletRequest request,
+                             @RequestParam(required = false, defaultValue = "1") int page,
+                             @RequestParam(required = false, defaultValue = "20") int size) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+        String language = commonService.getLanguageCode(locale, null);
+
+        JakduScheduleResponse response = jakduService.getSchedules(language, page, size);
+
+        return response;
+    }
+
     // 작두 일정 데이터 하나 가져오기.
-   @RequestMapping(value = "/data/schedule/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
     public Map dataSchedule(@PathVariable String id) {
 
         Map<String, Object> result = jakduService.getDataSchedule(id);
@@ -72,7 +88,8 @@ public class JakduRestController {
 
     // 작두 댓글 달기
     @RequestMapping(value ="/schedule/comment", method = RequestMethod.POST)
-    public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest, HttpServletRequest request) {
+    public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest,
+                                     HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
 
@@ -98,12 +115,16 @@ public class JakduRestController {
         return response;
     }
 
-    @RequestMapping(value = "/schedule/comment/{id}/{commentId}/{feeling}")
-    public void setCommentFeeling(@PathVariable String id,
-                                  @PathVariable String commentId,
-                                  @PathVariable CommonConst.FEELING_TYPE feeling
-                                  ) {
+    // 작두 댓글 좋아요 싫어요
+    @RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
+    public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
+                                                 @PathVariable CommonConst.FEELING_TYPE feeling,
+                                                 HttpServletRequest request) {
 
-        //boardFreeService.setUsersCommentFeelings(model, seq, id, CommonConst.FEELING_TYPE_LIKE);
+        Locale locale = localeResolver.resolveLocale(request);
+
+        UserFeelingResponse response = jakduService.setJakduCommentFeeling(locale, commentId, feeling);
+
+        return response;
     }
 }

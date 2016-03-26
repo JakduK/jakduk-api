@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.exception.UserFeelingException;
+import com.jakduk.model.web.UserFeelingResponse;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 
@@ -881,14 +884,23 @@ public class BoardFreeService {
 		
 		model.addAttribute("count", count);
 	}
-	
-	public Model setUsersCommentFeelings(Model model, String commentId, CommonConst.FEELING_TYPE feeling) {
-		
-		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
+
+	/**
+	 * 자유게시판 감정 표현.
+	 * @param locale
+	 * @param commentId
+	 * @param feeling
+     * @return
+     */
+	public UserFeelingResponse setFreeCommentFeeling(Locale locale, String commentId, CommonConst.FEELING_TYPE feeling) {
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
-		String userid = principal.getId();
+		String userId = principal.getId();
 		String username = principal.getUsername();
+
+		// 인증되지 않은 회원
+		if (Objects.isNull(userId))
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 		
 		BoardFreeComment boardComment = boardFreeCommentRepository.findById(commentId);
 		CommonWriter writer = boardComment.getWriter();
@@ -896,70 +908,45 @@ public class BoardFreeService {
 		List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
 		List<CommonFeelingUser> usersDisliking = boardComment.getUsersDisliking();
 
-		if (usersLiking == null) {
-			usersLiking = new ArrayList<CommonFeelingUser>(); 
-		}
-		
-		if (usersDisliking == null) {
-			usersDisliking = new ArrayList<CommonFeelingUser>(); 
-		}
-		
-		if (userid != null && username != null) {
-			
-			if (userid.equals(writer.getUserId())) {
-				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
-			}
+		if (Objects.isNull(usersLiking)) usersLiking = new ArrayList<>();
+		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (CommonFeelingUser boardUser : usersLiking) {
-					if (boardUser != null && userid.equals(boardUser.getUserId())) {
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
-						break;
-					}
-				}
-			}
-			
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (CommonFeelingUser boardUser : usersDisliking) {
-					if (boardUser != null && userid.equals(boardUser.getUserId())) {
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
-						break;
-					}
-				}
-			}
-
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				CommonFeelingUser boardUser = new CommonFeelingUser();
-				boardUser.setUserId(userid);
-				boardUser.setUsername(username);
-				boardUser.setId(new ObjectId().toString());
-
-				switch (feeling) {
-					case LIKE:
-						usersLiking.add(boardUser);
-						boardComment.setUsersLiking(usersLiking);
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE;
-						break;
-					case DISLIKE:
-						usersDisliking.add(boardUser);
-						boardComment.setUsersDisliking(usersDisliking);
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
-						break;
-					default:
-						break;
-				}
-				
-				boardFreeCommentRepository.save(boardComment);
-			}
-		} else {
-			errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ANONYMOUS;
+		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
+		if (userId.equals(writer.getUserId())) {
+			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
+					, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.you.are.writer"));
 		}
-		
-		model.addAttribute("errorCode", errCode);
-		model.addAttribute("numberOfLike", usersLiking.size());
-		model.addAttribute("numberOfDislike", usersDisliking.size());
-		
-		return model;
+
+		// 해당 회원이 좋아요를 이미 했는지 검사
+		for (CommonFeelingUser feelingUser : usersLiking) {
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
+				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+			}
+		}
+
+		// 해당 회원이 싫어요를 이미 했는지 검사
+		for (CommonFeelingUser feelingUser : usersDisliking) {
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
+				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+			}
+		}
+
+		UserFeelingResponse response = new UserFeelingResponse();
+
+		CommonFeelingUser feelingUser = new CommonFeelingUser();
+		feelingUser.setUserId(userId);
+		feelingUser.setUsername(username);
+		feelingUser.setId(new ObjectId().toString());
+
+		boardFreeCommentRepository.save(boardComment);
+
+		response.setFeeling(feeling.toString());
+		response.setNumberOfLike(usersLiking.size());
+		response.setNumberOfDislike(usersDisliking.size());
+
+		return response;
 	}
 	
 	public Integer deleteFree(Model model, int seq, String type) {

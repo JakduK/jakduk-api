@@ -2,6 +2,8 @@ package com.jakduk.restcontroller;
 
 import com.jakduk.common.RestError;
 import com.jakduk.exception.RepositoryExistException;
+import com.jakduk.exception.UserFeelingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +14,14 @@ import java.util.NoSuchElementException;
  */
 
 @ControllerAdvice(value = "com.jakduk.restcontroller", annotations = RestController.class)
+@Slf4j
 public class RestExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public RestError illegalArgumentException(IllegalArgumentException e) {
-        RestError restError = new RestError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        RestError restError = new RestError(HttpStatus.BAD_REQUEST.toString(), e.getMessage());
         return  restError;
     }
 
@@ -26,15 +29,15 @@ public class RestExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public RestError noSuchElementException(NoSuchElementException e) {
-        RestError restError = new RestError(HttpStatus.NOT_FOUND.value(), e.getMessage());
+        RestError restError = new RestError(HttpStatus.NOT_FOUND.toString(), e.getMessage());
         return  restError;
     }
 
-    @ExceptionHandler(RepositoryExistException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UserFeelingException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public RestError repositoryExistException(RepositoryExistException e) {
-        RestError restError = new RestError(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
+    public RestError repositoryExistException(UserFeelingException e) {
+        RestError restError = new RestError(e.getCode(), e.getMessage());
         return  restError;
     }
 
@@ -42,7 +45,7 @@ public class RestExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public RestError runtimeException(RuntimeException e) {
-        RestError restError = new RestError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        RestError restError = new RestError(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage());
         return  restError;
     }
 }

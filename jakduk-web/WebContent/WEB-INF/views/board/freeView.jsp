@@ -714,7 +714,8 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			});			
 		}
 	};
-	
+
+	// 댓글 더보기 단추.
 	$scope.btnMoreComment = function() {
 		if ($scope.comments.length > 0) {
 			var lastComment = $scope.comments[$scope.comments.length - 1];
@@ -723,45 +724,39 @@ jakdukApp.controller("commentCtrl", function($scope, $http) {
 			$scope.loadComments("btnMoreComment", "");			
 		}
 	};
-	
+
+	// 댓글 새로고침 단추.
 	$scope.btnRefreshComment = function() {
 		$scope.commentAlert = {};
 		$scope.comments = [];
 		$scope.loadComments("btnRefreshComment", "");
 	};
-	
+
+	// 댓글 감정 표현
 	$scope.btnCommentFeeling = function(commentId, status) {
-		
-		var bUrl = '<c:url value="/board/comment/' + commentId + '/' + status + '.json"/>';
+		var bUrl = '<c:url value="/api/board/comment/' + commentId + '/' + status + '"/>';
 		var conn = $scope.commentFeelingConn[commentId];
 		
 		if (conn == "none" || conn == null) {
-			var reqPromise = $http.get(bUrl);
+			var reqPromise = $http.post(bUrl);
 			
 			$scope.commentFeelingConn[commentId] = "loading";
 			
 			reqPromise.success(function(data, status, headers, config) {
-				var message = "";
-				
-				if (data.errorCode == "like") {
+
+				if (data.feeling == 'LIKE') {
 					$scope.numberOfCommentLike[commentId] = data.numberOfLike;
-				} else if (data.errorCode == "dislike") {
+				} else if (data.feeling == 'DISLIKE') {
 					$scope.numberOfCommentDislike[commentId] = data.numberOfDislike;
-				} else if (data.errorCode == "already") {
-					message = '<spring:message code="board.msg.select.already.like"/>';
-				} else if (data.errorCode == "anonymous") {
-					message = '<spring:message code="board.msg.need.login.for.feel"/>';
-				} else if (data.errorCode == "writer") {
-					message = "<spring:message code='board.msg.you.are.writer'/>";
 				}
-				
-				$scope.commentFeelingAlert[commentId] = message;
+
+				$scope.commentFeelingAlert[commentId] = '';
 				$scope.commentFeelingConn[commentId] = "ok";
 				
 			});
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.commentFeelingConn[commentId] = "none";
-				$scope.commentFeelingAlert[commentId] = '<spring:message code="common.msg.error.network.unstable"/>';				
+				$scope.commentFeelingAlert[commentId] = data.message;
 			});
 		}
 	};

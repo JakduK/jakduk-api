@@ -43,8 +43,6 @@ public class JakdukDAO {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
 	/**
 	 * 축구단 목록 정렬해서 가져온다.
 	 * @param language

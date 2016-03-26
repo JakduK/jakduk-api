@@ -146,14 +146,6 @@ public class BoardController {
 		boardFreeService.getFreeCommentCount(model, seq);
 		
 	}
-	
-	@RequestMapping(value = "/comment/{commentId}/{feeling}")
-	public void setFreeCommentFeeling(@PathVariable String commentId,
-									  @PathVariable CommonConst.FEELING_TYPE feeling,
-									  Model model) {
-		
-		boardFreeService.setUsersCommentFeelings(model, commentId, feeling);
-	}
 
 	@RequestMapping(value = "/free/delete/{seq}", method = RequestMethod.GET)
 	public String deleteFree(@PathVariable int seq, Model model,

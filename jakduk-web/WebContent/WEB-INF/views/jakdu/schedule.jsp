@@ -116,7 +116,7 @@
         });
 
         $scope.getDataSchedulesList = function(page, size) {
-            var bUrl = '<c:url value="/jakdu/data/schedule.json?page=' + page + '&size=' + size + '"/>';
+            var bUrl = '<c:url value="/api/jakdu/schedule?page=' + page + '&size=' + size + '"/>';
 
             if ($scope.dataSchedulesConn == "none") {
 
@@ -126,18 +126,17 @@
 
                 reqPromise.success(function(data, status, headers, config) {
                     //console.log(data);
-                    $scope.schedules = data.schedules;
 
                     if (data.schedules != null) {
                         $scope.schedules = data.schedules;
                     }
 
-                    if (data.schedules != null) {
-                        $scope.fcNames = JSON.parse(data.fcNames);
+                    if (data.fcNames != null) {
+                        $scope.fcNames = data.fcNames;
                     }
 
                     if (data.competitionNames != null) {
-                        $scope.competitionNames = JSON.parse(data.competitionNames);
+                        $scope.competitionNames = data.competitionNames;
                     }
 
                     $scope.dataSchedulesConn = "none";

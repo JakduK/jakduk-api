@@ -30,9 +30,6 @@ public class JakduController {
     LocaleResolver localeResolver;
 
     @Autowired
-    private CommonService commonService;
-
-    @Autowired
     private JakduService jakduService;
 
     @RequestMapping
@@ -57,21 +54,13 @@ public class JakduController {
         return "jakdu/schedule";
     }
 
-    @RequestMapping(value = "/data/schedule", method = RequestMethod.GET)
-    public void dataSchedule(Model model,
-                                   HttpServletRequest request,
-                                   @RequestParam(required = false, defaultValue = "1") int page,
-                                   @RequestParam(required = false, defaultValue = "20") int size) {
+    @RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
+    public String schedule(@PathVariable String id,
+                           Model model,
+                           HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        String language = commonService.getLanguageCode(locale, null);
-
-        jakduService.getDataScheduleList(model, language, page, size);
-    }
-
-    @RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
-    public String schedule(@PathVariable String id, Model model) throws IOException {
-        jakduService.getView(model, id);
+        jakduService.getView(locale, model, id);
 
         return "jakdu/scheduleView";
     }

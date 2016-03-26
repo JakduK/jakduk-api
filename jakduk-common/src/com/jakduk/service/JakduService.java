@@ -1,19 +1,20 @@
 package com.jakduk.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.exception.RepositoryExistException;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.exception.UserFeelingException;
 import com.jakduk.model.db.*;
 import com.jakduk.model.elasticsearch.JakduCommentOnES;
-import com.jakduk.model.embedded.BoardCommentStatus;
-import com.jakduk.model.embedded.BoardItem;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.LocalName;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.embedded.*;
+import com.jakduk.model.web.UserFeelingResponse;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
+import com.jakduk.model.web.jakdu.JakduScheduleResponse;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
 import com.jakduk.repository.jakdu.JakduCommentRepository;
 import com.jakduk.repository.jakdu.JakduRepository;
@@ -24,11 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -65,7 +64,7 @@ public class JakduService {
         model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
     }
 
-    public void getDataScheduleList(Model model, String language, int page, int size) {
+    public JakduScheduleResponse getSchedules(String language, int page, int size) {
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
         Pageable pageable = new PageRequest(page - 1, size, sort);
@@ -77,6 +76,7 @@ public class JakduService {
         for (JakduSchedule jakduSchedule : jakduSchedules) {
             fcIds.add(new ObjectId(jakduSchedule.getHome().getId()));
             fcIds.add(new ObjectId(jakduSchedule.getAway().getId()));
+
             if (jakduSchedule.getCompetition() != null)
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
@@ -95,14 +95,12 @@ public class JakduService {
             competitionNames.put(competition.getId(), competition.getNames().get(0));
         }
 
-        try {
-            model.addAttribute("fcNames", new ObjectMapper().writeValueAsString(fcNames));
-            model.addAttribute("competitionNames", new ObjectMapper().writeValueAsString(competitionNames));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        JakduScheduleResponse response = new JakduScheduleResponse();
+        response.setJakduSchedules(jakduSchedules);
+        response.setFcNames(fcNames);
+        response.setCompetitionNames(competitionNames);
 
-        model.addAttribute("schedules", jakduSchedules);
+        return response;
     }
 
     public Map getDataSchedule(String id) {
@@ -174,9 +172,14 @@ public class JakduService {
         return result;
     }
 
-    public void getView(Model model, String id) {
+    public void getView(Locale locale, Model model, String id) {
 
         model.addAttribute("id", id);
+        try {
+            model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.parsing.or.generating"));
+        }
     }
 
     /**
@@ -188,9 +191,9 @@ public class JakduService {
         CommonPrincipal principal = userService.getCommonPrincipal();
         String accountId = principal.getId();
 
-        if (accountId == null) {
-            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-        }
+        // 인증되지 않은 회원
+        if (Objects.isNull(accountId))
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
         CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType());
 
@@ -227,9 +230,9 @@ public class JakduService {
         CommonPrincipal principal = userService.getCommonPrincipal();
         String accountId = principal.getId();
 
-        if (accountId == null) {
-            throw new AccessDeniedException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-        }
+        // 인증되지 않은 회원
+        if (Objects.isNull(accountId))
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
         CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType());
 
@@ -265,6 +268,12 @@ public class JakduService {
         return jakduComment;
     }
 
+    /**
+     * 작두 댓글 목록.
+     * @param jakduScheduleId
+     * @param commentId
+     * @return
+     */
     public JakduCommentsResponse getComments(String jakduScheduleId, String commentId) {
 
         List<JakduComment> comments;
@@ -280,6 +289,83 @@ public class JakduService {
         JakduCommentsResponse response = new JakduCommentsResponse();
         response.setComments(comments);
         response.setCount(count);
+
+        return response;
+    }
+
+    /**
+     * 작두 댓글 감정 표현
+     * @param locale
+     * @param commentId
+     * @param feeling
+     * @return
+     */
+    public UserFeelingResponse setJakduCommentFeeling(Locale locale, String commentId, CommonConst.FEELING_TYPE feeling) {
+
+        CommonPrincipal principal = userService.getCommonPrincipal();
+        String userId = principal.getId();
+        String username = principal.getUsername();
+
+        // 인증되지 않은 회원
+        if (Objects.isNull(userId))
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+
+        JakduComment jakduComment = jakduCommentRepository.findOne(commentId);
+        CommonWriter writer = jakduComment.getWriter();
+
+        List<CommonFeelingUser> usersLiking = jakduComment.getUsersLiking();
+        List<CommonFeelingUser> usersDisliking = jakduComment.getUsersDisliking();
+
+        if (Objects.isNull(usersLiking)) usersLiking = new ArrayList<>();
+        if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
+
+        // 이 게시물의 작성자라서 감정 표현을 할 수 없음
+        if (userId.equals(writer.getUserId())) {
+            throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
+                    , commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.you.are.writer"));
+        }
+
+        // 해당 회원이 좋아요를 이미 했는지 검사
+        for (CommonFeelingUser feelingUser : usersLiking) {
+            if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
+                throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+                        , commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+            }
+        }
+
+        // 해당 회원이 싫어요를 이미 했는지 검사
+        for (CommonFeelingUser feelingUser : usersDisliking) {
+            if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
+                throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+                        , commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+            }
+        }
+
+        UserFeelingResponse response = new UserFeelingResponse();
+
+        CommonFeelingUser feelingUser = new CommonFeelingUser();
+        feelingUser.setUserId(userId);
+        feelingUser.setUsername(username);
+        feelingUser.setId(new ObjectId().toString());
+
+        switch (feeling) {
+            case LIKE:
+                usersLiking.add(feelingUser);
+                jakduComment.setUsersLiking(usersLiking);
+                break;
+            case DISLIKE:
+                usersDisliking.add(feelingUser);
+                jakduComment.setUsersDisliking(usersDisliking);
+                break;
+            default:
+                break;
+        }
+
+        jakduCommentRepository.save(jakduComment);
+
+        response.setFeeling(feeling.toString());
+        response.setNumberOfLike(usersLiking.size());
+        response.setNumberOfDislike(usersDisliking.size());
 
         return response;
     }

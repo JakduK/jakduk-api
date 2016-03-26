@@ -151,13 +151,13 @@
 				</p>
 	
 				<button type="button" class="btn btn-xs rounded btn-dropbox"
-				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'LIKE')"
+				ng-click="btnCommentFeeling(comment.id, 'LIKE')"
 				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 					<i class="fa fa-thumbs-o-up fa-lg" ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length"></i>
 					{{numberOfCommentLike[comment.id]}}
 				</button>
 				<button type="button" class="btn btn-xs rounded btn-weibo"
-				ng-click="btnCommentFeeling(comment.boardItem.seq, comment.id, 'DISLIKE')"
+				ng-click="btnCommentFeeling(comment.id, 'DISLIKE')"
 				tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
 					<i class="fa fa-thumbs-o-down fa-lg" ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length"></i>
 					{{numberOfCommentDislike[comment.id]}}
@@ -301,44 +301,36 @@ jakdukApp.controller("boardCtrl", function($scope, $http, jakdukFactory) {
 			});
 		}
 	};
-	
-	$scope.btnCommentFeeling = function(boardId, commentId, status) {
 
-		var bUrl = '<c:url value="/board/comment/' + commentId + '/' + status + '.json"/>';
-
+	// 댓글 감정 표현
+	$scope.btnCommentFeeling = function(commentId, status) {
+		var bUrl = '<c:url value="/api/board/comment/' + commentId + '/' + status + '"/>';
 		var conn = $scope.commentFeelingConn[commentId];
-		
+
 		if (conn == "none" || conn == null) {
-			var reqPromise = $http.get(bUrl);
-			
+			var reqPromise = $http.post(bUrl);
+
 			$scope.commentFeelingConn[commentId] = "loading";
-			
+
 			reqPromise.success(function(data, status, headers, config) {
-				var message = "";
-				
-				if (data.errorCode == "like") {
+
+				if (data.feeling == 'LIKE') {
 					$scope.numberOfCommentLike[commentId] = data.numberOfLike;
-				} else if (data.errorCode == "dislike") {
+				} else if (data.feeling == 'DISLIKE') {
 					$scope.numberOfCommentDislike[commentId] = data.numberOfDislike;
-				} else if (data.errorCode == "already") {
-					message = '<spring:message code="board.msg.select.already.like"/>';
-				} else if (data.errorCode == "anonymous") {
-					message = '<spring:message code="board.msg.need.login.for.feel"/>';
-				} else if (data.errorCode == "writer") {
-					message = "<spring:message code='board.msg.you.are.writer'/>";
 				}
-				
-				$scope.commentFeelingAlert[commentId] = message;
+
+				$scope.commentFeelingAlert[commentId] = '';
 				$scope.commentFeelingConn[commentId] = "ok";
-				
+
 			});
 			reqPromise.error(function(data, status, headers, config) {
 				$scope.commentFeelingConn[commentId] = "none";
-				$scope.commentFeelingAlert[commentId] = '<spring:message code="common.msg.error.network.unstable"/>';				
+				$scope.commentFeelingAlert[commentId] = data.message;
 			});
 		}
-	};	
-	
+	};
+
 	$scope.btnEnter = function() {
 		
 		var isValid = true;

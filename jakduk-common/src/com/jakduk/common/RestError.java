@@ -15,11 +15,10 @@ import lombok.Data;
 
 @JsonTypeName(value = "error")
 @JsonTypeInfo(use=JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
-//@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include= JsonTypeInfo.As.WRAPPER_OBJECT)
 @Data
 @AllArgsConstructor
 public class RestError {
 
-    private int code;
+    private String code;
     private String message;
 }

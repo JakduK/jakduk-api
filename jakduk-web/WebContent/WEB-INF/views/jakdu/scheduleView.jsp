@@ -181,11 +181,11 @@
 						</h2>
 
 						<div class="media-body ng-cloak">
-							<div ng-repeat="comment in commentList">
+							<div ng-repeat="comment in comments">
 								<h6 class="clearfix">
 									<i aria-hidden="true" class="icon-user"></i>
 									<span ng-bind="comment.writer.username"></span>
-									<span class="pull-right" ng-bind="dateFromObjectId(comment.id) | date:'${dateTimeFormat.dateTime}'"></span>
+									<span class="pull-right" ng-bind="jakdukFactory.dateFromObjectId(comment.id) | date:dateTimeFormat.dateTime"></span>
 								</h6>
 								<p>
 									<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
@@ -277,251 +277,249 @@
 		<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
 
 		<script type="text/javascript">
+
 			angular.module("jakdukApp", ['ui.bootstrap', 'angular-ladda', 'summernote', 'infinite-scroll'])
-				.controller('jakduCtrl', function ($scope, $http) {
+					.factory('jakdukFactory', function() {
+						return {
+							objectIdFromDate : function (date) {
+								return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+							},
+							dateFromObjectId : function (objectId) {
+								return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+							},
+							intFromObjectId : function (objectId) {
+								return parseInt(objectId.substring(0, 8), 16) * 1000;
+						}}
+					})
+					.controller('jakduCtrl', function ($scope, $http, jakdukFactory) {
+						$scope.jakdukFactory = jakdukFactory;
+						$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
+						$scope.btnGoJakdu = btnGoJakdu;
+						$scope.getDataSchedule = getDataSchedule;
 
-					$scope.btnGoJakdu = btnGoJakdu;
-					$scope.getDataSchedule = getDataSchedule;
+						$scope.dataScheduleConn = "none";   // 작두 데이터 커넥션 상태
+						$scope.jakduSchedule = {};          // 작두 데이터
 
-					$scope.dataScheduleConn = "none";   // 작두 데이터 커넥션 상태
-					$scope.jakduSchedule = {};          // 작두 데이터
+						getDataSchedule();
 
-					getDataSchedule();
+						function btnGoJakdu() {
+							var bUrl = '<c:url value="/api/jakdu/myJakdu"/>';
+							var reqData = {};
 
-					function btnGoJakdu() {
-						var bUrl = '<c:url value="/jakdu/myJakdu"/>';
-						var reqData = {};
+							if (isEmpty($scope.myHomeScore) || isEmpty($scope.myAwayScore)) {
+								return;
+							}
 
-						if (isEmpty($scope.myHomeScore) || isEmpty($scope.myAwayScore)) {
-							return;
-						}
+							reqData.homeScore = $scope.myHomeScore;
+							reqData.awayScore = $scope.myAwayScore;
+							reqData.jakduScheduleId = "${id}";
 
-						reqData.homeScore = $scope.myHomeScore;
-						reqData.awayScore = $scope.myAwayScore;
-						reqData.jakduScheduleId = "${id}";
-
-						var reqPromise = $http.post(bUrl, reqData, config);
-						$scope.goJakdu = true;
-
-						reqPromise.success(function (data, status, headers, config) {
-							console.log("success");
-							$scope.goJakdu = false;
-						});
-						reqPromise.error(function (data, status, headers, config) {
-							alert(data.message);
-							$scope.goJakdu = false;
-						});
-					}
-
-					function getDataSchedule() {
-						var bUrl = '<c:url value="/jakdu/data/schedule/${id}" />';
-
-						if ($scope.dataScheduleConn == "none") {
-
-							var reqPromise = $http.get(bUrl);
-
-							$scope.dataScheduleConn = "loading";
+							var reqPromise = $http.post(bUrl, reqData);
+							$scope.goJakdu = true;
 
 							reqPromise.success(function (data, status, headers, config) {
-
-								if (data.jakduSchedule != null) {
-									$scope.jakduSchedule = data.jakduSchedule;
-								}
-
-								$scope.dataScheduleConn = "none";
+								console.log("success");
+								$scope.goJakdu = false;
 							});
 							reqPromise.error(function (data, status, headers, config) {
-								$scope.dataScheduleConn = "none";
-								$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+								alert(data.message);
+								$scope.goJakdu = false;
 							});
 						}
-					};
 
-				}).controller('commentCtrl', function ($scope, $http) {
-				$scope.boardCommentContentLengthMin = Jakduk.BoardCommentContentLengthMin;
-				$scope.boardCommentContentLengthMax = Jakduk.BoardCommentContentLengthMax;
+						function getDataSchedule() {
+							var bUrl = '<c:url value="/api/jakdu/schedule/${id}" />';
 
-				$scope.comments = [];					// 댓글들
-				$scope.commentAlert = {};				// 댓글 상태 문구
-				$scope.summernoteAlert = {};			// summernote 상태 문구
-				$scope.commentFeelingConn = {};			// 댓글들 좋아요 싫어요 커넥션
-				$scope.commentFeelingAlert = {};		// 댓글들 좋아요 싫어요 상태 문구
-				$scope.numberOfCommentLike = {};		// 댓글들 좋아요 수
-				$scope.numberOfCommentDislike = {};		// 댓글들 싫어요 수
-				$scope.loadCommentConn = "none";		// 댓글 가져오기 커넥션
-				$scope.writeCommentConn = "none";		// 댓글 남기기 커넥션
-				$scope.writeCommentAlert = {};			// 댓글 남기기 버튼 상태 문구
-				$scope.infiniteDisabled = false;		// infinited
+							if ($scope.dataScheduleConn == "none") {
 
-				angular.element(document).ready(function() {
-				});
+								var reqPromise = $http.get(bUrl);
 
-				// summernote config
-				$scope.options = {
-					height : 0,
-					//placeholder: '<spring:message code="board.msg.write.text.here"/>',
-					lang : "${summernoteLang}",
-					toolbar: [
-						['font', ['bold']],
-						// ['fontsize', ['fontsize']], // Still buggy
-						['color', ['color']],
-						['insert', ['link']],
-						['help', ['help']]
-					]
-				};
+								$scope.dataScheduleConn = "loading";
 
-				$scope.focus = function(e) {
-					if ("${authRole}" == "ANNONYMOUS") {
-						if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
-							location.href = "<c:url value='/login'/>";
+								reqPromise.success(function (data, status, headers, config) {
+
+									if (data.jakduSchedule != null) {
+										$scope.jakduSchedule = data.jakduSchedule;
+									}
+
+									$scope.dataScheduleConn = "none";
+								});
+								reqPromise.error(function (data, status, headers, config) {
+									$scope.dataScheduleConn = "none";
+									$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+								});
+							}
+						};
+					})
+					.controller('commentCtrl', function ($scope, $http, jakdukFactory) {
+						$scope.jakdukFactory = jakdukFactory;
+						$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
+						$scope.boardCommentContentLengthMin = Jakduk.BoardCommentContentLengthMin;
+						$scope.boardCommentContentLengthMax = Jakduk.BoardCommentContentLengthMax;
+
+						$scope.comments = [];					// 댓글들
+						$scope.commentAlert = {};				// 댓글 상태 문구
+						$scope.summernoteAlert = {};			// summernote 상태 문구
+						$scope.commentFeelingConn = {};			// 댓글들 좋아요 싫어요 커넥션
+						$scope.commentFeelingAlert = {};		// 댓글들 좋아요 싫어요 상태 문구
+						$scope.numberOfCommentLike = {};		// 댓글들 좋아요 수
+						$scope.numberOfCommentDislike = {};		// 댓글들 싫어요 수
+						$scope.loadCommentConn = "none";		// 댓글 가져오기 커넥션
+						$scope.writeCommentConn = "none";		// 댓글 남기기 커넥션
+						$scope.writeCommentAlert = {};			// 댓글 남기기 버튼 상태 문구
+						$scope.infiniteDisabled = false;		// infinited
+
+						angular.element(document).ready(function() {
+						});
+
+						// summernote config
+						$scope.options = {
+							height : 0,
+							//placeholder: '<spring:message code="board.msg.write.text.here"/>',
+							lang : "${summernoteLang}",
+							toolbar: [
+								['font', ['bold']],
+								// ['fontsize', ['fontsize']], // Still buggy
+								['color', ['color']],
+								['insert', ['link']],
+								['help', ['help']]
+							]
+						};
+
+						$scope.focus = function(e) {
+							if ("${authRole}" == "ANNONYMOUS") {
+								if (confirm('<spring:message code="board.msg.need.login.for.write"/>') == true) {
+									location.href = "<c:url value='/login'/>";
+								}
+							}
+						};
+
+						if ("${authRole}" == "ANNONYMOUS") {
+							$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login.for.write"/>'};
 						}
-					}
-				};
 
-				if ("${authRole}" == "ANNONYMOUS") {
-					$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="board.msg.need.login.for.write"/>'};
-				}
+						// 댓글 남기기
+						$scope.btnWriteComment = function() {
+							var bUrl = '<c:url value="/api/jakdu/schedule/comment"/>';
 
-				$scope.objectIdFromDate = function(date) {
-					return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
-				};
+							if ($scope.summernote.contents.length < Jakduk.BoardCommentContentLengthMin
+									|| $scope.summernote.contents.length > Jakduk.BoardCommentContentLengthMax) {
+								$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.board.comment.content"/>'};
+								return;
+							}
 
-				$scope.dateFromObjectId = function(objectId) {
-					return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
-				};
+							if ($scope.writeCommentConn == "none") {
+								var reqPromise = $http.post(bUrl, $scope.summernote);
+								$scope.writeCommentConn = "connecting";
+								//$scope.writeCommentAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
+								$scope.writeComment = true;
 
-				$scope.intFromObjectId = function(objectId) {
-					return parseInt(objectId.substring(0, 8), 16) * 1000;
-				};
+								reqPromise.success(function(data, status, headers, config) {
+									$scope.btnMoreComment();
 
-				// 댓글 남기기
-				$scope.btnWriteComment = function() {
-					var bUrl = '<c:url value="/jakdu/schedule/comment"/>';
+									$scope.summernote.contents = "";
+									$scope.commentAlert = {};
+									$scope.summernoteAlert = {};
+									$scope.writeCommentAlert = {};
+									$scope.writeCommentConn = "none";
+									$scope.writeComment = false;
+								});
+								reqPromise.error(function(data, status, headers, config) {
+									$scope.writeCommentAlert = {"classType":"text-danger", "msg":data.message};
+									$scope.writeCommentConn = "none";
+									$scope.writeComment = false;
+								});
+							}
+						};
 
-					if ($scope.summernote.contents.length < Jakduk.BoardCommentContentLengthMin
-							|| $scope.summernote.contents.length > Jakduk.BoardCommentContentLengthMax) {
-						$scope.summernoteAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.board.comment.content"/>'};
-						return;
-					}
+						// infinite 초기 설정
+						$scope.initComment = function() {
+							$scope.loadComments("init", "");
+							$scope.infiniteDisabled = true;
+						};
 
-					if ($scope.writeCommentConn == "none") {
-						var reqPromise = $http.post(bUrl, $scope.summernote, config);
-						$scope.writeCommentConn = "connecting";
-						//$scope.writeCommentAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
-						$scope.writeComment = true;
+						// 댓글 목록 가져오기.
+						$scope.loadComments = function(type, commentId) {
+							var bUrl = '<c:url value="/api/jakdu/schedule/comments/${id}?commentId=' + commentId + '"/>';
 
-						reqPromise.success(function(data, status, headers, config) {
-							$scope.btnMoreComment();
+							if ($scope.loadCommentConn == "none") {
+								var reqPromise = $http.get(bUrl);
 
-							$scope.summernote.contents = "";
+								$scope.loadCommentConn = "connecting";
+
+								reqPromise.success(function(data, status, headers, config) {
+
+									$scope.commentCount = data.count;
+
+									if (data.comments.length < 1) { // 댓글이 하나도 없을때
+										if (type == "init") {
+										} else {
+											$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
+											$scope.commentAlert.classType = "bg-warning";
+										}
+									} else {	// 댓글을 1개 이상 가져왔을 때
+										if (type == "init" || type == "btnRefreshComment") {
+											$scope.comments = data.comments;
+										} else if (type == "btnMoreComment" || type == "btnWriteComment") {
+											$scope.comments = $scope.comments.concat(data.comments);
+										}
+									}
+
+									$scope.loadCommentConn = "none";
+								});
+								reqPromise.error(function(data, status, headers, config) {
+									$scope.loadCommentConn = "none";
+								});
+							}
+						};
+
+						// 댓글 더보기 단추.
+						$scope.btnMoreComment = function() {
+							if ($scope.comments.length > 0) {
+								var lastComment = $scope.comments[$scope.comments.length - 1];
+								$scope.loadComments("btnMoreComment", lastComment.id);
+							} else {
+								$scope.loadComments("btnMoreComment", "");
+							}
+						};
+
+						// 댓글 새로고침 단추.
+						$scope.btnRefreshComment = function() {
 							$scope.commentAlert = {};
-							$scope.summernoteAlert = {};
-							$scope.writeCommentAlert = {};
-							$scope.writeCommentConn = "none";
-							$scope.writeComment = false;
-						});
-						reqPromise.error(function(data, status, headers, config) {
-							$scope.writeCommentAlert = {"classType":"text-danger", "msg":data.message};
-							$scope.writeCommentConn = "none";
-							$scope.writeComment = false;
-						});
-					}
-				};
+							$scope.comments = [];
+							$scope.loadComments("btnRefreshComment", "");
+						};
 
-				// infinite 초기 설정
-				$scope.initComment = function() {
-					$scope.loadComments("init", "");
-					$scope.infiniteDisabled = true;
-				};
+						// 댓글 감정 표현
+						$scope.btnCommentFeeling = function(commentId, status) {
 
-				// 댓글 목록 가져오기.
-				$scope.loadComments = function(type, commentId) {
-					var bUrl = '<c:url value="/jakdu/schedule/comments/${id}?commentId=' + commentId + '"/>';
+							var bUrl = '<c:url value="/api/jakdu/schedule/comment/' + commentId + '/' + status + '"/>';
+							var conn = $scope.commentFeelingConn[commentId];
 
-					if ($scope.loadCommentConn == "none") {
-						var reqPromise = $http.get(bUrl);
+							if (conn == "none" || conn == null) {
+								var reqPromise = $http.post(bUrl);
 
-						$scope.loadCommentConn = "connecting";
+								$scope.commentFeelingConn[commentId] = "loading";
 
-						reqPromise.success(function(data, status, headers, config) {
+								reqPromise.success(function(data, status, headers, config) {
 
-							$scope.commentCount = data.count;
+									if (data.feeling == 'LIKE') {
+										$scope.numberOfCommentLike[commentId] = data.numberOfLike;
+									} else if (data.feeling == 'DISLIKE') {
+										$scope.numberOfCommentDislike[commentId] = data.numberOfDislike;
+									}
 
-							if (data.comments.length < 1) { // 댓글이 하나도 없을때
-								if (type == "init") {
-								} else {
-									$scope.commentAlert.msg = '<spring:message code="board.msg.there.is.no.new.comment"/>';
-									$scope.commentAlert.classType = "bg-warning";
-								}
-							} else {	// 댓글을 1개 이상 가져왔을 때
-								if (type == "init" || type == "btnRefreshComment") {
-									$scope.comments = data.comments;
-								} else if (type == "btnMoreComment" || type == "btnWriteComment") {
-									$scope.comments = $scope.comments.concat(data.comments);
-								}
+									$scope.commentFeelingAlert[commentId] = '';
+									$scope.commentFeelingConn[commentId] = "ok";
+
+								});
+								reqPromise.error(function(data, status, headers, config) {
+									$scope.commentFeelingConn[commentId] = "none";
+									$scope.commentFeelingAlert[commentId] = data.message;
+								});
 							}
-
-							$scope.loadCommentConn = "none";
-						});
-						reqPromise.error(function(data, status, headers, config) {
-							$scope.loadCommentConn = "none";
-						});
-					}
-				};
-
-				// 댓글 더보기 버튼.
-				$scope.btnMoreComment = function() {
-					if ($scope.comments.length > 0) {
-						var lastComment = $scope.comments[$scope.comments.length - 1];
-						$scope.loadComments("btnMoreComment", lastComment.id);
-					} else {
-						$scope.loadComments("btnMoreComment", "");
-					}
-				};
-
-				// 댓글 새로고침 버튼.
-				$scope.btnRefreshComment = function() {
-					$scope.commentAlert = {};
-					$scope.comments = [];
-					$scope.loadComments("btnRefreshComment", "");
-				};
-
-				$scope.btnCommentFeeling = function(commentId, status) {
-
-					var bUrl = '<c:url value="/jakdu/schedule/comment/' + status + '/${post.seq}.json?id=' + commentId + '"/>';
-					var conn = $scope.commentFeelingConn[commentId];
-
-					if (conn == "none" || conn == null) {
-						var reqPromise = $http.get(bUrl);
-
-						$scope.commentFeelingConn[commentId] = "loading";
-
-						reqPromise.success(function(data, status, headers, config) {
-							var message = "";
-
-							if (data.errorCode == "like") {
-								$scope.numberOfCommentLike[commentId] = data.numberOfLike;
-							} else if (data.errorCode == "dislike") {
-								$scope.numberOfCommentDislike[commentId] = data.numberOfDislike;
-							} else if (data.errorCode == "already") {
-								message = '<spring:message code="board.msg.select.already.like"/>';
-							} else if (data.errorCode == "anonymous") {
-								message = '<spring:message code="board.msg.need.login.for.feel"/>';
-							} else if (data.errorCode == "writer") {
-								message = "<spring:message code='board.msg.you.are.writer'/>";
-							}
-
-							$scope.commentFeelingAlert[commentId] = message;
-							$scope.commentFeelingConn[commentId] = "ok";
-
-						});
-						reqPromise.error(function(data, status, headers, config) {
-							$scope.commentFeelingConn[commentId] = "none";
-							$scope.commentFeelingAlert[commentId] = '<spring:message code="common.msg.error.network.unstable"/>';
-						});
-					}
-				};
-			});
+						};
+					});
 		</script>
 
 		<jsp:include page="../include/body-footer.jsp"/>

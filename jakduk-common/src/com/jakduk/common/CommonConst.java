@@ -91,15 +91,20 @@ public class CommonConst {
 	public final static String BOARD_USERS_FEELINGS_STATUS_DISLIKE = "dislike";
 	public final static String BOARD_USERS_FEELINGS_STATUS_WRITER = "writer";
 	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
-	
-	/**
-	 * 글의 좋아요, 싫어요
-	 */
+
+	// 게시물 감정 표현. 좋아요, 싫어요
 	public enum FEELING_TYPE {
 		LIKE,
 		DISLIKE
 	}
-	
+
+	// 게시물 감정 표현할때의 에러 코드
+	public enum USER_FEELING_ERROR_CODE {
+		ALREADY,		// 이미 감정 표현을 함
+		WRITER,			// 이 게시물의 작성자라서 감정 표현을 할 수 없음
+		ANONYMOUS		// 인증되지 않은 회원
+	}
+
 	public final static String PRINCIPAL_ANONYMOUSUSER = "anonymousUser";
 	
 	/**
