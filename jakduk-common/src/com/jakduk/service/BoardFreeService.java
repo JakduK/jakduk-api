@@ -18,7 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.exception.UserFeelingException;
 import com.jakduk.model.web.UserFeelingResponse;
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
 import org.json.simple.JSONArray;
@@ -67,6 +68,7 @@ import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.GalleryRepository;
 
 @Service
+@Slf4j
 public class BoardFreeService {
 	
 	@Value("${kakao.javascript.key}")
@@ -98,8 +100,6 @@ public class BoardFreeService {
 	
 	@Autowired
 	private SearchService searchService;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	/**
 	 * 자유게시판 글쓰기 페이지
@@ -344,12 +344,12 @@ public class BoardFreeService {
 		
 		searchService.createDocumentBoard(boardFreeOnEs);
 		
-		if (logger.isInfoEnabled()) {
-			logger.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+		if (log.isInfoEnabled()) {
+			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("boardFree(new) = " + boardFree);
+		if (log.isDebugEnabled()) {
+			log.debug("boardFree(new) = " + boardFree);
 		}
 		
 		return HttpServletResponse.SC_OK;		
@@ -523,12 +523,12 @@ public class BoardFreeService {
 		
 		searchService.createDocumentBoard(boardFreeOnEs);
 
-		if (logger.isInfoEnabled()) {
-			logger.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+		if (log.isInfoEnabled()) {
+			log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("BoardFree(edit) = " + boardFree);
+		if (log.isDebugEnabled()) {
+			log.debug("BoardFree(edit) = " + boardFree);
 		}
 		
 		return HttpServletResponse.SC_OK;
@@ -846,8 +846,8 @@ public class BoardFreeService {
 			
 			searchService.createDocumentComment(commentOnES);
 		} else {
-			if (logger.isDebugEnabled()) {
-				logger.debug("You can't write comment and need to login.");
+			if (log.isDebugEnabled()) {
+				log.debug("You can't write comment and need to login.");
 			}
 		}
 	}
@@ -1021,12 +1021,12 @@ public class BoardFreeService {
 			
 			boardFreeRepository.save(boardFree);
 
-			if (logger.isInfoEnabled()) {
-				logger.info("A post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+			if (log.isInfoEnabled()) {
+				log.info("A post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 			}
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("Delete(post only) post. BoardFree = " + boardFree);
+			if (log.isDebugEnabled()) {
+				log.debug("Delete(post only) post. BoardFree = " + boardFree);
 			}
 			
 			break;
@@ -1034,12 +1034,12 @@ public class BoardFreeService {
 		case CommonConst.BOARD_DELETE_TYPE_ALL:
 			boardFreeRepository.delete(boardFree);
 
-			if (logger.isInfoEnabled()) {
-				logger.info("A post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+			if (log.isInfoEnabled()) {
+				log.info("A post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 			}
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("Delete(all) post. BoardFree = " + boardFree);
+			if (log.isDebugEnabled()) {
+				log.debug("Delete(all) post. BoardFree = " + boardFree);
 			}
 			
 			break;
@@ -1119,12 +1119,12 @@ public class BoardFreeService {
 		
 		boardFreeRepository.save(boardFree);
 		
-		if (logger.isInfoEnabled()) {
-			logger.info("Set notice. post seq=" + boardFree.getSeq() + ", type=" + status.getNotice());
+		if (log.isInfoEnabled()) {
+			log.info("Set notice. post seq=" + boardFree.getSeq() + ", type=" + status.getNotice());
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Set notice. BoardFree = " + boardFree);
+		if (log.isDebugEnabled()) {
+			log.debug("Set notice. BoardFree = " + boardFree);
 		}
 		
 		return HttpServletResponse.SC_OK;

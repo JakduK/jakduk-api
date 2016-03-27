@@ -7,7 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -24,12 +25,12 @@ import com.jakduk.service.CommonService;
  * @date     : 2014. 11. 13.
  * @desc     :
  */
+
+@Slf4j
 public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 	
 	@Autowired
 	CommonService commonService;
-
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	private RequestCache requestCache = new HttpSessionRequestCache();
 
@@ -45,8 +46,8 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 			String addInfoStatus = principal.getAddInfoStatus();	
 			
 			if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Didn't input your additional infomation. Redrict input form.");
+				if (log.isDebugEnabled()) {
+					log.debug("Didn't input your additional infomation. Redrict input form.");
 				}
 				
 				String targetUrl = "/oauth/write";
@@ -60,8 +61,8 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 		if (savedRequest != null) {
 			String targetUrl = savedRequest.getRedirectUrl();
 			
-			if (logger.isDebugEnabled()) {
-				logger.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
+			if (log.isDebugEnabled()) {
+				log.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
 			}
 			
 			getRedirectStrategy().sendRedirect(request, response, targetUrl);
@@ -70,14 +71,14 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 		
 		if (loginRedirect != null) {
 			if (commonService.isRedirectUrl(loginRedirect)) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Redirecting to this Url: " + loginRedirect);
+				if (log.isDebugEnabled()) {
+					log.debug("Redirecting to this Url: " + loginRedirect);
 				}
 				getRedirectStrategy().sendRedirect(request, response, loginRedirect);
 				return;
 			} else {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Don't redirect to this Url" + loginRedirect);
+				if (log.isDebugEnabled()) {
+					log.debug("Don't redirect to this Url" + loginRedirect);
 				}
 			}
 		}

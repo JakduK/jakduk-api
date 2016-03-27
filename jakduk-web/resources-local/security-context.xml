@@ -3,13 +3,10 @@
     xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
     xmlns:beans="http://www.springframework.org/schema/beans" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
            http://www.springframework.org/schema/security
            http://www.springframework.org/schema/security/spring-security-4.0.xsd
-           http://www.springframework.org/schema/util 
-           http://www.springframework.org/schema/util/spring-util-4.0.xsd
            http://www.springframework.org/schema/security/oauth2 
            http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
        
@@ -40,10 +37,14 @@
 		<intercept-url pattern="/sample" access="hasRole('ROLE_ROOT')" />		
 		
 		<form-login login-page="/login"
-			username-parameter="j_username" 
-			password-parameter="j_password" 
+			username-parameter="j_username"
+			password-parameter="j_password"
 			authentication-success-handler-ref="jakdukSuccessHandler" 
 			authentication-failure-handler-ref="jakdukFailureHandler"/>
+
+		<!--
+		<remember-me user-service-ref="jakdukDetailsService"/>
+		-->
 			
 		<access-denied-handler error-page="/error/denied" />
 		
@@ -53,7 +54,12 @@
 		
 		<logout invalidate-session="true" delete-cookies="JSESSIONID" logout-url="/logout" logout-success-url="/logout/success"/>					
 	</http>
-	
+
+	<beans:bean id="ipTokenBasedRememberMeServicesBean" class="com.jakduk.authentication.jakduk.IPTokenBasedRememberMeServices">
+		<beans:constructor-arg value="jakduk"/>
+		<beans:constructor-arg ref="jakdukDetailsService"/>
+	</beans:bean>
+
 	<beans:bean id="jakdukSuccessHandler" class="com.jakduk.authentication.jakduk.JakdukSuccessHandler"/>
 	<beans:bean id="jakdukFailureHandler" class="com.jakduk.authentication.jakduk.JakdukFailureHandler"/>
 	
@@ -85,7 +91,9 @@
 		authentication-scheme="query"
 		token-name="access_token" 
 		pre-established-redirect-uri="/"
-		client-authentication-scheme="form"/>		
+		client-authentication-scheme="form"/>
+
+	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
 
 	<!-- Facebook 서버에 접속하기 위한 RestTemplate -->	
 	<oauth:rest-template id="facebookRestTemplate" resource="facebook"/>
@@ -104,8 +112,7 @@
 		<beans:property name="daumRestTemplate" ref="daumRestTemplate"/>
 		<beans:property name="profileUri" value="#{daumProp['daum.profile-uri']}"/>
 	</beans:bean>
-	
-	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
+
 	<beans:bean id="jakdukDetailsService" class="com.jakduk.authentication.jakduk.JakdukDetailsService"/>	
 	
 	<beans:bean id="oauthFilter" class="com.jakduk.authentication.common.OAuthProcessingFilter">
@@ -122,7 +129,7 @@
 		<beans:property name="daumService" ref="daumService"/>
 	</beans:bean>
 	
-	<beans:bean id="jakdukAuthenticationProvider" class="com.jakduk.authentication.jakduk.JakdukAuthenticationProvider">
+	<beans:bean id="jakdukAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
 		<beans:property name="passwordEncoder" ref="encoder"/>
 		<beans:property name="userDetailsService" ref="jakdukDetailsService"/>
 	</beans:bean>

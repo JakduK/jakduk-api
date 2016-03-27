@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,7 @@ import com.jakduk.service.UserService;
  */
 
 @Controller
+@Slf4j
 @RequestMapping("/oauth")
 @SessionAttributes({"OAuthUserWrite", "footballClubs"})
 public class OAuthWriteController {
@@ -44,8 +46,6 @@ public class OAuthWriteController {
 	@Resource
 	LocaleResolver localeResolver;
 
-	private Logger logger = Logger.getLogger(this.getClass());
-	
 	@RequestMapping(value = "/write", method = RequestMethod.GET)
 	public String write(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
@@ -65,8 +65,8 @@ public class OAuthWriteController {
 	public String write(@Valid OAuthUserWrite oAuthUserWrite, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);	
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "oauth/write";
 		}
@@ -74,8 +74,8 @@ public class OAuthWriteController {
 		userService.checkOAuthProfileUpdate(oAuthUserWrite, result);
 		
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "oauth/write";
 		}

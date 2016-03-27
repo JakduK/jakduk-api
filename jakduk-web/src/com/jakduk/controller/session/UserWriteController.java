@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +33,7 @@ import com.jakduk.service.UserService;
  */
 
 @Controller
+@Slf4j
 @RequestMapping("/user")
 @SessionAttributes({"userWrite", "footballClubs"})
 public class UserWriteController {
@@ -44,9 +46,7 @@ public class UserWriteController {
 	
 	@Resource
 	LocaleResolver localeResolver;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	@RequestMapping(value = "/write", method = RequestMethod.GET)
 	public String write(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,
@@ -65,14 +65,14 @@ public class UserWriteController {
 			HttpServletRequest request, HttpServletResponse response) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "user/write";
 		}
 		
 		userService.checkUserWrite(userWrite, result);
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "user/write";
 		}
 		

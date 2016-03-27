@@ -6,7 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
@@ -25,8 +25,6 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 	
 	@Autowired
 	CommonService commonService;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request,

@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.jongo.MongoCollection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +45,7 @@ public class BoardDAO {
 	
 	@Resource
 	private JongoR jongoR;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("boardItem.seq").in(arrSeq));

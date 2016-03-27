@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,12 +20,11 @@ import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.repository.UserRepository;
 
 @Service
+@Slf4j
 public class JakdukDetailsService implements UserDetailsManager {
 	
 	@Autowired
 	UserRepository userRepository;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -45,8 +45,8 @@ public class JakdukDetailsService implements UserDetailsManager {
 						, user.getPassword(), user.getUsername(), CommonConst.AUTH_TYPE_JAKDUK
 						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 				
-				if (logger.isInfoEnabled()) {
-					logger.info("load Jakduk username=" + jakdukPrincipal.getUsername());
+				if (log.isInfoEnabled()) {
+					log.info("load Jakduk username=" + jakdukPrincipal.getUsername());
 				}
 
 				return jakdukPrincipal;

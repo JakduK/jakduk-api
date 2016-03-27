@@ -12,7 +12,8 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ import com.jakduk.repository.TokenRepository;
 import com.jakduk.repository.UserRepository;
 
 @Service
+@Slf4j
 public class EmailService {
 
 	@Autowired
@@ -49,15 +51,13 @@ public class EmailService {
 	@Value("${email.url.static.resource}")
 	private String staticResourceUrl;
 
-	private Logger logger = Logger.getLogger(this.getClass());
-
 	public void sendResetPassword(String host, Locale locale, String email) {
 		if (Objects.isNull(userRepository.findByEmail(email))) {
 			return;
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("send email to reset password. email is " + email);
+		if (log.isDebugEnabled()) {
+			log.debug("send email to reset password. email is " + email);
 		}
 
 		try {
@@ -97,7 +97,7 @@ public class EmailService {
 			}
 			tokenRepository.insert(token);
 		} catch (MessagingException e) {
-			logger.error(e);
+			log.error("error", e);
 		}
 	}
 }

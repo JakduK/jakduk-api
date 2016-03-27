@@ -2,7 +2,8 @@ package com.jakduk.authentication.facebook;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestOperations;
 
 /**
@@ -11,8 +12,10 @@ import org.springframework.web.client.RestOperations;
  * @date     : 2014. 7. 27.
  * @desc     :
  */
+
+@Slf4j
 public class FacebookService {
-	private Logger logger = Logger.getLogger(this.getClass());	
+
 	private String profileUri;
 	private RestOperations facebookRestTemplate;
 
@@ -29,8 +32,8 @@ public class FacebookService {
 		//logger.debug("phjang user=" + facebookRestTemplate.getForObject(profileUri, Map.class));
 		FacebookUser facebookUser = facebookRestTemplate.getForObject(profileUri, FacebookUser.class);
 		
-		if(logger.isInfoEnabled()) {
-			logger.info(facebookUser);
+		if(log.isInfoEnabled()) {
+			log.info("facebookuser", facebookUser);
 		}
 		
 		return facebookUser;

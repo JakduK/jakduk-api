@@ -1,6 +1,5 @@
 package com.jakduk.authentication.facebook;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,9 +24,7 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 	private OAuthDetailService oauthDetailService;
 	
 	private FacebookService facebookService;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	public void setFacebookService(FacebookService facebookService) {
 		this.facebookService = facebookService;
 	}

@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,8 +43,6 @@ public class OAuthController {
 	@Resource
 	LocaleResolver localeResolver;
 
-	private Logger logger = Logger.getLogger(this.getClass());
-	
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)
 	public String profile(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(required = false) String lang,

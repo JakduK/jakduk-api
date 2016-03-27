@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.repository.*;
-import org.apache.log4j.Logger;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -65,11 +65,6 @@ public class HomeService {
 	@Autowired
 	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
 
-	@Autowired
-	private FootballClubOriginRepository footballClubOriginRepository;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
 	public Model getHome(Model model, Locale locale) {
 		
 		try {

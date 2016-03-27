@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.exception.UnauthorizedAccessException;
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +53,7 @@ import com.jakduk.repository.GalleryRepository;
  */
 
 @Service
+@Slf4j
 public class GalleryService {
 	
 	@Value("${storage.image.path}")
@@ -78,8 +79,6 @@ public class GalleryService {
 	
 	@Autowired
 	private SearchService searchService;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
 	
 	public void getList(Model model, Locale locale) {
 		try {
@@ -187,8 +186,8 @@ public class GalleryService {
 				ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
 			}
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("gallery info=" + gallery);
+			if (log.isDebugEnabled()) {
+				log.debug("gallery info=" + gallery);
 			}
 
 			return gallery;

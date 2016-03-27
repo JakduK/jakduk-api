@@ -6,7 +6,8 @@ import java.util.List;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.repository.FootballClubOriginRepository;
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -44,6 +45,7 @@ import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
 
 @Service
+@Slf4j
 public class UserService {
 	
 	@Autowired
@@ -69,9 +71,7 @@ public class UserService {
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	public void create(User user) {
 		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
 		
@@ -141,12 +141,12 @@ public class UserService {
 		
 		this.create(user);
 		
-		if (logger.isInfoEnabled()) {
-			logger.info("new user joined. email=" + user.getEmail() + ", username=" + user.getUsername());
+		if (log.isInfoEnabled()) {
+			log.info("new user joined. email=" + user.getEmail() + ", username=" + user.getUsername());
 		}
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("user=" + user);
+		if (log.isDebugEnabled()) {
+			log.debug("user=" + user);
 		}
 	}
 	
@@ -280,12 +280,12 @@ public class UserService {
 		
 		user.setOauthUser(oAuthUser);
 		
-		if (logger.isInfoEnabled()) {
-			logger.info("OAuth user =" + user.getUsername() + "'s additional infomation are update.");
+		if (log.isInfoEnabled()) {
+			log.info("OAuth user =" + user.getUsername() + "'s additional infomation are update.");
 		}
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("OAuth user=" + user);
+		if (log.isDebugEnabled()) {
+			log.debug("OAuth user=" + user);
 		}
 		
 		userRepository.save(user);
@@ -388,8 +388,8 @@ public class UserService {
 			user.setSupportFC(supportFC);
 		}
 		
-		if (logger.isInfoEnabled()) {
-			logger.info("jakduk user update. id=" + user.getId() + ", username=" + user.getUsername());
+		if (log.isInfoEnabled()) {
+			log.info("jakduk user update. id=" + user.getId() + ", username=" + user.getUsername());
 		}
 		
 		userRepository.save(user);
@@ -439,8 +439,8 @@ public class UserService {
 		
 		this.create(user);
 		
-		if (logger.isInfoEnabled()) {
-			logger.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
+		if (log.isInfoEnabled()) {
+			log.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
 		}
 	}
 
@@ -449,8 +449,8 @@ public class UserService {
 		user.setPassword(password);
 		this.create(user);
 
-		if (logger.isInfoEnabled()) {
-			logger.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
+		if (log.isInfoEnabled()) {
+			log.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
 		}
 	}
 

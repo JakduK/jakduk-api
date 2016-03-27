@@ -9,7 +9,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,10 +28,10 @@ import com.jakduk.common.CommonConst;
  * @date     : 2014. 10. 11.
  * @desc     :
  */
+
+@Slf4j
 public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
-	private Logger logger = Logger.getLogger(this.getClass());
-	
 	protected OAuthProcessingFilter(String defaultFilterProcessesUrl) {
 		super(defaultFilterProcessesUrl);
 	}
@@ -46,8 +47,8 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 				!httpRequest.getServletPath().equals("/oauth/write"))) {
 			SecurityContextHolder.getContext().setAuthentication(null);
 			
-			if (logger.isInfoEnabled()) {
-				logger.info("oauth was cancled. Authentication object was deleted.");
+			if (log.isInfoEnabled()) {
+				log.info("oauth was cancled. Authentication object was deleted.");
 			}
 		}
 		

@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +25,7 @@ import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
 @Controller
+@Slf4j
 @RequestMapping("/user")
 public class UserController {
 	
@@ -35,9 +37,7 @@ public class UserController {
 	
 	@Resource
 	LocaleResolver localeResolver;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	@RequestMapping
 	public String root() {
 		
@@ -46,11 +46,11 @@ public class UserController {
 	
 	@RequestMapping(value = "/list")
 	public void list(Model model) {
-		
-		logger.debug("/test : " + userService.testFindId("test02"));
+
+		log.debug("/test : " + userService.testFindId("test02"));
 		
 		List<User> users = userService.findAll();
-		logger.debug("/list : " + users);
+		log.debug("/list : " + users);
 		
 		model.addAttribute("list", users);
 	}
@@ -81,15 +81,15 @@ public class UserController {
 	public String passwordUpdate(@Valid UserPasswordUpdate userPasswordUpdate, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "user/passwordUpdate";
 		}
 		
 		userService.checkUserPasswordUpdate(userPasswordUpdate, result);
 		
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "user/passwordUpdate";
 		}

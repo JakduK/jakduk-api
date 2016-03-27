@@ -2,7 +2,7 @@ package com.jakduk.common;
 
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -15,8 +15,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
  * @desc     :
  */
 public class FilterModifiy implements BeanDefinitionRegistryPostProcessor {
-	
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	@Override
 	public void postProcessBeanFactory( ConfigurableListableBeanFactory beanFactory) throws BeansException {

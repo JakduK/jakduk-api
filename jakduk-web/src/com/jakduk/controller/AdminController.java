@@ -6,7 +6,8 @@ import com.jakduk.model.db.*;
 import com.jakduk.model.web.*;
 import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
 import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,14 +28,13 @@ import com.jakduk.service.AdminService;
  */
 
 @Controller
+@Slf4j
 @RequestMapping("/admin")
 public class AdminController {
 	
 	@Autowired
 	private AdminService adminService;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	@RequestMapping
 	public String root() {
 		
@@ -107,7 +107,7 @@ public class AdminController {
 	public String encyclopediaWrite(@Valid Encyclopedia encyclopedia, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "encyclopedia/write";
 		}
 		
@@ -142,7 +142,7 @@ public class AdminController {
 	public String footballClubWrite(@Valid FootballClubWrite footballClubWrite, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/footballClubWrite";
 		}
 		
@@ -177,7 +177,7 @@ public class AdminController {
 	public String footballClubOriginWrite(@Valid FootballClubOrigin footballClubOrigin, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/footballClubOriginWrite";
 		}
 		
@@ -212,7 +212,7 @@ public class AdminController {
 	public String boardCategoryWrite(@Valid BoardCategoryWrite boardCategoryWtite, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/boardCategoryWrite";
 		}
 		
@@ -241,7 +241,7 @@ public class AdminController {
 	public String thumbnailSizeWrite(@Valid ThumbnailSizeWrite thumbnailSizeWrite, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/thumbnailSizeWrite";
 		}
 		
@@ -269,7 +269,7 @@ public class AdminController {
 	public String homeDescriptionWrite(@Valid HomeDescription homeDescription, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/homeDescriptionWrite";
 		}
 		
@@ -303,7 +303,7 @@ public class AdminController {
 	public String attendanceLeagueWrite(@Valid AttendanceLeague attendanceLeague, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/attendanceLeagueWrite";
 		}
 		
@@ -347,7 +347,7 @@ public class AdminController {
 	public String attendanceClubWrite(@Valid AttendanceClubWrite attendanceClubWrite, BindingResult result) {
 		
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/attendanceClubWrite";
 		}
 		
@@ -381,7 +381,7 @@ public class AdminController {
 	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.POST)
 	public String jakduScheduleWrite(@Valid JakduScheduleWrite jakduScheduleWrite, BindingResult result) {
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/jakduScheduleWrite";
 		}
 
@@ -423,7 +423,7 @@ public class AdminController {
 	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.POST)
 	public String jakduScheduleGroupWrite(@Valid JakduScheduleGroupWrite jakduScheduleGroupWrite, BindingResult result) {
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/jakduScheduleGroupWrite";
 		}
 
@@ -465,7 +465,7 @@ public class AdminController {
 	@RequestMapping(value = "/competition/write", method = RequestMethod.POST)
 	public String competitionWrite(@Valid CompetitionWrite competitionWrite, BindingResult result) {
 		if (result.hasErrors()) {
-			logger.debug("result=" + result);
+			log.debug("result=" + result);
 			return "admin/competitionWrite";
 		}
 

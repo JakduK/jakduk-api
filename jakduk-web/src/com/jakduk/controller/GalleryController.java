@@ -7,7 +7,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,7 @@ import com.jakduk.service.GalleryService;
  */
 
 @Controller
+@Slf4j
 @RequestMapping("/gallery")
 public class GalleryController {
 	
@@ -42,9 +44,7 @@ public class GalleryController {
 	
 	@Resource
 	LocaleResolver localeResolver;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	@RequestMapping
 	public String root() {
 		
@@ -84,7 +84,7 @@ public class GalleryController {
 		Integer status = galleryService.getImage(response, id);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
-			logger.error("image error response = " + status);
+			log.error("image error response = " + status);
 			// after the response has been committed 에러가 자꾸 떠서 일단 주석.
 			//response.sendError(status);
 		}
@@ -98,7 +98,7 @@ public class GalleryController {
 		Integer status = galleryService.getThumbnail(response, id);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {
-			logger.error("thumbnail error response = " + status);
+			log.error("thumbnail error response = " + status);
 			// after the response has been committed 에러가 자꾸 떠서 일단 주석.
 			//response.sendError(status);
 		}

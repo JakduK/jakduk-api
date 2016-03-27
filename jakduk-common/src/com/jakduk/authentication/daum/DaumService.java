@@ -2,7 +2,8 @@ package com.jakduk.authentication.daum;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestOperations;
 
 /**
@@ -11,10 +12,10 @@ import org.springframework.web.client.RestOperations;
  * @date     : 2014. 10. 11.
  * @desc     :
  */
+
+@Slf4j
 public class DaumService {
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	private String profileUri;
 	private RestOperations daumRestTemplate;
 	
@@ -31,8 +32,8 @@ public class DaumService {
 //		logger.debug("phjang user=" + daumRestTemplate.getForObject(profileUri, Map.class));
 		DaumUser user = daumRestTemplate.getForObject(profileUri, DaumUser.class);
 		
-		if (logger.isInfoEnabled()) {
-			logger.info(user);
+		if (log.isInfoEnabled()) {
+			log.info("user", user);
 		}
 		
 		return user;

@@ -6,7 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,14 +29,13 @@ import com.jakduk.service.BoardFreeService;
  */
 
 @Controller
+@Slf4j
 @RequestMapping("/board")
 @SessionAttributes({"boardFreeWrite","boardCategorys"})
 public class BoardFreeWriteController {
 
 	@Autowired
 	private BoardFreeService boardFreeService;
-
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	@RequestMapping(value = "/free/write", method = RequestMethod.GET)
 	public String freeWrite(Model model) {
@@ -50,8 +50,8 @@ public class BoardFreeWriteController {
 			, HttpServletRequest request) {
 		
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);	
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "board/freeWrite";
 		}
@@ -81,8 +81,8 @@ public class BoardFreeWriteController {
 			, HttpServletRequest request) {
 
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);	
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "board/freeEdit";
 		}
@@ -90,8 +90,8 @@ public class BoardFreeWriteController {
 		boardFreeService.checkBoardFreeEdit(boardFreeWrite, result);
 		
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);	
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "board/freeEdit";
 		}

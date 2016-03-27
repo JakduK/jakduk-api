@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,7 @@ import com.jakduk.service.UserService;
  */
 
 @Service
+@Slf4j
 public class OAuthDetailService implements UserDetailsService {
 
 	@Autowired
@@ -41,9 +43,7 @@ public class OAuthDetailService implements UserDetailsService {
 	private String username;
 	
 	private String type;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	public String getUsername() {
 		return username;
 	}
@@ -81,12 +81,12 @@ public class OAuthDetailService implements UserDetailsService {
 			
 			user = userRepository.findByOauthUser(type, oauthId);
 			
-			if (logger.isInfoEnabled()) {
-				logger.info("new oauth user joined. username=" + username);
+			if (log.isInfoEnabled()) {
+				log.info("new oauth user joined. username=" + username);
 			}
 			
-			if (logger.isDebugEnabled()) {
-				logger.debug("oauth user info=" + user);
+			if (log.isDebugEnabled()) {
+				log.debug("oauth user info=" + user);
 			}
 		}
 		

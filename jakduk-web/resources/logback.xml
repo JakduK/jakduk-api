@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 30초마다 설정 파일의 변경을 확인한다. 파일이 변경되면 다시 로딩한다 -->
+<configuration scan="false" scanPeriod="30 seconds">
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern> %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${APP_HOME}/sujemall-webapp.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 파일이 하루에 한개씩 생성된다 -->
+            <fileNamePattern>sujemall-webapp.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- maxHIstory 설정은 위 부분에 롤링 정책에 따라 적용되 된다고 보면된다.
+             위 설정데로 라면 30일이 지난 파일은 삭제가 된다.-->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework" level="info"/>
+    <logger name="org.hibernate" level="debug"/>
+    <logger name="com.sujemall.webapp" level="debug"/>
+    <if condition='property("RUN_MODE").equals("SERVICE")'>
+        <then>
+            <!-- 설정파일에 RUN_MODE 가 SERVICE로 정의되어 있으면 로깅 레벨을 INFO로 지정 -->
+            <root level="info">
+                <appender-ref ref="console"/>
+                <appender-ref ref="FILE"/>
+            </root>
+        </then>
+        <!-- 설정파일에 RUN_MODE 가 SERVICE로 정의되어 있지 않으면  로깅 레벨을 DEBUG 지정 -->
+        <else>
+            <root level="debug">
+                <appender-ref ref="console"/>
+                <appender-ref ref="FILE"/>
+            </root>
+        </else>
+    </if>
+</configuration>

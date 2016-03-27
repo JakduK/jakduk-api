@@ -10,7 +10,8 @@ import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.Sequence;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.SequenceRepository;
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +44,7 @@ import java.util.regex.Pattern;
  */
 
 @Service
+@Slf4j
 public class CommonService {
 
 	@Autowired
@@ -59,9 +61,7 @@ public class CommonService {
 
 	@Value("${deny.redirect.url}")
 	private String denyRedirectUrl;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	/**
 	 * 차기 SEQUENCE를 가져온다.
 	 * @param name 게시판 ID
@@ -86,7 +86,7 @@ public class CommonService {
 			Sequence newSequence = new Sequence();
 			newSequence.setName(name);
 			sequenceRepository.save(newSequence);
-			logger.debug("sequence is Null. Insert new Sequence.");
+			log.debug("sequence is Null. Insert new Sequence.");
 			
 			return nextSeq;
 		} else {
@@ -196,7 +196,7 @@ public class CommonService {
 			cookie.setPath(path);
 			response.addCookie(cookie);
 		} catch (UnsupportedEncodingException e) {
-			logger.error(e);
+			log.error(e.getMessage());
 		}
 	}
 	

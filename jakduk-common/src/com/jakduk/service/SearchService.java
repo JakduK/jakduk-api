@@ -8,7 +8,8 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.model.elasticsearch.JakduCommentOnES;
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import io.searchbox.core.SearchResult;
 */
 
 @Service
+@Slf4j
 public class SearchService {
 	
 	@Value("${elasticsearch.index.name}")
@@ -51,8 +53,6 @@ public class SearchService {
 	
 	@Autowired
 	private BoardDAO boardDAO;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	public void getSearch(Model model, Locale locale, String q, String w, int from, int size) {
 		model.addAttribute("q", q);
@@ -69,8 +69,8 @@ public class SearchService {
 	
 	public void getDataSearch(Model model, String q, String w, int from, int size) {
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("q=" + q + ", w=" + w + ", from=" + from + ", size=" + size);
+		if (log.isDebugEnabled()) {
+			log.debug("q=" + q + ", w=" + w + ", from=" + from + ", size=" + size);
 		}
 		
 		if (size <= 0) size = 10;
@@ -165,7 +165,7 @@ public class SearchService {
 			JestResult jestResult = jestClient.execute(index);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.error(jestResult.getErrorMessage());
+				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -180,14 +180,14 @@ public class SearchService {
 			        .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
 			        .build());
 			
-			if (logger.isDebugEnabled()) {
+			if (log.isDebugEnabled()) {
 				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
-					logger.debug("board id " + id + " is not found. so can't delete it!");
+					log.debug("board id " + id + " is not found. so can't delete it!");
 				}
 			}
 			
 			if (!jestResult.isSucceeded()) {
-				logger.error(jestResult.getErrorMessage());
+				log.error(jestResult.getErrorMessage());
 			}
 			
 		} catch (IOException e) {
@@ -240,7 +240,7 @@ public class SearchService {
 			JestResult jestResult = jestClient.execute(index);
 
 			if (!jestResult.isSucceeded()) {
-				logger.error(jestResult.getErrorMessage());
+				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -255,7 +255,7 @@ public class SearchService {
 			JestResult jestResult = jestClient.execute(index);
 
 			if (!jestResult.isSucceeded()) {
-				logger.error(jestResult.getErrorMessage());
+				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -341,7 +341,7 @@ public class SearchService {
 			JestResult jestResult = jestClient.execute(index);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.error(jestResult.getErrorMessage());
+				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -356,14 +356,14 @@ public class SearchService {
 			        .type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
 			        .build());
 			
-			if (logger.isDebugEnabled()) {
+			if (log.isDebugEnabled()) {
 				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
-					logger.debug("gallery id " + id + " is not found. so can't delete it!");
+					log.debug("gallery id " + id + " is not found. so can't delete it!");
 				}
 			}
 			
 			if (!jestResult.isSucceeded()) {
-				logger.error(jestResult.getErrorMessage());
+				log.error(jestResult.getErrorMessage());
 			}
 			
 		} catch (IOException e) {

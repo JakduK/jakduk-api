@@ -1,7 +1,8 @@
 package com.jakduk.controller;
 
 import com.jakduk.model.web.BoardListInfo;
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,10 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
+@Slf4j
 @RequestMapping("/sample")
 public class SampleController {
-
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	@RequestMapping(value = "/summernote01")
 	public String summernote01(Model model) {
@@ -187,7 +187,7 @@ public class SampleController {
 	@RequestMapping(value ="/rest01", method = RequestMethod.POST)
 	@ResponseBody
 	public Map rest01(@RequestBody Map<Object,Object> map) {
-		logger.debug(map);
+		log.debug("map", map);
 
 		Map result = new HashMap<>();
 		result.put("result", Boolean.TRUE);

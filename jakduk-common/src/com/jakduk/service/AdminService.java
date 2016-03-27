@@ -29,7 +29,8 @@ import com.jakduk.model.web.jakdu.JakduScheduleWrite;
 import com.jakduk.repository.*;
 import com.jakduk.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.repository.jakdu.JakduScheduleRepository;
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,7 @@ import io.searchbox.indices.mapping.PutMapping;
  */
 
 @Service
+@Slf4j
 public class AdminService {
 	
 	@Value("${storage.image.path}")
@@ -78,10 +80,7 @@ public class AdminService {
 	
 	@Autowired
 	private CommonService commonService;
-	
-	@Autowired
-	private BoardFreeRepository boardFreeRepository;
-	
+
 	@Autowired
 	private BoardCategoryRepository boardCategoryRepository;
 	
@@ -114,8 +113,6 @@ public class AdminService {
 
 	@Autowired
 	private CompetitionRepository competitionRepository;
-
-	private Logger logger = Logger.getLogger(this.getClass());
 	
 	public String initBoardCategory() {
 		
@@ -147,8 +144,8 @@ public class AdminService {
 			usingBoard.add(CommonConst.BOARD_NAME_FREE);
 			boardCategory03.setUsingBoard(usingBoard);
 			boardCategoryRepository.save(boardCategory03);
-			
-			logger.debug("input board category.");
+
+			log.debug("input board category.");
 			result = "success input board category data at DB";
 		} else {
 			result = "already exist board category at DB.";
@@ -172,7 +169,7 @@ public class AdminService {
 			JestResult jestResult = jestClient.execute(new CreateIndex.Builder(elasticsearchIndexName).settings(settingsBuilder.build().getAsMap()).build());
 			
 			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+				log.debug(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -199,7 +196,7 @@ public String initSearchType() {
 			JestResult jestResult = jestClient.execute(putMapping1);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+				log.debug(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -220,7 +217,7 @@ public String initSearchType() {
 			JestResult jestResult = jestClient.execute(putMapping2);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+				log.debug(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -241,7 +238,7 @@ public String initSearchType() {
 			JestResult jestResult = jestClient.execute(putMapping3);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+				log.debug(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -276,7 +273,7 @@ public String initSearchData() {
 			JestResult jestResult = jestClient.execute(bulk);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+				log.debug(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -310,7 +307,7 @@ public String initSearchData() {
 			JestResult jestResult = jestClient.execute(bulk);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+				log.debug(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -344,7 +341,7 @@ public String initSearchData() {
 			JestResult jestResult = jestClient.execute(bulk);
 			
 			if (!jestResult.isSucceeded()) {
-				logger.debug(jestResult.getErrorMessage());
+				log.debug(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -458,8 +455,8 @@ public String initSearchData() {
 			boardCategory.setUsingBoard(usingBoard);			
 		}
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("boardCategory=" + boardCategory);
+		if (log.isDebugEnabled()) {
+			log.debug("boardCategory=" + boardCategory);
 		}
 		
 		boardCategoryRepository.save(boardCategory);
@@ -607,8 +604,8 @@ public String initSearchData() {
 					if (Files.exists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
 						Files.delete(thumbFilePath);
 					}
-					
-					logger.debug("gallery=" + gallery);
+
+					log.debug("gallery=" + gallery);
 					
 					BufferedInputStream in = new BufferedInputStream(new FileInputStream(imageFilePath.toString()));
 					
@@ -643,8 +640,8 @@ public String initSearchData() {
 			attendanceLeague.setId(null);
 		} 
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("attendanceLeague=" + attendanceLeague);
+		if (log.isDebugEnabled()) {
+			log.debug("attendanceLeague=" + attendanceLeague);
 		}
 		
 		attendanceLeagueReposidory.save(attendanceLeague);
@@ -678,8 +675,8 @@ public String initSearchData() {
 			homeDescription.setId(null);
 		} 
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("homeDescription=" + homeDescription);
+		if (log.isDebugEnabled()) {
+			log.debug("homeDescription=" + homeDescription);
 		}
 		
 		homeDescriptionReposotiry.save(homeDescription);
@@ -702,7 +699,7 @@ public String initSearchData() {
 	
 	public void getAttendanceClubWrite(Model model, String id) {
 		AttendanceClub attendanceClub = attendanceClubRepository.findOne(id);
-		logger.debug("attendanceClub=" + attendanceClub);
+		log.debug("attendanceClub=" + attendanceClub);
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 		
 		AttendanceClubWrite attendanceClubWrite = new AttendanceClubWrite();
@@ -833,8 +830,8 @@ public String initSearchData() {
 			jakduSchedule.setId(jakduScheduleWrite.getId());
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("jakduSchedule=" + jakduSchedule);
+		if (log.isDebugEnabled()) {
+			log.debug("jakduSchedule=" + jakduSchedule);
 		}
 
 		jakduScheduleRepository.save(jakduSchedule);
@@ -847,7 +844,7 @@ public String initSearchData() {
 
 			if (jakduSchedule != null) {
 				jakduScheduleRepository.delete(jakduSchedule);
-				logger.debug("delete JakduSchedule=" + jakduSchedule);
+				log.debug("delete JakduSchedule=" + jakduSchedule);
 				return true;
 			}
 		}
@@ -899,8 +896,8 @@ public String initSearchData() {
 			jakduScheduleGroup.setId(jakduScheduleGroupWrite.getId());
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("jakduScheduleGroup=" + jakduScheduleGroup);
+		if (log.isDebugEnabled()) {
+			log.debug("jakduScheduleGroup=" + jakduScheduleGroup);
 		}
 
 		jakduScheduleGroupRepository.save(jakduScheduleGroup);
@@ -913,7 +910,7 @@ public String initSearchData() {
 
 			if (jakduScheduleGroup != null) {
 				jakduScheduleGroupRepository.delete(jakduScheduleGroup);
-				logger.debug("delete jakduScheduleGroup=" + jakduScheduleGroup);
+				log.debug("delete jakduScheduleGroup=" + jakduScheduleGroup);
 				return true;
 			}
 		}

@@ -5,7 +5,6 @@ import java.util.Locale;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,9 +33,7 @@ public class SearchController {
 	
 	@Autowired
 	private SearchService searchService;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	@RequestMapping
 	public String root(HttpServletRequest request, Model model,
 			@RequestParam(required = false) String q,

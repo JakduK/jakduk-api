@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.log4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,7 @@ import com.jakduk.service.UserService;
  */
 
 @Controller
+@Slf4j
 @RequestMapping("/user")
 @SessionAttributes({"userProfileWrite", "footballClubs"})
 public class UserProfileUpdateController {
@@ -43,9 +45,7 @@ public class UserProfileUpdateController {
 	
 	@Resource
 	LocaleResolver localeResolver;
-	
-	private Logger logger = Logger.getLogger(this.getClass());
-	
+
 	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
 	public String profileUpdate(HttpServletRequest request,
 			@RequestParam(required = false) String lang,
@@ -63,8 +63,8 @@ public class UserProfileUpdateController {
 	public String profileUpdate(@Valid UserProfileWrite userProfileWrite, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "user/profileUpdate";
 		}
@@ -72,8 +72,8 @@ public class UserProfileUpdateController {
 		userService.checkProfileUpdate(userProfileWrite, result);
 		
 		if (result.hasErrors()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("result=" + result);
+			if (log.isDebugEnabled()) {
+				log.debug("result=" + result);
 			}
 			return "user/profileUpdate";
 		}
