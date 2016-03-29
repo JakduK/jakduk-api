@@ -85,9 +85,10 @@
 		pre-established-redirect-uri="oauth/callback?type=daum"
 		client-authentication-scheme="form"/>
 
-	<!-- Facebook 서버에 접속하기 위한 RestTemplate -->	
-	<oauth:rest-template resource="facebook" id="facebookRestTemplate" />
-	
+	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
+
+	<!-- Facebook 서버에 접속하기 위한 RestTemplate -->
+	<oauth:rest-template id="facebookRestTemplate" resource="facebook"/>
 	<oauth:rest-template id="daumRestTemplate" resource="daum"/>
 	
 	<!-- OAuth 2.0 Client를 연동 시키기 위한 Filter 생성 -->
@@ -103,8 +104,7 @@
 		<beans:property name="daumRestTemplate" ref="daumRestTemplate"/>
 		<beans:property name="profileUri" value="#{daumProp['daum.profile-uri']}"/>
 	</beans:bean>
-	
-	<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
+
 	<beans:bean id="jakdukDetailsService" class="com.jakduk.authentication.jakduk.JakdukDetailsService"/>	
 	
 	<beans:bean id="oauthFilter" class="com.jakduk.authentication.common.OAuthProcessingFilter">
@@ -120,10 +120,10 @@
 	<beans:bean id="daumAuthenticationProvider" class="com.jakduk.authentication.daum.DaumAuthenticationProvider">
 		<beans:property name="daumService" ref="daumService"/>
 	</beans:bean>
-	
-	<beans:bean id="jakdukAuthenticationProvider" class="com.jakduk.authentication.jakduk.JakdukAuthenticationProvider">
+
+	<beans:bean id="jakdukAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
 		<beans:property name="passwordEncoder" ref="encoder"/>
 		<beans:property name="userDetailsService" ref="jakdukDetailsService"/>
-	</beans:bean>	
+	</beans:bean>
 
 </beans:beans>
