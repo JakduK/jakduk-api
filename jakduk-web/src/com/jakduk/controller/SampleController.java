@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Controller
 @Slf4j
@@ -133,7 +134,7 @@ public class SampleController {
 	
 	@RequestMapping(value = "/home02")
 	public String home02(Model model) {
-		
+
 		return "sample/home02";
 	}
 	

@@ -3,17 +3,25 @@
 <!-- 30초마다 설정 파일의 변경을 확인한다. 파일이 변경되면 다시 로딩한다 -->
 <configuration scan="false" scanPeriod="30 seconds">
 
+    <property name="LOG_DIR" value="/usr/local/tomcat/logs" />
+
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern> %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${APP_HOME}/sujemall-webapp.log</file>
+    <appender name="jakdukDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/jakduk.log</file>
+        <append>true</append>
+
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 파일이 하루에 한개씩 생성된다 -->
-            <fileNamePattern>sujemall-webapp.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>jakduk%i.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 5MB -->
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
 
             <!-- maxHIstory 설정은 위 부분에 롤링 정책에 따라 적용되 된다고 보면된다.
              위 설정데로 라면 30일이 지난 파일은 삭제가 된다.-->
@@ -25,23 +33,131 @@
         </encoder>
     </appender>
 
+    <appender name="authDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/auth.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>auth%i.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="boardDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/board.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>board%i.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="galleryDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/gallery.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>gallery%i.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="searchDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/search.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>search%i.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="emailDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/email.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>email%i.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SLACK" class="com.github.maricn.logback.SlackAppender">
+        <!-- Slack API token -->
+        <token>https://hooks.slack.com/services/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</token>
+        <!-- Channel that you want to post - default is #general -->
+        <channel>#jakduk_log</channel>
+        <!-- Formatting (you can use Slack formatting - URL links, code formatting, etc.) -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%-4relative [%thread] %-5level %class - %msg%n</pattern>
+        </layout>
+        <!-- Username of the messages sender -->
+        <username>JAKDUK</username>
+        <!-- Emoji to be used for messages -->
+        <iconEmoji>:stuck_out_tongue_winking_eye:</iconEmoji>
+    </appender>
+
+    <!-- Currently recommended way of using Slack appender -->
+    <appender name="ASYNC_SLACK" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK" />
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
     <logger name="org.springframework" level="info"/>
     <logger name="org.hibernate" level="debug"/>
-    <logger name="com.sujemall.webapp" level="debug"/>
-    <if condition='property("RUN_MODE").equals("SERVICE")'>
-        <then>
-            <!-- 설정파일에 RUN_MODE 가 SERVICE로 정의되어 있으면 로깅 레벨을 INFO로 지정 -->
-            <root level="info">
-                <appender-ref ref="console"/>
-                <appender-ref ref="FILE"/>
-            </root>
-        </then>
-        <!-- 설정파일에 RUN_MODE 가 SERVICE로 정의되어 있지 않으면  로깅 레벨을 DEBUG 지정 -->
-        <else>
-            <root level="debug">
-                <appender-ref ref="console"/>
-                <appender-ref ref="FILE"/>
-            </root>
-        </else>
-    </if>
+
+    <logger name="com.jakduk.authentication" level="DEBUG">
+        <appender-ref ref="authDailyRollingFile" />
+    </logger>
+
+    <logger name="com.jakduk.service.BoardFreeService" level="DEBUG">
+        <appender-ref ref="boardDailyRollingFile" />
+    </logger>
+
+    <logger name="com.jakduk.service.GalleryService" level="DEBUG">
+        <appender-ref ref="galleryDailyRollingFile" />
+    </logger>
+
+    <logger name="com.jakduk.service.SearchService" level="DEBUG">
+        <appender-ref ref="searchDailyRollingFile" />
+    </logger>
+
+    <logger name="com.jakduk.service.EmailService" level="DEBUG">
+        <appender-ref ref="emailDailyRollingFile" />
+    </logger>
+
+    <root level="debug">
+        <appender-ref ref="console"/>
+        <appender-ref ref="jakdukDailyRollingFile"/>
+        <appender-ref ref="ASYNC_SLACK" />
+    </root>
+
 </configuration>
