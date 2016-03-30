@@ -1,11 +1,11 @@
 /*Wrapping element for Sticky-Footer*/
 html {
-  	min-height: 100%;
-  	position: relative;
+	height: 100%;
 }
 
 body {
-  	margin-bottom: 60px; /* Margin bottom by footer height */
+ 	min-height: 100%;
+ 	position: relative;
 }
 
 /*Coming Soon Page
@@ -31,15 +31,11 @@ body {
 	background: #585f69;
 }
 
-.coming-soon {
-	margin-top: 100px;
-}
-
 .coming-soon,
 .coming-soon-plugin {
 	padding: 20px;
 	text-align: center;
-}  
+}
 
 .coming-soon h1,
 .coming-soon p {
@@ -68,7 +64,7 @@ body {
 }
 
 /* Small devices (tablets, 768px and less) */
-@media (max-width: 768px) { 
+@media (max-width: 768px) {
 	.coming-soon h1 {
 		font-size: 40px;
 	}
@@ -85,23 +81,27 @@ body {
 /*Sticky-Footer
 ------------------------------------*/
 .sticky-footer {
-  	bottom: 0;
-  	width: 100%;
-  	padding: 20px;
-  	position: absolute;
-  	height: 60px; /* Set the fixed height of the footer here */
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	padding: 20px;
+	position: absolute;
 }
-
 .sticky-footer .copyright-space {
 	color: #fff;
 	text-align: center;
 }
+@media (max-height: 800px) {
+	.sticky-footer {
+		position: static;
+	}
+}
 
 /*Countdown
 ------------------------------------*/
-#defaultCountdown { 
+#defaultCountdown {
 	width: 100%;
-	margin: 10px 0; 
+	margin: 10px 0;
 	overflow: hidden;
 }
 
@@ -124,7 +124,7 @@ body {
 	font-weight: 200;
 	font-size: 60px !important;
 	line-height: 65px !important;
-  	font-family: 'Open Sans', sans-serif;	
+  	font-family: 'Open Sans', sans-serif;
 }
 
 #defaultCountdown span.countdown-period {

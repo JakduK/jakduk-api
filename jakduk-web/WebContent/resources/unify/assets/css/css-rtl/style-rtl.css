@@ -1653,3 +1653,8 @@ img.img-mouse {
 .team-v1 li > h3 {
 	color: #555;
 }
+
+/*Hiding arrows for select field in IE*/
+select::-ms-expand {
+  display: none;
+}

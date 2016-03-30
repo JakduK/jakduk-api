@@ -1,7 +1,7 @@
 /*!
  * Cube Portfolio - Responsive jQuery Grid Plugin
  *
- * version: 3.4.2 (12 December, 2015)
+ * version: 3.5.1 (30 January, 2016)
  * require: jQuery v1.7+
  *
  * Copyright 2013-2015, Mihai Buricea (http://scriptpie.com/cubeportfolio/live-preview/)
@@ -2252,7 +2252,8 @@
   left: 0;
   top: 0;
   display: none;
-  overflow-y: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
   z-index: 9990;
   padding: 0 10px; }
@@ -2260,7 +2261,10 @@
     outline: 0 none; }
 
 .cbp-popup-lightbox {
-  background: rgba(0, 0, 0, 0.8); }
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center; }
 
 .cbp-popup-singlePage {
   background: white;
@@ -2270,8 +2274,7 @@
   content: "";
   display: inline-block;
   height: 100%;
-  vertical-align: middle;
-  /*margin-right: -.25em; // it breaks on mobile*/ }
+  vertical-align: middle; }
 
 .cbp-popup-content {
   position: relative;
@@ -2540,6 +2543,9 @@
 .cbp-popup-loading .cbp-popup-loadingBox {
   visibility: visible;
   display: block; }
+
+.cbp-popup-transitionend {
+  overflow-y: scroll; }
 
 .cbp-popup-singlePage {
   left: 100%;
@@ -2854,7 +2860,8 @@
 .cbp-l-inline-desc {
   font: 400 13px/20px "Open Sans", sans-serif;
   color: #474747;
-  margin-top: 25px; }
+  margin-top: 25px;
+  margin-bottom: 20px; }
 
 .cbp-l-inline-view-wrap {
   text-align: right; }
@@ -3613,3 +3620,28 @@
   text-align: center;
   width: 100%;
   font: 13px "Open Sans", sans-serif; }
+
+.cbp-l-project-social a {
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  line-height: 32px;
+  text-align: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 14px;
+  margin-right: 7px; }
+  .cbp-l-project-social a:hover {
+    opacity: .8; }
+
+.cbp-social-fb {
+  background-color: #5070B4; }
+
+.cbp-social-twitter {
+  background-color: #55acee; }
+
+.cbp-social-googleplus {
+  background-color: #E57371; }
+
+.cbp-social-pinterest {
+  background-color: #cb2027; }

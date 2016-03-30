@@ -1,11 +1,11 @@
 /*Wrapping element for Sticky-Footer*/
 html {
-  	min-height: 100%;
-  	position: relative;
+	height: 100%;
 }
 
 body {
-  	margin-bottom: 60px; /* Margin bottom by footer height */
+ 	min-height: 100%;
+ 	position: relative;
 }
 
 /*Coming Soon Page
@@ -28,13 +28,11 @@ body {
 }
 
 .coming-soon {
-	margin-top: 100px;
-}
-
-.coming-soon {
 	padding: 20px;
 	text-align: center;
-}  
+	position: relative;
+	top: -70px;
+}
 
 
 .coming-soon h1,
@@ -64,11 +62,11 @@ body {
 
 .coming-soon h3 {
 	font-size: 16px;
-	margin-bottom: 30px;	
+	margin-bottom: 30px;
 }
 
 /* Small devices (tablets, 768px and less) */
-@media (max-width: 768px) { 
+@media (max-width: 768px) {
 	.coming-soon h1 {
 		font-size: 40px;
 	}
@@ -95,13 +93,17 @@ body {
 /*Sticky-Footer
 ------------------------------------*/
 .sticky-footer {
-  	bottom: 0;
-  	width: 100%;
-  	padding-top: 25px;
-  	position: absolute;
-  	height: 60px; /* Set the fixed height of the footer here */
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	padding-top: 25px;
+	position: absolute;
 }
-
+@media (max-height: 800px) {
+	.sticky-footer {
+		position: static;
+	}
+}
 @media (max-width: 767px) {
 	.sticky-footer {
   		padding-top: 0;
@@ -115,9 +117,9 @@ body {
 
 /*Countdown
 ------------------------------------*/
-#defaultCountdown { 
+#defaultCountdown {
 	width: 100%;
-	margin: 10px 0; 
+	margin: 10px 0;
 	overflow: hidden;
 }
 
@@ -139,7 +141,7 @@ body {
 	font-weight: 200;
 	font-size: 45px !important;
 	line-height: 45px !important;
-  	font-family: 'Open Sans', sans-serif;	
+  	font-family: 'Open Sans', sans-serif;
 }
 
 #defaultCountdown span.countdown-period {

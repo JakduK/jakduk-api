@@ -1,7 +1,7 @@
 /*!
  * Cube Portfolio - Responsive jQuery Grid Plugin
  *
- * version: 3.4.2 (12 December, 2015)
+ * version: 3.5.1 (30 January, 2016)
  * require: jQuery v1.7+
  *
  * Copyright 2013-2015, Mihai Buricea (http://scriptpie.com/cubeportfolio/live-preview/)
@@ -4187,8 +4187,10 @@ if (typeof Object.create !== 'function') {
 
             $('html').css({
                 overflow: 'hidden',
-                paddingRight: window.innerWidth - $(document).width()
+                marginRight: window.innerWidth - $(document).width()
             });
+
+            t.wrap.addClass('cbp-popup-transitionend');
 
             // show the wrapper (lightbox box)
             t.wrap.show();
@@ -4266,11 +4268,6 @@ if (typeof Object.create !== 'function') {
 
             t.scrollTop = $(window).scrollTop();
 
-            $('html').css({
-                overflow: 'hidden',
-                paddingRight: window.innerWidth - $(document).width()
-            });
-
             // go to top of the page (reset scroll)
             t.wrap.scrollTop(0);
 
@@ -4283,15 +4280,19 @@ if (typeof Object.create !== 'function') {
             // if transitionend is not fulfilled
             t.navigationMobile = $();
             t.wrap.one(CubePortfolio.private.transitionend, function() {
-                var width;
+                $('html').css({
+                    overflow: 'hidden',
+                    marginRight: window.innerWidth - $(document).width()
+                });
+
+                t.wrap.addClass('cbp-popup-transitionend');
 
                 // make the navigation sticky
                 if (t.options.singlePageStickyNavigation) {
 
                     t.wrap.addClass('cbp-popup-singlePage-sticky');
 
-                    width = t.wrap[0].clientWidth;
-                    t.navigationWrap.width(width);
+                    t.navigationWrap.width(t.wrap[0].clientWidth);
 
                     if (CubePortfolio.private.browser === 'android' || CubePortfolio.private.browser === 'ios') {
                         // wrap element
@@ -4325,9 +4326,7 @@ if (typeof Object.create !== 'function') {
             if (CubePortfolio.private.browser === 'ie8' || CubePortfolio.private.browser === 'ie9') {
                 // make the navigation sticky
                 if (t.options.singlePageStickyNavigation) {
-                    var width = t.wrap[0].clientWidth;
-
-                    t.navigationWrap.width(width);
+                    t.navigationWrap.width(t.wrap[0].clientWidth);
 
                     setTimeout(function() {
                         t.wrap.addClass('cbp-popup-singlePage-sticky');
@@ -4610,9 +4609,6 @@ if (typeof Object.create !== 'function') {
                 scripts: scripts
             };
 
-            // trigger public event
-            t.cubeportfolio.$obj.trigger('updateSinglePageStart.cbp');
-
             t.finishOpen--;
 
             if (t.finishOpen <= 0) {
@@ -4635,6 +4631,10 @@ if (typeof Object.create !== 'function') {
 
             t.fromAJAX = {};
 
+
+            // trigger public event
+            t.cubeportfolio.$obj.trigger('updateSinglePageStart.cbp');
+
             // instantiate slider if exists
             selectorSlider = t.content.find('.cbp-slider');
             if (selectorSlider) {
@@ -4654,6 +4654,9 @@ if (typeof Object.create !== 'function') {
                 t.slider = null;
             }
 
+            // check for social share icons
+            t.checkForSocialLinks(t.content);
+
             // scroll bug on android and ios
             if (CubePortfolio.private.browser === 'android' || CubePortfolio.private.browser === 'ios') {
                 $('html').css({
@@ -4663,6 +4666,46 @@ if (typeof Object.create !== 'function') {
 
             // trigger public event
             t.cubeportfolio.$obj.trigger('updateSinglePageComplete.cbp');
+        },
+
+        checkForSocialLinks: function(content) {
+            var t = this;
+
+            t.createFacebookShare(content.find('.cbp-social-fb'));
+            t.createTwitterShare(content.find('.cbp-social-twitter'));
+            t.createGooglePlusShare(content.find('.cbp-social-googleplus'));
+            t.createPinterestShare(content.find('.cbp-social-pinterest'));
+        },
+
+        createFacebookShare: function(item) {
+            if (item.length && !item.attr('onclick')) {
+                item.attr('onclick', "window.open('http://www.facebook.com/sharer.php?u=" + encodeURIComponent(window.location.href) + "', '_blank', 'top=100,left=100,toolbar=0,status=0,width=620,height=400'); return false;");
+            }
+        },
+
+        createTwitterShare: function(item) {
+            if (item.length && !item.attr('onclick')) {
+                item.attr('onclick', "window.open('https://twitter.com/intent/tweet?source=" + encodeURIComponent(window.location.href) + "&text=" + encodeURIComponent(document.title) + "', '_blank', 'top=100,left=100,toolbar=0,status=0,width=620,height=300'); return false;");
+            }
+        },
+
+        createGooglePlusShare: function(item) {
+            if (item.length && !item.attr('onclick')) {
+                item.attr('onclick', "window.open('https://plus.google.com/share?url=" + encodeURIComponent(window.location.href) + "', '_blank', 'top=100,left=100,toolbar=0,status=0,width=620,height=450'); return false;");
+            }
+        },
+
+        createPinterestShare: function(item) {
+            if (item.length && !item.attr('onclick')) {
+                var media = '';
+                var firstImg = this.content.find('img')[0];
+
+                if(firstImg) {
+                    media = firstImg.src;
+                }
+
+                item.attr('onclick', "window.open('http://pinterest.com/pin/create/button/?url=" + encodeURIComponent(window.location.href) + "&media=" + media + "', '_blank', 'top=100,left=100,toolbar=0,status=0,width=620,height=400'); return false;");
+            }
         },
 
         updateSinglePageInline: function(html, scripts) {
@@ -4724,6 +4767,9 @@ if (typeof Object.create !== 'function') {
                     t.slider = null;
                     t.deferredInline.done(finishLoading);
                 }
+
+                // check for social share icons
+                t.checkForSocialLinks(t.content);
             });
         },
 
@@ -5010,7 +5056,7 @@ if (typeof Object.create !== 'function') {
             } else if (t.type === 'singlePage') {
                 t.resetWrap();
 
-                t.wrap.removeClass('cbp-popup-ready');
+                t.wrap.removeClass('cbp-popup-ready cbp-popup-transitionend');
 
                 // scroll bug on android and ios
                 if (CubePortfolio.private.browser === 'android' || CubePortfolio.private.browser === 'ios') {
@@ -5043,13 +5089,19 @@ if (typeof Object.create !== 'function') {
 
                         $('html').css({
                             overflow: '',
-                            paddingRight: '',
+                            marginRight: '',
                             position: ''
                         });
 
                         t.navigationWrap.removeAttr('style');
                     }
                 }, 0);
+
+                $('html').css({
+                    overflow: '',
+                    marginRight: '',
+                    position: ''
+                });
 
                 t.wrap.one(CubePortfolio.private.transitionend, function() {
                     // reset content
@@ -5058,11 +5110,6 @@ if (typeof Object.create !== 'function') {
                     // hide the wrap
                     t.wrap.detach();
 
-                    $('html').css({
-                        overflow: '',
-                        paddingRight: '',
-                        position: ''
-                    });
 
                     t.navigationWrap.removeAttr('style');
                 });
@@ -5072,7 +5119,7 @@ if (typeof Object.create !== 'function') {
                 } else {
                     $('html').css({
                         overflow: '',
-                        paddingRight: ''
+                        marginRight: ''
                     });
                 }
 
@@ -5264,7 +5311,13 @@ if (typeof Object.create !== 'function') {
 
             p.$obj.on('click.cbp', p.options.singlePageInlineDelegate, function(e) {
                 e.preventDefault();
-                p.singlePageInline.openSinglePageInline(p.blocksOn, this);
+
+                var oldDate = $.data(this, 'cbp-locked'),
+                    newDate = $.data(this, 'cbp-locked', +new Date());
+
+                if(!oldDate || ((newDate - oldDate) > 300)) {
+                    p.singlePageInline.openSinglePageInline(p.blocksOn, this);
+                }
             });
         }
     };

@@ -1,16 +1,19 @@
 /*404 Error Page v2
 ------------------------------------*/
 
-/*@import url(http://fonts.googleapis.com/css?family=Kite+One);*/
+html {
+	height: 100%;
+}
 
 body {
 	background: #555;
+	min-height: 100%;
 }
 
 .error-v2 {
 	padding: 40px;
 	margin: 60px 0;
-	text-align: center;	
+	text-align: center;
 	background: rgba(0,0,0,0.5);
 }
 
@@ -33,10 +36,10 @@ body {
 }
 
 /*For Mobile Devices*/
-@media (max-width: 500px) { 
+@media (max-width: 500px) {
 	.error-v2 p {
 		font-size: 16px;
-	}	
+	}
 
 	.error-v2 span {
 		font-size: 26px;
@@ -44,6 +47,6 @@ body {
 
 	.error-v2 span.error-v2-title {
 		font-size: 100px;
-		line-height: 120px;		
+		line-height: 120px;
 	}
 }

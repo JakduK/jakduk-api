@@ -558,11 +558,11 @@ body.dark .header-v6 .shopping-cart-open span.shc-total {
 
 	/*Navbar Brand*/
 	body.dark.header-fixed .header-v6.header-fixed-shrink .navbar-brand img.default-logo {
-		display: inherit;
+		display: none;
 	}
 	/*fixed in v1.9*/
 	body.dark.header-fixed .header-v6.header-fixed-shrink .navbar-brand img.shrink-logo {
-		display: none;
+		display: inherit;
 	}
 
 	/*Navbar*/
@@ -1848,13 +1848,19 @@ body.dark .sky-form {
 body.dark .sky-form header,
 body.dark .sky-form fieldset,
 body.dark .sky-form footer {
-	/*background: #222;*/
+	background: #222;
 	border-color: #555;
 }
 
 /*Bug fixed v1.9*/
 body.dark .sky-form.contact-style fieldset {
     background: #252525 none repeat scroll 0% 0%;
+}
+
+
+/*Bug fixed v1.9.1*/
+body.dark .contacts-section .sky-form fieldset {
+	background: transparent none repeat scroll 0% 0%;
 }
 
 body.dark .sky-form header {
