@@ -108,6 +108,13 @@
         </encoder>
     </appender>
 
+    <!-- Currently recommended way of using Slack appender -->
+    <appender name="ASYNC_SLACK" class="com.jakduk.common.SlackAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%-4relative [%thread] %-5level %class - %msg%n</pattern>
+        </layout>
+    </appender>
+
     <logger name="org.springframework" level="info"/>
     <logger name="org.hibernate" level="debug"/>
 
@@ -131,9 +138,10 @@
         <appender-ref ref="emailDailyRollingFile" />
     </logger>
 
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="console"/>
         <appender-ref ref="jakdukDailyRollingFile"/>
+        <appender-ref ref="ASYNC_SLACK" />
     </root>
 
 </configuration>
