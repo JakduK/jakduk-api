@@ -13,79 +13,98 @@
 
 <body class="header-fixed">
 
-<div class="container" ng-controller="userCtrl">
-<jsp:include page="../include/navigation-header.jsp"/>
+	<div class="wrapper" ng-controller="userCtrl">
 
-<legend><spring:message code="user.profile"/></legend>
-<c:choose>
-	<c:when test="${status == 1}">
-		<div class="alert alert-success" role="alert"><spring:message code="user.msg.success.update.profile"/></div>
-	</c:when>
-	<c:when test="${status == 2}">
-		<div class="alert alert-success" role="alert"><spring:message code="user.mgs.success.change.password"/></div>
-	</c:when>                		
-</c:choose>
-<form class="form-horizontal" role="form">
-  <div class="form-group">
-    <label class="col-sm-2 control-label"><spring:message code="user.email"/></label>
-    <div class="col-sm-3">
-      <p class="form-control-static">${userProfile.email}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-2 control-label"><spring:message code="user.nickname"/></label>
-    <div class="col-sm-3">
-      <p class="form-control-static">${userProfile.username}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-2 control-label"><spring:message code="user.support.football.club"/></label>
-    <div class="col-sm-3">
-			<c:choose>
-				<c:when test="${not empty userProfile.footballClubName}">
-					<p class="form-control-static">${userProfile.footballClubName.fullName}</p>
-				</c:when>
-				<c:otherwise>
-					<p class="form-control-static"><spring:message code="common.none"/></p>
-				</c:otherwise>
-			</c:choose>
-    </div>
-  </div>
-	<div class="form-group">
-    <label class="col-sm-2 control-label"><spring:message code="user.comment"/></label>
-    <div class="col-sm-3">
-      <p class="form-control-static">${userProfile.about}</p>
-    </div>
-  </div>    
-	<hr>  
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-4">
-				<a class="btn btn-default" href="<c:url value="/user/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>
-				<a class="btn btn-default" href="<c:url value="/user/password/update"/>"><spring:message code="common.button.user.password.update"/></a>
-			</div> 
-		</div>  
-</form>
+		<jsp:include page="../include/navigation-header.jsp"/>
 
-<jsp:include page="../include/footer.jsp"/>
-</div><!-- /.container -->
+		<!--=== Breadcrumbs ===-->
+		<div class="breadcrumbs">
+			<div class="container">
+				<h1 class="pull-left"><a href="<c:url value="/user/refresh"/>"><spring:message code="user.profile"/></a></h1>
+			</div><!--/container-->
+		</div><!--/breadcrumbs-->
+		<!--=== End Breadcrumbs ===-->
 
-<!-- Bootstrap core JavaScript ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
-<script type="text/javascript">
-var jakdukApp = angular.module("jakdukApp", []);
+			<!--=== Content Part ===-->
+			<div class="container content">
 
-jakdukApp.controller("userCtrl", function($scope) {
-	
-	angular.element(document).ready(function() {
-		App.init();
-	});
-	
-});
-</script>
+				<c:choose>
+					<c:when test="${status == 1}">
+						<div class="alert alert-success" role="alert"><spring:message code="user.msg.success.update.profile"/></div>
+					</c:when>
+					<c:when test="${status == 2}">
+						<div class="alert alert-success" role="alert"><spring:message code="user.mgs.success.change.password"/></div>
+					</c:when>
+				</c:choose>
 
-<jsp:include page="../include/body-footer.jsp"/>
+				<form class="form-horizontal" role="form">
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><spring:message code="user.email"/></label>
+						<div class="col-sm-3">
+							<p class="form-control-static">${userProfile.email}</p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><spring:message code="user.nickname"/></label>
+						<div class="col-sm-3">
+							<p class="form-control-static">${userProfile.username}</p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><spring:message code="user.support.football.club"/></label>
+						<div class="col-sm-3">
+							<c:choose>
+								<c:when test="${not empty userProfile.footballClubName}">
+									<p class="form-control-static">${userProfile.footballClubName.fullName}</p>
+								</c:when>
+								<c:otherwise>
+									<p class="form-control-static"><spring:message code="common.none"/></p>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><spring:message code="user.comment"/></label>
+						<div class="col-sm-3">
+							<p class="form-control-static">${userProfile.about}</p>
+						</div>
+					</div>
+					<hr>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-4">
+							<a class="btn btn-default" href="<c:url value="/user/profile/update"/>"><spring:message code="common.button.user.profile.update"/></a>
+							<a class="btn btn-default" href="<c:url value="/user/password/update"/>"><spring:message code="common.button.user.password.update"/></a>
+						</div>
+					</div>
+				</form>
 
+			</div> <!--=== End Content Part ===-->
+
+		<jsp:include page="../include/footer.jsp"/>
+
+	</div>
+
+	<!-- Bootstrap core JavaScript ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
+	<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		var jakdukApp = angular.module("jakdukApp", []);
+
+		jakdukApp.controller("userCtrl", function($scope) {
+
+			angular.element(document).ready(function() {
+			});
+
+		});
+	</script>
+
+	<jsp:include page="../include/body-footer.jsp"/>
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+			App.init();
+		});
+	</script>
 </body>
 </html>

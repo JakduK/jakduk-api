@@ -99,15 +99,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages/common");
-        messageSource.setBasename("classpath:messages/board");
-        messageSource.setBasename("classpath:messages/user");
-        messageSource.setBasename("classpath:messages/about");
-        messageSource.setBasename("classpath:messages/home");
-        messageSource.setBasename("classpath:messages/gallery");
-        messageSource.setBasename("classpath:messages/stats");
-        messageSource.setBasename("classpath:messages/search");
-        messageSource.setBasename("classpath:messages/jakdu");
+        messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user", "classpath:messages/about",
+                "classpath:messages/home", "classpath:messages/gallery", "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(180);
 

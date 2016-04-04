@@ -69,16 +69,7 @@ public class HomeController {
 		
 		model.addAttribute("existUsername", existUsername);
 	}
-	
-	@RequestMapping(value = "/check/user/update/username")
-	public void checkUpdateUsername(Model model,
-			@RequestParam(required = true) String username) {
-		
-		Boolean existUsername = userService.existUsernameOnUpdate(username);
-		
-		model.addAttribute("existUsername", existUsername);
-	}
-	
+
 	@RequestMapping(value = "/check/oauth/update/username")
 	public void checkOAuthUpdateUsername(Model model,
 			@RequestParam(required = true) String username) {

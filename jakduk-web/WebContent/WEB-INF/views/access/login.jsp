@@ -69,7 +69,9 @@
 							</div>
 
 							<div class="form-group">
+								<!--
 								<input id = "remember_me" name ="remember-me" type = "checkbox"/>Remember me
+								-->
 								<div class="checkbox">
 									<label>
 										<input type="checkbox" name="remember" ng-model="remember">

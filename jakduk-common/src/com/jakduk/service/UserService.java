@@ -2,11 +2,16 @@ package com.jakduk.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
+import com.jakduk.exception.DuplicateDataException;
+import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.repository.FootballClubOriginRepository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -174,7 +179,7 @@ public class UserService {
 		return result;
 	}
 	
-	public Boolean existUsernameOnUpdate(String username) {
+	public Boolean existUsernameOnUpdate(Locale locale, String username) {
 		Boolean result = false;
 		
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
@@ -183,8 +188,11 @@ public class UserService {
 			
 			UserProfile userProfile = userRepository.userFindByNEIdAndUsername(id, username);
 			
-			if (userProfile != null) result = true;
-		} 
+			if (Objects.nonNull(userProfile))
+				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.replicated.data"));
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
 		
 		return result;
 	}
