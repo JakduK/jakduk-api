@@ -52,24 +52,6 @@ public class HomeController {
 		return "home/home";
 	}
 
-	@RequestMapping(value = "/check/user/email")
-	public void checkEmail(Model model,
-			@RequestParam(required = true) String email) {
-		
-		Boolean existEmail = userService.existEmail(email);
-		
-		model.addAttribute("existEmail", existEmail);
-	}
-	
-	@RequestMapping(value = "/check/user/username")
-	public void checkUsername(Model model,
-			@RequestParam(required = true) String username) {
-		
-		Boolean existUsername = userService.existUsernameOnWrite(username);
-		
-		model.addAttribute("existUsername", existUsername);
-	}
-
 	@RequestMapping(value = "/check/oauth/update/username")
 	public void checkOAuthUpdateUsername(Model model,
 			@RequestParam(required = true) String username) {

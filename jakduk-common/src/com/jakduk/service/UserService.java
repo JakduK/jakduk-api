@@ -92,25 +92,7 @@ public class UserService {
 		
 		return mongoTemplate.findOne(query, CommonWriter.class);
 	}
-	
-	public void checkUserWrite(UserWrite userWrite, BindingResult result) {
-		
-		String pwd = userWrite.getPassword();
-		String pwdCfm = userWrite.getPasswordConfirm();
-		
-		if (this.existEmail(userWrite.getEmail())) {
-			result.rejectValue("email", "user.msg.already.email");
-		}
-		
-		if (this.existUsernameOnWrite(userWrite.getUsername())) {
-			result.rejectValue("username", "user.msg.already.username");
-		}
-		
-		if (!pwd.equals(pwdCfm)) {
-			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
-		}
-	}
-	
+
 	public Model getUserWrite(Model model, String language) {
 
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
@@ -163,19 +145,33 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public Boolean existEmail(String email) {
+	public Boolean existEmail(Locale locale, String email) {
 		Boolean result = false;
-		
-		if (userRepository.findOneByEmail(email) != null) result = true;
+
+		if (commonService.isAnonymousUser()) {
+			User user = userRepository.findOneByEmail(email);
+
+			if (Objects.nonNull(user))
+				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.email"));
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+		}
 		
 		return result;
 	}
 	
-	public Boolean existUsernameOnWrite(String username) {
+	public Boolean existUsernameOnWrite(Locale locale, String username) {
 		Boolean result = false;
-		
-		if (userRepository.findOneByUsername(username) != null) result = true;
-		
+
+		if (commonService.isAnonymousUser()) {
+			User user = userRepository.findOneByUsername(username);
+
+			if (Objects.nonNull(user))
+				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.username"));
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+		}
+
 		return result;
 	}
 	

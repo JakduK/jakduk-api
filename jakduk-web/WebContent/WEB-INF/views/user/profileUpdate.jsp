@@ -158,7 +158,7 @@
 
 		$scope.onUsername = function() {
 			if ($scope.userProfileWrite.username.$valid) {
-				var bUrl = '<c:url value="/api/user/exist/update/username/' + $scope.username + '"/>';
+				var bUrl = '<c:url value="/api/user/exist/username/update?username=' + $scope.username + '/"/>';
 
 				if ($scope.usernameConn == "none") {
 					var reqPromise = $http.get(bUrl);
