@@ -42,10 +42,6 @@
 			authentication-success-handler-ref="jakdukSuccessHandler" 
 			authentication-failure-handler-ref="jakdukFailureHandler"/>
 
-		<!--
-		<remember-me user-service-ref="jakdukDetailsService"/>
-		-->
-			
 		<access-denied-handler error-page="/error/denied" />
 		
 		<session-management>

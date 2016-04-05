@@ -43,7 +43,13 @@ public class UserController {
 		
 		return "redirect:/user/list";
 	}
-	
+
+	@RequestMapping(value = "/refresh", method = RequestMethod.GET)
+	public String freeRefresh() {
+
+		return "redirect:/user/profile";
+	}
+
 	@RequestMapping(value = "/list")
 	public void list(Model model) {
 

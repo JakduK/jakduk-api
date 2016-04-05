@@ -1,6 +1,6 @@
 package com.jakduk.service;
 
-import com.jakduk.authentication.common.CommonUserDetails;
+import com.jakduk.authentication.common.CommonUser;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
@@ -171,7 +171,7 @@ public class CommonService {
 		return dateTimeFormat;
 	}
 	
-	public void doOAuthAutoLogin(OAuthPrincipal principal, Object credentials, CommonUserDetails userDetails) {
+	public void doOAuthAutoLogin(OAuthPrincipal principal, Object credentials, CommonUser userDetails) {
 		
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());
 		

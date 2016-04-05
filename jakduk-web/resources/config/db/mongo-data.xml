@@ -12,9 +12,7 @@
       http://www.springframework.org/schema/context
 	  http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<context:property-placeholder properties-ref="deployProperties" />
-
-	<!-- Activate Spring Data MongoDB repository support -->
+		<!-- Activate Spring Data MongoDB repository support -->
 	<mongo:repositories base-package="com.jakduk.repository" />
 
 	<!-- MongoDB host -->

@@ -127,8 +127,8 @@ public class OAuthDetailService implements UserDetailsService {
 		return authorities;
 	}
 	
-	public CommonUserDetails getUserDetails(DaumUser user) {
-		CommonUserDetails userDetails = new CommonUserDetails();
+	public CommonUser getUserDetails(DaumUser user) {
+		CommonUser userDetails = new CommonUser();
 		
 		if (user.getImagePath() != null) {
 			userDetails.setImagePath(user.getImagePath());
@@ -137,8 +137,8 @@ public class OAuthDetailService implements UserDetailsService {
 		return userDetails;
 	}
 	
-	public CommonUserDetails getUserDetails(FacebookUser user) {
-		CommonUserDetails userDetails = new CommonUserDetails();
+	public CommonUser getUserDetails(FacebookUser user) {
+		CommonUser userDetails = new CommonUser();
 		
 		if (user.getEmail() != null) {
 			userDetails.setEmail(user.getEmail());

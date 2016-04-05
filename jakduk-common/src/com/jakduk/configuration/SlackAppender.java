@@ -23,15 +23,18 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     private String webhook;
     private String channel;
     private String username;
+    private Boolean enabled;
     private Layout<ILoggingEvent> layout;
 
     @Override
     protected void append(ILoggingEvent iLoggingEvent) {
 
-        if (iLoggingEvent.getLevel().isGreaterOrEqual(Level.ERROR)) {
-            // Send simple message in different room with custom name
-            SlackApi api = new SlackApi(webhook);
-            api.call(new SlackMessage(channel, username, layout.doLayout(iLoggingEvent)));
+        if (enabled) {
+            if (iLoggingEvent.getLevel().isGreaterOrEqual(Level.ERROR)) {
+                // Send simple message in different room with custom name
+                SlackApi api = new SlackApi(webhook);
+                api.call(new SlackMessage(channel, username, layout.doLayout(iLoggingEvent)));
+            }
         }
     }
 }

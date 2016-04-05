@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.jakduk.configuration.AppConfig;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.mongodb.MongoClient;
 import org.bson.types.ObjectId;
@@ -39,6 +40,7 @@ import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -48,7 +50,8 @@ import com.jakduk.repository.BoardFreeRepository;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath:applicationContext.xml")
+@ContextConfiguration(classes = AppConfig.class)
+@WebAppConfiguration
 public class BoardTest {
 	
 	@Autowired
