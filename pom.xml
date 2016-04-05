@@ -22,7 +22,7 @@
 	  <javax.servlet.jsp-api.version>2.3.1</javax.servlet.jsp-api.version>
 	  <com.fasterxml.jackson.version>2.7.2</com.fasterxml.jackson.version>
 	  <junit.version>4.12</junit.version>
-	  <org.hibernate.validator.version>5.2.2.Final</org.hibernate.validator.version>
+	  <org.hibernate.validator.version>5.2.4.Final</org.hibernate.validator.version>
 	  <org.hibernate.annotations.version>3.5.6-Final</org.hibernate.annotations.version>
 	  <org.projectlombok.version>1.16.6</org.projectlombok.version>
 
@@ -230,6 +230,7 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>${org.hibernate.validator.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>

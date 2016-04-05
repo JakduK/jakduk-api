@@ -236,9 +236,9 @@ public class CommonService {
 		}
 		
 		if (result == false) {
-			Collection<? extends GrantedAuthority> authoritys = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			
-			for (GrantedAuthority authority : authoritys) {
+			for (GrantedAuthority authority : authorities) {
 				if (authority.getAuthority().equals("ROLE_ROOT")) {
 					result = true;
 					break;
