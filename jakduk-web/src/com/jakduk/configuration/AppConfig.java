@@ -23,8 +23,6 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = {"com.jakduk"}, excludeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
 @ImportResource(value = {
-        "classpath:/security-context.xml",
-        "classpath:/config/oauth/oauth-data.xml",
         "classpath:/config/db/mongo-data.xml"})
 public class AppConfig {
 
