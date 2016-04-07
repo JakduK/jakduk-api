@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.ui.velocity.VelocityEngineFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -27,12 +28,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableWebSecurity
 @ImportResource(value = {
-        "classpath:/security-context.xml",
+//        "classpath:/security-context.xml",
         "classpath:/config/oauth/oauth-data.xml"})
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    private JakdukDetailsService jakdukDetailsService;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -44,39 +42,48 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         //http.addFilterAfter()
 
-        http.authorizeRequests()
+        http
+//                .csrf().disable()
+                .authorizeRequests()
                     .antMatchers("/check/**", "/logout", "/home/**", "/about/**").permitAll()
-                    .antMatchers("/login*", "/j_spring_*", "/user/write").anonymous()
+                    .antMatchers("/login*", "/user/write").anonymous()
                     .antMatchers("/user/**", "/oauth/**").authenticated()
-                    .antMatchers("/board/*/write", "/board/*/edit", "/jakdu/write").hasAnyRole("ROLE_USER_01", "ROLE_USER_02", "ROLE_USER_03")
+                    .antMatchers("/board/*/write", "/board/*/edit", "/jakdu/write").hasAnyRole("USER_01", "USER_02", "USER_03")
                     .antMatchers("/admin/**").hasRole("ROOT")
-                    .anyRequest().anonymous()
+                    .anyRequest().permitAll()
                     .and()
                 .formLogin()
                     .loginPage("/login")
                     .usernameParameter("j_username")
-                    .usernameParameter("j_password")
+                    .passwordParameter("j_password")
                     .successHandler(jakdukSuccessHandler())
                     .failureHandler(jakdukFailureHandler())
-                    .permitAll()
                     .and()
                 .logout()
-                    .logoutUrl("/logout")
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                     .logoutSuccessUrl("/logout/success")
                     .and()
-                .csrf().disable();
+                .exceptionHandling().accessDeniedPage("/error/denied")
+                    .and()
+                .sessionManagement().maximumSessions(3).expiredUrl("/error/maxSession");
+//                .and().httpBasic();
+//                    .and()
+//                .apply(new SpringSocialConfigurer());
 
-        http.exceptionHandling().accessDeniedPage("/error/denied");
-        http.sessionManagement().maximumSessions(3).expiredUrl("/error/maxSession");
+
     }
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(jakdukAuthenticationProvider());
+        auth.userDetailsService(jakdukDetailsService()).passwordEncoder(passwordEncoder());
+        //auth.inMemoryAuthentication().withUser("test06@test.com").password("password").roles("ADMIN");
     }
 
+
+    /*
     @Bean
     public DaoAuthenticationProvider jakdukAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -84,6 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         provider.setUserDetailsService(jakdukDetailsService);
         return provider;
     }
+    */
 
     @Bean
     public StandardPasswordEncoder passwordEncoder() {
@@ -98,6 +106,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JakdukFailureHandler jakdukFailureHandler() {
         return new JakdukFailureHandler();
+    }
+
+    @Bean
+    public JakdukDetailsService jakdukDetailsService() {
+        return new JakdukDetailsService();
     }
 
 

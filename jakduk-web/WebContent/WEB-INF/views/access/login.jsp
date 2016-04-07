@@ -43,6 +43,9 @@
 				<div class="row">
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
 						<form action="login" class="reg-page" name="loginForm" method="POST" ng-submit="onSubmit($event)">
+							<input type="hidden"
+								   name="${_csrf.parameterName}"
+								   value="${_csrf.token}"/>
 							<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
 							<div class="reg-header">
 								<h2><spring:message code="user.sign.in.header"/></h2>
