@@ -4,6 +4,9 @@ import com.jakduk.authentication.common.OAuthProcessingFilter;
 import com.jakduk.authentication.jakduk.JakdukDetailsService;
 import com.jakduk.authentication.jakduk.JakdukFailureHandler;
 import com.jakduk.authentication.jakduk.JakdukSuccessHandler;
+import com.jakduk.authentication.social.SocialDetailService;
+import com.jakduk.authentication.social.SocialDetailService2;
+import com.jakduk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +19,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.social.security.SocialUserDetailsService;
+import org.springframework.social.security.SpringSocialConfigurer;
 import org.springframework.ui.velocity.VelocityEngineFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -30,7 +36,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ImportResource(value = {
 //        "classpath:/security-context.xml",
         "classpath:/config/oauth/oauth-data.xml"})
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -43,43 +49,70 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //http.addFilterAfter()
 
         http
-//                .csrf().disable()
-                .authorizeRequests()
-                    .antMatchers("/check/**", "/logout", "/home/**", "/about/**").permitAll()
-                    .antMatchers("/login*", "/user/write").anonymous()
-                    .antMatchers("/user/**", "/oauth/**").authenticated()
-                    .antMatchers("/board/*/write", "/board/*/edit", "/jakdu/write").hasAnyRole("USER_01", "USER_02", "USER_03")
-                    .antMatchers("/admin/**").hasRole("ROOT")
-                    .anyRequest().permitAll()
-                    .and()
+                //                .csrf().disable()
+                //Configures form login
                 .formLogin()
                     .loginPage("/login")
                     .usernameParameter("j_username")
                     .passwordParameter("j_password")
                     .successHandler(jakdukSuccessHandler())
                     .failureHandler(jakdukFailureHandler())
-                    .and()
-                .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID")
-                    .logoutSuccessUrl("/logout/success")
-                    .and()
-                .exceptionHandling().accessDeniedPage("/error/denied")
-                    .and()
-                .sessionManagement().maximumSessions(3).expiredUrl("/error/maxSession");
-//                .and().httpBasic();
-//                    .and()
-//                .apply(new SpringSocialConfigurer());
-
-
+                //Configures the logout function
+                .and()
+                    .logout()
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessUrl("/logout/success")
+                .and()
+                    .exceptionHandling().accessDeniedPage("/error/denied")
+                //Configures url based authorization
+                .and()
+                    .authorizeRequests()
+                        .antMatchers(
+                                "/check/**",
+                                "/logout",
+                                "/home/**",
+                                "/about/**",
+                                "/auth/**"
+                        ).permitAll()
+                        .antMatchers(
+                                "/login*",
+                                "/auth/*",
+                                "/signup/*",
+                                "/user/write"
+                        ).anonymous()
+                        .antMatchers(
+                                "/user/**",
+                                "/oauth/**"
+                        ).authenticated()
+                        .antMatchers(
+                                "/board/*/write",
+                                "/board/*/edit",
+                                "/jakdu/write"
+                        ).hasAnyRole("USER_01", "USER_02", "USER_03")
+                        .antMatchers("/admin/**").hasRole("ROOT")
+                        .anyRequest().permitAll()
+                .and()
+                    .apply(new SpringSocialConfigurer())
+                .and()
+                    .sessionManagement()
+                        .maximumSessions(3).expiredUrl("/error/maxSession");
     }
 
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(jakdukDetailsService()).passwordEncoder(passwordEncoder());
+        auth
+                .userDetailsService(jakdukDetailsService())
+                .passwordEncoder(passwordEncoder());
+
         //auth.inMemoryAuthentication().withUser("test06@test.com").password("password").roles("ADMIN");
+    }
+
+    @Bean
+    public SocialUserDetailsService socialUsersDetailService() {
+        return new SocialDetailService2(socialDetailService());
     }
 
 
@@ -114,4 +147,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    @Bean
+    public SocialDetailService socialDetailService() {
+        return new SocialDetailService();
+    }
 }

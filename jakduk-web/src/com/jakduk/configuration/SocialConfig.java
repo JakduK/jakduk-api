@@ -1,0 +1,66 @@
+package com.jakduk.configuration;
+
+import com.jakduk.configuration.mongo.MongoConnectionTransformers;
+import com.jakduk.configuration.mongo.MongoUsersConnectionRepository;
+import com.mongodb.Mongo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.social.UserIdSource;
+import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
+import org.springframework.social.config.annotation.EnableSocial;
+import org.springframework.social.config.annotation.SocialConfigurer;
+import org.springframework.social.config.annotation.SocialConfigurerAdapter;
+import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.social.connect.ConnectionRepository;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.web.ConnectController;
+import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.social.facebook.connect.FacebookConnectionFactory;
+import org.springframework.social.security.AuthenticationNameUserIdSource;
+
+/**
+ * Created by pyohwan on 16. 4. 8.
+ */
+
+@Configuration
+@EnableSocial
+public class SocialConfig implements SocialConfigurer {
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Override
+    public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
+        connectionFactoryConfigurer.addConnectionFactory(new FacebookConnectionFactory("827230814014466", "35d50ea50c52589406614c2428e2493a"));
+    }
+
+    @Override
+    public UserIdSource getUserIdSource() {
+        return new AuthenticationNameUserIdSource();
+    }
+
+    @Override
+    public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
+        MongoConnectionTransformers transformers = new MongoConnectionTransformers(connectionFactoryLocator, Encryptors.noOpText());
+        return new MongoUsersConnectionRepository(mongoTemplate, connectionFactoryLocator, transformers);
+    }
+
+    /**
+     * This bean manages the connection flow between the account provider and
+     * the example application.
+     */
+    @Bean
+    public ConnectController connectController(ConnectionFactoryLocator connectionFactoryLocator, ConnectionRepository connectionRepository) {
+        return new ConnectController(connectionFactoryLocator, connectionRepository);
+    }
+
+    @Bean
+    public ProviderSignInUtils providerSignInUtils(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository) {
+        return new ProviderSignInUtils(connectionFactoryLocator, usersConnectionRepository);
+    }
+
+}

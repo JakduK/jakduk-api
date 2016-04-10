@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 public class OAuthPrincipal implements UserDetails {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8207029289879890348L;
 

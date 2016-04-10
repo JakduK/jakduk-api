@@ -100,6 +100,7 @@
 								</a>
 							</p>
 							<h5><spring:message code="user.msg.register.oauth"/></h5>
+
 							<div class="clearfix">
 								<div class="pull-left">
 									<a class="btn btn-link" href="<c:url value="/oauth/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
@@ -113,6 +114,10 @@
 								</div>
 							</div>
 
+						</form>
+						<a class="ax-item" onclick="document.facebook.submit();"><i class="axi axi-facebook-square"></i> Facebook</a>
+						<form action="auth/facebook" name="facebook">
+							<input type="hidden" name="scope" value="email"/>
 						</form>
 					</div>
 				</div><!--/row-->

@@ -8,11 +8,16 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.util.UrlUtils;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.UserProfile;
+import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,9 +28,11 @@ import com.jakduk.repository.TokenRepository;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.EmailService;
 import com.jakduk.service.UserService;
+import org.springframework.web.context.request.WebRequest;
 
 @Controller
 @RequestMapping()
+@Slf4j
 public class AccessController {
 
 	@Autowired
@@ -39,6 +46,9 @@ public class AccessController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ProviderSignInUtils providerSignInUtils;
 
 	@Value("#{tokenTerminationTrigger.span}")
 	private long tokenSpan;
@@ -60,6 +70,17 @@ public class AccessController {
 		model.addAttribute("result", result);
 		
 		return "access/login";
+	}
+
+	@RequestMapping(value = "/signup", method = RequestMethod.GET)
+	public void redirectRequestToRegistrationPage(WebRequest request, ModelMap modelMap) {
+		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+		UserProfile userProfile = connection.fetchUserProfile();
+
+		log.debug("userProfile=" + userProfile.getEmail());
+		log.debug("userProfile=" + userProfile.getUsername());
+		log.debug("userProfile=" + userProfile.getName());
+
 	}
 
 	@RequestMapping(value = "/logout/success", method = RequestMethod.GET)
