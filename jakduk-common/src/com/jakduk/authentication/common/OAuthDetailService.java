@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.embedded.SocialInfo;
+import com.jakduk.model.simple.SocialUserOnLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.jakduk.authentication.daum.DaumUser;
 import com.jakduk.authentication.facebook.FacebookUser;
-import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
-import com.jakduk.model.embedded.OAuthUser;
-import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.repository.UserRepository;
 import com.jakduk.service.UserService;
 
@@ -42,35 +42,34 @@ public class OAuthDetailService implements UserDetailsService {
 	
 	private String username;
 	
-	private String type;
+	private CommonConst.ACCOUNT_TYPE providerId;
 
 	public String getUsername() {
 		return username;
 	}
 	
-	public String getType() {
-		return type;
+	public CommonConst.ACCOUNT_TYPE getProviderId() {
+		return providerId;
 	}
 
-	public UserDetails loadUser(String oauthId, String username, String type) {
+	public UserDetails loadUser(String oauthId, String username, CommonConst.ACCOUNT_TYPE providerId) {
 		this.username = username;
-		this.type = type;
+		this.providerId = providerId;
 		return loadUserByUsername(oauthId);
 	}
 	
 	@Override
 	public UserDetails loadUserByUsername(String oauthId)	throws UsernameNotFoundException {
 		
-		OAuthUserOnLogin user = userRepository.findByOauthUser(type, oauthId);
+		SocialUserOnLogin user = userRepository.findByOauthUser(providerId, oauthId);
 		
 		if (user == null) {
-			OAuthUserOnLogin oauthUserOnLogin = new OAuthUserOnLogin();
+			SocialUserOnLogin oauthUserOnLogin = new SocialUserOnLogin();
 			oauthUserOnLogin.setUsername(username);			
-			OAuthUser oauthUser = new OAuthUser();
+			SocialInfo oauthUser = new SocialInfo();
 			oauthUser.setOauthId(oauthId);
-			oauthUser.setType(type);
-			oauthUser.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK);
-			oauthUserOnLogin.setOauthUser(oauthUser);
+			oauthUser.setProviderId(providerId);
+			oauthUserOnLogin.setSocialInfo(oauthUser);
 			
 			ArrayList<Integer> roles = new ArrayList<Integer>();
 			roles.add(CommonRole.ROLE_NUMBER_USER_02);
@@ -79,7 +78,7 @@ public class OAuthDetailService implements UserDetailsService {
 			
 			userService.oauthUserWrite(oauthUserOnLogin);
 			
-			user = userRepository.findByOauthUser(type, oauthId);
+			user = userRepository.findByOauthUser(providerId, oauthId);
 			
 			if (log.isInfoEnabled()) {
 				log.info("new oauth user joined. username=" + username);
@@ -90,7 +89,7 @@ public class OAuthDetailService implements UserDetailsService {
 			}
 		}
 		
-		OAuthPrincipal principal = new OAuthPrincipal(user.getId(), oauthId, user.getUsername(), type, user.getOauthUser().getAddInfoStatus(),
+		OAuthPrincipal principal = new OAuthPrincipal(user.getId(), oauthId, user.getUsername(), providerId,
 				true, true, true, true, getAuthorities(user.getRoles()));
 		
 		return principal;

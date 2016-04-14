@@ -97,12 +97,12 @@ public class GalleryService {
 			CommonPrincipal principal = userService.getCommonPrincipal();
 			String userid = principal.getId();
 			String username = principal.getUsername();
-			String type = principal.getType();
+			CommonConst.ACCOUNT_TYPE type = principal.getType();
 
 			CommonWriter writer = new CommonWriter();
 			writer.setUserId(userid);
 			writer.setUsername(username);
-			writer.setType(type);
+			writer.setType(type.name());
 			gallery.setWriter(writer);
 
 			GalleryStatus status = new GalleryStatus();

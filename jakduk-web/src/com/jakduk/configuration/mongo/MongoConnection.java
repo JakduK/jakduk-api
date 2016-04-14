@@ -1,126 +1,128 @@
 package com.jakduk.configuration.mongo;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
+/**
+ * The MongoDB collection for the spring social connections.
+ * <p>
+ * Note: After conversion to {@link net.exacode.spring.social.connect.mongo.MongoConnection} all OAuth tokens are
+ * encrypted.
+ * 
+ * 
+ * @author mendlik
+ */
 @Document(collection = "connections")
 @CompoundIndexes({
-        @CompoundIndex(name = "primary", def = "{ 'userId' : 1, 'providerId' : 1, 'providerUserId' : 1 }", unique = true),
-        @CompoundIndex(name = "rank", def = "{ 'userId' : 1, 'providerId' : 1, 'created' : 1 }", unique = true)
-})
+		@CompoundIndex(name = "connectionsRankIdx", def = "{'userId': 1, 'providerId': 1, 'rank': 1}", unique = true),
+		@CompoundIndex(name = "connectionsPrimaryIdx", def = "{'userId': 1, 'providerId': 1, 'providerUserId': 1}", unique = true) })
 public class MongoConnection {
+	@Id
+	private ObjectId id;
+	private String userId;
+	private String providerId;
+	private String providerUserId;
+	private int rank;
+	private String displayName;
+	private String profileUrl;
+	private String imageUrl;
+	private String accessToken;
+	private String secret;
+	private String refreshToken;
+	private Long expireTime;
 
-    @Id
-    private String id;
-    private Date created;
-    private String userId;
-    private String providerId;
-    private String providerUserId;
-    private String displayName;
-    private String profileUrl;
-    private String imageUrl;
-    private String accessToken;
-    private String secret;
-    private String refreshToken;
-    private Long expireTime;
+	public ObjectId getId() {
+		return id;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getUserId() {
+		return userId;
+	}
 
-    public void setId(final String id) {
-        this.id = id;
-    }
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
-    public Date getCreated() {
-        return created;
-    }
+	public String getProviderId() {
+		return providerId;
+	}
 
-    public void setCreated(final Date created) {
-        this.created = created;
-    }
+	public void setProviderId(String providerId) {
+		this.providerId = providerId;
+	}
 
-    public String getUserId() {
-        return userId;
-    }
+	public String getProviderUserId() {
+		return providerUserId;
+	}
 
-    public void setUserId(final String userId) {
-        this.userId = userId;
-    }
+	public void setProviderUserId(String providerUserId) {
+		this.providerUserId = providerUserId;
+	}
 
-    public String getProviderId() {
-        return providerId;
-    }
+	public int getRank() {
+		return rank;
+	}
 
-    public void setProviderId(final String providerId) {
-        this.providerId = providerId;
-    }
+	public void setRank(int rank) {
+		this.rank = rank;
+	}
 
-    public String getProviderUserId() {
-        return providerUserId;
-    }
+	public String getDisplayName() {
+		return displayName;
+	}
 
-    public void setProviderUserId(final String providerUserId) {
-        this.providerUserId = providerUserId;
-    }
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
 
-    public String getDisplayName() {
-        return displayName;
-    }
+	public String getProfileUrl() {
+		return profileUrl;
+	}
 
-    public void setDisplayName(final String displayName) {
-        this.displayName = displayName;
-    }
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
+	}
 
-    public String getProfileUrl() {
-        return profileUrl;
-    }
+	public String getImageUrl() {
+		return imageUrl;
+	}
 
-    public void setProfileUrl(final String profileUrl) {
-        this.profileUrl = profileUrl;
-    }
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
+	public String getAccessToken() {
+		return accessToken;
+	}
 
-    public void setImageUrl(final String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
 
-    public String getAccessToken() {
-        return accessToken;
-    }
+	public String getSecret() {
+		return secret;
+	}
 
-    public void setAccessToken(final String accessToken) {
-        this.accessToken = accessToken;
-    }
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
 
-    public String getSecret() {
-        return secret;
-    }
+	public String getRefreshToken() {
+		return refreshToken;
+	}
 
-    public void setSecret(final String secret) {
-        this.secret = secret;
-    }
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
 
-    public String getRefreshToken() {
-        return refreshToken;
-    }
+	public Long getExpireTime() {
+		return expireTime;
+	}
 
-    public void setRefreshToken(final String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-    
-    public Long getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(final Long expireTime) {
-        this.expireTime = expireTime;
-    }
+	public void setExpireTime(Long expireTime) {
+		this.expireTime = expireTime;
+	}
 }

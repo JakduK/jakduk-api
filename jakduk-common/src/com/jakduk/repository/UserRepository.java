@@ -1,11 +1,12 @@
 package com.jakduk.repository;
 
+import com.jakduk.common.CommonConst;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.OAuthProfile;
-import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.SocialUserOnLogin;
 import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
@@ -30,17 +31,20 @@ public interface UserRepository extends MongoRepository<User, String> {
 	@Query(value="{'id' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1}")
 	UserProfile userFindByNEIdAndUsername(String id, String username);
 
-	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
-	User userFindByOauthUser(String type, String oauthId);
+	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
+	User userFindByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
+
+	@Query(value="{'email' : ?0}")
+	SocialUserOnLogin findSocialUserByEmail(String email);
+
+	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
+	SocialUserOnLogin findByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 	
-	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
-	OAuthUserOnLogin findByOauthUser(String type, String oauthId);
-	
-	@Query(value="{'oauthUser.oauthId' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1, 'oauthUser' : 1}")
+	@Query(value="{'socialInfo.oauthId' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1, 'socialInfo' : 1}")
 	OAuthProfile userFindByNEOauthIdAndUsername(String oauthId, String username);
 	
-	@Query(value="{'oauthUser.type' : ?0, 'oauthUser.oauthId' : ?1}")
-	OAuthProfile userfindByOauthUser(String type, String oauthId);
+	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
+	OAuthProfile userfindByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 	
 	@Query(value="{'email' : ?0}")
 	UserOnAuthentication userFindByEmail(String email);

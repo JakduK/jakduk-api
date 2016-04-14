@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
+import com.jakduk.model.web.SocialUserForm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.model.web.OAuthUserWrite;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
@@ -34,7 +34,7 @@ import com.jakduk.service.UserService;
 @Controller
 @Slf4j
 @RequestMapping("/oauth")
-@SessionAttributes({"OAuthUserWrite", "footballClubs"})
+@SessionAttributes({"SocialUserForm", "footballClubs"})
 public class OAuthProfileUpdateController {
 	
 	@Autowired
@@ -60,7 +60,7 @@ public class OAuthProfileUpdateController {
 	}
 	
 	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
-	public String profileUpdate(@Valid OAuthUserWrite oAuthUserWrite, BindingResult result, SessionStatus sessionStatus) {
+	public String profileUpdate(@Valid SocialUserForm socialUserForm, BindingResult result, SessionStatus sessionStatus) {
 		
 		if (result.hasErrors()) {
 			if (log.isDebugEnabled()) {
@@ -69,7 +69,7 @@ public class OAuthProfileUpdateController {
 			return "oauth/write";
 		}
 		
-		userService.checkOAuthProfileUpdate(oAuthUserWrite, result);
+		userService.checkOAuthProfileUpdate(socialUserForm, result);
 		
 		if (result.hasErrors()) {
 			if (log.isDebugEnabled()) {
@@ -78,7 +78,7 @@ public class OAuthProfileUpdateController {
 			return "oauth/write";
 		}
 		
-		userService.oAuthProfileUpdate(oAuthUserWrite);
+		userService.oAuthProfileUpdate(socialUserForm);
 		sessionStatus.setComplete();
 		
 		return "redirect:/oauth/profile?status=1";

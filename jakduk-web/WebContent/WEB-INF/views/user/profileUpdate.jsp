@@ -61,6 +61,8 @@
 								'glyphicon-remove':userProfileWrite.username.$invalid || usernameStatus != 'ok'}"></span>
 					<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 					<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
+
+					<!-- 초기화 시 onUsername()를 호출 -->
 					<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername()">{{usernameAlert.msg}}</span>
 				</div>
 			</div>

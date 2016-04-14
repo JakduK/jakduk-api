@@ -160,7 +160,7 @@ public class HomeService {
 				Stream<BoardHistory> sHistory = history.stream();
 				
 				List<BoardHistory> uHistory = sHistory
-						.filter(item -> item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getType().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
+						.filter(item -> item.getProviderId().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getProviderId().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
 						.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
 						.limit(1)
 						.collect(Collectors.toList());

@@ -1,31 +1,21 @@
 package com.jakduk.configuration;
 
-import com.jakduk.authentication.common.OAuthProcessingFilter;
 import com.jakduk.authentication.jakduk.JakdukDetailsService;
 import com.jakduk.authentication.jakduk.JakdukFailureHandler;
 import com.jakduk.authentication.jakduk.JakdukSuccessHandler;
 import com.jakduk.authentication.social.SocialDetailService;
-import com.jakduk.authentication.social.SocialDetailService2;
-import com.jakduk.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
-import org.springframework.ui.velocity.VelocityEngineFactoryBean;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * Created by pyohwan on 16. 4. 6.
@@ -80,7 +70,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/login*",
                                 "/auth/*",
                                 "/signup/*",
-                                "/user/write"
+                                "/user/write",
+                                "/oauth"
                         ).anonymous()
                         .antMatchers(
                                 "/user/**",
@@ -112,7 +103,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public SocialUserDetailsService socialUsersDetailService() {
-        return new SocialDetailService2(socialDetailService());
+        return new SocialDetailService();
     }
 
 
@@ -144,11 +135,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JakdukDetailsService jakdukDetailsService() {
         return new JakdukDetailsService();
-    }
-
-
-    @Bean
-    public SocialDetailService socialDetailService() {
-        return new SocialDetailService();
     }
 }

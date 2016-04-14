@@ -196,7 +196,7 @@ public class BoardFreeService {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 		String username = principal.getUsername();
-		String type = principal.getType();
+		CommonConst.ACCOUNT_TYPE type = principal.getType();
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
@@ -207,7 +207,7 @@ public class BoardFreeService {
 		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(username);
-		writer.setType(type);
+		writer.setType(type.name());
 		boardFree.setWriter(writer);
 		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
 		
@@ -360,7 +360,7 @@ public class BoardFreeService {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 		String username = principal.getUsername();
-		String type = principal.getType();
+		CommonConst.ACCOUNT_TYPE type = principal.getType();
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
@@ -369,7 +369,7 @@ public class BoardFreeService {
 		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(username);
-		writer.setType(type);
+		writer.setType(type.name());
 		
 		BoardFree boardFree = boardFreeRepository.findOne(boardFreeWrite.getId());
 		
@@ -814,7 +814,7 @@ public class BoardFreeService {
 			CommonWriter writer = new CommonWriter();
 			writer.setUserId(principal.getId());
 			writer.setUsername(principal.getUsername());
-			writer.setType(principal.getType());
+			writer.setType(principal.getType().name());
 			boardFreeComment.setWriter(writer);
 			
 			boardFreeComment.setContent(content);
@@ -954,12 +954,12 @@ public class BoardFreeService {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 		String accountUsername = principal.getUsername();
-		String accountType = principal.getType();
+		CommonConst.ACCOUNT_TYPE accountType = principal.getType();
 
 		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(accountUsername);
-		writer.setType(accountType);
+		writer.setType(accountType.name());
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
@@ -1059,12 +1059,12 @@ public class BoardFreeService {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 		String accountUsername = principal.getUsername();
-		String accountType = principal.getType();
+		CommonConst.ACCOUNT_TYPE accountType = principal.getType();
 
 		CommonWriter writer = new CommonWriter();
 		writer.setUserId(accountId);
 		writer.setUsername(accountUsername);
-		writer.setType(accountType);
+		writer.setType(accountType.name());
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,7 @@ import com.jakduk.repository.TokenRepository;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.EmailService;
 import com.jakduk.service.UserService;
+import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 @Controller
@@ -46,9 +48,6 @@ public class AccessController {
 
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private ProviderSignInUtils providerSignInUtils;
 
 	@Value("#{tokenTerminationTrigger.span}")
 	private long tokenSpan;
@@ -73,14 +72,9 @@ public class AccessController {
 	}
 
 	@RequestMapping(value = "/signup", method = RequestMethod.GET)
-	public void redirectRequestToRegistrationPage(WebRequest request, ModelMap modelMap) {
-		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
-		UserProfile userProfile = connection.fetchUserProfile();
+	public String redirectRequestToRegistrationPage() {
 
-		log.debug("userProfile=" + userProfile.getEmail());
-		log.debug("userProfile=" + userProfile.getUsername());
-		log.debug("userProfile=" + userProfile.getName());
-
+		return "redirect:/social/user";
 	}
 
 	@RequestMapping(value = "/logout/success", method = RequestMethod.GET)

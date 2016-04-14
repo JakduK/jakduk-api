@@ -115,7 +115,7 @@ public class SearchService {
 	public String searchDocumentBoard(String q, int from, int size) {
 		
 		String query = "{\n" +
-				//"\"fields\" : [\"seq\", \"writer.type\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
+				//"\"fields\" : [\"seq\", \"writer.providerId\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
 				"\"from\" : " + from + "," + 
 				"\"size\" : " + size + "," + 
 				"\"_source\" : { \"exclude\" : \"content\"}, " +

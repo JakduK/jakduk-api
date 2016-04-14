@@ -34,11 +34,11 @@ public class DaumAuthenticationProvider implements AuthenticationProvider {
 		
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 		
-		if (username.equals(CommonConst.OAUTH_TYPE_DAUM)) {
+		if (username.equals(CommonConst.ACCOUNT_TYPE.DAUM)) {
 			
 			DaumUser user = daumService.findUser();
 			
-			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getUserid(), user.getNickname(), CommonConst.OAUTH_TYPE_DAUM);
+			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getUserid(), user.getNickname(), CommonConst.ACCOUNT_TYPE.DAUM);
 			
 			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());
 

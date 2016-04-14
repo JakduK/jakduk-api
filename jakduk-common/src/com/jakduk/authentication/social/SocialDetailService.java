@@ -1,19 +1,13 @@
 package com.jakduk.authentication.social;
 
-import com.jakduk.authentication.common.OAuthPrincipal;
-import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
-import com.jakduk.model.embedded.OAuthUser;
-import com.jakduk.model.simple.OAuthUserOnLogin;
+import com.jakduk.model.simple.SocialUserOnLogin;
 import com.jakduk.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.social.security.SocialUserDetails;
 import org.springframework.social.security.SocialUserDetailsService;
 
 import java.util.ArrayList;
@@ -25,23 +19,25 @@ import java.util.List;
  */
 
 @Slf4j
-public class SocialDetailService implements UserDetailsService {
+public class SocialDetailService implements SocialUserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        OAuthUserOnLogin user = userRepository.findByOauthUser(CommonConst.OAUTH_TYPE_FACEBOOK, username);
+    public org.springframework.social.security.SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
+
+        log.debug("userId=" + userId);
+
+        SocialUserOnLogin user = userRepository.findSocialUserByEmail(userId);
 
         log.debug("user=" + user);
 
-        OAuthPrincipal principal = new OAuthPrincipal(user.getId(), username, user.getUsername(), CommonConst.OAUTH_TYPE_FACEBOOK, user.getOauthUser().getAddInfoStatus(),
+        SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getSocialInfo().getOauthId(), user.getUsername(), user.getSocialInfo().getProviderId(),
                 true, true, true, true, getAuthorities(user.getRoles()));
 
-        return principal;
+        return userDetail;
     }
-
 
     public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
         List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));

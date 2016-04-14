@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.jakduk.common.CommonConst;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
@@ -21,7 +22,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	//~ Instance fields ================================================================================================
 	private String password;
 	private String username;
-	private String type;
+	private CommonConst.ACCOUNT_TYPE type;
 	private final String email;
 	private final String id;
 	private final Set<GrantedAuthority> authorities;
@@ -55,8 +56,8 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	 *         either as a parameter or as an element in the
 	 *         <code>GrantedAuthority</code> collection
 	 */
-	public JakdukPrincipal(String email, String id, String password, String username, String type, boolean enabled, boolean accountNonExpired,
-			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+	public JakdukPrincipal(String email, String id, String password, String username, CommonConst.ACCOUNT_TYPE type, boolean enabled, boolean accountNonExpired,
+						   boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		if (((email == null) || "".equals(email)) || (password == null)) {
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
@@ -88,7 +89,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		return username;
 	}
 	
-	public String getType() {
+	public CommonConst.ACCOUNT_TYPE getType() {
 		return type;
 	}
 

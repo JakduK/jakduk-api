@@ -1,8 +1,12 @@
 package com.jakduk.configuration;
 
-import com.jakduk.configuration.mongo.MongoConnectionTransformers;
-import com.jakduk.configuration.mongo.MongoUsersConnectionRepository;
-import com.mongodb.Mongo;
+
+import com.jakduk.configuration.mongo.MongoConnectionDao;
+import net.exacode.spring.social.connect.GenericUsersConnectionRepository;
+
+
+import net.exacode.spring.social.connect.mongo.MongoConnectionConverter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +17,6 @@ import org.springframework.social.UserIdSource;
 import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
 import org.springframework.social.config.annotation.EnableSocial;
 import org.springframework.social.config.annotation.SocialConfigurer;
-import org.springframework.social.config.annotation.SocialConfigurerAdapter;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
@@ -45,8 +48,10 @@ public class SocialConfig implements SocialConfigurer {
 
     @Override
     public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
-        MongoConnectionTransformers transformers = new MongoConnectionTransformers(connectionFactoryLocator, Encryptors.noOpText());
-        return new MongoUsersConnectionRepository(mongoTemplate, connectionFactoryLocator, transformers);
+
+        MongoConnectionDao mongoConnectionDao = new MongoConnectionDao(mongoTemplate, mongoConnectionConverter(connectionFactoryLocator));
+
+        return new GenericUsersConnectionRepository(mongoConnectionDao, connectionFactoryLocator);
     }
 
     /**
@@ -61,6 +66,11 @@ public class SocialConfig implements SocialConfigurer {
     @Bean
     public ProviderSignInUtils providerSignInUtils(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository) {
         return new ProviderSignInUtils(connectionFactoryLocator, usersConnectionRepository);
+    }
+
+    @Bean
+    public MongoConnectionConverter mongoConnectionConverter(ConnectionFactoryLocator connectionFactoryLocator) {
+        return new MongoConnectionConverter(connectionFactoryLocator, Encryptors.noOpText());
     }
 
 }

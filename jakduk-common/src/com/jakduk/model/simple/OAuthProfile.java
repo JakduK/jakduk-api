@@ -2,11 +2,11 @@ package com.jakduk.model.simple;
 
 import java.util.List;
 
+import com.jakduk.model.embedded.SocialInfo;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.embedded.OAuthUser;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -22,7 +22,7 @@ public class OAuthProfile {
 	
 	private String username;
 	
-	private OAuthUser oauthUser;
+	private SocialInfo oauthUser;
 	
 	private List<Integer> roles;
 	
@@ -47,11 +47,11 @@ public class OAuthProfile {
 		this.username = username;
 	}
 
-	public OAuthUser getOauthUser() {
+	public SocialInfo getOauthUser() {
 		return oauthUser;
 	}
 
-	public void setOauthUser(OAuthUser oauthUser) {
+	public void setOauthUser(SocialInfo oauthUser) {
 		this.oauthUser = oauthUser;
 	}
 	
@@ -82,7 +82,7 @@ public class OAuthProfile {
 	@Override
 	public String toString() {
 		return "OAuthProfile [id=" + id + ", username=" + username
-				+ ", oauthUser=" + oauthUser + ", roles=" + roles + ", about="
+				+ ", socialInfo=" + oauthUser + ", roles=" + roles + ", about="
 				+ about + ", supportFC=" + supportFC + "]";
 	}
 

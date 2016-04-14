@@ -1,5 +1,6 @@
 package com.jakduk.authentication.social;
 
+import com.jakduk.common.CommonConst;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.social.security.SocialUserDetails;
@@ -11,13 +12,12 @@ import java.util.*;
 /**
  * Created by pyohwan on 16. 4. 8.
  */
-public class SocialUserDetail implements SocialUserDetails {
+public class SocialUserDetail implements org.springframework.social.security.SocialUserDetails {
 
     private String id;
     private String userId;
     private String username;
-    private String type;
-    private String addInfoStatus;
+    private CommonConst.ACCOUNT_TYPE providerId;
 
     private final Set<GrantedAuthority> authorities;
     private final boolean accountNonExpired;
@@ -25,14 +25,13 @@ public class SocialUserDetail implements SocialUserDetails {
     private final boolean credentialsNonExpired;
     private final boolean enabled;
 
-    public SocialUserDetail(String id, String userId, String username, String type, String addInfoStatus, boolean enabled, boolean accountNonExpired,
+    public SocialUserDetail(String id, String userId, String username, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
                             boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
         this.id = id;
         this.userId = userId;
         this.username = username;
-        this.type = type;
-        this.addInfoStatus = addInfoStatus;
+        this.providerId = providerId;
         this.enabled = enabled;
         this.accountNonExpired = accountNonExpired;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -80,16 +79,8 @@ public class SocialUserDetail implements SocialUserDetails {
         return userId;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public String getAddInfoStatus() {
-        return addInfoStatus;
-    }
-
-    public void setAddInfoStatus(String addInfoStatus) {
-        this.addInfoStatus = addInfoStatus;
+    public CommonConst.ACCOUNT_TYPE getProviderId() {
+        return providerId;
     }
 
     @Override
