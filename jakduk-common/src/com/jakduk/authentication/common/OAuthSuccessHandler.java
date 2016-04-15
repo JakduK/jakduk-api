@@ -43,8 +43,9 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 		
 		if (authentication.getPrincipal() instanceof OAuthPrincipal) {
 			OAuthPrincipal principal = (OAuthPrincipal) authentication.getPrincipal();
-			String addInfoStatus = principal.getAddInfoStatus();	
-			
+
+
+			/*
 			if (addInfoStatus.equals(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_BLANK)) {
 				if (log.isDebugEnabled()) {
 					log.debug("Didn't input your additional infomation. Redrict input form.");
@@ -53,7 +54,8 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 				String targetUrl = "/oauth/write";
 				getRedirectStrategy().sendRedirect(request, response, targetUrl);
 				return;
-			} 
+			}
+			*/
 		}
 		
 		clearAuthenticationAttributes(request);

@@ -29,8 +29,8 @@ public class JakdukDetailsService implements UserDetailsManager {
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		
-		if (email != null && (email.equals(CommonConst.OAUTH_TYPE_FACEBOOK) 
-				|| email.equals(CommonConst.OAUTH_TYPE_DAUM))) {
+		if (email != null && (email.equals(CommonConst.ACCOUNT_TYPE.FACEBOOK)
+				|| email.equals(CommonConst.ACCOUNT_TYPE.DAUM))) {
 			throw new UsernameNotFoundException("not found email=" + email);
 		} else {
 			UserOnAuthentication user = userRepository.userFindByEmail(email);
@@ -42,7 +42,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 				boolean accountNonLocked = true;
 
 				JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
-						, user.getPassword(), user.getUsername(), CommonConst.AUTH_TYPE_JAKDUK
+						, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
 						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 				
 				if (log.isInfoEnabled()) {

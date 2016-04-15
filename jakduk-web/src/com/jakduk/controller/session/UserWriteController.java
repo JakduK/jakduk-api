@@ -63,14 +63,33 @@ public class UserWriteController {
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
 	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus,
 			HttpServletRequest request, HttpServletResponse response) {
-		
+
+		Locale locale = localeResolver.resolveLocale(request);
+
 		if (result.hasErrors()) {
 			log.debug("result=" + result);
 			return "user/write";
 		}
-		
-		userService.checkUserWrite(userWrite, result);
-		
+
+		String pwd = userWrite.getPassword();
+		String pwdCfm = userWrite.getPasswordConfirm();
+
+		try {
+			userService.existEmail(locale, userWrite.getEmail());
+		} catch (RuntimeException e) {
+			result.rejectValue("email", "user.msg.already.email");
+		}
+
+		try {
+			userService.existUsernameOnWrite(locale, userWrite.getUsername());
+		} catch (RuntimeException e) {
+			result.rejectValue("username", "user.msg.already.username");
+		}
+
+		if (!pwd.equals(pwdCfm)) {
+			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
+		}
+
 		if (result.hasErrors()) {
 			log.debug("result=" + result);
 			return "user/write";

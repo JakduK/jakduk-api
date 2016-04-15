@@ -43,6 +43,9 @@
 				<div class="row">
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
 						<form action="login" class="reg-page" name="loginForm" method="POST" ng-submit="onSubmit($event)">
+							<input type="hidden"
+								   name="${_csrf.parameterName}"
+								   value="${_csrf.token}"/>
 							<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
 							<div class="reg-header">
 								<h2><spring:message code="user.sign.in.header"/></h2>
@@ -97,6 +100,7 @@
 								</a>
 							</p>
 							<h5><spring:message code="user.msg.register.oauth"/></h5>
+
 							<div class="clearfix">
 								<div class="pull-left">
 									<a class="btn btn-link" href="<c:url value="/oauth/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
@@ -110,6 +114,10 @@
 								</div>
 							</div>
 
+						</form>
+						<a class="ax-item" onclick="document.facebook.submit();"><i class="axi axi-facebook-square"></i> Facebook</a>
+						<form action="auth/facebook" name="facebook">
+							<input type="hidden" name="scope" value="email"/>
 						</form>
 					</div>
 				</div><!--/row-->

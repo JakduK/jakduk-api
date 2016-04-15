@@ -61,11 +61,13 @@ public class CommonConst {
 	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 	
 	/**
-	 * OAuth 종류
+	 * 인증 종류
 	 */
-	public final static String OAUTH_TYPE_FACEBOOK = "facebook";
-	public final static String OAUTH_TYPE_DAUM = "daum";
-	public final static String AUTH_TYPE_JAKDUK = "jakduk";
+	public enum ACCOUNT_TYPE {
+		JAKDUK,
+		FACEBOOK,
+		DAUM
+	}
 	
 	/**
 	 * OAuth 추가 정보 입력 여부

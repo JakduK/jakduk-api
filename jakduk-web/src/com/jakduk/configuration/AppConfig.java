@@ -1,10 +1,18 @@
 package com.jakduk.configuration;
 
+import com.jakduk.dao.JongoR;
 import com.jakduk.model.db.Token;
 import com.jakduk.trigger.TokenTerminationTrigger;
+import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoFactoryBean;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Controller;
@@ -13,6 +21,7 @@ import org.springframework.ui.velocity.VelocityEngineFactoryBean;
 
 import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
+import java.net.UnknownHostException;
 import java.util.Properties;
 
 
@@ -22,10 +31,7 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = {"com.jakduk"}, excludeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
-@ImportResource(value = {
-        "classpath:/security-context.xml",
-        "classpath:/config/oauth/oauth-data.xml",
-        "classpath:/config/db/mongo-data.xml"})
+@EnableMongoRepositories(basePackages = {"com.jakduk.repository"})
 public class AppConfig {
 
     @Resource
@@ -54,4 +60,31 @@ public class AppConfig {
 
         return velocityEngine;
     }
+
+    /*
+     * Use the standard Mongo driver API to create a com.mongodb.Mongo instance.
+     */
+    public @Bean Mongo mongo() throws UnknownHostException {
+        return new Mongo(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
+    }
+
+    public @Bean
+    MongoDbFactory mongoDbFactory() throws Exception {
+        return new SimpleMongoDbFactory(mongo(), environment.getProperty("mongo.db.name"));
+    }
+
+    public @Bean MongoTemplate mongoTemplate() throws Exception {
+        return new MongoTemplate(mongo(), environment.getProperty("mongo.db.name"));
+    }
+
+    @Bean
+    public JongoR jongoR() throws UnknownHostException {
+        return new JongoR(environment.getProperty("mongo.host.name"), mongoClient());
+    }
+
+    @Bean
+    public MongoClient mongoClient() throws UnknownHostException {
+        return new MongoClient(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
+    }
+
 }

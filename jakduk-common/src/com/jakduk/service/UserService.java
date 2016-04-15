@@ -8,10 +8,12 @@ import java.util.Objects;
 import com.jakduk.exception.DuplicateDataException;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.embedded.SocialInfo;
+import com.jakduk.model.simple.SocialUserOnLogin;
+import com.jakduk.model.web.*;
 import com.jakduk.repository.FootballClubOriginRepository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -33,17 +35,10 @@ import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.OAuthUser;
 import com.jakduk.model.simple.OAuthProfile;
-import com.jakduk.model.simple.OAuthUserOnLogin;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.OAuthProfileInfo;
-import com.jakduk.model.web.OAuthUserWrite;
-import com.jakduk.model.web.UserPasswordUpdate;
-import com.jakduk.model.web.UserProfileInfo;
-import com.jakduk.model.web.UserProfileWrite;
-import com.jakduk.model.web.UserWrite;
+import com.jakduk.model.web.SocialUserForm;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
 
@@ -92,25 +87,7 @@ public class UserService {
 		
 		return mongoTemplate.findOne(query, CommonWriter.class);
 	}
-	
-	public void checkUserWrite(UserWrite userWrite, BindingResult result) {
-		
-		String pwd = userWrite.getPassword();
-		String pwdCfm = userWrite.getPasswordConfirm();
-		
-		if (this.existEmail(userWrite.getEmail())) {
-			result.rejectValue("email", "user.msg.already.email");
-		}
-		
-		if (this.existUsernameOnWrite(userWrite.getUsername())) {
-			result.rejectValue("username", "user.msg.already.username");
-		}
-		
-		if (!pwd.equals(pwdCfm)) {
-			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
-		}
-	}
-	
+
 	public Model getUserWrite(Model model, String language) {
 
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
@@ -153,29 +130,43 @@ public class UserService {
 		}
 	}
 	
-	public void oauthUserWrite(OAuthUserOnLogin oauthUserOnLogin) {
+	public void oauthUserWrite(SocialUserOnLogin oauthUserOnLogin) {
 		User user = new User();
 		
 		user.setUsername(oauthUserOnLogin.getUsername());
-		user.setOauthUser(oauthUserOnLogin.getOauthUser());
+		user.setSocialInfo(oauthUserOnLogin.getSocialInfo());
 		user.setRoles(oauthUserOnLogin.getRoles());
 		
 		userRepository.save(user);
 	}
 	
-	public Boolean existEmail(String email) {
+	public Boolean existEmail(Locale locale, String email) {
 		Boolean result = false;
-		
-		if (userRepository.findOneByEmail(email) != null) result = true;
+
+		if (commonService.isAnonymousUser()) {
+			User user = userRepository.findOneByEmail(email);
+
+			if (Objects.nonNull(user))
+				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.email"));
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+		}
 		
 		return result;
 	}
 	
-	public Boolean existUsernameOnWrite(String username) {
+	public Boolean existUsernameOnWrite(Locale locale, String username) {
 		Boolean result = false;
-		
-		if (userRepository.findOneByUsername(username) != null) result = true;
-		
+
+		if (commonService.isAnonymousUser()) {
+			User user = userRepository.findOneByUsername(username);
+
+			if (Objects.nonNull(user))
+				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.username"));
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+		}
+
 		return result;
 	}
 	
@@ -220,19 +211,19 @@ public class UserService {
 			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			CommonUser userDetails = (CommonUser) SecurityContextHolder.getContext().getAuthentication().getDetails();
 			
-			OAuthUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(principal.getType(), principal.getOauthId());
+			SocialUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(principal.getProviderId(), principal.getOauthId());
 			
-			OAuthUserWrite oauthUserWrite = new OAuthUserWrite();
+			SocialUserForm oauthUserForm = new SocialUserForm();
 			
 			if (oauthUserOnLogin != null && oauthUserOnLogin.getUsername() != null) {
-				oauthUserWrite.setUsername(oauthUserOnLogin.getUsername());
+				oauthUserForm.setUsername(oauthUserOnLogin.getUsername());
 			}
 			
 			if (userDetails != null && userDetails.getBio() != null) {
-				oauthUserWrite.setAbout(userDetails.getBio());
+				oauthUserForm.setAbout(userDetails.getBio());
 			}
 			
-			model.addAttribute("OAuthUserWrite", oauthUserWrite);
+			model.addAttribute("OAuthUserWrite", oauthUserForm);
 		}
 
 		model.addAttribute("footballClubs", footballClubs);
@@ -240,12 +231,12 @@ public class UserService {
 		return model;
 	}
 	
-	public void checkOAuthProfileUpdate(OAuthUserWrite oAuthUserWrite, BindingResult result) {
+	public void checkOAuthProfileUpdate(SocialUserForm socialUserForm, BindingResult result) {
 		
 		OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String oauthId = principal.getOauthId();
 		
-		String username = oAuthUserWrite.getUsername();
+		String username = socialUserForm.getUsername();
 		
 		if (oauthId != null && username != null) {
 			OAuthProfile profile = userRepository.userFindByNEOauthIdAndUsername(oauthId, username);
@@ -254,52 +245,44 @@ public class UserService {
 			}
 		}		
 	}
-	
-	public void oAuthWriteDetails(OAuthUserWrite userWrite) {
-		
-		OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-		CommonUser userDetails = (CommonUser) SecurityContextHolder.getContext().getAuthentication().getDetails();
-		
-		User user = userRepository.userFindByOauthUser(principal.getType(), principal.getOauthId());
-		OAuthUser oAuthUser = user.getOauthUser();
 
-		String username = userWrite.getUsername();
-		String footballClub = userWrite.getFootballClub();
-		String about = userWrite.getAbout();
-		
-		if (username != null && !username.isEmpty()) {
-			user.setUsername(userWrite.getUsername());
-		}
-		
-		if (footballClub != null && !footballClub.isEmpty()) {
-			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
-			
+	public void saveSocialUser(SocialUserForm userForm, SocialInfo socialInfo) {
+
+		User user = new User();
+
+		user.setEmail(userForm.getEmail().trim());
+		user.setUsername(userForm.getUsername().trim());
+
+		ArrayList<Integer> roles = new ArrayList<Integer>();
+		roles.add(CommonRole.ROLE_NUMBER_USER_01);
+
+		user.setRoles(roles);
+
+		String footballClub = userForm.getFootballClub();
+		String about = userForm.getAbout();
+
+		if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
+			FootballClub supportFC = footballClubRepository.findOne(footballClub);
+
 			user.setSupportFC(supportFC);
 		}
-		
-		if (about != null && !about.isEmpty()) {
-			user.setAbout(userWrite.getAbout());
+
+		if (Objects.nonNull(about) && !about.isEmpty()) {
+			user.setAbout(userForm.getAbout().trim());
 		}
-		
-		oAuthUser.setAddInfoStatus(CommonConst.OAUTH_ADDITIONAL_INFO_STATUS_OK);
-		
-		user.setOauthUser(oAuthUser);
-		
-		if (log.isInfoEnabled()) {
-			log.info("OAuth user =" + user.getUsername() + "'s additional infomation are update.");
-		}
-		
+
+		user.setSocialInfo(socialInfo);
+
 		if (log.isDebugEnabled()) {
 			log.debug("OAuth user=" + user);
 		}
-		
+
 		userRepository.save(user);
 
-		principal.setUsername(userWrite.getUsername());
-		principal.setAddInfoStatus(oAuthUser.getAddInfoStatus());
-		
-		commonService.doOAuthAutoLogin(principal, credentials, userDetails);
+//		principal.setUsername(userWrite.getUsername());
+//		principal.setAddInfoStatus(socialInfo.getAddInfoStatus());
+//
+//		commonService.doOAuthAutoLogin(principal, credentials, userDetails);
 	}
 	
 	public Model getUserProfile(Model model, String language, Integer status) {
@@ -464,7 +447,7 @@ public class UserService {
 
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			OAuthProfile profile = userRepository.userfindByOauthUser(principal.getType(), principal.getOauthId());
+			OAuthProfile profile = userRepository.userfindByOauthUser(principal.getProviderId(), principal.getOauthId());
 			
 			OAuthProfileInfo profileInfo = new OAuthProfileInfo();
 			profileInfo.setUsername(profile.getUsername());
@@ -498,20 +481,20 @@ public class UserService {
 			
 			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
 				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				OAuthProfile profile = userRepository.userfindByOauthUser(principal.getType(), principal.getOauthId());
+				OAuthProfile profile = userRepository.userfindByOauthUser(principal.getProviderId(), principal.getOauthId());
 				
 				FootballClub footballClub = profile.getSupportFC();
 				
-				OAuthUserWrite oAuthUserWrite = new OAuthUserWrite();
+				SocialUserForm socialUserForm = new SocialUserForm();
 				
-				oAuthUserWrite.setUsername(profile.getUsername());
-				oAuthUserWrite.setAbout(profile.getAbout());
+				socialUserForm.setUsername(profile.getUsername());
+				socialUserForm.setAbout(profile.getAbout());
 
 				if (footballClub != null) {
-					oAuthUserWrite.setFootballClub(footballClub.getId());
+					socialUserForm.setFootballClub(footballClub.getId());
 				}
 				
-				model.addAttribute("OAuthUserWrite", oAuthUserWrite);
+				model.addAttribute("OAuthUserWrite", socialUserForm);
 			}
 			
 			model.addAttribute("footballClubs", footballClubs);
@@ -522,15 +505,15 @@ public class UserService {
 		return model;
 	}
 	
-	public void oAuthProfileUpdate(OAuthUserWrite userWrite) {
+	public void oAuthProfileUpdate(SocialUserForm userWrite) {
 		
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
 			CommonUser userDetails = (CommonUser) SecurityContextHolder.getContext().getAuthentication().getDetails();
 			
-			User user = userRepository.userFindByOauthUser(principal.getType(), principal.getOauthId());
-			OAuthUser oAuthUser = user.getOauthUser();
+			User user = userRepository.userFindByOauthUser(principal.getProviderId(), principal.getOauthId());
+			SocialInfo socialInfo = user.getSocialInfo();
 			
 			String username = userWrite.getUsername();
 			String footballClub = userWrite.getFootballClub();
@@ -550,7 +533,7 @@ public class UserService {
 				user.setAbout(userWrite.getAbout());
 			}
 			
-			user.setOauthUser(oAuthUser);
+			user.setSocialInfo(socialInfo);
 			
 			userRepository.save(user);
 			
@@ -569,7 +552,7 @@ public class UserService {
 				OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				commonPrincipal.setId(principal.getId());
 				commonPrincipal.setUsername(principal.getUsername());
-				commonPrincipal.setType(principal.getType());
+				commonPrincipal.setType(principal.getProviderId());
 			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
 				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				commonPrincipal.setId(principal.getId());

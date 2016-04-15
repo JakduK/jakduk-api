@@ -61,6 +61,8 @@
 								'glyphicon-remove':userProfileWrite.username.$invalid || usernameStatus != 'ok'}"></span>
 					<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 					<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
+
+					<!-- 초기화 시 onUsername()를 호출 -->
 					<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername()">{{usernameAlert.msg}}</span>
 				</div>
 			</div>
@@ -158,7 +160,7 @@
 
 		$scope.onUsername = function() {
 			if ($scope.userProfileWrite.username.$valid) {
-				var bUrl = '<c:url value="/api/user/exist/update/username/' + $scope.username + '"/>';
+				var bUrl = '<c:url value="/api/user/exist/username/update?username=' + $scope.username + '/"/>';
 
 				if ($scope.usernameConn == "none") {
 					var reqPromise = $http.get(bUrl);

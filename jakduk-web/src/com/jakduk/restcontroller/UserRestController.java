@@ -26,15 +26,35 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/exist/update/username/{username}", method = RequestMethod.GET)
-    public Boolean checkUpdateUsername(@PathVariable String username,
+    @RequestMapping(value = "/exist/username/update", method = RequestMethod.GET)
+    public Boolean existUpdateUsername(@RequestParam(required = true) String username,
                                        HttpServletRequest request) {
-
-        log.debug("username=" + username);
 
         Locale locale = localeResolver.resolveLocale(request);
 
         Boolean existUsername = userService.existUsernameOnUpdate(locale, username);
+
+        return existUsername;
+    }
+
+    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
+    public Boolean existEmail(@RequestParam(required = true) String email,
+                           HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+
+        Boolean existEmail = userService.existEmail(locale, email);
+
+        return existEmail;
+    }
+
+    @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
+    public Boolean existUsername(@RequestParam(required = true) String username,
+                              HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+
+        Boolean existUsername = userService.existUsernameOnWrite(locale, username);
 
         return existUsername;
     }

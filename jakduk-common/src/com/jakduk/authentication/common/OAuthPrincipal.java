@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.jakduk.common.CommonConst;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,15 +24,14 @@ import org.springframework.util.Assert;
 public class OAuthPrincipal implements UserDetails {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8207029289879890348L;
 
 	private String id;
 	private String oauthId;
 	private String username;
-	private String type;
-	private String addInfoStatus;
+	private CommonConst.ACCOUNT_TYPE providerId;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -47,18 +47,10 @@ public class OAuthPrincipal implements UserDetails {
 		return oauthId;
 	}
 
-	public String getType() {
-		return type;
+	public CommonConst.ACCOUNT_TYPE getProviderId() {
+		return providerId;
 	}
 	
-	public String getAddInfoStatus() {
-		return addInfoStatus;
-	}
-
-	public void setAddInfoStatus(String addInfoStatus) {
-		this.addInfoStatus = addInfoStatus;
-	}
-
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
@@ -141,29 +133,17 @@ public class OAuthPrincipal implements UserDetails {
 		return sortedAuthorities;
 	}
 
-	public OAuthPrincipal(String id, String oauthId, String username, String type, String addInfoStatus, boolean enabled, boolean accountNonExpired,
-			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+	public OAuthPrincipal(String id, String oauthId, String username, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
+						  boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		this.id = id;
 		this.oauthId = oauthId;
 		this.username = username;
-		this.type = type;
-		this.addInfoStatus = addInfoStatus;
+		this.providerId = providerId;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
 		this.accountNonLocked = accountNonLocked;
 		this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
-	}
-
-	@Override
-	public String toString() {
-		return "OAuthPrincipal [id=" + id + ", oauthId=" + oauthId
-				+ ", username=" + username + ", type=" + type
-				+ ", addInfoStatus=" + addInfoStatus + ", authorities="
-				+ authorities + ", accountNonExpired=" + accountNonExpired
-				+ ", accountNonLocked=" + accountNonLocked
-				+ ", credentialsNonExpired=" + credentialsNonExpired
-				+ ", enabled=" + enabled + "]";
 	}
 }

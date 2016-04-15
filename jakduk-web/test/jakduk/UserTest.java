@@ -2,6 +2,10 @@ package jakduk;
 
 import java.util.List;
 
+import com.jakduk.configuration.AppConfig;
+import com.jakduk.model.db.User;
+import com.jakduk.model.simple.SocialUserOnLogin;
+import com.jakduk.model.simple.UserOnAuthentication;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +23,7 @@ import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 
 /**
@@ -29,7 +34,8 @@ import com.jakduk.repository.UserRepository;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/applicationContext.xml")
+@ContextConfiguration(classes = AppConfig.class)
+@WebAppConfiguration
 public class UserTest {
 	
 	@Autowired
@@ -101,6 +107,21 @@ public class UserTest {
 		List<SupporterCount> users = jakdukDAO.getSupportFCCount("ko");
 		System.out.println("getSupportFCCount=" + users);
 		
+	}
+
+	@Test
+	public void getSocialUser() {
+
+		String email = "phjang19834@daum.net";
+
+		UserOnAuthentication user1 = userRepository.userFindByEmail(email);
+		System.out.println("user1=" + user1);
+
+		SocialUserOnLogin user3 = userRepository.findSocialUserByEmail("phjang19834@daum.net");
+		System.out.println("user3=" + user3);
+
+		User user2 = userRepository.findOneByEmail("phjang19834@daum.net");
+		System.out.println("user2=" + user2);
 	}
 
 }

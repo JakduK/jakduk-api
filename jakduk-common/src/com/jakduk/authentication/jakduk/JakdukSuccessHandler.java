@@ -19,6 +19,7 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import com.jakduk.common.CommonConst;
 import com.jakduk.repository.UserRepository;
 import com.jakduk.service.CommonService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -26,6 +27,8 @@ import com.jakduk.service.CommonService;
  * @date     : 2014. 7. 11.
  * @desc     :
  */
+
+@Component
 public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	 {
 
 	@Autowired

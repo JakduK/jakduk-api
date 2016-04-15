@@ -35,11 +35,11 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
 
-		if (username.equals(CommonConst.OAUTH_TYPE_FACEBOOK)) {
+		if (username.equals(CommonConst.ACCOUNT_TYPE.FACEBOOK)) {
 			FacebookUser user = facebookService.findUser();
 
 //			logger.debug("phjang=" + facebookUser);
-			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getId(), user.getName(), CommonConst.OAUTH_TYPE_FACEBOOK);
+			OAuthPrincipal principal = (OAuthPrincipal) oauthDetailService.loadUser(user.getId(), user.getName(), CommonConst.ACCOUNT_TYPE.FACEBOOK);
 			
 			UsernamePasswordAuthenticationToken token = 
 					new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials(), principal.getAuthorities());

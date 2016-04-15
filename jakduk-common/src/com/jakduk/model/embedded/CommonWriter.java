@@ -1,5 +1,6 @@
 package com.jakduk.model.embedded;
 
+import com.jakduk.common.CommonConst;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +21,4 @@ public class CommonWriter {
 	private String userId;
 	private String username;
 	private String type;
-
 }

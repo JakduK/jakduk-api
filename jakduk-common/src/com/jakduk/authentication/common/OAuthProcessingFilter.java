@@ -69,7 +69,7 @@ public class OAuthProcessingFilter extends AbstractAuthenticationProcessingFilte
 			throw new BadCredentialsException(error);
 		}
 		
-		if (type!= null && (type.equals(CommonConst.OAUTH_TYPE_DAUM) || type.equals(CommonConst.OAUTH_TYPE_FACEBOOK))) {
+		if (type!= null && (type.equals(CommonConst.ACCOUNT_TYPE.DAUM) || type.equals(CommonConst.ACCOUNT_TYPE.FACEBOOK))) {
 			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(type, null);
 			SecurityContextHolder.getContext().setAuthentication(authRequest);
 
