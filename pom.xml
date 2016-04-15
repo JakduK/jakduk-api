@@ -132,7 +132,7 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
 			<version>${spring.data.mongodb.version}</version>
-			<providerId>jar</providerId>
+			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<!-- MongoDB Java Driver -->
@@ -140,7 +140,7 @@
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongodb.driver.version}</version>
-			<providerId>jar</providerId>
+			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

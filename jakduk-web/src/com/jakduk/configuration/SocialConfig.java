@@ -1,12 +1,12 @@
 package com.jakduk.configuration;
 
 
+
+
+
 import com.jakduk.configuration.mongo.MongoConnectionDao;
 import net.exacode.spring.social.connect.GenericUsersConnectionRepository;
-
-
 import net.exacode.spring.social.connect.mongo.MongoConnectionConverter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

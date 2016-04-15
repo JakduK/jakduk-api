@@ -246,7 +246,7 @@ public class UserService {
 		}		
 	}
 
-	public void saveSocialUser(SocialUserForm userForm, SocialInfo socialInfo) {
+	public User saveSocialUser(SocialUserForm userForm, SocialInfo socialInfo) {
 
 		User user = new User();
 
@@ -278,6 +278,8 @@ public class UserService {
 		}
 
 		userRepository.save(user);
+
+		return user;
 
 //		principal.setUsername(userWrite.getUsername());
 //		principal.setAddInfoStatus(socialInfo.getAddInfoStatus());
