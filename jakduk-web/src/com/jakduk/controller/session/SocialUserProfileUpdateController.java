@@ -35,7 +35,7 @@ import com.jakduk.service.UserService;
 @Slf4j
 @RequestMapping("/oauth")
 @SessionAttributes({"SocialUserForm", "footballClubs"})
-public class OAuthProfileUpdateController {
+public class SocialUserProfileUpdateController {
 	
 	@Autowired
 	private CommonService commonService;

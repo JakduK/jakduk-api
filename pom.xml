@@ -132,7 +132,6 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
 			<version>${spring.data.mongodb.version}</version>
-			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<!-- MongoDB Java Driver -->
@@ -140,7 +139,6 @@
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongodb.driver.version}</version>
-			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -239,6 +237,7 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>${org.hibernate.validator.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
@@ -392,10 +391,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
     <dependencyManagement>
     	<dependencies>
     	</dependencies>
     </dependencyManagement>
+
     <modules>
     	<module>jakduk-common</module>
     	<module>jakduk-web</module>

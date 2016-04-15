@@ -59,9 +59,9 @@ public class CommonConst {
 	public final static String COOKIE_EMAIL = "email";
 	public final static String COOKIE_REMEMBER = "remember";
 	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-	
+
 	/**
-	 * 인증 종류
+	 * Social 프로바이더 종류.
 	 */
 	public enum ACCOUNT_TYPE {
 		JAKDUK,

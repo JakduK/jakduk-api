@@ -1,13 +1,13 @@
 package com.jakduk.authentication.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-
+`import com.jakduk.authentication.daum.DaumUser;
+import com.jakduk.authentication.facebook.FacebookUser;
 import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
 import com.jakduk.model.embedded.SocialInfo;
-import com.jakduk.model.simple.SocialUserOnLogin;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
+import com.jakduk.repository.UserRepository;
+import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,11 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.jakduk.authentication.daum.DaumUser;
-import com.jakduk.authentication.facebook.FacebookUser;
-import com.jakduk.common.CommonRole;
-import com.jakduk.repository.UserRepository;
-import com.jakduk.service.UserService;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -61,15 +59,15 @@ public class OAuthDetailService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String oauthId)	throws UsernameNotFoundException {
 		
-		SocialUserOnLogin user = userRepository.findByOauthUser(providerId, oauthId);
+		SocialUserOnAuthentication user = userRepository.findByOauthUser(providerId, oauthId);
 		
 		if (user == null) {
-			SocialUserOnLogin oauthUserOnLogin = new SocialUserOnLogin();
+			SocialUserOnAuthentication oauthUserOnLogin = new SocialUserOnAuthentication();
 			oauthUserOnLogin.setUsername(username);			
 			SocialInfo oauthUser = new SocialInfo();
 			oauthUser.setOauthId(oauthId);
 			oauthUser.setProviderId(providerId);
-			oauthUserOnLogin.setSocialInfo(oauthUser);
+			//oauthUserOnLogin.setSocialInfo(oauthUser);
 			
 			ArrayList<Integer> roles = new ArrayList<Integer>();
 			roles.add(CommonRole.ROLE_NUMBER_USER_02);

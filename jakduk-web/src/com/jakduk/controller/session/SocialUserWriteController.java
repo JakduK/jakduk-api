@@ -1,21 +1,13 @@
 package com.jakduk.controller.session;
 
-import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.common.CommonConst;
-import com.jakduk.common.CommonRole;
 import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.SocialInfo;
 import com.jakduk.model.web.SocialUserForm;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.UserProfile;
@@ -35,8 +27,6 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -115,10 +105,10 @@ public class SocialUserWriteController {
 
         log.debug("socialUserForm=" + socialUserForm);
 
-        SocialInfo socialInfo = new SocialInfo();
-        socialInfo.setProviderId(CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase()));
-        socialInfo.setOauthId(connectionKey.getProviderUserId());
+        CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
+        String providerUserId = connectionKey.getProviderUserId();
 
+        userService.saveSocialUser(socialUserForm, providerId, providerUserId);
         User user = userService.saveSocialUser(socialUserForm, socialInfo);
 
         OAuthPrincipal userDetails = new OAuthPrincipal(user.getId(), socialInfo.getOauthId(), user.getUsername(), socialInfo.getProviderId(),
@@ -126,7 +116,6 @@ public class SocialUserWriteController {
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         //sessionStatus.setComplete();
 
         providerSignInUtils.doPostSignUp(socialUserForm.getEmail(), request);

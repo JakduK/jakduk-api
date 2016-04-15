@@ -32,7 +32,7 @@ import com.jakduk.service.UserService;
 
 @Controller
 @RequestMapping("/oauth")
-public class OAuthController {
+public class SocialUserController {
 	
 	@Autowired
 	private CommonService commonService;

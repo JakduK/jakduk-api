@@ -31,16 +31,34 @@ import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
-import com.jakduk.dao.JakdukDAO;
+import com.jakduk.exception.DuplicateDataException;
+import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.OAuthProfile;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.SocialUserForm;
+import com.jakduk.model.web.*;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -51,22 +69,13 @@ public class UserService {
 	
 	@Autowired
 	private StandardPasswordEncoder encoder;
-	
-	@Autowired
-	private UserDetailsManager userDetailsManager;
-	
+
 	@Autowired
 	private UserRepository userRepository;
 	
 	@Autowired
 	private FootballClubRepository footballClubRepository;
 
-	@Autowired
-	private FootballClubOriginRepository footballClubOriginRepository;
-	
-	@Autowired
-	private JakdukDAO jakdukDAO;
-	
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
@@ -98,43 +107,44 @@ public class UserService {
 		return model;
 	}
 	
-	public void userWrite(UserWrite userWrite) {
+	public void saveUserOnSignUp(UserWrite userWrite) {
+
 		User user = new User();
-		user.setEmail(userWrite.getEmail());
-		user.setUsername(userWrite.getUsername());
-		user.setPassword(userWrite.getPassword());
+		user.setEmail(userWrite.getEmail().trim());
+		user.setUsername(userWrite.getUsername().trim());
+		user.setPassword(userWrite.getPassword().trim());
+		user.setProviderId(CommonConst.ACCOUNT_TYPE.JAKDUK);
 		
 		String footballClub = userWrite.getFootballClub();
-		
-		if (footballClub != null && !footballClub.isEmpty()) {
+		String about = userWrite.getAbout();
+
+		if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
 			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
 			
 			user.setSupportFC(supportFC);
 		}
-		
-		user.setAbout(userWrite.getAbout());
-		
+
+		if (Objects.nonNull(about) && !about.isEmpty()) {
+			user.setAbout(about.trim());
+		}
+
 		ArrayList<Integer> roles = new ArrayList<Integer>();
 		roles.add(CommonRole.ROLE_NUMBER_USER_01);
 		
 		user.setRoles(roles);
 		
 		this.create(user);
-		
-		if (log.isInfoEnabled()) {
-			log.info("new user joined. email=" + user.getEmail() + ", username=" + user.getUsername());
-		}
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug("user=" + user);
 		}
 	}
 	
-	public void oauthUserWrite(SocialUserOnLogin oauthUserOnLogin) {
+	public void oauthUserWrite(SocialUserOnAuthentication oauthUserOnLogin) {
 		User user = new User();
 		
 		user.setUsername(oauthUserOnLogin.getUsername());
-		user.setSocialInfo(oauthUserOnLogin.getSocialInfo());
+		//user.setSocialInfo(oauthUserOnLogin.getSocialInfo());
 		user.setRoles(oauthUserOnLogin.getRoles());
 		
 		userRepository.save(user);
@@ -211,7 +221,7 @@ public class UserService {
 			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			CommonUser userDetails = (CommonUser) SecurityContextHolder.getContext().getAuthentication().getDetails();
 			
-			SocialUserOnLogin oauthUserOnLogin = userRepository.findByOauthUser(principal.getProviderId(), principal.getOauthId());
+			SocialUserOnAuthentication oauthUserOnLogin = userRepository.findByOauthUser(principal.getProviderId(), principal.getOauthId());
 			
 			SocialUserForm oauthUserForm = new SocialUserForm();
 			
@@ -246,12 +256,15 @@ public class UserService {
 		}		
 	}
 
-	public User saveSocialUser(SocialUserForm userForm, SocialInfo socialInfo) {
+	public void saveSocialUser(SocialUserForm userForm, SocialInfo socialInfo) {
 
 		User user = new User();
 
 		user.setEmail(userForm.getEmail().trim());
 		user.setUsername(userForm.getUsername().trim());
+		user.setProviderId(providerId);
+		user.setProviderUserId(providerUserId);
+
 
 		ArrayList<Integer> roles = new ArrayList<Integer>();
 		roles.add(CommonRole.ROLE_NUMBER_USER_01);
@@ -270,8 +283,6 @@ public class UserService {
 		if (Objects.nonNull(about) && !about.isEmpty()) {
 			user.setAbout(userForm.getAbout().trim());
 		}
-
-		user.setSocialInfo(socialInfo);
 
 		if (log.isDebugEnabled()) {
 			log.debug("OAuth user=" + user);
@@ -515,8 +526,7 @@ public class UserService {
 			CommonUser userDetails = (CommonUser) SecurityContextHolder.getContext().getAuthentication().getDetails();
 			
 			User user = userRepository.userFindByOauthUser(principal.getProviderId(), principal.getOauthId());
-			SocialInfo socialInfo = user.getSocialInfo();
-			
+
 			String username = userWrite.getUsername();
 			String footballClub = userWrite.getFootballClub();
 			String about = userWrite.getAbout();
@@ -534,9 +544,7 @@ public class UserService {
 			if (about != null && !about.isEmpty()) {
 				user.setAbout(userWrite.getAbout());
 			}
-			
-			user.setSocialInfo(socialInfo);
-			
+
 			userRepository.save(user);
 			
 			principal.setUsername(userWrite.getUsername());
@@ -559,7 +567,7 @@ public class UserService {
 				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				commonPrincipal.setId(principal.getId());
 				commonPrincipal.setUsername(principal.getUsername());
-				commonPrincipal.setType(principal.getType());
+				commonPrincipal.setType(principal.getProviderId());
 			}
 		}
 		
