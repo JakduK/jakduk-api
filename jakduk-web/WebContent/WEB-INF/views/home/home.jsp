@@ -277,7 +277,7 @@
 							});
 							reqPromise.error(function (data, status, headers, config) {
 								$scope.encyclopediaConn = "none";
-								console.error(data.error);
+								console.error(data.message);
 							});
 						}
 					}

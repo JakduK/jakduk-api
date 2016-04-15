@@ -1,11 +1,16 @@
 package jakduk;
 
-import java.util.List;
-
+import com.jakduk.common.CommonRole;
 import com.jakduk.configuration.AppConfig;
+import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.User;
-import com.jakduk.model.simple.SocialUserOnLogin;
+import com.jakduk.model.etc.SupporterCount;
+import com.jakduk.model.simple.OAuthProfile;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnAuthentication;
+import com.jakduk.model.simple.UserProfile;
+import com.jakduk.repository.FootballClubRepository;
+import com.jakduk.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,15 +20,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.jakduk.common.CommonRole;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.etc.SupporterCount;
-import com.jakduk.model.simple.OAuthProfile;
-import com.jakduk.model.simple.UserProfile;
-import com.jakduk.repository.FootballClubRepository;
-import com.jakduk.repository.UserRepository;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import java.util.List;
 
 
 /**
@@ -112,15 +111,15 @@ public class UserTest {
 	@Test
 	public void getSocialUser() {
 
-		String email = "phjang19834@daum.net";
+		String email = "phjang1983@daum.net";
 
 		UserOnAuthentication user1 = userRepository.userFindByEmail(email);
 		System.out.println("user1=" + user1);
 
-		SocialUserOnLogin user3 = userRepository.findSocialUserByEmail("phjang19834@daum.net");
+		SocialUserOnAuthentication user3 = userRepository.findSocialUserByEmail(email);
 		System.out.println("user3=" + user3);
 
-		User user2 = userRepository.findOneByEmail("phjang19834@daum.net");
+		User user2 = userRepository.findOneByEmail(email);
 		System.out.println("user2=" + user2);
 	}
 

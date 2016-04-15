@@ -12,12 +12,13 @@ import java.util.*;
 /**
  * Created by pyohwan on 16. 4. 8.
  */
-public class SocialUserDetail implements org.springframework.social.security.SocialUserDetails {
+public class SocialUserDetail implements SocialUserDetails {
 
     private String id;
     private String userId;
     private String username;
     private CommonConst.ACCOUNT_TYPE providerId;
+    private String providerUserId;
 
     private final Set<GrantedAuthority> authorities;
     private final boolean accountNonExpired;
@@ -25,13 +26,14 @@ public class SocialUserDetail implements org.springframework.social.security.Soc
     private final boolean credentialsNonExpired;
     private final boolean enabled;
 
-    public SocialUserDetail(String id, String userId, String username, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
+    public SocialUserDetail(String id, String userId, String username, CommonConst.ACCOUNT_TYPE providerId, String providerUserId, boolean enabled, boolean accountNonExpired,
                             boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
         this.id = id;
         this.userId = userId;
         this.username = username;
         this.providerId = providerId;
+        this.providerUserId = providerUserId;
         this.enabled = enabled;
         this.accountNonExpired = accountNonExpired;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -71,16 +73,9 @@ public class SocialUserDetail implements org.springframework.social.security.Soc
         }
     }
 
-    public String getId() {
-        return id;
-    }
-
+    @Override
     public String getUserId() {
         return userId;
-    }
-
-    public CommonConst.ACCOUNT_TYPE getProviderId() {
-        return providerId;
     }
 
     @Override
@@ -118,12 +113,12 @@ public class SocialUserDetail implements org.springframework.social.security.Soc
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public CommonConst.ACCOUNT_TYPE getProviderId() {
+        return providerId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getProviderUserId() {
+        return providerUserId;
     }
 
 }

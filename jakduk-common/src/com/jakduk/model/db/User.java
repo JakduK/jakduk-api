@@ -1,15 +1,14 @@
 package com.jakduk.model.db;
 
-import java.util.List;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-
-import com.jakduk.model.embedded.SocialInfo;
+import com.jakduk.common.CommonConst;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import java.util.List;
 
 @Document
 @Data
@@ -23,9 +22,11 @@ public class User {
 	private String username;
 	
 	private String password;
-	
-	private SocialInfo socialInfo;
-	
+
+	private CommonConst.ACCOUNT_TYPE providerId;
+
+	private String providerUserId;
+
 	private List<Integer> roles;
 
 	private String about;

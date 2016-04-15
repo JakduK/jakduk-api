@@ -1,11 +1,10 @@
 package com.jakduk.model.simple;
 
-import java.util.List;
-
-import com.jakduk.model.embedded.SocialInfo;
+import com.jakduk.common.CommonConst;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -15,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Data
-public class SocialUserOnLogin {
+public class SocialUserOnAuthentication {
 	
 	@Id
 	private String id;
@@ -23,8 +22,10 @@ public class SocialUserOnLogin {
 	private String email;
 	
 	private String username;
-	
-	private SocialInfo socialInfo;
+
+	private CommonConst.ACCOUNT_TYPE providerId;
+
+	private String providerUserId;
 	
 	private List<Integer> roles;
 

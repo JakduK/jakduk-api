@@ -38,15 +38,15 @@
 				</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
 					<sec:authentication property="principal.username" var="accountName"/>
-					<sec:authentication property="principal.type" var="userType"/>
+					<sec:authentication property="principal.providerId" var="userType"/>
 					<c:choose>
-						<c:when test="${userType == 'jakduk'}">
+						<c:when test="${userType == 'JAKDUK'}">
 							<li>
 								<i class="fa fa-user"></i>
 								<a href="<c:url value="/user/profile"/>">${accountName}</a>
 							</li>
 						</c:when>
-						<c:when test="${userType == 'facebook' || userType == 'daum'}">
+						<c:when test="${userType == 'FACEBOOK' || userType == 'DAUM'}">
 							<li>
 								<i class="fa fa-user"></i>
 								<a href="<c:url value="/oauth/profile"/>">${accountName}</a>

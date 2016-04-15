@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.OAuthProfile;
-import com.jakduk.model.simple.SocialUserOnLogin;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
@@ -34,11 +34,9 @@ public interface UserRepository extends MongoRepository<User, String> {
 	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
 	User userFindByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 
-	@Query(value="{'email' : ?0}")
-	SocialUserOnLogin findSocialUserByEmail(String email);
+	@Query(value="{'email' : ?0}") SocialUserOnAuthentication findSocialUserByEmail(String email);
 
-	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
-	SocialUserOnLogin findByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
+	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}") SocialUserOnAuthentication findByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 	
 	@Query(value="{'socialInfo.oauthId' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1, 'socialInfo' : 1}")
 	OAuthProfile userFindByNEOauthIdAndUsername(String oauthId, String username);

@@ -1,35 +1,30 @@
 package com.jakduk.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.model.elasticsearch.JakduCommentOnES;
-
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
-import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
-
+import com.jakduk.model.elasticsearch.JakduCommentOnES;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -115,7 +110,7 @@ public class SearchService {
 	public String searchDocumentBoard(String q, int from, int size) {
 		
 		String query = "{\n" +
-				//"\"fields\" : [\"seq\", \"writer.providerId\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
+				//"\"fields\" : [\"seq\", \"writer.type\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
 				"\"from\" : " + from + "," + 
 				"\"size\" : " + size + "," + 
 				"\"_source\" : { \"exclude\" : \"content\"}, " +

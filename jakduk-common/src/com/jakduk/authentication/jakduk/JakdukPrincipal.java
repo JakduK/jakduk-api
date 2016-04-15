@@ -1,19 +1,14 @@
 package com.jakduk.authentication.jakduk;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
+import java.util.*;
 
 public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 
@@ -22,7 +17,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	//~ Instance fields ================================================================================================
 	private String password;
 	private String username;
-	private CommonConst.ACCOUNT_TYPE type;
+	private CommonConst.ACCOUNT_TYPE providerId;
 	private final String email;
 	private final String id;
 	private final Set<GrantedAuthority> authorities;
@@ -56,7 +51,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	 *         either as a parameter or as an element in the
 	 *         <code>GrantedAuthority</code> collection
 	 */
-	public JakdukPrincipal(String email, String id, String password, String username, CommonConst.ACCOUNT_TYPE type, boolean enabled, boolean accountNonExpired,
+	public JakdukPrincipal(String email, String id, String password, String username, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
 						   boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		if (((email == null) || "".equals(email)) || (password == null)) {
@@ -67,7 +62,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		this.id = id;
 		this.password = password;
 		this.username = username;
-		this.type = type;
+		this.providerId = providerId;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
@@ -89,8 +84,8 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		return username;
 	}
 	
-	public CommonConst.ACCOUNT_TYPE getType() {
-		return type;
+	public CommonConst.ACCOUNT_TYPE getProviderId() {
+		return providerId;
 	}
 
 	public String getId() {

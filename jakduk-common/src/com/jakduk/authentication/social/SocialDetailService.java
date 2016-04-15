@@ -1,18 +1,20 @@
 package com.jakduk.authentication.social;
 
 import com.jakduk.common.CommonRole;
-import com.jakduk.model.simple.SocialUserOnLogin;
+import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.social.security.SocialUserDetails;
 import org.springframework.social.security.SocialUserDetailsService;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 4. 8.
@@ -25,18 +27,23 @@ public class SocialDetailService implements SocialUserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public org.springframework.social.security.SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
+    public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
 
-        log.debug("userId=" + userId);
+        if (Objects.isNull(userId)) {
+            throw new IllegalArgumentException("userId 는 꼭 필요한 값입니다.");
+        } else {
+            UserOnAuthentication user = userRepository.userFindByEmail(userId);
 
-        SocialUserOnLogin user = userRepository.findSocialUserByEmail(userId);
+            if (Objects.isNull(user))
+                throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. userId=" + userId);
 
-        log.debug("user=" + user);
+            log.debug("user=" + user);
 
-        SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getSocialInfo().getOauthId(), user.getUsername(), user.getSocialInfo().getProviderId(),
-                true, true, true, true, getAuthorities(user.getRoles()));
+            SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
+                    true, true, true, true, getAuthorities(user.getRoles()));
 
-        return userDetail;
+            return userDetail;
+        }
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {

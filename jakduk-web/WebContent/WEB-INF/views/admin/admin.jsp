@@ -55,7 +55,7 @@
 		  	</button>
 			<ul class="dropdown-menu" role="menu">
 				<li><a ng-click="getData('encyclopedia')">Get Encyclopedia</a></li>
-				<li><a ng-click="getData('fcOrigin')"/>Get Football Club Origin</a></li>
+				<li><a ng-click="getData('fcOrigin')">Get Football Club Origin</a></li>
 				<li><a ng-click="getData('fc')">Get Football Club</a></li>
 				<li><a ng-click="getData('boardCategory')">Get Board Category</a></li>
 				<li><a ng-click="getData('homeDescription')">Get Home Description</a></li>

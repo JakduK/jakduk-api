@@ -105,11 +105,10 @@ public class SocialUserWriteController {
 
         log.debug("socialUserForm=" + socialUserForm);
 
-        SocialInfo socialInfo = new SocialInfo();
-        socialInfo.setProviderId(CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase()));
-        socialInfo.setOauthId(connectionKey.getProviderUserId());
+        CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
+        String providerUserId = connectionKey.getProviderUserId();
 
-        userService.saveSocialUser(socialUserForm, socialInfo);
+        userService.saveSocialUser(socialUserForm, providerId, providerUserId);
 
         sessionStatus.setComplete();
 

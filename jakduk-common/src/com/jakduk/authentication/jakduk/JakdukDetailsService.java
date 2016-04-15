@@ -1,9 +1,6 @@
 package com.jakduk.authentication.jakduk;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,33 +25,30 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		
-		if (email != null && (email.equals(CommonConst.ACCOUNT_TYPE.FACEBOOK)
-				|| email.equals(CommonConst.ACCOUNT_TYPE.DAUM))) {
-			throw new UsernameNotFoundException("not found email=" + email);
+
+		if (Objects.isNull(email)) {
+			throw new IllegalArgumentException("email 은 꼭 필요한 값입니다.");
 		} else {
 			UserOnAuthentication user = userRepository.userFindByEmail(email);
 
-			if (user != null) {
-				boolean enabled = true;
-				boolean accountNonExpired = true;
-				boolean credentialsNonExpired = true;
-				boolean accountNonLocked = true;
+			if (Objects.isNull(user))
+				throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
 
-				JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
-						, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
-						, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
-				
-				if (log.isInfoEnabled()) {
-					log.info("load Jakduk username=" + jakdukPrincipal.getUsername());
-				}
+			boolean enabled = true;
+			boolean accountNonExpired = true;
+			boolean credentialsNonExpired = true;
+			boolean accountNonLocked = true;
 
-				return jakdukPrincipal;
-			} else {
-				throw new UsernameNotFoundException("not found email=" + email);
+			JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
+					, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
+					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
+
+			if (log.isInfoEnabled()) {
+				log.info("load Jakduk username=" + jakdukPrincipal.getUsername());
 			}
+
+			return jakdukPrincipal;
 		}
-		
 	}
 	
 	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
@@ -88,41 +82,24 @@ public class JakdukDetailsService implements UserDetailsManager {
 		return authorities;
 	}
 
-
-
 	@Override
 	public void createUser(UserDetails user) {
-		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public void updateUser(UserDetails user) {
-		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public void deleteUser(String username) {
-		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public void changePassword(String oldPassword, String newPassword) {
 	}
 
-
-
 	@Override
 	public boolean userExists(String username) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

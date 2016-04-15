@@ -95,7 +95,7 @@ public class UserWriteController {
 			return "user/write";
 		}
 		
-		userService.userWrite(userWrite);
+		userService.saveUserOnSignUp(userWrite);
 		sessionStatus.setComplete();
 		
 		String path = String.format("%s/", request.getContextPath());
