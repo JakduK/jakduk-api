@@ -41,7 +41,7 @@ public class UserController {
 	@RequestMapping
 	public String root() {
 		
-		return "redirect:/user/list";
+		return "redirect:/user/profile";
 	}
 
 	@RequestMapping(value = "/refresh", method = RequestMethod.GET)

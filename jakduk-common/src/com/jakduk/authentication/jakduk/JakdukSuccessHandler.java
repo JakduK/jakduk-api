@@ -17,7 +17,7 @@ import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.repository.UserRepository;
+import com.jakduk.repository.user.UserRepository;
 import com.jakduk.service.CommonService;
 import org.springframework.stereotype.Component;
 

@@ -2,7 +2,7 @@ package com.jakduk.authentication.social;
 
 import com.jakduk.common.CommonRole;
 import com.jakduk.model.simple.UserOnAuthentication;
-import com.jakduk.repository.UserRepository;
+import com.jakduk.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

@@ -224,7 +224,6 @@
 					}
 
 					$scope.eaualPasswordConfirm();
-					$scope.submitConn = "none";
 					$scope.buttonAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.need.form.validation"/>'};
 					event.preventDefault();
 				}

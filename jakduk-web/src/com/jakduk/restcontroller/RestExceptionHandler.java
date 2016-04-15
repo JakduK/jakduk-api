@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
  * Created by pyohwan on 16. 3. 4.
  */
 
-@ControllerAdvice(value = "com.jakduk.restcontroller", annotations = RestController.class)
+@ControllerAdvice(value = "com.jakduk.restcontroller")
 @Slf4j
 public class RestExceptionHandler {
 

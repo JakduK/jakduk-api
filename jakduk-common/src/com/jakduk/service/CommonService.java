@@ -3,6 +3,7 @@ package com.jakduk.service;
 import com.jakduk.authentication.common.CommonUser;
 import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
+import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
@@ -22,6 +23,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -170,18 +172,7 @@ public class CommonService {
 		
 		return dateTimeFormat;
 	}
-	
-	public void doOAuthAutoLogin(OAuthPrincipal principal, Object credentials, CommonUser userDetails) {
-		
-		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());
-		
-		if (userDetails != null) {
-			token.setDetails(userDetails);
-		}
-		
-		SecurityContextHolder.getContext().setAuthentication(token);
-	}
-	
+
 	public void doJakdukAutoLogin(JakdukPrincipal principal, Object credentials) {
 		
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());

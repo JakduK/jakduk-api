@@ -3,6 +3,7 @@ package com.jakduk.model.simple;
 import java.util.List;
 
 import com.jakduk.model.embedded.SocialInfo;
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,7 +16,7 @@ import com.jakduk.model.db.FootballClub;
  * @desc     :
  */
 
-@Document(collection = "user")
+@Data
 public class OAuthProfile {
 	
 	private String id;
@@ -30,60 +31,5 @@ public class OAuthProfile {
 	
 	@DBRef
 	private FootballClub supportFC;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public SocialInfo getOauthUser() {
-		return oauthUser;
-	}
-
-	public void setOauthUser(SocialInfo oauthUser) {
-		this.oauthUser = oauthUser;
-	}
-	
-	public List<Integer> getRoles() {
-		return roles;
-	}
-
-	public void setRoles(List<Integer> roles) {
-		this.roles = roles;
-	}
-
-	public String getAbout() {
-		return about;
-	}
-
-	public void setAbout(String about) {
-		this.about = about;
-	}
-
-	public FootballClub getSupportFC() {
-		return supportFC;
-	}
-
-	public void setSupportFC(FootballClub supportFC) {
-		this.supportFC = supportFC;
-	}
-
-	@Override
-	public String toString() {
-		return "OAuthProfile [id=" + id + ", username=" + username
-				+ ", socialInfo=" + oauthUser + ", roles=" + roles + ", about="
-				+ about + ", supportFC=" + supportFC + "]";
-	}
 
 }

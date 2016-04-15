@@ -35,6 +35,12 @@
 
             <form class="form-horizontal" role="form">
                 <div class="form-group">
+                    <label class="col-sm-2 control-label"><spring:message code="user.email"/></label>
+                    <div class="col-sm-3">
+                        <p class="form-control-static">${userProfile.email}</p>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-sm-2 control-label"><spring:message code="user.nickname"/></label>
                     <div class="col-sm-3">
                         <p class="form-control-static">${userProfile.username}</p>

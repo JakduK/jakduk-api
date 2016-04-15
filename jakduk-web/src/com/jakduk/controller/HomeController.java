@@ -52,15 +52,6 @@ public class HomeController {
 		return "home/home";
 	}
 
-	@RequestMapping(value = "/check/oauth/update/username")
-	public void checkOAuthUpdateUsername(Model model,
-			@RequestParam(required = true) String username) {
-		
-		Boolean existUsername = userService.existOAuthUsernameOnUpdate(username);
-		
-		model.addAttribute("existUsername", existUsername);
-	}
-	
 	@RequestMapping(value = "/home/board/latest", method = RequestMethod.GET)
 	public String boardLatest(Model model) {
 		

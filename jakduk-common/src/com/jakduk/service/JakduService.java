@@ -121,7 +121,7 @@ public class JakduService {
         CommonPrincipal principal = userService.getCommonPrincipal();
         String accountId = principal.getId();
         String accountUsername = principal.getUsername();
-        CommonConst.ACCOUNT_TYPE accountType = principal.getType();
+        CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
 
         if (accountId == null)
             return result;
@@ -195,7 +195,7 @@ public class JakduService {
         if (Objects.isNull(accountId))
             throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
-        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType().name());
+        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId().name());
 
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
 
@@ -234,7 +234,7 @@ public class JakduService {
         if (Objects.isNull(accountId))
             throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
-        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getType().name());
+        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId().name());
 
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(request.getId());
 

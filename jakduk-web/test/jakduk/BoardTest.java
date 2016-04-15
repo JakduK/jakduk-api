@@ -62,10 +62,7 @@ public class BoardTest {
 	
 	@Autowired
 	BoardDAO boardDAO;
-	
-	@Autowired
-	private MongoTemplate mongoTemplate;
-	
+
 	@Resource
 	private JongoR jongoR;
 

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.model.simple.UserOnAuthentication;
-import com.jakduk.repository.UserRepository;
+import com.jakduk.repository.user.UserRepository;
 
 @Service
 @Slf4j
@@ -30,6 +30,8 @@ public class JakdukDetailsService implements UserDetailsManager {
 			throw new IllegalArgumentException("email 은 꼭 필요한 값입니다.");
 		} else {
 			UserOnAuthentication user = userRepository.userFindByEmail(email);
+
+			log.debug("user=" + user);
 
 			if (Objects.isNull(user))
 				throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);

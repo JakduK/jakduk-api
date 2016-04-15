@@ -1,6 +1,5 @@
 package com.jakduk.service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -26,7 +25,7 @@ import com.jakduk.model.etc.SupporterCount;
 import com.jakduk.repository.AttendanceClubRepository;
 import com.jakduk.repository.AttendanceLeagueRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
-import com.jakduk.repository.UserRepository;
+import com.jakduk.repository.user.UserRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>

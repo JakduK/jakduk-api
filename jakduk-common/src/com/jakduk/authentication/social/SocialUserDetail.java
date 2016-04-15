@@ -117,6 +117,10 @@ public class SocialUserDetail implements SocialUserDetails {
         return providerId;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getProviderUserId() {
         return providerUserId;
     }

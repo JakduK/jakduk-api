@@ -2,6 +2,7 @@ package com.jakduk.dao;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import lombok.Getter;
 import org.jongo.Jongo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,16 +16,14 @@ import java.net.UnknownHostException;
 * @date     : 2015. 12. 16.
 * @desc     :
 */
+
+@Getter
 public class JongoR {
-	private Jongo jongo = null;
+	private Jongo jongo;
 
 	public JongoR(String dbName, MongoClient mongoClient) {
 
 		DB db = mongoClient.getDB(dbName);
 		jongo = new Jongo(db);
-	}
-
-	public Jongo getJongo() {
-		return jongo;
 	}
 }

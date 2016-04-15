@@ -86,7 +86,7 @@
 			<div class="form-group">
 				<label class="col-sm-2 control-label"> <spring:message code="user.comment"/></label>
 				<div class="col-sm-4">
-					<textarea name="about" class="form-control" cols="40" rows="5" placeholder='<spring:message code="user.placeholder.about"/>'></textarea>
+					<form:textarea path="about" cssClass="form-control" cols="40" rows="5" placeholder='<spring:message code="user.placeholder.about"/>'/>
 				</div>
 			</div>
 
@@ -160,7 +160,7 @@
 
 		$scope.onUsername = function() {
 			if ($scope.userProfileWrite.username.$valid) {
-				var bUrl = '<c:url value="/api/user/exist/username/update?username=' + $scope.username + '/"/>';
+				var bUrl = '<c:url value="/api/user/exist/username/update?username=' + $scope.username + '"/>';
 
 				if ($scope.usernameConn == "none") {
 					var reqPromise = $http.get(bUrl);

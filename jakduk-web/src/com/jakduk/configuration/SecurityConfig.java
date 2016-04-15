@@ -69,11 +69,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/auth/*",
                                 "/signup/*",
                                 "/user/write",
-                                "/oauth"
+                                "/social/user/write"
                         ).anonymous()
                         .antMatchers(
                                 "/user/**",
-                                "/oauth/**"
+                                "/social/user/**"
                         ).authenticated()
                         .antMatchers(
                                 "/board/*/write",

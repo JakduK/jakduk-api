@@ -10,8 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import java.util.List;
 
-@Document
 @Data
+@Document
 public class User {
 
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)

@@ -60,7 +60,7 @@
 		</div>
 		
 		<div class="form-group has-feedback" ng-class="{'has-success':boardFreeWrite.subject.$valid, 'has-error':boardFreeWrite.subject.$invalid}">
-			<label for="subject" class="control-label"><abbr title="required">*</abbr> <spring:message code="board.subject"/></label>
+			<label class="control-label"><abbr title="required">*</abbr> <spring:message code="board.subject"/></label>
 			<input type="text" name="subject" class="form-control" placeholder='<spring:message code="board.placeholder.subject"/>'
 			ng-model="subject" ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
 			ng-required="true" ng-minlength="3" ng-maxlength="60"/>

@@ -70,14 +70,18 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
 	}
 
-	//~ Methods ========================================================================================================
+	@Override
+	public void eraseCredentials() {
+		password = "";
+	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
 
 	public Collection<GrantedAuthority> getAuthorities() {
 		return authorities;
-	}
-
-	public String getPassword() {
-		return password;
 	}
 
 	public String getUsername() {
@@ -110,10 +114,6 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 
 	public boolean isCredentialsNonExpired() {
 		return credentialsNonExpired;
-	}
-
-	public void eraseCredentials() {
-		password = null;
 	}
 
 	public void setUsername(String username) {

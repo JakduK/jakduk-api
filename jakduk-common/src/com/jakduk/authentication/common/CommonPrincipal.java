@@ -14,9 +14,10 @@ import lombok.Data;
 public class CommonPrincipal {
 	
 	private String id;
+
+	private String email;
 	
 	private String username;
 	
-	private CommonConst.ACCOUNT_TYPE type;
-
+	private CommonConst.ACCOUNT_TYPE providerId;
 }

@@ -3,7 +3,6 @@ package com.jakduk.restcontroller;
 import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -26,15 +25,27 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
+    @RequestMapping(value = "/exist/email/update", method = RequestMethod.GET)
+    public Boolean existUpdateEmail(@RequestParam(required = true) String email,
+                                       HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+
+        Boolean exist = userService.existEmailOnUpdate(locale, email.trim());
+
+        return exist;
+    }
+
+
     @RequestMapping(value = "/exist/username/update", method = RequestMethod.GET)
     public Boolean existUpdateUsername(@RequestParam(required = true) String username,
                                        HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
 
-        Boolean existUsername = userService.existUsernameOnUpdate(locale, username);
+        Boolean exist = userService.existUsernameOnUpdate(locale, username.trim());
 
-        return existUsername;
+        return exist;
     }
 
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
@@ -43,7 +54,7 @@ public class UserRestController {
 
         Locale locale = localeResolver.resolveLocale(request);
 
-        Boolean existEmail = userService.existEmail(locale, email);
+        Boolean existEmail = userService.existEmail(locale, email.trim());
 
         return existEmail;
     }
@@ -54,7 +65,7 @@ public class UserRestController {
 
         Locale locale = localeResolver.resolveLocale(request);
 
-        Boolean existUsername = userService.existUsernameOnWrite(locale, username);
+        Boolean existUsername = userService.existUsernameOnWrite(locale, username.trim());
 
         return existUsername;
     }

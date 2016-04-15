@@ -1,12 +1,12 @@
 package com.jakduk.authentication.common;
 
-`import com.jakduk.authentication.daum.DaumUser;
+import com.jakduk.authentication.daum.DaumUser;
 import com.jakduk.authentication.facebook.FacebookUser;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.model.embedded.SocialInfo;
 import com.jakduk.model.simple.SocialUserOnAuthentication;
-import com.jakduk.repository.UserRepository;
+import com.jakduk.repository.user.UserRepository;
 import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

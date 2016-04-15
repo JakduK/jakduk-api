@@ -10,7 +10,8 @@ import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.FootballClubRepository;
-import com.jakduk.repository.UserRepository;
+import com.jakduk.repository.user.UserProfileRepository;
+import com.jakduk.repository.user.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,22 +37,16 @@ import java.util.List;
 @ContextConfiguration(classes = AppConfig.class)
 @WebAppConfiguration
 public class UserTest {
-	
-	@Autowired
-	private ApplicationContext applicationContext;
-	
-	@Autowired
-	private StandardPasswordEncoder encoder;
-	
+
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	UserProfileRepository userProfileRepository;
 	
 	@Autowired
 	FootballClubRepository footballClubRepository;
-	
-	@Autowired
-	private MongoTemplate mongoTemplate;
-	
+
 	@Autowired
 	private JakdukDAO jakdukDAO;
 	
@@ -61,9 +56,18 @@ public class UserTest {
 	
 	@Test
 	public void test01() {
-		
 		UserProfile user = userRepository.userFindByNEIdAndUsername("544dd2a13d9648d912a339c7", "test05");		
 		System.out.println("UserProfile=" + user);
+	}
+
+	@Test
+	public void 회원_정보_편집() {
+		String id = "5703d2e2e4b07a2fcef75ec3";
+		UserProfile userProfile = userProfileRepository.findOne(id);
+		User user = userRepository.findById(id);
+
+		System.out.println("UserProfile=" + userProfile);
+		System.out.println("user=" + user);
 	}
 	
 	@Test

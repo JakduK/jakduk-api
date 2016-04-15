@@ -2,16 +2,24 @@ package com.jakduk.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import com.jakduk.authentication.common.OAuthPrincipal;
+import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.simple.OAuthProfile;
+import com.jakduk.model.simple.UserProfile;
+import com.jakduk.model.web.OAuthProfileInfo;
+import com.jakduk.model.web.UserProfileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +39,7 @@ import com.jakduk.service.UserService;
  */
 
 @Controller
-@RequestMapping("/oauth")
+@RequestMapping("/social/user")
 public class SocialUserController {
 	
 	@Autowired
@@ -43,18 +51,56 @@ public class SocialUserController {
 	@Resource
 	LocaleResolver localeResolver;
 
+	@RequestMapping
+	public String root() {
+
+		return "redirect:/social/user/profile";
+	}
+
+	@RequestMapping(value = "/refresh", method = RequestMethod.GET)
+	public String freeRefresh() {
+
+		return "redirect:/social/user/profile";
+	}
+
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)
-	public String profile(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(required = false) String lang,
-			@RequestParam(required = false) Integer status,
-			Model model) {
+	public String profile(@RequestParam(required = false) String lang,
+						  @RequestParam(required = false) Integer status,
+						  HttpServletRequest request,
+						  Model model) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
+			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+			UserProfile user = userService.userProfileFindById(userDetail.getId());
+
+			UserProfileInfo profileInfo = new UserProfileInfo();
+			profileInfo.setEmail(user.getEmail());
+			profileInfo.setUsername(user.getUsername());
+			profileInfo.setAbout(user.getAbout());
+
+			FootballClub footballClub = user.getSupportFC();
+
+			if (Objects.nonNull(footballClub)) {
+				List<LocalName> names = footballClub.getNames();
+
+				for (LocalName name : names) {
+					if (name.getLanguage().equals(language)) {
+						profileInfo.setFootballClubName(name);
+					}
+				}
+			}
+
+			model.addAttribute("userProfile", profileInfo);
+			model.addAttribute("status", status);
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
 		
-		userService.getOAuthProfile(model, language, status);
-		
-		return "oauth/profile";
+		return "user/socialProfile";
 	}
 	
 }

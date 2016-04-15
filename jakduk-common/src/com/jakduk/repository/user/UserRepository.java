@@ -23,12 +23,6 @@ public interface UserRepository extends MongoRepository<User, String> {
 	User writerFindById(String id);
 
 	@Query(value="{'id' : ?0}")
-	User userProfileFindById2(String id);
-	
-	@Query(value="{'id' : ?0}")
-	UserProfile userProfileFindById(String id);
-	
-	@Query(value="{'id' : ?0}")
 	UserOnPasswordUpdate userOnPasswordUpdateFindById(String id);
 
 	@Query(value="{'id' : {$ne : ?0}, 'email' : ?1}", fields="{'id' : 1, 'email' : 1}")

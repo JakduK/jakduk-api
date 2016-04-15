@@ -64,22 +64,24 @@ public class AppConfig {
     /*
      * Use the standard Mongo driver API to create a com.mongodb.Mongo instance.
      */
-    public @Bean Mongo mongo() throws UnknownHostException {
+    @Bean
+    public Mongo mongo() throws UnknownHostException {
         return new Mongo(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
     }
 
-    public @Bean
-    MongoDbFactory mongoDbFactory() throws Exception {
+    @Bean
+    public MongoDbFactory mongoDbFactory() throws Exception {
         return new SimpleMongoDbFactory(mongo(), environment.getProperty("mongo.db.name"));
     }
 
-    public @Bean MongoTemplate mongoTemplate() throws Exception {
+    @Bean
+    public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongo(), environment.getProperty("mongo.db.name"));
     }
 
     @Bean
     public JongoR jongoR() throws UnknownHostException {
-        return new JongoR(environment.getProperty("mongo.host.name"), mongoClient());
+        return new JongoR(environment.getProperty("mongo.db.name"), mongoClient());
     }
 
     @Bean

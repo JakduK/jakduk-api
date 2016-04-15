@@ -24,7 +24,7 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import com.jakduk.model.db.Token;
 import com.jakduk.repository.TokenRepository;
-import com.jakduk.repository.UserRepository;
+import com.jakduk.repository.user.UserRepository;
 
 @Service
 @Slf4j
