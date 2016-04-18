@@ -49,7 +49,7 @@
 						<c:when test="${userType == 'FACEBOOK' || userType == 'DAUM'}">
 							<li>
 								<i class="fa fa-user"></i>
-								<a href="<c:url value="/social/user/profile"/>">${accountName}</a>
+								<a href="<c:url value="/user/social/profile"/>">${accountName}</a>
 							</li>
 						</c:when>
 					</c:choose>

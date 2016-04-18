@@ -2,6 +2,7 @@ package com.jakduk.controller;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -9,8 +10,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
+import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.simple.UserProfile;
+import com.jakduk.model.web.UserProfileInfo;
+import com.jakduk.service.FootballService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,6 +44,9 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private FootballService footballService;
 	
 	@Resource
 	LocaleResolver localeResolver;
@@ -45,9 +58,15 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/refresh", method = RequestMethod.GET)
-	public String freeRefresh() {
+	public String refresh() {
 
 		return "redirect:/user/profile";
+	}
+
+	@RequestMapping(value = "/social/refresh", method = RequestMethod.GET)
+	public String socialRefresh() {
+
+		return "redirect:/user/social/profile";
 	}
 
 	@RequestMapping(value = "/list")
@@ -62,19 +81,39 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)
-	public String profile(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(required = false) String lang,
-			@RequestParam(required = false) Integer status,
-			Model model) {
-		
+	public String profile(@RequestParam(required = false) String lang,
+						  @RequestParam(required = false) Integer status,
+						  HttpServletRequest request,
+						  Model model) {
+
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
-		
-		userService.getUserProfile(model, language, status);
-		
-		return "user/profile";
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+			UserProfile user = userService.getUserProfileById(authUser.getId());
+
+			UserProfileInfo userProfileInfo = new UserProfileInfo();
+			userProfileInfo.setEmail(user.getEmail());
+			userProfileInfo.setUsername(user.getUsername());
+			userProfileInfo.setAbout(user.getAbout());
+
+			FootballClub footballClub = user.getSupportFC();
+
+			LocalName localName = footballService.getLocalNameOfFootballClub(footballClub, language);
+
+			if (Objects.nonNull(localName)) userProfileInfo.setFootballClubName(localName);
+
+			model.addAttribute("status", status);
+			model.addAttribute("userProfile", userProfileInfo);
+
+			return "user/profile";
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
 	}
-	
+
 	@RequestMapping(value = "/password/update", method = RequestMethod.GET)
 	public String passwordUpdate(Model model) {
 		
@@ -103,5 +142,39 @@ public class UserController {
 		userService.userPasswordUpdate(userPasswordUpdate);
 		
 		return "redirect:/user/profile?status=2";
+	}
+
+	@RequestMapping(value = "/social/profile", method = RequestMethod.GET)
+	public String socialProfile(@RequestParam(required = false) String lang,
+						  @RequestParam(required = false) Integer status,
+						  HttpServletRequest request,
+						  Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
+			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+			UserProfile user = userService.getUserProfileById(userDetail.getId());
+
+			UserProfileInfo profileInfo = new UserProfileInfo();
+			profileInfo.setEmail(user.getEmail());
+			profileInfo.setUsername(user.getUsername());
+			profileInfo.setAbout(user.getAbout());
+
+			FootballClub footballClub = user.getSupportFC();
+
+			LocalName localName = footballService.getLocalNameOfFootballClub(footballClub, language);
+
+			if (Objects.nonNull(localName)) profileInfo.setFootballClubName(localName);
+
+			model.addAttribute("userProfile", profileInfo);
+			model.addAttribute("status", status);
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
+
+		return "user/socialProfile";
 	}
 }

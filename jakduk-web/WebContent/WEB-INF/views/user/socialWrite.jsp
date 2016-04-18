@@ -36,7 +36,7 @@
 			<div class="row">
 				<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
 
-					<form:form commandName="socialUserForm" name="socialUserForm" action="${contextPath}/social/user" method="POST" cssClass="reg-page"
+					<form:form commandName="socialUserForm" name="socialUserForm" action="${contextPath}/user/social" method="POST" cssClass="reg-page"
 							   ng-submit="onSubmit($event)">
 
 						<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${socialUserForm.emailStatus}'" ng-model="emailStatus"/>

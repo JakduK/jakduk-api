@@ -35,7 +35,7 @@ import java.util.*;
 
 @Controller
 @Slf4j
-@RequestMapping("/social")
+@RequestMapping("/user")
 @SessionAttributes({"SocialUserForm", "footballClubs"})
 public class SocialUserWriteController {
 
@@ -51,7 +51,7 @@ public class SocialUserWriteController {
     @Autowired
     private ProviderSignInUtils providerSignInUtils;
 
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    @RequestMapping(value = "/social", method = RequestMethod.GET)
     public String write(@RequestParam(required = false) String lang,
                         Model model,
                         NativeWebRequest request) {
@@ -78,7 +78,7 @@ public class SocialUserWriteController {
         return "user/socialWrite";
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @RequestMapping(value = "/social", method = RequestMethod.POST)
     public String write(@Valid SocialUserForm socialUserForm,
                         BindingResult result,
                         SessionStatus sessionStatus,
@@ -94,8 +94,6 @@ public class SocialUserWriteController {
         Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
         ConnectionKey connectionKey = connection.getKey();
 
-        log.debug("socialUserForm=" + socialUserForm);
-
         CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
         String providerUserId = connectionKey.getProviderUserId();
 
@@ -106,6 +104,50 @@ public class SocialUserWriteController {
         userService.signUpSocialUser(user, request);
 
         return "redirect:/home";
+    }
+
+    @RequestMapping(value = "/social/profile/update", method = RequestMethod.GET)
+    public String profileUpdate(@RequestParam(required = false) String lang,
+                                HttpServletRequest request,
+                                Model model) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+        String language = commonService.getLanguageCode(locale, lang);
+
+        userService.getOAuthProfileUpdate(model, language);
+
+        return "user/socialProfileUpdate";
+    }
+
+    @RequestMapping(value = "/social/profile/update", method = RequestMethod.POST)
+    public String profileUpdate(@Valid SocialUserForm socialUserForm, BindingResult result, SessionStatus sessionStatus,
+                                WebRequest request) {
+
+        if (result.hasErrors()) {
+            if (log.isDebugEnabled()) {
+                log.debug("result=" + result);
+            }
+            return "user/socialProfileUpdate";
+        }
+
+        // 실제 DB에서 중복 검사
+        userService.checkOAuthProfileUpdate(socialUserForm, result);
+
+        // 위 중복 검사를 통과 못할 경우.
+        if (result.hasErrors()) {
+            if (log.isDebugEnabled()) {
+                log.debug("result=" + result);
+            }
+            return "user/socialProfileUpdate";
+        }
+
+        User user = userService.editSocialProfile(socialUserForm);
+
+        sessionStatus.setComplete();
+
+        userService.signUpSocialUser(user, request);
+
+        return "redirect:/user/social/profile?status=1";
     }
 
 }

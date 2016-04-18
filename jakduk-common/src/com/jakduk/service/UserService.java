@@ -66,17 +66,21 @@ public class UserService {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	public List<User> findAll() {
+		return userRepository.findAll();
+	}
+
+	public UserProfile getUserProfileById(String id) {
+		return userProfileRepository.findOne(id);
+	}
+
 	public void create(User user) {
 		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
 		
 		user.setPassword(encoder.encode(user.getPassword()));
 		userRepository.save(user);
 	}
-	
-	public List<User> findAll() {
-		return userRepository.findAll();
-	}
-	
+
 	public CommonWriter testFindId(String userid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("email").is(userid));
@@ -209,34 +213,6 @@ public class UserService {
 		return false;
 	}
 
-	public Model getOAuthWriteDetails(Model model, String language) {
-
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof OAuthPrincipal) {
-			OAuthPrincipal principal = (OAuthPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			CommonUser userDetails = (CommonUser) SecurityContextHolder.getContext().getAuthentication().getDetails();
-			
-			SocialUserOnAuthentication oauthUserOnLogin = userRepository.findByOauthUser(principal.getProviderId(), principal.getOauthId());
-			
-			SocialUserForm oauthUserForm = new SocialUserForm();
-			
-			if (oauthUserOnLogin != null && oauthUserOnLogin.getUsername() != null) {
-				oauthUserForm.setUsername(oauthUserOnLogin.getUsername());
-			}
-			
-			if (userDetails != null && userDetails.getBio() != null) {
-				oauthUserForm.setAbout(userDetails.getBio());
-			}
-			
-			model.addAttribute("OAuthUserWrite", oauthUserForm);
-		}
-
-		model.addAttribute("footballClubs", footballClubs);
-		
-		return model;
-	}
-
 	public void checkOAuthProfileUpdate(SocialUserForm socialUserForm, BindingResult result) {
 
 		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -288,39 +264,8 @@ public class UserService {
 		userRepository.save(user);
 
 		return user;
-//
-//		commonService.signUpSocialUser(principal, credentials, userDetails);
 	}
-	
-	public Model getUserProfile(Model model, String language, Integer status) {
 
-		JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-		UserProfile user = userProfileRepository.findOne(authUser.getId());
-		
-		UserProfileInfo userProfileInfo = new UserProfileInfo();
-		userProfileInfo.setEmail(user.getEmail());
-		userProfileInfo.setUsername(user.getUsername());
-		userProfileInfo.setAbout(user.getAbout());
-		
-		FootballClub footballClub = user.getSupportFC();
-		
-		if (footballClub != null) {
-			List<LocalName> names = footballClub.getNames();
-			
-			for (LocalName name : names) {
-				if (name.getLanguage().equals(language)) {
-					userProfileInfo.setFootballClubName(name);
-				}		
-			}
-		}
-				
-		model.addAttribute("status", status);
-		model.addAttribute("userProfile", userProfileInfo);
-		
-		return model;
-	}
-	
 	public Model getUserProfileUpdate(Model model, String language) {
 
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
@@ -486,20 +431,20 @@ public class UserService {
 		String footballClub = userWrite.getFootballClub();
 		String about = userWrite.getAbout();
 
-		if (Objects.nonNull(email) && !email.isEmpty()) {
-			user.setUsername(email.trim());
+		if (Objects.nonNull(email) && email.isEmpty() == false) {
+			user.setEmail(email.trim());
 		}
 
-		if (Objects.nonNull(username) && !username.isEmpty()) {
+		if (Objects.nonNull(username) && username.isEmpty() == false) {
 			user.setUsername(username.trim());
 		}
 
-		if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
+		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
 			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
 			user.setSupportFC(supportFC);
 		}
 
-		if (Objects.nonNull(about) && !about.isEmpty()) {
+		if (Objects.nonNull(about) && about.isEmpty() == false) {
 			user.setAbout(about.trim());
 		}
 
@@ -532,10 +477,6 @@ public class UserService {
 		}
 		
 		return commonPrincipal;
-	}
-
-	public UserProfile userProfileFindById(String id) {
-		return userProfileRepository.findOne(id);
 	}
 
 	/**

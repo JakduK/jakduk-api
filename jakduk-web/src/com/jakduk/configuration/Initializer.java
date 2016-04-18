@@ -1,5 +1,6 @@
 package com.jakduk.configuration;
 
+import net.jawr.web.servlet.JawrServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.WebApplicationInitializer;
@@ -35,6 +36,7 @@ public class Initializer implements WebApplicationInitializer {
         registerSpringSecurityFilter(container);
         registerDeviceResolverRequestFilter(container);
         registerDispatcherServlet(container);
+        registerJawrServlet(container);
     }
 
     // UTF-8 캐릭터 인코딩 필터를 추가한다.
@@ -69,6 +71,14 @@ public class Initializer implements WebApplicationInitializer {
         // Register and map the dispatcher servlet
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
         dispatcher.addMapping("/");
+    }
+
+    // Create the JAWR servlet's Spring application context
+    public void registerJawrServlet(ServletContext servletContext) {
+        JawrServlet jawrServlet = new JawrServlet();
+        ServletRegistration.Dynamic servlet = servletContext.addServlet("JavascriptServlet", jawrServlet);
+        servlet.setInitParameter("configLocation", "classpath:/config/spring/jawr.properties");
+        servlet.addMapping("*.js");
     }
 }
 

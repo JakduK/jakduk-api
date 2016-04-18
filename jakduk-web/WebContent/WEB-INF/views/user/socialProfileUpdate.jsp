@@ -24,14 +24,14 @@
 		<!--=== Breadcrumbs ===-->
 		<div class="breadcrumbs">
 			<div class="container">
-				<h1 class="pull-left"><a href="<c:url value="/social/user/refresh"/>"><spring:message code="user.profile.update"/></a></h1>
+				<h1 class="pull-left"><a href="<c:url value="/user/social/refresh"/>"><spring:message code="user.profile.update"/></a></h1>
 			</div><!--/container-->
 		</div><!--/breadcrumbs-->
 		<!--=== End Breadcrumbs ===-->
 
 		<div class="container content" ng-controller="writeCtrl">
 
-			<form:form commandName="socialUserForm" name="socialUserForm" action="${contextPath}/social/user/profile/update" method="POST" cssClass="form-horizontal"
+			<form:form commandName="socialUserForm" name="socialUserForm" action="${contextPath}/user/social/profile/update" method="POST" cssClass="form-horizontal"
 					   ng-submit="onSubmit($event)">
 
 				<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${socialUserForm.emailStatus}'" ng-model="emailStatus"/>

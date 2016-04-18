@@ -4,18 +4,22 @@ import com.jakduk.authentication.jakduk.JakdukDetailsService;
 import com.jakduk.authentication.jakduk.JakdukFailureHandler;
 import com.jakduk.authentication.jakduk.JakdukSuccessHandler;
 import com.jakduk.authentication.social.SocialDetailService;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.social.security.SocialUserDetailsService;
-import org.springframework.social.security.SpringSocialConfigurer;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.security.*;
 
 /**
  * Created by pyohwan on 16. 4. 6.
@@ -67,13 +71,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers(
                                 "/login*",
                                 "/auth/*",
-                                "/signup/*",
-                                "/user/write",
-                                "/social/user/write"
+                                "/signup",
+                                "/user/social",
+                                "/user/*/write"
                         ).anonymous()
                         .antMatchers(
-                                "/user/**",
-                                "/social/user/**"
+                                "/user/**"
                         ).authenticated()
                         .antMatchers(
                                 "/board/*/write",
@@ -83,37 +86,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/admin/**").hasRole("ROOT")
                         .anyRequest().permitAll()
                 .and()
-                    .apply(new SpringSocialConfigurer())
+                    .apply(getSpringSocialConfigurer())
                 .and()
                     .sessionManagement()
                         .maximumSessions(3).expiredUrl("/error/maxSession");
     }
-
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .userDetailsService(jakdukDetailsService())
                 .passwordEncoder(passwordEncoder());
+    }
 
-        //auth.inMemoryAuthentication().withUser("test06@test.com").password("password").roles("ADMIN");
+    // 로그인 성공 후 특정 URL일 경우 REDIRECT 안 시키는 로직을 추가 해야 한다.
+    private SpringSocialConfigurer getSpringSocialConfigurer() {
+        SpringSocialConfigurer configurer = new SpringSocialConfigurer();
+        return  configurer;
     }
 
     @Bean
     public SocialUserDetailsService socialUsersDetailService() {
         return new SocialDetailService();
     }
-
-
-    /*
-    @Bean
-    public DaoAuthenticationProvider jakdukAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(jakdukDetailsService);
-        return provider;
-    }
-    */
 
     @Bean
     public StandardPasswordEncoder passwordEncoder() {

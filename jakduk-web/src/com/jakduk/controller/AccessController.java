@@ -74,7 +74,7 @@ public class AccessController {
 	@RequestMapping(value = "/signup", method = RequestMethod.GET)
 	public String redirectRequestToRegistrationPage() {
 
-		return "redirect:/social/user";
+		return "redirect:/user/social";
 	}
 
 	@RequestMapping(value = "/logout/success", method = RequestMethod.GET)
