@@ -36,7 +36,7 @@ public class Initializer implements WebApplicationInitializer {
         registerSpringSecurityFilter(container);
         registerDeviceResolverRequestFilter(container);
         registerDispatcherServlet(container);
-        registerJawrServlet(container);
+        //registerJawrServlet(container);
     }
 
     // UTF-8 캐릭터 인코딩 필터를 추가한다.

@@ -36,47 +36,35 @@
 			<div class="row">
 				<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
 
-					<form:form commandName="socialUserForm" name="socialUserForm" action="${contextPath}/user/social" method="POST" cssClass="reg-page"
+					<form:form commandName="userProfileForm" name="userProfileForm" action="${contextPath}/user/social" method="POST" cssClass="reg-page"
 							   ng-submit="onSubmit($event)">
 
-						<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${socialUserForm.emailStatus}'" ng-model="emailStatus"/>
-						<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${socialUserForm.usernameStatus}'" ng-model="usernameStatus"/>
+						<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userProfileForm.usernameStatus}'" ng-model="usernameStatus"/>
 
 						<div class="reg-header">
 							<h2><spring:message code="oauth.register.header"/></h2>
 						</div>
 
-						<div class="form-group has-feedback" ng-class="{'has-success':socialUserForm.email.$valid, 'has-error':socialUserForm.email.$invalid || emailStatus != 'ok'}">
+						<div class="form-group">
 							<label class="control-label">
 								<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.email"/>
 							</label>
 							<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>'
-								   ng-init="email='${socialUserForm.email}'" ng-model="email"
-								   ng-blur="onEmail()" ng-change="validationEmail()"
-								   ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
-
-							<span class="glyphicon form-control-feedback"
-								  ng-class="{'glyphicon-ok':socialUserForm.email.$valid, 'glyphicon-remove':socialUserForm.email.$invalid || emailStatus != 'ok'}"></span>
-
-							<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
-							<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
-
-							<!-- 초기화 시 onEmail()를 호출 -->
-							<span class="{{emailAlert.classType}}" ng-show="emailAlert.msg" ng-init="onEmail()">{{emailAlert.msg}}</span>
+								   ng-init="email='${userProfileForm.email}'" ng-model="email" disabled="disabled"/>
 						</div>
 
-						<div class="form-group has-feedback" ng-class="{'has-success':socialUserForm.username.$valid,
-						'has-error':socialUserForm.username.$invalid || usernameStatus != 'ok'}">
+						<div class="form-group has-feedback" ng-class="{'has-success':userProfileForm.username.$valid,
+						'has-error':userProfileForm.username.$invalid || usernameStatus != 'ok'}">
 							<label class="control-label">
 								<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 							</label>
 							<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
-								   ng-model="username" ng-init="username='${socialUserForm.username}'"
+								   ng-model="username" ng-init="username='${userProfileForm.username}'"
 								   ng-blur="onUsername()" ng-change="validationUsername()"
 								   ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
-							<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':socialUserForm.username.$valid,
-							'glyphicon-remove':socialUserForm.username.$invalid || usernameStatus != 'ok'}"></span>
+							<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userProfileForm.username.$valid,
+							'glyphicon-remove':userProfileForm.username.$invalid || usernameStatus != 'ok'}"></span>
 							<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 							<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 
@@ -141,14 +129,10 @@
 		var jakdukApp = angular.module("jakdukApp", ["angular-ladda"]);
 
 		jakdukApp.controller("writeCtrl", function($scope, $http) {
-			$scope.emailLengthMin = Jakduk.FormEmailLengthMin;
-			$scope.emailLengthMax = Jakduk.FormEmailLengthMax;
 			$scope.usernameLengthMin = Jakduk.FormUsernameLengthMin;
 			$scope.usernameLengthMax = Jakduk.FormUsernameLengthMax;
 
-			$scope.emailConn = "none";
 			$scope.usernameConn = "none";
-			$scope.emailAlert = {};
 			$scope.usernameAlert = {};
 			$scope.buttonAlert = {};
 
@@ -156,13 +140,11 @@
 			});
 
 			$scope.onSubmit = function(event) {
-				if ($scope.socialUserForm.$valid && $scope.emailStatus == 'ok' && $scope.usernameStatus == "ok") {
+				if ($scope.userProfileForm.$valid && $scope.usernameStatus == "ok") {
 					submitted = true;
 					$scope.btnSubmit = true;
 				} else {
-					if ($scope.socialUserForm.email.$invalid) {
-						$scope.validationEmail();
-					} else if ($scope.socialUserForm.username.$invalid) {
+					if ($scope.userProfileForm.username.$invalid) {
 						$scope.validationUsername();
 					}
 
@@ -171,35 +153,8 @@
 				}
 			};
 
-			$scope.onEmail = function() {
-				if ($scope.socialUserForm.email.$valid) {
-					var bUrl = '<c:url value="/api/user/exist/email/?email=' + $scope.email + '"/>';
-
-					if ($scope.emailConn == "none") {
-						var reqPromise = $http.get(bUrl);
-						$scope.emailConn = "connecting";
-						reqPromise.success(function(data, status, headers, config) {
-
-							if (data == false) {
-								$scope.emailStatus = "ok";
-								$scope.emailAlert = {"classType":"text-success", "msg":'<spring:message code="user.msg.avaliable.data"/>'};
-							}
-
-							$scope.emailConn = "none";
-						});
-						reqPromise.error(function(data, status, headers, config) {
-							$scope.emailConn = "none";
-							$scope.emailAlert = {"classType":"text-danger", "msg":data.message};
-						});
-					}
-				} else {
-					$scope.emailStatus = "invalid";
-					$scope.validationEmail();
-				}
-			};
-
 			$scope.onUsername = function() {
-				if ($scope.socialUserForm.username.$valid) {
+				if ($scope.userProfileForm.username.$valid) {
 					var bUrl = '<c:url value="/api/user/exist/username?username=' + $scope.username + '"/>';
 					if ($scope.usernameConn == "none") {
 						var reqPromise = $http.get(bUrl);
@@ -224,25 +179,11 @@
 				}
 			};
 
-			$scope.validationEmail = function() {
-				if ($scope.socialUserForm.email.$invalid) {
-					if ($scope.socialUserForm.email.$error.required) {
-						$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-					} else if ($scope.socialUserForm.email.$error.minlength || $scope.socialUserForm.email.$error.maxlength) {
-						$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.email"/>'};
-					} else {
-						$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="user.msg.check.mail.format"/>'};
-					}
-				} else {
-					$scope.emailAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
-				}
-			};
-
 			$scope.validationUsername = function () {
-				if ($scope.socialUserForm.username.$invalid) {
-					if ($scope.socialUserForm.username.$error.required) {
+				if ($scope.userProfileForm.username.$invalid) {
+					if ($scope.userProfileForm.username.$error.required) {
 						$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-					} else if ($scope.socialUserForm.$error.minlength || $scope.socialUserForm.username.$error.maxlength) {
+					} else if ($scope.userProfileForm.$error.minlength || $scope.userProfileForm.username.$error.maxlength) {
 						$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
 					}
 				} else {

@@ -71,6 +71,7 @@ public class AccessController {
 		return "access/login";
 	}
 
+	// SNS로 회원 가입할때.
 	@RequestMapping(value = "/signup", method = RequestMethod.GET)
 	public String redirectRequestToRegistrationPage() {
 

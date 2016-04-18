@@ -5,7 +5,6 @@ import java.util.*;
 import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.exception.DuplicateDataException;
 import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.*;
 
 import com.jakduk.repository.user.UserProfileRepository;
@@ -26,8 +25,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.common.CommonUser;
-import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
@@ -213,12 +210,17 @@ public class UserService {
 		return false;
 	}
 
-	public void checkOAuthProfileUpdate(SocialUserForm socialUserForm, BindingResult result) {
+	/**
+	 * SNS 계정의 회원 정보 업데이트 시 DB에 쿼리하여 중복 체크한다.
+	 * @param userProfileForm
+	 * @param result
+     */
+	public void checkSocialProfileUpdate(UserProfileForm userProfileForm, BindingResult result) {
 
 		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String id = principal.getId();
-		String email = socialUserForm.getEmail();
-		String username = socialUserForm.getUsername();
+		String email = userProfileForm.getEmail();
+		String username = userProfileForm.getUsername();
 
 		UserProfile existEmail = userRepository.userFindByNEIdAndEmail(id, email);
 		if (Objects.nonNull(existEmail))
@@ -229,7 +231,7 @@ public class UserService {
 			result.rejectValue("username", "user.msg.already.username");
 	}
 
-	public User writeSocialUser(SocialUserForm userForm, CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public User writeSocialUser(UserProfileForm userForm, CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
 
 		User user = new User();
 
@@ -277,16 +279,16 @@ public class UserService {
 			
 			FootballClub footballClub = userProfile.getSupportFC();
 			
-			UserProfileWrite userProfileWrite = new UserProfileWrite();
-			userProfileWrite.setEmail(userProfile.getEmail());
-			userProfileWrite.setUsername(userProfile.getUsername());
-			userProfileWrite.setAbout(userProfile.getAbout());
+			UserProfileForm userProfileForm = new UserProfileForm();
+			userProfileForm.setEmail(userProfile.getEmail());
+			userProfileForm.setUsername(userProfile.getUsername());
+			userProfileForm.setAbout(userProfile.getAbout());
 
 			if (footballClub != null) {
-				userProfileWrite.setFootballClub(footballClub.getId());
+				userProfileForm.setFootballClub(footballClub.getId());
 			}
 			
-			model.addAttribute("userProfileWrite", userProfileWrite);
+			model.addAttribute("userProfileWrite", userProfileForm);
 			model.addAttribute("footballClubs", footballClubs);
 			
 		} else {
@@ -295,12 +297,12 @@ public class UserService {
 		return model;
 	}
 	
-	public void checkProfileUpdate(UserProfileWrite userProfileWrite, BindingResult result) {
+	public void checkProfileUpdate(UserProfileForm userProfileForm, BindingResult result) {
 		
 		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String id = jakdukPrincipal.getId();
 		
-		String username = userProfileWrite.getUsername();
+		String username = userProfileForm.getUsername();
 		
 		if (id != null && username != null) {
 			UserProfile userProfle = userRepository.userFindByNEIdAndUsername(id, username);
@@ -310,20 +312,20 @@ public class UserService {
 		}		
 	}
 	
-	public void userProfileUpdate(UserProfileWrite userProfileWrite) {
+	public void userProfileUpdate(UserProfileForm userProfileForm) {
 		
 		JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
 		String id = principal.getId();
 		
 		User user = userRepository.findById(id);
-		user.setUsername(userProfileWrite.getUsername());
-		user.setAbout(userProfileWrite.getAbout());
+		user.setUsername(userProfileForm.getUsername());
+		user.setAbout(userProfileForm.getAbout());
 		
-		String footballClub = userProfileWrite.getFootballClub();
+		String footballClub = userProfileForm.getFootballClub();
 		
 		if (footballClub != null && !footballClub.isEmpty()) {
-			FootballClub supportFC = footballClubRepository.findOne(userProfileWrite.getFootballClub());
+			FootballClub supportFC = footballClubRepository.findOne(userProfileForm.getFootballClub());
 			
 			user.setSupportFC(supportFC);
 		}
@@ -334,7 +336,7 @@ public class UserService {
 		
 		userRepository.save(user);
 		
-		principal.setUsername(userProfileWrite.getUsername());
+		principal.setUsername(userProfileForm.getUsername());
 		
 		commonService.doJakdukAutoLogin(principal, credentials);
 		
@@ -394,53 +396,22 @@ public class UserService {
 		}
 	}
 
-	public Model getOAuthProfileUpdate(Model model, String language) {
-
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
-			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile userProfile = userProfileRepository.findOne(userDetail.getId());
-
-			FootballClub footballClub = userProfile.getSupportFC();
-
-			SocialUserForm socialUserForm = new SocialUserForm();
-			socialUserForm.setEmail(userProfile.getEmail());
-			socialUserForm.setUsername(userProfile.getUsername());
-			socialUserForm.setAbout(userProfile.getAbout());
-
-			if (Objects.nonNull(footballClub)) {
-				socialUserForm.setFootballClub(footballClub.getId());
-			}
-
-			model.addAttribute("socialUserForm", socialUserForm);
-			model.addAttribute("footballClubs", footballClubs);
-		}
-
-		return model;
-	}
-	
-	public User editSocialProfile(SocialUserForm userWrite) {
+	public User editSocialProfile(UserProfileForm userProfileForm) {
 
 		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		User user = userRepository.findById(principal.getId());
 
-		String email = userWrite.getEmail();
-		String username = userWrite.getUsername();
-		String footballClub = userWrite.getFootballClub();
-		String about = userWrite.getAbout();
-
-		if (Objects.nonNull(email) && email.isEmpty() == false) {
-			user.setEmail(email.trim());
-		}
+		String username = userProfileForm.getUsername();
+		String footballClub = userProfileForm.getFootballClub();
+		String about = userProfileForm.getAbout();
 
 		if (Objects.nonNull(username) && username.isEmpty() == false) {
 			user.setUsername(username.trim());
 		}
 
 		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
-			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
+			FootballClub supportFC = footballClubRepository.findOne(userProfileForm.getFootballClub());
 			user.setSupportFC(supportFC);
 		}
 

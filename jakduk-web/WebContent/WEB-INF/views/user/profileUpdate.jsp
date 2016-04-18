@@ -33,32 +33,32 @@
 	<!--=== Content Part ===-->
 	<div class="container content">
 
-		<form:form commandName="userProfileWrite" name="userProfileWrite" action="${contextPath}/user/profile/update" method="POST" cssClass="form-horizontal"
+		<form:form commandName="userProfileForm" name="userProfileForm" action="${contextPath}/user/profile/update" method="POST" cssClass="form-horizontal"
 				   ng-submit="onSubmit($event)">
 
-			<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userProfileWrite.usernameStatus}'" ng-model="usernameStatus"/>
+			<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userProfileForm.usernameStatus}'" ng-model="usernameStatus"/>
 
 			<div class="form-group">
 				<label class="col-sm-2 control-label"><spring:message code="user.email"/></label>
 				<div class="col-sm-4">
 					<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>'
-						   ng-init="email='${userProfileWrite.email}'" ng-model="email" disabled="disabled"/>
+						   ng-init="email='${userProfileForm.email}'" ng-model="email" disabled="disabled"/>
 				</div>
 			</div>
 
-			<div class="form-group has-feedback" ng-class="{'has-success':userProfileWrite.username.$valid,
-					'has-error':userProfileWrite.username.$invalid || usernameStatus != 'ok'}">
+			<div class="form-group has-feedback" ng-class="{'has-success':userProfileForm.username.$valid,
+					'has-error':userProfileForm.username.$invalid || usernameStatus != 'ok'}">
 				<label class="col-sm-2 control-label">
 					<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 				</label>
 				<div class="col-sm-4">
 					<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
-						   ng-model="username" ng-init="username='${userProfileWrite.username}'"
+						   ng-model="username" ng-init="username='${userProfileForm.username}'"
 						   ng-blur="onUsername()" ng-change="validationUsername()"
 						   ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
-					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userProfileWrite.username.$valid,
-								'glyphicon-remove':userProfileWrite.username.$invalid || usernameStatus != 'ok'}"></span>
+					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userProfileForm.username.$valid,
+								'glyphicon-remove':userProfileForm.username.$invalid || usernameStatus != 'ok'}"></span>
 					<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 					<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 
@@ -142,12 +142,12 @@
 		});
 
 		$scope.onSubmit = function(event) {
-			if ($scope.userProfileWrite.$valid && $scope.usernameStatus == "ok") {
+			if ($scope.userProfileForm.$valid && $scope.usernameStatus == "ok") {
 				submitted = true;
 				$scope.submitConn = "connecting";
 				$scope.buttonAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 			} else {
-				if ($scope.userProfileWrite.username.$invalid) {
+				if ($scope.userProfileForm.username.$invalid) {
 					$scope.validationUsername();
 				} else if ($scope.usernameStatus != 'ok') {
 				}
@@ -159,7 +159,7 @@
 		};
 
 		$scope.onUsername = function() {
-			if ($scope.userProfileWrite.username.$valid) {
+			if ($scope.userProfileForm.username.$valid) {
 				var bUrl = '<c:url value="/api/user/exist/username/update?username=' + $scope.username + '"/>';
 
 				if ($scope.usernameConn == "none") {
@@ -187,10 +187,10 @@
 		};
 
 		$scope.validationUsername = function () {
-			if ($scope.userProfileWrite.username.$invalid) {
-				if ($scope.userProfileWrite.username.$error.required) {
+			if ($scope.userProfileForm.username.$invalid) {
+				if ($scope.userProfileForm.username.$error.required) {
 					$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.required"/>'};
-				} else if ($scope.userProfileWrite.username.$error.minlength || $scope.userProfileWrite.username.$error.maxlength) {
+				} else if ($scope.userProfileForm.username.$error.minlength || $scope.userProfileForm.username.$error.maxlength) {
 					$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="Size.userWrite.username"/>'};
 				}
 			} else {
