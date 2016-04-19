@@ -37,6 +37,10 @@ public class Initializer implements WebApplicationInitializer {
         registerDeviceResolverRequestFilter(container);
         registerDispatcherServlet(container);
         //registerJawrServlet(container);
+
+        //container.setInitParameter("spring.profiles.active", "local");
+        rootContext.getEnvironment().setActiveProfiles("local");
+
     }
 
     // UTF-8 캐릭터 인코딩 필터를 추가한다.

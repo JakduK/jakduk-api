@@ -47,19 +47,7 @@ public class UserWriteController {
 	@Resource
 	LocaleResolver localeResolver;
 
-	@RequestMapping(value = "/write", method = RequestMethod.GET)
-	public String write(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(required = false) String lang,
-			Model model) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-		
-		userService.getUserWrite(model, language);
-		
-		return "user/write";
-	}
-	
+	// jakduk 회원 가입 처리.
 	@RequestMapping(value = "/write", method = RequestMethod.POST)
 	public String write(@Valid UserWrite userWrite, BindingResult result, SessionStatus sessionStatus,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -95,7 +83,7 @@ public class UserWriteController {
 			return "user/write";
 		}
 		
-		userService.saveUserOnSignUp(userWrite);
+		userService.writeUser(userWrite);
 		sessionStatus.setComplete();
 		
 		String path = String.format("%s/", request.getContextPath());

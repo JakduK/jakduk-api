@@ -62,19 +62,7 @@ public class UserProfileWriteController {
 	@Autowired
 	private ProviderSignInUtils providerSignInUtils;
 
-	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
-	public String profileUpdate(HttpServletRequest request,
-			@RequestParam(required = false) String lang,
-			Model model) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-		
-		userService.getUserProfileUpdate(model, language);
-		
-		return "user/profileUpdate";
-	}
-	
+	// jakduk 회원 정보 편집 처리.
 	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
 	public String profileUpdate(@Valid UserProfileForm userProfileForm, BindingResult result, SessionStatus sessionStatus) {
 		
@@ -100,33 +88,7 @@ public class UserProfileWriteController {
 		return "redirect:/user/profile?status=1";
 	}
 
-	@RequestMapping(value = "/social", method = RequestMethod.GET)
-	public String write(@RequestParam(required = false) String lang,
-						Model model,
-						NativeWebRequest request) {
-
-		Locale locale = localeResolver.resolveLocale((HttpServletRequest) request.getNativeRequest());
-		String language = commonService.getLanguageCode(locale, lang);
-
-		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
-
-		if (Objects.isNull(connection))
-			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
-
-		org.springframework.social.connect.UserProfile userProfile = connection.fetchUserProfile();
-
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		UserProfileForm user = new UserProfileForm();
-		user.setEmail(userProfile.getEmail());
-		user.setUsername(userProfile.getName());
-
-		model.addAttribute("userProfileForm", user);
-		model.addAttribute("footballClubs", footballClubs);
-
-		return "user/socialWrite";
-	}
-
+	// social 회원 가입 처리.
 	@RequestMapping(value = "/social", method = RequestMethod.POST)
 	public String write(@Valid UserProfileForm userProfileForm,
 						BindingResult result,
@@ -155,40 +117,7 @@ public class UserProfileWriteController {
 		return "redirect:/home";
 	}
 
-	@RequestMapping(value = "/social/profile/update", method = RequestMethod.GET)
-	public String profileUpdate(@RequestParam(required = false) String lang,
-								HttpServletRequest request,
-								Model model) {
-
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-
-		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
-			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile userProfile = userService.getUserProfileById(userDetail.getId());
-
-			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-			FootballClub footballClub = userProfile.getSupportFC();
-
-			UserProfileForm userProfileForm = new UserProfileForm();
-			userProfileForm.setEmail(userProfile.getEmail());
-			userProfileForm.setUsername(userProfile.getUsername());
-			userProfileForm.setAbout(userProfile.getAbout());
-
-			if (Objects.nonNull(footballClub)) {
-				userProfileForm.setFootballClub(footballClub.getId());
-			}
-
-			model.addAttribute("userProfileForm", userProfileForm);
-			model.addAttribute("footballClubs", footballClubs);
-
-			return "user/socialProfileUpdate";
-		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-		}
-	}
-
+	// social 회원 정보 편집 처리.
 	@RequestMapping(value = "/social/profile/update", method = RequestMethod.POST)
 	public String profileUpdate(@Valid UserProfileForm userProfileForm,
 								BindingResult result,

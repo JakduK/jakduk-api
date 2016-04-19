@@ -95,7 +95,7 @@ public class UserService {
 		return model;
 	}
 	
-	public void saveUserOnSignUp(UserWrite userWrite) {
+	public void writeUser(UserWrite userWrite) {
 
 		User user = new User();
 		user.setEmail(userWrite.getEmail().trim());

@@ -12,21 +12,26 @@ import javax.validation.Valid;
 
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.model.web.UserProfileForm;
 import com.jakduk.model.web.UserProfileInfo;
 import com.jakduk.service.FootballService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.model.db.User;
@@ -50,6 +55,9 @@ public class UserController {
 	
 	@Resource
 	LocaleResolver localeResolver;
+
+	@Autowired
+	private ProviderSignInUtils providerSignInUtils;
 
 	@RequestMapping
 	public String root() {
@@ -79,7 +87,22 @@ public class UserController {
 		
 		model.addAttribute("list", users);
 	}
-	
+
+	// jakduk 회원 가입 페이지.
+	@RequestMapping(value = "/write", method = RequestMethod.GET)
+	public String write(@RequestParam(required = false) String lang,
+						HttpServletRequest request,
+						Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
+
+		userService.getUserWrite(model, language);
+
+		return "user/write";
+	}
+
+	// jakduk 회원 정보 페이지.
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)
 	public String profile(@RequestParam(required = false) String lang,
 						  @RequestParam(required = false) Integer status,
@@ -114,6 +137,20 @@ public class UserController {
 		}
 	}
 
+	// jakduk 회원 정보 편집 페이지.
+	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
+	public String updateProfile(HttpServletRequest request,
+								@RequestParam(required = false) String lang,
+								Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
+
+		userService.getUserProfileUpdate(model, language);
+
+		return "user/profileUpdate";
+	}
+
 	@RequestMapping(value = "/password/update", method = RequestMethod.GET)
 	public String passwordUpdate(Model model) {
 		
@@ -144,11 +181,40 @@ public class UserController {
 		return "redirect:/user/profile?status=2";
 	}
 
+	// social 회원 가입 페이지.
+	@RequestMapping(value = "/social", method = RequestMethod.GET)
+	public String writeSocial(@RequestParam(required = false) String lang,
+						NativeWebRequest request,
+						Model model) {
+
+		Locale locale = localeResolver.resolveLocale((HttpServletRequest) request.getNativeRequest());
+		String language = commonService.getLanguageCode(locale, lang);
+
+		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+
+		if (Objects.isNull(connection))
+			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+
+		org.springframework.social.connect.UserProfile userProfile = connection.fetchUserProfile();
+
+		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
+		UserProfileForm user = new UserProfileForm();
+		user.setEmail(userProfile.getEmail());
+		user.setUsername(userProfile.getName());
+
+		model.addAttribute("userProfileForm", user);
+		model.addAttribute("footballClubs", footballClubs);
+
+		return "user/socialWrite";
+	}
+
+	// social 회원 정보 페이지.
 	@RequestMapping(value = "/social/profile", method = RequestMethod.GET)
 	public String socialProfile(@RequestParam(required = false) String lang,
-						  @RequestParam(required = false) Integer status,
-						  HttpServletRequest request,
-						  Model model) {
+								@RequestParam(required = false) Integer status,
+								HttpServletRequest request,
+								Model model) {
 
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
@@ -176,5 +242,39 @@ public class UserController {
 		}
 
 		return "user/socialProfile";
+	}
+
+	// social 회원 정보 편집 페이지.
+	@RequestMapping(value = "/social/profile/update", method = RequestMethod.GET)
+	public String updateSocialProfile(@RequestParam(required = false) String lang,
+								HttpServletRequest request,
+								Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
+			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			UserProfile userProfile = userService.getUserProfileById(userDetail.getId());
+
+			UserProfileForm userProfileForm = new UserProfileForm();
+			userProfileForm.setEmail(userProfile.getEmail());
+			userProfileForm.setUsername(userProfile.getUsername());
+			userProfileForm.setAbout(userProfile.getAbout());
+
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+			FootballClub footballClub = userProfile.getSupportFC();
+
+			if (Objects.nonNull(footballClub)) {
+				userProfileForm.setFootballClub(footballClub.getId());
+			}
+
+			model.addAttribute("userProfileForm", userProfileForm);
+			model.addAttribute("footballClubs", footballClubs);
+
+			return "user/socialProfileUpdate";
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
 	}
 }
