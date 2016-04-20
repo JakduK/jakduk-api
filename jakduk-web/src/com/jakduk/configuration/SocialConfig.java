@@ -22,6 +22,8 @@ import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.web.ConnectController;
 import org.springframework.social.connect.web.ProviderSignInUtils;
+
+import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
@@ -38,7 +40,8 @@ public class SocialConfig implements SocialConfigurer {
 
     @Override
     public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
-        connectionFactoryConfigurer.addConnectionFactory(new FacebookConnectionFactory("827230814014466", "35d50ea50c52589406614c2428e2493a"));
+        connectionFactoryConfigurer.addConnectionFactory(new FacebookConnectionFactory(environment.getProperty("facebook.app.id"), environment.getProperty("facebook.app.secret")));
+        connectionFactoryConfigurer.addConnectionFactory(new DaumConnectionFactory(environment.getProperty("daum.client.id"), environment.getProperty("daum.client.secret")));
     }
 
     @Override

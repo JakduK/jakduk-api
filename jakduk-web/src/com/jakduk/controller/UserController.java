@@ -77,6 +77,7 @@ public class UserController {
 		return "redirect:/user/social/profile";
 	}
 
+	// 사용 안함.
 	@RequestMapping(value = "/list")
 	public void list(Model model) {
 
@@ -146,9 +147,30 @@ public class UserController {
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
 
-		userService.getUserProfileUpdate(model, language);
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			UserProfile user = userService.getUserProfileById(authUser.getId());
 
-		return "user/profileUpdate";
+			UserProfileForm userProfileForm = new UserProfileForm();
+			userProfileForm.setEmail(user.getEmail());
+			userProfileForm.setUsername(user.getUsername());
+			userProfileForm.setAbout(user.getAbout());
+
+			FootballClub footballClub = user.getSupportFC();
+
+			if (Objects.nonNull(footballClub)) {
+				userProfileForm.setFootballClub(footballClub.getId());
+			}
+
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
+			model.addAttribute("userProfileForm", userProfileForm);
+			model.addAttribute("footballClubs", footballClubs);
+
+			return "user/profileUpdate";
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
 	}
 
 	@RequestMapping(value = "/password/update", method = RequestMethod.GET)
@@ -192,16 +214,29 @@ public class UserController {
 
 		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
 
+		log.debug("phjang=" + connection.getDisplayName());
+		log.debug("phjang=" + connection.getKey());
+		log.debug("phjang=" + connection.getProfileUrl());
+		log.debug("phjang=" + connection.getApi());
+
 		if (Objects.isNull(connection))
 			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
 
 		org.springframework.social.connect.UserProfile userProfile = connection.fetchUserProfile();
 
+		log.debug("phjang=" + userProfile.getFirstName());
+		log.debug("phjang=" + userProfile.getLastName());
+		log.debug("phjang=" + userProfile.getId());
+		log.debug("phjang=" + userProfile.getName());
+		log.debug("phjang=" + userProfile.getUsername());
+		log.debug("phjang=" + userProfile.getEmail());
+
+
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
 
 		UserProfileForm user = new UserProfileForm();
 		user.setEmail(userProfile.getEmail());
-		user.setUsername(userProfile.getName());
+		user.setUsername(connection.getDisplayName());
 
 		model.addAttribute("userProfileForm", user);
 		model.addAttribute("footballClubs", footballClubs);

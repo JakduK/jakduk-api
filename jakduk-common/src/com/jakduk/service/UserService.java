@@ -268,35 +268,6 @@ public class UserService {
 		return user;
 	}
 
-	public Model getUserProfileUpdate(Model model, String language) {
-
-		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-
-			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-			
-			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile userProfile = userProfileRepository.findOne(authUser.getId());
-			
-			FootballClub footballClub = userProfile.getSupportFC();
-			
-			UserProfileForm userProfileForm = new UserProfileForm();
-			userProfileForm.setEmail(userProfile.getEmail());
-			userProfileForm.setUsername(userProfile.getUsername());
-			userProfileForm.setAbout(userProfile.getAbout());
-
-			if (footballClub != null) {
-				userProfileForm.setFootballClub(footballClub.getId());
-			}
-			
-			model.addAttribute("userProfileWrite", userProfileForm);
-			model.addAttribute("footballClubs", footballClubs);
-			
-		} else {
-		}
-		
-		return model;
-	}
-	
 	public void checkProfileUpdate(UserProfileForm userProfileForm, BindingResult result) {
 		
 		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

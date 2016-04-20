@@ -119,6 +119,10 @@
 						<form action="auth/facebook" name="facebook">
 							<input type="hidden" name="scope" value="email"/>
 						</form>
+
+						<a class="ax-item" onclick="document.daum.submit();"><i class="axi axi-facebook-square"></i> Daum</a>
+						<form action="auth/daum" name="daum">
+						</form>
 					</div>
 				</div><!--/row-->
 			</div>

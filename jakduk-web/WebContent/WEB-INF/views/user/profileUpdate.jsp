@@ -86,7 +86,8 @@
 			<div class="form-group">
 				<label class="col-sm-2 control-label"> <spring:message code="user.comment"/></label>
 				<div class="col-sm-4">
-					<form:textarea path="about" cssClass="form-control" cols="40" rows="5" placeholder='<spring:message code="user.placeholder.about"/>'/>
+					<!-- form:textarea 태그를 사용하면서 placeholder에 spring:message를 넣으면 제대로 안나온다. -->
+					<form:textarea path="about" cssClass="form-control" cols="40" rows="5" />
 				</div>
 			</div>
 
