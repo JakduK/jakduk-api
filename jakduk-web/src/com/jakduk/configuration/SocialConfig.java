@@ -1,9 +1,5 @@
 package com.jakduk.configuration;
 
-
-
-
-
 import com.jakduk.configuration.mongo.MongoConnectionDao;
 import net.exacode.spring.social.connect.GenericUsersConnectionRepository;
 import net.exacode.spring.social.connect.mongo.MongoConnectionConverter;
@@ -22,7 +18,6 @@ import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.web.ConnectController;
 import org.springframework.social.connect.web.ProviderSignInUtils;
-
 import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;

@@ -203,47 +203,6 @@ public class UserController {
 		return "redirect:/user/profile?status=2";
 	}
 
-	// social 회원 가입 페이지.
-	@RequestMapping(value = "/social", method = RequestMethod.GET)
-	public String writeSocial(@RequestParam(required = false) String lang,
-						NativeWebRequest request,
-						Model model) {
-
-		Locale locale = localeResolver.resolveLocale((HttpServletRequest) request.getNativeRequest());
-		String language = commonService.getLanguageCode(locale, lang);
-
-		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
-
-		log.debug("phjang=" + connection.getDisplayName());
-		log.debug("phjang=" + connection.getKey());
-		log.debug("phjang=" + connection.getProfileUrl());
-		log.debug("phjang=" + connection.getApi());
-
-		if (Objects.isNull(connection))
-			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
-
-		org.springframework.social.connect.UserProfile userProfile = connection.fetchUserProfile();
-
-		log.debug("phjang=" + userProfile.getFirstName());
-		log.debug("phjang=" + userProfile.getLastName());
-		log.debug("phjang=" + userProfile.getId());
-		log.debug("phjang=" + userProfile.getName());
-		log.debug("phjang=" + userProfile.getUsername());
-		log.debug("phjang=" + userProfile.getEmail());
-
-
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		UserProfileForm user = new UserProfileForm();
-		user.setEmail(userProfile.getEmail());
-		user.setUsername(connection.getDisplayName());
-
-		model.addAttribute("userProfileForm", user);
-		model.addAttribute("footballClubs", footballClubs);
-
-		return "user/socialWrite";
-	}
-
 	// social 회원 정보 페이지.
 	@RequestMapping(value = "/social/profile", method = RequestMethod.GET)
 	public String socialProfile(@RequestParam(required = false) String lang,

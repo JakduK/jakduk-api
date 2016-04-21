@@ -4,22 +4,17 @@ import com.jakduk.authentication.jakduk.JakdukDetailsService;
 import com.jakduk.authentication.jakduk.JakdukFailureHandler;
 import com.jakduk.authentication.jakduk.JakdukSuccessHandler;
 import com.jakduk.authentication.social.SocialDetailService;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.security.*;
+import org.springframework.social.security.SocialUserDetailsService;
+import org.springframework.social.security.SpringSocialConfigurer;
 
 /**
  * Created by pyohwan on 16. 4. 6.
@@ -27,9 +22,6 @@ import org.springframework.social.security.*;
 
 @Configuration
 @EnableWebSecurity
-@ImportResource(value = {
-//        "classpath:/security-context.xml",
-        "classpath:/config/oauth/oauth-data.xml"})
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
