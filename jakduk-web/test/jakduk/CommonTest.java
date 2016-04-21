@@ -1,25 +1,18 @@
 package jakduk;
 
 import com.jakduk.configuration.AppConfig;
-import net.gpedro.integrations.slack.SlackApi;
-import net.gpedro.integrations.slack.SlackMessage;
+import com.jakduk.service.CommonService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.jakduk.service.CommonService;
 import org.springframework.test.context.web.WebAppConfiguration;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AppConfig.class)
@@ -49,6 +42,8 @@ public class CommonTest {
 	public void environmentTest() {
 		System.out.println(storageTempPath);
 		System.out.println(environment.getProperty("mongo.db.name"));
+
+		new DaumConnectionFactory(environment.getProperty("daum.client.id"), environment.getProperty("daum.client.secret"));
 
 	}
 	
