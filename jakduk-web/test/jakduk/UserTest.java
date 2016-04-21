@@ -13,6 +13,7 @@ import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +86,8 @@ public class UserTest {
 		assertTrue(encoder.matches("1111", result));
 		*/
 	}
-	
+
+	@Ignore
 	@Test
 	public void test03() {
 		OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");		

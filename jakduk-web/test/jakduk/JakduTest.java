@@ -1,5 +1,6 @@
 package jakduk;
 
+import com.jakduk.configuration.AppConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Competition;
 import com.jakduk.model.db.JakduComment;
@@ -14,15 +15,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by pyohwan on 15. 12. 27.
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath:applicationContext.xml")
+@ContextConfiguration(classes = AppConfig.class)
+@WebAppConfiguration
 public class JakduTest {
 
     @Autowired

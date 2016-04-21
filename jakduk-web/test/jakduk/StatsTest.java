@@ -1,24 +1,21 @@
 package jakduk;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.jakduk.model.embedded.LocalName;
+import com.jakduk.configuration.AppConfig;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.AttendanceClub;
+import com.jakduk.model.etc.SupporterCount;
+import com.jakduk.repository.AttendanceClubRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.AttendanceClub;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.etc.SupporterCount;
-import com.jakduk.repository.AttendanceClubRepository;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -28,7 +25,8 @@ import com.jakduk.repository.AttendanceClubRepository;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/applicationContext.xml")
+@ContextConfiguration(classes = AppConfig.class)
+@WebAppConfiguration
 public class StatsTest {
 	
 	@Autowired

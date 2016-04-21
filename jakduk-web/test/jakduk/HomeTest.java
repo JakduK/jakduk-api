@@ -1,30 +1,27 @@
 package jakduk;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.repository.FootballClubOriginRepository;
-import com.jakduk.service.CommonService;
-import org.bson.types.ObjectId;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import com.jakduk.common.CommonConst;
+import com.jakduk.configuration.AppConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.model.simple.UserOnHome;
 import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
+import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.service.CommonService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -34,7 +31,8 @@ import com.jakduk.repository.BoardFreeOnHomeRepository;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath:applicationContext.xml")
+@ContextConfiguration(classes = AppConfig.class)
+@WebAppConfiguration
 public class HomeTest {
 	
 	@Autowired

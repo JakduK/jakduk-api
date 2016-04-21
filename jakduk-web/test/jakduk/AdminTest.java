@@ -1,14 +1,15 @@
 package jakduk;
 
+import com.jakduk.configuration.AppConfig;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.BoardFreeRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.jakduk.model.db.BoardCategory;
-import com.jakduk.repository.BoardCategoryRepository;
-import com.jakduk.repository.BoardFreeRepository;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -18,7 +19,8 @@ import com.jakduk.repository.BoardFreeRepository;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath:applicationContext.xml")
+@ContextConfiguration(classes = AppConfig.class)
+@WebAppConfiguration
 public class AdminTest {
 	
 	@Autowired
