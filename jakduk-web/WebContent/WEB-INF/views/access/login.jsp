@@ -7,12 +7,8 @@
 <!--[if !IE]> --><html lang="ko" ng-app="jakdukApp"><!-- <![endif]-->
 	<head>
 		<title><spring:message code="user.sign.in"/> &middot; <spring:message code="common.jakduk"/></title>
-
-		<!-- CSS Page Style -->
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_log_reg_v1.css">
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
-
-		<jsp:include page="../include/html-header.jsp"></jsp:include>
+		<jsp:include page="../include/html-header.jsp"/>
+		<link rel="stylesheet" href="<%=request.getContextPath()%>/bundles/login.css">
 	</head>
 
 	<body class="header-fixed">
@@ -130,68 +126,57 @@
 			<jsp:include page="../include/footer.jsp"/>
 		</div><!-- /.container -->
 
-		<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/angular-cookies/angular-cookies.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
-
+		<script src="<%=request.getContextPath()%>/bundles/login.js"></script>
 		<script type="text/javascript">
+			angular.module("jakdukApp", ["ngCookies", "angular-ladda", "jakdukCommon"])
+				.controller("loginCtrl", function ($scope, $cookies) {
+					$scope.emailLengthMin = Jakduk.FormEmailLengthMin;
+					$scope.emailLengthMax = Jakduk.FormEmailLengthMax;
+					$scope.passwordLengthMin = Jakduk.FormPasswordLengthMin;
+					$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
 
-			var jakdukApp = angular.module("jakdukApp", ["ngCookies", "angular-ladda"]);
+					// angular.ready()함수에서는 안된다. 마우스 클릭하니 그제서야 이메일이 들어간다.
+					var email = $cookies.get("email");
+					var remember = $cookies.get("remember");
 
-			jakdukApp.controller("loginCtrl", function ($scope, $cookies) {
-				$scope.emailLengthMin = Jakduk.FormEmailLengthMin;
-				$scope.emailLengthMax = Jakduk.FormEmailLengthMax;
-				$scope.passwordLengthMin = Jakduk.FormPasswordLengthMin;
-				$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
-
-				// angular.ready()함수에서는 안된다. 마우스 클릭하니 그제서야 이메일이 들어간다.
-				var email = $cookies.get("email");
-				var remember = $cookies.get("remember");
-
-				if (!isEmpty(email) && !isEmpty(remember) && remember == "1") {
-					$scope.email = email;
-					$scope.remember = true;
-				}
-
-				angular.element(document).ready(function () {
-					App.init();
-				});
-
-				$scope.onSubmit = function (event) {
-					if ($scope.loginForm.$valid) {
-						$scope.btnSubmit = true;
-					} else {
-						$scope.onEmail();
-
-						if ($scope.loginForm.j_password.$error.required) {
-							$scope.errorPassword = '<spring:message code="common.msg.required"/>';
-						} else if ($scope.loginForm.j_password.$error.minlength || $scope.loginForm.j_password.$error.maxlength) {
-							$scope.errorPassword = '<spring:message code="Size.userWrite.password"/>';
-						}
-						event.preventDefault();
+					if (!Jakduk.isEmpty(email) && !Jakduk.isEmpty(remember) && remember == "1") {
+						$scope.email = email;
+						$scope.remember = true;
 					}
-				};
 
-				$scope.onEmail = function () {
-					if ($scope.loginForm.j_username.$invalid) {
-						if ($scope.loginForm.j_username.$error.required) {
-							$scope.errorEmail = '<spring:message code="common.msg.required"/>';
-						} else if ($scope.loginForm.j_username.$error.minlength || $scope.loginForm.j_username.$error.maxlength) {
-							$scope.errorEmail = '<spring:message code="Size.userWrite.email"/>';
+					angular.element(document).ready(function () {
+						App.init();
+					});
+
+					$scope.onSubmit = function (event) {
+						if ($scope.loginForm.$valid) {
+							$scope.btnSubmit = true;
 						} else {
-							$scope.errorEmail = '<spring:message code="user.msg.check.mail.format"/>';
+							$scope.onEmail();
+
+							if ($scope.loginForm.j_password.$error.required) {
+								$scope.errorPassword = '<spring:message code="common.msg.required"/>';
+							} else if ($scope.loginForm.j_password.$error.minlength || $scope.loginForm.j_password.$error.maxlength) {
+								$scope.errorPassword = '<spring:message code="Size.userWrite.password"/>';
+							}
+							event.preventDefault();
 						}
-					} else {
-						$scope.errorEmail = "";
-					}
-				};
+					};
 
-			});
+					$scope.onEmail = function () {
+						if ($scope.loginForm.j_username.$invalid) {
+							if ($scope.loginForm.j_username.$error.required) {
+								$scope.errorEmail = '<spring:message code="common.msg.required"/>';
+							} else if ($scope.loginForm.j_username.$error.minlength || $scope.loginForm.j_username.$error.maxlength) {
+								$scope.errorEmail = '<spring:message code="Size.userWrite.email"/>';
+							} else {
+								$scope.errorEmail = '<spring:message code="user.msg.check.mail.format"/>';
+							}
+						} else {
+							$scope.errorEmail = "";
+						}
+					};
+				});
 		</script>
-		<jsp:include page="../include/body-footer.jsp"/>
-
 	</body>
 </html>

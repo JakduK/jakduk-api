@@ -1,6 +1,13 @@
 package com.jakduk.configuration;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.WebApplicationInitializer;
@@ -9,10 +16,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
-
-import javax.servlet.*;
-import java.util.EnumSet;
-import java.util.Objects;
+import ro.isdc.wro.http.WroFilter;
 
 /**
  * Created by pyohwan on 16. 4. 2.
@@ -35,6 +39,7 @@ public class Initializer implements WebApplicationInitializer {
         registerSpringSecurityFilter(container);
         registerDeviceResolverRequestFilter(container);
         registerDispatcherServlet(container);
+        registerWroFilter(container);
 
         rootContext.getEnvironment().setDefaultProfiles("local");
     }
@@ -71,6 +76,12 @@ public class Initializer implements WebApplicationInitializer {
         // Register and map the dispatcher servlet
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
         dispatcher.addMapping("/");
+    }
+
+    // Create the wro filter's Spring application context
+    public void registerWroFilter(ServletContext servletContext) {
+        FilterRegistration.Dynamic wro = servletContext.addFilter("WroFilter", new WroFilter());
+        wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
     }
 }
 

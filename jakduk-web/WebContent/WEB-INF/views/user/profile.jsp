@@ -1,29 +1,31 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>  
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>  
+	pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
-<!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
-<head>
-	<title><spring:message code="user.profile"/> &middot; <spring:message code="common.jakduk"/></title>
-	<jsp:include page="../include/html-header.jsp"></jsp:include>
-</head>
+<!--[if !IE]><!-->
+<html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
+	<head>
+		<title><spring:message code="user.profile"/> &middot; <spring:message code="common.jakduk"/></title>
+		<jsp:include page="../include/html-header.jsp"/>
+		<link rel="stylesheet" href="<%=request.getContextPath()%>/bundles/user.css">
+	</head>
 
-<body class="header-fixed">
+	<body class="header-fixed">
 
-	<div class="wrapper" ng-controller="userCtrl">
+		<div class="wrapper" ng-controller="userCtrl">
 
-		<jsp:include page="../include/navigation-header.jsp"/>
+			<jsp:include page="../include/navigation-header.jsp"/>
 
-		<!--=== Breadcrumbs ===-->
-		<div class="breadcrumbs">
-			<div class="container">
-				<h1 class="pull-left"><a href="<c:url value="/user/refresh"/>"><spring:message code="user.profile"/></a></h1>
-			</div><!--/container-->
-		</div><!--/breadcrumbs-->
-		<!--=== End Breadcrumbs ===-->
+			<!--=== Breadcrumbs ===-->
+			<div class="breadcrumbs">
+				<div class="container">
+					<h1 class="pull-left"><a href="<c:url value="/user/refresh"/>"><spring:message code="user.profile"/></a></h1>
+				</div><!--/container-->
+			</div><!--/breadcrumbs-->
+			<!--=== End Breadcrumbs ===-->
 
 			<!--=== Content Part ===-->
 			<div class="container content">
@@ -33,7 +35,8 @@
 						<div class="alert alert-success" role="alert"><spring:message code="user.msg.success.update.profile"/></div>
 					</c:when>
 					<c:when test="${status == 2}">
-						<div class="alert alert-success" role="alert"><spring:message code="user.mgs.success.change.password"/></div>
+						<div class="alert alert-success" role="alert">
+							<spring:message code="user.mgs.success.change.password"/></div>
 					</c:when>
 				</c:choose>
 
@@ -80,31 +83,24 @@
 
 			</div> <!--=== End Content Part ===-->
 
-		<jsp:include page="../include/footer.jsp"/>
+			<jsp:include page="../include/footer.jsp"/>
 
-	</div>
+		</div>
 
-	<!-- Bootstrap core JavaScript ================================================== -->
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-	<script src="<%=request.getContextPath()%>/resources/bootstrap/dist/js/bootstrap.min.js"></script>
-	<script type="text/javascript">
-		var jakdukApp = angular.module("jakdukApp", []);
+		<script src="<%=request.getContextPath()%>/bundles/user.js"></script>
+		<script type="text/javascript">
+			var jakdukApp = angular.module("jakdukApp", ['jakdukCommon']);
 
-		jakdukApp.controller("userCtrl", function($scope) {
+			jakdukApp.controller("userCtrl", function ($scope) {
 
-			angular.element(document).ready(function() {
+				angular.element(document).ready(function () {
+				});
+
 			});
 
-		});
-	</script>
-
-	<jsp:include page="../include/body-footer.jsp"/>
-
-	<script type="text/javascript">
-		$(document).ready(function () {
-			App.init();
-		});
-	</script>
-</body>
+			$(document).ready(function () {
+				App.init();
+			});
+		</script>
+	</body>
 </html>
