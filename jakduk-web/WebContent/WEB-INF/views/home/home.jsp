@@ -3,25 +3,12 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <!DOCTYPE html>
-<!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
-<!--[if !IE]><!-->
-<html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
-
+<!--[if IE 9]><html lang="ko" class="ie9" ng-app="jakdukApp"><![endif]-->
+<!--[if !IE]><!--><html lang="ko" ng-app="jakdukApp"><!--<![endif]-->
 	<head>
 		<title><spring:message code="common.home"/> &middot; <spring:message code="common.jakduk"/></title>
-
-		<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-
-		<!-- CSS Implementing Plugins -->
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/scrollbar/css/jquery.mCustomScrollbar.css">
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/slick-carousel/slick/slick.css">
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/slick-carousel/slick/slick-theme.css">
-
-		<!-- CSS Page Style -->
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/page_job_inner.css">
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/css/pages/profile.css">
-
 		<jsp:include page="../include/html-header.jsp"/>
+		<link rel="stylesheet" href="<%=request.getContextPath()%>/bundles/home.css">
 	</head>
 
 	<body class="header-fixed">
@@ -204,15 +191,9 @@
 			<jsp:include page="../include/footer.jsp"/>
 		</div><!-- /.container -->
 
-		<!-- Placed at the end of the document so the pages load faster -->
-		<script src="<%=request.getContextPath()%>/resources/angular-sanitize/angular-sanitize.min.js"></script>
-		<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/smoothScroll.js"></script>
-		<script type="text/javascript" src="<%=request.getContextPath()%>/resources/unify/assets/plugins/scrollbar/js/jquery.mCustomScrollbar.concat.min.js"></script>
-		<script type="text/javascript" src="<%=request.getContextPath()%>/resources/slick-carousel/slick/slick.min.js"></script>
-		<script type="text/javascript" src="<%=request.getContextPath()%>/resources/angular-slick-carousel/dist/angular-slick.min.js"></script>
-
+		<script src="<%=request.getContextPath()%>/bundles/home.js"></script>
 		<script type="text/javascript">
-			angular.module('jakdukApp', ['ngSanitize', 'slickCarousel'])
+			angular.module('jakdukApp', ['ngSanitize', 'slickCarousel', 'jakdukCommon'])
 				.controller("homeCtrl", function ($scope, $http) {
 					$scope.refreshEncyclopedia = refreshEncyclopedia;
 					$scope.getDataLatest = getDataLatest;
@@ -321,11 +302,7 @@
 						return parseInt(objectId.substring(0, 8), 16) * 1000;
 					}
 				});
-		</script>
 
-		<jsp:include page="../include/body-footer.jsp"/>
-
-		<script type="text/javascript">
 			$(document).ready(function() {
 				App.init();
 				App.initScrollBar();

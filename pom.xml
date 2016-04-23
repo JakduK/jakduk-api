@@ -319,24 +319,38 @@
 		  <version>1.0.0</version>
 	  </dependency>
 
-  </dependencies>
+		<dependency>
+			<groupId>ro.isdc.wro4j</groupId>
+			<artifactId>wro4j-core</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>ro.isdc.wro4j</groupId>
+			<artifactId>wro4j-extensions</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+	</dependencies>
   
  	<build>
 		<sourceDirectory>${project.basedir}/src</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/test</testSourceDirectory>
 		<resources>
 			<resource>
+				<directory>${project.basedir}/WebContent/resources/bower_components/summernote</directory>
+				<targetPath>${project.basedir}/WebContent/resources/summernote</targetPath>
+			</resource>
+			<resource>
 				<directory>${project.basedir}/resources</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
 				</excludes>
 			</resource>
-           <resource>
+		 <resource>
 				<directory>${project.basedir}/resources-${env}</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
 				</excludes>                
-            </resource>			
+			</resource>
 		</resources>
 		<testResources>
 			<testResource>
