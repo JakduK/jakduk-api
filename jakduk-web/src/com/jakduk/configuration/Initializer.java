@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
+import com.github.lifus.wro4j_runtime_taglib.servlet.TaglibServletContextListener;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.WebApplicationInitializer;
@@ -16,7 +17,9 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
+import ro.isdc.wro.http.WroContextFilter;
 import ro.isdc.wro.http.WroFilter;
+import ro.isdc.wro.http.WroServletContextListener;
 
 /**
  * Created by pyohwan on 16. 4. 2.
@@ -34,12 +37,15 @@ public class Initializer implements WebApplicationInitializer {
         container.addListener(new ContextLoaderListener(rootContext));
         container.addListener(new HttpSessionEventPublisher());
         container.addListener(new SessionListener());
+        container.addListener(new WroServletContextListener());
+        //container.addListener(new TaglibServletContextListener());
 
         registerCharcterEncodingFilter(container);
         registerSpringSecurityFilter(container);
         registerDeviceResolverRequestFilter(container);
         registerDispatcherServlet(container);
         registerWroFilter(container);
+        //registerWroContextFilter(container);
 
         rootContext.getEnvironment().setDefaultProfiles("local");
     }
@@ -65,6 +71,18 @@ public class Initializer implements WebApplicationInitializer {
         filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/*");
     }
 
+    // Create the wro filter's Spring application context
+    public void registerWroFilter(ServletContext servletContext) {
+        FilterRegistration.Dynamic wro = servletContext.addFilter("WroFilter", new WroFilter());
+        wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
+    }
+
+    // Create the wroContext filter's Spring application context
+    public void registerWroContextFilter(ServletContext servletContext) {
+        FilterRegistration.Dynamic wro = servletContext.addFilter("WroContextFilter", new WroContextFilter());
+        wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
+    }
+
     // Create the dispatcher servlet's Spring application context
     public void registerDispatcherServlet(ServletContext servletContext) {
 //        XmlWebApplicationContext appContext = new XmlWebApplicationContext();
@@ -76,12 +94,6 @@ public class Initializer implements WebApplicationInitializer {
         // Register and map the dispatcher servlet
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
         dispatcher.addMapping("/");
-    }
-
-    // Create the wro filter's Spring application context
-    public void registerWroFilter(ServletContext servletContext) {
-        FilterRegistration.Dynamic wro = servletContext.addFilter("WroFilter", new WroFilter());
-        wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
     }
 }
 

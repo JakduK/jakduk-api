@@ -1,5 +1,6 @@
 package com.jakduk.model.web;
 
+import com.jakduk.common.CommonConst;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -26,9 +27,10 @@ public class UserProfileForm {
 	private String about;
 	
 	private String footballClub;
-	
-	/**
-	 * 별명 겹침 검사 상태 값
-	 */
-	private String usernameStatus = "none";
+
+	// 이메일 겹침 검사 상태 값
+	private CommonConst.VALIDATION_TYPE emailStatus = CommonConst.VALIDATION_TYPE.NONE;
+
+	// 별명 겹침 검사 상태 값
+	private CommonConst.VALIDATION_TYPE usernameStatus = CommonConst.VALIDATION_TYPE.NONE;
 }

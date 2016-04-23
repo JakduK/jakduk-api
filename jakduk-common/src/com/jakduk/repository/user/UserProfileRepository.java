@@ -8,4 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * Created by pyohwan on 16. 4. 16.
  */
 public interface UserProfileRepository extends MongoRepository<UserProfile, String> {
+    UserProfile findOneByEmail(String email);
+    UserProfile findOneByUsername(String username);
 }

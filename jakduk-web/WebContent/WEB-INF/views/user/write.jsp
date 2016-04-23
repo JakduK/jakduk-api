@@ -45,7 +45,8 @@
 								<h2><spring:message code="user.register.header"/></h2>
 							</div>
 
-							<div class="form-group has-feedback" ng-class="{'has-success':userWrite.email.$valid, 'has-error':userWrite.email.$invalid || emailStatus != 'ok'}">
+							<div class="form-group has-feedback"
+								 ng-class="{'has-success':userWrite.email.$valid, 'has-error':userWrite.email.$invalid || emailStatus != 'OK'}">
 								<label class="control-label">
 									<abbr title='<spring:message code="common.msg.required"/>'>*</abbr>
 									<spring:message code="user.email"/>
@@ -56,14 +57,15 @@
 									ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
 
 							<span class="glyphicon form-control-feedback"
-								ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'ok'}"></span>
+								ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'OK'}"></span>
 
 								<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
 								<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
 								<span class="{{emailAlert.classType}}" ng-show="emailAlert.msg">{{emailAlert.msg}}</span>
 							</div>
 
-							<div class="form-group has-feedback" ng-class="{'has-success':userWrite.username.$valid, 'has-error':userWrite.username.$invalid || usernameStatus != 'ok'}">
+							<div class="form-group has-feedback"
+								 ng-class="{'has-success':userWrite.username.$valid, 'has-error':userWrite.username.$invalid || usernameStatus != 'OK'}">
 
 								<label class="control-label">
 									<abbr title='<spring:message code="common.msg.required"/>'>*</abbr>
@@ -74,8 +76,8 @@
 									ng-blur="onUsername()" ng-change="validationUsername()"
 									ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
-							<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.username.$valid,
-							'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'ok'}"></span>
+							<span class="glyphicon form-control-feedback"
+								  ng-class="{'glyphicon-ok':userWrite.username.$valid, 'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'OK'}"></span>
 
 								<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 								<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
@@ -93,8 +95,8 @@
 											ng-model="password" ng-change="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
 											ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 
-									<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.password.$valid,
-									'glyphicon-remove':userWrite.password.$invalid}"></span>
+									<span class="glyphicon form-control-feedback"
+										  ng-class="{'glyphicon-ok':userWrite.password.$valid, 'glyphicon-remove':userWrite.password.$invalid}"></span>
 
 										<form:errors path="password" cssClass="text-danger" element="span" ng-hide="passwordAlert.msg"/>
 										<span class="{{passwordAlert.classType}}" ng-show="passwordAlert.msg">{{passwordAlert.msg}}</span>
@@ -111,10 +113,11 @@
 											ng-model="passwordConfirm" ng-change="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
 											ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 
-									<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userWrite.passwordConfirm.$valid,
-														'glyphicon-remove':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}"></span>
+									<span class="glyphicon form-control-feedback"
+										  ng-class="{'glyphicon-ok':userWrite.passwordConfirm.$valid, 'glyphicon-remove':userWrite.passwordConfirm.$invalid || equalPasswordStatus != 'true'}"></span>
 
-										<form:errors path="passwordConfirm" cssClass="text-danger" element="span" ng-hide="passwordConfirmAlert.msg || (passwordConfirm.length > 0 && password == passwordConfirm)"/>
+										<form:errors path="passwordConfirm" cssClass="text-danger" element="span"
+													 ng-hide="passwordConfirmAlert.msg || (passwordConfirm.length > 0 && password == passwordConfirm)"/>
 										<span class="{{passwordConfirmAlert.classType}}" ng-show="passwordConfirmAlert.msg">{{passwordConfirmAlert.msg}}</span>
 									</div>
 								</div>
@@ -197,23 +200,17 @@
 				});
 
 				$scope.onSubmit = function (event) {
-					if ($scope.userWrite.$valid && $scope.emailStatus == 'ok' && $scope.usernameStatus == 'ok'
+					if ($scope.userWrite.$valid && $scope.emailStatus == 'OK' && $scope.usernameStatus == 'OK'
 						&& $scope.equalPasswordStatus == "true") {
 						submitted = true;
 						$scope.btnSubmit = true;
 					} else {
 						if ($scope.userWrite.email.$invalid) {
 							$scope.validationEmail();
-						} else if ($scope.emailStatus != 'ok') {
-							//$scope.emailAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
-							//document.userWrite.email.focus();
 						}
 
 						if ($scope.userWrite.username.$invalid) {
 							$scope.validationUsername();
-						} else if ($scope.usernameStatus != 'ok') {
-							//$scope.usernameAlert = {"classType":"text-danger", "msg":'<spring:message code="common.msg.error.shoud.check.redudancy"/>'};
-							//document.userWrite.username.focus();
 						}
 
 						$scope.eaualPasswordConfirm();
@@ -235,7 +232,7 @@
 							reqPromise.success(function (data, status, headers, config) {
 
 								if (data == false) {
-									$scope.emailStatus = "ok";
+									$scope.emailStatus = "OK";
 									$scope.emailAlert = {
 										"classType": "text-success",
 										"msg": '<spring:message code="user.msg.avaliable.data"/>'
@@ -250,7 +247,7 @@
 							});
 						}
 					} else {
-						$scope.emailStatus = "invalid";
+						$scope.emailStatus = "INVALID";
 						$scope.validationEmail();
 					}
 				};
@@ -264,7 +261,7 @@
 							reqPromise.success(function (data, status, headers, config) {
 
 								if (data == false) {
-									$scope.usernameStatus = "ok";
+									$scope.usernameStatus = "OK";
 									$scope.usernameAlert = {
 										"classType": "text-success",
 										"msg": '<spring:message code="user.msg.avaliable.data"/>'
@@ -279,7 +276,7 @@
 							});
 						}
 					} else {
-						$scope.usernameStatus = 'invalid';
+						$scope.usernameStatus = 'INVALID';
 						$scope.validationUsername();
 					}
 				};

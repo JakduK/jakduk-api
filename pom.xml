@@ -310,9 +310,20 @@
 	  </dependency>
 
 	  <dependency>
-		  <groupId>net.exacode.spring.social</groupId>
-		  <artifactId>spring-social-mongodb</artifactId>
-		  <version>1.0.0</version>
+		  <groupId>ro.isdc.wro4j</groupId>
+		  <artifactId>wro4j-core</artifactId>
+		  <version>1.8.0</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>ro.isdc.wro4j</groupId>
+		  <artifactId>wro4j-extensions</artifactId>
+		  <version>1.8.0</version>
+	  </dependency>
+
+	  <dependency>
+		  <groupId>com.github.lifus</groupId>
+		  <artifactId>wro4j-runtime-taglib</artifactId>
+		  <version>0.2.0</version>
 	  </dependency>
 
 	  <dependency>
@@ -330,23 +341,16 @@
 		  <scope>system</scope>
 		  <systemPath>${project.basedir}/custom-lib/spring-social-mongodb-1.0.1-SNAPSHOT.jar</systemPath>
 	  </dependency>
-
-		<dependency>
-			<groupId>ro.isdc.wro4j</groupId>
-			<artifactId>wro4j-core</artifactId>
-			<version>1.8.0</version>
-		</dependency>
-		<dependency>
-			<groupId>ro.isdc.wro4j</groupId>
-			<artifactId>wro4j-extensions</artifactId>
-			<version>1.8.0</version>
-		</dependency>
 	</dependencies>
   
  	<build>
 		<sourceDirectory>${project.basedir}/src</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/test</testSourceDirectory>
 		<resources>
+			<resource>
+				<directory>${project.basedir}/WebContent/resources/bower_components/summernote</directory>
+				<targetPath>${project.basedir}/WebContent/resources/summernote</targetPath>
+			</resource>
 			<resource>
 				<directory>${project.basedir}/resources</directory>
 				<excludes>

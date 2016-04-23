@@ -17,9 +17,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -57,7 +54,7 @@ public class UserTest {
 	
 	@Test
 	public void test01() {
-		UserProfile user = userRepository.userFindByNEIdAndUsername("544dd2a13d9648d912a339c7", "test05");		
+		UserProfile user = userRepository.findByNEIdAndUsername("544dd2a13d9648d912a339c7", "test05");
 		System.out.println("UserProfile=" + user);
 	}
 
@@ -93,7 +90,7 @@ public class UserTest {
 		OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");		
 		System.out.println("OAuthProfile=" + user);
 		
-		UserProfile userProfile = userRepository.userFindByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
+		UserProfile userProfile = userRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
 		System.out.println("userProfile=" + userProfile);
 	}
 	

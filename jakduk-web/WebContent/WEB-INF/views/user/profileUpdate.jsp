@@ -45,8 +45,8 @@
 						</div>
 					</div>
 
-					<div class="form-group has-feedback" ng-class="{'has-success':userProfileForm.username.$valid,
-					'has-error':userProfileForm.username.$invalid || usernameStatus != 'ok'}">
+					<div class="form-group has-feedback"
+						 ng-class="{'has-success':userProfileForm.username.$valid, 'has-error':userProfileForm.username.$invalid || usernameStatus != 'OK'}">
 						<label class="col-sm-2 control-label">
 							<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.nickname"/>
 						</label>
@@ -56,8 +56,8 @@
 								ng-blur="onUsername()" ng-change="validationUsername()"
 								ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
-					<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':userProfileForm.username.$valid,
-								'glyphicon-remove':userProfileForm.username.$invalid || usernameStatus != 'ok'}"></span>
+					<span class="glyphicon form-control-feedback"
+						  ng-class="{'glyphicon-ok':userProfileForm.username.$valid, 'glyphicon-remove':userProfileForm.username.$invalid || usernameStatus != 'OK'}"></span>
 							<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 							<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 
@@ -137,7 +137,7 @@
 				});
 
 				$scope.onSubmit = function (event) {
-					if ($scope.userProfileForm.$valid && $scope.usernameStatus == "ok") {
+					if ($scope.userProfileForm.$valid && $scope.usernameStatus == "OK") {
 						submitted = true;
 						$scope.submitConn = "connecting";
 						$scope.buttonAlert = {
@@ -147,7 +147,6 @@
 					} else {
 						if ($scope.userProfileForm.username.$invalid) {
 							$scope.validationUsername();
-						} else if ($scope.usernameStatus != 'ok') {
 						}
 
 						$scope.submitConn = "none";
@@ -170,7 +169,7 @@
 							reqPromise.success(function (data, status, headers, config) {
 
 								if (data == false) {
-									$scope.usernameStatus = "ok";
+									$scope.usernameStatus = "OK";
 									$scope.usernameAlert = {
 										"classType": "text-success",
 										"msg": '<spring:message code="user.msg.avaliable.data"/>'
@@ -185,7 +184,7 @@
 							});
 						}
 					} else {
-						$scope.usernameStatus = 'invalid';
+						$scope.usernameStatus = 'INVALID';
 						$scope.validationUsername();
 					}
 				};

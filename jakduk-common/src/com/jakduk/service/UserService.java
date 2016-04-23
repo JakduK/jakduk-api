@@ -71,6 +71,26 @@ public class UserService {
 		return userProfileRepository.findOne(id);
 	}
 
+	// email과 일치하는 회원 찾기.
+	public UserProfile findOneByEmail(String email) {
+		return userProfileRepository.findOneByEmail(email);
+	}
+
+	// username과 일치하는 회원 찾기.
+	public UserProfile findOneByUsername(String username) {
+		return userProfileRepository.findOneByUsername(username);
+	}
+
+	// 해당 ID를 제외하고 username과 일치하는 회원 찾기.
+	public UserProfile findByNEIdAndUsername(String id, String username) {
+		return userRepository.findByNEIdAndUsername(id, username);
+	};
+
+	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
+	public UserProfile findByNEIdAndEmail(String id, String email) {
+		return userRepository.findByNEIdAndEmail(id, email);
+	}
+
 	public void create(User user) {
 		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
 		
@@ -181,7 +201,7 @@ public class UserService {
 		if (Objects.isNull(commonPrincipal.getId()))
 			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
-		UserProfile userProfile = userRepository.userFindByNEIdAndEmail(commonPrincipal.getId(), email);
+		UserProfile userProfile = userRepository.findByNEIdAndEmail(commonPrincipal.getId(), email);
 
 		if (Objects.nonNull(userProfile))
 			throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.replicated.data"));
@@ -202,33 +222,12 @@ public class UserService {
 		if (Objects.isNull(commonPrincipal.getId()))
 			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
-		UserProfile userProfile = userRepository.userFindByNEIdAndUsername(commonPrincipal.getId(), username);
+		UserProfile userProfile = userRepository.findByNEIdAndUsername(commonPrincipal.getId(), username);
 
 		if (Objects.nonNull(userProfile))
 			throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.replicated.data"));
 
 		return false;
-	}
-
-	/**
-	 * SNS 계정의 회원 정보 업데이트 시 DB에 쿼리하여 중복 체크한다.
-	 * @param userProfileForm
-	 * @param result
-     */
-	public void checkSocialProfileUpdate(UserProfileForm userProfileForm, BindingResult result) {
-
-		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = principal.getId();
-		String email = userProfileForm.getEmail();
-		String username = userProfileForm.getUsername();
-
-		UserProfile existEmail = userRepository.userFindByNEIdAndEmail(id, email);
-		if (Objects.nonNull(existEmail))
-			result.rejectValue("email", "user.msg.already.email");
-
-		UserProfile existUsername = userRepository.userFindByNEIdAndUsername(id, username);
-		if (Objects.nonNull(existUsername))
-			result.rejectValue("username", "user.msg.already.username");
 	}
 
 	public User writeSocialUser(UserProfileForm userForm, CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
@@ -239,7 +238,6 @@ public class UserService {
 		user.setUsername(userForm.getUsername().trim());
 		user.setProviderId(providerId);
 		user.setProviderUserId(providerUserId);
-
 
 		ArrayList<Integer> roles = new ArrayList<Integer>();
 		roles.add(CommonRole.ROLE_NUMBER_USER_01);
@@ -260,7 +258,7 @@ public class UserService {
 		}
 
 		if (log.isDebugEnabled()) {
-			log.debug("OAuth user=" + user);
+			log.debug("social user=" + user);
 		}
 
 		userRepository.save(user);
@@ -276,7 +274,7 @@ public class UserService {
 		String username = userProfileForm.getUsername();
 		
 		if (id != null && username != null) {
-			UserProfile userProfle = userRepository.userFindByNEIdAndUsername(id, username);
+			UserProfile userProfle = userRepository.findByNEIdAndUsername(id, username);
 			if (userProfle != null) {
 				result.rejectValue("username", "user.msg.already.username");
 			}
@@ -373,9 +371,14 @@ public class UserService {
 
 		User user = userRepository.findById(principal.getId());
 
+		String email = userProfileForm.getEmail();
 		String username = userProfileForm.getUsername();
 		String footballClub = userProfileForm.getFootballClub();
 		String about = userProfileForm.getAbout();
+
+		if (Objects.nonNull(email) && email.isEmpty() == false) {
+			user.setEmail(email.trim());
+		}
 
 		if (Objects.nonNull(username) && username.isEmpty() == false) {
 			user.setUsername(username.trim());

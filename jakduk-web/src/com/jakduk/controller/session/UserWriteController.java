@@ -54,6 +54,7 @@ public class UserWriteController {
 
 		Locale locale = localeResolver.resolveLocale(request);
 
+		// 첫 번째 검증.
 		if (result.hasErrors()) {
 			log.debug("result=" + result);
 			return "user/write";
@@ -78,6 +79,7 @@ public class UserWriteController {
 			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
 		}
 
+		// 위 검사를 통과 못한 경우, 메시지 출력
 		if (result.hasErrors()) {
 			log.debug("result=" + result);
 			return "user/write";

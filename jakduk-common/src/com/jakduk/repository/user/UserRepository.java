@@ -20,18 +20,22 @@ public interface UserRepository extends MongoRepository<User, String> {
 	@Query(value="{'id' : ?0}")
 	UserOnPasswordUpdate userOnPasswordUpdateFindById(String id);
 
+	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
 	@Query(value="{'id' : {$ne : ?0}, 'email' : ?1}", fields="{'id' : 1, 'email' : 1}")
-	UserProfile userFindByNEIdAndEmail(String id, String email);
-	
+	UserProfile findByNEIdAndEmail(String id, String email);
+
+	// 해당 ID를 제외하고 username과 일치하는 회원 찾기.
 	@Query(value="{'id' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1}")
-	UserProfile userFindByNEIdAndUsername(String id, String username);
+	UserProfile findByNEIdAndUsername(String id, String username);
 
 	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
 	User userFindByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 
-	@Query(value="{'email' : ?0}") SocialUserOnAuthentication findSocialUserByEmail(String email);
+	@Query(value="{'email' : ?0}")
+	SocialUserOnAuthentication findSocialUserByEmail(String email);
 
-	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}") SocialUserOnAuthentication findByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
+	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
+	SocialUserOnAuthentication findByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 	
 	@Query(value="{'socialInfo.oauthId' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1, 'socialInfo' : 1}")
 	OAuthProfile userFindByNEOauthIdAndUsername(String oauthId, String username);

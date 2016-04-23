@@ -167,16 +167,19 @@ public class CommonConst {
 	public final static String ELASTICSEARCH_TYPE_JAKDU_COMMENT = "jakduComment";
 	public final static String ELASTICSEARCH_TYPE_GALLERY = "gallery";
 
+	// 이름 타입.
 	public enum NAME_TYPE {
 		fullName,
 		shortName
 	}
 
+	// 축구단 성격.
 	public enum CLUB_TYPE {
 		FOOTBALL_CLUB,
 		NATIONAL_TEAM
 	}
 
+	// 축구단 연령대.
 	public enum CLUB_AGE {
 		UNDER_14,
 		UNDER_17,
@@ -185,11 +188,13 @@ public class CommonConst {
 		SENIOR
 	}
 
+	// 축구단 성별.
 	public enum CLUB_SEX {
 		MEN,
 		WOMEN
 	}
 
+	// 작두 경기의 상태.
 	public enum JAKDU_GROUP_STATE {
 		SCHEDULE,	// 경기 예정
 		STANDBY,	// 대기중
@@ -203,5 +208,12 @@ public class CommonConst {
 		SEND_OK,
 		CHANGE_OK,
 		INVALID
+	}
+
+	// 검증 상태.
+	public enum VALIDATION_TYPE {
+		NONE,
+		INVALID,
+		OK
 	}
 }

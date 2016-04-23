@@ -1,13 +1,17 @@
 package com.jakduk.controller.session;
 
+import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.common.CommonConst;
+import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
+import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.UserProfileForm;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.web.ProviderSignInUtils;
@@ -127,13 +131,24 @@ public class UserProfileWriteController {
 	public String write(@Valid UserProfileForm userProfileForm,
 						BindingResult result,
 						SessionStatus sessionStatus,
-						WebRequest request) {
+						NativeWebRequest request) {
 
+		Locale locale = localeResolver.resolveLocale((HttpServletRequest) request.getNativeRequest());
+
+		// 첫 번째 검증.
 		if (result.hasErrors()) {
 			if (log.isDebugEnabled()) {
 				log.debug("result=" + result);
 			}
 			return "user/socialWrite";
+		}
+
+		this.checkValidationUserProfileOnWrite(userProfileForm, result);
+
+		// 위 검사를 통과 못한 경우, 메시지 출력
+		if (result.hasErrors()) {
+			log.debug("result=" + result);
+			return "user/write";
 		}
 
 		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
@@ -151,6 +166,40 @@ public class UserProfileWriteController {
 		return "redirect:/home";
 	}
 
+	// social 회원 정보 편집 페이지.
+	@RequestMapping(value = "/social/profile/update", method = RequestMethod.GET)
+	public String updateSocialProfile(@RequestParam(required = false) String lang,
+									  HttpServletRequest request,
+									  Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
+			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			UserProfile userProfile = userService.getUserProfileById(userDetail.getId());
+
+			UserProfileForm userProfileForm = new UserProfileForm();
+			userProfileForm.setEmail(userProfile.getEmail());
+			userProfileForm.setUsername(userProfile.getUsername());
+			userProfileForm.setAbout(userProfile.getAbout());
+
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+			FootballClub footballClub = userProfile.getSupportFC();
+
+			if (Objects.nonNull(footballClub)) {
+				userProfileForm.setFootballClub(footballClub.getId());
+			}
+
+			model.addAttribute("userProfileForm", userProfileForm);
+			model.addAttribute("footballClubs", footballClubs);
+
+			return "user/socialProfileUpdate";
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
+	}
+
 	// social 회원 정보 편집 처리.
 	@RequestMapping(value = "/social/profile/update", method = RequestMethod.POST)
 	public String profileUpdate(@Valid UserProfileForm userProfileForm,
@@ -166,7 +215,7 @@ public class UserProfileWriteController {
 		}
 
 		// 실제 DB에서 중복 검사
-		userService.checkSocialProfileUpdate(userProfileForm, result);
+		this.checkValidationUserProfileOnUpdate(userProfileForm, result);
 
 		// 위 중복 검사를 통과 못한 경우, 메시지 출력
 		if (result.hasErrors()) {
@@ -183,6 +232,58 @@ public class UserProfileWriteController {
 		userService.signUpSocialUser(user, request);
 
 		return "redirect:/user/social/profile?status=1";
+	}
+
+	// SNS 계정의 회원 정보를 공통으로 검증.
+	private void checkCommonValidationUserProfile(UserProfileForm userProfileForm, BindingResult result) {
+		CommonConst.VALIDATION_TYPE emailStatus = userProfileForm.getEmailStatus();
+		CommonConst.VALIDATION_TYPE usernameStatus = userProfileForm.getUsernameStatus();
+
+		if (emailStatus.equals(CommonConst.VALIDATION_TYPE.OK) == false) {
+			result.rejectValue("email", "user.msg.need.validation.email");
+		}
+
+		if (usernameStatus.equals(CommonConst.VALIDATION_TYPE.OK) == false) {
+			result.rejectValue("username", "user.msg.need.validation.username");
+		}
+	}
+
+	// SNS 계정의 회원 가입 시 DB에 쿼리하여 중복 체크한다.
+	private void checkValidationUserProfileOnWrite(UserProfileForm userProfileForm, BindingResult result) {
+
+		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = principal.getId();
+		String email = userProfileForm.getEmail();
+		String username = userProfileForm.getUsername();
+
+		this.checkCommonValidationUserProfile(userProfileForm, result);
+
+		UserProfile existEmail = userService.findOneByEmail(email);
+		if (Objects.nonNull(existEmail))
+			result.rejectValue("email", "user.msg.already.email");
+
+		UserProfile existUsername = userService.findOneByUsername(username);
+		if (Objects.nonNull(existUsername))
+			result.rejectValue("username", "user.msg.already.username");
+	}
+
+	// SNS 계정의 회원 정보 편집 시 DB에 쿼리하여 중복 체크한다.
+	private void checkValidationUserProfileOnUpdate(UserProfileForm userProfileForm, BindingResult result) {
+
+		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = principal.getId();
+		String email = userProfileForm.getEmail();
+		String username = userProfileForm.getUsername();
+
+		this.checkCommonValidationUserProfile(userProfileForm, result);
+
+		UserProfile existEmail = userService.findByNEIdAndEmail(id, email);
+		if (Objects.nonNull(existEmail))
+			result.rejectValue("email", "user.msg.already.email");
+
+		UserProfile existUsername = userService.findByNEIdAndUsername(id, username);
+		if (Objects.nonNull(existUsername))
+			result.rejectValue("username", "user.msg.already.username");
 	}
 
 }
