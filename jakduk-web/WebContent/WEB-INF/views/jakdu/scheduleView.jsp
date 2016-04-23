@@ -15,20 +15,13 @@
 <!--[if IE 9]> <html lang="ko" class="ie9" ng-app="jakdukApp"> <![endif]-->
 <!--[if !IE]><!--> <html lang="ko" ng-app="jakdukApp"> <!--<![endif]-->
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title><spring:message code="jakdu.view"/> &middot; <spring:message code="jakdu"/> &middot;
-			<spring:message code="common.jakduk"/></title>
+		<title>
+			<spring:message code="jakdu.view"/> &middot; <spring:message code="jakdu"/> &middot;
+			<spring:message code="common.jakduk"/>
+		</title>
 		<link href='https://jakduk.com/jakdu/schedule/${id}' rel='canonical' />
-
-		<jsp:include page="../include/html-header.jsp"></jsp:include>
-
-		<!-- summernote를 사용하기 위해서는 맨 위로 와야 한다 -->
-		<script src="<%=request.getContextPath()%>/resources/jquery/dist/jquery.min.js"></script>
-
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/line-icons-pro/styles.css">
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css">
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/dist/summernote.css">
-		<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css">
+		<jsp:include page="../include/html-header.jsp"/>
+		<link rel="stylesheet" href="<%=request.getContextPath()%>/bundles/jakdu.css">
 	</head>
 
 	<body class="header-fixed">
@@ -263,22 +256,14 @@
 			<jsp:include page="../include/footer.jsp"/>
 		</div>
 
-		<script src="<%=request.getContextPath()%>/resources/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/angular-ladda/dist/angular-ladda.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/ng-infinite-scroller-origin/build/ng-infinite-scroll.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/summernote/dist/summernote.min.js"></script>
-		<script src="<%=request.getContextPath()%>/resources/angular-summernote/dist/angular-summernote.min.js"></script>
+		<script src="<%=request.getContextPath()%>/bundles/jakdu.js"></script>
 		<c:if test="${fn:contains('ko', pageContext.response.locale.language)}">
 			<script src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
 			<c:set var="summernoteLang" value="ko-KR"/>
 		</c:if>
-		<script src="<%=request.getContextPath()%>/resources/jakduk/js/jakduk.js"></script>
-
 		<script type="text/javascript">
 
-			angular.module("jakdukApp", ['ui.bootstrap', 'angular-ladda', 'summernote', 'infinite-scroll'])
+			angular.module("jakdukApp", ['ui.bootstrap', 'angular-ladda', 'summernote', 'infinite-scroll', 'jakdukCommon'])
 					.factory('jakdukFactory', function() {
 						return {
 							objectIdFromDate : function (date) {
@@ -306,7 +291,7 @@
 							var bUrl = '<c:url value="/api/jakdu/myJakdu"/>';
 							var reqData = {};
 
-							if (isEmpty($scope.myHomeScore) || isEmpty($scope.myAwayScore)) {
+							if (Jakduk.isEmpty($scope.myHomeScore) || Jakduk.isEmpty($scope.myAwayScore)) {
 								return;
 							}
 
@@ -520,15 +505,10 @@
 							}
 						};
 					});
-		</script>
 
-		<jsp:include page="../include/body-footer.jsp"/>
-
-		<script type="text/javascript">
 			$(document).ready(function () {
 				App.init();
 			});
 		</script>
-
 	</body>
 </html>
