@@ -44,10 +44,6 @@
 			<id>springsource-repo</id>
 			<url>http://repo.springsource.org/release</url>
 		</repository>
-		<repository>
-			<id>exacode-releases</id>
-			<url>https://github.com/exacode/mvn-repo/raw/master/releases</url>
-		</repository>
 	</repositories>
 
   <dependencies>
@@ -317,6 +313,22 @@
 		  <groupId>net.exacode.spring.social</groupId>
 		  <artifactId>spring-social-mongodb</artifactId>
 		  <version>1.0.0</version>
+	  </dependency>
+
+	  <dependency>
+		  <groupId>org.springframework.social</groupId>
+		  <artifactId>spring-social-daum</artifactId>
+		  <version>0.1.1</version>
+		  <scope>system</scope>
+		  <systemPath>${project.basedir}/custom-lib/spring-social-daum-0.1.1.jar</systemPath>
+	  </dependency>
+
+	  <dependency>
+		  <groupId>net.exacode.spring.social</groupId>
+		  <artifactId>spring-social-mongodb</artifactId>
+		  <version>1.0.1-SNAPSHOT</version>
+		  <scope>system</scope>
+		  <systemPath>${project.basedir}/custom-lib/spring-social-mongodb-1.0.1-SNAPSHOT.jar</systemPath>
 	  </dependency>
 
   </dependencies>

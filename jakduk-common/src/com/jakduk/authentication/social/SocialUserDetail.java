@@ -18,7 +18,7 @@ public class SocialUserDetail implements SocialUserDetails {
     private String userId;
     private String username;
     private CommonConst.ACCOUNT_TYPE providerId;
-    private String providerUserId;
+    private String email;
 
     private final Set<GrantedAuthority> authorities;
     private final boolean accountNonExpired;
@@ -26,14 +26,14 @@ public class SocialUserDetail implements SocialUserDetails {
     private final boolean credentialsNonExpired;
     private final boolean enabled;
 
-    public SocialUserDetail(String id, String userId, String username, CommonConst.ACCOUNT_TYPE providerId, String providerUserId, boolean enabled, boolean accountNonExpired,
+    public SocialUserDetail(String id, String userId, String username, CommonConst.ACCOUNT_TYPE providerId, String email, boolean enabled, boolean accountNonExpired,
                             boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
         this.id = id;
         this.userId = userId;
         this.username = username;
         this.providerId = providerId;
-        this.providerUserId = providerUserId;
+        this.email = email;
         this.enabled = enabled;
         this.accountNonExpired = accountNonExpired;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -121,8 +121,8 @@ public class SocialUserDetail implements SocialUserDetails {
         return id;
     }
 
-    public String getProviderUserId() {
-        return providerUserId;
+    public String getEmail() {
+        return email;
     }
 
 }

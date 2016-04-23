@@ -1,15 +1,10 @@
 package com.jakduk.repository.user;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.User;
+import com.jakduk.model.simple.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-
-import com.jakduk.model.db.User;
-import com.jakduk.model.simple.OAuthProfile;
-import com.jakduk.model.simple.SocialUserOnAuthentication;
-import com.jakduk.model.simple.UserOnAuthentication;
-import com.jakduk.model.simple.UserOnPasswordUpdate;
-import com.jakduk.model.simple.UserProfile;
 
 public interface UserRepository extends MongoRepository<User, String> {
 	
@@ -46,4 +41,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	
 	@Query(value="{'email' : ?0}")
 	UserOnAuthentication userFindByEmail(String email);
+
+	@Query(value="{'providerUserId' : ?0}")
+	UserOnAuthentication userFindByProviderUserId(String providerUserId);
 }

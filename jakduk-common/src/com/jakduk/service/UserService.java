@@ -434,7 +434,7 @@ public class UserService {
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		providerSignInUtils.doPostSignUp(user.getEmail(), request);
+		providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 	}
 
 	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {

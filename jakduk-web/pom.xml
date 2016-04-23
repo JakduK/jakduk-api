@@ -19,6 +19,16 @@
       <artifactId>jakduk-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.social</groupId>
+      <artifactId>spring-social-daum</artifactId>
+      <version>0.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>net.exacode.spring.social</groupId>
+      <artifactId>spring-social-mongodb</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

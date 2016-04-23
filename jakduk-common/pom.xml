@@ -14,12 +14,5 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.springframework.social</groupId>
-      <artifactId>spring-social-daum</artifactId>
-      <version>0.1.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../custom-lib/spring-social-daum-0.1.1.jar</systemPath>
-    </dependency>
   </dependencies>
 </project>

@@ -32,14 +32,15 @@ public class SocialDetailService implements SocialUserDetailsService {
         if (Objects.isNull(userId)) {
             throw new IllegalArgumentException("userId 는 꼭 필요한 값입니다.");
         } else {
-            UserOnAuthentication user = userRepository.userFindByEmail(userId);
+            //UserOnAuthentication user = userRepository.userFindByEmail(userId);
+            UserOnAuthentication user = userRepository.userFindByProviderUserId(userId);
 
             if (Objects.isNull(user))
                 throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. userId=" + userId);
 
             log.debug("user=" + user);
 
-            SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
+            SocialUserDetail userDetail = new SocialUserDetail(user.getId(), userId, user.getUsername(), user.getProviderId(), user.getEmail(),
                     true, true, true, true, getAuthorities(user.getRoles()));
 
             return userDetail;
