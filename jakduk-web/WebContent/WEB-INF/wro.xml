@@ -17,6 +17,7 @@
 
 	<group name="intro">
 		<group-ref>base</group-ref>
+		<css>/resources/jakduk/css/jakduk.css</css>
 	</group>
 	
 	<group name="login">
@@ -24,6 +25,7 @@
 
 		<css>/resources/unify/assets/css/pages/page_log_reg_v1.css</css>
 		<css>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/spin.js</js>
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/ladda.js</js>
@@ -33,12 +35,15 @@
 
 	<group name="resetPassword">
 		<group-ref>login</group-ref>
+		<css>/resources/jakduk/css/jakduk.css</css>
 	</group>
 
 	<group name="admin">
 		<group-ref>base</group-ref>
 
 		<css>/resources/bower_components/angular-bootstrap/ui-bootstrap-csp.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
+
 		<js>/resources/bower_components/angular-bootstrap/ui-bootstrap-tpls.js</js>
 	</group>
 
@@ -81,6 +86,7 @@
 		<css>/resources/unify/assets/css/pages/blog.css</css>
 		<css>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css</css>
 		<css>/resources/bower_components/angular-bootstrap/ui-bootstrap-csp.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/bower_components/angular-sanitize/angular-sanitize.js</js>
 		<js>/resources/bower_components/angular-animate/angular-animate.js</js>
@@ -93,6 +99,7 @@
 		<css>/resources/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.css</css>
 		<css>/resources/bower_components/angular-bootstrap/ui-bootstrap-csp.css</css>
 		<css>/resources/bower_components/angular-loading-bar/build/loading-bar.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/bower_components/angular-lazy-img/release/angular-lazy-img.js</js>
 		<js>/resources/bower_components/ng-infinite-scroller-origin/build/ng-infinite-scroll.js</js>
@@ -107,6 +114,7 @@
 
 		<css>/resources/unify/assets/css/pages/blog.css</css>
 		<css>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/kakao/js/kakao.min.js</js>
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js</js>
@@ -121,6 +129,7 @@
 		<css>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css</css>
 		<css>/resources/bower_components/summernote/dist/summernote.css</css>
 		<css>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js</js>
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js</js>
@@ -139,6 +148,7 @@
 		<css>/resources/bower_components/angular-bootstrap/ui-bootstrap-csp.css</css>
 		<css>/resources/bower_components/angular-loading-bar/build/loading-bar.css</css>
 		<css>/resources/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/spin.min.js</js>
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/ladda.min.js</js>
@@ -156,6 +166,7 @@
 		<css>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/css/cubeportfolio.min.css</css>
 		<css>/resources/unify/assets/plugins/cube-portfolio/cubeportfolio/custom/custom-cubeportfolio.css</css>
 		<css>/resources/bower_components/angular-bootstrap/ui-bootstrap-csp.css</css>
+		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/kakao/js/kakao.min.js</js>
 		<js>/resources/bower_components/highcharts/highcharts.js</js>
@@ -177,6 +188,8 @@
 
 	<group name="user">
 		<group-ref>base</group-ref>
+
+		<css>/resources/jakduk/css/jakduk.css</css>
 	</group>
 
 	<group name="base">
