@@ -43,8 +43,8 @@
 								<h2><spring:message code="oauth.register.header"/></h2>
 							</div>
 
-							<div class="form-group has-feedback" ng-class="{'has-success':userProfileForm.email.$valid,
-							'has-error':userProfileForm.email.$invalid || emailStatus != 'OK'}">
+							<div class="form-group has-feedback"
+								 ng-class="{'has-success':userProfileForm.email.$valid, 'has-error':userProfileForm.email.$invalid || emailStatus != 'OK'}">
 								<label class="control-label">
 									<abbr title='<spring:message code="common.msg.required"/>'>*</abbr> <spring:message code="user.email"/>
 								</label>
@@ -59,8 +59,7 @@
 								<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
 								<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
 
-								<!-- 초기화 시 onEmail()를 호출 -->
-								<span class="{{emailAlert.classType}}" ng-show="emailAlert.msg" ng-init="onEmail()">{{emailAlert.msg}}</span>
+								<span class="{{emailAlert.classType}}" ng-show="emailAlert.msg">{{emailAlert.msg}}</span>
 							</div>
 
 							<div class="form-group has-feedback" ng-class="{'has-success':userProfileForm.username.$valid,
@@ -79,8 +78,7 @@
 								<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 								<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 
-								<!-- 초기화 시 onUsername()를 호출 -->
-								<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername()">{{usernameAlert.msg}}</span>
+								<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>
 							</div>
 
 							<div class="form-group">
@@ -148,6 +146,8 @@
 				$scope.buttonAlert = {};
 
 				angular.element(document).ready(function () {
+					$scope.onEmail();
+					$scope.onUsername();
 				});
 
 				$scope.onSubmit = function (event) {

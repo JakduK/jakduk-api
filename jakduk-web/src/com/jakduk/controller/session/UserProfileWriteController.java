@@ -1,5 +1,6 @@
 package com.jakduk.controller.session;
 
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
@@ -59,6 +60,41 @@ public class UserProfileWriteController {
 	@Autowired
 	private ProviderSignInUtils providerSignInUtils;
 
+	// jakduk 회원 정보 편집 페이지.
+	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
+	public String updateProfile(HttpServletRequest request,
+								@RequestParam(required = false) String lang,
+								Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+		String language = commonService.getLanguageCode(locale, lang);
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			UserProfile user = userService.getUserProfileById(authUser.getId());
+
+			UserProfileForm userProfileForm = new UserProfileForm();
+			userProfileForm.setEmail(user.getEmail());
+			userProfileForm.setUsername(user.getUsername());
+			userProfileForm.setAbout(user.getAbout());
+
+			FootballClub footballClub = user.getSupportFC();
+
+			if (Objects.nonNull(footballClub)) {
+				userProfileForm.setFootballClub(footballClub.getId());
+			}
+
+			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
+			model.addAttribute("userProfileForm", userProfileForm);
+			model.addAttribute("footballClubs", footballClubs);
+
+			return "user/profileUpdate";
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
+	}
+
 	// jakduk 회원 정보 편집 처리.
 	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
 	public String profileUpdate(@Valid UserProfileForm userProfileForm, BindingResult result, SessionStatus sessionStatus) {
@@ -96,23 +132,10 @@ public class UserProfileWriteController {
 
 		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
 
-		log.debug("phjang=" + connection.getDisplayName());
-		log.debug("phjang=" + connection.getKey());
-		log.debug("phjang=" + connection.getProfileUrl());
-		log.debug("phjang=" + connection.getApi());
-
 		if (Objects.isNull(connection))
 			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
 
 		org.springframework.social.connect.UserProfile userProfile = connection.fetchUserProfile();
-
-		log.debug("phjang=" + userProfile.getFirstName());
-		log.debug("phjang=" + userProfile.getLastName());
-		log.debug("phjang=" + userProfile.getId());
-		log.debug("phjang=" + userProfile.getName());
-		log.debug("phjang=" + userProfile.getUsername());
-		log.debug("phjang=" + userProfile.getEmail());
-
 
 		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
 
@@ -251,8 +274,6 @@ public class UserProfileWriteController {
 	// SNS 계정의 회원 가입 시 DB에 쿼리하여 중복 체크한다.
 	private void checkValidationUserProfileOnWrite(UserProfileForm userProfileForm, BindingResult result) {
 
-		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = principal.getId();
 		String email = userProfileForm.getEmail();
 		String username = userProfileForm.getUsername();
 

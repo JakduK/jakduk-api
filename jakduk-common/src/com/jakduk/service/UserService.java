@@ -126,13 +126,13 @@ public class UserService {
 		String footballClub = userWrite.getFootballClub();
 		String about = userWrite.getAbout();
 
-		if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
+		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
 			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
 			
 			user.setSupportFC(supportFC);
 		}
 
-		if (Objects.nonNull(about) && !about.isEmpty()) {
+		if (Objects.nonNull(about) && about.isEmpty() == false) {
 			user.setAbout(about.trim());
 		}
 

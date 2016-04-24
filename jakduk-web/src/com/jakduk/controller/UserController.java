@@ -138,41 +138,6 @@ public class UserController {
 		}
 	}
 
-	// jakduk 회원 정보 편집 페이지.
-	@RequestMapping(value = "/profile/update", method = RequestMethod.GET)
-	public String updateProfile(HttpServletRequest request,
-								@RequestParam(required = false) String lang,
-								Model model) {
-
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-
-		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
-			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile user = userService.getUserProfileById(authUser.getId());
-
-			UserProfileForm userProfileForm = new UserProfileForm();
-			userProfileForm.setEmail(user.getEmail());
-			userProfileForm.setUsername(user.getUsername());
-			userProfileForm.setAbout(user.getAbout());
-
-			FootballClub footballClub = user.getSupportFC();
-
-			if (Objects.nonNull(footballClub)) {
-				userProfileForm.setFootballClub(footballClub.getId());
-			}
-
-			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-			model.addAttribute("userProfileForm", userProfileForm);
-			model.addAttribute("footballClubs", footballClubs);
-
-			return "user/profileUpdate";
-		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-		}
-	}
-
 	@RequestMapping(value = "/password/update", method = RequestMethod.GET)
 	public String passwordUpdate(Model model) {
 		

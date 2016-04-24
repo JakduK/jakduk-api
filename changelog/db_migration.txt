@@ -1,0 +1,16 @@
+
+Version 0.6.0
+
+// JakduK 계정으로 가입한 회원 정보에 providerId : JAKDUK를 추가한다.
+db.user.update({'oauthUser' : {$exists: false}, 'providerId' : {$exists: false}}, {$set:{'providerId':'JAKDUK'}}, {multi:true})
+
+// 다음 계정으로 가입한 회원 정보에 providerId : DAUM을 추가한다.
+db.user.update({'oauthUser.type' : 'daum'}, {$set:{'providerId':'DAUM'}}, {multi:true})
+
+// 페이스북 계정으로 가입한 회원 정보에 providerId : FACEBOOK을 추가한다.
+db.user.update({'oauthUser.type' : 'facebook'}, {$set:{'providerId':'FACEBOOK'}}, {multi:true})
+
+// SNS 계정으로 가인한 회원 정보에 providerUserId : 해당 oauthUser.oauthId를 추가한다.
+db.user.find({'oauthUser' : {$exists: true}}).forEach(function(doc){
+       db.user.update({_id:doc._id}, {$set:{"providerUserId":doc.oauthUser.oauthId}});
+});
