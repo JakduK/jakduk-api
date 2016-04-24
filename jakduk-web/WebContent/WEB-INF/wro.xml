@@ -25,6 +25,8 @@
 
 		<css>/resources/unify/assets/css/pages/page_log_reg_v1.css</css>
 		<css>/resources/unify/assets/plugins/ladda-buttons/css/custom-lada-btn.css</css>
+		<css>/resources/unify/assets/plugins/line-icons-pro/styles.css</css>
+		<css>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css</css>
 		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/unify/assets/plugins/ladda-buttons/js/spin.js</js>

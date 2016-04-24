@@ -1,0 +1,44 @@
+/*Intro Page
+------------------------------------*/
+.page-intro .intro-page-link {
+	color: #555;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.page-intro .intro-page-link:hover {
+	color: #222;
+	text-decoration: none;
+}
+
+.page-intro .section-socials {
+	display: table;
+	margin: 60px auto 0;
+	position: relative;
+	left: 0;
+}
+.page-intro .section-social {
+	display: table-cell;
+	padding: 5px 25px;
+	vertical-align: top;
+}
+.page-intro .section-social:nth-child(2) {
+	border-left: 1px solid rgba(255,255,255,.7);
+}
+
+.page-intro .section-social-title {
+	margin-bottom: 12px;
+	color: #fff;
+}
+
+.page-intro .section-social-button {
+	text-align: center;
+}
+
+.page-intro .section-socials .twitter-follow-button {
+	color: #1b95e0;
+}
+
+.page-intro .cbp-l-grid-agency {
+	z-index: 0;
+}

@@ -38,87 +38,90 @@
 
 				<div class="row">
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-						<form action="login" class="reg-page" name="loginForm" method="POST" ng-submit="onSubmit($event)">
-							<input type="hidden"
-								   name="${_csrf.parameterName}"
-								   value="${_csrf.token}"/>
-							<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
-							<div class="reg-header">
-								<h2><spring:message code="user.sign.in.header"/></h2>
-							</div>
-
-							<div class="form-group">
-								<div class="input-group has-feedback" ng-class="{'has-success':loginForm.j_username.$valid,
-							'has-error':loginForm.j_username.$invalid}">
-									<span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span>
-									<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>' ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" autofocus>
-								<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
+						<div class="reg-page">
+							<form action="login" name="loginForm" method="POST" ng-submit="onSubmit($event)">
+								<input type="hidden"
+									   name="${_csrf.parameterName}"
+									   value="${_csrf.token}"/>
+								<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
+								<div class="reg-header">
+									<h2><spring:message code="user.sign.in.header"/></h2>
 								</div>
-								<p class="text-danger" ng-model="errorEmail" ng-show="errorEmail" ng-bind="errorEmail"></p>
-							</div>
 
-							<div class="form-group">
-								<div class="input-group has-feedback"
-									ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
-									<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
-									<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>' ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
-								<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>
+								<div class="form-group">
+									<div class="input-group has-feedback"
+										 ng-class="{'has-success':loginForm.j_username.$valid, 'has-error':loginForm.j_username.$invalid}">
+										<span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span>
+										<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
+											   ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" autofocus>
+									<span class="glyphicon form-control-feedback"
+										  ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
+									</div>
+									<p class="text-danger" ng-model="errorEmail" ng-show="errorEmail" ng-bind="errorEmail"></p>
 								</div>
-								<p class="text-danger" ng-model="errorPassword" ng-show="errorPassword" ng-bind="errorPassword"></p>
-							</div>
 
-							<div class="form-group">
-								<!--
-								<input id = "remember_me" name ="remember-me" type = "checkbox"/>Remember me
-								-->
+								<div class="form-group">
+									<div class="input-group has-feedback"
+										 ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
+										<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
+										<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>'
+											   ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
+									<span class="glyphicon form-control-feedback"
+										  ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>
+									</div>
+									<p class="text-danger" ng-model="errorPassword" ng-show="errorPassword" ng-bind="errorPassword"></p>
+								</div>
+
+								<div class="form-group">
+									<!--
+                                    <input id = "remember_me" name ="remember-me" type = "checkbox"/>Remember me
+                                    -->
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" name="remember" ng-model="remember">
+											<spring:message code="user.email.remember"/>
+										</label>
+									</div>
+								</div>
+
+								<button type="submit" class="btn btn-u rounded btn-block ladda-button" ladda="btnSubmit" data-style="expand-right">
+									<spring:message code="user.sign.in"/>
+								</button>
+
 								<div class="checkbox">
-									<label>
-										<input type="checkbox" name="remember" ng-model="remember">
-										<spring:message code="user.email.remember"/>
-									</label>
+									<ul class="list-inline">
+										<li>
+											<a href="<c:url value="/user/write"/>">
+												<span aria-hidden="true" class="icon-user-follow"></span> <spring:message code="user.register"/>
+											</a>
+										</li>
+										|
+										<li>
+											<a href="<%=request.getContextPath()%>/reset_password">
+												<span aria-hidden="true" class="icon-real-estate-056"></span> <spring:message code="user.sign.forgot.password"/>
+											</a>
+										</li>
+									</ul>
 								</div>
-							</div>
+							</form>
 
-							<button type="submit" class="btn btn-u rounded btn-block ladda-button" ladda="btnSubmit" data-style="expand-right">
-								<spring:message code="user.sign.in"/>
+							<hr/>
+
+							<button class="btn btn-facebook btn-block" onclick="javascript:document.facebook.submit();">
+								<i class="fa fa-facebook"></i> <spring:message code="common.button.connect.with.facebook"/> <i class="fa fa-angle-right"></i>
 							</button>
 
-							<a class="btn btn-info btn-block rounded ladda-button" href="<%=request.getContextPath()%>/reset_password">
-								<spring:message code="user.sign.forgot.password"/>
-							</a>
+							<button class="btn btn-dropbox btn-block" onclick="javascript:document.daum.submit();">
+								<spring:message code="common.button.connect.with.daum"/> <i class="fa fa-angle-right"></i>
+							</button>
 
-							<hr>
+							<form action="auth/facebook" name="facebook">
+								<input type="hidden" name="scope" value="email"/>
+							</form>
 
-							<p>
-								<spring:message code="user.msg.not.user"/>
-								<a href="<c:url value="/user/write"/>">
-									<strong><i class="fa fa-user-plus"></i> <spring:message code="user.msg.register.here"/></strong>
-								</a>
-							</p>
-							<h5><spring:message code="user.msg.register.oauth"/></h5>
-
-							<div class="clearfix">
-								<div class="pull-left">
-									<a class="btn btn-link" href="<c:url value="/oauth/callback?type=facebook&loginRedirect=${loginRedirect}"/>">
-										<i class="fa fa-facebook-square fa-3x text-primary"></i>
-									</a>
-								</div>
-								<div class="pull-left">
-									<a class="btn btn-link" href="<c:url value="/oauth/callback?type=daum&loginRedirect=${loginRedirect}"/>">
-										<img src="<%=request.getContextPath()%>/resources/jakduk/icon/daum_bt.png" style="width: 40px; height: 40px;" alt="Daum">
-									</a>
-								</div>
-							</div>
-
-						</form>
-						<a class="ax-item" onclick="document.facebook.submit();"><i class="axi axi-facebook-square"></i> Facebook</a>
-						<form action="auth/facebook" name="facebook">
-							<input type="hidden" name="scope" value="email"/>
-						</form>
-
-						<a class="ax-item" onclick="document.daum.submit();"><i class="axi axi-facebook-square"></i> Daum</a>
-						<form action="auth/daum" name="daum">
-						</form>
+							<form action="auth/daum" name="daum">
+							</form>
+						</div>
 					</div>
 				</div><!--/row-->
 			</div>
@@ -145,7 +148,6 @@
 					}
 
 					angular.element(document).ready(function () {
-						App.init();
 					});
 
 					$scope.onSubmit = function (event) {
@@ -177,6 +179,10 @@
 						}
 					};
 				});
+
+			$(document).ready(function () {
+				App.init();
+			});
 		</script>
 	</body>
 </html>
