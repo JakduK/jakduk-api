@@ -16,6 +16,7 @@
 	<body class="header-fixed">
 
 		<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
+		<c:set var="existId" value="${userProfileForm.id ne null}"/>
 
 		<div class="wrapper">
 			<jsp:include page="../include/navigation-header.jsp"/>
@@ -30,11 +31,18 @@
 
 			<div class="container content" ng-controller="writeCtrl">
 
+				<c:if test="${existId eq true}">
+					<div class="alert alert-info" role="alert"><spring:message code="user.msg.new.update.social.signup"/></div>
+				</c:if>
+
 				<div class="row">
 					<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
 
 						<form:form commandName="userProfileForm" name="userProfileForm" action="${contextPath}/user/social" method="POST" cssClass="reg-page"
 							ng-submit="onSubmit($event)">
+
+							<!-- Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53 -->
+							<form:hidden path="id"/>
 
 							<form:input path="emailStatus" cssClass="hidden" size="0" ng-init="emailStatus='${userProfileForm.emailStatus}'" ng-model="emailStatus"/>
 							<form:input path="usernameStatus" cssClass="hidden" size="0" ng-init="usernameStatus='${userProfileForm.usernameStatus}'" ng-model="usernameStatus"/>
@@ -171,7 +179,15 @@
 
 				$scope.onEmail = function() {
 					if ($scope.userProfileForm.email.$valid) {
-						var bUrl = '<c:url value="/api/user/exist/email/?email=' + $scope.email + '"/>';
+						var existId = Boolean("${existId}");
+						var id = "${userProfileForm.id}";
+
+						// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+						if (existId == true) {
+							var bUrl = '<c:url value="/api/user/exist/email/anonymous?id=' + id + '&email=' + $scope.email + '"/>';
+						} else {
+							var bUrl = '<c:url value="/api/user/exist/email/?email=' + $scope.email + '"/>';
+						}
 
 						if ($scope.emailConn == "none") {
 							var reqPromise = $http.get(bUrl);
@@ -198,7 +214,17 @@
 
 				$scope.onUsername = function () {
 					if ($scope.userProfileForm.username.$valid) {
-						var bUrl = '<c:url value="/api/user/exist/username?username=' + $scope.username + '"/>';
+
+						var existId = Boolean("${existId}");
+						var id = "${userProfileForm.id}";
+
+						// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+						if (existId == true) {
+							var bUrl = '<c:url value="/api/user/exist/username/anonymous?id=' + id + '&username=' + $scope.username + '"/>';
+						} else {
+							var bUrl = '<c:url value="/api/user/exist/username?username=' + $scope.username + '"/>';
+						}
+
 						if ($scope.usernameConn == "none") {
 							var reqPromise = $http.get(bUrl);
 							$scope.usernameConn = "connecting";

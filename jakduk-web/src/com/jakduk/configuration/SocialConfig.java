@@ -1,7 +1,5 @@
 package com.jakduk.configuration;
 
-
-
 import net.exacode.spring.social.connect.GenericUsersConnectionRepository;
 import net.exacode.spring.social.connect.mongo.MongoConnectionConverter;
 import net.exacode.spring.social.connect.mongo.MongoConnectionDao;

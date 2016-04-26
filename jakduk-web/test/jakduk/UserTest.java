@@ -1,5 +1,6 @@
 package jakduk;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.configuration.AppConfig;
 import com.jakduk.dao.JakdukDAO;
@@ -12,11 +13,13 @@ import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -47,6 +50,9 @@ public class UserTest {
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
+
+	@Autowired
+	private StandardPasswordEncoder encoder;
 	
 	@Before
 	public void setUp() {
@@ -69,29 +75,26 @@ public class UserTest {
 	}
 	
 	@Test
-	public void test02() {
-/*						
-		User user = userRepository.findByUsername("test01");		
-		String pwd = user.getPassword();
-		System.out.println("user =" + user);
-		System.out.println("user pwd=" + pwd);
-		
-		String result = encoder.encode("1111");
-//		System.out.println("result=" + result);
-		
-		System.out.println(encoder.matches("1112", result));
-		assertTrue(encoder.matches("1111", result));
-		*/
+	public void 스프링시큐리티_암호_인코딩() {
+		//User user = userRepository.findByUsername("test01");
+		//String pwd = user.getPassword();
+
+		String password = encoder.encode("1111");
+
+		Assert.assertFalse(encoder.matches("1112", password));
+		Assert.assertTrue(encoder.matches("1111", password));
 	}
 
-	@Ignore
 	@Test
 	public void test03() {
-		OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");		
-		System.out.println("OAuthProfile=" + user);
+		//OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");
+		//System.out.println("OAuthProfile=" + user);
 		
-		UserProfile userProfile = userRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
-		System.out.println("userProfile=" + userProfile);
+		UserProfile userProfile01 = userRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
+		System.out.println("userProfile01=" + userProfile01);
+
+		UserProfile userProfile02 = userRepository.findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE.DAUM, "1lnkE");
+		System.out.println("userProfile02=" + userProfile02);
 	}
 	
 	@Test

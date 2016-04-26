@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
@@ -17,13 +16,12 @@ import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.UserProfileForm;
-import com.jakduk.model.web.UserProfileInfo;
+import com.jakduk.model.web.user.UserProfileInfo;
+import com.jakduk.model.web.user.UserWrite;
 import com.jakduk.service.FootballService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,11 +29,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.model.db.User;
-import com.jakduk.model.web.UserPasswordUpdate;
+import com.jakduk.model.web.user.UserPasswordUpdate;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 
@@ -98,7 +95,10 @@ public class UserController {
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, lang);
 
-		userService.getUserWrite(model, language);
+		List<FootballClub> footballClubs = footballService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
+		model.addAttribute("userWrite", new UserWrite());
+		model.addAttribute("footballClubs", footballClubs);
 
 		return "user/write";
 	}

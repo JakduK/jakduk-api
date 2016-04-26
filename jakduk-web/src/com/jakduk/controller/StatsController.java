@@ -1,10 +1,12 @@
 package com.jakduk.controller;
 
-import java.util.Locale;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.service.CommonService;
+import com.jakduk.service.FootballService;
+import com.jakduk.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -14,9 +16,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.StatsService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -37,6 +42,9 @@ public class StatsController {
 	
 	@Autowired
 	private StatsService statsService;
+
+	@Autowired
+	private FootballService footballService;
 	
 	@Resource
 	LocaleResolver localeResolver;
@@ -135,9 +143,31 @@ public class StatsController {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		String language = commonService.getLanguageCode(locale, null);
-		
-		statsService.getAttendancesSeason(locale, model, language, season, league);
-		
+
+		Map<String, String> fcNames = new HashMap<>();
+
+		List<FootballClub> footballClubs = footballService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
+		for (FootballClub fc : footballClubs) {
+			fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0).getShortName());
+		}
+
+		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+
+		if (season != 0) {
+			model.addAttribute("season", season);
+		}
+
+		if (league != null && !league.isEmpty()) {
+			model.addAttribute("league", league);
+		}
+
+		try {
+			model.addAttribute("fcNames", new ObjectMapper().writeValueAsString(fcNames));
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.parsing.or.generating"));
+		}
+
 		return "stats/attendanceSeason";
 	}
 }

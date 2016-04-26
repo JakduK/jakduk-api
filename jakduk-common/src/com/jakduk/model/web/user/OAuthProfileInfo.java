@@ -1,4 +1,4 @@
-package com.jakduk.model.web;
+package com.jakduk.model.web.user;
 
 import com.jakduk.model.embedded.LocalName;
 import lombok.Data;

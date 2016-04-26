@@ -11,7 +11,7 @@ import com.jakduk.exception.UserFeelingException;
 import com.jakduk.model.db.*;
 import com.jakduk.model.elasticsearch.JakduCommentOnES;
 import com.jakduk.model.embedded.*;
-import com.jakduk.model.web.UserFeelingResponse;
+import com.jakduk.model.web.user.UserFeelingResponse;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.model.web.jakdu.JakduScheduleResponse;

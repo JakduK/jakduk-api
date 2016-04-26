@@ -10,6 +10,7 @@ import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.service.CommonService;
+import com.jakduk.service.FootballService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class HomeTest {
 
 	@Autowired
 	CommonService commonService;
+
+	@Autowired
+	private FootballService footballService;
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
@@ -81,7 +85,7 @@ public class HomeTest {
 	@Test
 	public void getFootballClubList() {
 
-		List<FootballClub> footballClubs = commonService.getFootballClubs("ko", CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.shortName);
+		List<FootballClub> footballClubs = footballService.getFootballClubs("ko", CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.shortName);
 
 		System.out.println("getFootballClubList=" + footballClubs);
 	}

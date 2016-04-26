@@ -1,31 +1,25 @@
 package com.jakduk.service;
 
-import java.util.*;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletResponse;
-
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.AttendanceClub;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.etc.SupporterCount;
 import com.jakduk.model.web.stats.AttendanceClubResponse;
+import com.jakduk.repository.AttendanceClubRepository;
+import com.jakduk.repository.AttendanceLeagueRepository;
+import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.AttendanceClub;
-import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.model.etc.SupporterCount;
-import com.jakduk.repository.AttendanceClubRepository;
-import com.jakduk.repository.AttendanceLeagueRepository;
-import com.jakduk.repository.FootballClubOriginRepository;
-import com.jakduk.repository.user.UserRepository;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -110,33 +104,7 @@ public class StatsService {
 
 		return attendances;
 	}
-	
-	public void getAttendancesSeason(Locale locale, Model model, String language, int season, String league) {
-		Map<String, String> fcNames = new HashMap<>();
 
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		for (FootballClub fc : footballClubs) {
-			fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0).getShortName());
-		}
-		
-		model.addAttribute("kakaoKey", kakaoJavascriptKey);
-		
-		if (season != 0) {
-			model.addAttribute("season", season);
-		}
-		
-		if (league != null && !league.isEmpty()) {
-			model.addAttribute("league", league);
-		}
-
-		try {
-			model.addAttribute("fcNames", new ObjectMapper().writeValueAsString(fcNames));
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.parsing.or.generating"));
-		}
-	}
-	
 	public List<AttendanceClub> getAttendancesSeason(Integer season, String league) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("average"));

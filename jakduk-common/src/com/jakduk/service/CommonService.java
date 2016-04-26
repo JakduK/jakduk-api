@@ -262,21 +262,6 @@ public class CommonService {
 		return pattern.matcher(str).matches();
 	}
 
-	public List<FootballClub> getFootballClubs(String language, CommonConst.CLUB_TYPE clubType, CommonConst.NAME_TYPE sortNameType) {
-
-		List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(clubType);
-		List<ObjectId> ids = new ArrayList<ObjectId>();
-
-		for (FootballClubOrigin fco : fcos) {
-			String id = fco.getId();
-			ids.add(new ObjectId(id));
-		}
-
-		List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(ids, language, sortNameType);
-
-		return footballClubs;
-	}
-
 	/**
 	 * ResourceBundle에서 메시지 가져오기.
 	 * @param locale

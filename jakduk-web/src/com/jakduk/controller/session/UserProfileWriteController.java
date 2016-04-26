@@ -3,12 +3,14 @@ package com.jakduk.controller.session;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.UserProfileForm;
+import com.jakduk.model.web.user.UserProfileForm;
 import com.jakduk.service.CommonService;
+import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -47,15 +50,18 @@ import java.util.Objects;
 @RequestMapping("/user")
 @SessionAttributes({"userProfileForm", "footballClubs"})
 public class UserProfileWriteController {
-	
+
+	@Resource
+	LocaleResolver localeResolver;
+
 	@Autowired
 	private CommonService commonService;
 	
 	@Autowired
 	private UserService userService;
-	
-	@Resource
-	LocaleResolver localeResolver;
+
+	@Autowired
+	private FootballService footballService;
 
 	@Autowired
 	private ProviderSignInUtils providerSignInUtils;
@@ -84,7 +90,7 @@ public class UserProfileWriteController {
 				userProfileForm.setFootballClub(footballClub.getId());
 			}
 
-			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+			List<FootballClub> footballClubs = footballService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
 
 			model.addAttribute("userProfileForm", userProfileForm);
 			model.addAttribute("footballClubs", footballClubs);
@@ -133,15 +139,29 @@ public class UserProfileWriteController {
 		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
 
 		if (Objects.isNull(connection))
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+
+		ConnectionKey connectionKey = connection.getKey();
+
+		if (Objects.isNull(connection))
 			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
 
-		org.springframework.social.connect.UserProfile userProfile = connection.fetchUserProfile();
+		org.springframework.social.connect.UserProfile socialProfile = connection.fetchUserProfile();
 
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+		List<FootballClub> footballClubs = footballService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+
+		CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
+		String providerUserId = connectionKey.getProviderUserId();
 
 		UserProfileForm user = new UserProfileForm();
-		user.setEmail(userProfile.getEmail());
+		user.setEmail(socialProfile.getEmail());
 		user.setUsername(connection.getDisplayName());
+
+		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+		UserProfile userProfile = userService.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
+
+		if (Objects.nonNull(userProfile))
+			user.setId(userProfile.getId());
 
 		model.addAttribute("userProfileForm", user);
 		model.addAttribute("footballClubs", footballClubs);
@@ -166,12 +186,17 @@ public class UserProfileWriteController {
 			return "user/socialWrite";
 		}
 
-		this.checkValidationUserProfileOnWrite(userProfileForm, result);
+		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+		if (Objects.nonNull(userProfileForm.getId())) {
+			this.checkValidationUserProfileOnAnonymous(userProfileForm, result);
+		} else {
+			this.checkValidationUserProfileOnWrite(userProfileForm, result);
+		}
 
 		// 위 검사를 통과 못한 경우, 메시지 출력
 		if (result.hasErrors()) {
 			log.debug("result=" + result);
-			return "user/write";
+			return "user/socialWrite";
 		}
 
 		Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
@@ -180,11 +205,41 @@ public class UserProfileWriteController {
 		CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
 		String providerUserId = connectionKey.getProviderUserId();
 
-		User user = userService.writeSocialUser(userProfileForm, providerId, providerUserId);
+		User user = new User();
+
+		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+		if (Objects.nonNull(userProfileForm.getId())) {
+			user = userService.findById(userProfileForm.getId());
+		}
+
+		user.setEmail(userProfileForm.getEmail().trim());
+		user.setUsername(userProfileForm.getUsername().trim());
+		user.setProviderId(providerId);
+		user.setProviderUserId(providerUserId);
+
+		ArrayList<Integer> roles = new ArrayList<Integer>();
+		roles.add(CommonRole.ROLE_NUMBER_USER_01);
+
+		user.setRoles(roles);
+
+		String footballClub = userProfileForm.getFootballClub();
+		String about = userProfileForm.getAbout();
+
+		if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
+			FootballClub supportFC = footballService.findById(footballClub);
+
+			user.setSupportFC(supportFC);
+		}
+
+		if (Objects.nonNull(about) && !about.isEmpty()) {
+			user.setAbout(userProfileForm.getAbout().trim());
+		}
+
+		User returnUser = userService.addSocialUser(user);
 
 		sessionStatus.setComplete();
 
-		userService.signUpSocialUser(user, request);
+		userService.signUpSocialUser(returnUser, request);
 
 		return "redirect:/home";
 	}
@@ -207,7 +262,7 @@ public class UserProfileWriteController {
 			userProfileForm.setUsername(userProfile.getUsername());
 			userProfileForm.setAbout(userProfile.getAbout());
 
-			List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+			List<FootballClub> footballClubs = footballService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
 			FootballClub footballClub = userProfile.getSupportFC();
 
 			if (Objects.nonNull(footballClub)) {
@@ -293,6 +348,24 @@ public class UserProfileWriteController {
 
 		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String id = principal.getId();
+		String email = userProfileForm.getEmail();
+		String username = userProfileForm.getUsername();
+
+		this.checkCommonValidationUserProfile(userProfileForm, result);
+
+		UserProfile existEmail = userService.findByNEIdAndEmail(id, email);
+		if (Objects.nonNull(existEmail))
+			result.rejectValue("email", "user.msg.already.email");
+
+		UserProfile existUsername = userService.findByNEIdAndUsername(id, username);
+		if (Objects.nonNull(existUsername))
+			result.rejectValue("username", "user.msg.already.username");
+	}
+
+	// SNS 계정의 회원 가입 시 DB에 쿼리하여 중복 체크한다.
+	// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+	private void checkValidationUserProfileOnAnonymous(UserProfileForm userProfileForm, BindingResult result) {
+		String id = userProfileForm.getId();
 		String email = userProfileForm.getEmail();
 		String username = userProfileForm.getUsername();
 

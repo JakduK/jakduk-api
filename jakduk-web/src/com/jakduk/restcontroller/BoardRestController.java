@@ -1,7 +1,7 @@
 package com.jakduk.restcontroller;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.web.UserFeelingResponse;
+import com.jakduk.model.web.user.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -16,7 +16,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AppConfig.class)
 @WebAppConfiguration
-//@ActiveProfiles("local")
 public class AppConfigTest {
 
     @Test

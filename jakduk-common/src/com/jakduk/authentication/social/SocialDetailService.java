@@ -32,7 +32,6 @@ public class SocialDetailService implements SocialUserDetailsService {
         if (Objects.isNull(userId)) {
             throw new IllegalArgumentException("userId 는 꼭 필요한 값입니다.");
         } else {
-            //UserOnAuthentication user = userRepository.userFindByEmail(userId);
             UserOnAuthentication user = userRepository.userFindByProviderUserId(userId);
 
             if (Objects.isNull(user))

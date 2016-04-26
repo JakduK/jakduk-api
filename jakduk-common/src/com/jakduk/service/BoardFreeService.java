@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.exception.UserFeelingException;
-import com.jakduk.model.web.UserFeelingResponse;
+import com.jakduk.model.web.user.UserFeelingResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;

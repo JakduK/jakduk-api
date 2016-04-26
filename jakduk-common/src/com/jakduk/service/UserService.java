@@ -5,8 +5,10 @@ import java.util.*;
 import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.exception.DuplicateDataException;
 import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.web.*;
 
+import com.jakduk.model.web.user.UserPasswordUpdate;
+import com.jakduk.model.web.user.UserProfileForm;
+import com.jakduk.model.web.user.UserWrite;
 import com.jakduk.repository.user.UserProfileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,10 @@ public class UserService {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	public User findById(String id) {
+		return userRepository.findOne(id);
+	}
+
 	public List<User> findAll() {
 		return userRepository.findAll();
 	}
@@ -91,11 +97,21 @@ public class UserService {
 		return userRepository.findByNEIdAndEmail(id, email);
 	}
 
+	// SNS 계정으로 가입한 회원 찾기.
+	public UserProfile findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
+	}
+
 	public void create(User user) {
 		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
 		
 		user.setPassword(encoder.encode(user.getPassword()));
 		userRepository.save(user);
+	}
+
+	// social 계정으로 회원 가입.
+	public User addSocialUser(User user) {
+		return userRepository.save(user);
 	}
 
 	public CommonWriter testFindId(String userid) {
@@ -105,16 +121,6 @@ public class UserService {
 		return mongoTemplate.findOne(query, CommonWriter.class);
 	}
 
-	public Model getUserWrite(Model model, String language) {
-
-		List<FootballClub> footballClubs = commonService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		model.addAttribute("userWrite", new UserWrite());
-		model.addAttribute("footballClubs", footballClubs);
-		
-		return model;
-	}
-	
 	public void writeUser(UserWrite userWrite) {
 
 		User user = new User();
@@ -189,27 +195,6 @@ public class UserService {
 	}
 
 	/**
-	 * 회원 프로필 업데이트 시 Email 중복 체크.
-	 * @param locale
-	 * @param email
-     * @return
-     */
-	public Boolean existEmailOnUpdate(Locale locale, String email) {
-
-		CommonPrincipal commonPrincipal = this.getCommonPrincipal();
-
-		if (Objects.isNull(commonPrincipal.getId()))
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-
-		UserProfile userProfile = userRepository.findByNEIdAndEmail(commonPrincipal.getId(), email);
-
-		if (Objects.nonNull(userProfile))
-			throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.replicated.data"));
-
-		return false;
-	}
-
-	/**
 	 * 회원 프로필 업데이트 시 별명 중복 체크.
 	 * @param locale
 	 * @param username
@@ -228,42 +213,6 @@ public class UserService {
 			throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.replicated.data"));
 
 		return false;
-	}
-
-	public User writeSocialUser(UserProfileForm userForm, CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
-
-		User user = new User();
-
-		user.setEmail(userForm.getEmail().trim());
-		user.setUsername(userForm.getUsername().trim());
-		user.setProviderId(providerId);
-		user.setProviderUserId(providerUserId);
-
-		ArrayList<Integer> roles = new ArrayList<Integer>();
-		roles.add(CommonRole.ROLE_NUMBER_USER_01);
-
-		user.setRoles(roles);
-
-		String footballClub = userForm.getFootballClub();
-		String about = userForm.getAbout();
-
-		if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
-			FootballClub supportFC = footballClubRepository.findOne(footballClub);
-
-			user.setSupportFC(supportFC);
-		}
-
-		if (Objects.nonNull(about) && !about.isEmpty()) {
-			user.setAbout(userForm.getAbout().trim());
-		}
-
-		if (log.isDebugEnabled()) {
-			log.debug("social user=" + user);
-		}
-
-		userRepository.save(user);
-
-		return user;
 	}
 
 	public void checkProfileUpdate(UserProfileForm userProfileForm, BindingResult result) {

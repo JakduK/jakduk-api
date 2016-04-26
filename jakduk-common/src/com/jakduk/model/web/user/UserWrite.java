@@ -1,4 +1,4 @@
-package com.jakduk.model.web;
+package com.jakduk.model.web.user;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
