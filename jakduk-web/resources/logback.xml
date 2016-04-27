@@ -108,17 +108,6 @@
         </encoder>
     </appender>
 
-    <appender name="ASYNC_SLACK" class="com.jakduk.configuration.SlackAppender">
-        <webhook>https://hooks.slack.com/services/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</webhook>
-        <channel>#jakduk_log</channel>
-        <username>JAKDUK</username>
-        <enabled>false</enabled>
-
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%-4relative [%thread] %-5level %class - %msg%n</pattern>
-        </layout>
-    </appender>
-
     <logger name="org.springframework" level="debug"/>
     <logger name="org.hibernate" level="debug"/>
 
@@ -145,7 +134,6 @@
     <root level="debug">
         <appender-ref ref="console"/>
         <appender-ref ref="jakdukDailyRollingFile"/>
-        <appender-ref ref="ASYNC_SLACK" />
     </root>
 
 </configuration>

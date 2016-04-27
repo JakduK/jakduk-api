@@ -16,9 +16,9 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 
 	//~ Instance fields ================================================================================================
 	private String password;
-	private String username;
+	private String username;							// email
 	private CommonConst.ACCOUNT_TYPE providerId;
-	private final String email;
+	private final String nickname;						// 별명
 	private final String id;
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -51,17 +51,16 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	 *         either as a parameter or as an element in the
 	 *         <code>GrantedAuthority</code> collection
 	 */
-	public JakdukPrincipal(String email, String id, String password, String username, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
+	public JakdukPrincipal(String username, String id, String password, String nickname, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
 						   boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
-		if (((email == null) || "".equals(email)) || (password == null)) {
+		if (Objects.isNull(username) || Objects.isNull(password))
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
-		}
 
-		this.email = email;
+		this.username = username;
+		this.nickname = nickname;
 		this.id = id;
 		this.password = password;
-		this.username = username;
 		this.providerId = providerId;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
@@ -96,8 +95,8 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		return id;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getNickname() {
+		return nickname;
 	}
 
 	public boolean isEnabled() {
@@ -162,7 +161,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	@Override
 	public boolean equals(Object rhs) {
 		if (rhs instanceof JakdukPrincipal) {
-			return email.equals(((JakdukPrincipal) rhs).email);
+			return username.equals(((JakdukPrincipal) rhs).username);
 		}
 		return false;
 	}
@@ -172,17 +171,17 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	 */
 	@Override
 	public int hashCode() {
-		return email.hashCode();
+		return username.hashCode();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(super.toString()).append(": ");
-		sb.append("email: ").append(this.email).append("; ");
+		sb.append("username: ").append(this.username).append("; ");
 		sb.append("id: ").append(this.id).append("; ");
 		sb.append("password: [PROTECTED]; ");
-		sb.append("username: ").append(this.username).append("; ");
+		sb.append("nickname: ").append(this.nickname).append("; ");
 		sb.append("Enabled: ").append(this.enabled).append("; ");
 		sb.append("AccountNonExpired: ").append(this.accountNonExpired).append("; ");
 		sb.append("credentialsNonExpired: ").append(this.credentialsNonExpired).append("; ");

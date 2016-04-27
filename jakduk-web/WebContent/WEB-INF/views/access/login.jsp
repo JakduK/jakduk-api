@@ -73,13 +73,11 @@
 								</div>
 
 								<div class="form-group">
-									<!--
-                                    <input id = "remember_me" name ="remember-me" type = "checkbox"/>Remember me
-                                    -->
+
 									<div class="checkbox">
 										<label>
-											<input type="checkbox" name="remember" ng-model="remember">
-											<spring:message code="user.email.remember"/>
+											<input id = "remember_me" name ="remember-me" type = "checkbox"/>
+											<spring:message code="user.remember.me"/>
 										</label>
 									</div>
 								</div>
@@ -105,7 +103,7 @@
 								</div>
 							</form>
 
-							<hr/>
+							<hr class="padding-10"/>
 
 							<button class="btn btn-facebook btn-block" onclick="javascript:document.facebook.submit();">
 								<i class="fa fa-facebook"></i> <spring:message code="common.button.connect.with.facebook"/> <i class="fa fa-angle-right"></i>
@@ -139,6 +137,8 @@
 					$scope.passwordLengthMax = Jakduk.FormPasswordLengthMax;
 
 					// angular.ready()함수에서는 안된다. 마우스 클릭하니 그제서야 이메일이 들어간다.
+					// 스프링 시큐리티 remember-me 활성화로 중단한다.
+					/*
 					var email = $cookies.get("email");
 					var remember = $cookies.get("remember");
 
@@ -146,6 +146,7 @@
 						$scope.email = email;
 						$scope.remember = true;
 					}
+					*/
 
 					angular.element(document).ready(function () {
 					});

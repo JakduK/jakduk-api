@@ -1,12 +1,8 @@
 package com.jakduk.authentication.jakduk;
 
-import java.io.IOException;
-import java.net.URLDecoder;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.jakduk.common.CommonConst;
+import com.jakduk.repository.user.UserRepository;
+import com.jakduk.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,11 +12,13 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
-
-import com.jakduk.common.CommonConst;
-import com.jakduk.repository.user.UserRepository;
-import com.jakduk.service.CommonService;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLDecoder;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -34,10 +32,7 @@ import org.springframework.stereotype.Component;
 public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	 {
 
 	@Autowired
-	CommonService commonService;
-
-	@Autowired
-	UserRepository userRepository;
+	private CommonService commonService;
 
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
@@ -98,9 +93,9 @@ public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	
 		if (remember != null && remember.equals("on")) {
 			if (authentication.getPrincipal() instanceof JakdukPrincipal) {
 				JakdukPrincipal authUser = (JakdukPrincipal) authentication.getPrincipal();
-				String email = authUser.getEmail();
+				String username = authUser.getUsername();
 				
-				commonService.setCookie(response, CommonConst.COOKIE_EMAIL, email, path);
+				commonService.setCookie(response, CommonConst.COOKIE_EMAIL, username, path);
 				
 				commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
 			}

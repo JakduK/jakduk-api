@@ -1,15 +1,24 @@
 package com.jakduk.service;
 
-import java.util.*;
-
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
 import com.jakduk.exception.DuplicateDataException;
 import com.jakduk.exception.UnauthorizedAccessException;
-
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.User;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
+import com.jakduk.model.simple.UserOnPasswordUpdate;
+import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.user.UserPasswordUpdate;
 import com.jakduk.model.web.user.UserProfileForm;
 import com.jakduk.model.web.user.UserWrite;
+import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
+import com.jakduk.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -25,20 +34,9 @@ import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.common.CommonRole;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.User;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.simple.SocialUserOnAuthentication;
-import com.jakduk.model.simple.UserOnPasswordUpdate;
-import com.jakduk.model.simple.UserProfile;
-import com.jakduk.repository.FootballClubRepository;
-import com.jakduk.repository.user.UserRepository;
 import org.springframework.web.context.request.WebRequest;
+
+import java.util.*;
 
 @Service
 @Slf4j
@@ -364,8 +362,8 @@ public class UserService {
 			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
 				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				commonPrincipal.setId(principal.getId());
-				commonPrincipal.setEmail(principal.getEmail());
-				commonPrincipal.setUsername(principal.getUsername());
+				commonPrincipal.setEmail(principal.getUsername());
+				commonPrincipal.setUsername(principal.getNickname());
 				commonPrincipal.setProviderId(principal.getProviderId());
 			}
 		}
