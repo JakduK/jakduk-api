@@ -65,7 +65,7 @@
 
 		</div><!-- /.wrapper -->
 
-		<script src="bundles/base.js"></script>
+		<script src="<%=request.getContextPath()%>/bundles/base.js"></script>
 		<script>angular.module('jakdukApp',['jakdukCommon']);</script>
 	</body>
 </html>
