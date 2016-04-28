@@ -123,11 +123,10 @@ public class AccessController {
 	}
 
 	@RequestMapping(value = "/reset_password", method = RequestMethod.POST)
-	public String sendResetPassword(
-		HttpServletRequest request,
-		Model model,
-		@RequestParam(value = "j_useremail") String email
-	) throws UnsupportedEncodingException {
+	public String sendResetPassword(@RequestParam(value = "useremail") String email,
+									HttpServletRequest request,
+									Model model) throws UnsupportedEncodingException {
+
 		String host = UrlUtils.buildFullRequestUrl(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), null);
 		emailService.sendResetPassword(host, request.getLocale(), email);
 		model.addAttribute("title", "user.sign.reset.password");
@@ -138,7 +137,7 @@ public class AccessController {
 	@RequestMapping(value = "/confirm_password", method = RequestMethod.POST)
 	public String updatePassword(
 		Model model,
-		@RequestParam(value = "j_password") String password,
+		@RequestParam(value = "password") String password,
 		@RequestParam(value = "code") String code
 	) {
 		long tokenSpanMillis = TimeUnit.MINUTES.toMillis(tokenSpan);

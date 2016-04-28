@@ -187,7 +187,7 @@ public class UserProfileWriteController {
 		}
 
 		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
-		if (Objects.nonNull(userProfileForm.getId())) {
+		if (Objects.nonNull(userProfileForm.getId()) && userProfileForm.getId().isEmpty() == true) {
 			this.checkValidationUserProfileOnAnonymous(userProfileForm, result);
 		} else {
 			this.checkValidationUserProfileOnWrite(userProfileForm, result);
@@ -208,7 +208,7 @@ public class UserProfileWriteController {
 		User user = new User();
 
 		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
-		if (Objects.nonNull(userProfileForm.getId())) {
+		if (Objects.nonNull(userProfileForm.getId()) && userProfileForm.getId().isEmpty() == true) {
 			user = userService.findById(userProfileForm.getId());
 		}
 

@@ -93,12 +93,14 @@
 												<span aria-hidden="true" class="icon-user-follow"></span> <spring:message code="user.register"/>
 											</a>
 										</li>
+										<!-- 비밀번호 찾기 숨김
 										|
 										<li>
 											<a href="<%=request.getContextPath()%>/reset_password">
 												<span aria-hidden="true" class="icon-real-estate-056"></span> <spring:message code="user.sign.forgot.password"/>
 											</a>
 										</li>
+										-->
 									</ul>
 								</div>
 							</form>

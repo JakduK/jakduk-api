@@ -4,7 +4,7 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk-parent</artifactId>
-  <version>0.5.5-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>jakduk</name>
   <url>https://jakduk.com</url>
@@ -389,7 +389,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
 				<configuration>
-					<argLine>-Dspring.profiles.active=local</argLine>
+					<argLine>-Dspring.profiles.active=production</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -406,6 +406,7 @@
 				<version>2.6</version>
 				<configuration>
 					<warSourceDirectory>WebContent</warSourceDirectory>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
 			<plugin>
