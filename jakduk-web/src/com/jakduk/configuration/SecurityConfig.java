@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                //                .csrf().disable()
+                .csrf().disable()           // CSRF 방어 비활성화
                 //Configures form login
                 .formLogin()
                     .loginPage("/login")

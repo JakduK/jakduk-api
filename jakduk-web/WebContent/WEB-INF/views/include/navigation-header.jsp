@@ -36,19 +36,23 @@
 					<li><a href="<c:url value="/login"/>"><spring:message code="common.login"/></a></li>
 				</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
-					<sec:authentication property="principal.username" var="accountName"/>
+
 					<sec:authentication property="principal.providerId" var="userType"/>
 					<c:choose>
 						<c:when test="${userType == 'JAKDUK'}">
 							<li>
 								<i class="fa fa-user"></i>
-								<a href="<c:url value="/user/profile"/>">${accountName}</a>
+								<a href="<c:url value="/user/profile"/>">
+									<sec:authentication property="principal.nickname"/>
+								</a>
 							</li>
 						</c:when>
 						<c:when test="${userType == 'FACEBOOK' || userType == 'DAUM'}">
 							<li>
 								<i class="fa fa-user"></i>
-								<a href="<c:url value="/user/social/profile"/>">${accountName}</a>
+								<a href="<c:url value="/user/social/profile"/>">
+									<sec:authentication property="principal.username" />
+								</a>
 							</li>
 						</c:when>
 					</c:choose>

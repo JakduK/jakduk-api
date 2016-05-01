@@ -65,7 +65,7 @@
 								  ng-class="{'glyphicon-ok':userProfileForm.email.$valid, 'glyphicon-remove':userProfileForm.email.$invalid || emailStatus != 'OK'}"></span>
 
 								<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
-								<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
+								<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg" />
 
 								<span class="{{emailAlert.classType}}" ng-show="emailAlert.msg">{{emailAlert.msg}}</span>
 							</div>
@@ -105,7 +105,9 @@
 
 							<div class="form-group">
 								<label class="control-label"> <spring:message code="user.comment"/></label>
-								<textarea name="about" class="form-control" cols="40" rows="3" placeholder='<spring:message code="user.placeholder.about"/>'></textarea>
+
+								<!-- form:textarea 태그를 사용하면서 placeholder에 spring:message를 넣으면 제대로 안나온다. -->
+								<form:textarea path="about" cssClass="form-control" cols="40" rows="3" />
 							</div>
 
 							<div class="text-right">
@@ -154,8 +156,17 @@
 				$scope.buttonAlert = {};
 
 				angular.element(document).ready(function () {
-					$scope.onEmail();
-					$scope.onUsername();
+
+					// spring form validation에서 검증 실패 될 경우, 처음에 메시지를 출력한다.
+					var emailErrors = document.getElementById("email.errors");
+					var usernameErrors = document.getElementById("username.errors");
+
+					if (Jakduk.isEmpty(emailErrors) == true)
+						$scope.onEmail();
+
+					if (Jakduk.isEmpty(usernameErrors) == true)
+						$scope.onUsername();
+
 				});
 
 				$scope.onSubmit = function (event) {
@@ -178,6 +189,8 @@
 				};
 
 				$scope.onEmail = function() {
+					console.log(document.getElementById("email.errors"));
+
 					if ($scope.userProfileForm.email.$valid) {
 						var existId = Boolean("${existId}");
 						var id = "${userProfileForm.id}";

@@ -160,8 +160,13 @@ public class UserProfileWriteController {
 		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
 		UserProfile userProfile = userService.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 
-		if (Objects.nonNull(userProfile))
+		if (Objects.nonNull(userProfile)) {
 			user.setId(userProfile.getId());
+			user.setAbout(userProfile.getAbout());
+
+			if (Objects.nonNull(userProfile.getSupportFC()))
+				user.setFootballClub(userProfile.getSupportFC().getId());
+		}
 
 		model.addAttribute("userProfileForm", user);
 		model.addAttribute("footballClubs", footballClubs);
@@ -187,7 +192,7 @@ public class UserProfileWriteController {
 		}
 
 		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
-		if (Objects.nonNull(userProfileForm.getId()) && userProfileForm.getId().isEmpty() == true) {
+		if (Objects.nonNull(userProfileForm.getId()) && userProfileForm.getId().isEmpty() == false) {
 			this.checkValidationUserProfileOnAnonymous(userProfileForm, result);
 		} else {
 			this.checkValidationUserProfileOnWrite(userProfileForm, result);
@@ -208,7 +213,7 @@ public class UserProfileWriteController {
 		User user = new User();
 
 		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
-		if (Objects.nonNull(userProfileForm.getId()) && userProfileForm.getId().isEmpty() == true) {
+		if (Objects.nonNull(userProfileForm.getId()) && userProfileForm.getId().isEmpty() == false) {
 			user = userService.findById(userProfileForm.getId());
 		}
 

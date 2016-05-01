@@ -93,7 +93,7 @@ public class UserTest {
 		UserProfile userProfile01 = userRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
 		System.out.println("userProfile01=" + userProfile01);
 
-		UserProfile userProfile02 = userRepository.findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE.DAUM, "1lnkE");
+		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE.DAUM, "1lnkE");
 		System.out.println("userProfile02=" + userProfile02);
 	}
 	

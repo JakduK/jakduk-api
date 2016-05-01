@@ -28,9 +28,6 @@ public interface UserRepository extends MongoRepository<User, String> {
 	@Query(value="{'id' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1}")
 	UserProfile findByNEIdAndUsername(String id, String username);
 
-	// SNS 계정으로 가입한 회원 찾기.
-	UserProfile findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId);
-
 	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
 	User userFindByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 

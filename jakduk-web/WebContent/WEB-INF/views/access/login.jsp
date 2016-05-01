@@ -40,9 +40,11 @@
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
 						<div class="reg-page">
 							<form action="login" name="loginForm" method="POST" ng-submit="onSubmit($event)">
+								<!-- CSRF 방어 비활성화
 								<input type="hidden"
 									   name="${_csrf.parameterName}"
 									   value="${_csrf.token}"/>
+								-->
 								<input type="hidden" name="loginRedirect" value="${loginRedirect}"/>
 								<div class="reg-header">
 									<h2><spring:message code="user.sign.in.header"/></h2>
@@ -93,14 +95,12 @@
 												<span aria-hidden="true" class="icon-user-follow"></span> <spring:message code="user.register"/>
 											</a>
 										</li>
-										<!-- 비밀번호 찾기 숨김
 										|
 										<li>
 											<a href="<%=request.getContextPath()%>/reset_password">
 												<span aria-hidden="true" class="icon-real-estate-056"></span> <spring:message code="user.sign.forgot.password"/>
 											</a>
 										</li>
-										-->
 									</ul>
 								</div>
 							</form>

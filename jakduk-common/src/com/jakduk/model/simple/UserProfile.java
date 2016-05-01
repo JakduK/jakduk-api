@@ -2,6 +2,7 @@ package com.jakduk.model.simple;
 
 import java.util.List;
 
+import com.jakduk.common.CommonConst;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -26,6 +27,10 @@ public class UserProfile {
 	private String email;
 
 	private String username;
+
+	private CommonConst.ACCOUNT_TYPE providerId;	// 제공자
+
+	private String providerUserId;					// SNS USER ID
 
 	private String about;
 

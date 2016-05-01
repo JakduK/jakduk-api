@@ -97,7 +97,7 @@
 					<label class="col-sm-2 control-label"> <spring:message code="user.comment"/></label>
 					<div class="col-sm-4">
 						<!-- form:textarea 태그를 사용하면서 placeholder에 spring:message를 넣으면 제대로 안나온다. -->
-						<form:textarea path="about" cssClass="form-control" cols="40" rows="5" />
+						<form:textarea path="about" cssClass="form-control" cols="40" rows="3" />
 					</div>
 				</div>
 
@@ -150,8 +150,16 @@
 			$scope.buttonAlert = {};
 
 			angular.element(document).ready(function() {
-				$scope.onEmail();
-				$scope.onUsername();
+
+				// spring form validation에서 검증 실패 될 경우, 처음에 메시지를 출력한다.
+				var emailErrors = document.getElementById("email.errors");
+				var usernameErrors = document.getElementById("username.errors");
+
+				if (Jakduk.isEmpty(emailErrors) == true)
+					$scope.onEmail();
+
+				if (Jakduk.isEmpty(usernameErrors) == true)
+					$scope.onUsername();
 			});
 
 			$scope.onSubmit = function(event) {

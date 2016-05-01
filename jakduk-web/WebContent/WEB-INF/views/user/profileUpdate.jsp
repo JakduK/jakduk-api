@@ -61,8 +61,7 @@
 							<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 							<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
 
-							<!-- 초기화 시 onUsername()를 호출 -->
-							<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg" ng-init="onUsername()">{{usernameAlert.msg}}</span>
+							<span class="{{usernameAlert.classType}}" ng-show="usernameAlert.msg">{{usernameAlert.msg}}</span>
 						</div>
 					</div>
 
@@ -86,7 +85,7 @@
 						<label class="col-sm-2 control-label"> <spring:message code="user.comment"/></label>
 						<div class="col-sm-4">
 							<!-- form:textarea 태그를 사용하면서 placeholder에 spring:message를 넣으면 제대로 안나온다. -->
-							<form:textarea path="about" cssClass="form-control" cols="40" rows="5"/>
+							<form:textarea path="about" cssClass="form-control" cols="40" rows="3"/>
 						</div>
 					</div>
 
@@ -134,6 +133,12 @@
 				$scope.buttonAlert = {};
 
 				angular.element(document).ready(function () {
+
+					// spring form validation에서 검증 실패 될 경우, 처음에 메시지를 출력한다.
+					var usernameErrors = document.getElementById("username.errors");
+
+					if (Jakduk.isEmpty(usernameErrors) == true)
+						$scope.onUsername();
 				});
 
 				$scope.onSubmit = function (event) {

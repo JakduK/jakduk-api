@@ -11,4 +11,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface UserProfileRepository extends MongoRepository<UserProfile, String> {
     UserProfile findOneByEmail(String email);
     UserProfile findOneByUsername(String username);
+
+    // SNS 계정으로 가입한 회원 찾기.
+    UserProfile findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId);
 }

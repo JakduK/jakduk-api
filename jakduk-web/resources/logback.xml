@@ -108,8 +108,11 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework" level="debug"/>
-    <logger name="org.hibernate" level="debug"/>
+    <!--
+    <logger name="org.springframework" level="DEBUG"/>
+    <logger name="org.hibernate" level="DEBUG"/>
+    -->
+    <logger name="org.mongodb.driver.cluster" level="INFO"/>
 
     <logger name="com.jakduk.authentication" level="DEBUG">
         <appender-ref ref="authDailyRollingFile" />
