@@ -82,7 +82,7 @@
 
 		<script src="<%=request.getContextPath()%>/bundles/stats.js"></script>
 		<script type="text/javascript">
-			var jakdukApp = angular.module("jakdukApp", ["highcharts-ng", "ui.bootstrap"]);
+			var jakdukApp = angular.module("jakdukApp", ["highcharts-ng", "ui.bootstrap", 'jakdukCommon']);
 
 			jakdukApp.controller('statsCtrl', function ($scope, $http) {
 				var KLCLId = 'KLCL';

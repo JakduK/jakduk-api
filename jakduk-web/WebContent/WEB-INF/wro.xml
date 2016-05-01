@@ -171,8 +171,8 @@
 		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/kakao/js/kakao.min.js</js>
-		<js>/resources/bower_components/highcharts/highcharts.js</js>
-		<js>/resources/bower_components/highcharts/modules/exporting.js</js>
+		<js>/resources/bower_components/highcharts/highcharts.src.js</js>
+		<js>/resources/bower_components/highcharts/modules/exporting.src.js</js>
 		<js>/resources/bower_components/highcharts-ng/dist/highcharts-ng.js</js>
 		<js>/resources/bower_components/angular-bootstrap/ui-bootstrap-tpls.js</js>
 	</group>
