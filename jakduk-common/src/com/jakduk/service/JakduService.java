@@ -10,8 +10,10 @@ import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.exception.UserFeelingException;
 import com.jakduk.model.db.*;
 import com.jakduk.model.elasticsearch.JakduCommentOnES;
-import com.jakduk.model.embedded.*;
-import com.jakduk.model.web.user.UserFeelingResponse;
+import com.jakduk.model.embedded.BoardCommentStatus;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.model.web.jakdu.JakduScheduleResponse;
@@ -300,7 +302,7 @@ public class JakduService {
      * @param feeling
      * @return
      */
-    public UserFeelingResponse setJakduCommentFeeling(Locale locale, String commentId, CommonConst.FEELING_TYPE feeling) {
+    public JakduComment setJakduCommentFeeling(Locale locale, String commentId, CommonConst.FEELING_TYPE feeling) {
 
         CommonPrincipal principal = userService.getCommonPrincipal();
         String userId = principal.getId();
@@ -341,8 +343,6 @@ public class JakduService {
             }
         }
 
-        UserFeelingResponse response = new UserFeelingResponse();
-
         CommonFeelingUser feelingUser = new CommonFeelingUser();
         feelingUser.setUserId(userId);
         feelingUser.setUsername(username);
@@ -363,10 +363,6 @@ public class JakduService {
 
         jakduCommentRepository.save(jakduComment);
 
-        response.setFeeling(feeling.toString());
-        response.setNumberOfLike(usersLiking.size());
-        response.setNumberOfDislike(usersDisliking.size());
-
-        return response;
+        return jakduComment;
     }
 }

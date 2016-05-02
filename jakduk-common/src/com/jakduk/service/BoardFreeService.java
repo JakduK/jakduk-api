@@ -1,27 +1,28 @@
 package com.jakduk.service;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardDAO;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.exception.UserFeelingException;
-import com.jakduk.model.web.user.UserFeelingResponse;
-
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
+import com.jakduk.model.embedded.*;
+import com.jakduk.model.etc.BoardFeelingCount;
+import com.jakduk.model.etc.BoardFreeOnBest;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.web.BoardFreeWrite;
+import com.jakduk.model.web.BoardListInfo;
+import com.jakduk.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,35 +38,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardDAO;
-import com.jakduk.model.db.BoardCategory;
-import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.model.elasticsearch.CommentOnES;
-import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.embedded.BoardCommentStatus;
-import com.jakduk.model.embedded.BoardHistory;
-import com.jakduk.model.embedded.BoardImage;
-import com.jakduk.model.embedded.BoardItem;
-import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.CommonFeelingUser;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.GalleryStatus;
-import com.jakduk.model.etc.BoardFeelingCount;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.jakduk.model.etc.BoardFreeOnBest;
-import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.model.web.BoardFreeWrite;
-import com.jakduk.model.web.BoardListInfo;
-import com.jakduk.repository.BoardCategoryRepository;
-import com.jakduk.repository.BoardFreeCommentRepository;
-import com.jakduk.repository.BoardFreeOnListRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.GalleryRepository;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -892,7 +876,7 @@ public class BoardFreeService {
 	 * @param feeling
      * @return
      */
-	public UserFeelingResponse setFreeCommentFeeling(Locale locale, String commentId, CommonConst.FEELING_TYPE feeling) {
+	public BoardFreeComment setFreeCommentFeeling(Locale locale, String commentId, CommonConst.FEELING_TYPE feeling) {
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String userId = principal.getId();
@@ -933,20 +917,25 @@ public class BoardFreeService {
 			}
 		}
 
-		UserFeelingResponse response = new UserFeelingResponse();
-
 		CommonFeelingUser feelingUser = new CommonFeelingUser();
 		feelingUser.setUserId(userId);
 		feelingUser.setUsername(username);
 		feelingUser.setId(new ObjectId().toString());
 
+		switch (feeling) {
+			case LIKE:
+				usersLiking.add(feelingUser);
+				boardComment.setUsersLiking(usersLiking);
+				break;
+			case DISLIKE:
+				usersDisliking.add(feelingUser);
+				boardComment.setUsersDisliking(usersDisliking);
+				break;
+		}
+
 		boardFreeCommentRepository.save(boardComment);
 
-		response.setFeeling(feeling.toString());
-		response.setNumberOfLike(usersLiking.size());
-		response.setNumberOfDislike(usersDisliking.size());
-
-		return response;
+		return boardComment;
 	}
 	
 	public Integer deleteFree(Model model, int seq, String type) {

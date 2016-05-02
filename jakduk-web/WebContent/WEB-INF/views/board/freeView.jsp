@@ -654,8 +654,6 @@
 					return parseInt(objectId.substring(0, 8), 16) * 1000;
 				};
 
-				$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-
 				$scope.btnWriteComment = function (status) {
 					var bUrl = '<c:url value="/board/free/comment/write"/>';
 
@@ -698,7 +696,7 @@
 				$scope.initComment = function () {
 					$scope.loadComments("init", "");
 					$scope.infiniteDisabled = true;
-				}
+				};
 
 				$scope.loadComments = function (type, commentId) {
 					var bUrl = '<c:url value="/board/free/comment/${post.seq}?commentId=' + commentId + '"/>';
@@ -804,6 +802,6 @@
 			$(document).ready(function () {
 				App.init();
 			});
-		</script
+		</script>
 	</body>
 </html>

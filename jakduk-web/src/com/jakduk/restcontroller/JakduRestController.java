@@ -3,7 +3,7 @@ package com.jakduk.restcontroller;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Jakdu;
 import com.jakduk.model.db.JakduComment;
-import com.jakduk.model.web.user.UserFeelingResponse;
+import com.jakduk.vo.UserFeelingResponse;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.model.web.jakdu.JakduScheduleResponse;
@@ -122,7 +122,15 @@ public class JakduRestController {
 
         Locale locale = localeResolver.resolveLocale(request);
 
-        UserFeelingResponse response = jakduService.setJakduCommentFeeling(locale, commentId, feeling);
+        JakduComment jakduComment = jakduService.setJakduCommentFeeling(locale, commentId, feeling);
+
+        Integer numberOfLike = Objects.nonNull(jakduComment.getUsersLiking()) ? jakduComment.getUsersLiking().size() : 0;
+        Integer numberOfDisLike = Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;
+
+        UserFeelingResponse response = new UserFeelingResponse();
+        response.setFeeling(feeling);
+        response.setNumberOfLike(numberOfLike);
+        response.setNumberOfDislike(numberOfDisLike);
 
         return response;
     }

@@ -180,10 +180,11 @@
 									<span ng-bind="comment.writer.username"></span>
 									<span class="pull-right" ng-bind="jakdukFactory.dateFromObjectId(comment.id) | date:dateTimeFormat.dateTime"></span>
 								</h6>
+
 								<p>
 									<span aria-hidden="true" class="icon-screen-smartphone" ng-if="comment.status.device == 'mobile'"></span>
 									<span aria-hidden="true" class="icon-screen-tablet" ng-if="comment.status.device == 'tablet'"></span>
-									<span ng-bind-html="comment.content"></span>
+									<span ng-bind-html="comment.contents"></span>
 								</p>
 
 								<button type="button" class="btn btn-xs rounded btn-dropbox" ng-click="btnCommentFeeling(comment.id, 'LIKE')"
@@ -263,7 +264,7 @@
 		</c:if>
 		<script type="text/javascript">
 
-			angular.module("jakdukApp", ['ui.bootstrap', 'angular-ladda', 'summernote', 'infinite-scroll', 'jakdukCommon'])
+			angular.module("jakdukApp", ['ui.bootstrap', 'angular-ladda', 'summernote', 'infinite-scroll', 'jakdukCommon', 'ngSanitize'])
 					.factory('jakdukFactory', function() {
 						return {
 							objectIdFromDate : function (date) {

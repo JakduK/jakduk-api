@@ -1,5 +1,6 @@
-package com.jakduk.model.web.user;
+package com.jakduk.vo;
 
+import com.jakduk.common.CommonConst;
 import lombok.Data;
 
 /**
@@ -8,7 +9,7 @@ import lombok.Data;
 
 @Data
 public class UserFeelingResponse {
-    private String feeling;
+    private CommonConst.FEELING_TYPE feeling;
     private Integer numberOfLike;
     private Integer numberOfDislike;
 }
