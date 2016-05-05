@@ -232,14 +232,14 @@
 					<div class="ladda-btn margin-bottom-10">
 						<div class="row">
 							<div class="col-xs-6">
-								<button class="btn btn-u-sm ladda-button btn-dropbox" type="button"
+								<button type="button" class="btn-u btn-u-sm btn-u-blue rounded ladda-button"
 									ng-click="btnFeeling('LIKE')" ng-init="numberOfLike=${fn:length(post.usersLiking)}"
 									ladda="btnLike" data-style="expand-right" data-spinner-color="Gainsboro"
 									tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
 									<i class="fa fa-thumbs-o-up fa-lg"></i>
 									<span ng-hide="likeConn == 'connecting'" ng-bind="numberOfLike"></span>
 								</button>
-								<button class="btn btn-u-sm ladda-button btn-weibo" type="button"
+								<button type="button" class="btn-u btn-u-sm btn-u-red rounded ladda-button"
 									ng-click="btnFeeling('DISLIKE')" ng-init="numberOfDislike=${fn:length(post.usersDisliking)}"
 									ladda="btnDislike" data-style="expand-right" data-spinner-color="Gainsboro"
 									tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>

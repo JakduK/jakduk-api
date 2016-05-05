@@ -216,4 +216,9 @@ public class CommonConst {
 		INVALID,
 		OK
 	}
+
+	// 토큰 타입
+	public enum TOKEN_TYPE {
+		RESET_PASSWORD
+	}
 }

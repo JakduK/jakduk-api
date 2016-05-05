@@ -13,6 +13,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 
+import com.jakduk.common.CommonConst;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import com.jakduk.repository.user.UserRepository;
 public class EmailService {
 
 	@Autowired
-	private UserRepository userRepository;
+	private CommonService commonService;
 
 	@Autowired
 	private TokenRepository tokenRepository;
@@ -51,29 +52,30 @@ public class EmailService {
 	@Value("${email.url.static.resource}")
 	private String staticResourceUrl;
 
-	public void sendResetPassword(String host, Locale locale, String email) {
-		if (Objects.isNull(userRepository.findByEmail(email))) {
-			return;
-		}
+	public void sendResetPassword(Locale locale, String host, String email) {
 
 		if (log.isDebugEnabled()) {
 			log.debug("send email to reset password. email is " + email);
 		}
 
+		String language = commonService.getLanguageCode(locale, null);
+
 		try {
 			String code = UUID.randomUUID().toString();
 			ResourceBundle bundle = ResourceBundle.getBundle("messages.user", locale);
-			String lang = bundle.getLocale().getLanguage();
-			if ("ko".equals(lang)) {
-				lang = "kr";
+
+			String logoPath = "";
+
+			if (language.equals(Locale.KOREAN.getLanguage())) {
+				logoPath = host + staticResourceUrl + "/img/logo_type_A_kr.png";
 			} else {
-				lang = "en";
+				logoPath = host + staticResourceUrl + "/img/logo_type_A_en.png";
 			}
 
 			Map<String, Object> model = new HashMap<>();
-			model.put("lang", lang);
+			model.put("lang", language);
 			model.put("title", "JakduK - " + bundle.getString("user.password.reset.instructions"));
-			model.put("logo", host + staticResourceUrl + "/img/logo_type_A_" + lang + ".png");
+			model.put("logo", logoPath);
 			model.put("host", host + resetPasswordPath);
 			model.put("code", code);
 			model.put("greeting", new MessageFormat(bundle.getString("user.password.reset.greeting")).format(new String[]{email}));
@@ -83,7 +85,7 @@ public class EmailService {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 			helper.setFrom(fromMail);
 			helper.setTo(email);
-			helper.setSubject("jakduk.com - " + bundle.getString("user.password.reset.instructions"));
+			helper.setSubject("jakduk.com-" + bundle.getString("user.password.reset.instructions"));
 			helper.setText(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "/resetPassword.vm", "UTF-8", model), true);
 
 			sender.send(message);

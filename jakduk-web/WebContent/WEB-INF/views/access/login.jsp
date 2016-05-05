@@ -97,7 +97,7 @@
 										</li>
 										|
 										<li>
-											<a href="<%=request.getContextPath()%>/reset_password">
+											<a href="<c:url value="/password/find"/>">
 												<span aria-hidden="true" class="icon-real-estate-056"></span> <spring:message code="user.sign.forgot.password"/>
 											</a>
 										</li>

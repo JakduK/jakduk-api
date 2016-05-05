@@ -2,9 +2,14 @@ package com.jakduk.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -19,6 +24,7 @@ import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +37,7 @@ import com.jakduk.service.EmailService;
 import com.jakduk.service.UserService;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.LocaleResolver;
 
 @Controller
 @RequestMapping()
@@ -44,10 +51,13 @@ public class AccessController {
 	private TokenRepository tokenRepository;
 
 	@Autowired
-	private EmailService emailService;
+	private UserService userService;
 
 	@Autowired
-	private UserService userService;
+	private EmailService emailService;
+
+	@Resource
+	LocaleResolver localeResolver;
 
 	@Value("#{tokenTerminationTrigger.span}")
 	private long tokenSpan;
@@ -98,63 +108,101 @@ public class AccessController {
 		return "access/denied";
 	}
 
-	@RequestMapping(value = "/reset_password", method = RequestMethod.GET)
-	public String resetPassword(
-			Model model,
-			@RequestParam(value = "code", required = false) String code) {
-
-		if (Objects.nonNull(code)) {
-			Token token = tokenRepository.findByCode(code);
-			if ((Objects.isNull(token) || !token.getCode().equals(code))) {
-				model.addAttribute("title", "user.sign.reset.password");
-				model.addAttribute("result", CommonConst.RESET_PASSWORD_RESULT.INVALID);
-			} else {
-				model.addAttribute("title", "user.placeholder.password");
-				model.addAttribute("user_email", token.getEmail());
-				model.addAttribute("result", CommonConst.RESET_PASSWORD_RESULT.CODE_OK);
-			}
-			model.addAttribute("action", "confirm_password");
-		} else {
-			model.addAttribute("action", "reset_password");
-			model.addAttribute("title", "user.sign.reset.password");
-			model.addAttribute("result", CommonConst.RESET_PASSWORD_RESULT.NONE);
-		}
-		return "access/resetPassword";
+	// jakduk 비밀번호 찾기 페이지.
+	@RequestMapping(value = "/password/find", method = RequestMethod.GET)
+	public String findPassword() {
+		return "access/passwordFind";
 	}
 
-	@RequestMapping(value = "/reset_password", method = RequestMethod.POST)
-	public String sendResetPassword(@RequestParam(value = "useremail") String email,
-									HttpServletRequest request,
-									Model model) throws UnsupportedEncodingException {
+	// jakduk 비밀번호 찾기 처리.
+	@RequestMapping(value = "/password/find", method = RequestMethod.POST)
+	public String findPassword(@RequestParam String email,
+							   HttpServletRequest request,
+							   Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+
+		String message = "";
 
 		String host = UrlUtils.buildFullRequestUrl(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), null);
-		emailService.sendResetPassword(host, request.getLocale(), email);
-		model.addAttribute("title", "user.sign.reset.password");
-		model.addAttribute("result", CommonConst.RESET_PASSWORD_RESULT.SEND_OK);
-		return "access/resetPassword";
+		com.jakduk.model.simple.UserProfile userProfile = userService.findOneByEmail(email);
+
+		if (Objects.isNull(userProfile)) {
+			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.are.not.registered");
+		} else {
+			switch (userProfile.getProviderId()) {
+				case JAKDUK:
+					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.sendok");
+					emailService.sendResetPassword(locale, host, email);
+					break;
+				case DAUM:
+					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);
+					break;
+				case FACEBOOK:
+					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.FACEBOOK);
+					break;
+			}
+		}
+
+		model.addAttribute("subject", email);
+		model.addAttribute("message", message);
+
+		return "access/passwordFindMessage";
 	}
 
-	@RequestMapping(value = "/confirm_password", method = RequestMethod.POST)
-	public String updatePassword(
-		Model model,
-		@RequestParam(value = "password") String password,
-		@RequestParam(value = "code") String code
-	) {
+	// jakduk 비밀번호 재설정 페이지.
+	@RequestMapping(value = "/password/reset/{code}", method = RequestMethod.GET)
+	public String resetPassword(@PathVariable String code,
+								HttpServletRequest request,
+								Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+
+		if (Objects.isNull(code))
+			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+
+		Token token = commonService.getTokenByCode(code);
+
+		if (Objects.isNull(token) || token.getCode().equals(code) == false) {
+			model.addAttribute("message", commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.invalid"));
+			return "access/passwordFindMessage";
+		}
+
+		model.addAttribute("subject", token.getEmail());
+		model.addAttribute("code", token.getCode());
+
+		return "access/passwordReset";
+	}
+
+	// jakduk 비밀번호 재설정 처리.
+	@RequestMapping(value = "/password/reset", method = RequestMethod.POST)
+	public String updatePassword(@RequestParam(value = "password") String password,
+								 @RequestParam(value = "code") String code,
+								 HttpServletRequest request,
+								 Model model) {
+
+		Locale locale = localeResolver.resolveLocale(request);
+
 		long tokenSpanMillis = TimeUnit.MINUTES.toMillis(tokenSpan);
 		Token token = tokenRepository.findByCode(code);
+
+		String message = "";
+
 		if (Objects.isNull(token) || token.getCreatedTime().getTime() + tokenSpanMillis <= System.currentTimeMillis()) {
-			model.addAttribute("title", "user.sign.reset.password");
-			model.addAttribute("result", CommonConst.RESET_PASSWORD_RESULT.INVALID);
+			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.invalid");
 		} else {
 			userService.userPasswordUpdateByEmail(token.getEmail(), password);
-			model.addAttribute("title", "user.placeholder.password");
-			model.addAttribute("user_email", token.getEmail());
-			model.addAttribute("result", CommonConst.RESET_PASSWORD_RESULT.CHANGE_OK);
+			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.success.change.password");
+			model.addAttribute("subject", token.getEmail());
 		}
+
 		if (Objects.nonNull(token)) {
 			tokenRepository.delete(token);
 		}
-		return "access/resetPassword";
+
+		model.addAttribute("message", message);
+
+		return "access/passwordFindMessage";
 	}
 
 }

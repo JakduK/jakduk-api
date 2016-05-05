@@ -1,19 +1,12 @@
 package com.jakduk.service;
 
-import com.jakduk.authentication.common.CommonUser;
-import com.jakduk.authentication.common.OAuthPrincipal;
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.common.CommonConst;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.Sequence;
-import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.model.db.Token;
 import com.jakduk.repository.SequenceRepository;
-
+import com.jakduk.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -23,7 +16,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -54,12 +47,9 @@ public class CommonService {
 	
 	@Autowired
 	private SequenceRepository sequenceRepository;
-	
-	@Autowired
-	private FootballClubOriginRepository footballClubOriginRepository;
 
 	@Autowired
-	private JakdukDAO jakdukDAO;
+	private TokenRepository tokenRepository;
 
 	@Value("${deny.redirect.url}")
 	private String denyRedirectUrl;
@@ -269,9 +259,9 @@ public class CommonService {
 	 * @param getString
      * @return
      */
-	public String getResourceBundleMessage(Locale locale, String bundle, String getString) {
+	public String getResourceBundleMessage(Locale locale, String bundle, String getString, Object... params) {
 		ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
-		return resourceBundle.getString(getString);
+		return MessageFormat.format(resourceBundle.getString(getString), params);
 	}
 
 	/**
@@ -289,5 +279,10 @@ public class CommonService {
 		} else {
 			return CommonConst.DEVICE_TYPE_NORMAL;
 		}
+	}
+
+	// 토큰 가져오기.
+	public Token getTokenByCode(String code) {
+		return tokenRepository.findByCode(code);
 	}
 }

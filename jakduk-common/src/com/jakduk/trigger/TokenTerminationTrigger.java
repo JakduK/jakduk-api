@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @EnableScheduling
@@ -28,16 +29,15 @@ public class TokenTerminationTrigger {
 
 	@Scheduled(cron = "0 */5 * * * *")
 	public void terminateToken() {
+
+		log.debug("terminateToken");
+
 		// 기한 만료된 토큰 삭제
-		Pageable request = new PageRequest(0, 100, new Sort(Sort.Direction.ASC, "createdTime"));
-		Page<Token> page = tokenRepository.findAll(request);
-		while (page.getTotalElements() > 0) {
-			page.getContent().stream().filter(token -> token.getCreatedTime().getTime() + span <= System.currentTimeMillis()).forEach(token -> {
-				tokenRepository.delete(token.getEmail());
-			});
-			request = request.next();
-			page = tokenRepository.findAll(request);
-		}
+		List<Token> tokens = tokenRepository.findAll();
+
+		tokens.stream()
+				.filter(token -> token.getCreatedTime().getTime() + span <= System.currentTimeMillis())
+				.forEach(token -> tokenRepository.delete(token.getEmail()));
 	}
 
 	public void setSpan(long minutes) {

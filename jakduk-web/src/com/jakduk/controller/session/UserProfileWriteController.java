@@ -127,7 +127,7 @@ public class UserProfileWriteController {
 		return "redirect:/user/profile?status=1";
 	}
 
-	// social 회원 가입 페이지.
+	// OAUTH2 콜백. social 회원 가입 페이지.
 	@RequestMapping(value = "/social", method = RequestMethod.GET)
 	public String writeSocial(@RequestParam(required = false) String lang,
 							  NativeWebRequest request,

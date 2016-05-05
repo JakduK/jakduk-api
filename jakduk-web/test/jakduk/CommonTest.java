@@ -34,7 +34,8 @@ public class CommonTest {
 		Assert.assertTrue(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/about/intro"));
 		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/login"));
 		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/board/free/write"));
-		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/reset_password"));
+		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/password/reset"));
+		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/password/find?lang=ko_kr"));
 	}
 
 	@Test

@@ -56,8 +56,8 @@
 									ng-blur="onEmail()" ng-change="validationEmail()"
 									ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
 
-							<span class="glyphicon form-control-feedback"
-								ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'OK'}"></span>
+								<span class="glyphicon form-control-feedback"
+									ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'OK'}"></span>
 
 								<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
 								<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
@@ -95,7 +95,7 @@
 											ng-model="password" ng-change="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
 											ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 
-									<span class="glyphicon form-control-feedback"
+										<span class="glyphicon form-control-feedback"
 										  ng-class="{'glyphicon-ok':userWrite.password.$valid, 'glyphicon-remove':userWrite.password.$invalid}"></span>
 
 										<form:errors path="password" cssClass="text-danger" element="span" ng-hide="passwordAlert.msg"/>
@@ -299,7 +299,7 @@
 							"msg": '<spring:message code="common.msg.error.shoud.check.redudancy"/>'
 						};
 					}
-				}
+				};
 
 				$scope.validationUsername = function () {
 					if ($scope.userWrite.username.$invalid) {
@@ -320,7 +320,7 @@
 							"msg": '<spring:message code="common.msg.error.shoud.check.redudancy"/>'
 						};
 					}
-				}
+				};
 
 				$scope.vlidationPassword = function () {
 					$scope.equalPasswordStatus = "false";
@@ -370,7 +370,7 @@
 							"msg": '<spring:message code="user.msg.password.mismatch"/>'
 						};
 					}
-				}
+				};
 
 				$scope.validationPasswordConfirm = function () {
 					$scope.equalPasswordStatus = "false";

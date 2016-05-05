@@ -34,8 +34,6 @@ public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	
 	@Autowired
 	private CommonService commonService;
 
-	protected final Log logger = LogFactory.getLog(this.getClass());
-
 	private RequestCache requestCache = new HttpSessionRequestCache();
 
 	@Override
@@ -52,8 +50,8 @@ public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	
 		if (savedRequest != null) {
 			String targetUrl = savedRequest.getRedirectUrl();
 			
-			if (logger.isDebugEnabled()) {
-				logger.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
+			if (log.isDebugEnabled()) {
+				log.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
 			}
 			
 			getRedirectStrategy().sendRedirect(request, response, targetUrl);
@@ -61,15 +59,15 @@ public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	
 		}
 		
 		if (loginRedirect != null) {
-			if (commonService.isRedirectUrl(loginRedirect)) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Redirecting to this Url: " + URLDecoder.decode(loginRedirect, "UTF-8"));
+			if (commonService.isRedirectUrl(URLDecoder.decode(loginRedirect, "UTF-8"))) {
+				if (log.isDebugEnabled()) {
+					log.debug("Redirecting to this Url: " + URLDecoder.decode(loginRedirect, "UTF-8"));
 				}
 				getRedirectStrategy().sendRedirect(request, response, URLDecoder.decode(loginRedirect, "UTF-8"));
 				return;
 			} else {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Don't redirect to this Url" + URLDecoder.decode(loginRedirect, "UTF-8"));
+				if (log.isDebugEnabled()) {
+					log.debug("Don't redirect to this Url" + URLDecoder.decode(loginRedirect, "UTF-8"));
 				}
 			}
 

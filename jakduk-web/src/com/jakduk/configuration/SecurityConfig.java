@@ -61,12 +61,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/auth/**"
                         ).permitAll()
                         .antMatchers(
-                                "/login*",          // 로그인
-                                "/auth/*",          // SNS 인증
-                                "/signup",          // SNS 계정으로 회원 가입
-                                "/user/social",
-                                "/user/write",      // JakduK 회원 가입
-                                "/user/*/write"     // SNS 계정으로 회원 가입
+                                "/login",               // 로그인
+                                "/auth/*",              // SNS 인증
+                                "/signup",              // SNS 계정으로 회원 가입
+                                "/user/social",         // OAUTH2 콜백
+                                "/user/write",          // JakduK 회원 가입
+                                "/user/*/write",        // SNS 계정으로 회원 가입
+                                "/password/*"           // 비밀번호 찾기
                         ).anonymous()
                         .antMatchers(
                                 "/user/**"

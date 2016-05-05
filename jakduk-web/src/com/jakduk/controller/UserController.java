@@ -1,5 +1,6 @@
 package com.jakduk.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -14,14 +15,18 @@ import com.jakduk.authentication.social.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.Token;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.user.UserProfileInfo;
 import com.jakduk.model.web.user.UserWrite;
+import com.jakduk.service.EmailService;
 import com.jakduk.service.FootballService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.UrlUtils;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,12 +54,12 @@ public class UserController {
 
 	@Autowired
 	private FootballService footballService;
-	
+
 	@Resource
 	LocaleResolver localeResolver;
 
-	@Autowired
-	private ProviderSignInUtils providerSignInUtils;
+	@Value("#{tokenTerminationTrigger.span}")
+	private long tokenSpan;
 
 	@RequestMapping
 	public String root() {
@@ -138,6 +143,7 @@ public class UserController {
 		}
 	}
 
+	// jakduk 비밀번호 변경 페이지.
 	@RequestMapping(value = "/password/update", method = RequestMethod.GET)
 	public String passwordUpdate(Model model) {
 		
@@ -145,7 +151,8 @@ public class UserController {
 		
 		return "user/passwordUpdate";
 	}
-	
+
+	// jakduk 비밀번호 변경 처리.
 	@RequestMapping(value = "/password/update", method = RequestMethod.POST)
 	public String passwordUpdate(@Valid UserPasswordUpdate userPasswordUpdate, BindingResult result) {
 		

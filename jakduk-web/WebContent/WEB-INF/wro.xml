@@ -35,7 +35,7 @@
 		<js>/resources/bower_components/angular-ladda/dist/angular-ladda.js</js>
 	</group>
 
-	<group name="resetPassword">
+	<group name="password.find">
 		<group-ref>login</group-ref>
 		<css>/resources/jakduk/css/jakduk.css</css>
 	</group>
@@ -88,7 +88,6 @@
 		<css>/resources/unify/assets/css/pages/blog.css</css>
 		<css>/resources/unify/assets/plugins/brand-buttons/css/brand-buttons.min.css</css>
 		<css>/resources/bower_components/angular-bootstrap/ui-bootstrap-csp.css</css>
-		<css>/resources/jakduk/css/jakduk.css</css>
 
 		<js>/resources/bower_components/angular-sanitize/angular-sanitize.js</js>
 		<js>/resources/bower_components/angular-animate/angular-animate.js</js>
