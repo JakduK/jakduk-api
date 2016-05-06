@@ -58,7 +58,7 @@
 								</label>
 								<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>'
 									   ng-init="email='${userProfileForm.email}'" ng-model="email"
-									   ng-blur="onEmail()" ng-change="validationEmail()"
+									   ng-blur="onEmail()" ng-keyup="validationEmail()"
 									   ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
 
 								<span class="glyphicon form-control-feedback"
@@ -78,7 +78,7 @@
 								</label>
 								<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
 									ng-model="username" ng-init="username='${userProfileForm.username}'"
-									ng-blur="onUsername()" ng-change="validationUsername()"
+									ng-blur="onUsername()" ng-keyup="validationUsername()"
 									ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
 							<span class="glyphicon form-control-feedback"

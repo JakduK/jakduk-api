@@ -53,7 +53,7 @@
 								</label>
 								<input type="email" name="email" class="form-control" placeholder='<spring:message code="user.placeholder.email"/>'
 									ng-init="email='${userWrite.email}'" ng-model="email"
-									ng-blur="onEmail()" ng-change="validationEmail()"
+									ng-blur="onEmail()" ng-keyup="validationEmail()"
 									ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
 
 								<span class="glyphicon form-control-feedback"
@@ -73,7 +73,7 @@
 								</label>
 								<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
 									ng-init="username='${userWrite.username}'" ng-model="username"
-									ng-blur="onUsername()" ng-change="validationUsername()"
+									ng-blur="onUsername()" ng-keyup="validationUsername()"
 									ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
 							<span class="glyphicon form-control-feedback"
@@ -92,7 +92,7 @@
 											<spring:message code="user.password"/>
 										</label>
 										<input type="password" name="password" class="form-control" placeholder='<spring:message code="user.placeholder.password"/>'
-											ng-model="password" ng-change="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
+											ng-model="password" ng-keyup="vlidationPassword()" ng-blur="eaualPasswordConfirm()"
 											ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 
 										<span class="glyphicon form-control-feedback"
@@ -110,7 +110,7 @@
 											<spring:message code="user.password.confirm"/>
 										</label>
 										<input type="password" name="passwordConfirm" class="form-control" placeholder='<spring:message code="user.placeholder.password.confirm"/>'
-											ng-model="passwordConfirm" ng-change="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
+											ng-model="passwordConfirm" ng-keyup="validationPasswordConfirm()" ng-blur="eaualPasswordConfirm()"
 											ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax"/>
 
 									<span class="glyphicon form-control-feedback"

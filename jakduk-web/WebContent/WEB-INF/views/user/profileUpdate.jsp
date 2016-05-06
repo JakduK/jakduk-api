@@ -53,7 +53,7 @@
 						<div class="col-sm-4">
 							<input type="text" name="username" class="form-control" placeholder='<spring:message code="user.placeholder.username"/>'
 								ng-model="username" ng-init="username='${userProfileForm.username}'"
-								ng-blur="onUsername()" ng-change="validationUsername()"
+								ng-blur="onUsername()" ng-keyup="validationUsername()"
 								ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
 					<span class="glyphicon form-control-feedback"
