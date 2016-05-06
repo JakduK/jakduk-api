@@ -31,9 +31,6 @@
 					<c:when test="${result == 'locked'}">
 						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure.locked"/></div>
 					</c:when>
-					<c:when test="${result == 'success'}">
-						<div class="alert alert-success" role="alert"><spring:message code="user.msg.register.success"/></div>
-					</c:when>
 				</c:choose>
 
 				<div class="row">

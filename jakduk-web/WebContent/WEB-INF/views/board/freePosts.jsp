@@ -105,8 +105,8 @@
 				</div>
 
 				<!-- Top Buttons -->
-				<div class="row margin-bottom-10">
-					<div class="col-sm-6">
+				<div class="row">
+					<div class="col-sm-6 margin-bottom-10">
 						<button type="button" class="btn-u rounded dropdown-toggle" data-toggle="dropdown">
 							<c:choose>
 								<c:when test="${boardListInfo.category != 'none'}">
@@ -138,14 +138,14 @@
 							</c:when>
 						</c:choose>
 					</div>
-					<div class="col-sm-6">
+					<div class="col-sm-6 sm-margin-bottom-10">
 						<div class="input-group">
 							<input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''"
 								ng-keypress="($event.which === 13)?btnEnter():return"
 								placeholder='<spring:message code="search.placeholder.words"/>'>
-				   <span class="input-group-btn">
-					   <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
-				   </span>
+						   <span class="input-group-btn">
+							   <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
+						   </span>
 						</div>
 					</div>
 				</div>

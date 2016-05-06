@@ -77,7 +77,7 @@ public class UserProfileWriteController {
 
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
 			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile user = userService.getUserProfileById(authUser.getId());
+			UserProfile user = userService.findUserProfileById(authUser.getId());
 
 			UserProfileForm userProfileForm = new UserProfileForm();
 			userProfileForm.setEmail(user.getEmail());
@@ -103,7 +103,12 @@ public class UserProfileWriteController {
 
 	// jakduk 회원 정보 편집 처리.
 	@RequestMapping(value = "/profile/update", method = RequestMethod.POST)
-	public String profileUpdate(@Valid UserProfileForm userProfileForm, BindingResult result, SessionStatus sessionStatus) {
+	public String profileUpdate(@Valid UserProfileForm userProfileForm,
+								BindingResult result,
+								SessionStatus sessionStatus,
+								HttpServletRequest request) {
+
+		Locale locale = localeResolver.resolveLocale(request);
 		
 		if (result.hasErrors()) {
 			if (log.isDebugEnabled()) {
@@ -111,19 +116,52 @@ public class UserProfileWriteController {
 			}
 			return "user/profileUpdate";
 		}
-		
-		userService.checkProfileUpdate(userProfileForm, result);
-		
+
+		JakdukPrincipal jakdukPrincipal = null;
+
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+			jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		} else {
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+		}
+
+		UserProfile userProfle = userService.findByNEIdAndUsername(jakdukPrincipal.getId(), userProfileForm.getUsername());
+
+		if (Objects.nonNull(userProfle)) {
+			result.rejectValue("username", "user.msg.already.username");
+		}
+
 		if (result.hasErrors()) {
 			if (log.isDebugEnabled()) {
 				log.debug("result=" + result);
 			}
 			return "user/profileUpdate";
 		}
-		
-		userService.userProfileUpdate(userProfileForm);
+
+		User user = userService.findById(jakdukPrincipal.getId());
+		user.setUsername(userProfileForm.getUsername().trim());
+
+		String footballClub = userProfileForm.getFootballClub();
+		String about = userProfileForm.getAbout();
+
+		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
+			FootballClub supportFC = footballService.findById(footballClub);
+
+			user.setSupportFC(supportFC);
+		}
+
+		if (Objects.nonNull(about) && about.isEmpty() == false) {
+			user.setAbout(about.trim());
+		}
+
+		userService.save(user);
+		userService.signUpJakdukUser(user);
 		sessionStatus.setComplete();
-		
+
+		if (log.isDebugEnabled()) {
+			log.debug("jakduk user update. user=" + user);
+		}
+
 		return "redirect:/user/profile?status=1";
 	}
 
@@ -244,7 +282,9 @@ public class UserProfileWriteController {
 
 		sessionStatus.setComplete();
 
-		userService.signUpSocialUser(returnUser, request);
+		userService.signUpSocialUser(returnUser);
+
+		providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 
 		return "redirect:/home";
 	}
@@ -260,7 +300,7 @@ public class UserProfileWriteController {
 
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
 			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			UserProfile userProfile = userService.getUserProfileById(userDetail.getId());
+			UserProfile userProfile = userService.findUserProfileById(userDetail.getId());
 
 			UserProfileForm userProfileForm = new UserProfileForm();
 			userProfileForm.setEmail(userProfile.getEmail());
@@ -312,7 +352,9 @@ public class UserProfileWriteController {
 
 		sessionStatus.setComplete();
 
-		userService.signUpSocialUser(user, request);
+		userService.signUpSocialUser(user);
+
+		providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 
 		return "redirect:/user/social/profile?status=1";
 	}

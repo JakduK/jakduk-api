@@ -208,7 +208,7 @@
 					$scope.usersLatest = [];
 					$scope.commentsLatest = [];
 					$scope.galleriesLatest = [];
-					$scope.homeDescription = '<spring:message code="common.now.loading"/>...';
+					$scope.homeDescription = '<spring:message code="common.now.loading"/>';
 
 					$scope.slickConfig = {
 						infinite: false,
@@ -242,7 +242,7 @@
 							$scope.encyclopediaConn = "loading";
 
 							reqPromise.success(function (data, status, headers, config) {
-								if (data != null) {
+								if (Jakduk.isEmpty(data) == false) {
 									if (data.kind == "player") {
 										$scope.encyclopedia.kind = '<spring:message code="home.kind.best.player"/>';
 									} else if (data.encyclopedia.kind == "book") {

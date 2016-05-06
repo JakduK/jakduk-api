@@ -1,5 +1,6 @@
 package com.jakduk.restcontroller;
 
+import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.HomeService;
@@ -13,7 +14,6 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -43,7 +43,7 @@ public class HomeRestController {
         Encyclopedia encyclopedia = homeService.getEncyclopedia(language);
 
         if (Objects.isNull(encyclopedia))
-            throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+            throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
 
         return encyclopedia;
     }

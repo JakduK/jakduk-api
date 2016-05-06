@@ -2,7 +2,7 @@ package com.jakduk.model.web.user;
 
 import com.jakduk.common.CommonConst;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -17,7 +17,6 @@ import javax.validation.constraints.Size;
 @Data
 public class UserProfileForm {
 
-	@Id
 	private String id;				// 하위 호환성 유지를 위함. https://github.com/Pyohwan/JakduK/issues/53
 
 	@NotNull

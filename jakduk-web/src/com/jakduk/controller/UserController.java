@@ -1,6 +1,5 @@
 package com.jakduk.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -12,22 +11,16 @@ import javax.validation.Valid;
 
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.authentication.social.SocialUserDetail;
-import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.Token;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.user.UserProfileInfo;
-import com.jakduk.model.web.user.UserWrite;
-import com.jakduk.service.EmailService;
 import com.jakduk.service.FootballService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.util.UrlUtils;
-import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -91,23 +84,6 @@ public class UserController {
 		model.addAttribute("list", users);
 	}
 
-	// jakduk 회원 가입 페이지.
-	@RequestMapping(value = "/write", method = RequestMethod.GET)
-	public String write(@RequestParam(required = false) String lang,
-						HttpServletRequest request,
-						Model model) {
-
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-
-		List<FootballClub> footballClubs = footballService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
-
-		model.addAttribute("userWrite", new UserWrite());
-		model.addAttribute("footballClubs", footballClubs);
-
-		return "user/write";
-	}
-
 	// jakduk 회원 정보 페이지.
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)
 	public String profile(@RequestParam(required = false) String lang,
@@ -121,7 +97,7 @@ public class UserController {
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
 			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-			UserProfile user = userService.getUserProfileById(authUser.getId());
+			UserProfile user = userService.findUserProfileById(authUser.getId());
 
 			UserProfileInfo userProfileInfo = new UserProfileInfo();
 			userProfileInfo.setEmail(user.getEmail());
@@ -188,7 +164,7 @@ public class UserController {
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
 			SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-			UserProfile user = userService.getUserProfileById(userDetail.getId());
+			UserProfile user = userService.findUserProfileById(userDetail.getId());
 
 			UserProfileInfo profileInfo = new UserProfileInfo();
 			profileInfo.setEmail(user.getEmail());

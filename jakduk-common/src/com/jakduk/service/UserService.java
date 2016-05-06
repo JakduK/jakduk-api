@@ -58,9 +58,6 @@ public class UserService {
 	private FootballClubRepository footballClubRepository;
 
 	@Autowired
-	private ProviderSignInUtils providerSignInUtils;
-
-	@Autowired
 	private MongoTemplate mongoTemplate;
 
 	public User findById(String id) {
@@ -71,7 +68,7 @@ public class UserService {
 		return userRepository.findAll();
 	}
 
-	public UserProfile getUserProfileById(String id) {
+	public UserProfile findUserProfileById(String id) {
 		return userProfileRepository.findOne(id);
 	}
 
@@ -100,10 +97,8 @@ public class UserService {
 		return userProfileRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
-	public void create(User user) {
-		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
-		
-		user.setPassword(encoder.encode(user.getPassword()));
+	// 회원 정보 저장.
+	public void save(User user) {
 		userRepository.save(user);
 	}
 
@@ -119,39 +114,6 @@ public class UserService {
 		return mongoTemplate.findOne(query, CommonWriter.class);
 	}
 
-	public void writeUser(UserWrite userWrite) {
-
-		User user = new User();
-		user.setEmail(userWrite.getEmail().trim());
-		user.setUsername(userWrite.getUsername().trim());
-		user.setPassword(userWrite.getPassword().trim());
-		user.setProviderId(CommonConst.ACCOUNT_TYPE.JAKDUK);
-		
-		String footballClub = userWrite.getFootballClub();
-		String about = userWrite.getAbout();
-
-		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
-			FootballClub supportFC = footballClubRepository.findOne(userWrite.getFootballClub());
-			
-			user.setSupportFC(supportFC);
-		}
-
-		if (Objects.nonNull(about) && about.isEmpty() == false) {
-			user.setAbout(about.trim());
-		}
-
-		ArrayList<Integer> roles = new ArrayList<Integer>();
-		roles.add(CommonRole.ROLE_NUMBER_USER_01);
-		
-		user.setRoles(roles);
-		
-		this.create(user);
-
-		if (log.isDebugEnabled()) {
-			log.debug("user=" + user);
-		}
-	}
-	
 	public void oauthUserWrite(SocialUserOnAuthentication oauthUserOnLogin) {
 		User user = new User();
 		
@@ -213,51 +175,6 @@ public class UserService {
 		return false;
 	}
 
-	public void checkProfileUpdate(UserProfileForm userProfileForm, BindingResult result) {
-		
-		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = jakdukPrincipal.getId();
-		
-		String username = userProfileForm.getUsername();
-		
-		if (id != null && username != null) {
-			UserProfile userProfle = userRepository.findByNEIdAndUsername(id, username);
-			if (userProfle != null) {
-				result.rejectValue("username", "user.msg.already.username");
-			}
-		}		
-	}
-	
-	public void userProfileUpdate(UserProfileForm userProfileForm) {
-		
-		JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-		String id = principal.getId();
-		
-		User user = userRepository.findById(id);
-		user.setUsername(userProfileForm.getUsername());
-		user.setAbout(userProfileForm.getAbout());
-		
-		String footballClub = userProfileForm.getFootballClub();
-		
-		if (footballClub != null && !footballClub.isEmpty()) {
-			FootballClub supportFC = footballClubRepository.findOne(userProfileForm.getFootballClub());
-			
-			user.setSupportFC(supportFC);
-		}
-		
-		if (log.isInfoEnabled()) {
-			log.info("jakduk user update. id=" + user.getId() + ", username=" + user.getUsername());
-		}
-		
-		userRepository.save(user);
-		
-		principal.setUsername(userProfileForm.getUsername());
-		
-		commonService.doJakdukAutoLogin(principal, credentials);
-		
-	}
-	
 	public Model getUserPasswordUpdate(Model model) {
 
 		model.addAttribute("userPasswordUpdate", new UserPasswordUpdate());
@@ -293,9 +210,9 @@ public class UserService {
 		
 		User user = userRepository.findById(id);
 		
-		user.setPassword(userPasswordUpdate.getNewPassword());
+		user.setPassword(encoder.encode(userPasswordUpdate.getNewPassword()));
 		
-		this.create(user);
+		this.save(user);
 		
 		if (log.isInfoEnabled()) {
 			log.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
@@ -304,8 +221,8 @@ public class UserService {
 
 	public void userPasswordUpdateByEmail(String email, String password) {
 		User user = userRepository.findByEmail(email);
-		user.setPassword(password);
-		this.create(user);
+		user.setPassword(encoder.encode(password));
+		this.save(user);
 
 		if (log.isInfoEnabled()) {
 			log.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
@@ -371,20 +288,31 @@ public class UserService {
 		return commonPrincipal;
 	}
 
-	/**
-	 * SNS 인증 회원의 로그인 처리.
-	 * @param user
-	 * @param request
-     */
-	public void signUpSocialUser(User user, WebRequest request) {
+	// jakduk 회원의 로그인 처리.
+	public void signUpJakdukUser(User user) {
+
+		boolean enabled = true;
+		boolean accountNonExpired = true;
+		boolean credentialsNonExpired = true;
+		boolean accountNonLocked = true;
+
+		JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
+				, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
+				, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
+
+		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukPrincipal, user.getPassword(), jakdukPrincipal.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(token);
+	}
+
+	// SNS 인증 회원의 로그인 처리.
+	public void signUpSocialUser(User user) {
 
 		SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
 				true, true, true, true, getAuthorities(user.getRoles()));
 
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-
-		providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 	}
 
 	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {

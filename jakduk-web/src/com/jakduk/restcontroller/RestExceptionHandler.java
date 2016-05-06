@@ -1,7 +1,7 @@
 package com.jakduk.restcontroller;
 
 import com.jakduk.common.RestError;
-import com.jakduk.exception.RepositoryExistException;
+import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.exception.UserFeelingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +17,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class RestExceptionHandler {
 
+    // 잘못된 파라미터.
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -25,11 +26,21 @@ public class RestExceptionHandler {
         return  restError;
     }
 
+    // 필수 데이터를 찾을수 없음
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public RestError noSuchElementException(NoSuchElementException e) {
         RestError restError = new RestError(HttpStatus.NOT_FOUND.toString(), e.getMessage());
+        return  restError;
+    }
+
+    // 에러는 아니지만 데이터가 없음.
+    @ExceptionHandler(SuccessButNoContentException.class)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public RestError successButNoContentException(SuccessButNoContentException e) {
+        RestError restError = new RestError(HttpStatus.NO_CONTENT.toString(), e.getMessage());
         return  restError;
     }
 

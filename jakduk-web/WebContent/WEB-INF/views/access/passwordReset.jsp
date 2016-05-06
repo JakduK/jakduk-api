@@ -85,6 +85,7 @@
                         if ($scope.resetForm.$valid) {
                             $scope.btnSubmit = true;
                         } else {
+                            $scope.validationPassword();
                             event.preventDefault();
                         }
                     };

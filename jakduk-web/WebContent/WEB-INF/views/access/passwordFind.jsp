@@ -82,13 +82,12 @@
                     if ($scope.resetForm.$valid) {
                         $scope.btnSubmit = true;
                     } else {
+                        $scope.validationEmail();
                         event.preventDefault();
                     }
                 };
 
                 $scope.validationEmail = function () {
-                    console.log("123");
-
                     if ($scope.resetForm.email.$invalid) {
                         if ($scope.resetForm.email.$error.required) {
                             $scope.emailAlert = {"classType": "text-danger", "msg": '<spring:message code="common.msg.required"/>'};

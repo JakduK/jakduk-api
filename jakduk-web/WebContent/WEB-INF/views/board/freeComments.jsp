@@ -101,6 +101,7 @@
 					<!--End Top Comments Rows-->
 				</div>
 
+				<!-- Top Buttons -->
 				<div class="row">
 					<div class="col-sm-6 margin-bottom-10">
 						<c:choose>
@@ -111,8 +112,7 @@
 								</button>
 							</c:when>
 							<c:when test="${authRole == 'USER'}">
-								<button type="button" class="btn-u btn-brd rounded" onclick="location.href='
-									<c:url value="/board/free/write"/>'"
+								<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
 									tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
 									<span aria-hidden="true" class="icon-pencil"></span>
 								</button>
@@ -181,8 +181,7 @@
 						</button>
 					</c:when>
 					<c:when test="${authRole == 'USER'}">
-						<button type="button" class="btn-u btn-brd rounded" onclick="location.href='
-							<c:url value="/board/free/write"/>'"
+						<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
 							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
 							<span aria-hidden="true" class="icon-pencil"></span>
 						</button>

@@ -163,13 +163,6 @@ public class CommonService {
 		return dateTimeFormat;
 	}
 
-	public void doJakdukAutoLogin(JakdukPrincipal principal, Object credentials) {
-		
-		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, credentials, principal.getAuthorities());
-		
-		SecurityContextHolder.getContext().setAuthentication(token);
-	}
-	
 	public void setCookie(HttpServletResponse response, String name, String value, String path) {
 		try {
 			Cookie cookie = new Cookie(name, URLEncoder.encode(value, "UTF-8"));
