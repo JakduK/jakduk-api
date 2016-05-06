@@ -45,7 +45,7 @@
                                 <span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
 
                                 <input type="password" name="password" class="form-control" placeholder='<spring:message code="user.placeholder.new.password"/>'
-                                       ng-model="password" ng-change="validationPassword()"
+                                       ng-model="password" ng-keyup="validationPassword()"
                                        ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax" autofocus/>
 
                                 <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':resetForm.password.$valid, 'glyphicon-remove':resetForm.password.$invalid}"></span>
