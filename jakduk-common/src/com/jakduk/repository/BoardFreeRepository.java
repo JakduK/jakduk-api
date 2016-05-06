@@ -25,5 +25,5 @@ public interface BoardFreeRepository extends MongoRepository<BoardFree, String> 
 	BoardFreeWrite boardFreeWriteFindOneBySeq(Integer seq);
 	
 	@Query(value="{'seq' : ?0}")
-	BoardFreeOfMinimum boardFreeOnCommentFindBySeq(Integer seq);
+	BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq);
 }

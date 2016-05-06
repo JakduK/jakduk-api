@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -275,7 +274,7 @@ public class BoardTest {
 
 	@Test
 	public void 자유게시판_댓글목록() {
-		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(58);
+		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(58);
 		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
 
 		System.out.println(CommonConst.FEELING_TYPE.DISLIKE);

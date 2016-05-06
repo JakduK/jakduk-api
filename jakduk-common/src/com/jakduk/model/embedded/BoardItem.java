@@ -1,6 +1,8 @@
 package com.jakduk.model.embedded;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,11 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@Document
 @Data
+@AllArgsConstructor
+@Document
 public class BoardItem {
-	
 	private String id;
-	
 	private int seq;
 }

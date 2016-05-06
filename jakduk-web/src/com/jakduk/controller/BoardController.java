@@ -110,40 +110,6 @@ public class BoardController {
 		
 		return "board/freeView";
 	}
-	
-	@RequestMapping(value = "/free/{seq}/{feeling}")
-	public void setFreeFeeling(@PathVariable Integer seq,
-							   @PathVariable CommonConst.FEELING_TYPE feeling,
-							   Model model) {
-		
-		boardFreeService.setUsersFeelings(model, seq, feeling);
-	}
-
-	@RequestMapping(value = "/free/comment/write", method = RequestMethod.POST)
-	public void freeCommentWrite(Model model,
-			HttpServletRequest request,
-			@RequestParam(required = false) String content,
-			@RequestParam(required = false) Integer seq) {
-		
-		boardFreeService.freeCommentWrite(request, seq, content);
-	}
-	
-	@RequestMapping(value = "/free/comment/{seq}", method = RequestMethod.GET)
-	public void freeComment(@PathVariable int seq,
-							@RequestParam(required = false) String commentId,
-							Model model) {
-		
-		boardFreeService.getFreeComment(model, seq, commentId);
-		
-//		return "board/free/comment";
-	}
-	
-	@RequestMapping(value = "/free/comment/count/{seq}", method = RequestMethod.GET)
-	public void freeCommentCount(@PathVariable int seq, Model model) {
-		
-		boardFreeService.getFreeCommentCount(model, seq);
-		
-	}
 
 	@RequestMapping(value = "/free/delete/{seq}", method = RequestMethod.GET)
 	public String deleteFree(@PathVariable int seq, Model model,

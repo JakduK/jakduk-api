@@ -1,5 +1,22 @@
 
-Version 0.6.0
+Version 0.6.1
+
+// JakduK 계정의 providerId 추가
+db.boardFree.update({'writer.type':{$in:['JAKDUK', 'jakduk']}}, {$set:{'writer.providerId':'JAKDUK'}}, {multi:true})
+db.boardFreeComment.update({'writer.type':{$in:['JAKDUK', 'jakduk']}}, {$set:{'writer.providerId':'JAKDUK'}}, {multi:true})
+db.gallery.update({'writer.type':{$in:['JAKDUK', 'jakduk']}}, {$set:{'writer.providerId':'JAKDUK'}}, {multi:true})
+
+// Daum 계정의 providerId 추가
+db.boardFree.update({'writer.type':{$in:['DAUM', 'daum']}}, {$set:{'writer.providerId':'DAUM'}}, {multi:true})
+db.boardFreeComment.update({'writer.type':{$in:['DAUM', 'daum']}}, {$set:{'writer.providerId':'DAUM'}}, {multi:true})
+db.gallery.update({'writer.type':{$in:['DAUM', 'daum']}}, {$set:{'writer.providerId':'DAUM'}}, {multi:true})
+
+// Facebook 계정의 providerId 추가
+db.boardFree.update({'writer.type':{$in:['FACEBOOK', 'facebook']}}, {$set:{'writer.providerId':'FACEBOOK'}}, {multi:true})
+db.boardFreeComment.update({'writer.type':{$in:['FACEBOOK', 'facebook']}}, {$set:{'writer.providerId':'FACEBOOK'}}, {multi:true})
+db.gallery.update({'writer.type':{$in:['FACEBOOK', 'facebook']}}, {$set:{'writer.providerId':'FACEBOOK'}}, {multi:true})
+
+Version 0.6.0 / 2016-05-01
 
 // JakduK 계정으로 가입한 회원 정보에 providerId : JAKDUK를 추가한다.
 db.user.update({'oauthUser' : {$exists: false}, 'providerId' : {$exists: false}}, {$set:{'providerId':'JAKDUK'}}, {multi:true})

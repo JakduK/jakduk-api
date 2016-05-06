@@ -338,7 +338,7 @@
 						<h4 class="text-primary"><spring:message code="board.comment.leave.comment"/></h4>
 						<div class="margin-bottom-10">
 							<summernote config="options" on-keyUp="focus(evt)"
-								ng-model="summernote.content" ng-init="summernote={content:'', seq:'${post.seq}'}"></summernote>
+								ng-model="summernote.contents" ng-init="summernote={contents:'', seq:'${post.seq}'}"></summernote>
 							<span class="{{summernoteAlert.classType}}" ng-show="summernoteAlert.msg" ng-bind="summernoteAlert.msg"></span>
 						</div>
 
@@ -359,7 +359,7 @@
 									</button>
 								</c:when>
 							</c:choose>
-							<span class="ng-cloak">{{summernote.content.length}} / {{boardCommentContentLengthMax}}</span>
+							<span class="ng-cloak">{{summernote.contents.length}} / {{boardCommentContentLengthMax}}</span>
 						</div>
 						<div>
 							<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg" ng-bind="writeCommentAlert.msg"></span>
@@ -481,6 +481,7 @@
 					return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
 				};
 
+				// 글 감정 표현.
 				$scope.btnFeeling = function (type) {
 					if ("${authRole}" == "ANNONYMOUS") {
 						$scope.alert.msg = '<spring:message code="board.msg.need.login.for.feel"/>';
@@ -494,63 +495,49 @@
 						return;
 					}
 
-					var bUrl = '<c:url value="/board/free/${post.seq}/' + type + '.json"/>';
+					var bUrl = '<c:url value="/api/board/free/${post.seq}/' + type + '"/>';
 
 					if ($scope.likeConn == "none" && $scope.dislikeConn == "none") {
 
-						var reqPromise = $http.get(bUrl);
+						var reqPromise = $http.post(bUrl);
 
-						if (type == "like") {
+						if (type == "LIKE") {
 							$scope.likeConn = "connecting";
 							$scope.btnLike = true;
-						} else if (type == "dislike") {
+						} else if (type == "DISLIKE") {
 							$scope.dislikeConn = "connecting";
 							$scope.btnDislike = true;
 						}
 
 						reqPromise.success(function (data, status, headers, config) {
+							$scope.numberOfLike = data.numberOfLike;
+							$scope.numberOfDislike = data.numberOfDislike;
+
 							var message = "";
-							var link = "";
-							var mType = "";
 
-							if (data.errorCode == "like") {
+							if (data.feeling == 'LIKE') {
 								message = '<spring:message code="board.msg.select.like"/>';
-								mType = "alert-success";
-								$scope.numberOfLike = data.numberOfLike;
-							} else if (data.errorCode == "dislike") {
-								message = "<spring:message code='board.msg.select.dislike'/>";
-								mType = "alert-success";
-								$scope.numberOfDislike = data.numberOfDislike;
-							} else if (data.errorCode == "already") {
-								message = '<spring:message code="board.msg.select.already.like"/>';
-								mType = "alert-warning";
-							} else if (data.errorCode == "anonymous") {
-								message = '<spring:message code="board.msg.need.login.for.feel"/>';
-								mType = "alert-warning";
-							} else if (data.errorCode == "writer") {
-								message = "<spring:message code='board.msg.you.are.writer'/>";
-								mType = "alert-warning";
-							}
 
-							$scope.alert.msg = message;
-							$scope.alert.classType = mType;
-
-							if (type == "like") {
 								$scope.likeConn = "success";
 								$scope.btnLike = false;
-							} else if (type == "dislike") {
+							} else if (data.feeling == 'DISLIKE') {
+								message = "<spring:message code='board.msg.select.dislike'/>";
+
 								$scope.dislikeConn = "success";
 								$scope.btnDislike = false;
 							}
+
+							$scope.alert.msg = message;
+							$scope.alert.classType = "alert-success";
 						});
 						reqPromise.error(function (data, status, headers, config) {
-							$scope.alert.msg = '<spring:message code="common.msg.error.network.unstable"/>';
+							$scope.alert.msg = data.message;
 							$scope.alert.classType = "alert-danger";
 
-							if (type == "like") {
+							if (type == "LIKE") {
 								$scope.likeConn = "none";
 								$scope.btnLike = false;
-							} else if (type == "dislike") {
+							} else if (type == "DISLIKE") {
 								$scope.dislikeConn = "none";
 								$scope.btnDislike = false;
 							}
@@ -627,21 +614,6 @@
 					};
 				}
 
-				// http config
-				var headers = {
-					"Content-Type": "application/x-www-form-urlencoded"
-				};
-
-				var config = {
-					headers: headers,
-					transformRequest: function (obj) {
-						var str = [];
-						for (var p in obj)
-							str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-						return str.join("&");
-					}
-				};
-
 				$scope.objectIdFromDate = function (date) {
 					return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
 				};
@@ -654,11 +626,12 @@
 					return parseInt(objectId.substring(0, 8), 16) * 1000;
 				};
 
+				// 댓글 달기
 				$scope.btnWriteComment = function (status) {
-					var bUrl = '<c:url value="/board/free/comment/write"/>';
+					var bUrl = '<c:url value="/api/board/free/comment"/>';
 
-					if ($scope.summernote.content.length < Jakduk.BoardCommentContentLengthMin
-						|| $scope.summernote.content.length > Jakduk.BoardCommentContentLengthMax) {
+					if ($scope.summernote.contents.length < Jakduk.BoardCommentContentLengthMin
+						|| $scope.summernote.contents.length > Jakduk.BoardCommentContentLengthMax) {
 						$scope.summernoteAlert = {
 							"classType": "text-danger",
 							"msg": '<spring:message code="Size.board.comment.content"/>'
@@ -667,15 +640,14 @@
 					}
 
 					if ($scope.writeCommentConn == "none") {
-						var reqPromise = $http.post(bUrl, $scope.summernote, config);
+						var reqPromise = $http.post(bUrl, $scope.summernote);
 						$scope.writeCommentConn = "connecting";
-						//$scope.writeCommentAlert = {"classType":"text-info", "msg":'<spring:message code="common.msg.be.cummunicating.server"/>'};
 						$scope.writeComment = true;
 
 						reqPromise.success(function (data, status, headers, config) {
 							$scope.btnMoreComment();
 
-							$scope.summernote.content = "";
+							$scope.summernote.contents = "";
 							$scope.commentAlert = {};
 							$scope.summernoteAlert = {};
 							$scope.writeCommentAlert = {};
@@ -683,23 +655,22 @@
 							$scope.writeComment = false;
 						});
 						reqPromise.error(function (data, status, headers, config) {
-							$scope.writeCommentAlert = {
-								"classType": "text-danger",
-								"msg": '<spring:message code="common.msg.error.network.unstable"/>'
-							};
+							$scope.writeCommentAlert = {"classType":"text-danger", "msg":data.message};
 							$scope.writeCommentConn = "none";
 							$scope.writeComment = false;
 						});
 					}
 				};
 
+				// infinite 초기 설정
 				$scope.initComment = function () {
 					$scope.loadComments("init", "");
 					$scope.infiniteDisabled = true;
 				};
 
+				// 댓글 목록 가져오기.
 				$scope.loadComments = function (type, commentId) {
-					var bUrl = '<c:url value="/board/free/comment/${post.seq}?commentId=' + commentId + '"/>';
+					var bUrl = '<c:url value="/api/board/free/comments/${post.seq}?commentId=' + commentId + '"/>';
 
 					if ($scope.loadCommentConn == "none") {
 						var reqPromise = $http.get(bUrl);

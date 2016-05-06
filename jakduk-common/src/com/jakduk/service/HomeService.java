@@ -1,16 +1,16 @@
 package com.jakduk.service;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-import javax.servlet.http.HttpServletResponse;
-
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.repository.*;
-
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.simple.*;
+import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
+import com.jakduk.repository.BoardFreeOnHomeRepository;
+import com.jakduk.repository.EncyclopediaRepository;
+import com.sun.syndication.feed.synd.*;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedOutput;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -21,24 +21,12 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.Encyclopedia;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.simple.BoardFreeCommentOnHome;
-import com.jakduk.model.simple.BoardFreeOnHome;
-import com.jakduk.model.simple.BoardFreeOnRSS;
-import com.jakduk.model.simple.GalleryOnList;
-import com.jakduk.model.simple.UserOnHome;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedOutput;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>

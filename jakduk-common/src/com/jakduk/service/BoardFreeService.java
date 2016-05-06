@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
-import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.exception.UserFeelingException;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
@@ -84,6 +83,14 @@ public class BoardFreeService {
 	
 	@Autowired
 	private SearchService searchService;
+
+	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
+		return boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
+	}
+
+	public Integer countCommentsByBoardItem(BoardItem boardItem) {
+		return boardFreeCommentRepository.countByBoardItem(boardItem);
+	}
 
 	/**
 	 * 자유게시판 글쓰기 페이지
@@ -180,7 +187,7 @@ public class BoardFreeService {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 		String username = principal.getUsername();
-		CommonConst.ACCOUNT_TYPE type = principal.getProviderId();
+		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
@@ -188,10 +195,8 @@ public class BoardFreeService {
 		
 		BoardFree boardFree = new BoardFree();
 
-		CommonWriter writer = new CommonWriter();
-		writer.setUserId(accountId);
-		writer.setUsername(username);
-		writer.setType(type.name());
+		CommonWriter writer = new CommonWriter(accountId, username, accountType);
+
 		boardFree.setWriter(writer);
 		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
 		
@@ -255,10 +260,8 @@ public class BoardFreeService {
 		
 		// 글과 연동 된 사진 처리
 		if (jsonArray != null) {
-			BoardItem boardItem = new BoardItem();
-			boardItem.setId(boardFree.getId());
-			boardItem.setSeq(boardFree.getSeq());
-			
+			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+
 			for (int i = 0 ; i < jsonArray.size() ; i++) {
 				JSONObject obj = (JSONObject)jsonArray.get(i);
 				String id = (String) obj.get("uid");
@@ -344,17 +347,14 @@ public class BoardFreeService {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 		String username = principal.getUsername();
-		CommonConst.ACCOUNT_TYPE type = principal.getProviderId();
+		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 
-		CommonWriter writer = new CommonWriter();
-		writer.setUserId(accountId);
-		writer.setUsername(username);
-		writer.setType(type.name());
-		
+		CommonWriter writer = new CommonWriter(accountId, username, accountType);
+
 		BoardFree boardFree = boardFreeRepository.findOne(boardFreeWrite.getId());
 		
 		if (boardFree == null) {
@@ -428,10 +428,8 @@ public class BoardFreeService {
 
 		// 글과 연동 된 사진 처리
 		if (jsonArray != null) {
-			BoardItem boardItem = new BoardItem();
-			boardItem.setId(boardFree.getId());
-			boardItem.setSeq(boardFree.getSeq());
-			
+			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+
 			for (int i = 0 ; i < jsonArray.size() ; i++) {
 				JSONObject obj = (JSONObject)jsonArray.get(i);
 				String id = (String) obj.get("uid");
@@ -695,154 +693,102 @@ public class BoardFreeService {
 		
 		return HttpServletResponse.SC_OK;
 	}
-	
-	/**
-	 * 게시물 좋아요 싫어요
-	 * @param model
-	 * @param seq
-	 * @param feeling
-	 * @return
-	 */
-	public Model setUsersFeelings(Model model, int seq, CommonConst.FEELING_TYPE feeling) {
-		
-		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
+	// 글 감정 표현.
+	public BoardFree setFreeFeelings(Locale locale, Integer seq, CommonConst.FEELING_TYPE feeling) {
 		CommonPrincipal principal = userService.getCommonPrincipal();
-		String userid = principal.getId();
+		String userId = principal.getId();
 		String username = principal.getUsername();
-		
+
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
 		CommonWriter writer = boardFree.getWriter();
 
 		List<CommonFeelingUser> usersLiking = boardFree.getUsersLiking();
 		List<CommonFeelingUser> usersDisliking = boardFree.getUsersDisliking();
 
-		if (usersLiking == null) {
-			usersLiking = new ArrayList<CommonFeelingUser>(); 
-		}
-		
-		if (usersDisliking == null) {
-			usersDisliking = new ArrayList<CommonFeelingUser>(); 
-		}
-		
-		if (userid != null && username != null) {
-			if (writer != null && userid.equals(writer.getUserId())) {
-				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
-			}
+		if (Objects.isNull(usersLiking)) usersLiking = new ArrayList<>();
+		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (CommonFeelingUser boardUser : usersLiking) {
-					if (boardUser != null && userid.equals(boardUser.getUserId())) {
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
-						break;
-					}
-				}
-			}
-			
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				for (CommonFeelingUser boardUser : usersDisliking) {
-					if (boardUser != null && userid.equals(boardUser.getUserId())) {
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
-						break;
-					}
-				}
-			}
-
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				CommonFeelingUser boardUser = new CommonFeelingUser();
-				boardUser.setUserId(userid);
-				boardUser.setUsername(username);
-				boardUser.setId(new ObjectId().toString());
-
-				switch (feeling) {
-					case LIKE:
-						usersLiking.add(boardUser);
-						boardFree.setUsersLiking(usersLiking);
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE;
-						break;
-					case DISLIKE:
-						usersDisliking.add(boardUser);
-						boardFree.setUsersDisliking(usersDisliking);
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
-						break;
-					default:
-						break;
-				}
-				
-				boardFreeRepository.save(boardFree);
-			}
-		} else {
-			errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ANONYMOUS;
+		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
+		if (userId.equals(writer.getUserId())) {
+			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
+					, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.you.are.writer"));
 		}
-		
-		model.addAttribute("errorCode", errCode);
-		model.addAttribute("numberOfLike", usersLiking.size());
-		model.addAttribute("numberOfDislike", usersDisliking.size());
-		
-		return model;
+
+		// 해당 회원이 좋아요를 이미 했는지 검사
+		for (CommonFeelingUser feelingUser : usersLiking) {
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
+				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+			}
+		}
+
+		// 해당 회원이 싫어요를 이미 했는지 검사
+		for (CommonFeelingUser feelingUser : usersDisliking) {
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
+				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+			}
+		}
+
+		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
+
+		switch (feeling) {
+			case LIKE:
+				usersLiking.add(feelingUser);
+				boardFree.setUsersLiking(usersLiking);
+				break;
+			case DISLIKE:
+				usersDisliking.add(feelingUser);
+				boardFree.setUsersDisliking(usersDisliking);
+				break;
+		}
+
+		boardFreeRepository.save(boardFree);
+
+		return boardFree;
 	}
-	
-	public void freeCommentWrite(HttpServletRequest request, Integer seq, String content) {
+
+	// 게시판 댓글 추가.
+	public BoardFreeComment addFreeComment(Integer seq, String contents, String device) {
 		BoardFreeComment boardFreeComment = new BoardFreeComment();
-		
-		if (!commonService.isAnonymousUser()) {
-			BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
-			
-			BoardItem boardItem = new BoardItem();
-			boardItem.setId(boardFreeOnComment.getId());
-			boardItem.setSeq(boardFreeOnComment.getSeq());
-			
-			boardFreeComment.setBoardItem(boardItem);
-			
-			CommonPrincipal principal = userService.getCommonPrincipal();
-			CommonWriter writer = new CommonWriter();
-			writer.setUserId(principal.getId());
-			writer.setUsername(principal.getUsername());
-			writer.setType(principal.getProviderId().name());
-			boardFreeComment.setWriter(writer);
-			
-			boardFreeComment.setContent(content);
-			
-			BoardCommentStatus status = new BoardCommentStatus();
-			Device device = DeviceUtils.getCurrentDevice(request);
-			
-			if (device.isNormal()) {
-				status.setDevice(CommonConst.DEVICE_TYPE_NORMAL);
-			} else if (device.isMobile()) {
-				status.setDevice(CommonConst.DEVICE_TYPE_MOBILE);
-			} else if (device.isTablet()) {
-				status.setDevice(CommonConst.DEVICE_TYPE_TABLET);
-			}
-			
-			boardFreeComment.setStatus(status);
-			
-			boardFreeCommentRepository.save(boardFreeComment);
-			
-			// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-			CommentOnES commentOnES = new CommentOnES();
-			commentOnES.setId(boardFreeComment.getId());
-			commentOnES.setWriter(boardFreeComment.getWriter());
-			commentOnES.setBoardItem(boardFreeComment.getBoardItem());
-			
-			commentOnES.setContent(boardFreeComment.getContent()					
-					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-					.replaceAll("\r|\n|&nbsp;",""));
-			
-			searchService.createDocumentComment(commentOnES);
-		} else {
-			if (log.isDebugEnabled()) {
-				log.debug("You can't write comment and need to login.");
-			}
-		}
+
+		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
+
+		BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
+		boardFreeComment.setBoardItem(boardItem);
+
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+		boardFreeComment.setWriter(writer);
+		boardFreeComment.setContent(contents);
+
+		BoardCommentStatus status = new BoardCommentStatus();
+		status.setDevice(device);
+		boardFreeComment.setStatus(status);
+
+		boardFreeCommentRepository.save(boardFreeComment);
+
+		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
+		CommentOnES commentOnES = new CommentOnES();
+		commentOnES.setId(boardFreeComment.getId());
+		commentOnES.setWriter(boardFreeComment.getWriter());
+		commentOnES.setBoardItem(boardFreeComment.getBoardItem());
+
+		commentOnES.setContent(boardFreeComment.getContent()
+				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+				.replaceAll("\r|\n|&nbsp;",""));
+
+		searchService.createDocumentComment(commentOnES);
+
+		return boardFreeComment;
 	}
-	
-	public void getFreeComment(Model model, int seq, String commentId) {
-		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
-		
-		BoardItem boardItem = new BoardItem();
-		boardItem.setId(boardFreeOnComment.getId());
-		boardItem.setSeq(boardFreeOnComment.getSeq());
-		
+
+	// 게시판 댓글 목록
+	public List<BoardFreeComment> getFreeComments(Integer seq, String commentId) {
+		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
+
 		List<BoardFreeComment> comments;
 		
 		if (commentId != null && !commentId.isEmpty()) {
@@ -850,20 +796,15 @@ public class BoardFreeService {
 		} else {
 			comments  = boardDAO.getBoardFreeComment(seq, null);
 		}
-		
-		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
-		
-		model.addAttribute("comments", comments);
-		model.addAttribute("count", count);		
+
+		return comments;
 	}
 	
 	public void getFreeCommentCount(Model model, int seq) {
-		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.boardFreeOnCommentFindBySeq(seq);
+		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
 		
-		BoardItem boardItem = new BoardItem();
-		boardItem.setId(boardFreeOnComment.getId());
-		boardItem.setSeq(boardFreeOnComment.getSeq());
-		
+		BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
+
 		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 		
 		model.addAttribute("count", count);
@@ -882,10 +823,6 @@ public class BoardFreeService {
 		String userId = principal.getId();
 		String username = principal.getUsername();
 
-		// 인증되지 않은 회원
-		if (Objects.isNull(userId))
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-		
 		BoardFreeComment boardComment = boardFreeCommentRepository.findById(commentId);
 		CommonWriter writer = boardComment.getWriter();
 
@@ -917,10 +854,7 @@ public class BoardFreeService {
 			}
 		}
 
-		CommonFeelingUser feelingUser = new CommonFeelingUser();
-		feelingUser.setUserId(userId);
-		feelingUser.setUsername(username);
-		feelingUser.setId(new ObjectId().toString());
+		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
 
 		switch (feeling) {
 			case LIKE:
@@ -945,10 +879,7 @@ public class BoardFreeService {
 		String accountUsername = principal.getUsername();
 		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
 
-		CommonWriter writer = new CommonWriter();
-		writer.setUserId(accountId);
-		writer.setUsername(accountUsername);
-		writer.setType(accountType.name());
+		CommonWriter writer = new CommonWriter(accountId, accountUsername, accountType);
 		
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
@@ -964,10 +895,8 @@ public class BoardFreeService {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
-		BoardItem boardItem = new BoardItem();
-		boardItem.setId(boardFree.getId());
-		boardItem.setSeq(boardFree.getSeq());
-		
+		BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+
 		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 		
 		if (type.equals(CommonConst.BOARD_DELETE_TYPE_POSTONLY) && count < 1) {
@@ -1050,11 +979,8 @@ public class BoardFreeService {
 		String accountUsername = principal.getUsername();
 		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
 
-		CommonWriter writer = new CommonWriter();
-		writer.setUserId(accountId);
-		writer.setUsername(accountUsername);
-		writer.setType(accountType.name());
-		
+		CommonWriter writer = new CommonWriter(accountId, accountUsername, accountType);
+
 		if (accountId == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}

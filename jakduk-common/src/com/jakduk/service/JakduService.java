@@ -128,10 +128,7 @@ public class JakduService {
         if (accountId == null)
             return result;
 
-        CommonWriter writer = new CommonWriter();
-        writer.setUserId(accountId);
-        writer.setUsername(accountUsername);
-        writer.setType(accountType.name());
+        CommonWriter writer = new CommonWriter(accountId, accountUsername, accountType);
 
         String language = commonService.getLanguageCode(locale, null);
 
@@ -197,7 +194,7 @@ public class JakduService {
         if (Objects.isNull(accountId))
             throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
-        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId().name());
+        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId());
 
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
 
@@ -236,7 +233,7 @@ public class JakduService {
         if (Objects.isNull(accountId))
             throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
-        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId().name());
+        CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId());
 
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(request.getId());
 
@@ -343,10 +340,7 @@ public class JakduService {
             }
         }
 
-        CommonFeelingUser feelingUser = new CommonFeelingUser();
-        feelingUser.setUserId(userId);
-        feelingUser.setUsername(username);
-        feelingUser.setId(new ObjectId().toString());
+        CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
 
         switch (feeling) {
             case LIKE:

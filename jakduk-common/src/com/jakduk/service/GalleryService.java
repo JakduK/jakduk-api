@@ -1,7 +1,30 @@
 package com.jakduk.service;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.simple.BoardFreeOnGallery;
+import com.jakduk.model.simple.GalleryOnList;
+import com.jakduk.repository.GalleryRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,34 +39,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Stream;
-
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.exception.UnauthorizedAccessException;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.embedded.CommonFeelingUser;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.GalleryStatus;
-import com.jakduk.model.simple.BoardFreeOnGallery;
-import com.jakduk.model.simple.GalleryOnList;
-import com.jakduk.repository.GalleryRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -97,12 +94,10 @@ public class GalleryService {
 			CommonPrincipal principal = userService.getCommonPrincipal();
 			String userid = principal.getId();
 			String username = principal.getUsername();
-			CommonConst.ACCOUNT_TYPE type = principal.getProviderId();
+			CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
 
-			CommonWriter writer = new CommonWriter();
-			writer.setUserId(userid);
-			writer.setUsername(username);
-			writer.setType(type.name());
+			CommonWriter writer = new CommonWriter(userid, username, accountType);
+
 			gallery.setWriter(writer);
 
 			GalleryStatus status = new GalleryStatus();
@@ -443,10 +438,7 @@ public class GalleryService {
 			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				CommonFeelingUser feelingUser = new CommonFeelingUser();
-				feelingUser.setUserId(accountId);
-				feelingUser.setUsername(accountName);
-				feelingUser.setId(new ObjectId().toString());
+				CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), accountId, accountName);
 
 				switch (feeling) {
 					case LIKE:

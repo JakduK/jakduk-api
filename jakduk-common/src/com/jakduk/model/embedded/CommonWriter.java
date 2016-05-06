@@ -20,5 +20,5 @@ public class CommonWriter {
 	
 	private String userId;
 	private String username;
-	private String type;
+	private CommonConst.ACCOUNT_TYPE providerId;
 }

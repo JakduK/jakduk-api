@@ -1,7 +1,36 @@
 package com.jakduk.service;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.*;
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
+import com.jakduk.model.embedded.JakduScheduleScore;
+import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.web.*;
+import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.repository.*;
+import com.jakduk.repository.jakdu.JakduScheduleGroupRepository;
+import com.jakduk.repository.jakdu.JakduScheduleRepository;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Bulk;
+import io.searchbox.core.Index;
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.mapping.PutMapping;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -17,40 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
-import javax.imageio.ImageIO;
-
-import com.jakduk.model.db.*;
-import com.jakduk.model.embedded.JakduScheduleScore;
-import com.jakduk.model.embedded.LocalName;
-import com.jakduk.model.web.*;
-import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.repository.*;
-import com.jakduk.repository.jakdu.JakduScheduleGroupRepository;
-import com.jakduk.repository.jakdu.JakduScheduleRepository;
-
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.model.elasticsearch.CommentOnES;
-import com.jakduk.model.elasticsearch.GalleryOnES;
-
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.Index;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.mapping.PutMapping;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>

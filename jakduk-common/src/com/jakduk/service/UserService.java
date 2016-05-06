@@ -15,7 +15,6 @@ import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.user.UserPasswordUpdate;
 import com.jakduk.model.web.user.UserProfileForm;
-import com.jakduk.model.web.user.UserWrite;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
@@ -30,11 +29,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.*;
 
