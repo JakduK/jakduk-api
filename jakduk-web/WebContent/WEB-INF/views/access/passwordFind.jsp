@@ -42,7 +42,7 @@
                                 <span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span>
 
                                 <input type="email" class="form-control" name="email" placeholder='<spring:message code="user.placeholder.email"/>'
-                                       ng-model="email" ng-change="validationEmail()"
+                                       ng-model="email" ng-keyup="validationEmail()"
                                        ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
 
                                 <span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':resetForm.email.$valid, 'glyphicon-remove':resetForm.email.$invalid}"></span>
