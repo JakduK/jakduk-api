@@ -52,39 +52,6 @@ public class HomeController {
 		return "home/home";
 	}
 
-	@RequestMapping(value = "/home/board/latest", method = RequestMethod.GET)
-	public String boardLatest(Model model) {
-		
-		homeService.getBoardLatest(model);
-		
-		return "home/board/latest";
-	}
-	
-	@RequestMapping(value = "/home/user/latest", method = RequestMethod.GET)
-	public String userLatest(Model model, HttpServletRequest request) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, null);
-		
-		homeService.getUserLatest(model, language);
-		
-		return "home/user/latest";
-	}
-	
-	@RequestMapping(value = "/home/data/latest", method = RequestMethod.GET)
-	public void dataLatest(Model model, HttpServletRequest request,
-			@RequestParam(required = false) String lang) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-
-		homeService.getBoardLatest(model);
-		homeService.getUserLatest(model, language);
-		homeService.getGalleryLatest(model);
-		homeService.getBoardCommentLatest(model);
-		homeService.getHomeDescription(model);
-	}
-	
 	@RequestMapping(value = "/error/{code}", method = RequestMethod.GET)
 	public String error(Model model, @PathVariable String code) {
 		

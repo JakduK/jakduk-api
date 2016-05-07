@@ -4,7 +4,7 @@
 
   <groupId>com.jakduk</groupId>
   <artifactId>jakduk-parent</artifactId>
-  <version>0.6.0-SNAPSHOT</version>
+  <version>0.6.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>jakduk</name>
   <url>https://jakduk.com</url>
@@ -36,6 +36,8 @@
 	  <!-- Elasticsearch -->
 	  <elasticsearch.version>1.7.2</elasticsearch.version>
 	  <io.searchbox.version>1.0.0</io.searchbox.version>
+
+	  <spring.social.facebook.version>2.0.3.RELEASE</spring.social.facebook.version>
 
   </properties>
 	  
@@ -300,7 +302,7 @@
 	  <dependency>
 		  <groupId>org.springframework.social</groupId>
 		  <artifactId>spring-social-facebook</artifactId>
-		  <version>2.0.3.RELEASE</version>
+		  <version>${spring.social.facebook.version}</version>
 	  </dependency>
 
 	  <dependency>

@@ -1,5 +1,7 @@
 package com.jakduk.vo;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.jakduk.common.CommonConst;
 import lombok.Data;
 
@@ -8,6 +10,8 @@ import lombok.Data;
  */
 
 @Data
+@JsonTypeName(value = "response")
+@JsonTypeInfo(use=JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
 public class UserFeelingResponse {
     private CommonConst.FEELING_TYPE feeling;
     private Integer numberOfLike;

@@ -84,35 +84,26 @@ public class HomeService {
 		return encyclopedia;
 
 	}
-	
-	public Model getBoardLatest(Model model) {
+
+	// 최근 글 가져오기.
+	public List<BoardFreeOnHome> getBoardLatest() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
 		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_POST, sort);
 		
 		List<BoardFreeOnHome> posts = boardFreeOnHomeRepository.findAll(pageable).getContent();
-		
-		model.addAttribute("posts", posts);
 
-		return model;
+		return posts;
 	}
-	
-	public Model getUserLatest(Model model, String language) {
-		
-		List<UserOnHome> posts = jakdukDAO.getUserOnHome(language);
-		
-		model.addAttribute("users", posts);
-		
-		return model;
+
+	// 최근 가입 회원 가져오기.
+	public List<UserOnHome> getUsersLatest(String language) {
+		return jakdukDAO.getUserOnHome(language);
 	}
-	
-	public Model getGalleryLatest(Model model) {
-		
-		List<GalleryOnList> galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
-		
-		model.addAttribute("galleries", galleries);
-		
-		return model;
+
+	// 최근 그림 목록 가져오기.
+	public List<GalleryOnList> getGalleriesLatest() {
+		return jakdukDAO.getGalleryList(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
 	}
 	
 	public Integer getRss(HttpServletResponse response, Locale locale, MessageSource messageSource) {
@@ -180,8 +171,9 @@ public class HomeService {
 		
 		return HttpServletResponse.SC_OK;
 	}		
-	
-	public Model getBoardCommentLatest(Model model) {
+
+	// 최근 댓글 가져오기.
+	public List<BoardFreeCommentOnHome> getBoardCommentsLatest() {
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
@@ -189,31 +181,34 @@ public class HomeService {
 		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
 		
 		for (BoardFreeCommentOnHome comment : comments) {
-			String content = comment.getContent().replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
-			Integer contentLength = content.length() + comment.getWriter().getUsername().length();
-			
-			if (contentLength > CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
-				content = content.substring(0, CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
-				content = String.format("%s...", content);
+			String content = comment.getContent();
+
+			if (Objects.nonNull(content)) {
+				content = content.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","").replaceAll("\r|\n|&nbsp;","");
+
+				Integer contentLength = content.length() + comment.getWriter().getUsername().length();
+
+				if (contentLength > CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+					content = content.substring(0, CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
+					content = String.format("%s...", content);
+				}
+				comment.setContent(content);
 			}
-			comment.setContent(content);
 		}
-		
-		model.addAttribute("comments", comments);
-		
-		return model;
+
+		return comments;
 	}
-	
-	public Model getHomeDescription(Model model) {
+
+	// 알림판 가져오기.
+	public HomeDescription getHomeDescription() {
 		
 		HomeDescription homeDescription = jakdukDAO.getHomeDescription();
 
-		if (homeDescription == null)
-			model.addAttribute("homeDescription", new HashMap());
-		else
-			model.addAttribute("homeDescription", homeDescription);
-		
-		return model;
+		if (Objects.nonNull(homeDescription)) {
+			return homeDescription;
+		} else {
+			return new HomeDescription();
+		}
 	}
 	
 }

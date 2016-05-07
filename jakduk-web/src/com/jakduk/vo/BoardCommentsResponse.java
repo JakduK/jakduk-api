@@ -12,9 +12,9 @@ import java.util.List;
  * Created by pyohwan on 16. 3. 23.
  */
 
+@Data
 @JsonTypeName(value = "response")
 @JsonTypeInfo(use=JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
-@Data
 public class BoardCommentsResponse {
     private List<BoardFreeComment> comments;
     private Integer count;

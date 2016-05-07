@@ -264,7 +264,7 @@
 					}
 
 					function getDataLatest() {
-						var bUrl = '<c:url value="/home/data/latest.json" />';
+						var bUrl = '<c:url value="/api/home/latest" />';
 
 						if ($scope.dataLatestConn == "none") {
 

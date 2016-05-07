@@ -11,6 +11,7 @@ import com.jakduk.repository.BoardFreeOnHomeRepository;
 import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
+import com.jakduk.service.HomeService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class HomeTest {
 
 	@Autowired
 	private FootballService footballService;
+
+	@Autowired
+	private HomeService homeService;
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
@@ -68,18 +72,14 @@ public class HomeTest {
 		
 		List<UserOnHome> users = jakdukDAO.getUserOnHome("ko");
 		
-		//System.out.println("getUserLatest=" +users);
+		//System.out.println("getUsersLatest=" +users);
 	}
 	
 	@Test
 	public void getCommentLatest() {
-		
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
-		
-		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
-		
-		//System.out.println("getCommentLatest=" +comments);
+		List<BoardFreeCommentOnHome> comments = homeService.getBoardCommentsLatest();
+
+		System.out.println("getCommentLatest=" +comments);
 	}
 	
 	@Test
