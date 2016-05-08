@@ -248,8 +248,6 @@
 
 					$scope.getDataCommentsList(page, size);
 					$scope.getDataBestLike();
-
-					App.init();
 				});
 
 				$scope.getDataCommentsList = function (page, size) {
@@ -359,6 +357,10 @@
 					location.href = '<c:url value="/board/free/write"/>';
 				}
 			}
+
+			$(document).ready(function () {
+				App.init();
+			});
 		</script>
 
 	</body>

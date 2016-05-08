@@ -35,9 +35,9 @@
 							<input type="text" class="form-control" ng-model="searchWords" ng-init="searchWords=''"
 								ng-keypress="($event.which === 13)?btnEnter():return"
 								placeholder='<spring:message code="search.placeholder.words"/>'>
-	           <span class="input-group-btn">
-	               <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
-	           </span>
+						   <span class="input-group-btn">
+							   <button class="btn-u" type="button" ng-click="btnEnter();"><i class="fa fa-search"></i></button>
+						   </span>
 						</div>
 						<span class="text-danger" ng-show="enterAlert">{{enterAlert}}</span>
 					</div>
@@ -60,13 +60,25 @@
 					</div>
 				</div>
 
-				<div infinite-scroll="getGalleries()" infinite-scroll-disabled="infiniteDisabled">
+				<div infinite-scroll="infiniteScroll()" infinite-scroll-disabled="infiniteDisabled">
 				</div>
-			</div>
+
+				<div class="margin-bottom-10" ng-show="galleries.length > 0">
+					<button type="button" class="btn-u btn-brd rounded btn-block btn-u-dark"
+							ng-click="btnMoreGalleries()">
+						<spring:message code="common.button.more.galleries"/> <i class="fa fa-angle-down"></i>
+						<i class="fa fa-circle-o-notch fa-spin" ng-show="galleriesConn == 'connecting'"></i>
+					</button>
+				</div>
+
+				<div class="contex-bg" ng-show="moreAlert.msg">
+					<p class="{{moreAlert.classType}} rounded" ng-bind="moreAlert.msg"></p>
+				</div>
+			</div> <!-- container end -->
 
 			<jsp:include page="../include/footer.jsp"/>
 
-		</div><!-- /.container -->
+		</div><!-- /.wrapper -->
 
 		<script src="<%=request.getContextPath()%>/bundles/gallery.list.js"></script>
 		<script type="text/javascript">
@@ -128,45 +140,54 @@
 				$scope.usersDislikingCount = [];
 				$scope.infiniteDisabled = false;
 				$scope.enterAlert = "";
+				$scope.moreAlert = {};
 
 				angular.element(document).ready(function () {
-					if ($("body").height() <= $(window).height()) {
-						$scope.getGalleries();
-					}
-
-					App.init();
 				});
 
-				$scope.getGalleries = function () {
+				// infiniteScroll
+				$scope.infiniteScroll = function () {
+					$scope.getGalleries("init");
+					$scope.infiniteDisabled = true;
+				};
 
-					var bUrl;
-					if ($scope.galleries.length > 0) {
-						var lastGallery = $scope.galleries[$scope.galleries.length - 1].id;
-						bUrl = '<c:url value="/gallery/data/list.json?id=' + lastGallery + '&size=' + Jakduk.ItemsPerPageOnGallery + '"/>';
+				// 사진 가져오기.
+				$scope.getGalleries = function (type, galleryId) {
+
+					if (Jakduk.isEmpty(galleryId)) {
+						var bUrl = '<c:url value="/api/galleries?size=' + Jakduk.ItemsPerPageOnGallery + '"/>';
 					} else {
-						bUrl = '<c:url value="/gallery/data/list.json?size=' + Jakduk.ItemsPerPageOnGallery + '"/>';
+						var bUrl = '<c:url value="/api/galleries?id=' + galleryId + '&size=' + Jakduk.ItemsPerPageOnGallery + '"/>';
 					}
 
 					if ($scope.galleriesConn == "none") {
 
 						var reqPromise = $http.get(bUrl);
 
-						$scope.galleriesConn = "loading";
+						$scope.galleriesConn = "connecting";
 
 						reqPromise.success(function (data, status, headers, config) {
 
-							data.galleries.forEach(function (gallery) {
-								$scope.galleries.push(gallery);
-							});
+							if (data.galleries.length < 1) { // 댓글이 하나도 없을때
+								if (type == "init") {
+								} else {
+									$scope.moreAlert.msg = '<spring:message code="gallery.msg.there.are.no.new.galleries"/>';
+									$scope.moreAlert.classType = "bg-warning";
+								}
+							} else {
+								data.galleries.forEach(function (gallery) {
+									$scope.galleries.push(gallery);
+								});
 
-							for (var key in data.usersLikingCount) {
-								var value = data.usersLikingCount[key];
-								$scope.usersLikingCount[key] = value;
-							}
+								for (var key in data.usersLikingCount) {
+									var value = data.usersLikingCount[key];
+									$scope.usersLikingCount[key] = value;
+								}
 
-							for (var key in data.usersDislikingCount) {
-								var value = data.usersDislikingCount[key];
-								$scope.usersDislikingCount[key] = value;
+								for (var key in data.usersDislikingCount) {
+									var value = data.usersDislikingCount[key];
+									$scope.usersDislikingCount[key] = value;
+								}
 							}
 
 							$scope.galleriesConn = "none";
@@ -174,8 +195,19 @@
 						});
 						reqPromise.error(function (data, status, headers, config) {
 							$scope.galleriesConn = "none";
-							$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
+							console.error(data.message);
 						});
+					}
+				};
+
+				// 사진 더보기 단추.
+				$scope.btnMoreGalleries = function () {
+
+					if ($scope.galleries.length > 0) {
+						var lastGallery = $scope.galleries[$scope.galleries.length - 1].id;
+						$scope.getGalleries("more", lastGallery);
+					} else {
+						$scope.getGalleries("more");
 					}
 				};
 
@@ -219,6 +251,10 @@
 				$scope.openNewTab = function () {
 					$window.open(Lightbox.imageUrl);
 				};
+			});
+
+			$(document).ready(function () {
+				App.init();
 			});
 		</script>
 	</body>

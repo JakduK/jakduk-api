@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.jakduk.model.db.*;
 
@@ -68,16 +69,17 @@ public class JakdukDAO {
 
 		return footballClubs;
 	}
-	
-	public List<GalleryOnList> getGalleryList(Direction direction, Integer size, ObjectId commentId) {
+
+	// 사진 목록.
+	public List<GalleryOnList> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {
 		
 		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is("use"));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").lt(commentId));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").lt(galleryId));
 		AggregationOperation sort = Aggregation.sort(direction, "_id");
 		AggregationOperation limit = Aggregation.limit(size);
 		
 		Aggregation aggregation;
-		if (commentId != null) {
+		if (galleryId != null) {
 			aggregation = Aggregation.newAggregation(match1, match2, sort, limit);
 		} else {
 			aggregation = Aggregation.newAggregation(match1, sort, limit);
@@ -120,8 +122,9 @@ public class JakdukDAO {
 		
 		return gallery;
 	}
-	
-	public HashMap<String, Integer> getGalleryUsersLikingCount(List<ObjectId> arrId) {
+
+	// 사진의 좋아요 개수 가져오기.
+	public Map<String, Integer> findGalleryUsersLikingCount(List<ObjectId> arrId) {
 		
 		AggregationOperation unwind = Aggregation.unwind("usersLiking");
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
@@ -130,18 +133,16 @@ public class JakdukDAO {
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);
 		
-		List<CommonCount> boardCommentCount = results.getMappedResults();
+		List<CommonCount> likingCounts = results.getMappedResults();
 
-		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
-		
-		for (CommonCount item : boardCommentCount) {
-			commentCount.put(item.getId(), item.getCount());
-		}
-		
-		return commentCount;
-	}	
-	
-	public HashMap<String, Integer> getGalleryUsersDislikingCount(List<ObjectId> arrId) {
+		Map<String, Integer> countMap = likingCounts.stream()
+				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+
+		return countMap;
+	}
+
+	// 사진의 싫어요 개수 가져오기.
+	public Map<String, Integer> findGalleryUsersDislikingCount(List<ObjectId> arrId) {
 		
 		AggregationOperation unwind = Aggregation.unwind("usersDisliking");
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
@@ -150,15 +151,12 @@ public class JakdukDAO {
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);
 		
-		List<CommonCount> boardCommentCount = results.getMappedResults();
+		List<CommonCount> diskingCount = results.getMappedResults();
 
-		HashMap<String, Integer> commentCount = new HashMap<String, Integer>();
-		
-		for (CommonCount item : boardCommentCount) {
-			commentCount.put(item.getId(), item.getCount());
-		}
-		
-		return commentCount;
+		Map<String, Integer> countMap = diskingCount.stream()
+				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+
+		return countMap;
 	}		
 	
 	public List<SupporterCount> getSupportFCCount(String language) {

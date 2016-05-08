@@ -61,8 +61,8 @@
 						<input type="text" name="subject" class="form-control" placeholder='<spring:message code="board.placeholder.subject"/>'
 							ng-model="subject" ng-change="validationSubject()" ng-model-options="{ debounce: 400 }"
 							ng-required="true" ng-minlength="3" ng-maxlength="60"/>
-		<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFreeWrite.subject.$valid, 
-		'glyphicon-remove':boardFreeWrite.subject.$invalid}"></span>
+						<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':boardFreeWrite.subject.$valid,
+						'glyphicon-remove':boardFreeWrite.subject.$invalid}"></span>
 						<form:errors path="subject" cssClass="text-danger" element="span" ng-hide="subjectAlert.msg"/>
 						<span class="{{subjectAlert.classType}}" ng-show="subjectAlert.msg" ng-bind="subjectAlert.msg"></span>
 					</div>
@@ -95,12 +95,12 @@
 									</button>
 									<small>{{item.size/1024|number:1}} KB</small>
 								</h5>
-								<div class="form-group has-feedback" ng-class="{'has-success':item.name.length >= 2,
-			'has-warning':item.name.length < 2 || item.name == null}">
+								<div class="form-group has-feedback"
+									 ng-class="{'has-success':item.name.length >= 2, 'has-warning':item.name.length < 2 || item.name == null}">
 									<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
 										ng-model="item.name" ng-blur="onGalleryItem(item, 'stored')">
-				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':item.name.length >= 2, 
-				'glyphicon-warning-sign':item.name.length < 2 || item.name == null}"></span>
+									<span class="glyphicon form-control-feedback"
+										  ng-class="{'glyphicon-ok':item.name.length >= 2, 'glyphicon-warning-sign':item.name.length < 2 || item.name == null}"/>
 								</div>
 							</div>
 						</div>
@@ -124,8 +124,8 @@
 								<div class="form-group has-feedback" ng-class="{'has-success':item.newName.length >= 2, 'has-warning':item.newName.length < 2 || item.newName == null}">
 									<input type="text" class="form-control input-sm col-md-2 has-error" placeholder='<spring:message code="gallery.placeholder.name"/>'
 										ng-model="item.newName" ng-blur="onGalleryItem(item, 'queue')">
-				<span class="glyphicon form-control-feedback" ng-class="{'glyphicon-ok':item.newName.length >= 2, 
-				'glyphicon-warning-sign':item.newName.length < 2 || item.newName == null}"></span>
+									<span class="glyphicon form-control-feedback"
+										  ng-class="{'glyphicon-ok':item.newName.length >= 2,'glyphicon-warning-sign':item.newName.length < 2 || item.newName == null}"/>
 								</div>
 							</div>
 						</div>

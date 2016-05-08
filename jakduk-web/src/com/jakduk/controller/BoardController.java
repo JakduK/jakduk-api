@@ -1,27 +1,20 @@
 package com.jakduk.controller;
 
-import java.io.IOException;
-import java.util.Locale;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.LocaleResolver;
-
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.LocaleResolver;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/board")
@@ -61,8 +54,9 @@ public class BoardController {
 	}	
 	
 	@RequestMapping(value = "/free", method = RequestMethod.GET)
-	public String freeList(@ModelAttribute BoardListInfo boardListInfo, Model model
-			, HttpServletRequest request) {
+	public String freeList(@ModelAttribute BoardListInfo boardListInfo,
+						   HttpServletRequest request,
+						   Model model) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		boardFreeService.getFreePostsList(model, locale, boardListInfo);
@@ -71,8 +65,9 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/free/posts", method = RequestMethod.GET)
-	public String freePostsList(@ModelAttribute BoardListInfo boardListInfo, Model model
-			, HttpServletRequest request) {
+	public String freePostsList(@ModelAttribute BoardListInfo boardListInfo,
+								HttpServletRequest request,
+								Model model) {
 		
 		Locale locale = localeResolver.resolveLocale(request);
 		boardFreeService.getFreePostsList(model, locale, boardListInfo);

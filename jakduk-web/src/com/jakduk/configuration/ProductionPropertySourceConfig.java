@@ -12,7 +12,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @Profile("production")
-@PropertySource({"classpath:/config/jakduk.properties", "classpath:/config/profile-production.properties"})
+@PropertySource({"classpath:/config/jakduk.properties", "classpath:/config/application-production.properties"})
 public class ProductionPropertySourceConfig {
 
     @Bean

@@ -131,14 +131,12 @@
 
 					<c:choose>
 						<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
-							<button type="button" class="btn-u rounded" onclick="location.href='
-								<c:url value="/board/notice/set/${post.seq}"/>'">
+							<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
 								<spring:message code="common.button.set.as.notice"/>
 							</button>
 						</c:when>
 						<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-							<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='
-								<c:url value="/board/notice/cancel/${post.seq}"/>'">
+							<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
 								<spring:message code="common.button.cancel.notice"/>
 							</button>
 						</c:when>
@@ -279,9 +277,9 @@
 
 						<h2 class="heading-sm text-primary">
 							<i class="fa fa-comments"></i>
-					<span infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
-						<spring:message code="board.msg.comment.count" arguments="<span ng-bind=\"commentCount\"></span>"/>
-					</span>
+							<span infinite-scroll="initComment()" infinite-scroll-disabled="infiniteDisabled">
+								<spring:message code="board.msg.comment.count" arguments="<span ng-bind=\"commentCount\"></span>"/>
+							</span>
 							<button type="button" class="btn btn-link" ng-click="btnRefreshComment()"
 								tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.refresh.comments"/>'>
 								<i class="fa fa-refresh text-muted" ng-class="{'fa-spin':loadCommentConn == 'connecting'}"></i>
@@ -303,17 +301,17 @@
 
 								<button type="button" class="btn btn-xs rounded btn-dropbox" ng-click="btnCommentFeeling(comment.id, 'LIKE')"
 									tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.like"/>'>
-							<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
-								<i class="fa fa-thumbs-o-up fa-lg"></i>
-								<span ng-bind="numberOfCommentLike[comment.id]"></span>
-							</span>
+									<span ng-init="numberOfCommentLike[comment.id]=comment.usersLiking.length">
+										<i class="fa fa-thumbs-o-up fa-lg"></i>
+										<span ng-bind="numberOfCommentLike[comment.id]"></span>
+									</span>
 								</button>
 								<button type="button" class="btn btn-xs rounded btn-weibo" ng-click="btnCommentFeeling(comment.id, 'DISLIKE')"
 									tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="common.button.dislike"/>'>
-							<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
-								<i class="fa fa-thumbs-o-down fa-lg"></i>
-								<span ng-bind="numberOfCommentDislike[comment.id]"></span>
-							</span>
+									<span ng-init="numberOfCommentDislike[comment.id]=comment.usersDisliking.length">
+										<i class="fa fa-thumbs-o-down fa-lg"></i>
+										<span ng-bind="numberOfCommentDislike[comment.id]"></span>
+									</span>
 								</button>
 								<div class="text-danger" ng-show="commentFeelingConn[comment.id]" ng-bind="commentFeelingAlert[comment.id]"></div>
 								<hr class="padding-5">
@@ -322,7 +320,7 @@
 							<div class="margin-bottom-10" ng-show="commentCount || commentAlert.msg">
 								<button type="button" class="btn-u btn-brd rounded btn-block btn-u-dark"
 									ng-click="btnMoreComment()" ng-show="commentCount">
-									<spring:message code="common.button.load.comment"/> <i class="fa fa-angle-down"></i>
+									<spring:message code="common.button.more.comments"/> <i class="fa fa-angle-down"></i>
 									<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
 								</button>
 							</div>
@@ -411,14 +409,12 @@
 
 					<c:choose>
 						<c:when test="${authAdminRole == 'ROOT' && post.status.notice != 'notice' && post.status.delete != 'delete'}">
-							<button type="button" class="btn-u rounded" onclick="location.href='
-								<c:url value="/board/notice/set/${post.seq}"/>'">
+							<button type="button" class="btn-u rounded" onclick="location.href='<c:url value="/board/notice/set/${post.seq}"/>'">
 								<spring:message code="common.button.set.as.notice"/>
 							</button>
 						</c:when>
 						<c:when test="${authAdminRole == 'ROOT' && post.status.notice == 'notice' && post.status.delete != 'delete'}">
-							<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='
-								<c:url value="/board/notice/cancel/${post.seq}"/>'">
+							<button type="button" class="btn-u btn-u-default rounded" onclick="location.href='<c:url value="/board/notice/cancel/${post.seq}"/>'">
 								<spring:message code="common.button.cancel.notice"/>
 							</button>
 						</c:when>

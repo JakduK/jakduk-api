@@ -1,13 +1,17 @@
 package com.jakduk.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import com.jakduk.exception.SuccessButNoContentException;
+import com.jakduk.model.db.Gallery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -66,41 +70,54 @@ public class GalleryController {
 		
 		return "gallery/list";
 	}
-	
-	@RequestMapping(value = "/data/list", method = RequestMethod.GET)
-	public void dataList(Model model,
-			@RequestParam(required = false) String id,
-			@RequestParam(required = false, defaultValue = "0") int size) {
-		
-		galleryService.getDataList(model, id, size);
-		
-	}
-	
+
+	// 사진 가져오기.
 	@ResponseBody
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public void gallery(@PathVariable String id, 
-			HttpServletResponse response) throws IOException {
+	public void gallery(@PathVariable String id,
+						HttpServletRequest request,
+						HttpServletResponse response) {
 
-		Integer status = galleryService.getImage(response, id);
-		
-		if (!status.equals(HttpServletResponse.SC_OK)) {
-			log.error("image error response = " + status);
-			// after the response has been committed 에러가 자꾸 떠서 일단 주석.
-			//response.sendError(status);
+		Locale locale = localeResolver.resolveLocale(request);
+
+		Gallery gallery = galleryService.findById(id);
+
+		if (Objects.isNull(gallery))
+			throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+
+		try {
+			ByteArrayOutputStream byteStream = galleryService.getImage(locale, gallery, CommonConst.IMAGE_TYPE.FULL);
+
+			response.setContentType(gallery.getContentType());
+			byteStream.writeTo(response.getOutputStream());
+
+		} catch (IOException exception) {
+			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.io"));
 		}
 	}
-	
+
+	// 사진 썸네일 가져오기.
 	@ResponseBody
 	@RequestMapping(value = "/thumbnail/{id}", method = RequestMethod.GET)
 	public void thumbnail(@PathVariable String id,
-			HttpServletResponse response) throws IOException {
+						  HttpServletRequest request,
+						  HttpServletResponse response) {
 
-		Integer status = galleryService.getThumbnail(response, id);
-		
-		if (!status.equals(HttpServletResponse.SC_OK)) {
-			log.error("thumbnail error response = " + status);
-			// after the response has been committed 에러가 자꾸 떠서 일단 주석.
-			//response.sendError(status);
+		Locale locale = localeResolver.resolveLocale(request);
+
+		Gallery gallery = galleryService.findById(id);
+
+		if (Objects.isNull(gallery))
+			throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+
+		try {
+			ByteArrayOutputStream byteStream = galleryService.getImage(locale, gallery, CommonConst.IMAGE_TYPE.THUMBNAIL);
+
+			response.setContentType(gallery.getContentType());
+			byteStream.writeTo(response.getOutputStream());
+
+		} catch (IOException exception) {
+			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.io"));
 		}
 	}		
 

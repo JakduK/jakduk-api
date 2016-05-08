@@ -12,7 +12,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @Profile("local")
-@PropertySource({"classpath:/config/jakduk.properties", "classpath:/config/profile-local.properties"})
+@PropertySource({"classpath:/config/jakduk.properties", "classpath:/config/application-local.properties"})
 public class LocalPropertySourceConfig {
 
     @Bean

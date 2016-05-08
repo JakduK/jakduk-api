@@ -56,7 +56,7 @@ public class HomeService {
 	public Model getHome(Model model, Locale locale) {
 		
 		try {
-			//List<GalleryOnList> galleries = jakdukDAO.getGalleryList(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
+			//List<GalleryOnList> galleries = jakdukDAO.findGalleriesById(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
 			
 			LocalDate date = LocalDate.now();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -103,7 +103,7 @@ public class HomeService {
 
 	// 최근 그림 목록 가져오기.
 	public List<GalleryOnList> getGalleriesLatest() {
-		return jakdukDAO.getGalleryList(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
+		return jakdukDAO.findGalleriesById(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
 	}
 	
 	public Integer getRss(HttpServletResponse response, Locale locale, MessageSource messageSource) {

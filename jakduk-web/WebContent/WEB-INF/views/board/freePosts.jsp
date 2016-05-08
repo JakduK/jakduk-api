@@ -352,7 +352,6 @@
 					$scope.itemsPerPage = size;
 
 					$scope.getDataBestLike();
-					App.init();
 				});
 
 				$scope.getDataBestLike = function () {
@@ -402,6 +401,10 @@
 					location.href = '<c:url value="/board/free/write"/>';
 				}
 			}
+
+			$(document).ready(function () {
+				App.init();
+			});
 		</script>
 	</body>
 </html>

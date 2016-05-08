@@ -26,10 +26,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -76,6 +73,28 @@ public class GalleryService {
 	
 	@Autowired
 	private SearchService searchService;
+
+	// 사진 목록.
+	public List<GalleryOnList> getGalleriesById(String id, Integer size) {
+		if (Objects.nonNull(id))
+			return jakdukDAO.findGalleriesById(Direction.DESC, size, new ObjectId(id));
+		else
+			return jakdukDAO.findGalleriesById(Direction.DESC, size, null);
+	}
+
+	// 사진의 좋아요 개수 가져오기.
+	public Map<String, Integer> getGalleryUsersLikingCount(List<ObjectId> ids) {
+		return jakdukDAO.findGalleryUsersLikingCount(ids);
+	}
+
+	// 사진의 싫어요 개수 가져오기.
+	public Map<String, Integer> getGalleryUsersDislikingCount(List<ObjectId> ids) {
+		return jakdukDAO.findGalleryUsersDislikingCount(ids);
+	}
+
+	public Gallery findById(String id) {
+		return galleryRepository.findOne(id);
+	}
 	
 	public void getList(Model model, Locale locale) {
 		try {
@@ -191,84 +210,42 @@ public class GalleryService {
 			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.gallery", "gallery.exception.io"));
 		}
 	}
-	
-	public Integer getImage(HttpServletResponse response, String id) {
-		
-		try{
-			Gallery gallery = galleryRepository.findOne(id);
-			
-			if (gallery == null) {
-				return HttpServletResponse.SC_NOT_FOUND;
-			}
-			
-			ObjectId objId = new ObjectId(gallery.getId());
-			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
-			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-			
-			Path filePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), 
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
-			
-			if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
-				BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
-				ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
-				
-				int imageByte;
-				
-				while ((imageByte = in.read()) != -1){
-					byteStream.write(imageByte);
-				}
-				
-				in.close();
-				response.setContentType(gallery.getContentType());
-				byteStream.writeTo(response.getOutputStream());
-			}
-			
 
-		} catch(IOException ioe){
-			ioe.printStackTrace();
-			return HttpServletResponse.SC_NOT_IMPLEMENTED;
-		}
-		return HttpServletResponse.SC_OK;
-	}
-	
-	public Integer getThumbnail(HttpServletResponse response, String id) {
-		
-		try{
-			Gallery gallery = galleryRepository.findOne(id);
-			
-			if (gallery == null) {
-				return HttpServletResponse.SC_NOT_FOUND;
-			}
-			
-			ObjectId objId = new ObjectId(gallery.getId());
-			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
-			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-			
-			Path filePath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), 
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
-			
-			if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
-				BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
-				ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
-				
-				int imageByte;
-				
-				while ((imageByte = in.read()) != -1){
-					byteStream.write(imageByte);
-				}
-				
-				in.close();
-				response.setContentType(gallery.getContentType());
-				byteStream.writeTo(response.getOutputStream());
-			}
-			
+	// 이미지 가져오기.
+	public ByteArrayOutputStream getImage(Locale locale, Gallery gallery, CommonConst.IMAGE_TYPE imageType) throws IOException {
+		ObjectId objId = new ObjectId(gallery.getId());
+		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
+		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
-		} catch(IOException ioe){
-			ioe.printStackTrace();
-			return HttpServletResponse.SC_NOT_IMPLEMENTED;
+		String imagePath = null;
+
+		switch (imageType) {
+			case FULL:
+				imagePath = storageImagePath;
+				break;
+			case THUMBNAIL:
+				imagePath = storageThumbnailPath;
+				break;
 		}
-		
-		return HttpServletResponse.SC_OK;
+
+		Path filePath = Paths.get(imagePath, String.valueOf(timePoint.getYear()),
+				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
+
+		if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
+			BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
+			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
+
+			int imageByte;
+
+			while ((imageByte = in.read()) != -1){
+				byteStream.write(imageByte);
+			}
+
+			in.close();
+			return byteStream;
+		} else {
+			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+		}
 	}
 	
 	/**
@@ -327,34 +304,6 @@ public class GalleryService {
 		searchService.deleteDocumentBoard(gallery.getId());
 	}	
 
-	public Model getDataList(Model model, String id, int size) {
-		
-		if (size < CommonConst.GALLERY_SIZE) size = CommonConst.GALLERY_SIZE;
-
-		List<ObjectId> ids = new ArrayList<ObjectId>();
-		
-		List<GalleryOnList> galleries;
-		
-		if (id != null && !id.isEmpty()) {
-			galleries = jakdukDAO.getGalleryList(Direction.DESC, size, new ObjectId(id));
-		} else {
-			galleries = jakdukDAO.getGalleryList(Direction.DESC, size, null);
-		}
-		
-		for (GalleryOnList gallery : galleries) {
-			ids.add(new ObjectId(gallery.getId()));
-		}
-		
-		HashMap<String, Integer> usersLikingCount = jakdukDAO.getGalleryUsersLikingCount(ids);
-		HashMap<String, Integer> usersDislikingCount = jakdukDAO.getGalleryUsersDislikingCount(ids);
-
-		model.addAttribute("galleries", galleries);
-		model.addAttribute("usersLikingCount", usersLikingCount);
-		model.addAttribute("usersDislikingCount", usersDislikingCount);
-
-		return model;
-	}
-	
 	public Integer getGallery(Model model, Locale locale, String id, Boolean isAddCookie) {
 		
 		Gallery gallery = galleryRepository.findOne(id);

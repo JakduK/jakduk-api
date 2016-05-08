@@ -1,4 +1,4 @@
-/resources/config/profile-production.properties
+/config/application-production.properties
 /target/
 /WebContent/resources/bower_components
 /WebContent/resources/summernote

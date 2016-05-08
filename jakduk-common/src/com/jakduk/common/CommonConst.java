@@ -68,15 +68,7 @@ public class CommonConst {
 		FACEBOOK,
 		DAUM
 	}
-	
-	/**
-	 * OAuth 추가 정보 입력 여부
-	 */
-	public final static String OAUTH_ADDITIONAL_INFO_STATUS_NONE = "none";
-	public final static String OAUTH_ADDITIONAL_INFO_STATUS_UNUSE = "unuse";
-	public final static String OAUTH_ADDITIONAL_INFO_STATUS_BLANK = "blank";
-	public final static String OAUTH_ADDITIONAL_INFO_STATUS_OK = "ok";
-	
+
 	/**
 	 * 축구단 상태
 	 */
@@ -220,5 +212,11 @@ public class CommonConst {
 	// 토큰 타입
 	public enum TOKEN_TYPE {
 		RESET_PASSWORD
+	}
+
+	// 이미지 타입
+	public enum IMAGE_TYPE {
+		FULL,		// 전체크기
+		THUMBNAIL	// 썸네일
 	}
 }

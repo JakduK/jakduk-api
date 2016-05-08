@@ -191,7 +191,7 @@ public class GalleryTest {
 	@Test
 	public void getGalleryList() {
 		
-		System.out.println("getGalleryList=" + jakdukDAO.getBoardFreeOnGallery(new ObjectId("54d8b3848bf8c15adcfce070")));
+		System.out.println("findGalleriesById=" + jakdukDAO.getBoardFreeOnGallery(new ObjectId("54d8b3848bf8c15adcfce070")));
 	}
 	
 	@Test
