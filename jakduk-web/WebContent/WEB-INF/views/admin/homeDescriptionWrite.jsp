@@ -6,12 +6,17 @@
 <!DOCTYPE html>
 <html ng-app="jakdukApp">
 	<head>
+		<title>ADMIN PAGE &middot; <spring:message code="common.jakduk"/></title>
 		<jsp:include page="../include/html-header.jsp"/>
 		<link rel="stylesheet" href="<%=request.getContextPath()%>/bundles/admin.css">
 	</head>
 	<body>
+
 		<div class="container" ng-controller="adminCtrl">
-			<h4>Write HomeDescription.</h4>
+			<div class="page-header">
+				<h4>Write HomeDescription.</h4>
+			</div>
+
 			<c:set var="contextPath" value="<%=request.getContextPath()%>"/>
 			<form:form commandName="homeDescription" action="${contextPath}/admin/home/description/write" method="POST">
 				<form:hidden path="id"/>
@@ -28,12 +33,16 @@
 				</p>
 				<form:errors path="desc"/>
 
-				<p>
-					<input type="submit" value="<spring:message code="common.button.write"/>" class="btn btn-default"/>
-				</p>
+				<button type="submit" class="btn btn-default">
+					<spring:message code="common.button.write"/>
+				</button>
+
+				<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/admin/settings?open=homeDescription"/>'">
+					<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
+				</button>
 			</form:form>
 		</div>
-		<jsp:include page="../include/footer.jsp"/>
+
 		<script src="<%=request.getContextPath()%>/bundles/admin.js"></script>
 		<script type="text/javascript">
 			var jakdukApp = angular.module("jakdukApp", ['jakdukCommon']);

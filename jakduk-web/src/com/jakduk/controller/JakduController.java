@@ -1,5 +1,7 @@
 package com.jakduk.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.model.web.JakduWriteList;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
@@ -30,6 +32,9 @@ public class JakduController {
     LocaleResolver localeResolver;
 
     @Autowired
+    private CommonService commonService;
+
+    @Autowired
     private JakduService jakduService;
 
     @RequestMapping
@@ -44,23 +49,33 @@ public class JakduController {
         return "redirect:/jakdu/schedule";
     }
 
+    // 작두 일정 페이지.
     @RequestMapping(value = "/schedule", method = RequestMethod.GET)
     public String schedule(Model model
             , HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        jakduService.getSchedule(model, locale);
+
+        model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
 
         return "jakdu/schedule";
     }
 
+    // 작두 페이지.
     @RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
     public String schedule(@PathVariable String id,
-                           Model model,
-                           HttpServletRequest request) {
+                           HttpServletRequest request,
+                           Model model) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        jakduService.getView(locale, model, id);
+
+        model.addAttribute("id", id);
+
+        try {
+            model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.parsing.or.generating"));
+        }
 
         return "jakdu/scheduleView";
     }

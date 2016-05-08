@@ -278,12 +278,6 @@ public class AdminController {
 		return "redirect:/admin/settings?open=homeDescription";
 	}
 
-	@RequestMapping(value = "/data/home/description", method = RequestMethod.GET)
-	public void dataHomeDescription(Model model) {
-
-		adminService.getHomeDescriptionList(model);
-	}
-	
 	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)
 	public String attendanceLeagueWrite(Model model) {
 		model.addAttribute("attendanceLeague", new AttendanceLeague());

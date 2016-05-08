@@ -178,11 +178,12 @@ public class CommonService {
 		cookie.setPath(path);
 		response.addCookie(cookie);		
 	}
-	
+
+	// 손님인지 검사.
 	public Boolean isAnonymousUser() {
 		Boolean result = false;
 		
-		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
 			result = true;
 		}
 		
@@ -199,11 +200,12 @@ public class CommonService {
 		
 		return result;
 	}
-	
+
+	// 관리자인지 검사.
 	public Boolean isAdmin() {
 		Boolean result = false;
 		
-		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
 			result = true;
 		}
 		
@@ -219,8 +221,31 @@ public class CommonService {
 		}
 		
 		return result;
-	}	
-	
+	}
+
+	// 회원인지 검사.
+	public Boolean isUser() {
+		Boolean result = false;
+
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
+			result = true;
+		}
+
+		if (result == false) {
+			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+
+			for (GrantedAuthority grantedAuthority : authorities) {
+				String authority = grantedAuthority.getAuthority();
+				if (authority.equals("ROLE_USER_01") || authority.equals("ROLE_USER_02") || authority.equals("ROLE_USER_03")) {
+					result = true;
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
 	public Boolean isRedirectUrl(String url) {
 		Boolean result = true;
 		

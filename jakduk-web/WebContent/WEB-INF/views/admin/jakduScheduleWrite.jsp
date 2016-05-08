@@ -146,8 +146,7 @@
 						<i class="fa fa-trash-o"></i> <spring:message code="common.button.delete"/>
 					</button>
 				</c:if>
-				<button type="button" class="btn btn-default" onclick="location.href='
-					<c:url value="/admin/settings?open=jakduSchedule"/>'">
+				<button type="button" class="btn btn-default" onclick="location.href='<c:url value="/admin/settings?open=jakduSchedule"/>'">
 					<span class="glyphicon glyphicon-ban-circle"></span> <spring:message code="common.button.cancel"/>
 				</button>
 			</form:form>

@@ -178,7 +178,7 @@
 								<h6 class="clearfix">
 									<i aria-hidden="true" class="icon-user"></i>
 									<span ng-bind="comment.writer.username"></span>
-									<span class="pull-right" ng-bind="jakdukFactory.dateFromObjectId(comment.id) | date:dateTimeFormat.dateTime"></span>
+									<span class="pull-right" ng-bind="comment.id | dateFromObjectId | date:dateTimeFormat.dateTime"></span>
 								</h6>
 
 								<p>
@@ -208,7 +208,7 @@
 							<div class="margin-bottom-10" ng-show="commentCount || commentAlert.msg">
 								<button type="button" class="btn-u btn-brd rounded btn-block btn-u-dark"
 										ng-click="btnMoreComment()" ng-show="commentCount">
-									<spring:message code="common.button.load.comment"/> <i class="fa fa-angle-down"></i>
+									<spring:message code="common.button.more.comments"/> <i class="fa fa-angle-down"></i>
 									<i class="fa fa-circle-o-notch fa-spin" ng-show="loadCommentConn == 'connecting'"></i>
 								</button>
 							</div>
@@ -265,20 +265,7 @@
 		<script type="text/javascript">
 
 			angular.module("jakdukApp", ['ui.bootstrap', 'angular-ladda', 'summernote', 'infinite-scroll', 'jakdukCommon', 'ngSanitize'])
-					.factory('jakdukFactory', function() {
-						return {
-							objectIdFromDate : function (date) {
-								return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
-							},
-							dateFromObjectId : function (objectId) {
-								return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
-							},
-							intFromObjectId : function (objectId) {
-								return parseInt(objectId.substring(0, 8), 16) * 1000;
-						}}
-					})
-					.controller('jakduCtrl', function ($scope, $http, jakdukFactory) {
-						$scope.jakdukFactory = jakdukFactory;
+					.controller('jakduCtrl', function ($scope, $http) {
 						$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
 						$scope.btnGoJakdu = btnGoJakdu;
 						$scope.getDataSchedule = getDataSchedule;
@@ -337,8 +324,7 @@
 							}
 						};
 					})
-					.controller('commentCtrl', function ($scope, $http, jakdukFactory) {
-						$scope.jakdukFactory = jakdukFactory;
+					.controller('commentCtrl', function ($scope, $http) {
 						$scope.dateTimeFormat = JSON.parse('${dateTimeFormat}');
 						$scope.boardCommentContentLengthMin = Jakduk.BoardCommentContentLengthMin;
 						$scope.boardCommentContentLengthMax = Jakduk.BoardCommentContentLengthMax;

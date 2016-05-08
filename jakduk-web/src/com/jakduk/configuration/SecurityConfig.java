@@ -59,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/home/**",
                                 "/about/**",
                                 "/auth/**"
-                        ).permitAll()
+                            ).permitAll()
                         .antMatchers(
                                 "/login",               // 로그인
                                 "/auth/*",              // SNS 인증
@@ -68,16 +68,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/user/write",          // JakduK 회원 가입
                                 "/user/*/write",        // SNS 계정으로 회원 가입
                                 "/password/*"           // 비밀번호 찾기
-                        ).anonymous()
+                            ).anonymous()
                         .antMatchers(
                                 "/user/**"
-                        ).authenticated()
+                            ).authenticated()
                         .antMatchers(
                                 "/board/*/write",
                                 "/board/*/edit",
                                 "/jakdu/write"
-                        ).hasAnyRole("USER_01", "USER_02", "USER_03")
-                        .antMatchers("/admin/**").hasRole("ROOT")
+                            ).hasAnyRole("USER_01", "USER_02", "USER_03")
+                        .antMatchers(
+                                "/admin/**",
+                                "/api/admin/**"
+                            ).hasRole("ROOT")
                         .anyRequest().permitAll()
                 .and()
                     .rememberMe()

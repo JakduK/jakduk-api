@@ -26,6 +26,13 @@ var Jakduk = (function() {
 	'use strict';
 
 	angular.module('jakdukCommon', [])
+		// mongodb id의 앞 8자리(16진수)로 Date 객체 생성.
+		.filter('dateFromObjectId', function() {
+			return function(objectId) {
+				return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+			}
+
+		})
 		.controller("headerCtrl", ['$scope', '$location', function($scope, $location) {
 
 			var port = $location.port();

@@ -1,6 +1,7 @@
 package com.jakduk.restcontroller;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.Jakdu;
 import com.jakduk.model.db.JakduComment;
 import com.jakduk.vo.UserFeelingResponse;
@@ -10,6 +11,7 @@ import com.jakduk.model.web.jakdu.JakduScheduleResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.JakduService;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
@@ -24,6 +26,7 @@ import java.util.*;
  * Created by pyohwan on 16. 3. 4.
  */
 
+@Slf4j
 @RestController
 @RequestMapping("/api/jakdu")
 public class JakduRestController {
@@ -75,6 +78,9 @@ public class JakduRestController {
     public Jakdu myJakduWrite(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
+
+        if (commonService.isUser() == false)
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
         if (Objects.isNull(myJakdu)) {
             throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));

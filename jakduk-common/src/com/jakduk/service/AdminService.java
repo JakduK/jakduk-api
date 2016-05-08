@@ -108,7 +108,12 @@ public class AdminService {
 
 	@Autowired
 	private CompetitionRepository competitionRepository;
-	
+
+	// 알림판 목록.
+	public List<HomeDescription> getHomeDescriptions() {
+		return homeDescriptionReposotiry.findAll();
+	}
+
 	public String initBoardCategory() {
 		
 		String result = "";
@@ -676,15 +681,7 @@ public String initSearchData() {
 		
 		homeDescriptionReposotiry.save(homeDescription);
 	}	
-	
-	public Model getHomeDescriptionList(Model model) {
-		List<HomeDescription> homeDescriptions = homeDescriptionReposotiry.findAll();
-		
-		model.addAttribute("homeDescriptions", homeDescriptions);
-		
-		return model;
-	}	
-	
+
 	public void getAttendanceClubWrite(Model model) {
 		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 		

@@ -61,11 +61,6 @@ public class JakduService {
     @Autowired
     private JakduCommentRepository jakduCommentRepository;
 
-    public void getSchedule(Model model, Locale locale) {
-
-        model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-    }
-
     public JakduScheduleResponse getSchedules(String language, int page, int size) {
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
@@ -171,42 +166,22 @@ public class JakduService {
         return result;
     }
 
-    public void getView(Locale locale, Model model, String id) {
-
-        model.addAttribute("id", id);
-        try {
-            model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.parsing.or.generating"));
-        }
-    }
-
-    /**
-     * 작두 타기 입력
-     * @param locale
-     * @param myJakdu
-     */
+    // 작두 타기 입력
     public Jakdu setMyJakdu(Locale locale, MyJakduRequest myJakdu) {
         CommonPrincipal principal = userService.getCommonPrincipal();
         String accountId = principal.getId();
-
-        // 인증되지 않은 회원
-        if (Objects.isNull(accountId))
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
         CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId());
 
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
 
-        if (Objects.isNull(jakduSchedule)) {
+        if (Objects.isNull(jakduSchedule))
             throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
-        }
 
         Jakdu existJakdu = jakduRepository.findByScheduleAndWriter(jakduSchedule, writer);
 
-        if (!Objects.isNull(existJakdu)) {
+        if (Objects.nonNull(existJakdu))
             throw new RepositoryExistException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.already.join.jakdu.exception"));
-        }
 
         Jakdu jakdu = new Jakdu();
         jakdu.setSchedule(jakduSchedule);
