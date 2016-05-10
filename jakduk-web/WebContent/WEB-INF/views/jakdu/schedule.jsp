@@ -114,8 +114,6 @@
 					var size = 20;
 
 					$scope.getDataSchedulesList(page, size);
-
-					App.init();
 				});
 
 				$scope.getDataSchedulesList = function (page, size) {
@@ -155,6 +153,10 @@
 					location.href = '<c:url value="/jakdu/schedule/' + id + '"/>';
 				};
 
+			});
+
+			$(document).ready(function () {
+				App.init();
 			});
 		</script>
 	</body>

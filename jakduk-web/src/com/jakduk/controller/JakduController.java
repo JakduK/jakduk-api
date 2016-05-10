@@ -51,8 +51,8 @@ public class JakduController {
 
     // 작두 일정 페이지.
     @RequestMapping(value = "/schedule", method = RequestMethod.GET)
-    public String schedule(Model model
-            , HttpServletRequest request) {
+    public String schedule(HttpServletRequest request,
+                           Model model) {
 
         Locale locale = localeResolver.resolveLocale(request);
 

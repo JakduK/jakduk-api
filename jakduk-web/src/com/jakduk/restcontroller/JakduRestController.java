@@ -4,6 +4,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.Jakdu;
 import com.jakduk.model.db.JakduComment;
+import com.jakduk.model.db.JakduSchedule;
 import com.jakduk.vo.UserFeelingResponse;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
@@ -52,9 +53,9 @@ public class JakduRestController {
 
     // 작두 일정 목록
     @RequestMapping(value = "/schedule", method = RequestMethod.GET)
-    public JakduScheduleResponse dataSchedule(HttpServletRequest request,
-                             @RequestParam(required = false, defaultValue = "1") int page,
-                             @RequestParam(required = false, defaultValue = "20") int size) {
+    public JakduScheduleResponse dataSchedule(@RequestParam(required = false, defaultValue = "1") int page,
+                                              @RequestParam(required = false, defaultValue = "20") int size,
+                                              HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
         String language = commonService.getLanguageCode(locale, null);
@@ -66,9 +67,19 @@ public class JakduRestController {
 
     // 작두 일정 데이터 하나 가져오기.
     @RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
-    public Map dataSchedule(@PathVariable String id) {
+    public Map<String, Object> dataSchedule(@PathVariable String id,
+                                            HttpServletRequest request) {
 
-        Map<String, Object> result = jakduService.getDataSchedule(id);
+        Locale locale = localeResolver.resolveLocale(request);
+
+        Map<String, Object> result = new HashMap<>();
+
+        JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
+        result.put("jakduSchedule", jakduSchedule);
+
+        if (commonService.isUser() == true) {
+            result.put("myJakdu", jakduService.getMyJakdu(locale, id));
+        }
 
         return result;
     }

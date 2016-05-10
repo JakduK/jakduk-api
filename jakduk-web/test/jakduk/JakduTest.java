@@ -1,10 +1,13 @@
 package jakduk;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.configuration.AppConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Competition;
 import com.jakduk.model.db.JakduComment;
 import com.jakduk.model.db.JakduSchedule;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.repository.jakdu.JakduRepository;
 import com.jakduk.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -31,10 +34,13 @@ import java.util.List;
 public class JakduTest {
 
     @Autowired
-    JakdukDAO jakdukDAO;
+    private  JakdukDAO jakdukDAO;
 
     @Autowired
-    JakduScheduleRepository jakduScheduleRepository;
+    private JakduScheduleRepository jakduScheduleRepository;
+
+    @Autowired
+    private JakduRepository jakduRepository;
 
     @Test
     public void getSchedulesTest01() {
@@ -60,5 +66,17 @@ public class JakduTest {
     public void getJakduComments() {
         List<JakduComment> comments = jakdukDAO.getJakduComments("567be7d8e4b06364b1618e0b", null);
         System.out.println("comments=" + comments);
+    }
+
+    @Test
+    public void 작두일정가져오기() {
+
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne("567be7d8e4b06364b1618e0b");
+
+        System.out.println(jakduSchedule);
+
+        System.out.println(jakduRepository.findByUserIdAndWriter("566d68d5e4b0dfaaa5b98685", new ObjectId("567be7d8e4b06364b1618e0b")));
+
+
     }
 }

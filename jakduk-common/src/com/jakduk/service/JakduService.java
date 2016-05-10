@@ -14,6 +14,7 @@ import com.jakduk.model.embedded.BoardCommentStatus;
 import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.simple.JakduOnSchedule;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.model.web.jakdu.JakduScheduleResponse;
@@ -61,6 +62,10 @@ public class JakduService {
     @Autowired
     private JakduCommentRepository jakduCommentRepository;
 
+    public JakduSchedule findScheduleById(String id) {
+        return jakduScheduleRepository.findOne(id);
+    }
+
     public JakduScheduleResponse getSchedules(String language, int page, int size) {
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
@@ -98,17 +103,6 @@ public class JakduService {
         response.setCompetitionNames(competitionNames);
 
         return response;
-    }
-
-    public Map getDataSchedule(String id) {
-
-        Map<String, Object> result = new HashMap<>();
-
-        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
-
-        result.put("jakduSchedule", jakduSchedule);
-
-        return result;
     }
 
     public Map getDataWrite(Locale locale) {
@@ -178,7 +172,7 @@ public class JakduService {
         if (Objects.isNull(jakduSchedule))
             throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
 
-        Jakdu existJakdu = jakduRepository.findByScheduleAndWriter(jakduSchedule, writer);
+        JakduOnSchedule existJakdu = jakduRepository.findByUserIdAndWriter(accountId, new ObjectId(jakduSchedule.getId()));
 
         if (Objects.nonNull(existJakdu))
             throw new RepositoryExistException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.already.join.jakdu.exception"));
@@ -192,6 +186,21 @@ public class JakduService {
         jakduRepository.save(jakdu);
 
         return jakdu;
+    }
+
+    // 내 작두 타기 가져오기.
+    public JakduOnSchedule getMyJakdu(Locale locale, String jakdukScheduleId) {
+        CommonPrincipal principal = userService.getCommonPrincipal();
+        String accountId = principal.getId();
+
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(jakdukScheduleId);
+
+        if (Objects.isNull(jakduSchedule))
+            throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+
+        JakduOnSchedule myJakdu = jakduRepository.findByUserIdAndWriter(accountId, new ObjectId(jakduSchedule.getId()));
+
+        return myJakdu;
     }
 
     /**
