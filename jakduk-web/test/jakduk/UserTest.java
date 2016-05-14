@@ -6,7 +6,6 @@ import com.jakduk.configuration.AppConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.User;
 import com.jakduk.model.etc.SupporterCount;
-import com.jakduk.model.simple.OAuthProfile;
 import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.model.simple.UserProfile;
@@ -15,7 +14,6 @@ import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +117,7 @@ public class UserTest {
 
 		String email = "phjang1983@daum.net";
 
-		UserOnAuthentication user1 = userRepository.userFindByEmail(email);
+		UserOnAuthentication user1 = userRepository.findAuthUserByEmail(email);
 		System.out.println("user1=" + user1);
 
 		SocialUserOnAuthentication user3 = userRepository.findSocialUserByEmail(email);

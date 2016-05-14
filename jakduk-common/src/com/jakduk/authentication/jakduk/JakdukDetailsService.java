@@ -1,9 +1,13 @@
 package com.jakduk.authentication.jakduk;
 
-import java.util.*;
-
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
+import com.jakduk.exception.FindUserButNotJakdukAccount;
+import com.jakduk.model.simple.UserOnAuthentication;
+import com.jakduk.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,10 +15,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.common.CommonRole;
-import com.jakduk.model.simple.UserOnAuthentication;
-import com.jakduk.repository.user.UserRepository;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -29,12 +33,15 @@ public class JakdukDetailsService implements UserDetailsManager {
 		if (Objects.isNull(email)) {
 			throw new IllegalArgumentException("email 은 꼭 필요한 값입니다.");
 		} else {
-			UserOnAuthentication user = userRepository.userFindByEmail(email);
-
-			log.debug("user=" + user);
+			UserOnAuthentication user = userRepository.findAuthUserByEmail(email);
 
 			if (Objects.isNull(user))
-				throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
+				throw new BadCredentialsException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
+
+			if (user.getProviderId().equals(CommonConst.ACCOUNT_TYPE.JAKDUK) == false)
+				throw new FindUserButNotJakdukAccount("JakduK 계정이 아니라 SNS 계정으로 연동되어 있습니다. email=" + email, user.getProviderId());
+
+			log.debug("Jakduk user=" + user);
 
 			boolean enabled = true;
 			boolean accountNonExpired = true;

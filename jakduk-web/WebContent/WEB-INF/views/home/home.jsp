@@ -50,8 +50,8 @@
 											<span aria-hidden="true" class="icon-user"></span>
 											<span ng-bind="post.writer.username"></span>
 											&nbsp;
-											<span ng-if="${timeNow} > intFromObjectId(post.id)" ng-bind="dateFromObjectId(post.id) | date:'${dateTimeFormat.date}'"></span>
-											<span ng-if="${timeNow} <= intFromObjectId(post.id)" ng-bind="dateFromObjectId(post.id) | date:'${dateTimeFormat.time}'"></span>
+											<span ng-if="${timeNow} > intFromObjectId(post.id)" ng-bind="post.id | dateFromObjectId | date:'${dateTimeFormat.date}'"></span>
+											<span ng-if="${timeNow} <= intFromObjectId(post.id)" ng-bind="post.id | dateFromObjectId | date:'${dateTimeFormat.time}'"></span>
 											&nbsp;
 											<span aria-hidden="true" class="icon-eye"></span> <span ng-bind="post.views"></span>
 										</small>
@@ -76,7 +76,7 @@
 											<span ng-bind="comment.writer.username"></span>
 										</strong>
 										<a href='<c:url value="/board/free/{{comment.boardItem.seq}}"/>' ng-bind="comment.content"></a>
-										<span class="twitter-time" ng-bind="dateFromObjectId(comment.id) | date:'${dateTimeFormat.dateTime}'"></span>
+										<span class="twitter-time" ng-bind="comment.id | dateFromObjectId | date:'${dateTimeFormat.dateTime}'"></span>
 									</div>
 								</div>
 							</div>
@@ -164,8 +164,8 @@
 								</a>
 
 								<div class="customNavigation">
-									<a class="owl-btn prev-v2" ng-click="slickConfig.method.slickPrev()"><i class="fa fa-angle-left"></i></a>
-									<a class="owl-btn next-v2" ng-click="slickConfig.method.slickNext()"><i class="fa fa-angle-right"></i></a>
+									<a class="owl-btn prev-v2" id="slickPrev"><i class="fa fa-angle-left"></i></a>
+									<a class="owl-btn next-v2" id="slickNext"><i class="fa fa-angle-right"></i></a>
 								</div>
 							</div><!--/navigation-->
 						</div>
@@ -198,7 +198,6 @@
 					$scope.refreshEncyclopedia = refreshEncyclopedia;
 					$scope.getDataLatest = getDataLatest;
 					$scope.objectIdFromDate = objectIdFromDate;
-					$scope.dateFromObjectId = dateFromObjectId;
 					$scope.intFromObjectId = intFromObjectId;
 
 					$scope.encyclopedia = {};
@@ -216,7 +215,9 @@
 						draggable: true,
 						autoplaySpeed: 3000,
 						//slidesToScroll : 2,
-						arrows: false,
+						//arrows: false,
+						prevArrow: '#slickPrev',
+						nextArrow: '#slickNext',
 						variableWidth: true,
 						lazyLoad: 'ondemand',
 						//centerPadding: '60px',
@@ -292,10 +293,6 @@
 
 					function objectIdFromDate(date) {
 						return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
-					}
-
-					function dateFromObjectId(objectId) {
-						return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
 					}
 
 					function intFromObjectId(objectId) {

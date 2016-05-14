@@ -123,20 +123,11 @@
 								<li><a href="?category=${category.key}"><spring:message code="${category.value}"/></a></li>
 							</c:forEach>
 						</ul>
-						<c:choose>
-							<c:when test="${authRole == 'ANNONYMOUS'}">
-								<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
-									tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
-									<span aria-hidden="true" class="icon-pencil"></span>
-								</button>
-							</c:when>
-							<c:when test="${authRole == 'USER'}">
-								<button type="button" class="btn-u btn-brd rounded" onclick="location.href='<c:url value="/board/free/write"/>'"
-									tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
-									<span aria-hidden="true" class="icon-pencil"></span>
-								</button>
-							</c:when>
-						</c:choose>
+
+						<c:import url="include/writeButton.jsp">
+							<c:param name="authRole" value="${authRole}"/>
+						</c:import>
+
 					</div>
 					<div class="col-sm-6 sm-margin-bottom-10">
 						<div class="input-group">
@@ -300,25 +291,13 @@
 					</ul>
 				</div>
 
-				<c:choose>
-					<c:when test="${authRole == 'ANNONYMOUS'}">
-						<button type="button" class="btn-u btn-brd rounded" onclick="needLogin();"
-							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
-							<span aria-hidden="true" class="icon-pencil"></span>
-						</button>
-					</c:when>
-					<c:when test="${authRole == 'USER'}">
-						<button type="button" class="btn-u btn-brd rounded" onclick="location.href='
-							<c:url value="/board/free/write"/>'"
-							tooltip-popup-close-delay='300' uib-tooltip='<spring:message code="board.write"/>'>
-							<span aria-hidden="true" class="icon-pencil"></span>
-						</button>
-					</c:when>
-				</c:choose>
+				<c:import url="include/writeButton.jsp">
+					<c:param name="authRole" value="${authRole}"/>
+				</c:import>
 
 				<div class="text-left" ng-show="totalItems > 0">
 					<uib-pagination ng-model="currentPage" total-items="totalItems" max-size="10" items-per-page="itemsPerPage"
-						previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"></uib-pagination>
+						previous-text="&lsaquo;" next-text="&rsaquo;" ng-change="pageChanged()"/>
 				</div>
 
 				<!--=== End Content Part ===-->

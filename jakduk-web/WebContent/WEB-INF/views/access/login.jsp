@@ -26,10 +26,10 @@
 			<div class="container content" ng-controller="loginCtrl">
 				<c:choose>
 					<c:when test="${result == 'failure'}">
-						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure"/></div>
+						<div class="alert alert-danger" role="alert">${message}</div>
 					</c:when>
-					<c:when test="${result == 'locked'}">
-						<div class="alert alert-danger" role="alert"><spring:message code="user.msg.login.failure.locked"/></div>
+					<c:when test="${result == 'warning'}">
+						<div class="alert alert-warning" role="alert">${message}</div>
 					</c:when>
 				</c:choose>
 

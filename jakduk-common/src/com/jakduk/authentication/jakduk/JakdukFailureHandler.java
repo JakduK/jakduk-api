@@ -1,19 +1,22 @@
 package com.jakduk.authentication.jakduk;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-
+import com.jakduk.common.CommonConst;
+import com.jakduk.exception.FindUserButNotJakdukAccount;
+import com.jakduk.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.service.CommonService;
+import javax.annotation.Resource;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.Locale;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -21,23 +24,39 @@ import com.jakduk.service.CommonService;
  * @date     : 2014. 7. 11.
  * @desc     :
  */
+
+@Component
 public class JakdukFailureHandler implements AuthenticationFailureHandler {
-	
+
+	@Resource
+	LocaleResolver localeResolver;
+
 	@Autowired
 	CommonService commonService;
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request,
-			HttpServletResponse response, AuthenticationException exception)
+										HttpServletResponse response,
+										AuthenticationException exception)
 			throws IOException, ServletException {
-		
+
+		Locale locale = localeResolver.resolveLocale(request);
+
 		String remember = request.getParameter("remember");
 		String loginRedirect = request.getParameter("loginRedirect");
 		String path = String.format("%s/", request.getContextPath());
 		String result = "failure";
-		
-		if (exception.getClass().isAssignableFrom(LockedException.class)) {
-			result = "locked";
+		String message = "";
+
+
+		if (exception.getCause().getClass().isAssignableFrom(FindUserButNotJakdukAccount.class)) {
+			result = "warning";
+			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns",
+					((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
+		} else if (exception.getClass().isAssignableFrom(LockedException.class)) {
+			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure.locked");
+		} else {
+			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure");
 		}
 		
 		if (remember != null && remember.equals("on")) {
@@ -50,7 +69,7 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
 		}
 		
-		response.sendRedirect(request.getContextPath() + "/login?result=" + result + "&loginRedirect=" + loginRedirect);
+		response.sendRedirect(request.getContextPath() + "/login?result=" + result + "&message=" + URLEncoder.encode(message, "UTF-8") + "&loginRedirect=" + loginRedirect);
 		
 	}
 

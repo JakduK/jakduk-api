@@ -63,10 +63,11 @@ public class AccessController {
 	private long tokenSpan;
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login(HttpServletRequest request,
-			Model model,
-			@RequestParam(required = false) String result,
-			@RequestParam(required = false) String loginRedirect) throws UnsupportedEncodingException {
+	public String login(@RequestParam(required = false) String result,
+						@RequestParam(required = false) String message,
+						@RequestParam(required = false) String loginRedirect,
+						HttpServletRequest request,
+						Model model) throws UnsupportedEncodingException {
 		
 		if (loginRedirect == null) {
 			loginRedirect = request.getHeader("REFERER");
@@ -75,6 +76,9 @@ public class AccessController {
 		if (loginRedirect != null) {
 			model.addAttribute("loginRedirect", URLEncoder.encode(loginRedirect, "UTF-8"));
 		}
+
+		if (Objects.nonNull(message) && message.isEmpty() == false)
+			model.addAttribute("message", message);
 		
 		model.addAttribute("result", result);
 		

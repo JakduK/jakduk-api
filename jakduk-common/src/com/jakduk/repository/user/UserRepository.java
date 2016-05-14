@@ -13,6 +13,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	User findOneByUsername(String username);
 	User findByEmail(String email);
 	User findOneByEmail(String email);
+	UserOnAuthentication findOneByEmailAndProviderId(String email, CommonConst.ACCOUNT_TYPE providerId);
 	
 	@Query(value="{'id' : ?0}", fields="{'username' : 1}")
 	User writerFindById(String id);
@@ -44,7 +45,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	OAuthProfile userfindByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
 	
 	@Query(value="{'email' : ?0}")
-	UserOnAuthentication userFindByEmail(String email);
+	UserOnAuthentication findAuthUserByEmail(String email);
 
 	@Query(value="{'providerUserId' : ?0}")
 	UserOnAuthentication userFindByProviderUserId(String providerUserId);
