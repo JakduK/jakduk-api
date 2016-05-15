@@ -33,8 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .httpBasic()                // basic auth 사용.
-                .and()
                 .csrf().disable()           // CSRF 방어 비활성화
                 //Configures form login
                 .formLogin()
@@ -50,6 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessUrl("/logout/success")
+                .and()
+                    .httpBasic()                // basic auth 사용.
                 .and()
                     .exceptionHandling().accessDeniedPage("/error/denied")
                 //Configures url based authorization

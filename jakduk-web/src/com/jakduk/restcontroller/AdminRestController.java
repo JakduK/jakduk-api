@@ -5,16 +5,12 @@ import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
 import com.jakduk.vo.HomeDescriptionRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -36,7 +32,7 @@ public class AdminRestController {
     private AdminService adminService;
 
     // 알림판 목록.
-    @RequestMapping(value = "/home/description", method = RequestMethod.GET)
+    @RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
     public Map<String, Object> dataHomeDescription() {
 
         List<HomeDescription> homeDescriptions = adminService.findHomeDescriptions();
@@ -69,7 +65,7 @@ public class AdminRestController {
     }
 
     // 새 알림판 저장.
-    @RequestMapping(value = "/home/description/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/home/description", method = RequestMethod.POST)
     public Map<String, Object> homeDescriptionWrite(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
         if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
@@ -88,6 +84,54 @@ public class AdminRestController {
         Map<String, Object> response = new HashMap();
 
         response.put("homeDescription", homeDescription);
+
+        return response;
+    }
+
+    // 알림판 편집.
+    @RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
+    public Map<String, Object> homeDescriptionWrite(@PathVariable String id,
+                                                    @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
+
+        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
+            throw new IllegalArgumentException("desc는 필수값입니다.");
+
+        if (Objects.isNull(homeDescriptionRequest.getPriority()))
+            throw new IllegalArgumentException("priority는 필수값입니다.");
+
+        HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
+
+        if (Objects.isNull(existHomeDescription))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
+
+        HomeDescription homeDescription = HomeDescription.builder()
+                .id(id)
+                .desc(homeDescriptionRequest.getDesc())
+                .priority(homeDescriptionRequest.getPriority())
+                .build();
+
+        adminService.saveHomeDescription(homeDescription);
+
+        Map<String, Object> response = new HashMap();
+
+        response.put("homeDescription", homeDescription);
+
+        return response;
+    }
+
+    // 알림판 지움.
+    @RequestMapping(value = "/home/description/{id}", method = RequestMethod.DELETE)
+    public Map<String, Object> homeDescriptionWrite(@PathVariable String id) {
+
+        HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
+
+        if (Objects.isNull(existHomeDescription))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
+
+        adminService.deleteHomeDescriptionById(id);
+
+        Map<String, Object> response = new HashMap();
+        response.put("result", true);
 
         return response;
     }

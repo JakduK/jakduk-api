@@ -189,8 +189,6 @@
 				};
 
 				$scope.onEmail = function() {
-					console.log(document.getElementById("email.errors"));
-
 					if ($scope.userProfileForm.email.$valid) {
 						var existId = Boolean("${existId}");
 						var id = "${userProfileForm.id}";

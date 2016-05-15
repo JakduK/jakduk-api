@@ -124,6 +124,11 @@ public class AdminService {
 		homeDescriptionReposotiry.save(homeDescription);
 	}
 
+	// 알림판 삭제.
+	public void deleteHomeDescriptionById(String id) {
+		homeDescriptionReposotiry.delete(id);
+	}
+
 	public String initBoardCategory() {
 		
 		String result = "";
