@@ -2,11 +2,6 @@ package com.jakduk.controller;
 
 import javax.validation.Valid;
 
-import com.jakduk.model.db.*;
-import com.jakduk.model.web.*;
-import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +13,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.web.AttendanceClubWrite;
+import com.jakduk.model.web.BoardCategoryWrite;
+import com.jakduk.model.web.CompetitionWrite;
+import com.jakduk.model.web.FootballClubWrite;
+import com.jakduk.model.web.ThumbnailSizeWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleWrite;
 import com.jakduk.service.AdminService;
 
 /**
@@ -37,56 +43,34 @@ public class AdminController {
 
 	@RequestMapping
 	public String root() {
-		
 		return "redirect:/admin/settings";
-	}	
+	}
 	
-	@RequestMapping("/settings")
-	public String root(Model model,
-			@RequestParam(required = false) String message,
-			@RequestParam(required = false) String open) {
-		
-		model.addAttribute("message", message);
-		
-		if (open != null) {
-			model.addAttribute("open", open);
-		}
-		
+	@RequestMapping(value = "/settings")
+	public String home() {
 		return "admin/admin";
 	}
 	
 	@RequestMapping(value = "/board/category/init")
 	public String initBoardCategory() {
-
-		String message = adminService.initBoardCategory();
-		
-		return "redirect:/admin/settings?message=" + message;
+		return "admin/admin";
 	}
 	
 	@RequestMapping(value = "/search/index/init")
 	public String initSearchIndex() {
-
-		String message = adminService.initSearchIndex();
-		
-		return "redirect:/admin/settings?message=" + message;
+		return "admin/admin";
 	}
 	
 	@RequestMapping(value = "/search/type/init")
 	public String initSearchType() {
-
-		String message = adminService.initSearchType();
-		
-		return "redirect:/admin/settings?message=" + message;
+		return "admin/admin";
 	}
 	
 	@RequestMapping(value = "/search/data/init")
 	public String initSearchData() {
-
-		String message = adminService.initSearchData();
-		
-		return "redirect:/admin/settings?message=" + message;
+		return "admin/admin";
 	}
-	
+
 	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.GET)
 	public String encyclopediaWrite(Model model) {
 		model.addAttribute("encyclopedia", new Encyclopedia());

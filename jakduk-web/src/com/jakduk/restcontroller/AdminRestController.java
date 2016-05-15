@@ -1,17 +1,29 @@
 package com.jakduk.restcontroller;
 
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
+
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
 import com.jakduk.vo.HomeDescriptionRequest;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
 
 /**
  * Created by pyohwan on 16. 5. 8.
@@ -37,7 +49,7 @@ public class AdminRestController {
 
         List<HomeDescription> homeDescriptions = adminService.findHomeDescriptions();
 
-        Map<String, Object> response = new HashMap();
+        Map<String, Object> response = new HashMap<>();
 
         response.put("homeDescriptions", homeDescriptions);
 
@@ -134,5 +146,25 @@ public class AdminRestController {
         response.put("result", true);
 
         return response;
+    }
+
+    @RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
+    public Map<String, Object> initBoardCategory() {
+        return adminService.initBoardCategory();
+    }
+
+    @RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
+    public Map<String, Object> initSearchIndex() {
+        return adminService.initSearchIndex();
+    }
+
+    @RequestMapping(value = "/search/type/init", method = RequestMethod.POST)
+    public Map<String, Object> initSearchType() {
+        return adminService.initSearchType();
+    }
+
+    @RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
+    public Map<String, Object> initSearchData() {
+        return adminService.initSearchData();
     }
 }
