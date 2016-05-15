@@ -44,9 +44,14 @@
 		<group-ref>base</group-ref>
 
 		<css>/resources/bower_components/angular-bootstrap/ui-bootstrap-csp.css</css>
+		<css>/resources/bower_components/Bootflat/bootflat/css/bootflat.css</css>
 		<css>/resources/jakduk/css/jakduk.css</css>
+		<css>/resources/jakduk/css/admin.css</css>
 
+		<js>/resources/bower_components/angular-animate/angular-animate.js</js>
+		<js>/resources/bower_components/angular-ui-router/release/angular-ui-router.js</js>
 		<js>/resources/bower_components/angular-bootstrap/ui-bootstrap-tpls.js</js>
+		<js>/resources/jakduk/js/admin.js</js>
 	</group>
 
 	<group name="board.write">

@@ -1,0 +1,175 @@
+<p>{{ctrl.message}}</p>
+
+<div ng-show="ctrl.encyclopedias.length">
+  <h4>Encyclopedia</h4>
+  <table class="table">
+    <tr>
+      <th>Seq</th><th>kind</th><th>Language</th><th>Subject</th><th>Content</th>
+    </tr>
+    <tr ng-repeat="encyclopedia in ctrl.encyclopedias">
+      <td><a ng-href="admin/encyclopedia/write/{{encyclopedia.seq}}?lang={{encyclopedia.language}}">{{encyclopedia.seq}}</a></td>
+      <td>{{encyclopedia.kind}}</td>
+      <td>{{encyclopedia.language}}</td>
+      <td>{{encyclopedia.subject}}</td>
+      <td>{{encyclopedia.content}}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.fcOrigins.length">
+  <h4>Football Club Origin</h4>
+  <table class="table">
+    <tr>
+      <th>Name</th><th>Club Type</th><th>Age</th><th>Sex</th>
+    </tr>
+    <tr ng-repeat="fcOrigin in ctrl.fcOrigins">
+      <td><a ng-href="admin/footballclub/origin/write/{{fcOrigin.id}}">{{fcOrigin.name}}</a></td>
+      <td>{{fcOrigin.clubType}}</td>
+      <td>{{fcOrigin.age}}</td>
+      <td>{{fcOrigin.sex}}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.fcs.length">
+  <h4>Football Club</h4>
+  <table class="table">
+    <tr>
+      <th>Origin</th><th>Active</th><th>Names</th>
+    </tr>
+    <tr ng-repeat="fc in ctrl.fcs">
+      <td><a href="admin/footballclub/write/{{fc.id}}">{{fc.origin.name}}</a></td>
+      <td>{{fc.active}}</td>
+      <td><div ng-repeat="name in fc.names">Lang={{name.language}} F.N.={{name.fullName}} S.N.={{name.shortName}}</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="boardCategorys.length">
+  <h4>Board Category</h4>
+  <table class="table">
+    <tr>
+      <th>Name</th><th>ResName</th><th>UsingBoard</th>
+    </tr>
+    <tr ng-repeat="boardCategory in ctrl.boardCategorys">
+      <td><a href="admin/board/category/write/{{boardCategory.id}}">{{boardCategory.name}}</a></td>
+      <td>{{boardCategory.resName}}</td>
+      <td><div ng-repeat="usingBoard in boardCategory.usingBoard">{{usingBoard}}</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.attendanceLeagues.length">
+  <h4>Attendance League</h4>
+  <div class="btn-group">
+    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+      LEAGUE
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+      <li><a ng-click="ctrl.getDataLeague('KL')">K LEAGUE</a></li>
+      <li><a ng-click="ctrl.getDataLeague('KLCL')">K LEAGUE CLASSIC</a></li>
+      <li><a ng-click="ctrl.getDataLeague('KLCH')">K LEAGUE CHALLENGE</a></li>
+    </ul>
+  </div>
+  <table class="table">
+    <tr>
+      <th>League</th><th>Season</th><th>Games</th><th>Total</th><th>Average</th><th>Number Of Clubs</th>
+    </tr>
+    <tr ng-repeat="attendanceLeague in ctrl.attendanceLeagues">
+      <td>{{attendanceLeague.league}}</td>
+      <td><a ng-href="admin/attendance/league/write/{{attendanceLeague.id}}">{{attendanceLeague.season}}</a></td>
+      <td>{{attendanceLeague.games}}</td>
+      <td>{{attendanceLeague.total}}</td>
+      <td>{{attendanceLeague.average}}</td>
+      <td>{{attendanceLeague.numberOfClubs}}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.attendanceClubs.length">
+  <h4>Attendance Clubs</h4>
+  <table class="table">
+    <tr>
+      <th>Club</th><th>Season</th><th>League</th><th>Games</th><th>Total</th><th>Average</th>
+    </tr>
+    <tr ng-repeat="attendanceClub in ctrl.attendanceClubs">
+      <td><a ng-href="admin/attendance/club/write/{{attendanceClub.id}}">{{attendanceClub.club.name}}</a></td>
+      <td>{{attendanceClub.season}}</td>
+      <td>{{attendanceClub.league}}</td>
+      <td>{{attendanceClub.games}}</td>
+      <td>{{attendanceClub.total}}</td>
+      <td>{{attendanceClub.average}}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.homeDescriptions.length">
+  <h4>Home Descriptions</h4>
+  <table class="table">
+    <tr>
+      <th>id</th><th>Priority</th><th>Description</th>
+    </tr>
+    <tr ng-repeat="homeDescription in ctrl.homeDescriptions">
+      <td><a ng-href="admin/home/description/write/{{homeDescription.id}}">{{homeDescription.id}}</a></td>
+      <td>{{homeDescription.priority}}</td>
+      <td>{{homeDescription.desc}}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.jakduSchedules.length">
+  <h4>Jakdu Schedule</h4>
+  <table class="table">
+    <tr>
+      <th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Group</th><th>Competition</th><th>Score</th><th>isTimeUp</th>
+    </tr>
+    <tr ng-repeat="jakduSchedule in ctrl.jakduSchedules">
+      <td><a href="<c:url value="/admin/jakdu/schedule/write/{{jakduSchedule.id}}"/>">{{jakduSchedule.id}}</a></td>
+      <td>{{jakduSchedule.date | date:'short' }}</td>
+      <td>{{jakduSchedule.home.name}}</td>
+      <td>{{jakduSchedule.away.name}}</td>
+      <td>{{jakduSchedule.group.seq}}</td>
+      <td>{{jakduSchedule.competition.code}}</td>
+      <td>
+          <span ng-if="jakduSchedule.score">
+            <span ng-if="jakduSchedule.score.homeFullTime && jakduSchedule.score.awayFullTime">FT {{jakduSchedule.score.homeFullTime}} : {{jakduSchedule.score.awayFullTime}}</span>
+            <span ng-if="jakduSchedule.score.homeOverTime && jakduSchedule.score.awayOverTime">OT {{jakduSchedule.score.homeOverTime}} : {{jakduSchedule.score.awayOverTime}}</span>
+            <span ng-if="jakduSchedule.score.homePenaltyShootout && jakduSchedule.score.awayPenaltyShootout">P {{jakduSchedule.score.homePenaltyShootout}} : {{jakduSchedule.score.awayPenaltyShootout}}</span>
+          </span>
+      </td>
+      <td>{{jakduSchedule.timeUp}}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.jakduScheduleGroups.length">
+  <h4>Jakdu Schedule Group</h4>
+  <table class="table">
+    <tr>
+      <th>id</th><th>Seq</th><th>State</th><th>OpenDate</th>
+    </tr>
+    <tr ng-repeat="jakduScheduleGroup in ctrl.jakduScheduleGroups">
+      <td><a ng-href="admin/jakdu/schedule/group/write/{{jakduScheduleGroup.id}}">{{jakduScheduleGroup.id}}</a></td>
+      <td>{{jakduScheduleGroup.seq}}</td>
+      <td>{{jakduScheduleGroup.state}}</td>
+      <td>{{jakduScheduleGroup.openDate | date:'short' }}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="ctrl.competitions.length">
+  <h4>Competitions</h4>
+  <table class="table">
+    <tr>
+      <th>Code</th><th>Names</th>
+    </tr>
+    <tr ng-repeat="competition in ctrl.competitions">
+      <td><a href="admin/competition/write/{{competition.id}}">{{competition.code}}</a></td>
+      <td><div ng-repeat="name in competition.names">Lang={{name.language}} F.N.={{name.fullName}} S.N.={{name.shortName}}</div>
+      </td>
+    </tr>
+  </table>
+</div>
