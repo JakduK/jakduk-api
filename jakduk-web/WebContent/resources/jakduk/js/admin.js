@@ -105,7 +105,7 @@
 				} else if (type === "attendanceClub") {
 					bUrl = '/admin/data/attendance/club.json';
 				} else if (type === "homeDescription") {
-					bUrl = '/api/admin/home/description';
+					bUrl = '/api/admin/home/descriptions';
 				} else if (type === "jakduSchedule") {
 					bUrl = '/admin/data/jakdu/schedule.json';
 				} else if (type === "jakduScheduleGroup") {

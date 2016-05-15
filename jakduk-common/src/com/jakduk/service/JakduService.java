@@ -1,7 +1,5 @@
 package com.jakduk.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
@@ -17,7 +15,6 @@ import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.JakduOnSchedule;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
-import com.jakduk.model.web.jakdu.JakduScheduleResponse;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
 import com.jakduk.repository.jakdu.JakduCommentRepository;
 import com.jakduk.repository.jakdu.JakduRepository;
@@ -25,11 +22,9 @@ import com.jakduk.repository.jakdu.JakduScheduleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import java.util.*;
 
@@ -66,43 +61,8 @@ public class JakduService {
         return jakduScheduleRepository.findOne(id);
     }
 
-    public JakduScheduleResponse getSchedules(String language, int page, int size) {
-
-        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
-        Pageable pageable = new PageRequest(page - 1, size, sort);
-
-        Set<ObjectId> fcIds = new HashSet<>();
-        Set<ObjectId> competitionIds = new HashSet<>();
-        List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll(pageable).getContent();
-
-        for (JakduSchedule jakduSchedule : jakduSchedules) {
-            fcIds.add(new ObjectId(jakduSchedule.getHome().getId()));
-            fcIds.add(new ObjectId(jakduSchedule.getAway().getId()));
-
-            if (jakduSchedule.getCompetition() != null)
-                competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
-        }
-
-        Map<String, LocalName> fcNames = new HashMap<>();
-        Map<String, LocalName> competitionNames = new HashMap<>();
-
-        List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(new ArrayList<>(fcIds), language, CommonConst.NAME_TYPE.fullName);
-        List<Competition> competitions = jakdukDAO.getCompetitionList(new ArrayList<>(competitionIds), language);
-
-        for (FootballClub fc : footballClubs) {
-            fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0));
-        }
-
-        for (Competition competition : competitions) {
-            competitionNames.put(competition.getId(), competition.getNames().get(0));
-        }
-
-        JakduScheduleResponse response = new JakduScheduleResponse();
-        response.setJakduSchedules(jakduSchedules);
-        response.setFcNames(fcNames);
-        response.setCompetitionNames(competitionNames);
-
-        return response;
+    public Page<JakduSchedule> findAll(Pageable pageable) {
+        return jakduScheduleRepository.findAll(pageable);
     }
 
     public Map getDataWrite(Locale locale) {
@@ -141,8 +101,8 @@ public class JakduService {
         Map<String, LocalName> fcNames = new HashMap<>();
         Map<String, LocalName> competitionNames = new HashMap<>();
 
-        List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(new ArrayList<>(fcIds), language, CommonConst.NAME_TYPE.fullName);
-        List<Competition> competitions = jakdukDAO.getCompetitionList(new ArrayList<>(competitionIds), language);
+        List<FootballClub> footballClubs = jakdukDAO.getFootballClubs(new ArrayList<>(fcIds), language, CommonConst.NAME_TYPE.fullName);
+        List<Competition> competitions = jakdukDAO.getCompetitions(new ArrayList<>(competitionIds), language);
 
         for (FootballClub fc : footballClubs) {
             fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0));

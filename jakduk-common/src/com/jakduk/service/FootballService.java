@@ -2,6 +2,7 @@ package com.jakduk.service;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.Competition;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.embedded.LocalName;
@@ -35,6 +36,13 @@ public class FootballService {
         return footballClubRepository.findOne(id);
     }
 
+    /**
+     * 조건에 맞는 축구단 목록을 가져온다.
+     * @param language 언어
+     * @param clubType 클럽 성격
+     * @param sortNameType 정렬 기준
+     * @return
+     */
     public List<FootballClub> getFootballClubs(String language, CommonConst.CLUB_TYPE clubType, CommonConst.NAME_TYPE sortNameType) {
 
         List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(clubType);
@@ -45,11 +53,26 @@ public class FootballService {
             ids.add(new ObjectId(id));
         }
 
-        List<FootballClub> footballClubs = jakdukDAO.getFootballClubList(ids, language, sortNameType);
+        List<FootballClub> footballClubs = jakdukDAO.getFootballClubs(ids, language, sortNameType);
 
         return footballClubs;
     }
 
+    /**
+     * 조건에 맞는 축구단 목록을 가져온다.
+     * @param language 언어
+     * @param sortNameType 정렬 기준
+     * @param ids footballClub Id 배열
+     * @return
+     */
+    public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CommonConst.NAME_TYPE sortNameType ) {
+
+        List<FootballClub> footballClubs = jakdukDAO.getFootballClubs(ids, language, sortNameType);
+
+        return footballClubs;
+    }
+
+    // 해당 언어에 맞는 축구단 이름 가져오기.
     public LocalName getLocalNameOfFootballClub(FootballClub footballClub, String language) {
         LocalName localName = null;
 
@@ -64,5 +87,10 @@ public class FootballService {
         }
 
         return localName;
+    }
+
+    // 대회 목록.
+    public List<Competition> getCompetitions(List<ObjectId> ids, String language) {
+        return jakdukDAO.getCompetitions(ids, language);
     }
 }

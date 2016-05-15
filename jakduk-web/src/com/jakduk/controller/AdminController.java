@@ -241,6 +241,17 @@ public class AdminController {
 		return "admin/homeDescriptionWrite";
 	}
 
+	@RequestMapping(value = "/home/description/write/{id}", method = RequestMethod.GET)
+	public String homeDescriptionWrite(@PathVariable String id, Model model) {
+
+		HomeDescription homeDescription = adminService.findHomeDescriptionById(id);
+
+		model.addAttribute("homeDescription", homeDescription);
+
+		return "admin/homeDescriptionWrite";
+	}
+
+
 	@RequestMapping(value = "/home/description/write", method = RequestMethod.POST)
 	public String homeDescriptionWrite(@Valid HomeDescription homeDescription, BindingResult result) {
 		

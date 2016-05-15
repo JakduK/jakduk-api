@@ -1,4 +1,4 @@
-package com.jakduk.model.web.jakdu;
+package com.jakduk.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -14,9 +14,9 @@ import java.util.Map;
  * Created by pyohwan on 16. 3. 26.
  */
 
+@Data
 @JsonTypeName(value = "response")
 @JsonTypeInfo(use=JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
-@Data
 public class JakduScheduleResponse {
     private Map<String, LocalName> fcNames;
     private Map<String, LocalName> competitionNames;

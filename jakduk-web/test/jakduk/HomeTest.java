@@ -87,7 +87,7 @@ public class HomeTest {
 
 		List<FootballClub> footballClubs = footballService.getFootballClubs("ko", CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.shortName);
 
-		System.out.println("getFootballClubList=" + footballClubs);
+		System.out.println("getFootballClubs=" + footballClubs);
 	}
 
 }

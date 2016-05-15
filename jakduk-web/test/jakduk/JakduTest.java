@@ -1,12 +1,10 @@
 package jakduk;
 
-import com.jakduk.common.CommonConst;
 import com.jakduk.configuration.AppConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Competition;
 import com.jakduk.model.db.JakduComment;
 import com.jakduk.model.db.JakduSchedule;
-import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.repository.jakdu.JakduRepository;
 import com.jakduk.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
@@ -47,7 +45,7 @@ public class JakduTest {
         List<ObjectId> ids = new ArrayList<ObjectId>();
         ids.add(new ObjectId("567e9af6e4b0c12e43d76157"));
 
-        List<Competition> competitions = jakdukDAO.getCompetitionList(ids, "ko");
+        List<Competition> competitions = jakdukDAO.getCompetitions(ids, "ko");
 
         System.out.println("competitions=" + competitions);
     }

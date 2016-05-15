@@ -1,8 +1,12 @@
 package com.jakduk.model.embedded;
 
+import lombok.Data;
+
 /**
  * Created by pyohwan on 15. 12. 26.
  */
+
+@Data
 public class LocalName {
 
     private String language;
@@ -10,37 +14,4 @@ public class LocalName {
     private String fullName;
 
     private String shortName;
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    @Override
-    public String toString() {
-        return "LocalName{" +
-                "language='" + language + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", shortName='" + shortName + '\'' +
-                '}';
-    }
 }

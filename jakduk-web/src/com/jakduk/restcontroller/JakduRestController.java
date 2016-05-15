@@ -2,18 +2,22 @@ package com.jakduk.restcontroller;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.db.Jakdu;
-import com.jakduk.model.db.JakduComment;
-import com.jakduk.model.db.JakduSchedule;
-import com.jakduk.vo.UserFeelingResponse;
+import com.jakduk.model.db.*;
+import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
-import com.jakduk.model.web.jakdu.JakduScheduleResponse;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.JakduService;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
+import com.jakduk.service.CommonService;
+import com.jakduk.service.FootballService;
+import com.jakduk.service.JakduService;
+import com.jakduk.vo.JakduScheduleResponse;
+import com.jakduk.vo.UserFeelingResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +26,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by pyohwan on 16. 3. 4.
@@ -40,6 +45,9 @@ public class JakduRestController {
 
     @Autowired
     private CommonService commonService;
+
+    @Autowired
+    private FootballService footballService;
 
     // /jakdu/write에서 쓰이는데 안쓸것 같다.
     @RequestMapping(value = "/data", method = RequestMethod.GET)
@@ -60,7 +68,34 @@ public class JakduRestController {
         Locale locale = localeResolver.resolveLocale(request);
         String language = commonService.getLanguageCode(locale, null);
 
-        JakduScheduleResponse response = jakduService.getSchedules(language, page, size);
+        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
+        Pageable pageable = new PageRequest(page - 1, size, sort);
+
+        Set<ObjectId> fcIds = new HashSet<>();
+        Set<ObjectId> competitionIds = new HashSet<>();
+        List<JakduSchedule> jakduSchedules = jakduService.findAll(pageable).getContent();
+
+        for (JakduSchedule jakduSchedule : jakduSchedules) {
+            fcIds.add(new ObjectId(jakduSchedule.getHome().getId()));
+            fcIds.add(new ObjectId(jakduSchedule.getAway().getId()));
+
+            if (Objects.nonNull(jakduSchedule.getCompetition()))
+                competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
+        }
+
+        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, CommonConst.NAME_TYPE.fullName);
+        List<Competition> competitions = footballService.getCompetitions(new ArrayList<>(competitionIds), language);
+
+        Map<String, LocalName> fcNames = footballClubs.stream()
+                .collect(Collectors.toMap(footballClub -> footballClub.getOrigin().getId(), footballClub -> footballClub.getNames().get(0)));
+
+        Map<String, LocalName> competitionNames = competitions.stream()
+                .collect(Collectors.toMap(Competition::getId, competition -> competition.getNames().get(0)));
+
+        JakduScheduleResponse response = new JakduScheduleResponse();
+        response.setJakduSchedules(jakduSchedules);
+        response.setFcNames(fcNames);
+        response.setCompetitionNames(competitionNames);
 
         return response;
     }

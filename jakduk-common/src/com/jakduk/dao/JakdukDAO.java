@@ -49,7 +49,7 @@ public class JakdukDAO {
 	 * @param language
 	 * @return
 	 */
-	public List<FootballClub> getFootballClubList(List<ObjectId> ids, String language, CommonConst.NAME_TYPE sortNameType) {
+	public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CommonConst.NAME_TYPE sortNameType) {
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where("names.language").is(language));
@@ -295,7 +295,8 @@ public class JakdukDAO {
 		return galleries;
 	}
 
-	public List<Competition> getCompetitionList(List<ObjectId> ids, String language) {
+	// 대회 목록.
+	public List<Competition> getCompetitions(List<ObjectId> ids, String language) {
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where("_id").in(ids));

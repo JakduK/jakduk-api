@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
 import com.jakduk.model.embedded.LocalName;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,13 +19,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+@Data
 @Document
-public class FootballClub implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 817223142559164242L;
+public class FootballClub {
 
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
@@ -35,43 +32,4 @@ public class FootballClub implements Serializable {
 	private String active;
 	
 	private List<LocalName> names;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public FootballClubOrigin getOrigin() {
-		return origin;
-	}
-
-	public void setOrigin(FootballClubOrigin origin) {
-		this.origin = origin;
-	}
-
-	public String getActive() {
-		return active;
-	}
-
-	public void setActive(String active) {
-		this.active = active;
-	}
-
-	public List<LocalName> getNames() {
-		return names;
-	}
-
-	public void setNames(List<LocalName> names) {
-		this.names = names;
-	}
-
-	@Override
-	public String toString() {
-		return "FootballClub [id=" + id + ", origin=" + origin + ", active="
-				+ active + ", names=" + names + "]";
-	}
-
 }
