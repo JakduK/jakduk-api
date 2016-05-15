@@ -31,7 +31,12 @@ var Jakduk = (function() {
 			return function(objectId) {
 				return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
 			}
-
+		})
+		// mongodb id의 앞 8자리(16진수)를 int로 변환.
+		.filter('intFromObjectId', function() {
+			return function(objectId) {
+				return parseInt(objectId.substring(0, 8), 16) * 1000;
+			}
 		})
 		.controller("headerCtrl", ['$scope', '$location', function($scope, $location) {
 

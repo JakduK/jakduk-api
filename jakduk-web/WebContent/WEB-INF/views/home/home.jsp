@@ -50,8 +50,8 @@
 											<span aria-hidden="true" class="icon-user"></span>
 											<span ng-bind="post.writer.username"></span>
 											&nbsp;
-											<span ng-if="${timeNow} > intFromObjectId(post.id)" ng-bind="post.id | dateFromObjectId | date:'${dateTimeFormat.date}'"></span>
-											<span ng-if="${timeNow} <= intFromObjectId(post.id)" ng-bind="post.id | dateFromObjectId | date:'${dateTimeFormat.time}'"></span>
+											<span ng-if="${timeNow} > (post.id | intFromObjectId)" ng-bind="post.id | dateFromObjectId | date:'${dateTimeFormat.date}'"></span>
+											<span ng-if="${timeNow} <= (post.id | intFromObjectId)" ng-bind="post.id | dateFromObjectId | date:'${dateTimeFormat.time}'"></span>
 											&nbsp;
 											<span aria-hidden="true" class="icon-eye"></span> <span ng-bind="post.views"></span>
 										</small>
@@ -197,8 +197,6 @@
 				.controller("homeCtrl", function ($scope, $http) {
 					$scope.refreshEncyclopedia = refreshEncyclopedia;
 					$scope.getDataLatest = getDataLatest;
-					$scope.objectIdFromDate = objectIdFromDate;
-					$scope.intFromObjectId = intFromObjectId;
 
 					$scope.encyclopedia = {};
 					$scope.encyclopediaConn = "none";
@@ -289,14 +287,6 @@
 								$scope.error = '<spring:message code="common.msg.error.network.unstable"/>';
 							});
 						}
-					}
-
-					function objectIdFromDate(date) {
-						return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
-					}
-
-					function intFromObjectId(objectId) {
-						return parseInt(objectId.substring(0, 8), 16) * 1000;
 					}
 				});
 

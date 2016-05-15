@@ -110,8 +110,18 @@ public class AdminService {
 	private CompetitionRepository competitionRepository;
 
 	// 알림판 목록.
-	public List<HomeDescription> getHomeDescriptions() {
+	public List<HomeDescription> findHomeDescriptions() {
 		return homeDescriptionReposotiry.findAll();
+	}
+
+	// 알림판 하나.
+	public HomeDescription findHomeDescriptionById(String id) {
+		return homeDescriptionReposotiry.findOne(id);
+	}
+
+	// 알림판 저장.
+	public void saveHomeDescription(HomeDescription homeDescription) {
+		homeDescriptionReposotiry.save(homeDescription);
 	}
 
 	public String initBoardCategory() {
@@ -660,15 +670,7 @@ public String initSearchData() {
 		
 		return false;
 	}
-	
-	public Model getHomeDescription(Model model, String id) {
-		HomeDescription homeDescription = homeDescriptionReposotiry.findOne(id);
-		
-		model.addAttribute("homeDescription", homeDescription);
-		
-		return model;
-	}
-	
+
 	public void homeDescriptionWrite(HomeDescription homeDescription) {
 		
 		if (homeDescription.getId().isEmpty()) {

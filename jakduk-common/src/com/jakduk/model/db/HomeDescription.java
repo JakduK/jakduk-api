@@ -3,6 +3,10 @@ package com.jakduk.model.db;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
+`import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,6 +17,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Document
 public class HomeDescription {
 	
@@ -25,35 +33,4 @@ public class HomeDescription {
 	private String desc;
 	
 	private Integer priority;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getDesc() {
-		return desc;
-	}
-
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
-
-	public Integer getPriority() {
-		return priority;
-	}
-
-	public void setPriority(Integer priority) {
-		this.priority = priority;
-	}
-
-	@Override
-	public String toString() {
-		return "HomeDescription [id=" + id + ", desc=" + desc + ", priority="
-				+ priority + "]";
-	}
-
 }
