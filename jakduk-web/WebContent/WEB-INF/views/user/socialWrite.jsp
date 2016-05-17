@@ -174,7 +174,7 @@
 						submitted = true;
 						$scope.btnSubmit = true;
 					} else {
-						if ($scope.socialUserForm.email.$invalid) {
+						if ($scope.userProfileForm.email.$invalid) {
 							$scope.validationEmail();
 						} else if ($scope.userProfileForm.username.$invalid) {
 							$scope.validationUsername();
