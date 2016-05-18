@@ -3,6 +3,7 @@ package com.jakduk.authentication.jakduk;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
 import com.jakduk.service.CommonService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -25,6 +27,7 @@ import java.util.Locale;
  * @desc     :
  */
 
+@Slf4j
 @Component
 public class JakdukFailureHandler implements AuthenticationFailureHandler {
 
@@ -48,12 +51,13 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 		String result = "failure";
 		String message = "";
 
+		Throwable throwable = exception.getCause();
 
-		if (exception.getCause().getClass().isAssignableFrom(FindUserButNotJakdukAccount.class)) {
+		if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(FindUserButNotJakdukAccount.class)) {
 			result = "warning";
 			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns",
 					((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
-		} else if (exception.getClass().isAssignableFrom(LockedException.class)) {
+		} else if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(LockedException.class)) {
 			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure.locked");
 		} else {
 			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure");

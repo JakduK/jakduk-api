@@ -46,7 +46,7 @@
 							</div>
 
 							<div class="form-group has-feedback"
-								 ng-class="{'has-success':userWrite.email.$valid, 'has-error':userWrite.email.$invalid || emailStatus != 'OK'}">
+								 ng-class="{'has-success':userWrite.email.$valid && emailStatus == 'OK', 'has-error':userWrite.email.$invalid || emailStatus != 'OK'}">
 								<label class="control-label">
 									<abbr title='<spring:message code="common.msg.required"/>'>*</abbr>
 									<spring:message code="user.email"/>
@@ -57,7 +57,7 @@
 									ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax"/>
 
 								<span class="glyphicon form-control-feedback"
-									ng-class="{'glyphicon-ok':userWrite.email.$valid, 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'OK'}"></span>
+									  ng-class="{'glyphicon-ok':userWrite.email.$valid && emailStatus == 'OK', 'glyphicon-remove':userWrite.email.$invalid || emailStatus != 'OK'}"></span>
 
 								<i class="fa fa-spinner fa-spin" ng-show="emailConn == 'connecting'"></i>
 								<form:errors path="email" cssClass="text-danger" element="span" ng-hide="emailAlert.msg"/>
@@ -65,7 +65,7 @@
 							</div>
 
 							<div class="form-group has-feedback"
-								 ng-class="{'has-success':userWrite.username.$valid, 'has-error':userWrite.username.$invalid || usernameStatus != 'OK'}">
+								 ng-class="{'has-success':userWrite.username.$valid && usernameStatus == 'OK', 'has-error':userWrite.username.$invalid || usernameStatus != 'OK'}">
 
 								<label class="control-label">
 									<abbr title='<spring:message code="common.msg.required"/>'>*</abbr>
@@ -76,8 +76,8 @@
 									ng-blur="onUsername()" ng-keyup="validationUsername()"
 									ng-required="true" ng-minlength="usernameLengthMin" ng-maxlength="usernameLengthMax"/>
 
-							<span class="glyphicon form-control-feedback"
-								  ng-class="{'glyphicon-ok':userWrite.username.$valid, 'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'OK'}"></span>
+								<span class="glyphicon form-control-feedback"
+									  ng-class="{'glyphicon-ok':userWrite.username.$valid && usernameStatus == 'OK', 'glyphicon-remove':userWrite.username.$invalid || usernameStatus != 'OK'}"></span>
 
 								<i class="fa fa-spinner fa-spin" ng-show="usernameConn == 'connecting'"></i>
 								<form:errors path="username" cssClass="text-danger" element="span" ng-hide="usernameAlert.msg"/>
@@ -197,6 +197,15 @@
 				$scope.equalPasswordStatus = "false";
 
 				angular.element(document).ready(function () {
+					// 서버의 spring form validation에서 검증 실패 될 경우, 처음에 메시지를 출력한다.
+					var emailErrors = document.getElementById("email.errors");
+					var usernameErrors = document.getElementById("username.errors");
+
+					if (Jakduk.isEmpty(emailErrors) == true)
+						$scope.onEmail();
+
+					if (Jakduk.isEmpty(usernameErrors) == true)
+						$scope.onUsername();
 				});
 
 				$scope.onSubmit = function (event) {
@@ -242,6 +251,7 @@
 								$scope.emailConn = "none";
 							});
 							reqPromise.error(function (data, status, headers, config) {
+								$scope.emailStatus = "INVALID";
 								$scope.emailConn = "none";
 								$scope.emailAlert = {"classType": "text-danger", "msg": data.message};
 							});
@@ -271,6 +281,7 @@
 								$scope.usernameConn = "none";
 							});
 							reqPromise.error(function (data, status, headers, config) {
+								$scope.usernameStatus = 'INVALID';
 								$scope.usernameConn = "none";
 								$scope.usernameAlert = {"classType": "text-danger", "msg": data.message};
 							});
