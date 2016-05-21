@@ -1,24 +1,28 @@
-var Jakduk = (function() {
+(function() {
 	'use strict';
-	return {
-		BoardCommentSize: 30,
-		BoardCommentContentLengthMin: 3, // 게시판 댓글 입력 가능한 최소한의 문자열 수
-		BoardCommentContentLengthMax: 800, // 게시판 댓글 입력 가능한 최대 문자열 수
-		SummernoteContentsMinSize: 5,
-		FormEmailLengthMin: 6,
-		FormEmailLengthMax: 30,
-		FormPasswordLengthMin: 4,
-		FormPasswordLengthMax: 20,
-		FormUsernameLengthMin: 2,
-		FormUsernameLengthMax: 20,
-		ItemsPerPageOnSearch: 10, 			// 찾기에서 페이지 당 아이템 수
-		ItemsPerPageOnSearchGallery: 12, 	// 찾기에서 사진첩의 페이지 당 아이템 수
-		ItemsPerPageOnGallery: 24,  		// 사진첩에서 한번 로딩할때 가져오는 그림의 수
-		ItemsPerPageOnBoardComments: 10,
-		isEmpty: function isEmpty(str) {
-			var obj = String(str);
-			return !!(obj == null || obj == undefined || obj == 'null' || obj == 'undefined' || obj == '');
-		}
+
+	var Jakduk = window.Jakduk;
+	if (!Jakduk) {
+		Jakduk = window.Jakduk = {};
+	}
+
+	Jakduk.BoardCommentSize = 30;
+	Jakduk.BoardCommentContentLengthMin = 3; // 게시판 댓글 입력 가능한 최소한의 문자열 수
+	Jakduk.BoardCommentContentLengthMax = 800; // 게시판 댓글 입력 가능한 최대 문자열 수
+	Jakduk.SummernoteContentsMinSize = 5;
+	Jakduk.FormEmailLengthMin = 6;
+	Jakduk.FormEmailLengthMax = 30;
+	Jakduk.FormPasswordLengthMin = 4;
+	Jakduk.FormPasswordLengthMax = 20;
+	Jakduk.FormUsernameLengthMin = 2;
+	Jakduk.FormUsernameLengthMax = 20;
+	Jakduk.ItemsPerPageOnSearch = 10; 			// 찾기에서 페이지 당 아이템 수
+	Jakduk.ItemsPerPageOnSearchGallery = 12; 	// 찾기에서 사진첩의 페이지 당 아이템 수
+	Jakduk.ItemsPerPageOnGallery = 24;  		// 사진첩에서 한번 로딩할때 가져오는 그림의 수
+	Jakduk.ItemsPerPageOnBoardComments = 10;
+	Jakduk.isEmpty = function (str) {
+		var obj = String(str);
+		return !!(obj == null || obj == undefined || obj == 'null' || obj == 'undefined' || obj == '');
 	};
 }());
 
@@ -95,11 +99,10 @@ var Jakduk = (function() {
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 (function() {
-	var userId = "${accountName}";
-	if (Jakduk.isEmpty(userId)) {
+	if (Jakduk.isEmpty(Jakduk.userId)) {
 		ga('create', 'UA-59051176-1', 'auto');
 	} else {
-		ga('create', 'UA-59051176-1', {'userId' : userId});
+		ga('create', 'UA-59051176-1', {'userId' : Jakduk.userId});
 	}
 	ga('send', 'pageview');
 }());
