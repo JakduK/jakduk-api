@@ -1,0 +1,22 @@
+<div class="alert alert-danger" ng-bind="ctrl.errorMessage" ng-if="ctrl.errorMessage"></div>
+<form name="encyclopedia" ng-submit="ctrl.submit()" novalidate>
+  <p>
+    LANGUAGE : <input name="language" class="form-control" placeholder="language" ng-model="ctrl.language"/>
+  </p>
+  <p>
+    KIND :
+    <select name="kind" class="form-control" ng-model="ctrl.kind">
+      <option value="player">Player</option>
+      <option value="book">Book</option>
+    </select>
+  </p>
+  <p>
+    SUBJECT : <input name="subject" class="form-control" placeholder="subject" ng-model="ctrl.subject"/>
+  </p>
+  <p>
+    CONTENT : <textarea name="content" class="form-control" cols="40" rows="5" ng-model="ctrl.content"/>
+  </p>
+  <p>
+    <input type="submit" class="btn btn-default"/>
+  </p>
+</form>

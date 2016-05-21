@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.web.AttendanceClubWrite;
@@ -40,13 +39,8 @@ public class AdminController {
 	
 	@Autowired
 	private AdminService adminService;
-
-	@RequestMapping
-	public String root() {
-		return "redirect:/admin/settings";
-	}
 	
-	@RequestMapping(value = "/settings")
+	@RequestMapping
 	public String home() {
 		return "admin/admin";
 	}
@@ -71,13 +65,61 @@ public class AdminController {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.GET)
-	public String encyclopediaWrite(Model model) {
-		model.addAttribute("encyclopedia", new Encyclopedia());
-		
-		return "admin/encyclopediaWrite";
+	@RequestMapping(value = "/encyclopedia/write")
+	public String writeEncyclopedia() {
+		return "admin/admin";
 	}
-	
+
+	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
+	public String dateEncyclopedia() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/fcOrigin", method = RequestMethod.GET)
+	public String datefcOrigin() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/fc", method = RequestMethod.GET)
+	public String datefc() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/boardCategory", method = RequestMethod.GET)
+	public String dateBoardCategory() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/homeDescription", method = RequestMethod.GET)
+	public String dateHomeDescription() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/attendanceLeague", method = RequestMethod.GET)
+	public String dateAttendanceLeague() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/attendanceClub", method = RequestMethod.GET)
+	public String dateAttendanceClub() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/jakduSchedule", method = RequestMethod.GET)
+	public String dateJakduSchedule() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/jakduScheduleGroup", method = RequestMethod.GET)
+	public String dateJakduScheduleGroup() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/competition", method = RequestMethod.GET)
+	public String dateCompetition() {
+		return "admin/admin";
+	}
+
 	@RequestMapping(value = "/encyclopedia/write/{seq}", method = RequestMethod.GET)
 	public String encyclopediaWrite(@PathVariable int seq, Model model,
 			@RequestParam(required = true) String lang) {
@@ -85,25 +127,6 @@ public class AdminController {
 		adminService.getEncyclopedia(model, seq, lang);
 		
 		return "admin/encyclopediaWrite";
-	}
-	
-	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.POST)
-	public String encyclopediaWrite(@Valid Encyclopedia encyclopedia, BindingResult result) {
-		
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "encyclopedia/write";
-		}
-		
-		adminService.encyclopediaWrite(encyclopedia);
-		
-		return "redirect:/admin/settings?open=encyclopedia";
-	}
-
-	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
-	public void dataEncyclopedia(Model model) {
-
-		adminService.getEncyclopediaList(model);
 	}
 	
 	@RequestMapping(value = "/footballclub/write", method = RequestMethod.GET)
