@@ -69,7 +69,7 @@ public class AdminRestController {
             throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
         }
 
-        Map<String, Object> response = new HashMap();
+        Map<String, Object> response = new HashMap<>();
 
         response.put("homeDescription", homeDescription);
 
@@ -80,7 +80,7 @@ public class AdminRestController {
     @RequestMapping(value = "/home/description", method = RequestMethod.POST)
     public Map<String, Object> homeDescriptionWrite(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
-        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
+        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty())
             throw new IllegalArgumentException("desc는 필수값입니다.");
 
         if (Objects.isNull(homeDescriptionRequest.getPriority()))
@@ -105,7 +105,7 @@ public class AdminRestController {
     public Map<String, Object> homeDescriptionWrite(@PathVariable String id,
                                                     @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
-        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
+        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty())
             throw new IllegalArgumentException("desc는 필수값입니다.");
 
         if (Objects.isNull(homeDescriptionRequest.getPriority()))
@@ -124,7 +124,7 @@ public class AdminRestController {
 
         adminService.saveHomeDescription(homeDescription);
 
-        Map<String, Object> response = new HashMap();
+        Map<String, Object> response = new HashMap<>();
 
         response.put("homeDescription", homeDescription);
 
@@ -142,7 +142,7 @@ public class AdminRestController {
 
         adminService.deleteHomeDescriptionById(id);
 
-        Map<String, Object> response = new HashMap();
+        Map<String, Object> response = new HashMap<>();
         response.put("result", true);
 
         return response;
