@@ -99,11 +99,6 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	// social 계정으로 회원 가입.
-	public User addSocialUser(User user) {
-		return userRepository.save(user);
-	}
-
 	public CommonWriter testFindId(String userid) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("email").is(userid));
@@ -212,7 +207,7 @@ public class UserService {
 		this.save(user);
 		
 		if (log.isInfoEnabled()) {
-			log.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
+			log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
 		}
 	}
 
@@ -222,7 +217,7 @@ public class UserService {
 		this.save(user);
 
 		if (log.isInfoEnabled()) {
-			log.info("jakduk user password was changed. id=" + user.getId() + ", username=" + user.getUsername());
+			log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
 		}
 	}
 
@@ -293,9 +288,9 @@ public class UserService {
 		boolean credentialsNonExpired = true;
 		boolean accountNonLocked = true;
 
-		JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
-				, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
-				, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
+		JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId(),
+				user.getPassword(), user.getUsername(), user.getProviderId(),
+				enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukPrincipal, user.getPassword(), jakdukPrincipal.getAuthorities());
 

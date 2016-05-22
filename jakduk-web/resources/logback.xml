@@ -33,6 +33,21 @@
         </encoder>
     </appender>
 
+    <appender name="userDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/user.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/user.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{ISO8601} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="authDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/auth.log</file>
         <append>true</append>
@@ -113,6 +128,14 @@
     <logger name="org.hibernate" level="DEBUG"/>
     -->
     <logger name="org.mongodb.driver.cluster" level="INFO"/>
+
+    <logger name="com.jakduk.controller.user" level="DEBUG">
+        <appender-ref ref="userDailyRollingFile" />
+    </logger>
+
+    <logger name="com.jakduk.service.UserService" level="DEBUG">
+        <appender-ref ref="userDailyRollingFile" />
+    </logger>
 
     <logger name="com.jakduk.authentication" level="DEBUG">
         <appender-ref ref="authDailyRollingFile" />

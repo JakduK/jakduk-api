@@ -1,4 +1,4 @@
-package com.jakduk.controller.session;
+package com.jakduk.controller.user;
 
 import com.jakduk.authentication.jakduk.JakdukPrincipal;
 import com.jakduk.authentication.social.SocialUserDetail;
@@ -155,12 +155,11 @@ public class UserProfileWriteController {
 		}
 
 		userService.save(user);
+
+		log.debug("jakduk user updated. user=" + user);
+
 		userService.signUpJakdukUser(user);
 		sessionStatus.setComplete();
-
-		if (log.isDebugEnabled()) {
-			log.debug("jakduk user update. user=" + user);
-		}
 
 		return "redirect:/user/profile?status=1";
 	}
@@ -278,11 +277,13 @@ public class UserProfileWriteController {
 			user.setAbout(userProfileForm.getAbout().trim());
 		}
 
-		User returnUser = userService.addSocialUser(user);
+		userService.save(user);
+
+		log.debug("social user created. user=" + user);
 
 		sessionStatus.setComplete();
 
-		userService.signUpSocialUser(returnUser);
+		userService.signUpSocialUser(user);
 
 		providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 
@@ -349,6 +350,8 @@ public class UserProfileWriteController {
 		}
 
 		User user = userService.editSocialProfile(userProfileForm);
+
+		log.debug("social user updated. user=" + user);
 
 		sessionStatus.setComplete();
 

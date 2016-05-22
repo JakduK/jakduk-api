@@ -1,4 +1,4 @@
-package com.jakduk.controller;
+package com.jakduk.controller.user;
 
 import java.util.List;
 import java.util.Locale;

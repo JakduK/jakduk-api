@@ -5,6 +5,8 @@ import com.jakduk.exception.FindUserButNotJakdukAccount;
 import com.jakduk.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -51,18 +53,22 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 		String result = "failure";
 		String message = "";
 
-		Throwable throwable = exception.getCause();
+		if (exception instanceof InternalAuthenticationServiceException) {
+			Throwable throwable = exception.getCause();
 
-		if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(FindUserButNotJakdukAccount.class)) {
-			result = "warning";
-			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns",
-					((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
-		} else if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(LockedException.class)) {
-			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure.locked");
+			if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(FindUserButNotJakdukAccount.class)) {
+				result = "warning";
+				message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns",
+						((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
+			} else if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(LockedException.class)) {
+				message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure.locked");
+			}
+		} else if (exception instanceof BadCredentialsException) {
+			message = commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.wrong.password");
 		} else {
 			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure");
 		}
-		
+
 		if (remember != null && remember.equals("on")) {
 			String email = request.getParameter("j_username");
 			

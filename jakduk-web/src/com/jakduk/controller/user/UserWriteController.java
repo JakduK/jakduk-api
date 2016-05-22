@@ -1,4 +1,4 @@
-package com.jakduk.controller.session;
+package com.jakduk.controller.user;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
@@ -130,6 +130,8 @@ public class UserWriteController {
 		user.setRoles(roles);
 		
 		userService.save(user);
+
+		log.debug("jakduk user created. user=" + user);
 
 		userService.signUpJakdukUser(user);
 
