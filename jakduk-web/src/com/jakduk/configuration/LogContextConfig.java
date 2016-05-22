@@ -26,9 +26,9 @@ public class LogContextConfig implements InitializingBean {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
         Boolean enabled = environment.getProperty("slack.enabled", Boolean.class);
-        String webhook = environment.getProperty("slack.webhook");
-        String channel = environment.getProperty("slack.channel");
-        String username = environment.getProperty("slack.username");
+        String webhook = environment.getProperty("slack.log.webhook");
+        String channel = environment.getProperty("slack.log.channel");
+        String username = environment.getProperty("slack.log.username");
         PatternLayout layout = new PatternLayout();
         layout.setContext(loggerContext);
         layout.setPattern("%-4relative [%thread] %-5level %class - %msg%n");

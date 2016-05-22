@@ -3,6 +3,7 @@ package com.jakduk.configuration;
 import com.jakduk.dao.JongoR;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import net.gpedro.integrations.slack.SlackApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -83,6 +84,11 @@ public class AppConfig {
     @Bean
     public MongoClient mongoClient() throws UnknownHostException {
         return new MongoClient(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
+    }
+
+    @Bean
+    public SlackApi slackApi() {
+        return new SlackApi(environment.getProperty("slack.board.webhook"));
     }
 
 }

@@ -19,6 +19,7 @@ import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.model.web.BoardListInfo;
+import com.jakduk.notification.SlackService;
 import com.jakduk.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -83,6 +84,9 @@ public class BoardFreeService {
 	
 	@Autowired
 	private SearchService searchService;
+
+	@Autowired
+	private SlackService slackService;
 
 	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
 		return boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
@@ -330,6 +334,9 @@ public class BoardFreeService {
 				.replaceAll("\r|\n|&nbsp;",""));
 		
 		searchService.createDocumentBoard(boardFreeOnEs);
+
+		// 슬랙 알림
+		slackService.send(boardFree.getWriter().getUsername(), boardFree.getSubject());
 		
 		if (log.isInfoEnabled()) {
 			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
@@ -338,7 +345,7 @@ public class BoardFreeService {
 		if (log.isDebugEnabled()) {
 			log.debug("boardFree(new) = " + boardFree);
 		}
-		
+
 		return HttpServletResponse.SC_OK;		
 	}
 	
