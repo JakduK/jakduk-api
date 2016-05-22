@@ -149,6 +149,16 @@ public class AdminService {
 		homeDescriptionReposotiry.save(homeDescription);
 	}
 
+	// 백과사전 목록.
+	public List<Encyclopedia> findEncyclopedias() {
+		return encyclopediaRepository.findAll();
+	}
+
+	// 백과사전 저장.
+	public void saveEncyclopedia(Encyclopedia encyclopedia) {
+		encyclopediaRepository.save(encyclopedia);
+	}
+
 	// 알림판 삭제.
 	public void deleteHomeDescriptionById(String id) {
 		homeDescriptionReposotiry.delete(id);
@@ -506,15 +516,7 @@ public HashMap<String, Object> initSearchData() {
 		
 		boardCategoryRepository.save(boardCategory);
 	}
-	
-	public Model getEncyclopediaList(Model model) {
-		List<Encyclopedia> encyclopedias = encyclopediaRepository.findAll();
-		
-		model.addAttribute("encyclopedias", encyclopedias);
-		
-		return model;
-	}
-	
+
 	public Model getEncyclopedia(Model model, int seq, String language) {
 		Encyclopedia encyclopedia = encyclopediaRepository.findOneBySeqAndLanguage(seq, language);
 		

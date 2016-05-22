@@ -167,7 +167,7 @@
 				var bUrl;
 
 				if (type === "encyclopedia") {
-					bUrl = '/admin/encyclopedia.json';
+					bUrl = '/api/admin/encyclopedias';
 				} else if (type === "fcOrigin") {
 					bUrl = '/admin/footballclub/origin.json';
 				} else if (type === "fc") {

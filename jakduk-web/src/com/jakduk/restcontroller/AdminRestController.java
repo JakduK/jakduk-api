@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.jakduk.common.CommonConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -48,7 +49,7 @@ public class AdminRestController {
 
     // 알림판 목록.
     @RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
-    public Map<String, Object> dataHomeDescription() {
+    public Map<String, Object> getHomeDescriptions() {
 
         List<HomeDescription> homeDescriptions = adminService.findHomeDescriptions();
 
@@ -61,8 +62,8 @@ public class AdminRestController {
 
     // 알림판 하나.
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.GET)
-    public Map<String, Object> homeDescriptionWrite(@PathVariable String id,
-                                                    HttpServletRequest request) {
+    public Map<String, Object> gethomeDescription(@PathVariable String id,
+                                                  HttpServletRequest request) {
 
         HomeDescription homeDescription = adminService.findHomeDescriptionById(id);
 
@@ -81,7 +82,7 @@ public class AdminRestController {
 
     // 새 알림판 저장.
     @RequestMapping(value = "/home/description", method = RequestMethod.POST)
-    public Map<String, Object> homeDescriptionWrite(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
+    public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
         if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty())
             throw new IllegalArgumentException("desc는 필수값입니다.");
@@ -105,8 +106,8 @@ public class AdminRestController {
 
     // 알림판 편집.
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> homeDescriptionWrite(@PathVariable String id,
-                                                    @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
+    public Map<String, Object> EditHomeDescription(@PathVariable String id,
+                                                   @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
         if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty())
             throw new IllegalArgumentException("desc는 필수값입니다.");
@@ -136,7 +137,7 @@ public class AdminRestController {
 
     // 알림판 지움.
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.DELETE)
-    public Map<String, Object> homeDescriptionWrite(@PathVariable String id) {
+    public Map<String, Object> DeleteHomeDescription(@PathVariable String id) {
 
         HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
 
@@ -147,6 +148,40 @@ public class AdminRestController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("result", true);
+
+        return response;
+    }
+
+    // 백과사전 목록.
+    @RequestMapping(value = "/encyclopedias", method = RequestMethod.GET)
+    public Map<String, Object> getEncyclopedias() {
+
+        List<Encyclopedia> encyclopedias = adminService.findEncyclopedias();
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("encyclopedias", encyclopedias);
+
+        return response;
+    }
+
+    // 새 백과사전 저장.
+    @RequestMapping(value = "/encyclopedia", method = RequestMethod.POST)
+    public Map<String, Object> addEncyclopedia(@RequestBody Encyclopedia encyclopedia) {
+
+        // 신규로 만들기때문에 null로 설정.
+        encyclopedia.setId(null);
+
+        if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+            encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));
+        } else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+            encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
+        }
+
+        adminService.saveEncyclopedia(encyclopedia);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("encyclopedia", encyclopedia);
 
         return response;
     }
@@ -169,22 +204,6 @@ public class AdminRestController {
     @RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
     public Map<String, Object> initSearchData() {
         return adminService.initSearchData();
-    }
-
-    @RequestMapping(value = "/encyclopedia/write", method = RequestMethod.POST)
-    public Map<String, Object> encyclopediaWrite(@Valid Encyclopedia encyclopedia, BindingResult result) {
-
-        if (result.hasErrors()) {
-            log.debug("result=" + result);
-            throw new IllegalArgumentException("누락된 값이 있습니다.");
-        }
-
-        adminService.encyclopediaWrite(encyclopedia);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("result", true);
-
-        return response;
     }
 
 }
