@@ -404,7 +404,7 @@ public HashMap<String, Object> initSearchData() {
 	
 	public void encyclopediaWrite(Encyclopedia encyclopedia) {
 		
-		if (encyclopedia.getId().isEmpty()) {
+		if (encyclopedia.getId() == null || encyclopedia.getId().isEmpty()) {
 			encyclopedia.setId(null);
 			if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
 				encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));			

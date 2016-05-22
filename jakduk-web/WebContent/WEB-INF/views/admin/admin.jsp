@@ -15,7 +15,7 @@
 		<nav class="navbar navbar-inverse navbar-fixed-top">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="admin/settings">JakduK Admin Page</a>
+					<a class="navbar-brand" href="admin">JakduK Admin Page</a>
 				</div>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="home" target="_self">Go JakduK</a></li>
@@ -28,7 +28,6 @@
 		</div>
 
 		<script src="bundles/admin.js"></script>
-		<script src="resources/jakduk/js/admin.js"></script>
 		<script type="text/javascript">
 			angular.module("jakdukApp", [
 				'jakdukCommon', 'jakdukAdmin', 'ui.bootstrap', 'ngAnimate'

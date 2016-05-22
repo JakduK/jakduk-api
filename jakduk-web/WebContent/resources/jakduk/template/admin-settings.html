@@ -1,4 +1,4 @@
-<p>{{ctrl.message}}</p>
+<p ng-show="ctrl.message">{{ctrl.message}}</p>
 
 <div ng-show="ctrl.encyclopedias.length">
   <h4>Encyclopedia</h4>
@@ -46,7 +46,7 @@
   </table>
 </div>
 
-<div ng-show="boardCategorys.length">
+<div ng-show="ctrl.boardCategorys.length">
   <h4>Board Category</h4>
   <table class="table">
     <tr>

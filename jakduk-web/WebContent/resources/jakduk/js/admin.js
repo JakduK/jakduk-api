@@ -3,74 +3,150 @@
 
 	angular.module('jakdukAdmin', ['ui.router'])
 		.constant('MENU_ID_MAP', {
-			HOME: 'admin.home',
-			BOARD_CATEGORY_INIT: 'admin.boardInit',
-			SEARCH_INDEX_INIT: 'admin.searchIndexInit',
-			SEARCH_TYPE_INIT: 'admin.searchTypeInit',
-			SEARCH_DATA_INIT: 'admin.searchDataInit'
+			HOME: 'admin',
+			INIT: {
+				BOARD_CATEGORY: 'admin.initBoardCategory',
+				SEARCH_INDEX: 'admin.initSearchIndex',
+				SEARCH_TYPE: 'admin.initSearchType',
+				SEARCH_DATA: 'admin.initSearchData'
+			},
+			WRITE: {
+				ENCYCLOPEDIA: 'admin.writeEncyclopedia'
+			},
+			GET: {
+				ENCYCLOPEDIA: 'admin.getEncyclopedia',
+				FC_ORIGIN: 'admin.getFcOrigin',
+				FC: 'admin.getFc',
+				BOARD_CATEGORY: 'admin.getBoardCategory',
+				HOME_DESCRIPTION: 'admin.getHomeDescription',
+				ATTENDANCE_LEAGUE: 'admin.getAttendanceLeague',
+				ATTENDANCE_CLUB: 'admin.getAttendanceClub',
+				JAKDU_SCHEDULE: 'admin.getJakduSchedule',
+				JAKDU_SCHEDULE_GROUP: 'admin.getJakduScheduleGroup',
+				COMPETITION: 'admin.getCompetition'
+			},
+			URL: {
+				HOME: '/admin',
+				INIT: {
+					BOARD_CATEGORY: '/board/category/init',
+					SEARCH_INDEX: '/search/index/init',
+					SEARCH_TYPE: '/search/type/init',
+					SEARCH_DATA: '/search/data/init'
+				},
+				WRITE: {
+					ENCYCLOPEDIA: '/encyclopedia/write'
+				},
+				GET: {
+					ENCYCLOPEDIA: '/encyclopedia',
+					FC_ORIGIN: '/fcOrigin',
+					FC: '/fc',
+					BOARD_CATEGORY: '/boardCategory',
+					HOME_DESCRIPTION: '/homeDescription',
+					ATTENDANCE_LEAGUE: '/attendanceLeague',
+					ATTENDANCE_CLUB: '/attendanceClub',
+					JAKDU_SCHEDULE: '/jakduSchedule',
+					JAKDU_SCHEDULE_GROUP: '/jakduScheduleGroup',
+					COMPETITION: '/competition'
+				}
+			}
 		})
 		.config(['$locationProvider', function($locationProvider) {
 			$locationProvider.html5Mode(true);
 		}])
 		.config(['$stateProvider', 'MENU_ID_MAP', function($stateProvider, MENU_ID_MAP) {
 			$stateProvider
-				.state('admin', {
-					abstract: true,
-					url: '/admin',
+				.state(MENU_ID_MAP.HOME, {
+					url: MENU_ID_MAP.URL.HOME,
 					templateUrl: 'resources/jakduk/template/admin.html',
 					controller: 'AdminController',
-					controllerAs: 'ctrl'
+					controllerAs: 'ctrl',
+					data: {
+						category: ''
+					}
 				})
-				.state(MENU_ID_MAP.HOME, {
-					url: '/settings?{open:string}',
-					templateUrl: 'resources/jakduk/template/admin-settings.html',
-					controller: 'AdminHomeController',
-					controllerAs: 'ctrl'
-				})
-				.state(MENU_ID_MAP.BOARD_CATEGORY_INIT, {
-					url: '/board/category/init',
+				.state(MENU_ID_MAP.INIT.BOARD_CATEGORY, {
+					url: MENU_ID_MAP.URL.INIT.BOARD_CATEGORY,
 					templateUrl: 'resources/jakduk/template/admin-board-category-init.html',
 					controller: 'AdminBoardCategoryInitController',
-					controllerAs: 'ctrl'
+					controllerAs: 'ctrl',
+					data: {
+						category: 'init'
+					}
 				})
-				.state(MENU_ID_MAP.SEARCH_INDEX_INIT, {
-					url: '/search/index/init',
+				.state(MENU_ID_MAP.INIT.SEARCH_INDEX, {
+					url: MENU_ID_MAP.URL.INIT.SEARCH_INDEX,
 					templateUrl: 'resources/jakduk/template/admin-search-index-init.html',
 					controller: 'AdminSearchIndexInitController',
-					controllerAs: 'ctrl'
+					controllerAs: 'ctrl',
+					data: {
+						category: 'init'
+					}
 				})
-				.state(MENU_ID_MAP.SEARCH_TYPE_INIT, {
-					url: '/search/type/init',
+				.state(MENU_ID_MAP.INIT.SEARCH_TYPE, {
+					url: MENU_ID_MAP.URL.INIT.SEARCH_TYPE,
 					templateUrl: 'resources/jakduk/template/admin-search-type-init.html',
 					controller: 'AdminSearchTypeInitController',
-					controllerAs: 'ctrl'
+					controllerAs: 'ctrl',
+					data: {
+						category: 'init'
+					}
 				})
-				.state(MENU_ID_MAP.SEARCH_DATA_INIT, {
-					url: '/search/data/init',
+				.state(MENU_ID_MAP.INIT.SEARCH_DATA, {
+					url: MENU_ID_MAP.URL.INIT.SEARCH_DATA,
 					templateUrl: 'resources/jakduk/template/admin-search-data-init.html',
 					controller: 'AdminSearchDataInitController',
-					controllerAs: 'ctrl'
+					controllerAs: 'ctrl',
+					data: {
+						category: 'init'
+					}
+				})
+				.state(MENU_ID_MAP.WRITE.ENCYCLOPEDIA, {
+					url: MENU_ID_MAP.URL.WRITE.ENCYCLOPEDIA,
+					templateUrl: 'resources/jakduk/template/admin-write-encyclopedia.html',
+					controller: 'AdminWriteEncyclopediaController',
+					controllerAs: 'ctrl',
+					data: {
+						category: 'write'
+					}
 				});
+
+			angular.forEach(MENU_ID_MAP.GET, function(value, key) {
+				$stateProvider.state(value, {
+					url: MENU_ID_MAP.URL.GET[key],
+					templateUrl: 'resources/jakduk/template/admin-settings.html',
+					controller: 'AdminGetController',
+					controllerAs: 'ctrl',
+					data: {
+						category: 'get'
+					}
+				});
+			});
+
 		}])
 		.controller("AdminController", ['$scope', '$state', 'MENU_ID_MAP', function($scope, $state, MENU_ID_MAP) {
 			var self = this;
 
-			self.currentMenu = $state.current.name;
+			pickMenuInfo($state.current);
 
 			$scope.MENU_ID_MAP = MENU_ID_MAP;
 			$scope.$on('$stateChangeSuccess', function (event, toState) {
-				self.currentMenu = toState.name;
+				pickMenuInfo(toState);
 			});
 
+			function pickMenuInfo(state) {
+				self.isOpened = {};
+				self.isOpened[state.data.category] = true;
+				self.currentMenu = state.name;
+			}
+
 		}])
-		.controller("AdminHomeController", ['$http', '$state', 'BASE_URL', function($http, $state, BASE_URL) {
+		.controller("AdminGetController", ['$http', '$state', 'BASE_URL', function($http, $state, BASE_URL) {
 			var self = this;
 
 			self.getData = getData;
 			self.getDataLeague = getDataLeague;
 			self.clearData = clearData;
 
-			self.message = '대시보드';
 			self.dataConn = "none";
 			self.dataLeagueConn = "none";
 			self.encyclopedias = [];
@@ -84,10 +160,8 @@
 			self.jakduScheduleGroups = [];
 			self.competitions = [];
 
-			if ($state.params.open) {
-				self.message = '불러오는 중...';
-				getData($state.params.open);
-			}
+			self.message = '불러오는 중...';
+			getData($state.current.url.replace('/', ''));
 
 			function getData(type) {
 				var bUrl;
@@ -123,30 +197,30 @@
 
 						var data = response.data;
 
-						if (type == "encyclopedia") {
-							self.encyclopedias = data.encyclopedias;
-						} else if (type == "fcOrigin") {
-							self.fcOrigins = data.fcOrigins;
-						} else if (type == "fc") {
-							self.fcs = data.fcs;
-						} else if (type == "boardCategory") {
-							self.boardCategorys = data.boardCategorys;
-						} else if (type == "attendanceLeague") {
-							self.attendanceLeagues = data.attendanceLeagues;
-						} else if (type == "attendanceClub") {
-							self.attendanceClubs = data.attendanceClubs;
-						} else if (type == "homeDescription") {
-							self.homeDescriptions = data.homeDescriptions;
-						} else if (type == "jakduSchedule") {
-							self.jakduSchedules = data.jakduSchedules;
-						} else if (type == "jakduScheduleGroup") {
-							self.jakduScheduleGroups = data.jakduScheduleGroups;
-						} else if (type == "competition") {
-							self.competitions = data.competitions;
+						if (type === "encyclopedia") {
+							self.encyclopedias = data;
+						} else if (type === "fcOrigin") {
+							self.fcOrigins = data;
+						} else if (type === "fc") {
+							self.fcs = data;
+						} else if (type === "boardCategory") {
+							self.boardCategorys = data;
+						} else if (type === "attendanceLeague") {
+							self.attendanceLeagues = data;
+						} else if (type === "attendanceClub") {
+							self.attendanceClubs = data;
+						} else if (type === "homeDescription") {
+							self.homeDescriptions = data;
+						} else if (type === "jakduSchedule") {
+							self.jakduSchedules = data;
+						} else if (type === "jakduScheduleGroup") {
+							self.jakduScheduleGroups = data;
+						} else if (type === "competition") {
+							self.competitions = data;
 						}
 
 						self.dataConn = "none";
-						self.message = '완료';
+						self.message = (!data || !data.length) ? '완료' : '';
 					}, function() {
 						self.dataConn = "none";
 						self.message = '오류 발생';
@@ -229,6 +303,41 @@
 				}, function(response) {
 					self.message = '오류 발생';
 				});
+		}])
+		.controller('AdminWriteEncyclopediaController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+			var self = this;
+			self.kind = 'player';
+			self.submit = function() {
+				var data = [];
+
+				if (self.subject) {
+					data.push('subject=' + self.subject);
+				}
+
+				if (self.kind) {
+					data.push('kind=' + self.kind);
+				}
+
+				if (self.content) {
+					data.push('content=' + self.content);
+				}
+
+				if (self.language) {
+					data.push('language=' + self.language);
+				}
+
+				self.errorMessage = '';
+
+				$http.post(BASE_URL + '/api/admin/encyclopedia/write', data.join('&'), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then(function() {
+					$location.url('/admin/encyclopedia');
+				}, function() {
+					self.errorMessage = 'SUBJECT, CONTENT 필수 입력';
+				});
+			};
 		}]);
 
 })();
