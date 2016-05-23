@@ -1,4 +1,4 @@
-package com.jakduk.vo;
+package com.jakduk.restcontroller.vo;
 
 import lombok.Data;
 

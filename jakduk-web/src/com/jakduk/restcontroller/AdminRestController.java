@@ -1,30 +1,21 @@
 package com.jakduk.restcontroller;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.LocaleResolver;
-
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.embedded.LocalName;
+import com.jakduk.restcontroller.vo.FootballClubRequest;
 import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
-import com.jakduk.vo.HomeDescriptionRequest;
+import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 
 /**
@@ -35,9 +26,6 @@ import com.jakduk.vo.HomeDescriptionRequest;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
-
-    @Resource
-    private LocaleResolver localeResolver;
 
     @Autowired
     private CommonService commonService;
@@ -60,15 +48,12 @@ public class AdminRestController {
 
     // 알림판 하나.
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.GET)
-    public Map<String, Object> gethomeDescription(@PathVariable String id,
-                                                  HttpServletRequest request) {
+    public Map<String, Object> getHomeDescription(@PathVariable String id) {
 
         HomeDescription homeDescription = adminService.findHomeDescriptionById(id);
 
-        Locale locale = localeResolver.resolveLocale(request);
-
         if (Objects.isNull(homeDescription)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
         }
 
         Map<String, Object> response = new HashMap<>();
@@ -82,7 +67,7 @@ public class AdminRestController {
     @RequestMapping(value = "/home/description", method = RequestMethod.POST)
     public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
-        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty())
+        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
             throw new IllegalArgumentException("desc는 필수값입니다.");
 
         if (Objects.isNull(homeDescriptionRequest.getPriority()))
@@ -104,10 +89,10 @@ public class AdminRestController {
 
     // 알림판 편집.
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> EditHomeDescription(@PathVariable String id,
+    public Map<String, Object> editHomeDescription(@PathVariable String id,
                                                    @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
-        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty())
+        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
             throw new IllegalArgumentException("desc는 필수값입니다.");
 
         if (Objects.isNull(homeDescriptionRequest.getPriority()))
@@ -135,7 +120,7 @@ public class AdminRestController {
 
     // 알림판 지움.
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.DELETE)
-    public Map<String, Object> DeleteHomeDescription(@PathVariable String id) {
+    public Map<String, Object> deleteHomeDescription(@PathVariable String id) {
 
         HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
 
@@ -163,9 +148,14 @@ public class AdminRestController {
         return response;
     }
 
+    // 백과사전 하나.
     @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.GET)
     public Map<String, Object> getEncyclopedia(@PathVariable String id) {
-        Encyclopedia encyclopedia = adminService.findEncyclopedia(id);
+
+        Encyclopedia encyclopedia = adminService.findEncyclopediaById(id);
+
+        if (Objects.isNull(encyclopedia))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
 
         Map<String, Object> response = new HashMap<>();
         if (Objects.nonNull(encyclopedia)) {
@@ -196,13 +186,207 @@ public class AdminRestController {
         return response;
     }
 
-    @RequestMapping(value = "/encyclopedia/{seq}", method = RequestMethod.PUT)
-    public Map<String, Object> editEncyclopedia(@PathVariable int seq, @RequestBody Encyclopedia encyclopedia) {
-        encyclopedia.setSeq(seq);
+    // 백과사전 편집.
+    @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.PUT)
+    public Map<String, Object> editEncyclopedia(@PathVariable String id,
+                                                @RequestBody Encyclopedia encyclopedia) {
+
+        if (encyclopedia.getSeq() < 1)
+            throw new IllegalArgumentException("seq는 1보다 작을 수 없습니다.");
+
+        Encyclopedia existEncyclopedia = adminService.findEncyclopediaById(id);
+
+        if (Objects.isNull(existEncyclopedia))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
+
+        encyclopedia.setId(id);
         adminService.saveEncyclopedia(encyclopedia);
 
         Map<String, Object> response = new HashMap<>();
         response.put("encyclopedia", encyclopedia);
+
+        return response;
+    }
+
+    // 백과사전 지움.
+    @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.DELETE)
+    public Map<String, Object> deleteEncyclopedia(@PathVariable String id) {
+
+        Encyclopedia encyclopedia = adminService.findEncyclopediaById(id);
+
+        if (Objects.isNull(encyclopedia))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
+
+        adminService.deleteEncyclopediaById(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", true);
+
+        return response;
+    }
+
+    // 부모 축구단 목록.
+    @RequestMapping(value = "/origin/football/clubs", method = RequestMethod.GET)
+    public Map<String, Object> getOriginFootballClubs() {
+
+        List<FootballClubOrigin> fcOrigins = adminService.findOriginFootballClubs();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("originFCs", fcOrigins);
+
+        return response;
+    }
+
+    // 부모 축구단 하나.
+    @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.GET)
+    public Map<String, Object> getOriginFootballClub(@PathVariable String id) {
+
+        FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(id);
+
+        if (Objects.isNull(footballClubOrigin))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("originFC", footballClubOrigin);
+
+        return response;
+    }
+
+    // 새 부모 축구단 하나 저장.
+    @RequestMapping(value = "/origin/football/club", method = RequestMethod.POST)
+    public Map<String, Object> addOriginFootballClub(@RequestBody FootballClubOrigin footballClubOrigin) {
+
+        // 신규로 만들기때문에 null로 설정.
+        footballClubOrigin.setId(null);
+
+        adminService.saveOriginFootballClub(footballClubOrigin);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("originFC", footballClubOrigin);
+
+        return response;
+    }
+
+    // 부모 축구단 하나 편집.
+    @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.PUT)
+    public Map<String, Object> editOriginFootballClub(@PathVariable String id,
+                                                      @RequestBody FootballClubOrigin footballClubOrigin) {
+
+        FootballClubOrigin existFootballClubOrigin = adminService.findOriginFootballClubById(id);
+
+        if (Objects.isNull(existFootballClubOrigin))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+
+        footballClubOrigin.setId(id);
+        adminService.saveOriginFootballClub(footballClubOrigin);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("originFC", footballClubOrigin);
+
+        return response;
+    }
+
+    // 부모 축구단 하나 지움.
+    @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.DELETE)
+    public Map<String, Object> deleteOriginFootballClub(@PathVariable String id) {
+
+        FootballClubOrigin existFootballClubOrigin = adminService.findOriginFootballClubById(id);
+
+        if (Objects.isNull(existFootballClubOrigin))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+
+        adminService.deleteOriginFootballClub(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", true);
+
+        return response;
+    }
+
+    // 축구단 목록.
+    @RequestMapping(value = "/football/clubs", method = RequestMethod.GET)
+    public Map<String, Object> getFootballClubs() {
+
+        List<FootballClub> footballClubs = adminService.findFootballClubs();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("fcs", footballClubs);
+
+        return response;
+    }
+
+    // 축구단 하나.
+    @RequestMapping(value = "/football/club/{id}", method = RequestMethod.GET)
+    public Map<String, Object> getFootballClub(@PathVariable String id) {
+
+        FootballClub fc = adminService.findFootballClubById(id);
+
+        if (Objects.isNull(fc))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 축구단이 존재하지 않습니다.");
+
+        List<FootballClubOrigin> originFCs = adminService.findOriginFootballClubs();
+
+        FootballClubRequest fcRequest = new FootballClubRequest();
+        fcRequest.setId(fc.getId());
+        fcRequest.setActive(fc.getActive());
+        fcRequest.setOrigin(fc.getOrigin().getId());
+
+        for (LocalName fcName : fc.getNames()) {
+            if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+                fcRequest.setFullNameKr(fcName.getFullName());
+                fcRequest.setShortNameKr(fcName.getShortName());
+            } else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+                fcRequest.setFullNameEn(fcName.getFullName());
+                fcRequest.setShortNameEn(fcName.getShortName());
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("originFCs", originFCs);
+        response.put("fcRequest", fcRequest);
+
+        return response;
+    }
+
+    // 새 축구단 하나 저장.
+    @RequestMapping(value = "/football/club", method = RequestMethod.POST)
+    public Map<String, Object> addFootballClub(@RequestBody FootballClubRequest request) {
+
+        if (Objects.isNull(request.getOrigin()) || request.getOrigin().isEmpty() == true)
+            throw new IllegalArgumentException("origin은 필수값입니다.");
+
+        FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(request.getOrigin());
+
+        if (Objects.isNull(footballClubOrigin))
+            throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+
+        LocalName footballClubNameKr = LocalName.builder()
+                .language(Locale.KOREAN.getLanguage())
+                .fullName(request.getFullNameKr())
+                .shortName(request.getShortNameKr())
+                .build();
+
+        LocalName footballClubNameEn = LocalName.builder()
+                .language(Locale.ENGLISH.getLanguage())
+                .fullName(request.getFullNameEn())
+                .shortName(request.getShortNameEn())
+                .build();
+
+        ArrayList<LocalName> names = new ArrayList<>();
+        names.add(footballClubNameKr);
+        names.add(footballClubNameEn);
+
+        FootballClub footballClub = FootballClub.builder()
+                .id(null)
+                .active(request.getActive())
+                .origin(footballClubOrigin)
+                .names(names)
+                .build();
+
+        adminService.saveFootballClub(footballClub);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("fc", footballClub);
 
         return response;
     }

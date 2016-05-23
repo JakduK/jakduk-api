@@ -1,7 +1,15 @@
 package com.jakduk.controller;
 
-import javax.validation.Valid;
-
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.web.AttendanceClubWrite;
+import com.jakduk.model.web.BoardCategoryWrite;
+import com.jakduk.model.web.CompetitionWrite;
+import com.jakduk.model.web.ThumbnailSizeWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.service.AdminService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,18 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.web.AttendanceClubWrite;
-import com.jakduk.model.web.BoardCategoryWrite;
-import com.jakduk.model.web.CompetitionWrite;
-import com.jakduk.model.web.FootballClubWrite;
-import com.jakduk.model.web.ThumbnailSizeWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.service.AdminService;
+import javax.validation.Valid;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -124,77 +121,7 @@ public class AdminController {
 	public String getCompetition() {
 		return "admin/admin";
 	}
-	
-	@RequestMapping(value = "/footballclub/write", method = RequestMethod.GET)
-	public String footballClubWrite(Model model) {
 
-		adminService.getFootballClub(model);
-
-		return "admin/footballClubWrite";
-	}
-	
-	@RequestMapping(value = "/footballclub/write/{id}", method = RequestMethod.GET)
-	public String footballClubWrite(@PathVariable String id, Model model) {
-
-		adminService.getFootballClub(model, id);
-
-		return "admin/footballClubWrite";
-	}
-
-	@RequestMapping(value = "/footballclub/write", method = RequestMethod.POST)
-	public String footballClubWrite(@Valid FootballClubWrite footballClubWrite, BindingResult result) {
-
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/footballClubWrite";
-		}
-
-		adminService.writeFootballClub(footballClubWrite);
-
-		return "redirect:/admin/fc";
-	}
-
-	@RequestMapping(value = "/footballclub", method = RequestMethod.GET)
-	public void dataFootballClub(Model model) {
-
-		adminService.getFootballClubList(model);
-	}
-	
-	@RequestMapping(value = "/footballclub/origin/write", method = RequestMethod.GET)
-	public String footballClubOriginWrite(Model model) {
-
-		adminService.getFootballClubOrigin(model);
-		
-		return "admin/footballClubOriginWrite";
-	}
-	
-	@RequestMapping(value = "/footballclub/origin/write/{id}", method = RequestMethod.GET)
-	public String footballClubOriginWrite(@PathVariable String id, Model model) {
-		
-		adminService.getFootballClubOrigin(model, id);
-		
-		return "admin/footballClubOriginWrite";
-	}
-	
-	@RequestMapping(value = "/footballclub/origin/write", method = RequestMethod.POST)
-	public String footballClubOriginWrite(@Valid FootballClubOrigin footballClubOrigin, BindingResult result) {
-		
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/footballClubOriginWrite";
-		}
-		
-		adminService.writeFootballClubOrigin(footballClubOrigin);
-
-		return "redirect:/admin/fcOrigin";
-	}
-
-	@RequestMapping(value = "/footballclub/origin", method = RequestMethod.GET)
-	public void dataFootballClubOrigin(Model model) {
-
-		adminService.dataFootballClubOriginList(model);
-	}
-	
 	@RequestMapping(value = "/board/category/write", method = RequestMethod.GET)
 	public String boardCategoryWrite(Model model) {
 		model.addAttribute("boardCategoryWrite", new BoardCategoryWrite());

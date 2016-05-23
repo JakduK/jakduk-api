@@ -1,8 +1,17 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <sec:authorize access="isAuthenticated()">
-	<sec:authentication property="principal.username" var="accountName"/>
+	<sec:authentication property="principal.providerId" var="userType"/>
+	<c:choose>
+		<c:when test="${userType == 'JAKDUK'}">
+			<sec:authentication property="principal.nickname" var="accountName"/>
+		</c:when>
+		<c:when test="${userType == 'FACEBOOK' || userType == 'DAUM'}">
+			<sec:authentication property="principal.username" var="accountName"/>
+		</c:when>
+	</c:choose>
 </sec:authorize>
 
 <meta charset="utf-8">

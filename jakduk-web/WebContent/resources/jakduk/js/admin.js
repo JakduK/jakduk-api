@@ -293,10 +293,10 @@
 						bUrl = '/api/admin/encyclopedias';
 						break;
 					case 'fcOrigin':
-						bUrl = '/admin/footballclub/origin.json';
+						bUrl = '/api/admin/origin/football/clubs';
 						break;
 					case 'fc':
-						bUrl = '/admin/footballclub.json';
+						bUrl = '/api/admin/football/clubs';
 						break;
 					case 'boardCategory':
 						bUrl = '/admin/board/category.json';
@@ -492,7 +492,8 @@
 
 				if (self.encyclopedia) {
 					data.id = self.encyclopedia.id;
-					promise = $http.put(BASE_URL + '/api/admin/encyclopedia/' + self.encyclopedia.seq, data);
+					data.seq = self.encyclopedia.seq;
+					promise = $http.put(BASE_URL + '/api/admin/encyclopedia/' + self.encyclopedia.id, data);
 				} else {
 					promise = $http.post(BASE_URL + '/api/admin/encyclopedia', data);
 				}

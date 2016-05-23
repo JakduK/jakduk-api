@@ -1,16 +1,17 @@
 package com.jakduk.model.db;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-
 import com.jakduk.model.embedded.LocalName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -20,6 +21,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Document
 public class FootballClub {
 
