@@ -38,7 +38,7 @@
 			WRITE: {
 				ENCYCLOPEDIA: {
 					ID: 'admin.writeEncyclopedia',
-					URL: '/encyclopedia/write/:seq?{lang:string}',
+					URL: '/encyclopedia/write/:id',
 					TEMPLATE: 'resources/jakduk/template/admin-write-encyclopedia.html',
 					CONTROLLER: 'AdminWriteEncyclopediaController'
 				},
@@ -455,14 +455,16 @@
 
 			self.kind = 'player';
 
-			if ($state.params.seq && $state.params.lang) {
-				$http.get(BASE_URL + '/api/admin/encyclopedia/' + $state.params.seq + '?lang=' + $state.params.lang).then(function(response) {
-					var encyclopedia = response.data;
-					self.encyclopedia = encyclopedia;
-					self.kind = encyclopedia.kind;
-					self.subject = encyclopedia.subject;
-					self.content = encyclopedia.content;
-					self.language = encyclopedia.language;
+			if ($state.params.id) {
+				$http.get(BASE_URL + '/api/admin/encyclopedia/' + $state.params.id).then(function(response) {
+					var encyclopedia = response.data.encyclopedia;
+					if (encyclopedia) {
+						self.encyclopedia = encyclopedia;
+						self.kind = encyclopedia.kind;
+						self.subject = encyclopedia.subject;
+						self.content = encyclopedia.content;
+						self.language = encyclopedia.language;
+					}
 				});
 			}
 

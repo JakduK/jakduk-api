@@ -12,12 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -165,10 +163,16 @@ public class AdminRestController {
         return response;
     }
 
-    @RequestMapping(value = "/encyclopedia/{seq}", method = RequestMethod.GET)
-    public Map<String, Object> writeEncyclopedia(@PathVariable int seq, @RequestParam String lang, Model model) {
-        adminService.getEncyclopedia(model, seq, lang);
-        return model.asMap();
+    @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.GET)
+    public Map<String, Object> getEncyclopedia(@PathVariable String id) {
+        Encyclopedia encyclopedia = adminService.findEncyclopedia(id);
+
+        Map<String, Object> response = new HashMap<>();
+        if (Objects.nonNull(encyclopedia)) {
+            response.put("encyclopedia", encyclopedia);
+        }
+
+        return response;
     }
 
     // 새 백과사전 저장.

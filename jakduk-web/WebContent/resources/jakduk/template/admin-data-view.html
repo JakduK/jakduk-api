@@ -7,7 +7,7 @@
       <th>Seq</th><th>Kind</th><th>Language</th><th>Subject</th><th>Content</th>
     </tr>
     <tr ng-repeat="encyclopedia in ctrl.encyclopedias">
-      <td><a ng-href="admin/encyclopedia/write/{{encyclopedia.seq}}?lang={{encyclopedia.language}}">{{encyclopedia.seq}}</a></td>
+      <td><a ng-href="admin/encyclopedia/write/{{encyclopedia.id}}">{{encyclopedia.seq}}</a></td>
       <td>{{encyclopedia.kind}}</td>
       <td>{{encyclopedia.language}}</td>
       <td>{{encyclopedia.subject}}</td>
