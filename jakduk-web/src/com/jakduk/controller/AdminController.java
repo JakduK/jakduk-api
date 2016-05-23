@@ -155,7 +155,7 @@ public class AdminController {
 		
 		adminService.writeFootballClub(footballClubWrite);
 
-		return "redirect:/admin/settings?open=fc";
+		return "redirect:/admin/fc";
 	}
 
 	@RequestMapping(value = "/footballclub", method = RequestMethod.GET)
@@ -190,7 +190,7 @@ public class AdminController {
 		
 		adminService.writeFootballClubOrigin(footballClubOrigin);
 
-		return "redirect:/admin/settings?open=fcOrigin";
+		return "redirect:/admin/fcOrigin";
 	}
 
 	@RequestMapping(value = "/footballclub/origin", method = RequestMethod.GET)
@@ -225,7 +225,7 @@ public class AdminController {
 		
 		adminService.boardCategoryWrite(boardCategoryWtite);
 
-		return "redirect:/admin/settings?open=boardCategory";
+		return "redirect:/admin/boardCategory";
 	}
 
 	@RequestMapping(value = "/board/category", method = RequestMethod.GET)
@@ -254,7 +254,7 @@ public class AdminController {
 		
 		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
 
-		return "redirect:/admin/settings";
+		return "redirect:/admin";
 	}		
 	
 	@RequestMapping(value = "/home/description/write", method = RequestMethod.GET)
@@ -285,7 +285,7 @@ public class AdminController {
 		
 		adminService.homeDescriptionWrite(homeDescription);
 
-		return "redirect:/admin/settings?open=homeDescription";
+		return "redirect:/admin/homeDescription";
 	}
 
 	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)
@@ -313,7 +313,7 @@ public class AdminController {
 		
 		adminService.attendanceLeagueWrite(attendanceLeague);
 
-		return "redirect:/admin/settings?open=attendanceLeague";
+		return "redirect:/admin/attendanceLeague";
 	}
 	
 	@RequestMapping(value = "/attendance/league/delete/{id}", method = RequestMethod.GET)
@@ -321,7 +321,7 @@ public class AdminController {
 		
 		boolean result = adminService.attendanceLeagueDelete(id);
 		
-		return "redirect:/admin/settings?open=attendanceLeague";
+		return "redirect:/admin/attendanceLeague";
 	}
 
 	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
@@ -357,7 +357,7 @@ public class AdminController {
 		
 		adminService.attendanceClubWrite(attendanceClubWrite);
 
-		return "redirect:/admin/settings?open=attendanceClub";
+		return "redirect:/admin/attendanceClub";
 	}
 
 	@RequestMapping(value = "/data/attendance/club", method = RequestMethod.GET)
@@ -391,7 +391,7 @@ public class AdminController {
 
 		adminService.writeJakduSchedule(jakduScheduleWrite);
 
-		return "redirect:/admin/settings?open=jakduSchedule";
+		return "redirect:/admin/jakduSchedule";
 	}
 
 	@RequestMapping(value = "/jakdu/schedule/delete/{id}", method = RequestMethod.GET)
@@ -399,7 +399,7 @@ public class AdminController {
 
 		boolean result = adminService.deleteJakduSchedule(id);
 
-		return "redirect:/admin/settings?open=jakduSchedule";
+		return "redirect:/admin/jakduSchedule";
 	}
 
 	@RequestMapping(value = "/data/jakdu/schedule", method = RequestMethod.GET)
@@ -433,7 +433,7 @@ public class AdminController {
 
 		adminService.writeJakduScheduleGroup(jakduScheduleGroupWrite);
 
-		return "redirect:/admin/settings?open=jakduScheduleGroup";
+		return "redirect:/admin/jakduScheduleGroup";
 	}
 
 	@RequestMapping(value = "jakdu/schedule/group/delete/{id}", method = RequestMethod.GET)
@@ -441,7 +441,7 @@ public class AdminController {
 
 		boolean result = adminService.deleteJakduScheduleGroup(id);
 
-		return "redirect:/admin/settings?open=jakduScheduleGroup";
+		return "redirect:/admin/jakduScheduleGroup";
 	}
 
 	@RequestMapping(value = "/data/jakdu/schedule/group", method = RequestMethod.GET)
@@ -475,7 +475,7 @@ public class AdminController {
 
 		adminService.writeCompetition(competitionWrite);
 
-		return "redirect:/admin/settings?open=competition";
+		return "redirect:/admin/competition";
 	}
 
 	@RequestMapping(value = "/data/competition", method = RequestMethod.GET)
