@@ -70,89 +70,85 @@ public class AdminController {
 		return "admin/admin";
 	}
 
+	@RequestMapping(value = "/encyclopedia/write/{seq}", method = RequestMethod.GET)
+	public String editEncyclopedia() {
+		return "admin/admin";
+	}
+
 	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
-	public String dateEncyclopedia() {
+	public String getEncyclopedia() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/fcOrigin", method = RequestMethod.GET)
-	public String datefcOrigin() {
+	public String getfcOrigin() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/fc", method = RequestMethod.GET)
-	public String datefc() {
+	public String getfc() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/boardCategory", method = RequestMethod.GET)
-	public String dateBoardCategory() {
+	public String getBoardCategory() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/homeDescription", method = RequestMethod.GET)
-	public String dateHomeDescription() {
+	public String getHomeDescription() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/attendanceLeague", method = RequestMethod.GET)
-	public String dateAttendanceLeague() {
+	public String getAttendanceLeague() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/attendanceClub", method = RequestMethod.GET)
-	public String dateAttendanceClub() {
+	public String getAttendanceClub() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/jakduSchedule", method = RequestMethod.GET)
-	public String dateJakduSchedule() {
+	public String getJakduSchedule() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/jakduScheduleGroup", method = RequestMethod.GET)
-	public String dateJakduScheduleGroup() {
+	public String getJakduScheduleGroup() {
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/competition", method = RequestMethod.GET)
-	public String dateCompetition() {
+	public String getCompetition() {
 		return "admin/admin";
-	}
-
-	@RequestMapping(value = "/encyclopedia/write/{seq}", method = RequestMethod.GET)
-	public String encyclopediaWrite(@PathVariable int seq, Model model,
-			@RequestParam(required = true) String lang) {
-		
-		adminService.getEncyclopedia(model, seq, lang);
-		
-		return "admin/encyclopediaWrite";
 	}
 	
 	@RequestMapping(value = "/footballclub/write", method = RequestMethod.GET)
 	public String footballClubWrite(Model model) {
-		
+
 		adminService.getFootballClub(model);
-		
+
 		return "admin/footballClubWrite";
 	}
 	
 	@RequestMapping(value = "/footballclub/write/{id}", method = RequestMethod.GET)
 	public String footballClubWrite(@PathVariable String id, Model model) {
-		
+
 		adminService.getFootballClub(model, id);
-		
+
 		return "admin/footballClubWrite";
 	}
-	
+
 	@RequestMapping(value = "/footballclub/write", method = RequestMethod.POST)
 	public String footballClubWrite(@Valid FootballClubWrite footballClubWrite, BindingResult result) {
-		
+
 		if (result.hasErrors()) {
 			log.debug("result=" + result);
 			return "admin/footballClubWrite";
 		}
-		
+
 		adminService.writeFootballClub(footballClubWrite);
 
 		return "redirect:/admin/fc";

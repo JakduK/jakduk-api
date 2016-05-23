@@ -159,6 +159,10 @@ public class AdminService {
 		encyclopediaRepository.save(encyclopedia);
 	}
 
+	public Encyclopedia findEncyclopedia(String id) {
+		return encyclopediaRepository.findOne(id);
+	}
+
 	// 알림판 삭제.
 	public void deleteHomeDescriptionById(String id) {
 		homeDescriptionReposotiry.delete(id);
