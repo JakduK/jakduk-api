@@ -166,26 +166,37 @@
 			function getData(type) {
 				var bUrl;
 
-				if (type === "encyclopedia") {
-					bUrl = '/api/admin/encyclopedias';
-				} else if (type === "fcOrigin") {
-					bUrl = '/admin/footballclub/origin.json';
-				} else if (type === "fc") {
-					bUrl = '/admin/footballclub.json';
-				} else if (type === "boardCategory") {
-					bUrl = '/admin/board/category.json';
-				} else if (type === "attendanceLeague") {
-					bUrl = '/admin/data/attendance/league.json';
-				} else if (type === "attendanceClub") {
-					bUrl = '/admin/data/attendance/club.json';
-				} else if (type === "homeDescription") {
-					bUrl = '/api/admin/home/descriptions';
-				} else if (type === "jakduSchedule") {
-					bUrl = '/admin/data/jakdu/schedule.json';
-				} else if (type === "jakduScheduleGroup") {
-					bUrl = '/admin/data/jakdu/schedule/group.json';
-				} else if (type === "competition") {
-					bUrl = '/admin/data/competition.json';
+				switch (type) {
+					case 'encyclopedia':
+						bUrl = '/api/admin/encyclopedias';
+						break;
+					case 'fcOrigin':
+						bUrl = '/admin/footballclub/origin.json';
+						break;
+					case 'fc':
+						bUrl = '/admin/footballclub.json';
+						break;
+					case 'boardCategory':
+						bUrl = '/admin/board/category.json';
+						break;
+					case 'attendanceLeague':
+						bUrl = '/admin/data/attendance/league.json';
+						break;
+					case 'attendanceClub':
+						bUrl = '/admin/data/attendance/club.json';
+						break;
+					case 'homeDescription':
+						bUrl = '/api/admin/home/descriptions';
+						break;
+					case 'jakduSchedule':
+						bUrl = '/admin/data/jakdu/schedule.json';
+						break;
+					case 'jakduScheduleGroup':
+						bUrl = '/admin/data/jakdu/schedule/group.json';
+						break;
+					case 'competition':
+						bUrl = '/admin/data/competition.json';
+						break;
 				}
 
 				if (bUrl && self.dataConn === "none") {
@@ -196,31 +207,44 @@
 						clearData();
 
 						var data = response.data;
+						var name;
 
-						if (type === "encyclopedia") {
-							self.encyclopedias = data;
-						} else if (type === "fcOrigin") {
-							self.fcOrigins = data;
-						} else if (type === "fc") {
-							self.fcs = data;
-						} else if (type === "boardCategory") {
-							self.boardCategorys = data;
-						} else if (type === "attendanceLeague") {
-							self.attendanceLeagues = data;
-						} else if (type === "attendanceClub") {
-							self.attendanceClubs = data;
-						} else if (type === "homeDescription") {
-							self.homeDescriptions = data;
-						} else if (type === "jakduSchedule") {
-							self.jakduSchedules = data;
-						} else if (type === "jakduScheduleGroup") {
-							self.jakduScheduleGroups = data;
-						} else if (type === "competition") {
-							self.competitions = data;
+						switch (type) {
+							case 'encyclopedia':
+								name = 'encyclopedias';
+								break;
+							case 'fcOrigin':
+								name = 'fcOrigins';
+								break;
+							case 'fc':
+								name = 'fcs';
+								break;
+							case 'boardCategory':
+								name = 'boardCategorys';
+								break;
+							case 'attendanceLeague':
+								name = 'attendanceLeagues';
+								break;
+							case 'attendanceClub':
+								name = 'attendanceClubs';
+								break;
+							case 'homeDescription':
+								name = 'homeDescriptions';
+								break;
+							case 'jakduSchedule':
+								name = 'jakduSchedules';
+								break;
+							case 'jakduScheduleGroup':
+								name = 'jakduScheduleGroups';
+								break;
+							case 'competition':
+								name = 'competitions';
+								break;
 						}
 
+						self[name] = data[name] || data;
 						self.dataConn = "none";
-						self.message = (!data || !data.length) ? '완료' : '';
+						self.message = (!self[name] || !self[name].length) ? '데이터 없음' : '';
 					}, function() {
 						self.dataConn = "none";
 						self.message = '오류 발생';
