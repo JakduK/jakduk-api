@@ -4,10 +4,10 @@
       Init Data <i class="fa fa-fw fa-caret-down"></i>
     </uib-accordion-heading>
     <div class="list-group">
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.BOARD_CATEGORY}" href="admin/board/category/init">Init Board Category</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.SEARCH_INDEX}" href="admin/search/index/init">Init Search Index</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.SEARCH_TYPE}" href="admin/search/type/init">Init Search Type</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.SEARCH_DATA}" href="admin/search/data/init">Init Search Data</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.BOARD_CATEGORY.ID}" href="admin/board/category/init">Init Board Category</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.SEARCH_INDEX.ID}" href="admin/search/index/init">Init Search Index</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.SEARCH_TYPE.ID}" href="admin/search/type/init">Init Search Type</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.INIT.SEARCH_DATA.ID}" href="admin/search/data/init">Init Search Data</a>
     </div>
   </uib-accordion-group>
 
@@ -16,17 +16,17 @@
       Write Data <i class="fa fa-fw fa-caret-down"></i>
     </uib-accordion-heading>
     <div class="list-group">
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.ENCYCLOPEDIA}" href="admin/encyclopedia/write">Encyclopedia Write</a>
-      <a class="list-group-item" href="admin/footballclub/origin/write" target="_self">Football Club Origin Write</a>
-      <a class="list-group-item" href="admin/footballclub/write" target="_self">Football Club Write</a>
-      <a class="list-group-item" href="admin/board/category/write" target="_self">Board Category Write</a>
-      <a class="list-group-item" href="admin/thumbnail/size/write" target="_self">Thumbnail Size Write</a>
-      <a class="list-group-item" href="admin/home/description/write" target="_self">Home Description Write</a>
-      <a class="list-group-item" href="admin/attendance/league/write" target="_self">Attendance League Write</a>
-      <a class="list-group-item" href="admin/attendance/club/write" target="_self">Attendance Club Write</a>
-      <a class="list-group-item" href="admin/jakdu/schedule/write" target="_self">Jakdu Schedule Write</a>
-      <a class="list-group-item" href="admin/jakdu/schedule/group/write" target="_self">Jakdu Schedule Group Write</a>
-      <a class="list-group-item" href="admin/competition/write" target="_self">Competition Write</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.ENCYCLOPEDIA.ID}" href="admin/encyclopedia/write">Encyclopedia Write</a>
+      <a class="list-group-item" href="admin/footballclub/origin/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.FC_ORIGIN.ID}" href="admin/encyclopedia/write" target="_self">Football Club Origin Write</a>
+      <a class="list-group-item" href="admin/footballclub/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.FC.ID}" href="admin/encyclopedia/write" target="_self">Football Club Write</a>
+      <a class="list-group-item" href="admin/board/category/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.BOARD_CATEGORY.ID}" href="admin/encyclopedia/write" target="_self">Board Category Write</a>
+      <a class="list-group-item" href="admin/thumbnail/size/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.THUMBNAIL_SIZE.ID}" href="admin/encyclopedia/write" target="_self">Thumbnail Size Write</a>
+      <a class="list-group-item" href="admin/home/description/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.HOME_DESCRIPTION.ID}" href="admin/encyclopedia/write" target="_self">Home Description Write</a>
+      <a class="list-group-item" href="admin/attendance/league/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.ATTENDANCE_LEAGUE.ID}" href="admin/encyclopedia/write" target="_self">Attendance League Write</a>
+      <a class="list-group-item" href="admin/attendance/club/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.ATTENDANCE_CLUB.ID}" href="admin/encyclopedia/write" target="_self">Attendance Club Write</a>
+      <a class="list-group-item" href="admin/jakdu/schedule/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.JAKDU_SCHEDULE.ID}" href="admin/encyclopedia/write" target="_self">Jakdu Schedule Write</a>
+      <a class="list-group-item" href="admin/jakdu/schedule/group/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.JAKDU_SCHEDULE_GROUP.ID}" href="admin/encyclopedia/write" target="_self">Jakdu Schedule Group Write</a>
+      <a class="list-group-item" href="admin/competition/write" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.WRITE.COMPETITION.ID}" target="_self">Competition Write</a>
     </div>
   </uib-accordion-group>
 
@@ -35,16 +35,16 @@
       Get Data <i class="fa fa-fw fa-caret-down"></i>
     </uib-accordion-heading>
     <div class="list-group">
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.ENCYCLOPEDIA}" href="admin/encyclopedia">Get Encyclopedia</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.FC_ORIGIN}" href="admin/fcOrigin">Get Football Club Origin</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.FC}" href="admin/fc">Get Football Club</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.BOARD_CATEGORY}" href="admin/boardCategory">Get Board Category</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.HOME_DESCRIPTION}" href="admin/homeDescription">Get Home Description</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.ATTENDANCE_LEAGUE}" href="admin/attendanceLeague">Get Attendance League</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.ATTENDANCE_CLUB}" href="admin/attendanceClub">Get Attendance Club</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.JAKDU_SCHEDULE}" href="admin/jakduSchedule">Get Jakdu Schedule</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.JAKDU_SCHEDULE_GROUP}" href="admin/jakduScheduleGroup">Get Jakdu Schedule Group</a>
-      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.COMPETITION}" href="admin/competition">Get Competition</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.ENCYCLOPEDIA.ID}" href="admin/encyclopedia">Get Encyclopedia</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.FC_ORIGIN.ID}" href="admin/fcOrigin">Get Football Club Origin</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.FC.ID}" href="admin/fc">Get Football Club</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.BOARD_CATEGORY.ID}" href="admin/boardCategory">Get Board Category</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.HOME_DESCRIPTION.ID}" href="admin/homeDescription">Get Home Description</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.ID}" href="admin/attendanceLeague">Get Attendance League</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.ATTENDANCE_CLUB.ID}" href="admin/attendanceClub">Get Attendance Club</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.JAKDU_SCHEDULE.ID}" href="admin/jakduSchedule">Get Jakdu Schedule</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.JAKDU_SCHEDULE_GROUP.ID}" href="admin/jakduScheduleGroup">Get Jakdu Schedule Group</a>
+      <a class="list-group-item" ng-class="{active: ctrl.currentMenu === MENU_ID_MAP.GET.COMPETITION.ID}" href="admin/competition">Get Competition</a>
     </div>
   </uib-accordion-group>
 </uib-accordion>

@@ -9,19 +9,19 @@ import java.util.Objects;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
-import com.jakduk.common.CommonConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.LocaleResolver;
 
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.service.AdminService;
@@ -165,6 +165,12 @@ public class AdminRestController {
         return response;
     }
 
+    @RequestMapping(value = "/encyclopedia/{seq}", method = RequestMethod.GET)
+    public Map<String, Object> writeEncyclopedia(@PathVariable int seq, @RequestParam String lang, Model model) {
+        adminService.getEncyclopedia(model, seq, lang);
+        return model.asMap();
+    }
+
     // 새 백과사전 저장.
     @RequestMapping(value = "/encyclopedia", method = RequestMethod.POST)
     public Map<String, Object> addEncyclopedia(@RequestBody Encyclopedia encyclopedia) {
@@ -178,6 +184,17 @@ public class AdminRestController {
             encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
         }
 
+        adminService.saveEncyclopedia(encyclopedia);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("encyclopedia", encyclopedia);
+
+        return response;
+    }
+
+    @RequestMapping(value = "/encyclopedia/{seq}", method = RequestMethod.PUT)
+    public Map<String, Object> editEncyclopedia(@PathVariable int seq, @RequestBody Encyclopedia encyclopedia) {
+        encyclopedia.setSeq(seq);
         adminService.saveEncyclopedia(encyclopedia);
 
         Map<String, Object> response = new HashMap<>();

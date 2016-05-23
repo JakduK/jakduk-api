@@ -3,118 +3,240 @@
 
 	angular.module('jakdukAdmin', ['ui.router'])
 		.constant('MENU_ID_MAP', {
-			HOME: 'admin',
+			HOME: {
+				ID: 'admin',
+				URL: '/admin',
+				CONTROLLER: 'AdminController',
+				TEMPLATE: 'resources/jakduk/template/admin.html'
+			},
 			INIT: {
-				BOARD_CATEGORY: 'admin.initBoardCategory',
-				SEARCH_INDEX: 'admin.initSearchIndex',
-				SEARCH_TYPE: 'admin.initSearchType',
-				SEARCH_DATA: 'admin.initSearchData'
+				BOARD_CATEGORY: {
+					ID: 'admin.initBoardCategory',
+					URL: '/board/category/init',
+					TEMPLATE: 'resources/jakduk/template/admin-board-category-init.html',
+					CONTROLLER: 'AdminBoardCategoryInitController'
+				},
+				SEARCH_INDEX: {
+					ID: 'admin.initSearchIndex',
+					URL: '/search/index/init',
+					TEMPLATE: 'resources/jakduk/template/admin-search-index-init.html',
+					CONTROLLER: 'AdminSearchIndexInitController'
+				},
+				SEARCH_TYPE: {
+					ID: 'admin.initSearchType',
+					URL: '/search/type/init',
+					TEMPLATE: 'resources/jakduk/template/admin-search-type-init.html',
+					CONTROLLER: 'AdminSearchTypeInitController'
+				},
+				SEARCH_DATA: {
+					ID: 'admin.initSearchData',
+					URL: '/search/data/init',
+					TEMPLATE: 'resources/jakduk/template/admin-write-encyclopedia.html',
+					CONTROLLER: 'AdminWriteEncyclopediaController'
+				}
 			},
 			WRITE: {
-				ENCYCLOPEDIA: 'admin.writeEncyclopedia'
+				ENCYCLOPEDIA: {
+					ID: 'admin.writeEncyclopedia',
+					URL: '/encyclopedia/write/:seq?{lang:string}',
+					TEMPLATE: 'resources/jakduk/template/admin-write-encyclopedia.html',
+					CONTROLLER: 'AdminWriteEncyclopediaController'
+				},
+				FC_ORIGIN: {
+					ID: 'admin.writefcOrigin',
+					URL: '/fcOrigin/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-football-club-origin.html',
+					CONTROLLER: 'AdminWriteFootballClubOriginController'
+				},
+				FC: {
+					ID: 'admin.writefc',
+					URL: '/fc/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-football-club.html',
+					CONTROLLER: 'AdminWriteFootballClubController'
+				},
+				BOARD_CATEGORY: {
+					ID: 'admin.writeBoardCategory',
+					URL: '/boardCategory/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-board-category.html',
+					CONTROLLER: 'AdminWriteBoardCategoryController'
+				},
+				THUMBNAIL_SIZE: {
+					ID: 'admin.writeThumbnailSize',
+					URL: '/thumbnail/size/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-thumbnail-size.html',
+					CONTROLLER: 'AdminWriteThumbnailSizeController'
+				},
+				HOME_DESCRIPTION: {
+					ID: 'admin.writeHomeDescription',
+					URL: '/homeDescription/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-home-description.html',
+					CONTROLLER: 'AdminWriteHomeDescriptionController'
+				},
+				ATTENDANCE_LEAGUE: {
+					ID: 'admin.writeAttendanceLeague',
+					URL: '/attendanceLeague/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-attendance-league.html',
+					CONTROLLER: 'AdminWriteAttendanceLeagueController'
+				},
+				ATTENDANCE_CLUB: {
+					ID: 'admin.writeAttendanceClub',
+					URL: '/attendanceClub/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-attendance-club.html',
+					CONTROLLER: 'AdminWriteAttendanceClubController'
+				},
+				JAKDU_SCHEDULE: {
+					ID: 'admin.writeJakduSchedule',
+					URL: '/jakduSchedule/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-jakdu-schedule.html',
+					CONTROLLER: 'AdminWriteJakduScheduleController'
+				},
+				JAKDU_SCHEDULE_GROUP: {
+					ID: 'admin.writeJakduScheduleGroup',
+					URL: '/jakduScheduleGroup/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-jakdu-schedule-group.html',
+					CONTROLLER: 'AdminWriteJakduScheduleGroupController'
+				},
+				COMPETITION: {
+					ID: 'admin.writeCompetition',
+					URL: '/competition/write/:id',
+					TEMPLATE: 'resources/jakduk/template/admin-write-competition.html',
+					CONTROLLER: 'AdminWriteCompetitionController'
+				}
 			},
 			GET: {
-				ENCYCLOPEDIA: 'admin.getEncyclopedia',
-				FC_ORIGIN: 'admin.getFcOrigin',
-				FC: 'admin.getFc',
-				BOARD_CATEGORY: 'admin.getBoardCategory',
-				HOME_DESCRIPTION: 'admin.getHomeDescription',
-				ATTENDANCE_LEAGUE: 'admin.getAttendanceLeague',
-				ATTENDANCE_CLUB: 'admin.getAttendanceClub',
-				JAKDU_SCHEDULE: 'admin.getJakduSchedule',
-				JAKDU_SCHEDULE_GROUP: 'admin.getJakduScheduleGroup',
-				COMPETITION: 'admin.getCompetition'
-			},
-			URL: {
-				HOME: '/admin',
-				INIT: {
-					BOARD_CATEGORY: '/board/category/init',
-					SEARCH_INDEX: '/search/index/init',
-					SEARCH_TYPE: '/search/type/init',
-					SEARCH_DATA: '/search/data/init'
+				ENCYCLOPEDIA: {
+					ID: 'admin.getEncyclopedia',
+					URL :'/encyclopedia',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
 				},
-				WRITE: {
-					ENCYCLOPEDIA: '/encyclopedia/write'
+				FC_ORIGIN: {
+					ID: 'admin.getFcOrigin',
+					URL: '/fcOrigin',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
 				},
-				GET: {
-					ENCYCLOPEDIA: '/encyclopedia',
-					FC_ORIGIN: '/fcOrigin',
-					FC: '/fc',
-					BOARD_CATEGORY: '/boardCategory',
-					HOME_DESCRIPTION: '/homeDescription',
-					ATTENDANCE_LEAGUE: '/attendanceLeague',
-					ATTENDANCE_CLUB: '/attendanceClub',
-					JAKDU_SCHEDULE: '/jakduSchedule',
-					JAKDU_SCHEDULE_GROUP: '/jakduScheduleGroup',
-					COMPETITION: '/competition'
+				FC: {
+					ID: 'admin.getFc',
+					URL: '/fc',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
+				},
+				BOARD_CATEGORY: {
+					ID: 'admin.getBoardCategory',
+					URL: '/boardCategory',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
+				},
+				HOME_DESCRIPTION: {
+					ID: 'admin.getHomeDescription',
+					URL: '/homeDescription',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
+				},
+				ATTENDANCE_LEAGUE: {
+					ID: 'admin.getAttendanceLeague',
+					URL: '/attendanceLeague',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
+				},
+				ATTENDANCE_CLUB: {
+					ID: 'admin.getAttendanceClub',
+					URL: '/attendanceClub',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
+				},
+				JAKDU_SCHEDULE: {
+					ID: 'admin.getJakduSchedule',
+					URL: '/jakduSchedule',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
+				},
+				JAKDU_SCHEDULE_GROUP: {
+					ID: 'admin.getJakduScheduleGroup',
+					URL: '/jakduScheduleGroup',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
+				},
+				COMPETITION: {
+					ID: 'admin.getCompetition',
+					URL: '/competition',
+					CONTROLLER: 'AdminGetController',
+					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
 				}
 			}
 		})
 		.config(['$locationProvider', function($locationProvider) {
 			$locationProvider.html5Mode(true);
 		}])
-		.config(['$stateProvider', 'MENU_ID_MAP', function($stateProvider, MENU_ID_MAP) {
+		.config(['$urlMatcherFactoryProvider', '$urlRouterProvider', '$stateProvider', 'MENU_ID_MAP', function($urlMatcherFactoryProvider, $urlRouterProvider, $stateProvider, MENU_ID_MAP) {
+			// https://github.com/angular-ui/ui-router/wiki/Frequently-Asked-Questions#how-to-make-a-trailing-slash-optional-for-all-routes
+			$urlMatcherFactoryProvider.strictMode(false);
+			$urlRouterProvider.rule(function ($injector, $location) {
+				var path = $location.url();
+
+				// check to see if the path already has a slash where it should be
+				if (path[path.length - 1] === '/' || path.indexOf('/?') > -1) {
+					return;
+				}
+
+				if (path.indexOf('?') > -1) {
+					return path.replace('?', '/?');
+				}
+
+				return path + '/';
+			});
+
 			$stateProvider
-				.state(MENU_ID_MAP.HOME, {
-					url: MENU_ID_MAP.URL.HOME,
-					templateUrl: 'resources/jakduk/template/admin.html',
-					controller: 'AdminController',
+				.state(MENU_ID_MAP.HOME.ID, {
+					url: MENU_ID_MAP.HOME.URL,
+					templateUrl: MENU_ID_MAP.HOME.TEMPLATE,
+					controller: MENU_ID_MAP.HOME.CONTROLLER,
 					controllerAs: 'ctrl',
 					data: {
 						category: ''
 					}
-				})
-				.state(MENU_ID_MAP.INIT.BOARD_CATEGORY, {
-					url: MENU_ID_MAP.URL.INIT.BOARD_CATEGORY,
-					templateUrl: 'resources/jakduk/template/admin-board-category-init.html',
-					controller: 'AdminBoardCategoryInitController',
-					controllerAs: 'ctrl',
-					data: {
-						category: 'init'
-					}
-				})
-				.state(MENU_ID_MAP.INIT.SEARCH_INDEX, {
-					url: MENU_ID_MAP.URL.INIT.SEARCH_INDEX,
-					templateUrl: 'resources/jakduk/template/admin-search-index-init.html',
-					controller: 'AdminSearchIndexInitController',
-					controllerAs: 'ctrl',
-					data: {
-						category: 'init'
-					}
-				})
-				.state(MENU_ID_MAP.INIT.SEARCH_TYPE, {
-					url: MENU_ID_MAP.URL.INIT.SEARCH_TYPE,
-					templateUrl: 'resources/jakduk/template/admin-search-type-init.html',
-					controller: 'AdminSearchTypeInitController',
-					controllerAs: 'ctrl',
-					data: {
-						category: 'init'
-					}
-				})
-				.state(MENU_ID_MAP.INIT.SEARCH_DATA, {
-					url: MENU_ID_MAP.URL.INIT.SEARCH_DATA,
-					templateUrl: 'resources/jakduk/template/admin-search-data-init.html',
-					controller: 'AdminSearchDataInitController',
-					controllerAs: 'ctrl',
-					data: {
-						category: 'init'
-					}
-				})
-				.state(MENU_ID_MAP.WRITE.ENCYCLOPEDIA, {
-					url: MENU_ID_MAP.URL.WRITE.ENCYCLOPEDIA,
-					templateUrl: 'resources/jakduk/template/admin-write-encyclopedia.html',
-					controller: 'AdminWriteEncyclopediaController',
-					controllerAs: 'ctrl',
-					data: {
-						category: 'write'
-					}
 				});
 
-			angular.forEach(MENU_ID_MAP.GET, function(value, key) {
-				$stateProvider.state(value, {
-					url: MENU_ID_MAP.URL.GET[key],
-					templateUrl: 'resources/jakduk/template/admin-settings.html',
-					controller: 'AdminGetController',
+			angular.forEach(MENU_ID_MAP.INIT, function(value) {
+				$stateProvider.state(value.ID, {
+					url: value.URL,
+					templateUrl: value.TEMPLATE,
+					controller: value.CONTROLLER,
+					controllerAs: 'ctrl',
+					data: {
+						category: 'init'
+					}
+				});
+			});
+
+			$stateProvider.state(MENU_ID_MAP.WRITE.ENCYCLOPEDIA.ID, {
+				url: MENU_ID_MAP.WRITE.ENCYCLOPEDIA.URL,
+				templateUrl: MENU_ID_MAP.WRITE.ENCYCLOPEDIA.TEMPLATE,
+				controller: MENU_ID_MAP.WRITE.ENCYCLOPEDIA.CONTROLLER,
+				controllerAs: 'ctrl',
+				data: {
+					category: 'write'
+				}
+			});
+
+			// angular.forEach(MENU_ID_MAP.WRITE, function(value) {
+			// 	$stateProvider.state(value.ID, {
+			// 		url: value.URL,
+			// 		templateUrl: value.TEMPLATE,
+			// 		controller: value.CONTROLLER,
+			// 		controllerAs: 'ctrl',
+			// 		data: {
+			// 			category: 'write'
+			// 		}
+			// 	});
+			// });
+
+			angular.forEach(MENU_ID_MAP.GET, function(value) {
+				$stateProvider.state(value.ID, {
+					url: value.URL,
+					templateUrl: value.TEMPLATE,
+					controller: value.CONTROLLER,
 					controllerAs: 'ctrl',
 					data: {
 						category: 'get'
@@ -328,40 +450,86 @@
 					self.message = '오류 발생';
 				});
 		}])
-		.controller('AdminWriteEncyclopediaController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+		.controller('AdminWriteEncyclopediaController', ['$http', '$state', '$location', 'BASE_URL', function($http, $state, $location, BASE_URL) {
 			var self = this;
+
 			self.kind = 'player';
+
+			if ($state.params.seq && $state.params.lang) {
+				$http.get(BASE_URL + '/api/admin/encyclopedia/' + $state.params.seq + '?lang=' + $state.params.lang).then(function(response) {
+					var encyclopedia = response.data;
+					self.encyclopedia = encyclopedia;
+					self.kind = encyclopedia.kind;
+					self.subject = encyclopedia.subject;
+					self.content = encyclopedia.content;
+					self.language = encyclopedia.language;
+				});
+			}
+
 			self.submit = function() {
-				var data = [];
+				var promise;
+				var data = {};
 
 				if (self.subject) {
-					data.push('subject=' + self.subject);
+					data.subject = self.subject;
 				}
 
 				if (self.kind) {
-					data.push('kind=' + self.kind);
+					data.kind = self.kind;
 				}
 
 				if (self.content) {
-					data.push('content=' + self.content);
+					data.content= self.content;
 				}
 
 				if (self.language) {
-					data.push('language=' + self.language);
+					data.language = self.language;
 				}
 
 				self.errorMessage = '';
 
-				$http.post(BASE_URL + '/api/admin/encyclopedia/write', data.join('&'), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then(function() {
+				if (self.encyclopedia) {
+					data.id = self.encyclopedia.id;
+					promise = $http.put(BASE_URL + '/api/admin/encyclopedia/' + self.encyclopedia.seq, data);
+				} else {
+					promise = $http.post(BASE_URL + '/api/admin/encyclopedia', data);
+				}
+				promise.then(function() {
 					$location.url('/admin/encyclopedia');
 				}, function() {
 					self.errorMessage = 'SUBJECT, CONTENT 필수 입력';
 				});
 			};
+		}])
+		.controller('AdminWriteFootballClubOriginController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteFootballClubController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteBoardCategoryController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteThumbnailSizeController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteHomeDescriptionController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteAttendanceLeagueController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteAttendanceClubController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteJakduScheduleController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteJakduScheduleGroupController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
+		}])
+		.controller('AdminWriteCompetitionController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+
 		}]);
 
 })();
