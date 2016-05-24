@@ -5,3 +5,10 @@ description = 'jakduk-web'
 dependencies {
   compile project(':jakduk-common')
 }
+
+task copyTask(type: Copy) {
+  from getRootDir().path + '/jakduk-web/src/main/webapp/resources/bower_components/summernote'
+  into getRootDir().path + '/jakduk-web/src/main/webapp/resources/summernote'
+}
+
+war.dependsOn copyTask
