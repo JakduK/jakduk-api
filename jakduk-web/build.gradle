@@ -1,0 +1,7 @@
+
+apply plugin: 'war'
+
+description = 'jakduk-web'
+dependencies {
+  compile project(':jakduk-common')
+}
