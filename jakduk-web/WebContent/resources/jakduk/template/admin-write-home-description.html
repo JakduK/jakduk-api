@@ -1,0 +1,22 @@
+<div class="container-fluid">
+	<div class="page-header">
+		<h4>Write HomeDescription</h4>
+	</div>
+
+	<div class="alert alert-danger" ng-bind="ctrl.errorMessage" ng-if="ctrl.errorMessage"></div>
+
+	<form name="homeDescriptionForm" ng-submit="ctrl.submit()" novalidate>
+
+		<p>
+			<label for="priority" class="control-label">PRIORITY</label>
+			<input id="priority" name="priority" type="number" class="form-control" placeholder="Priority" ng-model="ctrl.priority" required>
+		</p>
+
+		<p>
+			<label for="desc" class="control-label">DESCRIPTION</label>
+			<textarea id="desc" name="desc" class="form-control" rows="15" placeholder="Description" ng-model="ctrl.desc" required></textarea>
+		</p>
+
+		<input type="submit" class="btn btn-default">
+	</form>
+</div>

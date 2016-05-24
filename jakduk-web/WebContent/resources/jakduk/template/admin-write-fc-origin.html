@@ -1,0 +1,53 @@
+<div class="container-fluid">
+	<div class="page-header">
+		<h4>Write FootballClub Origin</h4>
+	</div>
+
+	<div class="alert alert-danger" ng-bind="ctrl.errorMessage" ng-if="ctrl.errorMessage"></div>
+
+	<form name="footballClubOriginForm" ng-submit="ctrl.submit()" novalidate>
+		<div class="row">
+			<div class="col-sm-12">
+				<label for="name" class="control-label">CODE NAME</label>
+				<div class="form-group">
+					<input id="name" name="name" class="form-control" placeholder="Code Name" ng-model="ctrl.codeName" required>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-4">
+				<label for="clubType" class="control-label">CLUB TYPE</label>
+				<div class="form-group">
+					<select id="clubType" class="form-control" ng-model="ctrl.clubType">
+						<option value="FOOTBALL_CLUB">FOOTBALL_CLUB</option>
+						<option value="NATIONAL_TEAM">NATIONAL_TEAM</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<label for="age" class="control-label">AGE</label>
+				<div class="form-group">
+					<select id="age" class="form-control" ng-model="ctrl.age">
+						<option value="UNDER_14">UNDER_14</option>
+						<option value="UNDER_17">UNDER_17</option>
+						<option value="UNDER_20">UNDER_20</option>
+						<option value="UNDER_23">UNDER_23</option>
+						<option value="SENIOR">SENIOR</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<label for="sex" class="control-label">SEX</label>
+				<div class="form-group">
+					<select id="sex" class="form-control" ng-model="ctrl.sex">
+						<option value="MEN">MEN</option>
+						<option value="WOMEN">WOMEN</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<input type="submit" class="btn btn-default">
+	</form>
+</div>
