@@ -1,8 +1,5 @@
 package com.jakduk.authentication.daum;
 
-import java.util.Map;
-
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestOperations;
 
