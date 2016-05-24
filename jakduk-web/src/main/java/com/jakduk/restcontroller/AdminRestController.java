@@ -1,6 +1,21 @@
 package com.jakduk.restcontroller;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.model.db.FootballClub;
@@ -8,14 +23,9 @@ import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.restcontroller.vo.FootballClubRequest;
+import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
 import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
-import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 
 /**
@@ -158,10 +168,7 @@ public class AdminRestController {
             throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
 
         Map<String, Object> response = new HashMap<>();
-        if (Objects.nonNull(encyclopedia)) {
-            response.put("encyclopedia", encyclopedia);
-        }
-
+        response.put("encyclopedia", encyclopedia);
         return response;
     }
 
@@ -190,9 +197,6 @@ public class AdminRestController {
     @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.PUT)
     public Map<String, Object> editEncyclopedia(@PathVariable String id,
                                                 @RequestBody Encyclopedia encyclopedia) {
-
-        if (encyclopedia.getSeq() < 1)
-            throw new IllegalArgumentException("seq는 1보다 작을 수 없습니다.");
 
         Encyclopedia existEncyclopedia = adminService.findEncyclopediaById(id);
 
@@ -352,37 +356,21 @@ public class AdminRestController {
     @RequestMapping(value = "/football/club", method = RequestMethod.POST)
     public Map<String, Object> addFootballClub(@RequestBody FootballClubRequest request) {
 
-        if (Objects.isNull(request.getOrigin()) || request.getOrigin().isEmpty() == true)
+        if (Objects.isNull(request.getOrigin()) || request.getOrigin().isEmpty())
             throw new IllegalArgumentException("origin은 필수값입니다.");
 
-        FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(request.getOrigin());
+        FootballClub footballClub = buildFootballClub(null, request);
+        adminService.saveFootballClub(footballClub);
 
-        if (Objects.isNull(footballClubOrigin))
-            throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+        Map<String, Object> response = new HashMap<>();
+        response.put("fc", footballClub);
 
-        LocalName footballClubNameKr = LocalName.builder()
-                .language(Locale.KOREAN.getLanguage())
-                .fullName(request.getFullNameKr())
-                .shortName(request.getShortNameKr())
-                .build();
+        return response;
+    }
 
-        LocalName footballClubNameEn = LocalName.builder()
-                .language(Locale.ENGLISH.getLanguage())
-                .fullName(request.getFullNameEn())
-                .shortName(request.getShortNameEn())
-                .build();
-
-        ArrayList<LocalName> names = new ArrayList<>();
-        names.add(footballClubNameKr);
-        names.add(footballClubNameEn);
-
-        FootballClub footballClub = FootballClub.builder()
-                .id(null)
-                .active(request.getActive())
-                .origin(footballClubOrigin)
-                .names(names)
-                .build();
-
+    @RequestMapping(value = "/football/club/{id}", method = RequestMethod.PUT)
+    public Map<String, Object> editFootballClub(@PathVariable String id, @RequestBody FootballClubRequest request) {
+        FootballClub footballClub = buildFootballClub(id, request);
         adminService.saveFootballClub(footballClub);
 
         Map<String, Object> response = new HashMap<>();
@@ -411,4 +399,33 @@ public class AdminRestController {
         return adminService.initSearchData();
     }
 
+    private FootballClub buildFootballClub(String id, FootballClubRequest request) {
+        FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(request.getOrigin());
+
+        if (Objects.isNull(footballClubOrigin))
+            throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+
+        LocalName footballClubNameKr = LocalName.builder()
+                                         .language(Locale.KOREAN.getLanguage())
+                                         .fullName(request.getFullNameKr())
+                                         .shortName(request.getShortNameKr())
+                                         .build();
+
+        LocalName footballClubNameEn = LocalName.builder()
+                                         .language(Locale.ENGLISH.getLanguage())
+                                         .fullName(request.getFullNameEn())
+                                         .shortName(request.getShortNameEn())
+                                         .build();
+
+        ArrayList<LocalName> names = new ArrayList<>();
+        names.add(footballClubNameKr);
+        names.add(footballClubNameEn);
+
+        return FootballClub.builder()
+                 .id(id)
+                 .active(request.getActive())
+                 .origin(footballClubOrigin)
+                 .names(names)
+                 .build();
+    }
 }
