@@ -235,17 +235,16 @@
 			});
 
 		}])
-		.controller("AdminController", ['$scope', '$state', 'MENU_ID_MAP', function($scope, $state, MENU_ID_MAP) {
+		.controller("AdminController", ['$scope', '$state', '$transitions', 'MENU_ID_MAP', function($scope, $state, $transitions, MENU_ID_MAP) {
 			var self = this;
 
-			pickMenuInfo($state.current);
+			pickMenuInfo($state);
 
 			$scope.MENU_ID_MAP = MENU_ID_MAP;
-			$scope.$on('$stateChangeSuccess', function (event, toState) {
-				pickMenuInfo(toState);
-			});
+			$transitions.onSuccess({}, pickMenuInfo.bind(self, $state));
 
-			function pickMenuInfo(state) {
+			function pickMenuInfo($state) {
+				var state = $state.current;
 				self.isOpened = {};
 				self.isOpened[state.data.category] = true;
 				self.currentMenu = state.name;
