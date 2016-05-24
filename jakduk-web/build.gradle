@@ -6,9 +6,16 @@ dependencies {
   compile project(':jakduk-common')
 }
 
-task copyTask(type: Copy) {
-  from getRootDir().path + '/jakduk-web/src/main/webapp/resources/bower_components/summernote'
-  into getRootDir().path + '/jakduk-web/src/main/webapp/resources/summernote'
+// summernote의 다국어 지원을 위해 bower_components 밖으로 복사한다.
+task copysummernote(type: copy) {
+  from getrootdir().path + '/jakduk-web/src/main/webapp/resources/bower_components/summernote'
+  into getrootdir().path + '/jakduk-web/src/main/webapp/resources/summernote'
 }
 
-war.dependsOn copyTask
+// bower install
+task bowerinstall(type: exec) {
+  commandline 'bower', 'install'
+}
+
+// war task 실행 전 copysummernote task 먼저 실행.
+war.dependson copysummernote

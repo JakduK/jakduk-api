@@ -1,3 +1,4 @@
+// 루트 프로젝트에 소스 디렉터리를 포함하지 않는 설정.
 apply plugin: 'base'
 
 allprojects  {
@@ -5,7 +6,7 @@ allprojects  {
     apply plugin: 'idea'
 
     group = 'com.jakduk'
-    version = '0.6.1-SNAPSHOT'
+    version = '0.6.2-SNAPSHOT'
 }
 
 subprojects {
@@ -13,6 +14,7 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
+    // test task에서 spring profile을 위한 설정.
     test {
         systemProperties = [
                 'spring.profiles.active':'production'
@@ -23,6 +25,7 @@ subprojects {
         mavenLocal()
         jcenter()
 
+        // 프로젝트에 import한 jar 보관 폴더.
         flatDir {
             dirs getRootDir().path + '/custom-lib'
         }

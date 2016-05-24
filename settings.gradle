@@ -1,3 +1,4 @@
+// 부모와 자식 프로젝트를 나타낸다.
 rootProject.name = 'jakduk-parent'
 include ':jakduk-common'
 include ':jakduk-web'

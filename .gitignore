@@ -1,8 +1,10 @@
-*.class
 # Java and Eclipse
+*.class
 target/
 build/
+classes/
 out/
+gradle/
 .idea/
 .classpath
 .settings
