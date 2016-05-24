@@ -1,10 +1,13 @@
 *.class
 # Java and Eclipse
 target/
+build/
+out/
 .idea/
 .classpath
 .settings
 .project
+.gradle
 *.iml
 
 # Mobile Tools for Java (J2ME)

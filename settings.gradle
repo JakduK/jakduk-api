@@ -1,0 +1,6 @@
+rootProject.name = 'jakduk-parent'
+include ':jakduk-common'
+include ':jakduk-web'
+
+project(':jakduk-common').projectDir = "$rootDir/jakduk-common" as File
+project(':jakduk-web').projectDir = "$rootDir/jakduk-web" as File
