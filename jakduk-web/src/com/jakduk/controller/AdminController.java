@@ -1,15 +1,7 @@
 package com.jakduk.controller;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.web.AttendanceClubWrite;
-import com.jakduk.model.web.BoardCategoryWrite;
-import com.jakduk.model.web.CompetitionWrite;
-import com.jakduk.model.web.ThumbnailSizeWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.service.AdminService;
+import javax.validation.Valid;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.Valid;
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.web.AttendanceClubWrite;
+import com.jakduk.model.web.BoardCategoryWrite;
+import com.jakduk.model.web.CompetitionWrite;
+import com.jakduk.model.web.ThumbnailSizeWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.service.AdminService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -67,33 +67,63 @@ public class AdminController {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/encyclopedia/write/{seq}", method = RequestMethod.GET)
+	@RequestMapping(value = "/encyclopedia/write/{id}")
 	public String editEncyclopedia() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
+	@RequestMapping(value = "/encyclopedia")
 	public String getEncyclopedia() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/fcOrigin", method = RequestMethod.GET)
-	public String getfcOrigin() {
-		return "admin/admin";
-	}
-
-	@RequestMapping(value = "/fc", method = RequestMethod.GET)
+	@RequestMapping(value = "/fc")
 	public String getfc() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/boardCategory", method = RequestMethod.GET)
+	@RequestMapping(value = "/fc/write")
+	public String writefc() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/fc/write/{id}")
+	public String editfc() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/fcOrigin")
+	public String getfcOrigin() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/fcOrigin/write")
+	public String writefcOrigin() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/fcOrigin/write/{id}")
+	public String editfcOrigin() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/boardCategory")
 	public String getBoardCategory() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/homeDescription", method = RequestMethod.GET)
+	@RequestMapping(value = "/homeDescription")
 	public String getHomeDescription() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/homeDescription/write")
+	public String writeHomeDescription() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/homeDescription/write/{id}")
+	public String editHomeDescription() {
 		return "admin/admin";
 	}
 
@@ -178,37 +208,6 @@ public class AdminController {
 		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
 
 		return "redirect:/admin";
-	}		
-	
-	@RequestMapping(value = "/home/description/write", method = RequestMethod.GET)
-	public String homeDescriptionWrite(Model model) {
-		model.addAttribute("homeDescription", new HomeDescription());
-		
-		return "admin/homeDescriptionWrite";
-	}
-
-	@RequestMapping(value = "/home/description/write/{id}", method = RequestMethod.GET)
-	public String homeDescriptionWrite(@PathVariable String id, Model model) {
-
-		HomeDescription homeDescription = adminService.findHomeDescriptionById(id);
-
-		model.addAttribute("homeDescription", homeDescription);
-
-		return "admin/homeDescriptionWrite";
-	}
-
-
-	@RequestMapping(value = "/home/description/write", method = RequestMethod.POST)
-	public String homeDescriptionWrite(@Valid HomeDescription homeDescription, BindingResult result) {
-		
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/homeDescriptionWrite";
-		}
-		
-		adminService.homeDescriptionWrite(homeDescription);
-
-		return "redirect:/admin/homeDescription";
 	}
 
 	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)

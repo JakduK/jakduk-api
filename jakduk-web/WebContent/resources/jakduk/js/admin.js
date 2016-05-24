@@ -45,13 +45,13 @@
 				FC_ORIGIN: {
 					ID: 'admin.writefcOrigin',
 					URL: '/fcOrigin/write/:id',
-					TEMPLATE: 'resources/jakduk/template/admin-write-football-club-origin.html',
+					TEMPLATE: 'resources/jakduk/template/admin-write-fc-origin.html',
 					CONTROLLER: 'AdminWriteFootballClubOriginController'
 				},
 				FC: {
 					ID: 'admin.writefc',
 					URL: '/fc/write/:id',
-					TEMPLATE: 'resources/jakduk/template/admin-write-football-club.html',
+					TEMPLATE: 'resources/jakduk/template/admin-write-fc.html',
 					CONTROLLER: 'AdminWriteFootballClubController'
 				},
 				BOARD_CATEGORY: {
@@ -210,27 +210,17 @@
 				});
 			});
 
-			$stateProvider.state(MENU_ID_MAP.WRITE.ENCYCLOPEDIA.ID, {
-				url: MENU_ID_MAP.WRITE.ENCYCLOPEDIA.URL,
-				templateUrl: MENU_ID_MAP.WRITE.ENCYCLOPEDIA.TEMPLATE,
-				controller: MENU_ID_MAP.WRITE.ENCYCLOPEDIA.CONTROLLER,
-				controllerAs: 'ctrl',
-				data: {
-					category: 'write'
-				}
+			angular.forEach(MENU_ID_MAP.WRITE, function(value) {
+				$stateProvider.state(value.ID, {
+					url: value.URL,
+					templateUrl: value.TEMPLATE,
+					controller: value.CONTROLLER,
+					controllerAs: 'ctrl',
+					data: {
+						category: 'write'
+					}
+				});
 			});
-
-			// angular.forEach(MENU_ID_MAP.WRITE, function(value) {
-			// 	$stateProvider.state(value.ID, {
-			// 		url: value.URL,
-			// 		templateUrl: value.TEMPLATE,
-			// 		controller: value.CONTROLLER,
-			// 		controllerAs: 'ctrl',
-			// 		data: {
-			// 			category: 'write'
-			// 		}
-			// 	});
-			// });
 
 			angular.forEach(MENU_ID_MAP.GET, function(value) {
 				$stateProvider.state(value.ID, {
@@ -336,7 +326,7 @@
 								name = 'encyclopedias';
 								break;
 							case 'fcOrigin':
-								name = 'fcOrigins';
+								name = 'originFCs';
 								break;
 							case 'fc':
 								name = 'fcs';
@@ -370,7 +360,7 @@
 					}, function() {
 						self.dataConn = "none";
 						self.message = '오류 발생';
-						alert("get data error");
+
 					});
 				}
 			}
@@ -391,7 +381,6 @@
 						self.dataLeagueConn = "none";
 					}, function() {
 						self.dataLeagueConn = "none";
-						alert("get data league error");
 					});
 				}
 			}
@@ -416,7 +405,7 @@
 			$http.post(BASE_URL + '/api/admin/board/category/init')
 				.then(function (response) {
 					self.message = response.data.result ? '기본 카테고리 생성완료' : '이미 생성되어 있음';
-				}, function(response) {
+				}, function() {
 					self.message = '오류 발생';
 				});
 		}])
@@ -424,9 +413,9 @@
 			var self = this;
 			self.message = '처리중...';
 			$http.post(BASE_URL + '/api/admin/search/index/init')
-				.then(function (response) {
+				.then(function () {
 					self.message = '검색 색인 완료';
-				}, function(response) {
+				}, function() {
 					self.message = '오류 발생';
 				});
 		}])
@@ -434,9 +423,9 @@
 			var self = this;
 			self.message = '처리중...';
 			$http.post(BASE_URL + '/api/admin/search/type/init')
-				.then(function (response) {
+				.then(function () {
 					self.message = '검색 색인 완료';
-				}, function(response) {
+				}, function() {
 					self.message = '오류 발생';
 				});
 		}])
@@ -444,15 +433,18 @@
 			var self = this;
 			self.message = '처리중...';
 			$http.post(BASE_URL + '/api/admin/search/data/init')
-				.then(function (response) {
+				.then(function () {
 					self.message = '검색 색인 완료';
-				}, function(response) {
+				}, function() {
 					self.message = '오류 발생';
 				});
 		}])
-		.controller('AdminWriteEncyclopediaController', ['$http', '$state', '$location', 'BASE_URL', function($http, $state, $location, BASE_URL) {
+		.controller('AdminWriteEncyclopediaController', ['$scope', '$http', '$state', '$location', 'BASE_URL', function($scope, $http, $state, $location, BASE_URL) {
 			var self = this;
 
+			self.submit = submit;
+
+			self.language = 'ko';
 			self.kind = 'player';
 
 			if ($state.params.id) {
@@ -468,47 +460,139 @@
 				});
 			}
 
-			self.submit = function() {
-				var promise;
-				var data = {};
-
-				if (self.subject) {
-					data.subject = self.subject;
-				}
-
-				if (self.kind) {
-					data.kind = self.kind;
-				}
-
-				if (self.content) {
-					data.content= self.content;
-				}
-
-				if (self.language) {
-					data.language = self.language;
-				}
-
+			function submit() {
 				self.errorMessage = '';
+				if ($scope.encyclopediaForm.$invalid) {
+					self.errorMessage = 'SUBJECT, CONTENT 필수 입력입니다';
+					return;
+				}
+
+				var data = {
+					subject: self.subject,
+					kind: self.kind,
+					content: self.content,
+					language: self.language
+				};
+				var promise;
 
 				if (self.encyclopedia) {
-					data.id = self.encyclopedia.id;
-					data.seq = self.encyclopedia.seq;
 					promise = $http.put(BASE_URL + '/api/admin/encyclopedia/' + self.encyclopedia.id, data);
 				} else {
 					promise = $http.post(BASE_URL + '/api/admin/encyclopedia', data);
 				}
+
 				promise.then(function() {
 					$location.url('/admin/encyclopedia');
 				}, function() {
-					self.errorMessage = 'SUBJECT, CONTENT 필수 입력';
+					self.errorMessage = 'SUBJECT, CONTENT 필수 입력입니다';
 				});
-			};
+			}
 		}])
-		.controller('AdminWriteFootballClubOriginController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+		.controller('AdminWriteFootballClubOriginController', ['$scope', '$http', '$state', '$location', 'BASE_URL', function($scope, $http, $state, $location, BASE_URL) {
+			var self = this;
 
+			self.submit = submit;
+
+			if ($state.params.id) {
+				$http.get(BASE_URL + '/api/admin/origin/football/club/' + $state.params.id).then(function(response) {
+					var originFC = response.data.originFC;
+					if (originFC) {
+						self.originFC = originFC;
+						self.codeName = originFC.name;
+						self.clubType = originFC.clubType;
+						self.age = originFC.age;
+						self.sex = originFC.sex;
+					}
+				});
+			} else {
+				self.clubType = 'FOOTBALL_CLUB';
+				self.age = 'UNDER_14';
+				self.sex = 'MEN';
+			}
+
+			function submit() {
+				self.errorMessage = '';
+				if ($scope.footballClubOriginForm.$invalid) {
+					self.errorMessage = 'CODE NAME 필수 입력입니다';
+					return;
+				}
+
+				var data = {
+					name: self.codeName,
+					clubType: self.clubType,
+					age: self.age,
+					sex: self.sex
+				};
+				var promise;
+
+				if ($state.params.id) {
+					promise = $http.put(BASE_URL + '/api/admin/origin/football/club/' + $state.params.id, data);
+				} else {
+					promise = $http.post(BASE_URL + '/api/admin/origin/football/club', data);
+				}
+
+				promise.then(function() {
+					$location.url('/admin/fcOrigin');
+				});
+			}
 		}])
-		.controller('AdminWriteFootballClubController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+		.controller('AdminWriteFootballClubController', ['$scope', '$http', '$state', '$location', 'BASE_URL', function($scope, $http, $state, $location, BASE_URL) {
+			var self = this;
 
+			self.submit = submit;
+
+			if ($state.params.id) {
+				$http.get(BASE_URL + '/api/admin/football/club/' + $state.params.id).then(function(response) {
+					var fc = response.data.fcRequest;
+					if (fc) {
+						self.active = fc.active;
+						self.shortNameKr = fc.shortNameKr;
+						self.fullNameKr = fc.fullNameKr;
+						self.shortNameEn = fc.shortNameEn;
+						self.fullNameEn = fc.fullNameEn;
+						self.origins = response.data.originFCs;
+						self.origin = self.origins.filter(function(each) {
+							return each.id === fc.origin;
+						})[0];
+					}
+				});
+			} else {
+				self.active = 'active';
+				$http.get(BASE_URL + '/api/admin/origin/football/clubs').then(function(response) {
+					self.origins = response.data.originFCs;
+					self.origin = self.origins[0];
+				});
+			}
+
+			function submit() {
+				self.errorMessage = '';
+				if ($scope.footballClubForm.$invalid) {
+					self.errorMessage = '빠짐없이 입력해 주세요';
+					return;
+				}
+
+				var data = {
+					origin: self.origin.id,
+					active: self.active,
+					shortNameKr: self.shortNameKr,
+					fullNameKr: self.fullNameKr,
+					shortNameEn: self.shortNameEn,
+					fullNameEn: self.fullNameEn
+				};
+				var promise;
+
+				if ($state.params.id) {
+					promise = $http.put(BASE_URL + '/api/admin/football/club/' + $state.params.id, data);
+				} else {
+					promise = $http.post(BASE_URL + '/api/admin/football/club', data);
+				}
+
+				promise.then(function() {
+					$location.url('/admin/fc');
+				}, function() {
+					self.errorMessage = '빠짐없이 입력해 주세요';
+				});
+			}
 		}])
 		.controller('AdminWriteBoardCategoryController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
 
@@ -516,8 +600,47 @@
 		.controller('AdminWriteThumbnailSizeController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
 
 		}])
-		.controller('AdminWriteHomeDescriptionController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+		.controller('AdminWriteHomeDescriptionController', ['$scope', '$http', '$state', '$location', 'BASE_URL', function($scope, $http, $state, $location, BASE_URL) {
+			var self = this;
 
+			self.submit = submit;
+
+			if ($state.params.id) {
+				$http.get(BASE_URL + '/api/admin/home/description/' + $state.params.id).then(function(response) {
+					var homeDescription = response.data.homeDescription;
+					if (homeDescription) {
+						self.homeDescription = homeDescription;
+						self.priority = homeDescription.priority;
+						self.desc = homeDescription.desc;
+					}
+				});
+			}
+
+			function submit() {
+				self.errorMessage = '';
+				if ($scope.homeDescriptionForm.$invalid) {
+					self.errorMessage = '빠짐없이 입력해 주세요.';
+					return;
+				}
+
+				var data = {
+					priority: self.priority,
+					desc: self.desc
+				};
+				var promise;
+
+				if ($state.params.id) {
+					promise = $http.put(BASE_URL + '/api/admin/home/description/' + $state.params.id, data);
+				} else {
+					promise = $http.post(BASE_URL + '/api/admin/home/description', data);
+				}
+
+				promise.then(function() {
+					$location.url('/admin/homeDescription');
+				}, function() {
+					self.errorMessage = '빠짐없이 입력해 주세요.';
+				});
+			}
 		}])
 		.controller('AdminWriteAttendanceLeagueController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
 
