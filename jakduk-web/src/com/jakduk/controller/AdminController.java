@@ -42,87 +42,87 @@ public class AdminController {
 		return "admin/admin";
 	}
 	
-	@RequestMapping(value = "/board/category/init")
+	@RequestMapping(value = "/board/category/init", method = RequestMethod.GET)
 	public String initBoardCategory() {
 		return "admin/admin";
 	}
 	
-	@RequestMapping(value = "/search/index/init")
+	@RequestMapping(value = "/search/index/init", method = RequestMethod.GET)
 	public String initSearchIndex() {
 		return "admin/admin";
 	}
 	
-	@RequestMapping(value = "/search/type/init")
+	@RequestMapping(value = "/search/type/init", method = RequestMethod.GET)
 	public String initSearchType() {
 		return "admin/admin";
 	}
 	
-	@RequestMapping(value = "/search/data/init")
+	@RequestMapping(value = "/search/data/init", method = RequestMethod.GET)
 	public String initSearchData() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/encyclopedia/write")
+	@RequestMapping(value = "/encyclopedia/write", method = RequestMethod.GET)
 	public String writeEncyclopedia() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/encyclopedia/write/{id}")
+	@RequestMapping(value = "/encyclopedia/write/{id}", method = RequestMethod.GET)
 	public String editEncyclopedia() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/encyclopedia")
+	@RequestMapping(value = "/encyclopedia", method = RequestMethod.GET)
 	public String getEncyclopedia() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/fc")
+	@RequestMapping(value = "/fc", method = RequestMethod.GET)
 	public String getfc() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/fc/write")
+	@RequestMapping(value = "/fc/write", method = RequestMethod.GET)
 	public String writefc() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/fc/write/{id}")
+	@RequestMapping(value = "/fc/write/{id}", method = RequestMethod.GET)
 	public String editfc() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/fcOrigin")
+	@RequestMapping(value = "/fcOrigin", method = RequestMethod.GET)
 	public String getfcOrigin() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/fcOrigin/write")
+	@RequestMapping(value = "/fcOrigin/write", method = RequestMethod.GET)
 	public String writefcOrigin() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/fcOrigin/write/{id}")
+	@RequestMapping(value = "/fcOrigin/write/{id}", method = RequestMethod.GET)
 	public String editfcOrigin() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/boardCategory")
+	@RequestMapping(value = "/boardCategory", method = RequestMethod.GET)
 	public String getBoardCategory() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/homeDescription")
+	@RequestMapping(value = "/homeDescription", method = RequestMethod.GET)
 	public String getHomeDescription() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/homeDescription/write")
+	@RequestMapping(value = "/homeDescription/write", method = RequestMethod.GET)
 	public String writeHomeDescription() {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/homeDescription/write/{id}")
+	@RequestMapping(value = "/homeDescription/write/{id}", method = RequestMethod.GET)
 	public String editHomeDescription() {
 		return "admin/admin";
 	}
