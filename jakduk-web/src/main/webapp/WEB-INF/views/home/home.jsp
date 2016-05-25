@@ -42,9 +42,8 @@
 								<!-- Trending -->
 								<ul class="ng-cloak list-unstyled blog-trending">
 									<li ng-repeat="post in postsLatest">
-										<h3 ng-switch="post.status.delete">
-											<a ng-switch-when="delete"><spring:message code="board.msg.deleted"/></a>
-											<a ng-switch-default ng-href="<c:url value="/board/free/{{post.seq}}"/>" ng-bind="post.subject"></a>
+										<h3>
+											<a ng-href="<c:url value="/board/free/{{post.seq}}"/>" ng-bind="post.status.delete === 'delete' ? '<spring:message code="board.msg.deleted"/>' : post.subject"></a>
 										</h3>
 										<small>
 											<span aria-hidden="true" class="icon-user"></span>

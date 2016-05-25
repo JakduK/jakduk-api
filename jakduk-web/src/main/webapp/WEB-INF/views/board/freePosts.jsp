@@ -61,14 +61,13 @@
 								<tr ng-repeat="post in topLike">
 									<td class="text-overflow max-width-240">
 										<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
-											<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
-											<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+											<strong ng-bind="post.status.delete !== 'delete' ? post.subject : '<spring:message code="board.msg.deleted"/>'"></strong>
 										</a>
 									</td>
 									<td>
 								<span class="text-primary">
 									<i class="fa fa-thumbs-o-up"></i>
-									<strong>{{post.count}}</strong>
+									<strong ng-bind="post.count"></strong>
 								</span>
 									</td>
 								</tr>
@@ -87,14 +86,13 @@
 								<tr ng-repeat="post in topComment">
 									<td class="text-overflow max-width-240">
 										<a ng-href='<c:url value="/board/free/{{post.seq}}?page=${boardListInfo.page}&category=${boardListInfo.category}"/>'>
-											<strong ng-if="post.status.delete == 'delete'"><spring:message code="board.msg.deleted"/></strong>
-											<strong ng-if="post.status.delete != 'delete'">{{post.subject}}</strong>
+											<strong ng-bind="post.status.delete !== 'delete' ? post.subject : '<spring:message code="board.msg.deleted"/>'"></strong>
 										</a>
 									</td>
 									<td>
 								<span class="text-default">
 									<i class="fa fa-comment-o"></i>
-									<strong>{{post.count}}</strong>
+									<strong ng-bind="post.count"></strong>
 								</span>
 									</td>
 								</tr>
