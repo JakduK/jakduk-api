@@ -2,6 +2,7 @@ K LEAGUE JAKDU KING
 ===================
 
 K LEAGUE JAKDU KING
+
 * https://jakduk.com
 
 ### What is K LEAGUE JAKDU KING?
@@ -19,16 +20,16 @@ If you join Slack, it's possible to talk.
 If you want to help to develop this project, anyone who wants to come is welcome.
 
 ### IDE
-This project is based on Eclipse. You can import the project using git clone.
-
-### Used technologies 
-popular open source
+This project is based on IntelliJ IDEA and Eclipse. You can import the project using git clone.
 
 #### JAVA
 * JDK 1.8
 
+#### Search engine
+* Elasticsearch
+
 #### Dependency Management
-* Apache Maven
+* Gradle
 
 #### Database
 * mongoDB
@@ -36,14 +37,20 @@ popular open source
 #### WAS
 * Apache tmocat 8.x
 
-#### Spring Framework
+#### Spring Framework 4.x
 * Spring Core
+* Spring Mvc
 * Spring Security
+* Spring Social
+* Spring Data
 
 #### Front end (CSS, Javascript)
+* Bower
 * Bootstrap
+* JQuery
 * AngularJS
 * [Summernote](https://github.com/HackerWins/summernote), [angular-summernote](https://github.com/outsideris/angular-summernote)
 * font-awesome
-
+* Highcharts
+* Slick
 

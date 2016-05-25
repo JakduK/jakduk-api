@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 import com.github.lifus.wro4j_runtime_taglib.servlet.TaglibServletContextListener;
+import org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.WebApplicationInitializer;
@@ -22,6 +23,7 @@ import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.WroServletContextListener;
 
 /**
+ * web.xml
  * Created by pyohwan on 16. 4. 2.
  */
 public class Initializer implements WebApplicationInitializer {
@@ -44,6 +46,7 @@ public class Initializer implements WebApplicationInitializer {
         registerSpringSecurityFilter(container);
         registerDeviceResolverRequestFilter(container);
         registerDispatcherServlet(container);
+        registerRestDispatcherServlet(container);
         registerWroFilter(container);
         //registerWroContextFilter(container);
 
@@ -85,15 +88,21 @@ public class Initializer implements WebApplicationInitializer {
 
     // Create the dispatcher servlet's Spring application context
     public void registerDispatcherServlet(ServletContext servletContext) {
-//        XmlWebApplicationContext appContext = new XmlWebApplicationContext();
-//        appContext.setConfigLocation("classpath:/config/spring/webmvc-config.xml");
-
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
         dispatcherContext.register(MvcConfig.class);
 
         // Register and map the dispatcher servlet
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
         dispatcher.addMapping("/");
+    }
+
+    // Create the dispatcher servlet's Spring application context
+    public void registerRestDispatcherServlet(ServletContext servletContext) {
+        AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
+        dispatcherContext.register(RestMvcConfig.class);
+
+        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("rest", new RepositoryRestDispatcherServlet(dispatcherContext));
+        dispatcher.addMapping("/api2/*");
     }
 }
 
