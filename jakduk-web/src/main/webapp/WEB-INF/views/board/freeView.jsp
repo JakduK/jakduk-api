@@ -259,8 +259,8 @@
 					</div>
 
 					<div class="alert fade in rounded ng-cloak" ng-class="alert.classType" ng-show="alert.msg">
-						{{alert.msg}}
-						<a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl">{{alert.linkLabel}}</a>
+						<span ng-bind="alert.msg"></span>
+						<a class="alert-link" ng-href="{{alert.linkUrl}}" ng-show="alert.linkUrl" ng-bind="alert.linkLabel"></a>
 					</div>
 
 				</div> <!--End Blog Post-->
@@ -357,11 +357,9 @@
 									</button>
 								</c:when>
 							</c:choose>
-							<span class="ng-cloak">{{summernote.contents.length}} / {{boardCommentContentLengthMax}}</span>
+							<span ng-bind="summernote.contents.length"></span> / <span ng-bind="boardCommentContentLengthMax"></span>
 						</div>
-						<div>
-							<span class="{{writeCommentAlert.classType}}" ng-show="writeCommentAlert.msg" ng-bind="writeCommentAlert.msg"></span>
-						</div>
+						<p ng-show="writeCommentAlert.msg" ng-class="writeCommentAlert.classType" ng-bind="writeCommentAlert.msg"></p>
 					</div>
 
 				</div> <!-- End Comment -->
