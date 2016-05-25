@@ -2,20 +2,28 @@
 apply plugin: 'war'
 
 description = 'jakduk-web'
+
 dependencies {
   compile project(':jakduk-common')
+
+  compile group: 'javax.servlet', name: 'jstl', version:'1.2'
+  compile group: 'ro.isdc.wro4j', name: 'wro4j-core', version:'1.8.0'
+  compile group: 'ro.isdc.wro4j', name: 'wro4j-extensions', version:'1.8.0'
+  compile group: 'com.github.lifus', name: 'wro4j-runtime-taglib', version:'0.2.0'
+  providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+  providedCompile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
 }
 
 // summernote의 다국어 지원을 위해 bower_components 밖으로 복사한다.
-task copysummernote(type: copy) {
-  from getrootdir().path + '/jakduk-web/src/main/webapp/resources/bower_components/summernote'
-  into getrootdir().path + '/jakduk-web/src/main/webapp/resources/summernote'
+task copySummernote(type: Copy) {
+  from getRootDir().path + '/jakduk-web/src/main/webapp/resources/bower_components/summernote'
+  into getRootDir().path + '/jakduk-web/src/main/webapp/resources/summernote'
 }
 
 // bower install
-task bowerinstall(type: exec) {
-  commandline 'bower', 'install'
+task bowerInstall(type: Exec) {
+  commandLine 'bower', 'install'
 }
 
 // war task 실행 전 copysummernote task 먼저 실행.
-war.dependson copysummernote
+war.dependsOn copySummernote
