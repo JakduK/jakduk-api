@@ -29,8 +29,8 @@ import com.jakduk.service.AdminService;
  * @desc     :
  */
 
-@Controller
 @Slf4j
+@Controller
 @RequestMapping("/admin")
 public class AdminController {
 	
