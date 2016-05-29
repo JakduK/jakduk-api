@@ -1,8 +1,37 @@
 package com.jakduk.service;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import javax.imageio.ImageIO;
+
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.*;
+import com.jakduk.model.db.AttendanceClub;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.Competition;
+import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.db.JakduSchedule;
+import com.jakduk.model.db.JakduScheduleGroup;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
@@ -14,7 +43,15 @@ import com.jakduk.model.web.CompetitionWrite;
 import com.jakduk.model.web.ThumbnailSizeWrite;
 import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
 import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.repository.*;
+import com.jakduk.repository.AttendanceClubRepository;
+import com.jakduk.repository.AttendanceLeagueRepository;
+import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.CompetitionRepository;
+import com.jakduk.repository.EncyclopediaRepository;
+import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.repository.FootballClubRepository;
+import com.jakduk.repository.GalleryRepository;
+import com.jakduk.repository.HomeDescriptionRepository;
 import com.jakduk.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.repository.jakdu.JakduScheduleRepository;
 import io.searchbox.client.JestClient;
@@ -31,22 +68,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -433,7 +454,7 @@ public class AdminService {
 		return result;
 	}
 
-	public void boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
+	public BoardCategory boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
 		BoardCategory boardCategory = new BoardCategory();
 		
 		if (boardCategoryWrite.getId() != null) {
@@ -454,13 +475,17 @@ public class AdminService {
 			log.debug("boardCategory=" + boardCategory);
 		}
 		
-		boardCategoryRepository.save(boardCategory);
+		return boardCategoryRepository.save(boardCategory);
+	}
+
+	public List<BoardCategory> getBoardCategoryList() {
+		return boardCategoryRepository.findAll();
 	}
 
 	public Model getBoardCategoryList(Model model) {
-		List<BoardCategory> boardCategorys = boardCategoryRepository.findAll();
+		List<BoardCategory> boardCategories = this.getBoardCategoryList();
 		
-		model.addAttribute("boardCategorys", boardCategorys);
+		model.addAttribute("boardCategories", boardCategories);
 		
 		return model;
 	}
@@ -491,9 +516,14 @@ public class AdminService {
 		model.addAttribute("attendanceClubs", attendanceClubs);
 		
 		return model;
-	}	
-	
+	}
+
 	public Model getBoardCategory(Model model, String id) {
+		model.addAttribute("boardCategoryWrite", this.getBoardCategory(id));
+		return model;
+	}
+
+	public BoardCategoryWrite getBoardCategory(String id) {
 		BoardCategory boardCategory = boardCategoryRepository.findOne(id);
 		
 		BoardCategoryWrite boardCategoryWrite = new BoardCategoryWrite();
@@ -502,10 +532,8 @@ public class AdminService {
 		boardCategoryWrite.setResName(boardCategory.getResName());
 		String[] usingBoard = boardCategory.getUsingBoard().toArray(new String[boardCategory.getUsingBoard().size()]);
 		boardCategoryWrite.setUsingBoard(usingBoard);
-		
-		model.addAttribute("boardCategoryWrite", boardCategoryWrite);
-		
-		return model;
+
+		return boardCategoryWrite;
 	}
 	
 	public void thumbnailSizeWrite(ThumbnailSizeWrite thumbnailSizeWrite) {

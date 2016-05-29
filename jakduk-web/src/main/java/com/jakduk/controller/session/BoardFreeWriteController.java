@@ -1,5 +1,10 @@
 package com.jakduk.controller.session;
 
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.service.BoardFreeService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -28,7 +28,7 @@ import java.io.IOException;
 @Controller
 @Slf4j
 @RequestMapping("/board")
-@SessionAttributes({"boardFreeWrite","boardCategorys"})
+@SessionAttributes({"boardFreeWrite","boardCategories"})
 public class BoardFreeWriteController {
 
 	@Autowired

@@ -46,14 +46,14 @@
   </table>
 </div>
 
-<div ng-show="ctrl.boardCategorys.length">
+<div ng-show="ctrl.boardCategories.length">
   <h4>Board Category</h4>
   <table class="table">
     <tr>
       <th>Name</th><th>ResName</th><th>UsingBoard</th>
     </tr>
-    <tr ng-repeat="boardCategory in ctrl.boardCategorys">
-      <td><a href="admin/board/category/write/{{boardCategory.id}}">{{boardCategory.name}}</a></td>
+    <tr ng-repeat="boardCategory in ctrl.boardCategories">
+      <td><a ng-href="admin/boardCategory/write/{{boardCategory.id}}">{{boardCategory.name}}</a></td>
       <td>{{boardCategory.resName}}</td>
       <td><div ng-repeat="usingBoard in boardCategory.usingBoard">{{usingBoard}}</div>
       </td>
@@ -80,7 +80,7 @@
     </tr>
     <tr ng-repeat="attendanceLeague in ctrl.attendanceLeagues">
       <td>{{attendanceLeague.league}}</td>
-      <td><a ng-href="admin/attendance/league/write/{{attendanceLeague.id}}">{{attendanceLeague.season}}</a></td>
+      <td><a ng-href="admin/attendance/league/write/{{attendanceLeague.id}}" target="_self">{{attendanceLeague.season}}</a></td>
       <td>{{attendanceLeague.games}}</td>
       <td>{{attendanceLeague.total}}</td>
       <td>{{attendanceLeague.average}}</td>
@@ -96,7 +96,7 @@
       <th>Club</th><th>Season</th><th>League</th><th>Games</th><th>Total</th><th>Average</th>
     </tr>
     <tr ng-repeat="attendanceClub in ctrl.attendanceClubs">
-      <td><a ng-href="admin/attendance/club/write/{{attendanceClub.id}}">{{attendanceClub.club.name}}</a></td>
+      <td><a ng-href="admin/attendance/club/write/{{attendanceClub.id}}" target="_self">{{attendanceClub.club.name}}</a></td>
       <td>{{attendanceClub.season}}</td>
       <td>{{attendanceClub.league}}</td>
       <td>{{attendanceClub.games}}</td>
@@ -127,7 +127,7 @@
       <th>id</th><th>Date</th><th>Home</th><th>Away</th><th>Group</th><th>Competition</th><th>Score</th><th>isTimeUp</th>
     </tr>
     <tr ng-repeat="jakduSchedule in ctrl.jakduSchedules">
-      <td><a ng-href="admin/jakdu/schedule/write/{{jakduSchedule.id}}">{{jakduSchedule.id}}</a></td>
+      <td><a ng-href="admin/jakdu/schedule/write/{{jakduSchedule.id}}" target="_self">{{jakduSchedule.id}}</a></td>
       <td>{{jakduSchedule.date | date:'short' }}</td>
       <td>{{jakduSchedule.home.name}}</td>
       <td>{{jakduSchedule.away.name}}</td>
@@ -152,7 +152,7 @@
       <th>id</th><th>Seq</th><th>State</th><th>OpenDate</th>
     </tr>
     <tr ng-repeat="jakduScheduleGroup in ctrl.jakduScheduleGroups">
-      <td><a ng-href="admin/jakdu/schedule/group/write/{{jakduScheduleGroup.id}}">{{jakduScheduleGroup.id}}</a></td>
+      <td><a ng-href="admin/jakdu/schedule/group/write/{{jakduScheduleGroup.id}}" target="_self">{{jakduScheduleGroup.id}}</a></td>
       <td>{{jakduScheduleGroup.seq}}</td>
       <td>{{jakduScheduleGroup.state}}</td>
       <td>{{jakduScheduleGroup.openDate | date:'short' }}</td>
@@ -167,7 +167,7 @@
       <th>Code</th><th>Names</th>
     </tr>
     <tr ng-repeat="competition in ctrl.competitions">
-      <td><a ng-href="admin/competition/write/{{competition.id}}">{{competition.code}}</a></td>
+      <td><a ng-href="admin/competition/write/{{competition.id}}" target="_self">{{competition.code}}</a></td>
       <td><div ng-repeat="name in competition.names">Lang={{name.language}} F.N.={{name.fullName}} S.N.={{name.shortName}}</div>
       </td>
     </tr>
