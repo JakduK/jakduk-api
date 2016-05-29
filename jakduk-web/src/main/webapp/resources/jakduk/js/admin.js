@@ -263,7 +263,7 @@
 			self.encyclopedias = [];
 			self.fcOrigins = [];
 			self.fcs = [];
-			self.boardCategorys = [];
+			self.boardCategories = [];
 			self.attendanceLeagues = [];
 			self.attendanceClubs = [];
 			self.homeDescriptions = [];
@@ -288,7 +288,7 @@
 						bUrl = '/api/admin/football/clubs';
 						break;
 					case 'boardCategory':
-						bUrl = '/admin/board/category.json';
+						bUrl = '/api/admin/board/categories';
 						break;
 					case 'attendanceLeague':
 						bUrl = '/admin/data/attendance/league.json';
@@ -331,7 +331,7 @@
 								name = 'fcs';
 								break;
 							case 'boardCategory':
-								name = 'boardCategorys';
+								name = 'boardCategories';
 								break;
 							case 'attendanceLeague':
 								name = 'attendanceLeagues';
@@ -388,7 +388,7 @@
 				self.encyclopedias = [];
 				self.fcOrigins = [];
 				self.fcs = [];
-				self.boardCategorys = [];
+				self.boardCategories = [];
 				self.attendanceLeagues = [];
 				self.attendanceClubs = [];
 				self.homeDescriptions = [];
@@ -593,7 +593,54 @@
 				});
 			}
 		}])
-		.controller('AdminWriteBoardCategoryController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+		.controller('AdminWriteBoardCategoryController', ['$scope', '$http', '$state', '$location', 'BASE_URL', function($scope, $http, $state, $location, BASE_URL) {
+			var self = this;
+
+			self.submit = submit;
+
+			if ($state.params.id) {
+				$http.get(BASE_URL + '/api/admin/board/category/' + $state.params.id).then(function(response) {
+					var boardCategory = response.data.boardCategory;
+					if (boardCategory) {
+						self.boardCategory = boardCategory;
+						self.name = boardCategory.name;
+						self.resName = boardCategory.resName;
+						self.usingBoard = boardCategory.usingBoard.map(function(each) {
+							return {
+								name: each,
+								value: true
+							}
+						});
+					}
+				});
+			} else {
+				self.usingBoard = [{name: 'freeBoard', value: true}];
+			}
+
+			function submit() {
+				self.errorMessage = '';
+				if ($scope.boardCategoryWrite.$invalid) {
+					self.errorMessage = '빠짐없이 입력해 주세요.';
+					return;
+				}
+
+				var data = {
+					name: self.name,
+					resName: self.resName,
+					usingBoard: self.usingBoard.filter(function(each) {return each.value;}).map(function(each) {return each.name;})
+				};
+				var promise;
+
+				if ($state.params.id) {
+					promise = $http.put(BASE_URL + '/api/admin/board/category/write/' + $state.params.id, data)
+				} else {
+					promise = $http.post(BASE_URL + '/api/admin/board/category/write', data)
+				}
+
+				promise.then(function() {
+					$location.url('/admin/boardCategory');
+				});
+			}
 
 		}])
 		.controller('AdminWriteThumbnailSizeController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {

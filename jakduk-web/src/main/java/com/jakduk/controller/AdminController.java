@@ -2,6 +2,14 @@ package com.jakduk.controller;
 
 import javax.validation.Valid;
 
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.web.AttendanceClubWrite;
+import com.jakduk.model.web.CompetitionWrite;
+import com.jakduk.model.web.ThumbnailSizeWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.service.AdminService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,16 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.web.AttendanceClubWrite;
-import com.jakduk.model.web.BoardCategoryWrite;
-import com.jakduk.model.web.CompetitionWrite;
-import com.jakduk.model.web.ThumbnailSizeWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.service.AdminService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -152,39 +150,19 @@ public class AdminController {
 		return "admin/admin";
 	}
 
-	@RequestMapping(value = "/board/category/write", method = RequestMethod.GET)
-	public String boardCategoryWrite(Model model) {
-		model.addAttribute("boardCategoryWrite", new BoardCategoryWrite());
-		
-		return "admin/boardCategoryWrite";
-	}
-	
-	@RequestMapping(value = "/board/category/write/{id}", method = RequestMethod.GET)
-	public String boardCategoryWrite(Model model,
-			@PathVariable String id) {
-		
-		adminService.getBoardCategory(model, id);
-		
-		return "admin/boardCategoryWrite";
-	}
-	
-	@RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
-	public String boardCategoryWrite(@Valid BoardCategoryWrite boardCategoryWtite, BindingResult result) {
-		
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/boardCategoryWrite";
-		}
-		
-		adminService.boardCategoryWrite(boardCategoryWtite);
-
-		return "redirect:/admin/boardCategory";
-	}
-
 	@RequestMapping(value = "/board/category", method = RequestMethod.GET)
-	public void dataBoardCategory(Model model) {
+	public String getBoardCategories() {
+		return "admin/admin";
+	}
 
-		adminService.getBoardCategoryList(model);
+	@RequestMapping(value = "/boardCategory/write", method = RequestMethod.GET)
+	public String writeBoardCategory() {
+		return "admin/admin";
+	}
+	
+	@RequestMapping(value = "/boardCategory/write/{id}", method = RequestMethod.GET)
+	public String editBoardCategory() {
+		return "admin/admin";
 	}
 	
 	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.GET)

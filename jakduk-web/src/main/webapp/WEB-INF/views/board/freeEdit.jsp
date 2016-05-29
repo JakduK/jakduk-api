@@ -47,7 +47,7 @@
 								<form:select path="categoryName" cssClass="form-control"
 									ng-model="categoryName" ng-init="categoryName='${boardFreeWrite.categoryName}'" ng-change="validationCategory()" ng-required="true">
 									<form:option value=""><spring:message code="board.category.init"/></form:option>
-									<c:forEach items="${boardCategorys}" var="category">
+									<c:forEach items="${boardCategories}" var="category">
 										<form:option value="${category.name}"><spring:message code="${category.resName}"/></form:option>
 									</c:forEach>
 								</form:select>

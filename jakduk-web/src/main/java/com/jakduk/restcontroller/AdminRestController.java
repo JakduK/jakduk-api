@@ -8,6 +8,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.web.BoardCategoryWrite;
+import com.jakduk.restcontroller.vo.FootballClubRequest;
+import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
+import com.jakduk.service.AdminService;
+import com.jakduk.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,17 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.Encyclopedia;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.model.db.HomeDescription;
-import com.jakduk.model.embedded.LocalName;
-import com.jakduk.restcontroller.vo.FootballClubRequest;
-import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
-import com.jakduk.service.AdminService;
-import com.jakduk.service.CommonService;
 
 
 /**
@@ -375,6 +376,61 @@ public class AdminRestController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("fc", footballClub);
+
+        return response;
+    }
+
+    @RequestMapping(value = "/board/categories", method = RequestMethod.GET)
+    public Map<String, Object> getBoardCategories() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("boardCategories", adminService.getBoardCategoryList());
+
+        return response;
+    }
+
+
+    @RequestMapping(value = "/board/category/{id}", method = RequestMethod.GET)
+    public Map<String, Object> getBoardCategory(@PathVariable String id) {
+        BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
+        if (Objects.isNull(boardCategoryWrite)) {
+            throw new IllegalArgumentException("유효하지 않은 id입니다.");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("boardCategory", boardCategoryWrite);
+
+        return response;
+    }
+
+    @RequestMapping(value = "/board/category/write/{id}", method = RequestMethod.PUT)
+    public Map<String, Object> editBoardCategory(
+      @PathVariable String id, @RequestBody BoardCategory boardCategory) {
+
+        BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
+        boardCategoryWrite.setName(boardCategory.getName());
+        boardCategoryWrite.setResName(boardCategory.getResName());
+        boardCategoryWrite.setUsingBoard(boardCategory.getUsingBoard().toArray(new String[0]));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
+
+        return response;
+    }
+
+    @RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
+    public Map<String, Object> writeBoardCategory(@RequestBody BoardCategory boardCategory) {
+
+        if (Objects.isNull(boardCategory.getName()) || Objects.isNull(boardCategory.getResName()) || Objects.isNull(boardCategory.getUsingBoard())) {
+            throw new IllegalArgumentException("필수값이 누락되었습니다.");
+        }
+
+        BoardCategoryWrite boardCategoryWrite = new BoardCategoryWrite();
+        boardCategoryWrite.setName(boardCategory.getName());
+        boardCategoryWrite.setResName(boardCategory.getResName());
+        boardCategoryWrite.setUsingBoard(boardCategory.getUsingBoard().toArray(new String[0]));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
 
         return response;
     }
