@@ -1,13 +1,5 @@
 package com.jakduk.configuration;
 
-import java.util.EnumSet;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-
 import org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
@@ -20,6 +12,9 @@ import org.springframework.web.servlet.DispatcherServlet;
 import ro.isdc.wro.http.WroContextFilter;
 import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.WroServletContextListener;
+
+import javax.servlet.*;
+import java.util.EnumSet;
 
 /**
  * web.xml
@@ -41,11 +36,6 @@ public class Initializer implements WebApplicationInitializer {
         ctx.addListener(new WroServletContextListener());
         //ctx.addListener(new TaglibServletContextListener());
 
-        RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
-        ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
-        reg.setLoadOnStartup(1);
-        reg.addMapping("/rest/*");
-
         registerCharcterEncodingFilter(ctx);
         registerSpringSecurityFilter(ctx);
         registerDeviceResolverRequestFilter(ctx);
@@ -53,6 +43,11 @@ public class Initializer implements WebApplicationInitializer {
         //registerRestDispatcherServlet(ctx);
         registerWroFilter(ctx);
         //registerWroContextFilter(ctx);
+
+        RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
+        ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
+        //reg.setLoadOnStartup(1);
+        reg.addMapping("/rest/*");
 
         rootContext.getEnvironment().setDefaultProfiles("local");
     }
