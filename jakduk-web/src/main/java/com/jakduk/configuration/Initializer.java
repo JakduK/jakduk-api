@@ -1,14 +1,6 @@
 package com.jakduk.configuration;
 
-import java.util.EnumSet;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-
-import com.github.lifus.wro4j_runtime_taglib.servlet.TaglibServletContextListener;
+import org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.WebApplicationInitializer;
@@ -21,31 +13,41 @@ import ro.isdc.wro.http.WroContextFilter;
 import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.WroServletContextListener;
 
+import javax.servlet.*;
+import java.util.EnumSet;
+
 /**
+ * web.xml
  * Created by pyohwan on 16. 4. 2.
  */
 public class Initializer implements WebApplicationInitializer {
 
     @Override
-    public void onStartup(ServletContext container) throws ServletException {
+    public void onStartup(ServletContext ctx) throws ServletException {
 
         // Create the 'root' Spring application context
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(AppConfig.class);
 
         // Manage the lifecycle of the root application context
-        container.addListener(new ContextLoaderListener(rootContext));
-        container.addListener(new HttpSessionEventPublisher());
-        container.addListener(new SessionListener());
-        container.addListener(new WroServletContextListener());
-        //container.addListener(new TaglibServletContextListener());
+        ctx.addListener(new ContextLoaderListener(rootContext));
+        ctx.addListener(new HttpSessionEventPublisher());
+        ctx.addListener(new SessionListener());
+        ctx.addListener(new WroServletContextListener());
+        //ctx.addListener(new TaglibServletContextListener());
 
-        registerCharcterEncodingFilter(container);
-        registerSpringSecurityFilter(container);
-        registerDeviceResolverRequestFilter(container);
-        registerDispatcherServlet(container);
-        registerWroFilter(container);
-        //registerWroContextFilter(container);
+        registerCharcterEncodingFilter(ctx);
+        registerSpringSecurityFilter(ctx);
+        registerDeviceResolverRequestFilter(ctx);
+        registerDispatcherServlet(ctx);
+        //registerRestDispatcherServlet(ctx);
+        registerWroFilter(ctx);
+        //registerWroContextFilter(ctx);
+
+        RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
+        ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
+        //reg.setLoadOnStartup(1);
+        reg.addMapping("/rest/*");
 
         rootContext.getEnvironment().setDefaultProfiles("local");
     }
@@ -85,15 +87,21 @@ public class Initializer implements WebApplicationInitializer {
 
     // Create the dispatcher servlet's Spring application context
     public void registerDispatcherServlet(ServletContext servletContext) {
-//        XmlWebApplicationContext appContext = new XmlWebApplicationContext();
-//        appContext.setConfigLocation("classpath:/config/spring/webmvc-config.xml");
-
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
         dispatcherContext.register(MvcConfig.class);
 
         // Register and map the dispatcher servlet
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
         dispatcher.addMapping("/");
+    }
+
+    // Create the dispatcher servlet's Spring application context
+    public void registerRestDispatcherServlet(ServletContext servletContext) {
+        AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
+        dispatcherContext.register(RestMvcConfig.class);
+
+        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("rest", new RepositoryRestDispatcherServlet(dispatcherContext));
+        dispatcher.addMapping("/rest/*");
     }
 }
 

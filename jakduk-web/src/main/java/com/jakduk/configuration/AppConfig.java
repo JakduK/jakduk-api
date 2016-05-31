@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 
 /**
+ * applicationContext.xml
  * Created by pyohwan on 16. 4. 2.
  */
 
