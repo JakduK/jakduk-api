@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @desc     :
  */
 
-@Controller
 @Slf4j
+@Controller
 @RequestMapping("/admin")
 public class AdminController {
 	

@@ -8,7 +8,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
-import com.github.lifus.wro4j_runtime_taglib.servlet.TaglibServletContextListener;
 import org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
@@ -29,26 +28,31 @@ import ro.isdc.wro.http.WroServletContextListener;
 public class Initializer implements WebApplicationInitializer {
 
     @Override
-    public void onStartup(ServletContext container) throws ServletException {
+    public void onStartup(ServletContext ctx) throws ServletException {
 
         // Create the 'root' Spring application context
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(AppConfig.class);
 
         // Manage the lifecycle of the root application context
-        container.addListener(new ContextLoaderListener(rootContext));
-        container.addListener(new HttpSessionEventPublisher());
-        container.addListener(new SessionListener());
-        container.addListener(new WroServletContextListener());
-        //container.addListener(new TaglibServletContextListener());
+        ctx.addListener(new ContextLoaderListener(rootContext));
+        ctx.addListener(new HttpSessionEventPublisher());
+        ctx.addListener(new SessionListener());
+        ctx.addListener(new WroServletContextListener());
+        //ctx.addListener(new TaglibServletContextListener());
 
-        registerCharcterEncodingFilter(container);
-        registerSpringSecurityFilter(container);
-        registerDeviceResolverRequestFilter(container);
-        registerDispatcherServlet(container);
-        registerRestDispatcherServlet(container);
-        registerWroFilter(container);
-        //registerWroContextFilter(container);
+        RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
+        ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
+        reg.setLoadOnStartup(1);
+        reg.addMapping("/rest/*");
+
+        registerCharcterEncodingFilter(ctx);
+        registerSpringSecurityFilter(ctx);
+        registerDeviceResolverRequestFilter(ctx);
+        registerDispatcherServlet(ctx);
+        //registerRestDispatcherServlet(ctx);
+        registerWroFilter(ctx);
+        //registerWroContextFilter(ctx);
 
         rootContext.getEnvironment().setDefaultProfiles("local");
     }
@@ -102,7 +106,7 @@ public class Initializer implements WebApplicationInitializer {
         dispatcherContext.register(RestMvcConfig.class);
 
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("rest", new RepositoryRestDispatcherServlet(dispatcherContext));
-        dispatcher.addMapping("/api2/*");
+        dispatcher.addMapping("/rest/*");
     }
 }
 

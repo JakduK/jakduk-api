@@ -14,6 +14,7 @@ import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardStatus;
 import com.jakduk.model.embedded.CommonFeelingUser;
 import com.jakduk.model.embedded.CommonWriter;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * 자유게시판 모델
@@ -22,6 +23,7 @@ import com.jakduk.model.embedded.CommonWriter;
  */
 
 @Data
+@RepositoryRestResource
 @Document
 public class BoardFree {
 
