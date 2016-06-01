@@ -48,8 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessUrl("/logout/success")
-                .and()
-                    .httpBasic()                // basic auth 사용.
+//                .and()
+//                    .httpBasic()                // basic auth 사용.
                 .and()
                     .exceptionHandling().accessDeniedPage("/error/denied")
                 //Configures url based authorization
