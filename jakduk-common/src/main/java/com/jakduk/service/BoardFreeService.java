@@ -67,6 +67,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -356,7 +357,16 @@ public class BoardFreeService {
 		searchService.createDocumentBoard(boardFreeOnEs);
 
 		// 슬랙 알림
-		slackService.send(boardFree.getWriter().getUsername(), boardFree.getSubject());
+		slackService.sendPost(
+			boardFree.getWriter().getUsername(),
+			boardFree.getSubject(),
+			"New post created.",
+			UrlUtils.buildFullRequestUrl(
+				request.getScheme(),
+				request.getServerName(),
+				request.getServerPort(),
+				request.getContextPath(), null) + "/board/free/" + boardFree.getSeq()
+		);
 		
 		if (log.isInfoEnabled()) {
 			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
