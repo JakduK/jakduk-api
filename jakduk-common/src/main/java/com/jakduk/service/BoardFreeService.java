@@ -1,5 +1,27 @@
 package com.jakduk.service;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
@@ -12,7 +34,14 @@ import com.jakduk.model.db.Gallery;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.embedded.*;
+import com.jakduk.model.embedded.BoardCommentStatus;
+import com.jakduk.model.embedded.BoardHistory;
+import com.jakduk.model.embedded.BoardImage;
+import com.jakduk.model.embedded.BoardItem;
+import com.jakduk.model.embedded.BoardStatus;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.embedded.GalleryStatus;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
@@ -20,7 +49,11 @@ import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.notification.SlackService;
-import com.jakduk.repository.*;
+import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.BoardFreeCommentRepository;
+import com.jakduk.repository.BoardFreeOnListRepository;
+import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONArray;
@@ -34,22 +67,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -336,7 +357,16 @@ public class BoardFreeService {
 		searchService.createDocumentBoard(boardFreeOnEs);
 
 		// 슬랙 알림
-		slackService.send(boardFree.getWriter().getUsername(), boardFree.getSubject());
+		slackService.sendPost(
+			boardFree.getWriter().getUsername(),
+			boardFree.getSubject(),
+			"New post created.",
+			UrlUtils.buildFullRequestUrl(
+				request.getScheme(),
+				request.getServerName(),
+				request.getServerPort(),
+				request.getContextPath(), null) + "/board/free/" + boardFree.getSeq()
+		);
 		
 		if (log.isInfoEnabled()) {
 			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
