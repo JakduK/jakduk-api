@@ -36,10 +36,10 @@
 			</div><!--/breadcrumbs-->
 			<!--=== End Breadcrumbs ===-->
 
-			<div class="alert alert-info"><spring:message code="common.msg.test.version"/></div>
-
 			<!--=== Content Part ===-->
 			<div class="container content">
+
+				<div class="alert alert-info"><spring:message code="common.msg.test.version"/></div>
 
 				<!-- Top Buttons -->
 				<div class="row">
