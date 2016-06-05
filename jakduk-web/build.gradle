@@ -25,5 +25,5 @@ task bowerInstall(type: Exec) {
   commandLine 'bower', 'install'
 }
 
-// war task 실행 전 copysummernote task 먼저 실행.
-war.dependsOn copySummernote
+// copySummernote task는 bowerInstall task 이후에 실행된다.
+bowerInstall.finalizedBy copySummernote
