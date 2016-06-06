@@ -4,6 +4,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.Competition;
 import com.jakduk.model.db.FootballClubOrigin;
 import com.jakduk.model.etc.SupporterCount;
 import com.jakduk.model.web.stats.AttendanceClubResponse;
@@ -51,6 +52,16 @@ public class StatsService {
 	
 	@Autowired
 	private FootballClubOriginRepository footballClubOriginRepository;
+
+	// 대회별 관중수 목록.
+	public List<AttendanceLeague> findLeagueAttendances(Sort sort) {
+		return attendanceLeagueRepository.findAll(sort);
+	}
+
+	// 대회별 관중수 목록.
+	public List<AttendanceLeague> findLeagueAttendances(Competition competition, Sort sort) {
+		return attendanceLeagueRepository.findByCompetition(competition, sort);
+	}
 	
 	public Integer getSupporters(Model model, String chartType) {
 		
@@ -76,19 +87,6 @@ public class StatsService {
 		model.addAttribute("usersTotal", usersTotal.intValue());
 	}
 
-	public List<AttendanceLeague> getAttendanceLeague(String league) {
-		
-		if (Objects.isNull(league)) {
-			league = CommonConst.K_LEAGUE_ABBREVIATION;
-		}
-		
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-		
-		List<AttendanceLeague> attendances = attendanceLeagueRepository.findByLeague(league, sort);
-		
-		return attendances;
-	}
-	
 	public List<AttendanceClub> getAttendanceClub(Locale locale, String clubOrigin) {
 
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findByName(clubOrigin);

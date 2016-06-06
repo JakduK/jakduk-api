@@ -3,15 +3,19 @@ package com.jakduk.restcontroller;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.Competition;
 import com.jakduk.service.CommonService;
+import com.jakduk.service.CompetitionService;
 import com.jakduk.service.StatsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -34,16 +38,20 @@ public class StatsRestController {
     @Autowired
     private CommonService commonService;
 
-    @RequestMapping(value = "/attendance/league/{league}", method = RequestMethod.GET)
-    public List<AttendanceLeague> getAttendancesLeague(@PathVariable String league,
-                                                       HttpServletRequest request) {
+    @Autowired
+    private CompetitionService competitionService;
 
-        Locale locale = localeResolver.resolveLocale(request);
+    @RequestMapping(value = "/league/attendances/competition/{competitionId}", method = RequestMethod.GET)
+    public List<AttendanceLeague> getAttendancesLeague(@PathVariable String competitionId) {
 
-        if (Objects.isNull(league) || league.isEmpty())
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+        Competition competition = null;
 
-        List<AttendanceLeague> attendances = statsService.getAttendanceLeague(league);
+        if (Objects.isNull(competitionId))
+            competition = competitionService.findCompetitionById(competitionId);
+
+        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+
+        List<AttendanceLeague> attendances = statsService.findLeagueAttendances(competition, sort);
 
         return attendances;
     }

@@ -9,8 +9,11 @@ import com.jakduk.restcontroller.vo.FootballClubRequest;
 import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
 import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
+import com.jakduk.service.CompetitionService;
+import com.jakduk.service.StatsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -30,6 +33,12 @@ public class AdminRestController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private StatsService statsService;
+
+    @Autowired
+    private CompetitionService competitionService;
 
     // 알림판 목록.
     @RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
@@ -422,14 +431,29 @@ public class AdminRestController {
         return response;
     }
 
-    // 리그별 관중수.
+    // 대회별 관중수.
     @RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
-    public Map<String, Object> getLeagueAttendances() {
+    public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId) {
 
-        List<FootballClub> footballClubs = adminService.findFootballClubs();
+        Competition competition = null;
+        List<AttendanceLeague> leagueAttendances;
+
+        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+
+        if (Objects.nonNull(competitionId))
+            competition = competitionService.findCompetitionById(competitionId);
+
+        if (Objects.isNull(competition)) {
+            leagueAttendances = statsService.findLeagueAttendances(sort);
+        } else {
+            leagueAttendances = statsService.findLeagueAttendances(competition, sort);
+        }
+
+        List<Competition> competitions = competitionService.findCompetitions();
 
         Map<String, Object> response = new HashMap<>();
-        response.put("fcs", footballClubs);
+        response.put("leagueAttendances", leagueAttendances);
+        response.put("competitions", competitions);
 
         return response;
     }

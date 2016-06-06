@@ -224,13 +224,6 @@ public class AdminController {
 		return "redirect:/admin/attendanceLeague";
 	}
 
-	@RequestMapping(value = "/data/attendance/league", method = RequestMethod.GET)
-	public void dataAttendanceLeague(Model model,
-									 @RequestParam(required = false) String league) {
-
-		adminService.getAttendanceLeagueList(model, league);
-	}
-	
 	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.GET)
 	public String attendanceClubWrite(Model model) {
 		

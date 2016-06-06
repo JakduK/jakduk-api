@@ -1,11 +1,11 @@
 package com.jakduk.repository;
 
-import java.util.List;
-
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.Competition;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.jakduk.model.db.AttendanceLeague;
+import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -14,6 +14,6 @@ import com.jakduk.model.db.AttendanceLeague;
  * @desc     :
  */
 public interface AttendanceLeagueRepository extends MongoRepository<AttendanceLeague, String>{
-	List<AttendanceLeague> findByLeague(String league, Sort sort);
+	List<AttendanceLeague> findByCompetition(Competition competition, Sort sort);
 
 }

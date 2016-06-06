@@ -36,8 +36,8 @@ import java.util.regex.Pattern;
  * @desc     : 공통으로 쓰이는 서비스
  */
 
-@Service
 @Slf4j
+@Service
 public class CommonService {
 
 	@Autowired

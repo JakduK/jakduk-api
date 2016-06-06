@@ -264,7 +264,7 @@
 			self.fcOrigins = [];
 			self.fcs = [];
 			self.boardCategories = [];
-			self.attendanceLeagues = [];
+			self.leagueAttendances = [];
 			self.attendanceClubs = [];
 			self.homeDescriptions = [];
 			self.jakduSchedules = [];
@@ -291,7 +291,7 @@
 						bUrl = '/api/admin/board/categories';
 						break;
 					case 'attendanceLeague':
-						bUrl = '/admin/data/attendance/league.json';
+						bUrl = '/api/admin/league/attendances';
 						break;
 					case 'attendanceClub':
 						bUrl = '/admin/data/attendance/club.json';
@@ -334,7 +334,7 @@
 								name = 'boardCategories';
 								break;
 							case 'attendanceLeague':
-								name = 'attendanceLeagues';
+								name = 'leagueAttendances';
 								break;
 							case 'attendanceClub':
 								name = 'attendanceClubs';
@@ -375,7 +375,7 @@
 
 						var data = response.data;
 
-						self.attendanceLeagues = data.attendanceLeagues;
+						self.leagueAttendances = data.leagueAttendances;
 
 						self.dataLeagueConn = "none";
 					}, function() {
@@ -389,7 +389,7 @@
 				self.fcOrigins = [];
 				self.fcs = [];
 				self.boardCategories = [];
-				self.attendanceLeagues = [];
+				self.leagueAttendances = [];
 				self.attendanceClubs = [];
 				self.homeDescriptions = [];
 				self.jakduSchedules = [];

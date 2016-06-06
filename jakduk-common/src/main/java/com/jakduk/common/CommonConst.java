@@ -194,14 +194,6 @@ public class CommonConst {
 		TIMEUP		// 경기 종료
 	}
 
-	public enum RESET_PASSWORD_RESULT {
-		NONE,
-		CODE_OK,
-		SEND_OK,
-		CHANGE_OK,
-		INVALID
-	}
-
 	// 검증 상태.
 	public enum VALIDATION_TYPE {
 		NONE,
