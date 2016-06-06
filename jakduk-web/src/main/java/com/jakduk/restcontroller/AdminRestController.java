@@ -1,19 +1,8 @@
 package com.jakduk.restcontroller;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.BoardCategory;
-import com.jakduk.model.db.Encyclopedia;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.FootballClubOrigin;
-import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.restcontroller.vo.FootballClubRequest;
@@ -22,11 +11,9 @@ import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 
 /**
@@ -431,6 +418,18 @@ public class AdminRestController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
+
+        return response;
+    }
+
+    // 리그별 관중수.
+    @RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
+    public Map<String, Object> getLeagueAttendances() {
+
+        List<FootballClub> footballClubs = adminService.findFootballClubs();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("fcs", footballClubs);
 
         return response;
     }
