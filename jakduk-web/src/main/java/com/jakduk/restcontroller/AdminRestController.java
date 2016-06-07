@@ -7,6 +7,7 @@ import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.restcontroller.vo.FootballClubRequest;
 import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
+import com.jakduk.restcontroller.vo.LeagueAttendanceForm;
 import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.CompetitionService;
@@ -433,15 +434,19 @@ public class AdminRestController {
 
     // 대회별 관중수.
     @RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
-    public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId) {
+    public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId,
+                                                    @RequestParam(required = false) String competitionCode) {
 
         Competition competition = null;
         List<AttendanceLeague> leagueAttendances;
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 
-        if (Objects.nonNull(competitionId))
+        if (Objects.nonNull(competitionId)) {
             competition = competitionService.findCompetitionById(competitionId);
+        } else if (Objects.nonNull(competitionCode)) {
+            competition = competitionService.findCompetitionByCode(competitionCode);
+        }
 
         if (Objects.isNull(competition)) {
             leagueAttendances = statsService.findLeagueAttendances(sort);
@@ -454,6 +459,103 @@ public class AdminRestController {
         Map<String, Object> response = new HashMap<>();
         response.put("leagueAttendances", leagueAttendances);
         response.put("competitions", competitions);
+
+        return response;
+    }
+
+    // 대회별 관중수 하나.
+    @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.GET)
+    public Map<String, Object> getLeagueAttendance(@PathVariable String id) {
+
+        AttendanceLeague attendanceLeague = statsService.findLeagueAttendance(id);
+
+        if (Objects.isNull(attendanceLeague))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회 관중수가 존재하지 않습니다.");
+
+        List<Competition> competitions = competitionService.findCompetitions();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("leagueAttendance", attendanceLeague);
+        response.put("competitions", competitions);
+
+        return response;
+    }
+
+    // 새 대회별 관중수 하나 저장.
+    @RequestMapping(value = "/league/attendance", method = RequestMethod.POST)
+    public Map<String, Object> addLeagueAttendance(@RequestBody LeagueAttendanceForm form) {
+
+        // 신규로 만들기때문에 null로 설정.
+        form.setId(null);
+
+        Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
+
+        if (Objects.isNull(competition))
+            throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
+
+        AttendanceLeague attendanceLeague = AttendanceLeague.builder()
+                .competition(competition)
+                .season(form.getSeason())
+                .games(form.getGames())
+                .total(form.getTotal())
+                .average(form.getAverage())
+                .numberOfClubs(form.getNumberOfClubs())
+                .build();
+
+        statsService.saveLeagueAttendance(attendanceLeague);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("leagueAttendance", attendanceLeague);
+
+        return response;
+    }
+
+    // 대회별 관중수 하나 편집.
+    @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.PUT)
+    public Map<String, Object> editLeagueAttendance(@PathVariable String id,
+                                                    @RequestBody LeagueAttendanceForm form) {
+
+        AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
+
+        if (Objects.isNull(existAttendanceLeague))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
+
+        Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
+
+        if (Objects.isNull(competition))
+            throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
+
+        AttendanceLeague attendanceLeague = AttendanceLeague.builder()
+                .id(id)
+                .competition(competition)
+                .season(form.getSeason())
+                .games(form.getGames())
+                .total(form.getTotal())
+                .average(form.getAverage())
+                .numberOfClubs(form.getNumberOfClubs())
+                .build();
+
+        statsService.saveLeagueAttendance(attendanceLeague);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("leagueAttendance", attendanceLeague);
+
+        return response;
+    }
+
+    // 대회별 관중수 하나 지움.
+    @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.DELETE)
+    public Map<String, Object> deleteLeagueAttendance(@PathVariable String id) {
+
+        AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
+
+        if (Objects.isNull(existAttendanceLeague))
+            throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
+
+        statsService.deleteLeagueAttendance(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", true);
 
         return response;
     }

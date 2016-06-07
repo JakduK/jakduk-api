@@ -28,4 +28,9 @@ public class CompetitionService {
     public Competition findCompetitionById(String id) {
         return competitionRepository.findOne(id);
     }
+
+    // 대회 하나.
+    public Competition findCompetitionByCode(String code) {
+        return competitionRepository.findOneByCode(code);
+    }
 }

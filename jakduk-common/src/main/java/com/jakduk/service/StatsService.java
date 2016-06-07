@@ -62,6 +62,21 @@ public class StatsService {
 	public List<AttendanceLeague> findLeagueAttendances(Competition competition, Sort sort) {
 		return attendanceLeagueRepository.findByCompetition(competition, sort);
 	}
+
+	// 대회별 관중수 하나.
+	public AttendanceLeague findLeagueAttendance(String id) {
+		return attendanceLeagueRepository.findOne(id);
+	}
+
+	// 새 대회별 관중수 저장.
+	public void saveLeagueAttendance(AttendanceLeague attendanceLeague) {
+		attendanceLeagueRepository.save(attendanceLeague);
+	}
+
+	// 대회별 관중수 하나 지움.
+	public void deleteLeagueAttendance(String id) {
+		attendanceLeagueRepository.delete(id);
+	}
 	
 	public Integer getSupporters(Model model, String chartType) {
 		
