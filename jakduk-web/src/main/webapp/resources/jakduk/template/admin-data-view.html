@@ -61,24 +61,26 @@
   </table>
 </div>
 
-<div ng-show="ctrl.attendanceLeagues.length">
+<div ng-show="ctrl.leagueAttendances.length">
   <h4>Attendance League</h4>
-  <div class="btn-group">
-    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
-      LEAGUE
-      <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" role="menu">
-      <li><a ng-click="ctrl.getDataLeague('KL')">K LEAGUE</a></li>
-      <li><a ng-click="ctrl.getDataLeague('KLCL')">K LEAGUE CLASSIC</a></li>
-      <li><a ng-click="ctrl.getDataLeague('KLCH')">K LEAGUE CHALLENGE</a></li>
-    </ul>
+  <div class="form-group">
+    <div class="btn-group">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+        <span ng-bind="ctrl.activeLeagueName"></span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu">
+        <li><a ng-href="{{'admin' + MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.URL + '=KL'}}" ng-hide="ctrl.activeLeague === 'KL'">K LEAGUE</a></li>
+        <li><a ng-href="{{'admin' + MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.URL + '=KLCL'}}" ng-hide="ctrl.activeLeague === 'KLCL'">K LEAGUE CLASSIC</a></li>
+        <li><a ng-href="{{'admin' + MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.URL + '=KLCH'}}" ng-hide="ctrl.activeLeague === 'KLCH'">K LEAGUE CHALLENGE</a></li>
+      </ul>
+    </div>
   </div>
   <table class="table">
     <tr>
       <th>League</th><th>Season</th><th>Games</th><th>Total</th><th>Average</th><th>Number Of Clubs</th>
     </tr>
-    <tr ng-repeat="attendanceLeague in ctrl.attendanceLeagues">
+    <tr ng-repeat="attendanceLeague in ctrl.leagueAttendances">
       <td>{{attendanceLeague.league}}</td>
       <td><a ng-href="admin/attendance/league/write/{{attendanceLeague.id}}" target="_self">{{attendanceLeague.season}}</a></td>
       <td>{{attendanceLeague.games}}</td>
