@@ -12,6 +12,8 @@ import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.CompetitionService;
 import com.jakduk.service.StatsService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,7 @@ import java.util.*;
  */
 
 @Slf4j
+@Api(value = "JPA예제", description = "JPA 예제 테스트")
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
@@ -41,7 +44,7 @@ public class AdminRestController {
     @Autowired
     private CompetitionService competitionService;
 
-    // 알림판 목록.
+    @ApiOperation(value = "알림판 목록")
     @RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
     public Map<String, Object> getHomeDescriptions() {
 

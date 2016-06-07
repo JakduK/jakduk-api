@@ -38,6 +38,15 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+        // swagger
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+
+        // swagger
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+
         registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
     }
 
@@ -101,8 +110,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user", "classpath:messages/about",
-                "classpath:messages/home", "classpath:messages/gallery", "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu");
+        messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
+                "classpath:messages/about", "classpath:messages/home", "classpath:messages/gallery",
+                "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(180);
 

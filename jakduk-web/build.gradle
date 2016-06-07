@@ -10,6 +10,9 @@ dependencies {
   compile group: 'ro.isdc.wro4j', name: 'wro4j-core', version:'1.8.0'
   compile group: 'ro.isdc.wro4j', name: 'wro4j-extensions', version:'1.8.0'
   compile group: 'com.github.lifus', name: 'wro4j-runtime-taglib', version:'0.2.0'
+  compile 'io.springfox:springfox-swagger2:2.5.0'
+  compile 'io.springfox:springfox-swagger-ui:2.5.0'
+
   providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
   providedCompile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
 }

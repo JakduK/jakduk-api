@@ -15,7 +15,6 @@ import javax.annotation.Resource;
  */
 
 @Configuration
-@Slf4j
 public class LogContextConfig implements InitializingBean {
 
     @Resource

@@ -23,6 +23,7 @@ subprojects {
 
     ext {
         springVersion = '4.2.6.RELEASE'
+        springSecurityVersion = '4.1.0.RELEASE'
     }
 
     repositories {
@@ -48,10 +49,10 @@ subprojects {
         compile group: 'org.springframework', name: 'spring-context-support', version:"${springVersion}"
         compile group: 'org.springframework', name: 'spring-aop', version:"${springVersion}"
         compile group: 'org.springframework', name: 'spring-orm', version:"${springVersion}"
-        compile group: 'org.springframework.security', name: 'spring-security-core', version:'4.1.0.RELEASE'
-        compile group: 'org.springframework.security', name: 'spring-security-web', version:'4.1.0.RELEASE'
-        compile group: 'org.springframework.security', name: 'spring-security-config', version:'4.1.0.RELEASE'
-        compile group: 'org.springframework.security', name: 'spring-security-taglibs', version:'4.1.0.RELEASE'
+        compile group: 'org.springframework.security', name: 'spring-security-core', version:"${springSecurityVersion}"
+        compile group: 'org.springframework.security', name: 'spring-security-web', version:"${springSecurityVersion}"
+        compile group: 'org.springframework.security', name: 'spring-security-config', version:"${springSecurityVersion}"
+        compile group: 'org.springframework.security', name: 'spring-security-taglibs', version:"${springSecurityVersion}"
         compile group: 'org.springframework.data', name: 'spring-data-rest-webmvc', version:'2.5.1.RELEASE'
         compile group: 'org.springframework.data', name: 'spring-data-mongodb', version:'1.9.1.RELEASE'
         compile group: 'org.springframework.social', name: 'spring-social-facebook', version:'2.0.3.RELEASE'
