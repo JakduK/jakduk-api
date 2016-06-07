@@ -136,7 +136,7 @@
 				},
 				ATTENDANCE_LEAGUE: {
 					ID: 'admin.getAttendanceLeague',
-					URL: '/attendanceLeague',
+					URL: '/attendanceLeague?competitionCode',
 					CONTROLLER: 'AdminGetController',
 					TEMPLATE: 'resources/jakduk/template/admin-data-view.html'
 				},
@@ -251,11 +251,10 @@
 			}
 
 		}])
-		.controller("AdminGetController", ['$http', '$state', 'BASE_URL', function($http, $state, BASE_URL) {
+		.controller("AdminGetController", ['$http', '$state', '$location', 'MENU_ID_MAP', 'BASE_URL', function($http, $state, $location, MENU_ID_MAP, BASE_URL) {
 			var self = this;
 
 			self.getData = getData;
-			self.getDataLeague = getDataLeague;
 			self.clearData = clearData;
 
 			self.dataConn = "none";
@@ -272,83 +271,86 @@
 			self.competitions = [];
 
 			self.message = '불러오는 중...';
-			getData($state.current.url.replace('/', ''));
+			getData($state.current.name);
 
-			function getData(type) {
-				var bUrl;
+			function getData(id) {
+				var apiUrl, apiParams = '';
 
-				switch (type) {
-					case 'encyclopedia':
-						bUrl = '/api/admin/encyclopedias';
+				switch (id) {
+					case MENU_ID_MAP.GET.ENCYCLOPEDIA.ID:
+						apiUrl = '/api/admin/encyclopedias';
 						break;
-					case 'fcOrigin':
-						bUrl = '/api/admin/origin/football/clubs';
+					case MENU_ID_MAP.GET.FC_ORIGIN.ID:
+						apiUrl = '/api/admin/origin/football/clubs';
 						break;
-					case 'fc':
-						bUrl = '/api/admin/football/clubs';
+					case MENU_ID_MAP.GET.FC.ID:
+						apiUrl = '/api/admin/football/clubs';
 						break;
-					case 'boardCategory':
-						bUrl = '/api/admin/board/categories';
+					case MENU_ID_MAP.GET.BOARD_CATEGORY.ID:
+						apiUrl = '/api/admin/board/categories';
 						break;
-					case 'attendanceLeague':
-						bUrl = '/api/admin/league/attendances';
+					case MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.ID:
+						self.activeLeague = ($state.params.competitionCode || 'KL');
+						self.activeLeagueName = getActiveLeage(self.activeLeague);
+						apiUrl = '/api/admin/league/attendances';
+						apiParams = '?competitionCode=' + self.activeLeague;
 						break;
-					case 'attendanceClub':
-						bUrl = '/admin/data/attendance/club.json';
+					case MENU_ID_MAP.GET.ATTENDANCE_CLUB.ID:
+						apiUrl = '/admin/data/attendance/club.json';
 						break;
-					case 'homeDescription':
-						bUrl = '/api/admin/home/descriptions';
+					case MENU_ID_MAP.GET.HOME_DESCRIPTION.ID:
+						apiUrl = '/api/admin/home/descriptions';
 						break;
-					case 'jakduSchedule':
-						bUrl = '/admin/data/jakdu/schedule.json';
+					case MENU_ID_MAP.GET.JAKDU_SCHEDULE.ID:
+						apiUrl = '/admin/data/jakdu/schedule.json';
 						break;
-					case 'jakduScheduleGroup':
-						bUrl = '/admin/data/jakdu/schedule/group.json';
+					case MENU_ID_MAP.GET.JAKDU_SCHEDULE_GROUP.ID:
+						apiUrl = '/admin/data/jakdu/schedule/group.json';
 						break;
-					case 'competition':
-						bUrl = '/admin/data/competition.json';
+					case MENU_ID_MAP.GET.COMPETITION.ID:
+						apiUrl = '/admin/data/competition.json';
 						break;
 				}
 
-				if (bUrl && self.dataConn === "none") {
+				if (apiUrl && self.dataConn === "none") {
 
 					self.dataConn = "loading";
 
-					$http.get(BASE_URL + bUrl).then(function(response) {
+					$http.get(BASE_URL + apiUrl + apiParams).then(function(response) {
 						clearData();
 
 						var data = response.data;
 						var name;
 
-						switch (type) {
-							case 'encyclopedia':
+						switch (id) {
+							case MENU_ID_MAP.GET.ENCYCLOPEDIA.ID:
 								name = 'encyclopedias';
 								break;
-							case 'fcOrigin':
+							case MENU_ID_MAP.GET.FC_ORIGIN.ID:
 								name = 'originFCs';
 								break;
-							case 'fc':
+							case MENU_ID_MAP.GET.FC.ID:
 								name = 'fcs';
 								break;
-							case 'boardCategory':
+							case MENU_ID_MAP.GET.BOARD_CATEGORY.ID:
 								name = 'boardCategories';
 								break;
-							case 'attendanceLeague':
+							case MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.ID:
 								name = 'leagueAttendances';
 								break;
-							case 'attendanceClub':
+							case MENU_ID_MAP.GET.ATTENDANCE_CLUB.ID:
 								name = 'attendanceClubs';
 								break;
-							case 'homeDescription':
+							case MENU_ID_MAP.GET.HOME_DESCRIPTION.ID:
 								name = 'homeDescriptions';
 								break;
-							case 'jakduSchedule':
+							case MENU_ID_MAP.GET.JAKDU_SCHEDULE.ID:
 								name = 'jakduSchedules';
 								break;
-							case 'jakduScheduleGroup':
+							case MENU_ID_MAP.GET.JAKDU_SCHEDULE_GROUP.ID:
 								name = 'jakduScheduleGroups';
 								break;
-							case 'competition':
+							case MENU_ID_MAP.GET.COMPETITION.ID:
 								name = 'competitions';
 								break;
 						}
@@ -359,27 +361,6 @@
 					}, function() {
 						self.dataConn = "none";
 						self.message = '오류 발생';
-
-					});
-				}
-			}
-
-
-			function getDataLeague(league) {
-				if (self.dataLeagueConn == "none") {
-
-					self.dataLeagueConn = "loading";
-
-					$http.get(BASE_URL + '/admin/attendance/league.json?league=' + league).then(function(response) {
-						clearData();
-
-						var data = response.data;
-
-						self.leagueAttendances = data.leagueAttendances;
-
-						self.dataLeagueConn = "none";
-					}, function() {
-						self.dataLeagueConn = "none";
 					});
 				}
 			}
@@ -395,6 +376,17 @@
 				self.jakduSchedules = [];
 				self.jakduScheduleGroups = [];
 				self.competitions = [];
+			}
+
+			function getActiveLeage(id) {
+				switch (id) {
+					case 'KLCL':
+						return 'K League Classic';
+					case 'KLCH':
+						return 'K League Challenge';
+					default:
+						return 'K League';
+				}
 			}
 
 		}])
