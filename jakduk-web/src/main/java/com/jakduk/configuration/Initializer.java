@@ -88,7 +88,10 @@ public class Initializer implements WebApplicationInitializer {
     // Create the dispatcher servlet's Spring application context
     public void registerDispatcherServlet(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
-        dispatcherContext.register(MvcConfig.class);
+
+        // springfox 활성화를 위해 껍데기 web-dispatcher.xml을 붙혔음.
+        //dispatcherContext.register(MvcConfig.class);
+        dispatcherContext.setConfigLocation("classpath*:/webContext/web-dispatcher.xml");
 
         // Register and map the dispatcher servlet
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
