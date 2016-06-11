@@ -27,7 +27,7 @@ import java.util.*;
  */
 
 @Slf4j
-@Api(value = "JPA예제", description = "JPA 예제 테스트")
+@Api(value = "ADMIN", description = "관리자 API")
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
@@ -57,7 +57,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 알림판 하나.
+    @ApiOperation(value = "알림판 하나")
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.GET)
     public Map<String, Object> getHomeDescription(@PathVariable String id) {
 
@@ -74,7 +74,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 새 알림판 저장.
+    @ApiOperation(value = "새 알림판 저장")
     @RequestMapping(value = "/home/description", method = RequestMethod.POST)
     public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
@@ -98,7 +98,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 알림판 편집.
+    @ApiOperation(value = "알림판 편집")
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
     public Map<String, Object> editHomeDescription(@PathVariable String id,
                                                    @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
@@ -129,7 +129,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 알림판 지움.
+    @ApiOperation(value = "알림판 지움")
     @RequestMapping(value = "/home/description/{id}", method = RequestMethod.DELETE)
     public Map<String, Object> deleteHomeDescription(@PathVariable String id) {
 
@@ -146,7 +146,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 백과사전 목록.
+    @ApiOperation(value = "백과사전 목록")
     @RequestMapping(value = "/encyclopedias", method = RequestMethod.GET)
     public Map<String, Object> getEncyclopedias() {
 
@@ -159,7 +159,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 백과사전 하나.
+    @ApiOperation(value = "백과사전 하나")
     @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.GET)
     public Map<String, Object> getEncyclopedia(@PathVariable String id) {
 
@@ -173,7 +173,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 새 백과사전 저장.
+    @ApiOperation(value = "새 백과사전 저장")
     @RequestMapping(value = "/encyclopedia", method = RequestMethod.POST)
     public Map<String, Object> addEncyclopedia(@RequestBody Encyclopedia encyclopedia) {
 
@@ -194,7 +194,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 백과사전 편집.
+    @ApiOperation(value = "백과사전 편집")
     @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.PUT)
     public Map<String, Object> editEncyclopedia(@PathVariable String id,
                                                 @RequestBody Encyclopedia encyclopedia) {
@@ -213,7 +213,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 백과사전 지움.
+    @ApiOperation(value = "백과사전 지움")
     @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.DELETE)
     public Map<String, Object> deleteEncyclopedia(@PathVariable String id) {
 
@@ -230,7 +230,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 부모 축구단 목록.
+    @ApiOperation(value = "부모 축구단 목록")
     @RequestMapping(value = "/origin/football/clubs", method = RequestMethod.GET)
     public Map<String, Object> getOriginFootballClubs() {
 
@@ -242,7 +242,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 부모 축구단 하나.
+    @ApiOperation(value = "부모 축구단 하나")
     @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.GET)
     public Map<String, Object> getOriginFootballClub(@PathVariable String id) {
 
@@ -257,7 +257,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 새 부모 축구단 하나 저장.
+    @ApiOperation(value = "새 부모 축구단 하나 저장")
     @RequestMapping(value = "/origin/football/club", method = RequestMethod.POST)
     public Map<String, Object> addOriginFootballClub(@RequestBody FootballClubOrigin footballClubOrigin) {
 
@@ -272,7 +272,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 부모 축구단 하나 편집.
+    @ApiOperation(value = "부모 축구단 하나 편집")
     @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.PUT)
     public Map<String, Object> editOriginFootballClub(@PathVariable String id,
                                                       @RequestBody FootballClubOrigin footballClubOrigin) {
@@ -291,7 +291,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 부모 축구단 하나 지움.
+    @ApiOperation(value = "부모 축구단 하나 지움")
     @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.DELETE)
     public Map<String, Object> deleteOriginFootballClub(@PathVariable String id) {
 
@@ -308,7 +308,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 축구단 목록.
+    @ApiOperation(value = "축구단 목록")
     @RequestMapping(value = "/football/clubs", method = RequestMethod.GET)
     public Map<String, Object> getFootballClubs() {
 
@@ -320,7 +320,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 축구단 하나.
+    @ApiOperation(value = "축구단 하나")
     @RequestMapping(value = "/football/club/{id}", method = RequestMethod.GET)
     public Map<String, Object> getFootballClub(@PathVariable String id) {
 
@@ -353,7 +353,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 새 축구단 하나 저장.
+    @ApiOperation(value = "새 축구단 하나 저장")
     @RequestMapping(value = "/football/club", method = RequestMethod.POST)
     public Map<String, Object> addFootballClub(@RequestBody FootballClubRequest request) {
 
@@ -369,6 +369,7 @@ public class AdminRestController {
         return response;
     }
 
+    @ApiOperation(value = "축구단 편집")
     @RequestMapping(value = "/football/club/{id}", method = RequestMethod.PUT)
     public Map<String, Object> editFootballClub(@PathVariable String id, @RequestBody FootballClubRequest request) {
         FootballClub footballClub = buildFootballClub(id, request);
@@ -380,6 +381,7 @@ public class AdminRestController {
         return response;
     }
 
+    @ApiOperation(value = "게시판 말머리 목록")
     @RequestMapping(value = "/board/categories", method = RequestMethod.GET)
     public Map<String, Object> getBoardCategories() {
         Map<String, Object> response = new HashMap<>();
@@ -388,7 +390,7 @@ public class AdminRestController {
         return response;
     }
 
-
+    @ApiOperation(value = "게시판 말머리 하나")
     @RequestMapping(value = "/board/category/{id}", method = RequestMethod.GET)
     public Map<String, Object> getBoardCategory(@PathVariable String id) {
         BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
@@ -402,6 +404,7 @@ public class AdminRestController {
         return response;
     }
 
+    @ApiOperation(value = "게시판 말머리 편집")
     @RequestMapping(value = "/board/category/write/{id}", method = RequestMethod.PUT)
     public Map<String, Object> editBoardCategory(
       @PathVariable String id, @RequestBody BoardCategory boardCategory) {
@@ -417,6 +420,7 @@ public class AdminRestController {
         return response;
     }
 
+    @ApiOperation(value = "새 게시판 말머리 저장")
     @RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
     public Map<String, Object> writeBoardCategory(@RequestBody BoardCategory boardCategory) {
 
@@ -435,7 +439,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 대회별 관중수.
+    @ApiOperation(value = "대회별 관중수 목록")
     @RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
     public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId,
                                                     @RequestParam(required = false) String competitionCode) {
@@ -466,7 +470,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 대회별 관중수 하나.
+    @ApiOperation(value = "대회별 관중수 하나")
     @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.GET)
     public Map<String, Object> getLeagueAttendance(@PathVariable String id) {
 
@@ -484,7 +488,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 새 대회별 관중수 하나 저장.
+    @ApiOperation(value = "새 대회별 관중수 하나 저장")
     @RequestMapping(value = "/league/attendance", method = RequestMethod.POST)
     public Map<String, Object> addLeagueAttendance(@RequestBody LeagueAttendanceForm form) {
 
@@ -513,7 +517,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 대회별 관중수 하나 편집.
+    @ApiOperation(value = "대회별 관중수 하나 편집")
     @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.PUT)
     public Map<String, Object> editLeagueAttendance(@PathVariable String id,
                                                     @RequestBody LeagueAttendanceForm form) {
@@ -546,7 +550,7 @@ public class AdminRestController {
         return response;
     }
 
-    // 대회별 관중수 하나 지움.
+    @ApiOperation(value = "대회별 관중수 하나 지움")
     @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.DELETE)
     public Map<String, Object> deleteLeagueAttendance(@PathVariable String id) {
 
@@ -563,21 +567,25 @@ public class AdminRestController {
         return response;
     }
 
+    @ApiOperation(value = "게시판 말머리 초기화")
     @RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
     public Map<String, Object> initBoardCategory() {
         return adminService.initBoardCategory();
     }
 
+    @ApiOperation(value = "검색 인덱스 초기화")
     @RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
     public Map<String, Object> initSearchIndex() {
         return adminService.initSearchIndex();
     }
 
+    @ApiOperation(value = "검색 타입 초기화")
     @RequestMapping(value = "/search/type/init", method = RequestMethod.POST)
     public Map<String, Object> initSearchType() {
         return adminService.initSearchType();
     }
 
+    @ApiOperation(value = "검색 데이터 초기화")
     @RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
     public Map<String, Object> initSearchData() {
         return adminService.initSearchData();
@@ -609,7 +617,7 @@ public class AdminRestController {
                  .id(id)
                  .active(request.getActive())
                  .origin(footballClubOrigin)
-                 .names(names)
-                 .build();
+                .names(names)
+                .build();
     }
 }

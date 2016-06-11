@@ -23,7 +23,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.jakduk.restcontroller"))
+//                .apis(RequestHandlerSelectors.basePackage("com.jakduk.restcontroller"))
                 .paths(PathSelectors.ant("/api/**"))
                 .build()
                 .apiInfo(apiInfo());
@@ -31,13 +31,13 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         ApiInfo apiInfo = new ApiInfo(
-                "My REST API",
+                "JakduK REST API",
                 "Some custom description of API.",
                 "API TOS",
                 "Terms of service",
                 new Contact("pio.", "https://jakduk.com", "phjang1983@daum.net"),
                 "License of API",
-                "API license URL");
+                "https://github.com/JakduK/JakduK/blob/master/LICENSE");
         return apiInfo;
     }
 }
