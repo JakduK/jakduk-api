@@ -1,10 +1,7 @@
 package com.jakduk.configuration;
 
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -34,6 +31,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = {"com.jakduk"}, useDefaultFilters = false, includeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
+@Import(SwaggerConfig.class)
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override

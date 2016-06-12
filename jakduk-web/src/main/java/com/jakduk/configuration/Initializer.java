@@ -105,15 +105,6 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
         wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
     }
 
-    protected void registerDispatcherServlet(ServletContext servletContext) {
-        AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
-        //dispatcherContext.register(MvcConfig.class);
-
-        // Register and map the dispatcher servlet
-        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
-        dispatcher.addMapping("/");
-    }
-
     // Create the dispatcher servlet's Spring application context
     public void registerRestDispatcherServlet(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();

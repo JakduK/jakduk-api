@@ -15,7 +15,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * Created by pyohwan on 16. 6. 7.
  */
 
-@Configuration
 @EnableSwagger2
 public class SwaggerConfig {
 
