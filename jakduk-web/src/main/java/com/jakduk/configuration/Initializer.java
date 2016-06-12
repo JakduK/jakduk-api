@@ -1,14 +1,19 @@
 package com.jakduk.configuration;
 
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import ro.isdc.wro.http.WroContextFilter;
 import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.WroServletContextListener;
@@ -20,44 +25,63 @@ import java.util.EnumSet;
  * web.xml
  * Created by pyohwan on 16. 4. 2.
  */
-public class Initializer implements WebApplicationInitializer {
+public class Initializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
-    public void onStartup(ServletContext ctx) throws ServletException {
-
-        // Create the 'root' Spring application context
-        AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
-        rootContext.register(AppConfig.class);
-
-        // Manage the lifecycle of the root application context
-        ctx.addListener(new ContextLoaderListener(rootContext));
-        ctx.addListener(new HttpSessionEventPublisher());
-        ctx.addListener(new SessionListener());
-        ctx.addListener(new WroServletContextListener());
-        //ctx.addListener(new TaglibServletContextListener());
-
-        registerCharcterEncodingFilter(ctx);
-        registerSpringSecurityFilter(ctx);
-        registerDeviceResolverRequestFilter(ctx);
-        registerDispatcherServlet(ctx);
-        //registerRestDispatcherServlet(ctx);
-        registerWroFilter(ctx);
-        //registerWroContextFilter(ctx);
-
-        RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
-        ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
-        //reg.setLoadOnStartup(1);
-        reg.addMapping("/rest/*");
-
-        rootContext.getEnvironment().setDefaultProfiles("local");
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
     }
 
-    // UTF-8 캐릭터 인코딩 필터를 추가한다.
-    public void registerCharcterEncodingFilter(ServletContext servletContext) {
-        FilterRegistration.Dynamic filter = servletContext.addFilter("CHARACTER_ENCODING_FILTER", CharacterEncodingFilter.class);
-        filter.setInitParameter("encoding", "UTF-8");
-        filter.setInitParameter("forceEncoding", "true");
-        filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class<?>[]{AppConfig.class};
+    }
+
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class<?>[]{MvcConfig.class};
+    }
+
+    @Override
+    protected Filter[] getServletFilters() {
+        // UTF-8 캐릭터 인코딩 필터를 추가한다.
+        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
+        encodingFilter.setEncoding("UTF-8");
+        encodingFilter.setForceEncoding(true);
+
+        return new Filter[] {encodingFilter};
+    }
+
+    @Override
+    protected void registerContextLoaderListener(ServletContext servletContext) {
+        super.registerContextLoaderListener(servletContext);
+
+        servletContext.addListener(new HttpSessionEventPublisher());
+        servletContext.addListener(new SessionListener());
+        servletContext.addListener(new WroServletContextListener());
+    }
+
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+        // 기본적으로 local로 프로파일 설정.
+        WebApplicationContext context = super.createRootApplicationContext();
+        ((ConfigurableEnvironment)context.getEnvironment()).setDefaultProfiles("local");
+        return context;
+    }
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        super.onStartup(servletContext);
+
+        registerSpringSecurityFilter(servletContext);
+        registerDeviceResolverRequestFilter(servletContext);
+        registerWroFilter(servletContext);
+        //registerWroContextFilter(ctx);
+
+        //RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
+        //ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
+        //reg.setLoadOnStartup(1);
+        //reg.addMapping("/rest/*");
     }
 
     // Spring Security Filter
@@ -86,19 +110,6 @@ public class Initializer implements WebApplicationInitializer {
     }
 
     // Create the dispatcher servlet's Spring application context
-    public void registerDispatcherServlet(ServletContext servletContext) {
-        AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
-
-        // springfox 활성화를 위해 껍데기 web-dispatcher.xml을 붙혔음.
-        //dispatcherContext.register(MvcConfig.class);
-        //dispatcherContext.setConfigLocation("classpath*:/webContext/web-dispatcher.xml");
-
-        // Register and map the dispatcher servlet
-        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
-        dispatcher.addMapping("/");
-    }
-
-    // Create the dispatcher servlet's Spring application context
     public void registerRestDispatcherServlet(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
         dispatcherContext.register(RestMvcConfig.class);
@@ -106,5 +117,6 @@ public class Initializer implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("rest", new RepositoryRestDispatcherServlet(dispatcherContext));
         dispatcher.addMapping("/rest/*");
     }
+
 }
 
