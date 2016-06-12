@@ -1,6 +1,6 @@
 package jakduk;
 
-import com.jakduk.configuration.AppConfig;
+import com.jakduk.configuration.RootConfig;
 import com.jakduk.notification.SlackService;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = RootConfig.class)
 @WebAppConfiguration
 public class NotificationTest {
 

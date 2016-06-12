@@ -30,7 +30,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = {"com.jakduk"}, excludeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
 @EnableMongoRepositories(basePackages = {"com.jakduk.repository"})
-public class AppConfig {
+public class RootConfig {
 
     @Resource
     private Environment environment;

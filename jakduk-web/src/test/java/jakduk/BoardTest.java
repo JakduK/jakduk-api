@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import com.jakduk.configuration.AppConfig;
+import com.jakduk.configuration.RootConfig;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.mongodb.MongoClient;
 import org.bson.types.ObjectId;
@@ -49,7 +49,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = RootConfig.class)
 @WebAppConfiguration
 public class BoardTest {
 	

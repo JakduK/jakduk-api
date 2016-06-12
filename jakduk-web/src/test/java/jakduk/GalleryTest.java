@@ -3,7 +3,7 @@ package jakduk;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jakduk.common.CommonConst;
-import com.jakduk.configuration.AppConfig;
+import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.repository.GalleryRepository;
@@ -49,7 +49,7 @@ import java.util.Map;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = RootConfig.class)
 @WebAppConfiguration
 public class GalleryTest {
 	

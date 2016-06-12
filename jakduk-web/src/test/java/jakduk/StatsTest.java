@@ -1,6 +1,6 @@
 package jakduk;
 
-import com.jakduk.configuration.AppConfig;
+import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.etc.SupporterCount;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = RootConfig.class)
 @WebAppConfiguration
 public class StatsTest {
 	

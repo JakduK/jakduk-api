@@ -1,13 +1,9 @@
 package com.jakduk.configuration;
 
-import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -34,7 +30,7 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[]{AppConfig.class};
+        return new Class<?>[]{RootConfig.class};
     }
 
     @Override
@@ -107,6 +103,15 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
     public void registerWroContextFilter(ServletContext servletContext) {
         FilterRegistration.Dynamic wro = servletContext.addFilter("WroContextFilter", new WroContextFilter());
         wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
+    }
+
+    protected void registerDispatcherServlet(ServletContext servletContext) {
+        AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
+        //dispatcherContext.register(MvcConfig.class);
+
+        // Register and map the dispatcher servlet
+        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
+        dispatcher.addMapping("/");
     }
 
     // Create the dispatcher servlet's Spring application context

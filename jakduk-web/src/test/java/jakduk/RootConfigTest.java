@@ -1,12 +1,10 @@
 package jakduk;
 
-import com.jakduk.configuration.AppConfig;
+import com.jakduk.configuration.RootConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.AnnotationConfigWebContextLoader;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
@@ -14,9 +12,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = RootConfig.class)
 @WebAppConfiguration
-public class AppConfigTest {
+public class RootConfigTest {
 
     @Test
     public void load() {

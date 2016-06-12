@@ -2,7 +2,7 @@ package jakduk;
 
 import com.google.gson.JsonObject;
 import com.jakduk.common.CommonConst;
-import com.jakduk.configuration.AppConfig;
+import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
@@ -39,7 +39,7 @@ import java.util.List;
 * @desc     :
 */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = RootConfig.class)
 @WebAppConfiguration
 public class JestTest {
 	

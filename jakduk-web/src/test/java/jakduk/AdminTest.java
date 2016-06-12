@@ -1,6 +1,6 @@
 package jakduk;
 
-import com.jakduk.configuration.AppConfig;
+import com.jakduk.configuration.RootConfig;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.repository.BoardCategoryRepository;
 import com.jakduk.repository.BoardFreeRepository;
@@ -19,7 +19,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class)
+@ContextConfiguration(classes = RootConfig.class)
 @WebAppConfiguration
 public class AdminTest {
 	
