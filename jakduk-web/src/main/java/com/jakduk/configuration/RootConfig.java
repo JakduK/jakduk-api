@@ -1,7 +1,6 @@
 package com.jakduk.configuration;
 
 import com.jakduk.dao.JongoR;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import net.gpedro.integrations.slack.SlackApi;
 import org.springframework.context.annotation.Bean;
@@ -59,32 +58,23 @@ public class RootConfig {
         return velocityEngine;
     }
 
-    /*
-     * Use the standard Mongo driver API to create a com.mongodb.Mongo instance.
-     */
     @Bean
-    public Mongo mongo() throws UnknownHostException {
-        return new Mongo(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
+    public MongoClient mongoClient() throws UnknownHostException {
+        return new MongoClient(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
     }
 
     @Bean
     public MongoDbFactory mongoDbFactory() throws Exception {
-        return new SimpleMongoDbFactory(mongo(), environment.getProperty("mongo.db.name"));
-    }
+        return new SimpleMongoDbFactory(mongoClient(), environment.getProperty("mongo.db.name"));    }
 
     @Bean
     public MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongo(), environment.getProperty("mongo.db.name"));
+        return new MongoTemplate(mongoDbFactory());
     }
 
     @Bean
     public JongoR jongoR() throws UnknownHostException {
         return new JongoR(environment.getProperty("mongo.db.name"), mongoClient());
-    }
-
-    @Bean
-    public MongoClient mongoClient() throws UnknownHostException {
-        return new MongoClient(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
     }
 
     @Bean
