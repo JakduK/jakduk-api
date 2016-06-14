@@ -1,24 +1,17 @@
 package com.jakduk.configuration;
 
-import com.jakduk.dao.JongoR;
-import com.mongodb.MongoClient;
 import net.gpedro.integrations.slack.SlackApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.velocity.VelocityEngineFactoryBean;
 
 import javax.annotation.Resource;
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 /**
@@ -28,7 +21,6 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = {"com.jakduk"}, excludeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
-@EnableMongoRepositories(basePackages = {"com.jakduk.repository"})
 public class RootConfig {
 
     @Resource
@@ -59,27 +51,7 @@ public class RootConfig {
     }
 
     @Bean
-    public MongoClient mongoClient() throws UnknownHostException {
-        return new MongoClient(environment.getProperty("mongo.host.name"), environment.getProperty("mongo.host.port", Integer.class));
-    }
-
-    @Bean
-    public MongoDbFactory mongoDbFactory() throws Exception {
-        return new SimpleMongoDbFactory(mongoClient(), environment.getProperty("mongo.db.name"));    }
-
-    @Bean
-    public MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongoDbFactory());
-    }
-
-    @Bean
-    public JongoR jongoR() throws UnknownHostException {
-        return new JongoR(environment.getProperty("mongo.db.name"), mongoClient());
-    }
-
-    @Bean
     public SlackApi slackApi() {
         return new SlackApi(environment.getProperty("slack.board.webhook"));
     }
-
 }

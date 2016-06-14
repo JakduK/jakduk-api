@@ -21,12 +21,6 @@ subprojects {
         ]
     }
 
-    ext {
-        springVersion = '4.3.0.RELEASE'
-        springSecurityVersion = '4.1.0.RELEASE'
-        jacksonVerstion = '2.7.5'
-    }
-
     repositories {
         mavenLocal()
         jcenter()

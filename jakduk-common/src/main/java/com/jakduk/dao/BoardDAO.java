@@ -1,15 +1,15 @@
 package com.jakduk.dao;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.etc.BoardFeelingCount;
+import com.jakduk.model.etc.BoardFreeOnBest;
+import com.jakduk.model.etc.CommonCount;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnSearchComment;
 import org.apache.commons.collections.IteratorUtils;
 import org.bson.types.ObjectId;
+import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -22,13 +22,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.etc.BoardFeelingCount;
-import com.jakduk.model.etc.CommonCount;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.jakduk.model.etc.BoardFreeOnBest;
-import com.jakduk.model.simple.BoardFreeOnSearchComment;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -43,8 +41,8 @@ public class BoardDAO {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	
-	@Resource
-	private JongoR jongoR;
+	@Autowired
+	private Jongo jongo;
 
 	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
 		
@@ -63,7 +61,7 @@ public class BoardDAO {
 	}
 
 	public Map<String, BoardFeelingCount> getBoardFreeUsersFeelingCount(List<ObjectId> arrId) {
-		MongoCollection boardFreeC = jongoR.getJongo().getCollection("boardFree");
+		MongoCollection boardFreeC = jongo.getCollection("boardFree");
 
 		Iterator<BoardFeelingCount> iPosts = boardFreeC.aggregate("{$match:{_id:{$in:#}}}", arrId)
 				.and("{$project:{_id:1, seq:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
@@ -123,7 +121,7 @@ public class BoardDAO {
 
 	public List<BoardFreeOnBest> getBoardFreeCountOfLikeBest(ObjectId commentId) {
 
-		MongoCollection boardFreeC = jongoR.getJongo().getCollection("boardFree");
+		MongoCollection boardFreeC = jongo.getCollection("boardFree");
 
 		Iterator<BoardFreeOnBest> iPosts = boardFreeC.aggregate("{$match:{_id:{$gt:#}}}", commentId)
 				.and("{$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}}")
