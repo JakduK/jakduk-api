@@ -290,10 +290,10 @@
 						apiUrl = '/api/admin/board/categories';
 						break;
 					case MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.ID:
-						self.activeLeague = ($state.params.competitionCode || 'KL');
+						self.activeLeague = ($state.params.competitionCode || '');
 						self.activeLeagueName = getActiveLeage(self.activeLeague);
 						apiUrl = '/api/admin/league/attendances';
-						apiParams = '?competitionCode=' + self.activeLeague;
+						apiParams = self.activeLeague ? '?competitionCode=' + self.activeLeague : '';
 						break;
 					case MENU_ID_MAP.GET.ATTENDANCE_CLUB.ID:
 						apiUrl = '/admin/data/attendance/club.json';
@@ -680,8 +680,61 @@
 				});
 			}
 		}])
-		.controller('AdminWriteAttendanceLeagueController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
+		.controller('AdminWriteAttendanceLeagueController', ['$scope', '$http', '$state', '$location', 'BASE_URL', function($scope, $http, $state, $location, BASE_URL) {
+			var self = this;
 
+			self.submit = submit;
+			self.deleteData = deleteData;
+
+			if ($state.params.id) {
+				$http.get(BASE_URL + '/api/admin/league/attendance/' + $state.params.id || '').then(function(response) {
+					var leagueAttendance = response.data.leagueAttendance;
+					if (leagueAttendance) {
+						self.leagueAttendance = leagueAttendance;
+						self.competitions = response.data.competitions;
+					}
+				});
+			} else {
+				$http.get(BASE_URL + '/api/admin/league/attendances').then(function(response) {
+					self.competitions = response.data.competitions;
+					self.leagueAttendance = {
+						competition: self.competitions[0]
+					};
+				});
+			}
+
+			function submit() {
+				self.errorMessage = '';
+				if ($scope.attendanceLeague.$invalid) {
+					self.errorMessage = '빠짐없이 입력해 주세요.';
+					return;
+				}
+
+				var promise;
+
+				if ($state.params.id) {
+					promise = $http.put(BASE_URL + '/api/admin/league/attendance/' + $state.params.id, angular.extend({
+						competitionId: self.leagueAttendance.competition.id
+					}, self.leagueAttendance));
+				} else {
+					promise = $http.post(BASE_URL + '/api/admin/league/attendance', angular.extend({
+						competitionId: self.leagueAttendance.competition.id
+					}, self.leagueAttendance));
+				}
+
+				promise.then(function() {
+					$location.url('/admin/attendanceLeague');
+				}, function() {
+					self.errorMessage = '빠짐없이 입력해 주세요.';
+				});
+			}
+
+			function deleteData() {
+				$http.delete(BASE_URL + '/api/admin/league/attendance/' + $state.params.id)
+					.then(function() {
+						$location.url('/admin/attendanceLeague');
+					});
+			}
 		}])
 		.controller('AdminWriteAttendanceClubController', ['$http', '$location', 'BASE_URL', function($http, $location, BASE_URL) {
 
