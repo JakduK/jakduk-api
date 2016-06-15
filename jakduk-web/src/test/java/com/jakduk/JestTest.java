@@ -1,19 +1,19 @@
-package jakduk;
+package com.jakduk;
 
 import com.google.gson.JsonObject;
 import com.jakduk.common.CommonConst;
-import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.Article;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.service.SearchService;
+import com.jakduk.util.AbstractSpringTest;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
-import jakduk.model.Article;
 import org.bson.types.ObjectId;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -21,11 +21,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,10 +34,8 @@ import java.util.List;
 * @date     : 2015. 8. 2.
 * @desc     :
 */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class JestTest {
+
+public class JestTest extends AbstractSpringTest {
 	
 	@Autowired
 	private JestClient jestClient;

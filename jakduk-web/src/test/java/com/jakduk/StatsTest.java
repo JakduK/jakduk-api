@@ -1,17 +1,13 @@
-package jakduk;
+package com.jakduk;
 
-import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.AttendanceClub;
 import com.jakduk.model.etc.SupporterCount;
 import com.jakduk.repository.AttendanceClubRepository;
+import com.jakduk.util.AbstractSpringTest;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,10 +20,7 @@ import java.util.stream.Stream;
  * @desc     :
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class StatsTest {
+public class StatsTest extends AbstractSpringTest {
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
