@@ -1,0 +1,52 @@
+<div class="container-fluid">
+	<h4>Write attendanceLeague</h4>
+	<form name="attendanceLeague" ng-submit="ctrl.submit()" novalidate>
+		<div class="form-group">
+			<label for="league" class="control-label">LEAGUE</label>
+			<select id="league" name="league" class="form-control" ng-model="ctrl.leagueAttendance.competition.code">
+				<option value="KL">K LEAGUE</option>
+				<option value="KLCL">K LEAGUE CLASSIC</option>
+				<option value="KLCH">K LEAGUE CHALLENGE</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="competitions" class="control-label">Competitions</label>
+			<select id="competitions" name="competitions" class="form-control" ng-model="ctrl.leagueAttendance.competition"
+				ng-options="competition.names[0].fullName for competition in ctrl.competitions track by competition.id">
+			</select>
+		</div>
+
+		<div class="form-group">
+			<p>
+				<label for="season" class="control-label">SEASON</label>
+				<input type="text" id="season" name="season" class="form-control" ng-model="ctrl.leagueAttendance.season"placeholder="Season">
+			</p>
+
+			<p>ex) 40</p>
+			<p>
+				GAMES :
+				<input type="number" id="games" name="games" class="form-control" placeholder="Games" ng-model="ctrl.leagueAttendance.games" ng-blur="ctrl.calcAve()"/>
+			</p>
+
+			<p>ex) 419478</p>
+			<p>
+				TOTAL : <input type="number" id="total" name="total" class="form-control" placeholder="Total" ng-model="ctrl.leagueAttendance.total" ng-blur="ctrl.calcAve()">
+			</p>
+
+			<p>
+				AVERAGE : <input type="number" id="average" name="average" class="form-control" placeholder="Average" ng-model="ctrl.leagueAttendance.average">
+			</p>
+		</div>
+
+		<div class="form-group">
+			<label for="numberOfClubs" class="control-label">NUMBER OF CLUBS</label>
+			<input type="number" id="numberOfClubs" name="numberOfClubs" class="form-control" ng-model="ctrl.leagueAttendance.numberOfClubs" placeholder="Number Of Clubs"/>
+		</div>
+
+		<input type="submit" class="btn btn-primary">
+		<button type="button" class="btn btn-default" ng-click="ctrl.deleteData()" ng-if="ctrl.leagueAttendance.id">
+			<i class="fa fa-trash-o"></i> 삭제
+		</button>
+	</form>
+</div>

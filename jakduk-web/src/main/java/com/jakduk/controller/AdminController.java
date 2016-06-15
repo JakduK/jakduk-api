@@ -3,7 +3,6 @@ package com.jakduk.controller;
 import javax.validation.Valid;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.AttendanceLeague;
 import com.jakduk.model.web.AttendanceClubWrite;
 import com.jakduk.model.web.CompetitionWrite;
 import com.jakduk.model.web.ThumbnailSizeWrite;
@@ -18,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -130,6 +128,16 @@ public class AdminController {
 		return "admin/admin";
 	}
 
+	@RequestMapping(value = "/attendanceLeague/write", method = RequestMethod.GET)
+	public String writeAttendanceLeague() {
+		return "admin/admin";
+	}
+
+	@RequestMapping(value = "/attendanceLeague/write/{id}", method = RequestMethod.GET)
+	public String editAttendanceLeague() {
+		return "admin/admin";
+	}
+
 	@RequestMapping(value = "/attendanceClub", method = RequestMethod.GET)
 	public String getAttendanceClub() {
 		return "admin/admin";
@@ -186,42 +194,6 @@ public class AdminController {
 		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
 
 		return "redirect:/admin";
-	}
-
-	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.GET)
-	public String attendanceLeagueWrite(Model model) {
-		model.addAttribute("attendanceLeague", new AttendanceLeague());
-		
-		return "admin/attendanceLeagueWrite";
-	}	
-	
-	@RequestMapping(value = "/attendance/league/write/{id}", method = RequestMethod.GET)
-	public String attendanceLeagueWrite(@PathVariable String id, Model model) {
-		
-		adminService.getAttendanceLeague(model, id);
-		
-		return "admin/attendanceLeagueWrite";
-	}	
-	
-	@RequestMapping(value = "/attendance/league/write", method = RequestMethod.POST)
-	public String attendanceLeagueWrite(@Valid AttendanceLeague attendanceLeague, BindingResult result) {
-		
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/attendanceLeagueWrite";
-		}
-		
-		adminService.attendanceLeagueWrite(attendanceLeague);
-
-		return "redirect:/admin/attendanceLeague";
-	}
-	
-	@RequestMapping(value = "/attendance/league/delete/{id}", method = RequestMethod.GET)
-	public String attendanceLeagueDelete(@PathVariable String id) {
-		
-		boolean result = adminService.attendanceLeagueDelete(id);
-		
-		return "redirect:/admin/attendanceLeague";
 	}
 
 	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.GET)

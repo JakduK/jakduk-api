@@ -78,11 +78,10 @@
   </div>
   <table class="table">
     <tr>
-      <th>League</th><th>Season</th><th>Games</th><th>Total</th><th>Average</th><th>Number Of Clubs</th>
+      <th>Season</th><th>Games</th><th>Total</th><th>Average</th><th>Number Of Clubs</th>
     </tr>
     <tr ng-repeat="attendanceLeague in ctrl.leagueAttendances">
-      <td>{{attendanceLeague.league}}</td>
-      <td><a ng-href="admin/attendance/league/write/{{attendanceLeague.id}}" target="_self">{{attendanceLeague.season}}</a></td>
+      <td><a ng-href="admin/attendanceLeague/write/{{attendanceLeague.id}}">{{attendanceLeague.season}}</a></td>
       <td>{{attendanceLeague.games}}</td>
       <td>{{attendanceLeague.total}}</td>
       <td>{{attendanceLeague.average}}</td>
