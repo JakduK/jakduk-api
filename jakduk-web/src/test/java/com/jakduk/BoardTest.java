@@ -1,4 +1,24 @@
-package jakduk;
+package com.jakduk;
+
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardDAO;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.etc.BoardFeelingCount;
+import com.jakduk.model.etc.BoardFreeOnBest;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.repository.BoardFreeCommentRepository;
+import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.util.AbstractSpringTest;
+import org.bson.types.ObjectId;
+import org.jongo.Jongo;
+import org.jongo.MongoCollection;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -13,33 +33,6 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
-import com.jakduk.configuration.RootConfig;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.mongodb.MongoClient;
-import org.bson.types.ObjectId;
-import org.jongo.MongoCollection;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardDAO;
-import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.etc.BoardFeelingCount;
-import com.jakduk.model.etc.BoardFreeOnBest;
-import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.repository.BoardFreeCommentRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import org.springframework.test.context.web.WebAppConfiguration;
-
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -47,10 +40,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
  * @desc     :
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class BoardTest {
+public class BoardTest extends AbstractSpringTest {
 	
 	@Autowired
 	BoardFreeRepository boardFreeRepository;
@@ -61,11 +51,9 @@ public class BoardTest {
 	@Autowired
 	BoardDAO boardDAO;
 
-	@Resource
-	private JongoR jongoR;
+	@Autowired
+	private Jongo jongo;
 
-	@Resource MongoClient mongoClient;
-	
 	@Test
 	public void test01() throws ParseException {
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(11);
@@ -255,7 +243,7 @@ public class BoardTest {
 		//DB db = mongoClient.getDB("jakduk_test");
 
 		//Jongo jongo = new Jongo(db);
-		MongoCollection boardFreeC = jongoR.getJongo().getCollection("boardFree");
+		MongoCollection boardFreeC = jongo.getCollection("boardFree");
 
 		System.out.println(boardFreeC);
 		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);

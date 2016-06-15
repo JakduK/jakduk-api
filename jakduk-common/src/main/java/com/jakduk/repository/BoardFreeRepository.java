@@ -8,9 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(collectionResourceRel = "boardfree", path="boardfree")
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String> {
 
 	Page<BoardFreeOnList> findByCategoryName(String categoryName, Pageable pageable);

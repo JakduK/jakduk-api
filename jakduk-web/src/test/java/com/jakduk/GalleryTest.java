@@ -1,19 +1,19 @@
-package jakduk;
+package com.jakduk;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jakduk.common.CommonConst;
-import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.repository.GalleryRepository;
+import com.jakduk.util.AbstractSpringTest;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort.Direction;
@@ -22,9 +22,6 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,10 +45,7 @@ import java.util.Map;
  * @desc     :
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class GalleryTest {
+public class GalleryTest extends AbstractSpringTest {
 	
 	@Value("${storage.image.path}")
 	private String storageImagePath;
@@ -92,7 +86,9 @@ public class GalleryTest {
 		    }
 		}
 	}
-	
+
+	// 파일이 없음.
+	@Ignore
 	@Test
 	public void inputOutputFile01() {
 		

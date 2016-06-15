@@ -39,6 +39,5 @@ public class LogContextConfig implements InitializingBean {
         slackAppender.setName("slackAppender");
         slackAppender.start();
         loggerContext.getLogger("root").addAppender(slackAppender);
-
     }
 }

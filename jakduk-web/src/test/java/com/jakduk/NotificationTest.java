@@ -1,24 +1,17 @@
-package jakduk;
+package com.jakduk;
 
-import com.jakduk.configuration.RootConfig;
 import com.jakduk.notification.SlackService;
+import com.jakduk.util.AbstractSpringTest;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
  * Created by pyohwan on 16. 5. 22.
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class NotificationTest {
+public class NotificationTest extends AbstractSpringTest {
 
     @Value("${slack.board.webhook}")
     private String boardWebhook;

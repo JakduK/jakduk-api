@@ -1,7 +1,6 @@
-package jakduk;
+package com.jakduk;
 
 import com.jakduk.common.CommonConst;
-import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
@@ -12,15 +11,12 @@ import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.HomeService;
+import com.jakduk.util.AbstractSpringTest;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,10 +28,7 @@ import java.util.List;
  * @desc     :
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class HomeTest {
+public class HomeTest extends AbstractSpringTest {
 	
 	@Autowired
 	BoardFreeOnHomeRepository boardFreeOnHomeRepository;

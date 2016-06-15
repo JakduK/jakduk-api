@@ -1,8 +1,7 @@
-package jakduk;
+package com.jakduk;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
-import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.User;
 import com.jakduk.model.etc.SupporterCount;
@@ -12,15 +11,12 @@ import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
+import com.jakduk.util.AbstractSpringTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 
@@ -32,10 +28,7 @@ import java.util.List;
  * @desc     :
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class UserTest {
+public class UserTest extends AbstractSpringTest {
 
 	@Autowired
 	UserRepository userRepository;

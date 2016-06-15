@@ -1,22 +1,18 @@
-package jakduk;
+package com.jakduk;
 
-import com.jakduk.configuration.RootConfig;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Competition;
 import com.jakduk.model.db.JakduComment;
 import com.jakduk.model.db.JakduSchedule;
 import com.jakduk.repository.jakdu.JakduRepository;
 import com.jakduk.repository.jakdu.JakduScheduleRepository;
+import com.jakduk.util.AbstractSpringTest;
 import org.bson.types.ObjectId;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,10 +22,7 @@ import java.util.List;
  * Created by pyohwan on 15. 12. 27.
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
-@WebAppConfiguration
-public class JakduTest {
+public class JakduTest extends AbstractSpringTest {
 
     @Autowired
     private  JakdukDAO jakdukDAO;
