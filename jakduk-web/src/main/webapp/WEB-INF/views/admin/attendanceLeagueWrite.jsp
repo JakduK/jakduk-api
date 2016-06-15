@@ -18,11 +18,11 @@
 
 				<p>
 					<label for="league" class="control-label">LEAGUE</label>
-					<form:select path="league" cssClass="form-control">
-						<form:option value="KL">K LEAGUE</form:option>
-						<form:option value="KLCL">K LEAGUE CLASSIC</form:option>
-						<form:option value="KLCH">K LEAGUE CHALLENGE</form:option>
-					</form:select>
+					<select id="league" name="league" class="form-control">
+						<option value="KL">K LEAGUE</option>
+						<option value="KLCL">K LEAGUE CLASSIC</option>
+						<option value="KLCH">K LEAGUE CHALLENGE</option>
+					</select>
 				</p>
 
 				<p>
