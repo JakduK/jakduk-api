@@ -2,6 +2,7 @@ package com.jakduk.authentication.jakduk;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
+import com.jakduk.exception.NotFoundJakdukAccountException;
 import com.jakduk.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,14 +55,20 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 		String message = "";
 
 		if (exception instanceof InternalAuthenticationServiceException) {
-			Throwable throwable = exception.getCause();
+			AuthenticationException customException = (AuthenticationException)exception.getCause();
 
-			if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(FindUserButNotJakdukAccount.class)) {
-				result = "warning";
-				message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns",
-						((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
-			} else if (Objects.nonNull(throwable) && throwable.getClass().isAssignableFrom(LockedException.class)) {
-				message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure.locked");
+			if (Objects.nonNull(customException)) {
+				if (customException instanceof FindUserButNotJakdukAccount) {
+					result = "warning";
+					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns",
+							((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
+				} else if (customException instanceof NotFoundJakdukAccountException)  {
+					message = commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.not.found.jakduk.account");
+				} else if (customException instanceof LockedException) {
+					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure.locked");
+				}
+			} else {
+				message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure");
 			}
 		} else if (exception instanceof BadCredentialsException) {
 			message = commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.wrong.password");
