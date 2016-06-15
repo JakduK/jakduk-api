@@ -3,6 +3,7 @@ package com.jakduk.authentication.jakduk;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
+import com.jakduk.exception.NotFoundJakdukAccountException;
 import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 			UserOnAuthentication user = userRepository.findAuthUserByEmail(email);
 
 			if (Objects.isNull(user))
-				throw new BadCredentialsException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
+				throw new NotFoundJakdukAccountException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
 
 			if (user.getProviderId().equals(CommonConst.ACCOUNT_TYPE.JAKDUK) == false)
 				throw new FindUserButNotJakdukAccount("JakduK 계정이 아니라 SNS 계정으로 연동되어 있습니다. email=" + email, user.getProviderId());
