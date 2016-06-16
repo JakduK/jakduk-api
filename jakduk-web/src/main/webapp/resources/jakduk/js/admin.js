@@ -290,10 +290,10 @@
 						apiUrl = '/api/admin/board/categories';
 						break;
 					case MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.ID:
-						self.activeLeague = ($state.params.competitionCode || '');
+						self.activeLeague = ($state.params.competitionCode || 'ALL');
 						self.activeLeagueName = getActiveLeage(self.activeLeague);
 						apiUrl = '/api/admin/league/attendances';
-						apiParams = self.activeLeague ? '?competitionCode=' + self.activeLeague : '';
+						apiParams = self.activeLeague === 'ALL' ? '' : '?competitionCode=' + self.activeLeague;
 						break;
 					case MENU_ID_MAP.GET.ATTENDANCE_CLUB.ID:
 						apiUrl = '/admin/data/attendance/club.json';
@@ -380,12 +380,14 @@
 
 			function getActiveLeage(id) {
 				switch (id) {
+					case 'KL':
+						return 'K LEAGUE';
 					case 'KLCL':
-						return 'K League Classic';
+						return 'K LEAGUE CLASSIC';
 					case 'KLCH':
-						return 'K League Challenge';
+						return 'K LEAGUE CHALLENGE';
 					default:
-						return 'K League';
+						return 'ALL LEAGUE';
 				}
 			}
 
