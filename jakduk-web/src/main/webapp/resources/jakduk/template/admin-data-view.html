@@ -70,6 +70,7 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu">
+        <li><a ng-href="{{'admin' + MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.URL}}" ng-hide="ctrl.activeLeague === 'ALL'">ALL LEAGUE</a></li>
         <li><a ng-href="{{'admin' + MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.URL + '=KL'}}" ng-hide="ctrl.activeLeague === 'KL'">K LEAGUE</a></li>
         <li><a ng-href="{{'admin' + MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.URL + '=KLCL'}}" ng-hide="ctrl.activeLeague === 'KLCL'">K LEAGUE CLASSIC</a></li>
         <li><a ng-href="{{'admin' + MENU_ID_MAP.GET.ATTENDANCE_LEAGUE.URL + '=KLCH'}}" ng-hide="ctrl.activeLeague === 'KLCH'">K LEAGUE CHALLENGE</a></li>
