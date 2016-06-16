@@ -72,7 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/password/*"           // 비밀번호 찾기
                             ).anonymous()
                         .antMatchers(
-                                "/user/**"
+                                "/user/**",
+                                "/swagger-ui.html",     // 스웨거
+                                "/rest/**"              // spring-data-rest
                             ).authenticated()
                         .antMatchers(
                                 "/board/*/write",

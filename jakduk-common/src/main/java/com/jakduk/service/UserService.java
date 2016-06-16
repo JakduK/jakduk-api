@@ -146,27 +146,6 @@ public class UserService {
 		return result;
 	}
 
-	/**
-	 * 회원 프로필 업데이트 시 별명 중복 체크.
-	 * @param locale
-	 * @param username
-     * @return
-     */
-	public Boolean existUsernameOnUpdate(Locale locale, String username) {
-
-		CommonPrincipal commonPrincipal = this.getCommonPrincipal();
-
-		if (Objects.isNull(commonPrincipal.getId()))
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-
-		UserProfile userProfile = userRepository.findByNEIdAndUsername(commonPrincipal.getId(), username);
-
-		if (Objects.nonNull(userProfile))
-			throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.replicated.data"));
-
-		return false;
-	}
-
 	public Model getUserPasswordUpdate(Model model) {
 
 		model.addAttribute("userPasswordUpdate", new UserPasswordUpdate());
@@ -259,7 +238,7 @@ public class UserService {
 	 * @return
      */
 	public CommonPrincipal getCommonPrincipal() {
-		CommonPrincipal commonPrincipal = new CommonPrincipal();
+		CommonPrincipal commonPrincipal = null;
 		
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
