@@ -1,7 +1,10 @@
 package com.jakduk.authentication.common;
 
 import com.jakduk.common.CommonConst;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,6 +13,9 @@ import lombok.Data;
  * @desc     :
  */
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class CommonPrincipal {
 	

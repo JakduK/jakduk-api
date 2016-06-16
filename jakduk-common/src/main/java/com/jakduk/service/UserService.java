@@ -243,16 +243,22 @@ public class UserService {
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
 				SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				commonPrincipal.setId(userDetail.getId());
-				commonPrincipal.setEmail(userDetail.getUserId());
-				commonPrincipal.setUsername(userDetail.getUsername());
-				commonPrincipal.setProviderId(userDetail.getProviderId());
+
+				commonPrincipal = CommonPrincipal.builder()
+						.id(userDetail.getId())
+						.email(userDetail.getUserId())
+						.username(userDetail.getUsername())
+						.providerId(userDetail.getProviderId())
+						.build();
 			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
 				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				commonPrincipal.setId(principal.getId());
-				commonPrincipal.setEmail(principal.getUsername());
-				commonPrincipal.setUsername(principal.getNickname());
-				commonPrincipal.setProviderId(principal.getProviderId());
+
+				commonPrincipal = CommonPrincipal.builder()
+						.id(principal.getId())
+						.email(principal.getUsername())
+						.username(principal.getNickname())
+						.providerId(principal.getProviderId())
+						.build();
 			}
 		}
 		
