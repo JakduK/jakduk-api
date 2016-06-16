@@ -7,6 +7,8 @@ import com.jakduk.model.db.Competition;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.CompetitionService;
 import com.jakduk.service.StatsService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -15,18 +17,16 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by pyohwan on 16. 3. 20.
  */
 
+@Slf4j
+@Api(value = "STATS", description = "통계 API")
 @RestController
 @RequestMapping("/api/stats")
-@Slf4j
 public class StatsRestController {
 
     @Resource
@@ -41,19 +41,29 @@ public class StatsRestController {
     @Autowired
     private CompetitionService competitionService;
 
-    @RequestMapping(value = "/league/attendances/competition/{competitionId}", method = RequestMethod.GET)
-    public List<AttendanceLeague> getAttendancesLeague(@PathVariable String competitionId) {
+    @ApiOperation(value = "대회별 관중수 목록")
+    @RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
+    public List<AttendanceLeague> getLeagueAttendances(@RequestParam(required = false) String competitionId,
+                                                       @RequestParam(required = false) String competitionCode) {
 
         Competition competition = null;
-
-        if (Objects.isNull(competitionId))
-            competition = competitionService.findCompetitionById(competitionId);
+        List<AttendanceLeague> leagueAttendances;
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 
-        List<AttendanceLeague> attendances = statsService.findLeagueAttendances(competition, sort);
+        if (Objects.nonNull(competitionId)) {
+            competition = competitionService.findCompetitionById(competitionId);
+        } else if (Objects.nonNull(competitionCode)) {
+            competition = competitionService.findCompetitionByCode(competitionCode);
+        }
 
-        return attendances;
+        if (Objects.isNull(competition)) {
+            leagueAttendances = statsService.findLeagueAttendances(sort);
+        } else {
+            leagueAttendances = statsService.findLeagueAttendances(competition, sort);
+        }
+
+        return leagueAttendances;
     }
 
     @RequestMapping(value = "/attendance/club/{clubOrigin}", method = RequestMethod.GET)

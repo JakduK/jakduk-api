@@ -248,7 +248,7 @@
 				});
 
 				$scope.getAttendance = function () {
-					var bUrl = '<c:url value="/api/stats/attendance/league/' + $scope.leagueId + '"/>';
+					var bUrl = '<c:url value="/api/stats/league/attendances?competitionCode=' + $scope.leagueId + '"/>';
 
 					if ($scope.attendancesConn == "none") {
 
