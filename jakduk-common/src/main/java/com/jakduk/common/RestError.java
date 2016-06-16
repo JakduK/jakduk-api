@@ -13,10 +13,10 @@ import lombok.Data;
  * Created by pyohwan on 16. 3. 5.
  */
 
-@JsonTypeName(value = "error")
-@JsonTypeInfo(use=JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
 @Data
 @AllArgsConstructor
+@JsonTypeName(value = "error")
+@JsonTypeInfo(use=JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
 public class RestError {
 
     private String code;

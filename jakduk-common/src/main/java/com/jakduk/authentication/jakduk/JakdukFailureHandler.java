@@ -1,6 +1,8 @@
 package com.jakduk.authentication.jakduk;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.common.CommonConst;
+import com.jakduk.common.RestError;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
 import com.jakduk.exception.NotFoundJakdukAccountException;
 import com.jakduk.service.CommonService;
@@ -19,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Objects;
@@ -43,11 +46,11 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request,
 										HttpServletResponse response,
-										AuthenticationException exception)
-			throws IOException, ServletException {
+										AuthenticationException exception) throws IOException, ServletException {
 
 		Locale locale = localeResolver.resolveLocale(request);
 
+		String accept = request.getHeader("accept");
 		String remember = request.getParameter("remember");
 		String loginRedirect = request.getParameter("loginRedirect");
 		String path = String.format("%s/", request.getContextPath());
@@ -76,18 +79,32 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure");
 		}
 
-		if (remember != null && remember.equals("on")) {
-			String email = request.getParameter("j_username");
-			
-			commonService.setCookie(response, CommonConst.COOKIE_EMAIL, email, path);
-			commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
+		if (Objects.nonNull(accept) && accept.contains("json")) {
+			response.setContentType("application/json");
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setCharacterEncoding("utf-8");
+
+			RestError error = new RestError("AUTH_FAIL", message);
+
+			String errorJson = new ObjectMapper().writeValueAsString(error);
+
+			PrintWriter out = response.getWriter();
+			out.print(errorJson);
+			out.flush();
+			out.close();
 		} else {
-			commonService.releaseCookie(response, CommonConst.COOKIE_EMAIL, path);
-			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
+			if (remember != null && remember.equals("on")) {
+				String email = request.getParameter("j_username");
+
+				commonService.setCookie(response, CommonConst.COOKIE_EMAIL, email, path);
+				commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
+			} else {
+				commonService.releaseCookie(response, CommonConst.COOKIE_EMAIL, path);
+				commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
+			}
+
+			response.sendRedirect(request.getContextPath() + "/login?result=" + result + "&message=" + URLEncoder.encode(message, "UTF-8") + "&loginRedirect=" + loginRedirect);
 		}
-		
-		response.sendRedirect(request.getContextPath() + "/login?result=" + result + "&message=" + URLEncoder.encode(message, "UTF-8") + "&loginRedirect=" + loginRedirect);
-		
 	}
 
 }
