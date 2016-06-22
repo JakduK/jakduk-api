@@ -4,6 +4,8 @@ import com.jakduk.authentication.jakduk.JakdukDetailsService;
 import com.jakduk.authentication.jakduk.JakdukFailureHandler;
 import com.jakduk.authentication.jakduk.JakdukSuccessHandler;
 import com.jakduk.authentication.social.SocialDetailService;
+import com.jakduk.configuration.handler.RestAccessDeniedHandler;
+import com.jakduk.configuration.handler.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,22 +38,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()           // CSRF 방어 비활성화
                 //Configures form login
                 .formLogin()
-                    .loginPage("/login")
-                    .usernameParameter("j_username")
-                    .passwordParameter("j_password")
+                    //.loginPage("/login")
+                    .loginProcessingUrl("/api/login")
+                    //.usernameParameter("j_username")
+                    //.passwordParameter("j_password")
                     .successHandler(jakdukSuccessHandler())
                     .failureHandler(jakdukFailureHandler())
                 //Configures the logout function
                 .and()
                     .logout()
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessUrl("/logout/success")
+                        //.logoutSuccessUrl("/logout/success")
 //                .and()
 //                    .httpBasic()                // basic auth 사용.
                 .and()
-                    .exceptionHandling().accessDeniedPage("/error/denied")
+                    .exceptionHandling()
+                        .authenticationEntryPoint(restAuthenticationEntryPoint())
+                        .accessDeniedHandler(restAccessDeniedHandler())
                 //Configures url based authorization
                 .and()
                     .authorizeRequests()
@@ -130,7 +135,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public RestAccessDeniedHandler restAccessDeniedHandler() {
+        return new RestAccessDeniedHandler();
+    }
+
+    @Bean
+    public RestAuthenticationEntryPoint restAuthenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
+    }
+
+    @Bean
     public JakdukDetailsService jakdukDetailsService() {
         return new JakdukDetailsService();
     }
+
 }

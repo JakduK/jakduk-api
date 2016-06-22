@@ -1,12 +1,10 @@
 package com.jakduk.authentication.jakduk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.common.CommonConst;
 import com.jakduk.common.RestError;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
 import com.jakduk.exception.NotFoundJakdukAccountException;
 import com.jakduk.service.CommonService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -22,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -33,7 +30,6 @@ import java.util.Objects;
  * @desc     :
  */
 
-@Slf4j
 @Component
 public class JakdukFailureHandler implements AuthenticationFailureHandler {
 
@@ -50,11 +46,6 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 
 		Locale locale = localeResolver.resolveLocale(request);
 
-		String accept = request.getHeader("accept");
-		String remember = request.getParameter("remember");
-		String loginRedirect = request.getParameter("loginRedirect");
-		String path = String.format("%s/", request.getContextPath());
-		String result = "failure";
 		String message = "";
 
 		if (exception instanceof InternalAuthenticationServiceException) {
@@ -62,7 +53,6 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 
 			if (Objects.nonNull(customException)) {
 				if (customException instanceof FindUserButNotJakdukAccount) {
-					result = "warning";
 					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns",
 							((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
 				} else if (customException instanceof NotFoundJakdukAccountException)  {
@@ -79,32 +69,19 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure");
 		}
 
-		if (Objects.nonNull(accept) && accept.contains("json")) {
-			response.setContentType("application/json");
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			response.setCharacterEncoding("utf-8");
+		response.setContentType("application/json");
+		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setCharacterEncoding("utf-8");
 
-			RestError error = new RestError("AUTH_FAIL", message);
+		RestError error = new RestError("-", message);
 
-			String errorJson = new ObjectMapper().writeValueAsString(error);
+		String errorJson = new ObjectMapper().writeValueAsString(error);
 
-			PrintWriter out = response.getWriter();
-			out.print(errorJson);
-			out.flush();
-			out.close();
-		} else {
-			if (remember != null && remember.equals("on")) {
-				String email = request.getParameter("j_username");
+		PrintWriter out = response.getWriter();
+		out.print(errorJson);
+		out.flush();
+		out.close();
 
-				commonService.setCookie(response, CommonConst.COOKIE_EMAIL, email, path);
-				commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
-			} else {
-				commonService.releaseCookie(response, CommonConst.COOKIE_EMAIL, path);
-				commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
-			}
-
-			response.sendRedirect(request.getContextPath() + "/login?result=" + result + "&message=" + URLEncoder.encode(message, "UTF-8") + "&loginRedirect=" + loginRedirect);
-		}
 	}
 
 }

@@ -2,10 +2,6 @@ package com.jakduk.authentication.jakduk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.service.CommonService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -13,14 +9,13 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLDecoder;
-import java.util.Objects;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -29,12 +24,8 @@ import java.util.Objects;
  * @desc     :
  */
 
-@Slf4j
 @Component
 public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	 {
-
-	@Autowired
-	private CommonService commonService;
 
 	private RequestCache requestCache = new HttpSessionRequestCache();
 
@@ -43,87 +34,46 @@ public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	
 										HttpServletResponse response,
 										Authentication authentication) throws ServletException, IOException {
 
-		String accept = request.getHeader("accept");
+		SavedRequest savedRequest = requestCache.getRequest(request, response);
 
-		if (Objects.nonNull(accept) && accept.contains("json")) {
-
-			JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-			CommonPrincipal commonPrincipal = CommonPrincipal.builder()
-					.id(principal.getId())
-					.email(principal.getUsername())
-					.username(principal.getNickname())
-					.providerId(principal.getProviderId())
-					.build();
-
-			response.setContentType("application/json");
-			response.setCharacterEncoding("utf-8");
-
-			String commonPrincipalJson = new ObjectMapper().writeValueAsString(commonPrincipal);
-
-			PrintWriter out = response.getWriter();
-			out.print(commonPrincipalJson);
-			out.flush();
-			out.close();
-		} else {
-			doCookie(request, response, authentication);
-
-			SavedRequest savedRequest = requestCache.getRequest(request, response);
-			String loginRedirect = request.getParameter("loginRedirect");
-
+		if (savedRequest == null) {
+			generateRestJson(response);
 			clearAuthenticationAttributes(request);
-
-			if (savedRequest != null) {
-				String targetUrl = savedRequest.getRedirectUrl();
-
-				if (log.isDebugEnabled()) {
-					log.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
-				}
-
-				getRedirectStrategy().sendRedirect(request, response, targetUrl);
-				return;
-			}
-
-			if (loginRedirect != null) {
-				if (commonService.isRedirectUrl(URLDecoder.decode(loginRedirect, "UTF-8"))) {
-					if (log.isDebugEnabled()) {
-						log.debug("Redirecting to this Url: " + URLDecoder.decode(loginRedirect, "UTF-8"));
-					}
-					getRedirectStrategy().sendRedirect(request, response, URLDecoder.decode(loginRedirect, "UTF-8"));
-					return;
-				} else {
-					if (log.isDebugEnabled()) {
-						log.debug("Don't redirect to this Url" + URLDecoder.decode(loginRedirect, "UTF-8"));
-					}
-				}
-			}
-
-			if (savedRequest == null) {
-				super.onAuthenticationSuccess(request, response, authentication);
-
-				return;
-			}
+			return;
 		}
+		String targetUrlParam = getTargetUrlParameter();
+		if (isAlwaysUseDefaultTargetUrl() ||
+				(targetUrlParam != null &&
+						StringUtils.hasText(request.getParameter(targetUrlParam)))) {
+			requestCache.removeRequest(request, response);
+			generateRestJson(response);
+			clearAuthenticationAttributes(request);
+			return;
+		}
+
+		generateRestJson(response);
+		clearAuthenticationAttributes(request);
 	}
-	
-	private void doCookie(HttpServletRequest request, HttpServletResponse response, 	Authentication authentication) {
-		String remember = request.getParameter("remember");
-		String path = String.format("%s/", request.getContextPath());
-		
-		if (remember != null && remember.equals("on")) {
-			if (authentication.getPrincipal() instanceof JakdukPrincipal) {
-				JakdukPrincipal authUser = (JakdukPrincipal) authentication.getPrincipal();
-				String username = authUser.getUsername();
-				
-				commonService.setCookie(response, CommonConst.COOKIE_EMAIL, username, path);
-				
-				commonService.setCookie(response, CommonConst.COOKIE_REMEMBER, "1", path);
-			}
-		} else {
-			commonService.releaseCookie(response, CommonConst.COOKIE_EMAIL, path);
-			
-			commonService.releaseCookie(response, CommonConst.COOKIE_REMEMBER, path);
-		}
+
+	private void generateRestJson(HttpServletResponse response) throws IOException {
+		JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		CommonPrincipal commonPrincipal = CommonPrincipal.builder()
+				.id(principal.getId())
+				.email(principal.getUsername())
+				.username(principal.getNickname())
+				.providerId(principal.getProviderId())
+				.build();
+
+		response.setContentType("application/json");
+		response.setCharacterEncoding("utf-8");
+
+		String commonPrincipalJson = new ObjectMapper().writeValueAsString(commonPrincipal);
+
+		PrintWriter out = response.getWriter();
+		out.print(commonPrincipalJson);
+		out.flush();
+		out.close();
 	}
 
 }
