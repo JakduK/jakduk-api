@@ -61,22 +61,6 @@ public class CommonConst {
 	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 	/**
-	 * Social 프로바이더 종류.
-	 */
-	public enum ACCOUNT_TYPE {
-		JAKDUK,
-		FACEBOOK,
-		DAUM
-	}
-
-	/**
-	 * 축구단 상태
-	 */
-	public final static String FOOTBALL_CLUB_STATUS_NONE = "none";
-	public final static String FOOTBALL_CLUB_STATUS_ACTIVE = "active";
-	public final static String FOOTBALL_CLUB_STATUS_INACTIVE = "inactive";
-	
-	/**
 	 * 글의 좋아요 싫어요에 대한 에러 코드
 	 */
 	public final static String BOARD_USERS_FEELINGS_STATUS_NONE = "none";
@@ -85,6 +69,17 @@ public class CommonConst {
 	public final static String BOARD_USERS_FEELINGS_STATUS_DISLIKE = "dislike";
 	public final static String BOARD_USERS_FEELINGS_STATUS_WRITER = "writer";
 	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
+
+	public final static String RESPONSE_VOID_OBJECT = "{}";
+
+	/**
+	 * Social 프로바이더 종류.
+	 */
+	public enum ACCOUNT_TYPE {
+		JAKDUK,
+		FACEBOOK,
+		DAUM
+	}
 
 	// 게시물 감정 표현. 좋아요, 싫어요
 	public enum FEELING_TYPE {

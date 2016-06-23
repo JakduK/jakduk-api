@@ -138,7 +138,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "내 프로필")
-    @RequestMapping(value = "/my/profile", method = RequestMethod.GET)
+    @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
     public CommonPrincipal getMyProfile(HttpServletRequest request) {
         Locale locale = localeResolver.resolveLocale(request);
 

@@ -6,6 +6,7 @@ import com.jakduk.authentication.jakduk.JakdukSuccessHandler;
 import com.jakduk.authentication.social.SocialDetailService;
 import com.jakduk.configuration.handler.RestAccessDeniedHandler;
 import com.jakduk.configuration.handler.RestAuthenticationEntryPoint;
+import com.jakduk.configuration.handler.RestLogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
@@ -38,19 +40,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()           // CSRF 방어 비활성화
                 //Configures form login
                 .formLogin()
-                    //.loginPage("/login")
                     .loginProcessingUrl("/api/login")
-                    //.usernameParameter("j_username")
-                    //.passwordParameter("j_password")
                     .successHandler(jakdukSuccessHandler())
                     .failureHandler(jakdukFailureHandler())
                 //Configures the logout function
                 .and()
                     .logout()
+                        .logoutSuccessHandler(restLogoutSuccessHandler())
                         .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        //.logoutSuccessUrl("/logout/success")
 //                .and()
 //                    .httpBasic()                // basic auth 사용.
                 .and()
@@ -62,13 +61,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests()
                         .antMatchers(
                                 "/check/**",
-                                "/logout",
+                                "/api/logout",
                                 "/home/**",
                                 "/about/**",
                                 "/auth/**"
                             ).permitAll()
                         .antMatchers(
-                                "/login",               // 로그인
+                                "/api/login",           // 로그인
                                 "/auth/*",              // SNS 인증
                                 "/signup",              // SNS 계정으로 회원 가입
                                 "/user/social",         // OAUTH2 콜백
@@ -132,6 +131,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JakdukFailureHandler jakdukFailureHandler() {
         return new JakdukFailureHandler();
+    }
+
+    @Bean
+    public RestLogoutSuccessHandler restLogoutSuccessHandler() {
+        return new RestLogoutSuccessHandler();
     }
 
     @Bean
