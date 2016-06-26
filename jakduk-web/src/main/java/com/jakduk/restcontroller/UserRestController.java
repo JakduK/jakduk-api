@@ -1,23 +1,28 @@
 package com.jakduk.restcontroller;
 
 import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
 import com.jakduk.exception.DuplicateDataException;
 import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.restcontroller.vo.UserForm;
 import com.jakduk.service.CommonService;
+import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -36,12 +41,88 @@ public class UserRestController {
     LocaleResolver localeResolver;
 
     @Autowired
+    private StandardPasswordEncoder encoder;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
     private CommonService commonService;
 
-    // 회원 프로필 업데이트 시 Email 중복 체크.
+    @Autowired
+    private FootballService footballService;
+
+    @ApiOperation(value = "JakduK 회원 가입")
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public String write(@RequestBody UserForm form,
+                        HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+
+        if (Objects.isNull(form.getEmail()))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.need.validation.email"));
+
+        if (Objects.isNull(form.getUsername()))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.need.validation.username"));
+
+        String password = form.getPassword();
+        String passwordConfirm = form.getPasswordConfirm();
+
+        if (Objects.isNull(password))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.placeholder.password"));
+
+        if (Objects.isNull(passwordConfirm))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.placeholder.password.confirm"));
+
+
+        if (!password.equals(passwordConfirm))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.password.mismatch"));
+
+        UserProfile existEmail = userService.findOneByEmail(form.getEmail());
+
+        if (Objects.nonNull(existEmail))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.email"));
+
+        UserProfile existUsername = userService.findOneByUsername(form.getUsername());
+
+        if (Objects.nonNull(existUsername))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.username"));
+
+        User user = User.builder()
+                .email(form.getEmail().trim())
+                .username(form.getUsername().trim())
+                .password(encoder.encode(form.getPassword().trim()))
+                .providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
+                .build();
+
+        String footballClub = form.getFootballClub();
+        String about = form.getAbout();
+
+        if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
+            FootballClub supportFC = footballService.findById(footballClub);
+
+            user.setSupportFC(supportFC);
+        }
+
+        if (Objects.nonNull(about) && about.isEmpty() == false) {
+            user.setAbout(about.trim());
+        }
+
+        ArrayList<Integer> roles = new ArrayList<>();
+        roles.add(CommonRole.ROLE_NUMBER_USER_01);
+
+        user.setRoles(roles);
+
+        userService.save(user);
+
+        log.debug("JakduK user created. user=" + user);
+
+        userService.signUpJakdukUser(user);
+
+        return CommonConst.RESPONSE_VOID_OBJECT;
+    }
+
+    @ApiOperation(value = "회원 프로필 업데이트 시 Email 중복 체크")
     @RequestMapping(value = "/exist/email/update", method = RequestMethod.GET)
     public Boolean existEmailOnUpdate(@RequestParam(required = true) String email,
                                        HttpServletRequest request) {
@@ -61,7 +142,7 @@ public class UserRestController {
         return false;
     }
 
-    // 비로그인 상태(id를 제외한)에서 Email 중복 체크.
+    @ApiOperation(value = "비로그인 상태(id를 제외한)에서 Email 중복 체크")
     @RequestMapping(value = "/exist/email/anonymous", method = RequestMethod.GET)
     public Boolean existEmailOnAnonymous(@RequestParam(required = true) String email,
                                     @RequestParam(required = true) String id,
@@ -77,7 +158,7 @@ public class UserRestController {
         return false;
     }
 
-    // 회원 프로필 업데이트 시 별명 중복 체크.
+    @ApiOperation(value = "회원 프로필 업데이트 시 별명 중복 체크")
     @RequestMapping(value = "/exist/username/update", method = RequestMethod.GET)
     public Boolean existUsernameOnUpdate(@RequestParam(required = true) String username,
                                        HttpServletRequest request) {
@@ -97,7 +178,7 @@ public class UserRestController {
         return false;
     }
 
-    // 비 로그인 상태(id를 제외한)에서 별명 중복 체크.
+    @ApiOperation(value = "// 비 로그인 상태(id를 제외한)에서 별명 중복 체크")
     @RequestMapping(value = "/exist/username/anonymous", method = RequestMethod.GET)
     public Boolean existUsernameOnAnonymous(@RequestParam(required = true) String username,
                                        @RequestParam(required = true) String id,
@@ -119,6 +200,9 @@ public class UserRestController {
                            HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
+
+        if (Objects.isNull(email))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
 
         Boolean existEmail = userService.existEmail(locale, email.trim());
 
