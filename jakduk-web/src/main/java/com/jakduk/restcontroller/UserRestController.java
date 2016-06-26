@@ -200,7 +200,6 @@ public class UserRestController {
         return false;
     }
 
-    @CrossOrigin
     @ApiOperation(value = "이메일 중복 여부")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
     public Boolean existEmail(@RequestParam String email,
@@ -216,7 +215,6 @@ public class UserRestController {
         return existEmail;
     }
 
-    @CrossOrigin
     @ApiOperation(value = "별명 중복 여부")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
     public Boolean existUsername(@RequestParam String username,
