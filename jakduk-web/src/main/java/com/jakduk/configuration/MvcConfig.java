@@ -71,6 +71,13 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(deviceResolverHandlerInterceptor);
     }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://silverprize.net")
+                .allowedHeaders("GET", "PUT", "DELETE", "POST");
+    }
+
     @Bean
     public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
         List<ViewResolver> viewResolvers = new ArrayList<>();
