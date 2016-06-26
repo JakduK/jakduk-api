@@ -87,7 +87,7 @@ public class PasswordRestController {
 		return response;
 	}
 
-	// jakduk 비밀번호 재설정 페이지.
+	// jakduk 비밀번호 재설정.
 	@RequestMapping(value = "/reset/{code}", method = RequestMethod.GET)
 	public Map<String, Object> resetPassword(@PathVariable String code,
 	                            HttpServletRequest request) {
