@@ -1,23 +1,11 @@
 package com.jakduk.service;
 
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.authentication.social.SocialUserDetail;
-import com.jakduk.common.CommonConst;
-import com.jakduk.common.CommonRole;
-import com.jakduk.exception.DuplicateDataException;
-import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.User;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.simple.SocialUserOnAuthentication;
-import com.jakduk.model.simple.UserOnPasswordUpdate;
-import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.user.UserPasswordUpdate;
-import com.jakduk.model.web.user.UserProfileForm;
-import com.jakduk.repository.FootballClubRepository;
-import com.jakduk.repository.user.UserProfileRepository;
-import com.jakduk.repository.user.UserRepository;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -33,7 +21,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-import java.util.*;
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
+import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.User;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
+import com.jakduk.model.simple.UserOnPasswordUpdate;
+import com.jakduk.model.simple.UserProfile;
+import com.jakduk.model.web.user.UserPasswordUpdate;
+import com.jakduk.model.web.user.UserProfileForm;
+import com.jakduk.repository.FootballClubRepository;
+import com.jakduk.repository.user.UserProfileRepository;
+import com.jakduk.repository.user.UserRepository;
 
 @Service
 @Slf4j
@@ -117,13 +121,11 @@ public class UserService {
 	}
 	
 	public Boolean existEmail(Locale locale, String email) {
-		Boolean result = false;
+		Boolean result;
 
 		if (commonService.isAnonymousUser()) {
 			User user = userRepository.findOneByEmail(email);
-
-			if (Objects.nonNull(user))
-				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.email"));
+			result = Objects.nonNull(user);
 		} else {
 			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
 		}
@@ -132,13 +134,12 @@ public class UserService {
 	}
 	
 	public Boolean existUsernameOnWrite(Locale locale, String username) {
-		Boolean result = false;
+
+		Boolean result;
 
 		if (commonService.isAnonymousUser()) {
 			User user = userRepository.findOneByUsername(username);
-
-			if (Objects.nonNull(user))
-				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.username"));
+			result = Objects.nonNull(user);
 		} else {
 			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
 		}

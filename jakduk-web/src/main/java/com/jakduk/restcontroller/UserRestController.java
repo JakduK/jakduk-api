@@ -1,5 +1,25 @@
 package com.jakduk.restcontroller;
 
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
+
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
@@ -12,20 +32,6 @@ import com.jakduk.restcontroller.vo.UserForm;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 4. 5.
@@ -194,9 +200,10 @@ public class UserRestController {
         return false;
     }
 
+    @CrossOrigin
     @ApiOperation(value = "이메일 중복 여부")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public Boolean existEmail(@RequestParam(required = true) String email,
+    public Boolean existEmail(@RequestParam String email,
                            HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
@@ -209,9 +216,10 @@ public class UserRestController {
         return existEmail;
     }
 
+    @CrossOrigin
     @ApiOperation(value = "별명 중복 여부")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
-    public Boolean existUsername(@RequestParam(required = true) String username,
+    public Boolean existUsername(@RequestParam String username,
                               HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);

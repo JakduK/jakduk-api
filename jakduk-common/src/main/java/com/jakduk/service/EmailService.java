@@ -1,7 +1,16 @@
 package com.jakduk.service;
 
-import com.jakduk.model.db.Token;
-import com.jakduk.repository.TokenRepository;
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +20,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.text.MessageFormat;
-import java.util.*;
+import com.jakduk.model.db.Token;
+import com.jakduk.repository.TokenRepository;
 
 @Service
 @Slf4j
@@ -35,9 +42,6 @@ public class EmailService {
 	@Value("${smtp.username}")
 	private String fromMail;
 
-	@Value("${email.url.reset.password}")
-	private String resetPasswordPath;
-
 	@Value("${email.url.static.resource}")
 	private String staticResourceUrl;
 
@@ -53,19 +57,19 @@ public class EmailService {
 			String code = UUID.randomUUID().toString();
 			ResourceBundle bundle = ResourceBundle.getBundle("messages.user", locale);
 
-			String logoPath = "";
+			String logoPath = staticResourceUrl;
 
 			if (language.equals(Locale.KOREAN.getLanguage())) {
-				logoPath = host + staticResourceUrl + "/img/logo_type_A_kr.png";
+				logoPath += "/img/logo_type_A_kr.png";
 			} else {
-				logoPath = host + staticResourceUrl + "/img/logo_type_A_en.png";
+				logoPath = "/img/logo_type_A_en.png";
 			}
 
 			Map<String, Object> model = new HashMap<>();
 			model.put("lang", language);
 			model.put("title", "JakduK - " + bundle.getString("user.password.reset.instructions"));
 			model.put("logo", logoPath);
-			model.put("host", host + resetPasswordPath);
+			model.put("host", host);
 			model.put("code", code);
 			model.put("greeting", new MessageFormat(bundle.getString("user.password.reset.greeting")).format(new String[]{email}));
 			model.put("linkLabel", bundle.getString("user.password.change"));
