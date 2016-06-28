@@ -17,8 +17,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.social.facebook.connect.FacebookAdapter;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -44,6 +50,9 @@ public class UserTest extends AbstractSpringTest {
 
 	@Autowired
 	private StandardPasswordEncoder encoder;
+
+	@Autowired
+	private UsersConnectionRepository usersConnectionRepository;
 	
 	@Before
 	public void setUp() {
@@ -109,6 +118,19 @@ public class UserTest extends AbstractSpringTest {
 	public void getSocialUser() {
 
 		String email = "phjang1983@daum.net";
+
+		FacebookTemplate facebookTemplate = new FacebookTemplate("EAALwXK7RDAIBABRLhRHZB8DV9GXKSLfSlvZBGkjXbVziSQRuPTqpc2eAvZBXcd9XM130euKDAF9wiZCCBroeZCT3PUpedn9U8WzZAY5q4rKCyQSRUkcGtON0aS95r46s1a2i4OTYMXDE5F8yEZBiw3X20VWXZBz33VjjMMG3hbNbtguVYjlZBJWXq");
+
+		org.springframework.social.facebook.api.User user = facebookTemplate.userOperations().getUserProfile();
+
+		System.out.println("userProfile=" + user.getEmail());
+		System.out.println("userProfile=" + user.getId());
+		System.out.println("userProfile=" + user.getName());
+
+
+		Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo("facebook", new HashSet<String>(Arrays.asList("917745831573018")));
+
+		System.out.println("phjang=" + userIds);
 
 		UserOnAuthentication user1 = userRepository.findAuthUserByEmail(email);
 		System.out.println("user1=" + user1);

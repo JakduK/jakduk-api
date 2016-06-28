@@ -94,8 +94,12 @@ public class UserService {
 	}
 
 	// SNS 계정으로 가입한 회원 찾기.
-	public UserProfile findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public UserProfile findUserProfileByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userProfileRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
+	}
+
+	public User findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
 	// 회원 정보 저장.

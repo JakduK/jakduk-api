@@ -7,12 +7,16 @@ import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.web.BoardListInfo;
+import com.jakduk.restcontroller.vo.BoardPaging;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import com.jakduk.vo.BoardCommentRequest;
 import com.jakduk.vo.BoardCommentsResponse;
 import com.jakduk.vo.UserFeelingResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
@@ -30,6 +34,7 @@ import java.util.Objects;
  * Created by pyohwan on 16. 3. 26.
  */
 
+@Api(value = "BOARD", description = "게시판 API")
 @RestController
 @RequestMapping("/api/board")
 public class BoardRestController {
@@ -46,7 +51,15 @@ public class BoardRestController {
     @Autowired
     private CommonService commonService;
 
-    // 게시판 댓글 목록
+    @ApiOperation(value = "게시물 목록(미구현)")
+    @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
+    public void freeList(@ModelAttribute BoardPaging boardPaging,
+                         HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+    }
+
+    @ApiOperation(value = "게시판 댓글 목록")
     @RequestMapping(value = "/free/comments/{seq}", method = RequestMethod.GET)
     public BoardCommentsResponse freeComment(@PathVariable Integer seq,
                             @RequestParam(required = false) String commentId) {
@@ -66,7 +79,7 @@ public class BoardRestController {
         return response;
     }
 
-    // 게시판 댓글 달기
+    @ApiOperation(value = "게시판 댓글 달기")
     @RequestMapping(value ="/free/comment", method = RequestMethod.POST)
     public BoardFreeComment commentWrite(@RequestBody BoardCommentRequest commentRequest,
                              HttpServletRequest request) {
@@ -98,7 +111,7 @@ public class BoardRestController {
         return boardFreeComment;
     }
 
-    // 글 감정 표현.
+    @ApiOperation(value = "글 감정 표현")
     @RequestMapping(value = "/free/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setFreeFeeling(@PathVariable Integer seq,
                                @PathVariable CommonConst.FEELING_TYPE feeling,
@@ -126,7 +139,7 @@ public class BoardRestController {
         return response;
     }
 
-    // 댓글 감정 표현.
+    @ApiOperation(value = "댓글 감정 표현")
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setFreeCommentFeeling(@PathVariable String commentId,
                                                      @PathVariable CommonConst.FEELING_TYPE feeling,

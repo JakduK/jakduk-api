@@ -195,7 +195,7 @@ public class UserProfileWriteController {
 		user.setUsername(connection.getDisplayName());
 
 		// Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
-		UserProfile userProfile = userService.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
+		UserProfile userProfile = userService.findUserProfileByProviderIdAndProviderUserId(providerId, providerUserId);
 
 		if (Objects.nonNull(userProfile)) {
 			user.setId(userProfile.getId());

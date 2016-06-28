@@ -1,23 +1,32 @@
 package com.jakduk.restcontroller;
 
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.jakduk.authentication.jakduk.JakdukPrincipal;
+import com.jakduk.model.web.user.UserProfileForm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionKey;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.social.facebook.connect.FacebookAdapter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.jakduk.authentication.common.CommonPrincipal;
@@ -50,6 +59,9 @@ public class UserRestController {
     private StandardPasswordEncoder encoder;
 
     @Autowired
+    private UsersConnectionRepository usersConnectionRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -60,8 +72,8 @@ public class UserRestController {
 
     @ApiOperation(value = "JakduK 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String write(@RequestBody UserForm form,
-                        HttpServletRequest request) {
+    public String addJakdukUser(@RequestBody UserForm form,
+                                HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
 
@@ -128,6 +140,49 @@ public class UserRestController {
         return CommonConst.RESPONSE_VOID_OBJECT;
     }
 
+    @ApiOperation(value = "Social 회원 가입")
+    @RequestMapping(value = "/facebook", method = RequestMethod.POST)
+    public ResponseEntity addSocialUser(@RequestParam String accessToken,
+                                        HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+
+        if (Objects.isNull(accessToken))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+
+        FacebookTemplate facebookTemplate = new FacebookTemplate(accessToken);
+        org.springframework.social.facebook.api.User facebookUser = facebookTemplate.userOperations().getUserProfile();
+
+        Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo("facebook", new HashSet<>(Arrays.asList(facebookUser.getId())));
+
+        // Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+        User existUser = userService.findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE.FACEBOOK, facebookUser.getId());
+
+        if (Objects.nonNull(userIds)) {
+            userService.signUpSocialUser(existUser);
+
+            CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+
+            return new ResponseEntity<>(commonPrincipal, HttpStatus.OK);
+        }
+
+        UserProfileForm user = new UserProfileForm();
+        user.setEmail(facebookUser.getEmail());
+        user.setUsername(facebookUser.getName());
+
+        if (Objects.nonNull(existUser)) {
+            user.setId(existUser.getId());
+            user.setAbout(existUser.getAbout());
+
+            if (Objects.nonNull(existUser.getSupportFC()))
+                user.setFootballClub(existUser.getSupportFC().getId());
+        }
+
+        log.debug("user=" + user);
+
+        return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
+    }
+
     @ApiOperation(value = "회원 프로필 업데이트 시 Email 중복 체크")
     @RequestMapping(value = "/exist/email/update", method = RequestMethod.GET)
     public Boolean existEmailOnUpdate(@RequestParam(required = true) String email,
@@ -184,7 +239,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "// 비 로그인 상태(id를 제외한)에서 별명 중복 체크")
+    @ApiOperation(value = "비 로그인 상태(id를 제외한)에서 별명 중복 체크")
     @RequestMapping(value = "/exist/username/anonymous", method = RequestMethod.GET)
     public Boolean existUsernameOnAnonymous(@RequestParam(required = true) String username,
                                        @RequestParam(required = true) String id,

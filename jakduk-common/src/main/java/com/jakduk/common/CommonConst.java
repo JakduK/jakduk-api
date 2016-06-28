@@ -52,6 +52,17 @@ public class CommonConst {
 	public final static String BOARD_CATEGORY_FOOTBALL = "football";
 	public final static String BOARD_CATEGORY_DEVELOP = "develop";
 	public final static String BOARD_CATEGORY_ALL = "all";
+
+	/**
+	 * 게시판 말머리 종류.
+	 */
+	public enum BOARD_CATEGORY_TYPE {
+		ALL,		// 전체
+		FREE,		// 자유
+		FOOTBALL,	// 축구
+		DEVELOP		// 개발
+	}
+
 	
 	/**
 	 * 사용자 쿠키
