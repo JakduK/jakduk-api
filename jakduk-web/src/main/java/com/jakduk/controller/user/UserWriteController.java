@@ -133,7 +133,7 @@ public class UserWriteController {
 
 		log.debug("jakduk user created. user=" + user);
 
-		userService.signUpJakdukUser(user);
+		userService.signInJakdukUser(user);
 
 		sessionStatus.setComplete();
 		

@@ -271,7 +271,7 @@ public class UserService {
 	}
 
 	// jakduk 회원의 로그인 처리.
-	public void signUpJakdukUser(User user) {
+	public void signInJakdukUser(User user) {
 
 		boolean enabled = true;
 		boolean accountNonExpired = true;
@@ -288,7 +288,7 @@ public class UserService {
 	}
 
 	// SNS 인증 회원의 로그인 처리.
-	public void signUpSocialUser(User user) {
+	public void signInSocialUser(User user) {
 
 		SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
 				true, true, true, true, getAuthorities(user.getRoles()));

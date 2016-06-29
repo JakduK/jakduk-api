@@ -158,7 +158,7 @@ public class UserProfileWriteController {
 
 		log.debug("jakduk user updated. user=" + user);
 
-		userService.signUpJakdukUser(user);
+		userService.signInJakdukUser(user);
 		sessionStatus.setComplete();
 
 		return "redirect:/user/profile?status=1";
@@ -283,7 +283,7 @@ public class UserProfileWriteController {
 
 		sessionStatus.setComplete();
 
-		userService.signUpSocialUser(user);
+		userService.signInSocialUser(user);
 
 		providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 
@@ -355,7 +355,7 @@ public class UserProfileWriteController {
 
 		sessionStatus.setComplete();
 
-		userService.signUpSocialUser(user);
+		userService.signInSocialUser(user);
 
 		providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 

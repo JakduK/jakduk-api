@@ -16,10 +16,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.web.ConnectController;
+import org.springframework.social.connect.web.ProviderSignInAttempt;
+import org.springframework.social.connect.web.SessionStrategy;
+import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookAdapter;
+import org.springframework.social.facebook.connect.FacebookConnectionFactory;
+import org.springframework.social.oauth2.AccessGrant;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -53,7 +61,10 @@ public class UserTest extends AbstractSpringTest {
 
 	@Autowired
 	private UsersConnectionRepository usersConnectionRepository;
-	
+
+	@Autowired
+	private Environment environment;
+
 	@Before
 	public void setUp() {
 	}
@@ -140,6 +151,19 @@ public class UserTest extends AbstractSpringTest {
 
 		User user2 = userRepository.findOneByEmail(email);
 		System.out.println("user2=" + user2);
+	}
+
+	@Test
+	public void 페이스북_OAUTH2() {
+		String accessToken = "EAALwXK7RDAIBABRLhRHZB8DV9GXKSLfSlvZBGkjXbVziSQRuPTqpc2eAvZBXcd9XM130euKDAF9wiZCCBroeZCT3PUpedn9U8WzZAY5q4rKCyQSRUkcGtON0aS95r46s1a2i4OTYMXDE5F8yEZBiw3X20VWXZBz33VjjMMG3hbNbtguVYjlZBJWXq";
+		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(environment.getProperty("facebook.app.id"), environment.getProperty("facebook.app.secret"));
+
+		AccessGrant accessGrant = new AccessGrant(accessToken);
+		Connection<Facebook> connection = connectionFactory.createConnection(accessGrant);
+
+		ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
+
+		System.out.println("profile=" + connection.getDisplayName());
 	}
 
 }
