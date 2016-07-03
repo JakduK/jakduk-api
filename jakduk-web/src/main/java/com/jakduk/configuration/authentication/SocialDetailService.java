@@ -1,5 +1,6 @@
-package com.jakduk.authentication.social;
+package com.jakduk.configuration.authentication;
 
+import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonRole;
 import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.repository.user.UserRepository;

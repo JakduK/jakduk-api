@@ -1,11 +1,11 @@
-package com.jakduk.configuration.handler;
+package com.jakduk.configuration.authentication.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.common.RestError;
+import com.jakduk.restcontroller.exceptionHandler.RestError;
 import com.jakduk.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -22,7 +22,7 @@ import java.util.Locale;
  */
 
 @Component
-public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
     @Resource
     LocaleResolver localeResolver;
@@ -31,15 +31,15 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     CommonService commonService;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
         Locale locale = localeResolver.resolveLocale(request);
 
         response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setCharacterEncoding("utf-8");
 
-        RestError error = new RestError("-", commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.unauthorized"));
+        RestError error = new RestError("-", commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
 
         String errorJson = new ObjectMapper().writeValueAsString(error);
 

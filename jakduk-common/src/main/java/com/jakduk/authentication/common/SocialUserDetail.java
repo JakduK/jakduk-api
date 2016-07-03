@@ -1,4 +1,4 @@
-package com.jakduk.authentication.social;
+package com.jakduk.authentication.common;
 
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.GrantedAuthority;

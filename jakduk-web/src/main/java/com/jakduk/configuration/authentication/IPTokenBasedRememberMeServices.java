@@ -1,4 +1,4 @@
-package com.jakduk.authentication.jakduk;
+package com.jakduk.configuration.authentication;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,10 +9,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.Arrays;
-
-import static org.springframework.security.core.context.SecurityContextHolder.setContext;
 
 /**
  * Created by pyohwan on 16. 3. 27.

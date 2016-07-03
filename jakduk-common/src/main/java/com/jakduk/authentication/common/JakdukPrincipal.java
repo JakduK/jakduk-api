@@ -1,4 +1,4 @@
-package com.jakduk.authentication.jakduk;
+package com.jakduk.authentication.common;
 
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.CredentialsContainer;

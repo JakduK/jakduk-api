@@ -1,11 +1,20 @@
 package com.jakduk.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.SocialUserDetail;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.CommonRole;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.model.db.User;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
+import com.jakduk.model.simple.UserOnPasswordUpdate;
+import com.jakduk.model.simple.UserProfile;
+import com.jakduk.model.web.user.UserPasswordUpdate;
+import com.jakduk.repository.FootballClubRepository;
+import com.jakduk.repository.user.UserProfileRepository;
+import com.jakduk.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,23 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.authentication.social.SocialUserDetail;
-import com.jakduk.common.CommonConst;
-import com.jakduk.common.CommonRole;
-import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.db.FootballClub;
-import com.jakduk.model.db.User;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.simple.SocialUserOnAuthentication;
-import com.jakduk.model.simple.UserOnPasswordUpdate;
-import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.user.UserPasswordUpdate;
-import com.jakduk.model.web.user.UserProfileForm;
-import com.jakduk.repository.FootballClubRepository;
-import com.jakduk.repository.user.UserProfileRepository;
-import com.jakduk.repository.user.UserRepository;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -85,12 +78,12 @@ public class UserService {
 
 	// 해당 ID를 제외하고 username과 일치하는 회원 찾기.
 	public UserProfile findByNEIdAndUsername(String id, String username) {
-		return userRepository.findByNEIdAndUsername(id, username);
+		return userProfileRepository.findByNEIdAndUsername(id, username);
 	};
 
 	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
 	public UserProfile findByNEIdAndEmail(String id, String email) {
-		return userRepository.findByNEIdAndEmail(id, email);
+		return userProfileRepository.findByNEIdAndEmail(id, email);
 	}
 
 	// SNS 계정으로 가입한 회원 찾기.
@@ -98,6 +91,7 @@ public class UserService {
 		return userProfileRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
+	// SNS 계정으로 가입한 회원 찾기(로그인).
 	public User findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
@@ -203,39 +197,6 @@ public class UserService {
 		if (log.isInfoEnabled()) {
 			log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
 		}
-	}
-
-	public User editSocialProfile(UserProfileForm userProfileForm) {
-
-		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-		User user = userRepository.findById(principal.getId());
-
-		String email = userProfileForm.getEmail();
-		String username = userProfileForm.getUsername();
-		String footballClub = userProfileForm.getFootballClub();
-		String about = userProfileForm.getAbout();
-
-		if (Objects.nonNull(email) && email.isEmpty() == false) {
-			user.setEmail(email.trim());
-		}
-
-		if (Objects.nonNull(username) && username.isEmpty() == false) {
-			user.setUsername(username.trim());
-		}
-
-		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
-			FootballClub supportFC = footballClubRepository.findOne(userProfileForm.getFootballClub());
-			user.setSupportFC(supportFC);
-		}
-
-		if (Objects.nonNull(about) && about.isEmpty() == false) {
-			user.setAbout(about.trim());
-		}
-
-		userRepository.save(user);
-
-		return user;
 	}
 
 	/**

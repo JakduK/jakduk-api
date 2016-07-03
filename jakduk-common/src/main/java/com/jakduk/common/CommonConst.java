@@ -82,6 +82,7 @@ public class CommonConst {
 	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
 
 	public final static String RESPONSE_VOID_OBJECT = "{}";
+	public final static String RESPONSE_ERROR_DEFAULT_CODE = "-";
 
 	/**
 	 * Social 프로바이더 종류.

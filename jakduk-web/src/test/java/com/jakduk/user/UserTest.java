@@ -1,4 +1,4 @@
-package com.jakduk;
+package com.jakduk.user;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
@@ -20,12 +20,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.web.ConnectController;
 import org.springframework.social.connect.web.ProviderSignInAttempt;
-import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.social.facebook.connect.FacebookAdapter;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 
@@ -68,12 +65,6 @@ public class UserTest extends AbstractSpringTest {
 	@Before
 	public void setUp() {
 	}
-	
-	@Test
-	public void test01() {
-		UserProfile user = userRepository.findByNEIdAndUsername("544dd2a13d9648d912a339c7", "test05");
-		System.out.println("UserProfile=" + user);
-	}
 
 	@Test
 	public void 회원_정보_편집() {
@@ -101,7 +92,7 @@ public class UserTest extends AbstractSpringTest {
 		//OAuthProfile user = userRepository.userFindByNEOauthIdAndUsername("100000128296954", "Pyohwan Jang");
 		//System.out.println("OAuthProfile=" + user);
 		
-		UserProfile userProfile01 = userRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
+		UserProfile userProfile01 = userProfileRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
 		System.out.println("userProfile01=" + userProfile01);
 
 		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE.DAUM, "1lnkE");
@@ -164,6 +155,16 @@ public class UserTest extends AbstractSpringTest {
 		ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
 
 		System.out.println("profile=" + connection.getDisplayName());
+	}
+
+	@Test
+	public void ID를제외하고_이메일로_회원찾기() {
+		UserProfile userProfile = userProfileRepository.findByNEIdAndEmail("54abdc143d96bf2c2b48adbb", "test05@test.com");
+		System.out.println("userProfile=" + userProfile);
+
+		UserProfile userProfile1 = userProfileRepository.findByNEIdAndUsername("54abdc143d96bf2c2b48adbb", "생글이_진주FC");
+		System.out.println("userProfile1=" + userProfile1);
+
 	}
 
 }

@@ -1,7 +1,7 @@
-package com.jakduk.authentication.jakduk;
+package com.jakduk.configuration.authentication.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.common.RestError;
+import com.jakduk.restcontroller.exceptionHandler.RestError;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
 import com.jakduk.exception.NotFoundJakdukAccountException;
 import com.jakduk.service.CommonService;

@@ -40,8 +40,7 @@ public class SocialConfig implements SocialConfigurer {
     @Override
     public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
         connectionFactoryConfigurer.addConnectionFactory(facebookConnectionFactory());
-        connectionFactoryConfigurer.addConnectionFactory(
-                new DaumConnectionFactory(environment.getProperty("daum.client.id"), environment.getProperty("daum.client.secret")));
+        connectionFactoryConfigurer.addConnectionFactory(daumConnectionFactory());
     }
 
     @Override
@@ -60,6 +59,11 @@ public class SocialConfig implements SocialConfigurer {
     @Bean
     public FacebookConnectionFactory facebookConnectionFactory() {
         return new FacebookConnectionFactory(environment.getProperty("facebook.app.id"), environment.getProperty("facebook.app.secret"));
+    }
+
+    @Bean
+    public DaumConnectionFactory daumConnectionFactory() {
+        return new DaumConnectionFactory(environment.getProperty("daum.client.id"), environment.getProperty("daum.client.secret"));
     }
     /**
      * This bean manages the connection flow between the account provider and

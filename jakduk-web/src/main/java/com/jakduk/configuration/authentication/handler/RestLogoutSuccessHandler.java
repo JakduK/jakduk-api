@@ -1,6 +1,5 @@
-package com.jakduk.configuration.handler;
+package com.jakduk.configuration.authentication.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;

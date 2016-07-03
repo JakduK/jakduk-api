@@ -1,22 +1,17 @@
 package com.jakduk.controller.user;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.model.web.user.UserPasswordUpdate;
 import com.jakduk.model.web.user.UserProfileInfo;
+import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
+import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +24,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.model.db.User;
-import com.jakduk.model.web.user.UserPasswordUpdate;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.UserService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 @Controller
 @Slf4j

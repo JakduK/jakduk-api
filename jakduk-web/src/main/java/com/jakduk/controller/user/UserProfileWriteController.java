@@ -1,14 +1,14 @@
 package com.jakduk.controller.user;
 
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.user.UserProfileForm;
+import com.jakduk.restcontroller.vo.UserProfileForm;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
@@ -349,7 +349,30 @@ public class UserProfileWriteController {
 			return "user/socialProfileUpdate";
 		}
 
-		User user = userService.editSocialProfile(userProfileForm);
+		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		User user = userService.findById(principal.getId());
+
+		String email = userProfileForm.getEmail();
+		String username = userProfileForm.getUsername();
+		String footballClub = userProfileForm.getFootballClub();
+		String about = userProfileForm.getAbout();
+
+		if (Objects.nonNull(email) && email.isEmpty() == false)
+			user.setEmail(email.trim());
+
+		if (Objects.nonNull(username) && username.isEmpty() == false)
+			user.setUsername(username.trim());
+
+		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
+			FootballClub supportFC = footballService.findById(userProfileForm.getFootballClub());
+			user.setSupportFC(supportFC);
+		}
+
+		if (Objects.nonNull(about) && about.isEmpty() == false)
+			user.setAbout(about.trim());
+
+		userService.save(user);
 
 		log.debug("social user updated. user=" + user);
 
@@ -362,27 +385,11 @@ public class UserProfileWriteController {
 		return "redirect:/user/social/profile?status=1";
 	}
 
-	// SNS 계정의 회원 정보를 공통으로 검증.
-	private void checkCommonValidationUserProfile(UserProfileForm userProfileForm, BindingResult result) {
-		CommonConst.VALIDATION_TYPE emailStatus = userProfileForm.getEmailStatus();
-		CommonConst.VALIDATION_TYPE usernameStatus = userProfileForm.getUsernameStatus();
-
-		if (emailStatus.equals(CommonConst.VALIDATION_TYPE.OK) == false) {
-			result.rejectValue("email", "user.msg.need.validation.email");
-		}
-
-		if (usernameStatus.equals(CommonConst.VALIDATION_TYPE.OK) == false) {
-			result.rejectValue("username", "user.msg.need.validation.username");
-		}
-	}
-
 	// SNS 계정의 회원 가입 시 DB에 쿼리하여 중복 체크한다.
 	private void checkValidationUserProfileOnWrite(UserProfileForm userProfileForm, BindingResult result) {
 
 		String email = userProfileForm.getEmail();
 		String username = userProfileForm.getUsername();
-
-		this.checkCommonValidationUserProfile(userProfileForm, result);
 
 		UserProfile existEmail = userService.findOneByEmail(email);
 		if (Objects.nonNull(existEmail))
@@ -401,8 +408,6 @@ public class UserProfileWriteController {
 		String email = userProfileForm.getEmail();
 		String username = userProfileForm.getUsername();
 
-		this.checkCommonValidationUserProfile(userProfileForm, result);
-
 		UserProfile existEmail = userService.findByNEIdAndEmail(id, email);
 		if (Objects.nonNull(existEmail))
 			result.rejectValue("email", "user.msg.already.email");
@@ -418,8 +423,6 @@ public class UserProfileWriteController {
 		String id = userProfileForm.getId();
 		String email = userProfileForm.getEmail();
 		String username = userProfileForm.getUsername();
-
-		this.checkCommonValidationUserProfile(userProfileForm, result);
 
 		UserProfile existEmail = userService.findByNEIdAndEmail(id, email);
 		if (Objects.nonNull(existEmail))

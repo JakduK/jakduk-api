@@ -2,8 +2,11 @@ package com.jakduk.restcontroller;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.model.db.User;
-import com.jakduk.model.web.user.UserProfileForm;
+import com.jakduk.model.simple.UserProfile;
+import com.jakduk.restcontroller.vo.UserProfileForm;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
@@ -19,19 +22,14 @@ import org.springframework.social.connect.web.HttpSessionSessionStrategy;
 import org.springframework.social.connect.web.ProviderSignInAttempt;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.social.connect.web.SessionStrategy;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -54,6 +52,9 @@ public class AuthRestController {
     private FacebookConnectionFactory facebookConnectionFactory;
 
     @Autowired
+    private DaumConnectionFactory daumConnectionFactory;
+
+    @Autowired
     private CommonService commonService;
 
     @Autowired
@@ -65,38 +66,67 @@ public class AuthRestController {
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
 
     @ApiOperation(value = "Social 로그인")
-    @RequestMapping(value = "/login/facebook", method = RequestMethod.POST)
+    @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
     public ResponseEntity loginSocialUser(
-                @RequestParam String accessToken,
-                NativeWebRequest request) {
+            @PathVariable Optional<String> providerId,
+            @RequestParam Optional<String> accessToken,
+            NativeWebRequest request) {
 
-        Locale locale = localeResolver.resolveLocale((HttpServletRequest) request.getNativeRequest());
+        if (accessToken.isPresent() == false)
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
 
-        if (Objects.isNull(accessToken))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+        if (providerId.isPresent() == false)
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
 
-        AccessGrant accessGrant = new AccessGrant(accessToken);
-        Connection<Facebook> connection = facebookConnectionFactory.createConnection(accessGrant);
+        CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.get().toUpperCase());
 
-        ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
-        sessionStrategy.setAttribute(request, ProviderSignInAttempt.SESSION_ATTRIBUTE, signInAttempt);
+        if (Objects.isNull(convertProviderId))
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
 
-        org.springframework.social.connect.UserProfile socialProfile = connection.fetchUserProfile();
-        //FacebookTemplate facebookTemplate = new FacebookTemplate(accessToken);
-        //org.springframework.social.facebook.api.User facebookUser = facebookTemplate.userOperations().getUserProfile();
+        AccessGrant accessGrant = new AccessGrant(accessToken.get());
+        Connection<?> connection = null;
 
-        Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo("facebook", new HashSet<>(Arrays.asList(socialProfile.getId())));
+        switch (convertProviderId) {
+            case FACEBOOK:
+                connection = facebookConnectionFactory.createConnection(accessGrant);
+                break;
+            case DAUM:
+                connection = daumConnectionFactory.createConnection(accessGrant);
+                break;
+        }
 
-        // Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
-        User existUser = userService.findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE.FACEBOOK, socialProfile.getId());
+        ConnectionKey connectionKey = connection.getKey();
 
-        if (Objects.nonNull(userIds)) {
+        Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo(providerId.get(), new HashSet<>(Arrays.asList(connectionKey.getProviderUserId())));
+        User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, connectionKey.getProviderUserId());
+
+        // 로그인 처리.
+        if (userIds.isEmpty() == false) {
             userService.signInSocialUser(existUser);
 
             CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
 
             return new ResponseEntity<>(commonPrincipal, HttpStatus.OK);
         }
+
+        // SNS 신규 가입.
+        ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
+        sessionStrategy.setAttribute(request, ProviderSignInAttempt.SESSION_ATTRIBUTE, signInAttempt);
+
+        throw new ServiceException(ServiceError.NOT_REGISTRER_WITH_SNS);
+    }
+
+    @ApiOperation(value = "Social 가입을 위한 프로필 정보")
+    @RequestMapping(value = "/social/attempted", method = RequestMethod.GET)
+    public ResponseEntity loginSocialUser(
+                NativeWebRequest request) {
+
+        Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+        ConnectionKey connectionKey = connection.getKey();
+
+        CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
+        UserProfile existUser = userService.findUserProfileByProviderIdAndProviderUserId(convertProviderId, connectionKey.getProviderUserId());
+        org.springframework.social.connect.UserProfile socialProfile = connection.fetchUserProfile();
 
         UserProfileForm user = new UserProfileForm();
         user.setEmail(socialProfile.getEmail());
@@ -110,21 +140,6 @@ public class AuthRestController {
                 user.setFootballClub(existUser.getSupportFC().getId());
         }
 
-        log.debug("user=" + user);
-
-        return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
-    }
-
-    @ApiOperation(value = "Social 로그인")
-    @RequestMapping(value = "/login/facebook", method = RequestMethod.GET)
-    public ResponseEntity loginSocialUser(
-                NativeWebRequest request) {
-
-        Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
-        ConnectionKey connectionKey = connection.getKey();
-
-        log.debug("user=" + connectionKey);
-
-        return new ResponseEntity<>(connectionKey, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }

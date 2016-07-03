@@ -1,5 +1,6 @@
-package com.jakduk.authentication.jakduk;
+package com.jakduk.configuration.authentication;
 
+import com.jakduk.authentication.common.JakdukPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
@@ -8,7 +9,6 @@ import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

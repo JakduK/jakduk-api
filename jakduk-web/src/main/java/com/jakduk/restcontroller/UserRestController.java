@@ -1,38 +1,44 @@
 package com.jakduk.restcontroller;
 
-import java.util.*;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import com.jakduk.model.web.user.UserProfileForm;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.LocaleResolver;
-
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.exception.DuplicateDataException;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.restcontroller.vo.UserForm;
+import com.jakduk.restcontroller.vo.UserProfileForm;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionKey;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ValidationUtils;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.servlet.LocaleResolver;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 4. 5.
@@ -51,6 +57,9 @@ public class UserRestController {
     private StandardPasswordEncoder encoder;
 
     @Autowired
+    private ProviderSignInUtils providerSignInUtils;
+
+    @Autowired
     private UsersConnectionRepository usersConnectionRepository;
 
     @Autowired
@@ -64,8 +73,9 @@ public class UserRestController {
 
     @ApiOperation(value = "JakduK 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String addJakdukUser(@RequestBody UserForm form,
-                                HttpServletRequest request) {
+    public String addJakdukUser(
+            @RequestBody UserForm form,
+            HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
 
@@ -132,10 +142,49 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "Social 회원 가입")
-    @RequestMapping(value = "/facebook", method = RequestMethod.POST)
-    public void addSocialUser(@RequestParam String accessToken,
-                                        HttpServletRequest request) {
+    @RequestMapping(value = "/social", method = RequestMethod.POST)
+    public void addSocialUser(
+            @Valid @RequestBody UserProfileForm form,
+            NativeWebRequest request) {
 
+        Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+        ConnectionKey connectionKey = connection.getKey();
+
+        CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
+        String providerUserId = connectionKey.getProviderUserId();
+
+        User user = new User();
+
+        user.setEmail(form.getEmail());
+        user.setUsername(form.getUsername());
+        user.setProviderId(providerId);
+        user.setProviderUserId(providerUserId);
+
+        ArrayList<Integer> roles = new ArrayList<Integer>();
+        roles.add(CommonRole.ROLE_NUMBER_USER_01);
+
+        user.setRoles(roles);
+
+        String footballClub = form.getFootballClub();
+        String about = form.getAbout();
+
+        if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
+            FootballClub supportFC = footballService.findById(footballClub);
+
+            user.setSupportFC(supportFC);
+        }
+
+        if (Objects.nonNull(about) && !about.isEmpty()) {
+            user.setAbout(form.getAbout().trim());
+        }
+
+        providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
+
+        userService.save(user);
+
+        log.debug("social user created. user=" + user);
+
+        userService.signInSocialUser(user);
 
     }
 

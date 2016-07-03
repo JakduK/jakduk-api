@@ -8,6 +8,7 @@ import com.jakduk.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -275,7 +276,22 @@ public class CommonService {
 	 * @param getString
      * @return
      */
+
+	@Deprecated
 	public String getResourceBundleMessage(Locale locale, String bundle, String getString, Object... params) {
+		ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
+		return MessageFormat.format(resourceBundle.getString(getString), params);
+	}
+
+	/**
+	 * ResourceBundle에서 메시지 가져오기.
+	 * @param bundle
+	 * @param getString
+	 * @param params
+     * @return
+     */
+	public String getResourceBundleMessage(String bundle, String getString, Object... params) {
+		Locale locale = LocaleContextHolder.getLocale();
 		ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
 		return MessageFormat.format(resourceBundle.getString(getString), params);
 	}

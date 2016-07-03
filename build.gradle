@@ -38,6 +38,7 @@ subprojects {
             exclude(module: 'servlet-api')
         }
         compile group: 'org.springframework', name: 'spring-oxm', version:"${springVersion}"
+        compile group: 'org.springframework', name: 'spring-web', version:"${springVersion}"
         compile group: 'org.springframework', name: 'spring-webmvc', version:"${springVersion}"
         compile group: 'org.springframework', name: 'spring-aspects', version:"${springVersion}"
         compile group: 'org.springframework', name: 'spring-jdbc', version:"${springVersion}"
@@ -75,6 +76,7 @@ subprojects {
 
         testCompile group: 'org.springframework', name: 'spring-test', version:"${springVersion}"
         testCompile group: 'junit', name: 'junit', version:'4.12'
+        testCompile 'org.mockito:mockito-all:1.10.19'
 
         compileOnly 'org.projectlombok:lombok:1.16.8'
     }
