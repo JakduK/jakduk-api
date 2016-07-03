@@ -15,18 +15,18 @@ import java.util.Objects;
  */
 
 @Slf4j
-public class ExistEmailCompatibilityValidator implements ConstraintValidator<ExistEmailCompatibility, Object> {
+public class ExistUsernameCompatibilityValidator implements ConstraintValidator<ExistUsernameCompatibility, Object> {
 
     private String userIdField;
-    private String emailField;
+    private String usernameField;
 
     @Autowired
     private UserService userService;
 
     @Override
-    public void initialize(ExistEmailCompatibility constraintAnnotation) {
+    public void initialize(ExistUsernameCompatibility constraintAnnotation) {
         userIdField = constraintAnnotation.userId();
-        emailField = constraintAnnotation.email();
+        usernameField = constraintAnnotation.username();
     }
 
     @Override
@@ -34,19 +34,18 @@ public class ExistEmailCompatibilityValidator implements ConstraintValidator<Exi
 
         try {
             final String userId = BeanUtils.getProperty(value, userIdField);
-            final String email = BeanUtils.getProperty(value, emailField);
+            final String username = BeanUtils.getProperty(value, usernameField);
 
-            UserProfile existEmail = null;
+            UserProfile existUsername = null;
 
             // Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
             if (Objects.nonNull(userId) && userId.isEmpty() == false) {
-                existEmail = userService.findByNEIdAndEmail(userId, email);
-                log.debug("existEmail=" + existEmail);
+                existUsername = userService.findByNEIdAndUsername(userId, username);
             } else {
-                existEmail = userService.findOneByEmail(email);
+                existUsername = userService.findOneByUsername(username);
             }
 
-            if (Objects.nonNull(existEmail)) {
+            if (Objects.nonNull(existUsername)) {
                 return false;
             }
 
