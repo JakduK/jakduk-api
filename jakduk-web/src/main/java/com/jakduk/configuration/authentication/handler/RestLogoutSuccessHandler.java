@@ -21,6 +21,9 @@ public class RestLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+
         PrintWriter out = response.getWriter();
         out.print(CommonConst.RESPONSE_VOID_OBJECT);
         out.flush();

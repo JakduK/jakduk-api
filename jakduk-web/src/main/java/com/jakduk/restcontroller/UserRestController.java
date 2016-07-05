@@ -145,6 +145,10 @@ public class UserRestController {
             NativeWebRequest request) {
 
         Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+
+        if (Objects.isNull(connection))
+            throw new ServiceException(ServiceError.CANNOT_GET_SNS_PROFILE);
+
         ConnectionKey connectionKey = connection.getKey();
 
         CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
@@ -157,7 +161,7 @@ public class UserRestController {
         user.setProviderId(providerId);
         user.setProviderUserId(providerUserId);
 
-        ArrayList<Integer> roles = new ArrayList<Integer>();
+        ArrayList<Integer> roles = new ArrayList<>();
         roles.add(CommonRole.ROLE_NUMBER_USER_01);
 
         user.setRoles(roles);

@@ -67,6 +67,8 @@ public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	
 				.build();
 
 		response.setContentType("application/json");
+		response.setHeader("Access-Control-Allow-Credentials", "true");
+		response.setHeader("Access-Control-Allow-Origin", "http://silverprize.net");
 		response.setCharacterEncoding("utf-8");
 
 		String commonPrincipalJson = new ObjectMapper().writeValueAsString(commonPrincipal);

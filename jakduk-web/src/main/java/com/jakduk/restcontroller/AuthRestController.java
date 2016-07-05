@@ -113,7 +113,7 @@ public class AuthRestController {
         ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
         sessionStrategy.setAttribute(request, ProviderSignInAttempt.SESSION_ATTRIBUTE, signInAttempt);
 
-        throw new ServiceException(ServiceError.NOT_REGISTRER_WITH_SNS);
+        throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
     @ApiOperation(value = "Social 가입을 위한 프로필 정보")
