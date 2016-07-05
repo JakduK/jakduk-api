@@ -60,9 +60,6 @@ public class UserRestController {
     private ProviderSignInUtils providerSignInUtils;
 
     @Autowired
-    private UsersConnectionRepository usersConnectionRepository;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
@@ -71,7 +68,7 @@ public class UserRestController {
     @Autowired
     private FootballService footballService;
 
-    @ApiOperation(value = "JakduK 회원 가입")
+    @ApiOperation(value = "JakduK 회원 가입", response = String.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
     public String addJakdukUser(
             @RequestBody UserForm form,
@@ -155,8 +152,8 @@ public class UserRestController {
 
         User user = new User();
 
-        user.setEmail(form.getEmail());
-        user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail().trim());
+        user.setUsername(form.getUsername().trim());
         user.setProviderId(providerId);
         user.setProviderUserId(providerUserId);
 

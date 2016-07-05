@@ -1,5 +1,7 @@
 package com.jakduk.common.constraints;
 
+import com.jakduk.exception.FormValidationErrorCode;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
@@ -13,7 +15,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = ExistEmailCompatibilityValidator.class)
 public @interface ExistEmailCompatibility {
 
-    String message() default "EXIST_EMAIL";
+    String message() default FormValidationErrorCode.EMAIL_EXISTS;
 
     Class<?>[] groups() default {};
 
