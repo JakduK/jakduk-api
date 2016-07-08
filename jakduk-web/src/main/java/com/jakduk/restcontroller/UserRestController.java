@@ -10,6 +10,7 @@ import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.restcontroller.vo.UserForm;
 import com.jakduk.restcontroller.vo.UserProfileForm;
 import com.jakduk.service.CommonService;
@@ -19,15 +20,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
-import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInUtils;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ValidationUtils;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
@@ -41,7 +37,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
- * Created by pyohwan on 16. 4. 5.
+ * @author pyohawan
+ * 16. 4. 5 오전 12:17
  */
 
 @Slf4j
@@ -68,9 +65,9 @@ public class UserRestController {
     @Autowired
     private FootballService footballService;
 
-    @ApiOperation(value = "JakduK 회원 가입", response = String.class)
+    @ApiOperation(value = "이메일 기반 회원 가입", response = EmptyJsonResponse.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String addJakdukUser(
+    public EmptyJsonResponse addJakdukUser(
             @RequestBody UserForm form,
             HttpServletRequest request) {
 
@@ -135,12 +132,12 @@ public class UserRestController {
 
         userService.signInJakdukUser(user);
 
-        return CommonConst.RESPONSE_VOID_OBJECT;
+        return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "Social 회원 가입")
+    @ApiOperation(value = "Social 기반 회원 가입", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/social", method = RequestMethod.POST)
-    public void addSocialUser(
+    public EmptyJsonResponse addSocialUser(
             @Valid @RequestBody UserProfileForm form,
             NativeWebRequest request) {
 
@@ -186,6 +183,8 @@ public class UserRestController {
         log.debug("social user created. user=" + user);
 
         userService.signInSocialUser(user);
+
+        return EmptyJsonResponse.newInstance();
 
     }
 

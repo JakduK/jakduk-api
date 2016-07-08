@@ -13,8 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.UsersConnectionRepository;
@@ -33,7 +31,8 @@ import javax.annotation.Resource;
 import java.util.*;
 
 /**
- * Created by pyohwan on 16. 6. 29.
+ * @author pyohwan
+ * 16. 6. 29 오전 12:27
  */
 
 @Slf4j
@@ -65,23 +64,20 @@ public class AuthRestController {
 
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
 
-    @ApiOperation(value = "Social 로그인")
+    @ApiOperation(value = "Social 로그인", response = CommonPrincipal.class)
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
-    public ResponseEntity loginSocialUser(
+    public CommonPrincipal loginSocialUser(
             @PathVariable Optional<String> providerId,
             @RequestParam Optional<String> accessToken,
             NativeWebRequest request) {
 
-        if (accessToken.isPresent() == false)
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
+        if (!accessToken.isPresent())
+            throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
-        if (providerId.isPresent() == false)
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
+        if (!providerId.isPresent())
+            throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.get().toUpperCase());
-
-        if (Objects.isNull(convertProviderId))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
 
         AccessGrant accessGrant = new AccessGrant(accessToken.get());
         Connection<?> connection = null;
@@ -95,18 +91,19 @@ public class AuthRestController {
                 break;
         }
 
+        assert connection != null;
         ConnectionKey connectionKey = connection.getKey();
 
-        Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo(providerId.get(), new HashSet<>(Arrays.asList(connectionKey.getProviderUserId())));
+        Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo(providerId.get(), new HashSet<>(Collections.singletonList(connectionKey.getProviderUserId())));
         User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, connectionKey.getProviderUserId());
 
         // 로그인 처리.
-        if (userIds.isEmpty() == false) {
+        if (!userIds.isEmpty()) {
             userService.signInSocialUser(existUser);
 
             CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
 
-            return new ResponseEntity<>(commonPrincipal, HttpStatus.OK);
+            return commonPrincipal;
         }
 
         // SNS 신규 가입.
@@ -116,12 +113,16 @@ public class AuthRestController {
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
-    @ApiOperation(value = "Social 가입을 위한 프로필 정보")
+    @ApiOperation(value = "Social 가입을 위한 프로필 정보", response = UserProfileForm.class)
     @RequestMapping(value = "/social/attempted", method = RequestMethod.GET)
-    public ResponseEntity loginSocialUser(
+    public UserProfileForm loginSocialUser(
                 NativeWebRequest request) {
 
         Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+
+        if (Objects.isNull(connection))
+            throw new ServiceException(ServiceError.CANNOT_GET_SNS_PROFILE);
+
         ConnectionKey connectionKey = connection.getKey();
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
@@ -140,6 +141,6 @@ public class AuthRestController {
                 user.setFootballClub(existUser.getSupportFC().getId());
         }
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return user;
     }
 }
