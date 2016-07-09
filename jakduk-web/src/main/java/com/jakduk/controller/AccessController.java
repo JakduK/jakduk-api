@@ -4,7 +4,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Token;
 import com.jakduk.repository.TokenRepository;
 import com.jakduk.service.CommonService;
-import com.jakduk.service.EmailService;
+import com.jakduk.notification.EmailService;
 import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.velocity.VelocityEngineFactoryBean;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.annotation.Resource;
 import java.util.Properties;
@@ -48,6 +49,15 @@ public class RootConfig {
         velocityEngine.setResourceLoaderPath("classpath:/templates/email");
 
         return velocityEngine;
+    }
+
+    @Bean
+    public FreeMarkerConfigurer freeMarkerConfigurer() {
+        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+        configurer.setTemplateLoaderPath("classpath:templates/email/");
+        configurer.setDefaultEncoding("UTF-8");
+
+        return configurer;
     }
 
     @Bean

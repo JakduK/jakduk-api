@@ -74,7 +74,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://silverprize.net")
+                .allowedOrigins("*")
                 .allowedHeaders("GET", "PUT", "DELETE", "POST", "OPTIONS")
                 .allowedHeaders("Content-Type");
     }

@@ -1,16 +1,8 @@
-package com.jakduk.service;
+package com.jakduk.notification;
 
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
+import com.jakduk.model.db.Token;
+import com.jakduk.repository.TokenRepository;
+import com.jakduk.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +12,13 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
-import com.jakduk.model.db.Token;
-import com.jakduk.repository.TokenRepository;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.text.MessageFormat;
+import java.util.*;
 
-@Service
 @Slf4j
+@Service
 public class EmailService {
 
 	@Autowired

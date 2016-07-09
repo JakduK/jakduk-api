@@ -37,6 +37,7 @@ import java.util.*;
 
 @Slf4j
 @Api(value = "Auth", description = "인증 API")
+@CrossOrigin
 @RestController
 @RequestMapping("/api")
 public class AuthRestController {
