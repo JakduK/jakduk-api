@@ -2,9 +2,9 @@ package com.jakduk.controller;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Token;
+import com.jakduk.notification.EmailService;
 import com.jakduk.repository.TokenRepository;
 import com.jakduk.service.CommonService;
-import com.jakduk.notification.EmailService;
 import com.jakduk.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,7 +124,7 @@ public class AccessController {
 			switch (userProfile.getProviderId()) {
 				case JAKDUK:
 					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.sendok");
-					emailService.sendResetPassword(locale, host, email);
+					emailService.sendResetPassword(host, email);
 					break;
 				case DAUM:
 					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);

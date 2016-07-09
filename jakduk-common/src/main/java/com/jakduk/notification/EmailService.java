@@ -3,17 +3,22 @@ package com.jakduk.notification;
 import com.jakduk.model.db.Token;
 import com.jakduk.repository.TokenRepository;
 import com.jakduk.service.CommonService;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.velocity.VelocityEngineUtils;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -28,10 +33,10 @@ public class EmailService {
 	private TokenRepository tokenRepository;
 
 	@Autowired
-	private JavaMailSender sender;
+	private JavaMailSender mailSender;
 
 	@Autowired
-	private VelocityEngine velocityEngine;
+	private FreeMarkerConfigurer freeMarkerConfigurer;
 
 	@Value("${smtp.username}")
 	private String fromMail;
@@ -39,12 +44,13 @@ public class EmailService {
 	@Value("${email.url.static.resource}")
 	private String staticResourceUrl;
 
-	public void sendResetPassword(Locale locale, String host, String email) {
+	public void sendResetPassword(String host, String email) {
 
 		if (log.isDebugEnabled()) {
 			log.debug("send email to reset password. email is " + email);
 		}
 
+		Locale locale = LocaleContextHolder.getLocale();
 		String language = commonService.getLanguageCode(locale, null);
 
 		try {
@@ -68,25 +74,47 @@ public class EmailService {
 			model.put("greeting", new MessageFormat(bundle.getString("user.password.reset.greeting")).format(new String[]{email}));
 			model.put("linkLabel", bundle.getString("user.password.change"));
 
-			MimeMessage message = sender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-			helper.setFrom(fromMail);
-			helper.setTo(email);
-			helper.setSubject("jakduk.com-" + bundle.getString("user.password.reset.instructions"));
-			helper.setText(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "/resetPassword.vm", "UTF-8", model), true);
+			String subject = "jakduk.com-" + bundle.getString("user.password.reset.instructions");
 
-			sender.send(message);
+			Configuration cfg = freeMarkerConfigurer.getConfiguration();
+
+			Template template = cfg.getTemplate("resetPassword.ftl");
+
+			StringBuffer content = new StringBuffer();
+
+			try {
+				content.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, model));
+			} catch (TemplateException e) {
+				e.printStackTrace();
+			}
+
+			send(email, subject, content.toString());
 
 			Token token = new Token();
 			token.setEmail(email);
 			token.setCode(code);
 			token.setCreatedTime(new Date());
+
 			if (Objects.nonNull(tokenRepository.findOne(email))) {
 				tokenRepository.delete(email);
 			}
 			tokenRepository.insert(token);
 		} catch (MessagingException e) {
 			log.error("error", e);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+	}
+
+	public void send(String to, String subject, String htmlBody) throws MessagingException {
+
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+		helper.setTo(to);
+		helper.setSubject(subject);
+		helper.setText(htmlBody, true);
+
+		mailSender.send(message);
 	}
 }

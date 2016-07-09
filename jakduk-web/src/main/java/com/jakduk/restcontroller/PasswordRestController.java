@@ -68,7 +68,7 @@ public class PasswordRestController {
 			switch (userProfile.getProviderId()) {
 				case JAKDUK:
 					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.sendok");
-					emailService.sendResetPassword(locale, callbackUrl, email);
+					emailService.sendResetPassword(callbackUrl, email);
 					break;
 				case DAUM:
 					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);

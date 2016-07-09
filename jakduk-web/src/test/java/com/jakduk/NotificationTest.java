@@ -1,5 +1,6 @@
 package com.jakduk;
 
+import com.jakduk.notification.EmailService;
 import com.jakduk.notification.SlackService;
 import com.jakduk.util.AbstractSpringTest;
 import freemarker.template.Configuration;
@@ -9,9 +10,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 
 /**
@@ -33,6 +39,12 @@ public class NotificationTest extends AbstractSpringTest {
     @Autowired
     private FreeMarkerConfigurer freeMarkerConfigurer;
 
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    @Autowired
+    private EmailService emailService;
+
     @Ignore
     @Test
     public void 슬랙알림() {
@@ -40,10 +52,9 @@ public class NotificationTest extends AbstractSpringTest {
     }
 
     @Test
-    public void 메일발송() throws IOException {
+    public void 메일발송() throws IOException, MessagingException {
 
         Configuration cfg = freeMarkerConfigurer.getConfiguration();
-
 
         Template template = cfg.getTemplate("hello.ftl");
 
@@ -54,6 +65,15 @@ public class NotificationTest extends AbstractSpringTest {
         } catch (TemplateException e) {
             e.printStackTrace();
         }
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+        helper.setTo("phjang1983@daum.net");
+        helper.setText(content.toString(), true);
+
+        //javaMailSender.send(message);
+
+        emailService.sendResetPassword("jakduk.com", "phjang1983@daum.net");
 
 
 

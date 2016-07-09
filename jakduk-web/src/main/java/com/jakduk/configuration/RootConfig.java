@@ -44,14 +44,6 @@ public class RootConfig {
     }
 
     @Bean
-    public VelocityEngineFactoryBean velocityEngine() {
-        VelocityEngineFactoryBean velocityEngine = new VelocityEngineFactoryBean();
-        velocityEngine.setResourceLoaderPath("classpath:/templates/email");
-
-        return velocityEngine;
-    }
-
-    @Bean
     public FreeMarkerConfigurer freeMarkerConfigurer() {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
         configurer.setTemplateLoaderPath("classpath:templates/email/");
