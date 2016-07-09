@@ -1,10 +1,15 @@
 package com.jakduk.configuration.authentication.handler;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Locale;
+import java.util.Objects;
+import javax.annotation.Resource;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.restcontroller.exceptionHandler.RestError;
-import com.jakduk.exception.FindUserButNotJakdukAccount;
-import com.jakduk.exception.NotFoundJakdukAccountException;
-import com.jakduk.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -14,14 +19,10 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Locale;
-import java.util.Objects;
+import com.jakduk.exception.FindUserButNotJakdukAccount;
+import com.jakduk.exception.NotFoundJakdukAccountException;
+import com.jakduk.restcontroller.exceptionHandler.RestError;
+import com.jakduk.service.CommonService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -47,6 +48,7 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 		Locale locale = localeResolver.resolveLocale(request);
 
 		String message = "";
+		int status = HttpServletResponse.SC_BAD_REQUEST;
 
 		if (exception instanceof InternalAuthenticationServiceException) {
 			AuthenticationException customException = (AuthenticationException)exception.getCause();
@@ -57,6 +59,7 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 							((FindUserButNotJakdukAccount) exception.getCause()).getProviderId());
 				} else if (customException instanceof NotFoundJakdukAccountException)  {
 					message = commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.not.found.jakduk.account");
+					status = HttpServletResponse.SC_NOT_FOUND;
 				} else if (customException instanceof LockedException) {
 					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.login.failure.locked");
 				}
@@ -70,7 +73,7 @@ public class JakdukFailureHandler implements AuthenticationFailureHandler {
 		}
 
 		response.setContentType("application/json");
-		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setStatus(status);
 		response.setCharacterEncoding("utf-8");
 
 		RestError error = new RestError("-", message);
