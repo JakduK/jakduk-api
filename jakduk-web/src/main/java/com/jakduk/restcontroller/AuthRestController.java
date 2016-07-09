@@ -1,13 +1,13 @@
 package com.jakduk.restcontroller;
 
-import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.restcontroller.vo.LoginSocialUserForm;
 import com.jakduk.restcontroller.vo.UserProfileForm;
-import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +28,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -36,8 +37,7 @@ import java.util.*;
  */
 
 @Slf4j
-@Api(value = "Auth", description = "인증 API")
-@CrossOrigin
+@Api(tags = "인증", description = "인증 관련")
 @RestController
 @RequestMapping("/api")
 public class AuthRestController {
@@ -55,9 +55,6 @@ public class AuthRestController {
     private DaumConnectionFactory daumConnectionFactory;
 
     @Autowired
-    private CommonService commonService;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
@@ -65,22 +62,19 @@ public class AuthRestController {
 
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
 
-    @ApiOperation(value = "Social 로그인", response = CommonPrincipal.class)
+    @ApiOperation(value = "SNS 기반 로그인", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
-    public CommonPrincipal loginSocialUser(
+    public EmptyJsonResponse loginSocialUser(
             @PathVariable Optional<String> providerId,
-            @RequestParam Optional<String> accessToken,
+            @Valid @RequestBody LoginSocialUserForm form,
             NativeWebRequest request) {
-
-        if (!accessToken.isPresent())
-            throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
         if (!providerId.isPresent())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.get().toUpperCase());
 
-        AccessGrant accessGrant = new AccessGrant(accessToken.get());
+        AccessGrant accessGrant = new AccessGrant(form.getAccessToken());
         Connection<?> connection = null;
 
         switch (convertProviderId) {
@@ -102,9 +96,7 @@ public class AuthRestController {
         if (!userIds.isEmpty()) {
             userService.signInSocialUser(existUser);
 
-            CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
-
-            return commonPrincipal;
+            return EmptyJsonResponse.newInstance();
         }
 
         // SNS 신규 가입.
@@ -114,7 +106,7 @@ public class AuthRestController {
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
-    @ApiOperation(value = "Social 가입을 위한 프로필 정보", response = UserProfileForm.class)
+    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json", response = UserProfileForm.class)
     @RequestMapping(value = "/social/attempted", method = RequestMethod.GET)
     public UserProfileForm loginSocialUser(
                 NativeWebRequest request) {

@@ -42,7 +42,7 @@ import java.util.Objects;
  */
 
 @Slf4j
-@Api(value = "USER", description = "회원 API")
+@Api(tags = "회원", description = "회원 관련")
 @RestController
 @RequestMapping("/api/user")
 public class UserRestController {
@@ -65,7 +65,7 @@ public class UserRestController {
     @Autowired
     private FootballService footballService;
 
-    @ApiOperation(value = "이메일 기반 회원 가입", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "이메일 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
     public EmptyJsonResponse addJakdukUser(
             @RequestBody UserForm form,
@@ -135,7 +135,7 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "Social 기반 회원 가입", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "SNS 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/social", method = RequestMethod.POST)
     public EmptyJsonResponse addSocialUser(
             @Valid @RequestBody UserProfileForm form,
@@ -188,7 +188,7 @@ public class UserRestController {
 
     }
 
-    @ApiOperation(value = "회원 프로필 업데이트 시 Email 중복 체크")
+    @ApiOperation(value = "회원 프로필 업데이트 시 Email 중복 체크", produces = "application/json")
     @RequestMapping(value = "/exist/email/update", method = RequestMethod.GET)
     public Boolean existEmailOnUpdate(@RequestParam(required = true) String email,
                                        HttpServletRequest request) {
@@ -208,7 +208,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "비로그인 상태(id를 제외한)에서 Email 중복 체크")
+    @ApiOperation(value = "비로그인 상태(id를 제외한)에서 Email 중복 체크", produces = "application/json")
     @RequestMapping(value = "/exist/email/anonymous", method = RequestMethod.GET)
     public Boolean existEmailOnAnonymous(@RequestParam(required = true) String email,
                                     @RequestParam(required = true) String id,
@@ -224,7 +224,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "회원 프로필 업데이트 시 별명 중복 체크")
+    @ApiOperation(value = "회원 프로필 업데이트 시 별명 중복 체크", produces = "application/json")
     @RequestMapping(value = "/exist/username/update", method = RequestMethod.GET)
     public Boolean existUsernameOnUpdate(@RequestParam(required = true) String username,
                                        HttpServletRequest request) {
@@ -244,7 +244,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "비 로그인 상태(id를 제외한)에서 별명 중복 체크")
+    @ApiOperation(value = "비 로그인 상태(id를 제외한)에서 별명 중복 체크", produces = "application/json")
     @RequestMapping(value = "/exist/username/anonymous", method = RequestMethod.GET)
     public Boolean existUsernameOnAnonymous(@RequestParam(required = true) String username,
                                        @RequestParam(required = true) String id,
@@ -260,7 +260,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "이메일 중복 여부")
+    @ApiOperation(value = "이메일 중복 여부", produces = "application/json")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
     public Boolean existEmail(@RequestParam String email,
                            HttpServletRequest request) {
@@ -275,7 +275,7 @@ public class UserRestController {
         return existEmail;
     }
 
-    @ApiOperation(value = "별명 중복 여부")
+    @ApiOperation(value = "별명 중복 여부", produces = "application/json")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
     public Boolean existUsername(@RequestParam String username,
                               HttpServletRequest request) {
@@ -287,7 +287,7 @@ public class UserRestController {
         return existUsername;
     }
 
-    @ApiOperation(value = "내 프로필")
+    @ApiOperation(value = "내 프로필", produces = "application/json")
     @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
     public CommonPrincipal getMyProfile(HttpServletRequest request) {
         Locale locale = localeResolver.resolveLocale(request);

@@ -1,6 +1,5 @@
 package com.jakduk;
 
-import com.google.api.services.gmail.model.Message;
 import com.jakduk.notification.SlackService;
 import com.jakduk.util.AbstractSpringTest;
 import freemarker.template.Configuration;
@@ -16,7 +15,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import java.io.IOException;
 
 /**
- * Created by pyohwan on 16. 5. 22.
+ * @author pyohwan
+ * 16. 5. 22 오후 10:50
  */
 
 public class NotificationTest extends AbstractSpringTest {

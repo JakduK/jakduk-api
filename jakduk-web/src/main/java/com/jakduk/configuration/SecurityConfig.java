@@ -72,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             ).anonymous()
                         .antMatchers(
                                 "/user/**",
-                                "/swagger-ui.html",     // 스웨거
+//                                "/swagger-ui.html",     // 스웨거
                                 "/rest/**"              // spring-data-rest
                             ).authenticated()
                         .antMatchers(
