@@ -66,7 +66,7 @@ public class BoardRestController {
         BoardListInfo paging = new BoardListInfo();
         paging.setPage(Objects.isNull(page) ? 1 : Integer.parseInt(page));
         paging.setSize(Objects.isNull(size) ? CommonConst.BOARD_MAX_LIMIT : Integer.parseInt(size));
-        paging.setCategory(Objects.isNull(category) ? CommonConst.BOARD_CATEGORY_NONE : category);
+        paging.setCategory(Objects.isNull(category) ? CommonConst.BOARD_CATEGORY_ALL : category);
         Locale locale = localeResolver.resolveLocale(request);
         return boardFreeService.getFreePostsList(locale, paging);
     }
