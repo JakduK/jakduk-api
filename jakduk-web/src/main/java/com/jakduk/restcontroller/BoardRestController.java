@@ -1,5 +1,25 @@
 package com.jakduk.restcontroller;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
+
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
@@ -8,27 +28,12 @@ import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.web.BoardListInfo;
-import com.jakduk.restcontroller.vo.BoardPaging;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import com.jakduk.vo.BoardCommentRequest;
 import com.jakduk.vo.BoardCommentsResponse;
 import com.jakduk.vo.UserFeelingResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 3. 26.
@@ -51,12 +56,19 @@ public class BoardRestController {
     @Autowired
     private CommonService commonService;
 
-    @ApiOperation(value = "게시물 목록(미구현)")
+    @ApiOperation(value = "게시물 목록")
     @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
-    public void freeList(@ModelAttribute BoardPaging boardPaging,
-                         HttpServletRequest request) {
+    public Map<String, Object> freeList(@RequestParam(required = false) String page,
+                                        @RequestParam(required = false) String size,
+                                        @RequestParam(required = false) String category,
+                                        HttpServletRequest request) {
 
+        BoardListInfo paging = new BoardListInfo();
+        paging.setPage(Objects.isNull(page) ? 1 : Integer.parseInt(page));
+        paging.setSize(Objects.isNull(size) ? CommonConst.BOARD_MAX_LIMIT : Integer.parseInt(size));
+        paging.setCategory(Objects.isNull(category) ? CommonConst.BOARD_CATEGORY_NONE : category);
         Locale locale = localeResolver.resolveLocale(request);
+        return boardFreeService.getFreePostsList(locale, paging);
     }
 
     @ApiOperation(value = "게시판 댓글 목록")
