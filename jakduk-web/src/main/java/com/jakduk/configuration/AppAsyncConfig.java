@@ -31,6 +31,7 @@ public class AppAsyncConfig implements AsyncConfigurer {
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setMaxPoolSize(2);
+        executor.setMaxPoolSize(5);
         executor.initialize();
 
         return executor;
@@ -39,5 +40,16 @@ public class AppAsyncConfig implements AsyncConfigurer {
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return new SimpleAsyncUncaughtExceptionHandler();
+    }
+
+    @Bean(name = "asyncMailExecutor")
+    public Executor getAsyncMailExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(3);
+        executor.setThreadNamePrefix("Mail-Thread-");
+        executor.initialize();
+
+        return executor;
     }
 }

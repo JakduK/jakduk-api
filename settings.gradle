@@ -1,7 +1,7 @@
 // 부모와 자식 프로젝트를 나타낸다.
 rootProject.name = 'jakduk-parent'
-include ':jakduk-common'
+include ':jakduk-core'
 include ':jakduk-web'
 
-project(':jakduk-common').projectDir = "$rootDir/jakduk-common" as File
+project(':jakduk-core').projectDir = "$rootDir/jakduk-core" as File
 project(':jakduk-web').projectDir = "$rootDir/jakduk-web" as File

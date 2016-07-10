@@ -1,5 +1,5 @@
 
-description = 'jakduk-common'
+description = 'jakduk-core'
 
 dependencies {
     // service에 HttpServlceRequest등 과같은 것이 없어질때 이것도 없애자.

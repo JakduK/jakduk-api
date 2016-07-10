@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
@@ -44,6 +45,7 @@ public class EmailService {
 	@Value("${email.url.static.resource}")
 	private String staticResourceUrl;
 
+	@Async(value = "asyncMailExecutor")
 	public void sendResetPassword(String host, String email) {
 
 		if (log.isDebugEnabled()) {
@@ -76,13 +78,10 @@ public class EmailService {
 
 			String subject = "jakduk.com-" + bundle.getString("user.password.reset.instructions");
 
-			Configuration cfg = freeMarkerConfigurer.getConfiguration();
-
-			Template template = cfg.getTemplate("resetPassword.ftl");
-
-			StringBuffer content = new StringBuffer();
+			StringBuilder content = new StringBuilder();
 
 			try {
+				Template template = getTemplate("resetPassword.ftl");
 				content.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, model));
 			} catch (TemplateException e) {
 				e.printStackTrace();
@@ -106,7 +105,13 @@ public class EmailService {
 		}
 	}
 
-	public void send(String to, String subject, String htmlBody) throws MessagingException {
+	private Template getTemplate(String templateName) throws IOException {
+		Configuration cfg = freeMarkerConfigurer.getConfiguration();
+
+		return cfg.getTemplate(templateName);
+	}
+
+	private void send(String to, String subject, String htmlBody) throws MessagingException {
 
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

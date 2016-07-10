@@ -80,13 +80,13 @@ public class UserRestController {
         String footballClub = form.getFootballClub();
         String about = form.getAbout();
 
-        if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
+        if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
             FootballClub supportFC = footballService.findById(footballClub);
 
             user.setSupportFC(supportFC);
         }
 
-        if (Objects.nonNull(about) && about.isEmpty() == false) {
+        if (Objects.nonNull(about) && !about.isEmpty()) {
             user.setAbout(about.trim());
         }
 
