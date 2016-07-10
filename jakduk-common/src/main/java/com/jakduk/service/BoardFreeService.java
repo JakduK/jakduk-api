@@ -23,6 +23,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.security.web.util.UrlUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
@@ -54,23 +72,6 @@ import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.GalleryRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.security.web.util.UrlUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 
 @Service
 @Slf4j
@@ -552,15 +553,13 @@ public class BoardFreeService {
 		
 		return HttpServletResponse.SC_OK;
 	}
-	
+
 	/**
 	 * 자유게시판 목록 페이지
-	 * @param model
 	 * @param boardListInfo
 	 * @return
 	 */
-	public Model getFreePostsList(Model model, Locale locale, BoardListInfo boardListInfo) {
-
+	public Map<String, Object> getFreePostsList(Locale locale, BoardListInfo boardListInfo) {
 		Map<String, Date> createDate = new HashMap<String, Date>();
 		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
 		ArrayList<Integer> seqs = new ArrayList<Integer>();
@@ -570,12 +569,12 @@ public class BoardFreeService {
 		Integer page = boardListInfo.getPage();
 		Integer size = boardListInfo.getSize();
 		String categoryName = boardListInfo.getCategory();
-		
+
 		if (categoryName == null || commonService.isNumeric(categoryName)) {
 			categoryName = CommonConst.BOARD_CATEGORY_ALL;
 			boardListInfo.setCategory(categoryName);
 		}
-		
+
 		if (page < 1) {
 			page = 1;
 			boardListInfo.setPage(page);
@@ -584,8 +583,8 @@ public class BoardFreeService {
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 
-		if (categoryName != null && 
-				(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
+		if (categoryName != null &&
+			(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
 			posts = boardFreeOnListRepository.findAll(pageable).getContent();
 			totalPosts = boardFreeOnListRepository.count();
 		} else {
@@ -630,16 +629,23 @@ public class BoardFreeService {
 		Map<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
 		Map<String, BoardFeelingCount> feelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
 
-		model.addAttribute("posts", posts);
-		model.addAttribute("notices", notices);
-		model.addAttribute("categorys", categorys);
-		model.addAttribute("boardListInfo", boardListInfo);
-		model.addAttribute("totalPosts", totalPosts);
-		model.addAttribute("commentCount", commentCount);
-		model.addAttribute("feelingCount", feelingCount);
-		model.addAttribute("createDate", createDate);
-		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
+		Map<String, Object> data = new HashMap<>();
+		data.put("posts", posts);
+		data.put("notices", notices);
+		data.put("categorys", categorys);
+		data.put("boardListInfo", boardListInfo);
+		data.put("totalPosts", totalPosts);
+		data.put("commentCount", commentCount);
+		data.put("feelingCount", feelingCount);
+		data.put("createDate", createDate);
+		data.put("dateTimeFormat", commonService.getDateTimeFormat(locale));
 
+		return data;
+	}
+
+	public Model getFreePostsList(Model model, Locale locale, BoardListInfo boardListInfo) {
+		Map<String, Object> data = getFreePostsList(locale, boardListInfo);
+		data.forEach(model::addAttribute);
 		return model;
 	}
 	
