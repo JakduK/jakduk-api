@@ -1,24 +1,4 @@
-package com.jakduk.restcontroller;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.LocaleResolver;
+package com.jakduk.restcontroller.board;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
@@ -27,19 +7,35 @@ import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardListInfo;
+import com.jakduk.restcontroller.board.vo.BoardCommentRequest;
+import com.jakduk.restcontroller.board.vo.BoardCommentsResponse;
+import com.jakduk.restcontroller.board.vo.PostsResponse;
+import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
-import com.jakduk.vo.BoardCommentRequest;
-import com.jakduk.vo.BoardCommentsResponse;
-import com.jakduk.vo.UserFeelingResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.LocaleResolver;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
- * Created by pyohwan on 16. 3. 26.
+ * @author pyohwan
+ * 16. 3. 26 오후 11:05
  */
 
-@Api(value = "BOARD", description = "게시판 API")
+@Api(tags = "게시판", description = "게시판 관련")
 @RestController
 @RequestMapping("/api/board")
 public class BoardRestController {
@@ -56,7 +52,7 @@ public class BoardRestController {
     @Autowired
     private CommonService commonService;
 
-    @ApiOperation(value = "게시물 목록")
+    @ApiOperation(value = "게시물 목록", produces = "application/json")
     @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
     public Map<String, Object> freeList(@RequestParam(required = false) String page,
                                         @RequestParam(required = false) String size,
@@ -69,6 +65,53 @@ public class BoardRestController {
         paging.setCategory(Objects.isNull(category) ? CommonConst.BOARD_CATEGORY_ALL : category);
         Locale locale = localeResolver.resolveLocale(request);
         return boardFreeService.getFreePostsList(locale, paging);
+    }
+
+    @ApiOperation(value = "게시물 목록", produces = "application/json", response = PostsResponse.class)
+    @RequestMapping(value = "/free/posts2", method = RequestMethod.GET)
+    public PostsResponse getPosts(@RequestParam(required = false) Integer page,
+                                        @RequestParam(required = false) Integer size,
+                                        @RequestParam(required = false, defaultValue = "ALL") CommonConst.BOARD_CATEGORY_TYPE category,
+                                        HttpServletRequest request) {
+
+        if (Objects.isNull(page))
+            page = 1;
+
+        if (Objects.isNull(size))
+            size = CommonConst.BOARD_MAX_LIMIT;
+
+        if (Objects.isNull(category))
+            category = CommonConst.BOARD_CATEGORY_TYPE.ALL;
+
+        Page<BoardFreeOnList> posts = boardFreeService.getPosts(category, page, size);
+
+
+        PostsResponse response = PostsResponse.builder()
+                .posts(posts.getContent())
+                .first(posts.isFirst())
+                .last(posts.isLast())
+                .totalPages(posts.getTotalPages())
+                .totalElements(posts.getTotalElements())
+                .numberOfElements(posts.getNumberOfElements())
+                .size(posts.getSize())
+                .number(posts.getNumber())
+                .build();
+
+        return response;
+    }
+
+    @RequestMapping(value = "/free/tops", method = RequestMethod.GET)
+    public void dataFreeTopList(Model model) {
+
+        Integer status = boardFreeService.getDataFreeTopList(model);
+    }
+
+    @RequestMapping(value = "/data/free/comments", method = RequestMethod.GET)
+    public void dataFreeCommentsList(Model model,
+                                     @RequestParam(required = false, defaultValue = "1") int page,
+                                     @RequestParam(required = false, defaultValue = "20") int size) {
+
+        Integer status = boardFreeService.getDataFreeCommentsList(model, page, size);
     }
 
     @ApiOperation(value = "게시판 댓글 목록")

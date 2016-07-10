@@ -1,20 +1,14 @@
 package com.jakduk.model.db;
 
-import java.util.List;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.embedded.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.jakduk.model.embedded.BoardHistory;
-import com.jakduk.model.embedded.BoardImage;
-import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.CommonFeelingUser;
-import com.jakduk.model.embedded.CommonWriter;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import java.util.List;
 
 /**
  * 자유게시판 모델
@@ -23,7 +17,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
  */
 
 @Data
-@RepositoryRestResource
 @Document
 public class BoardFree {
 
@@ -57,7 +50,7 @@ public class BoardFree {
 	/**
 	 * 분류 ID
 	 */
-	private String categoryName;
+	private CommonConst.BOARD_CATEGORY_TYPE category;
 	
 	/**
 	 * 조회

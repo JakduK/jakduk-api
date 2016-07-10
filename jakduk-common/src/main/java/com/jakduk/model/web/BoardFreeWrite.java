@@ -105,7 +105,7 @@ public class BoardFreeWrite {
 	public String toString() {
 		return "BoardFreeWrite [id=" + id + ", writer=" + writer + ", subject="
 				+ subject + ", content=" + content + ", seq=" + seq
-				+ ", categoryName=" + categoryName + ", views=" + views
+				+ ", category=" + categoryName + ", views=" + views
 				+ ", images=" + images + "]";
 	}
 

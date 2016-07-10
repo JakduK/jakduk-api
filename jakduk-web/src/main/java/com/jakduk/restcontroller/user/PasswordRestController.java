@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.user;
 
 import java.util.HashMap;
 import java.util.Locale;

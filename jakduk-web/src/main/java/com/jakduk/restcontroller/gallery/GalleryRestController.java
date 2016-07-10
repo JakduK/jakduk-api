@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.gallery;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.SuccessButNoContentException;
@@ -6,7 +6,7 @@ import com.jakduk.model.db.Gallery;
 import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.GalleryService;
-import com.jakduk.vo.GalleriesResponse;
+import com.jakduk.restcontroller.vo.GalleriesResponse;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +15,6 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

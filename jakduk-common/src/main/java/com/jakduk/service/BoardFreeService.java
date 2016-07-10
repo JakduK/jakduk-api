@@ -1,46 +1,6 @@
 package com.jakduk.service;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.security.web.util.UrlUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
@@ -52,14 +12,7 @@ import com.jakduk.model.db.Gallery;
 import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.embedded.BoardCommentStatus;
-import com.jakduk.model.embedded.BoardHistory;
-import com.jakduk.model.embedded.BoardImage;
-import com.jakduk.model.embedded.BoardItem;
-import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.CommonFeelingUser;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.embedded.*;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
@@ -67,11 +20,38 @@ import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.notification.SlackService;
-import com.jakduk.repository.BoardCategoryRepository;
-import com.jakduk.repository.BoardFreeCommentRepository;
-import com.jakduk.repository.BoardFreeOnListRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.GalleryRepository;
+import com.jakduk.repository.*;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.security.web.util.UrlUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -182,7 +162,7 @@ public class BoardFreeService {
 		
 		boardFreeWrite.setId(boardFree.getId());
 		boardFreeWrite.setSeq(boardFree.getSeq());
-		boardFreeWrite.setCategoryName(boardFree.getCategoryName());
+		boardFreeWrite.setCategoryName(boardFree.getCategory().toString());
 		boardFreeWrite.setSubject(boardFree.getSubject());
 		boardFreeWrite.setContent(boardFree.getContent());
 		boardFreeWrite.setViews(boardFree.getViews());
@@ -276,8 +256,10 @@ public class BoardFreeService {
 				e.printStackTrace();
 			}
 		}
-		
-		boardFree.setCategoryName(boardFreeWrite.getCategoryName());
+
+		// 임시 처리.
+		//boardFree.setCategory(boardFreeWrite.getCategoryName());
+		boardFree.setCategory(CommonConst.BOARD_CATEGORY_TYPE.ALL);
 		boardFree.setSubject(boardFreeWrite.getSubject());
 		boardFree.setContent(boardFreeWrite.getContent());
 		boardFree.setViews(0);
@@ -345,7 +327,7 @@ public class BoardFreeService {
 		boardFreeOnEs.setId(boardFree.getId());
 		boardFreeOnEs.setSeq(boardFree.getSeq());
 		boardFreeOnEs.setWriter(boardFree.getWriter());
-		boardFreeOnEs.setCategoryName(boardFree.getCategoryName());
+		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
 		
 		boardFreeOnEs.setSubject(boardFree.getSubject()
 				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
@@ -398,8 +380,10 @@ public class BoardFreeService {
 		if (boardFree == null) {
 			return HttpServletResponse.SC_NOT_FOUND;
 		}
-		
-		boardFree.setCategoryName(boardFreeWrite.getCategoryName());
+
+		// 임시 처리.
+		//boardFree.setCategory(boardFreeWrite.getCategoryName());
+		boardFree.setCategory(CommonConst.BOARD_CATEGORY_TYPE.ALL);
 		boardFree.setSubject(boardFreeWrite.getSubject());
 		boardFree.setContent(boardFreeWrite.getContent());
 		
@@ -531,7 +515,7 @@ public class BoardFreeService {
 		boardFreeOnEs.setId(boardFree.getId());
 		boardFreeOnEs.setSeq(boardFree.getSeq());
 		boardFreeOnEs.setWriter(boardFree.getWriter());
-		boardFreeOnEs.setCategoryName(boardFree.getCategoryName());
+		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
 		
 		boardFreeOnEs.setSubject(boardFree.getSubject()
 				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
@@ -552,6 +536,26 @@ public class BoardFreeService {
 		}
 		
 		return HttpServletResponse.SC_OK;
+	}
+
+	public Page<BoardFreeOnList> getPosts(CommonConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
+
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
+		Pageable pageable = new PageRequest(page - 1, size, sort);
+		Page<BoardFreeOnList> posts = null;
+
+		switch (category) {
+			case ALL:
+				posts = boardFreeOnListRepository.findAll(pageable);
+				break;
+			case FOOTBALL:
+			case DEVELOP:
+			case FREE:
+				posts = boardFreeOnListRepository.findByCategory(category, pageable);
+				break;
+		}
+
+		return posts;
 	}
 
 	/**
@@ -665,6 +669,8 @@ public class BoardFreeService {
 		return model;
 
 	}
+
+
 	
 	/**
 	 * 자유게시판 게시물 보기 페이지
@@ -683,7 +689,7 @@ public class BoardFreeService {
 			}
 			
 			List<BoardImage> images = boardFree.getGalleries();
-			BoardCategory boardCategory = boardCategoryRepository.findByName(boardFree.getCategoryName());
+			BoardCategory boardCategory = boardCategoryRepository.findByName(boardFree.getCategory().toString());
 			
 			if (isAddCookie == true) {
 				int views = boardFree.getViews();

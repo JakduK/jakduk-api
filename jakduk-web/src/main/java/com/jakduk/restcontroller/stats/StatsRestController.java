@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.stats;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.AttendanceClub;

@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.admin;
 
 
 import com.jakduk.common.CommonConst;

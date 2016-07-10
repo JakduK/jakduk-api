@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.user;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
@@ -10,9 +10,9 @@ import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.restcontroller.vo.UserForm;
-import com.jakduk.restcontroller.vo.UserProfileForm;
+import com.jakduk.restcontroller.EmptyJsonResponse;
+import com.jakduk.restcontroller.user.vo.UserForm;
+import com.jakduk.restcontroller.user.vo.UserProfileForm;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;

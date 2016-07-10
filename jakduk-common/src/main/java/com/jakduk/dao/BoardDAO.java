@@ -196,7 +196,7 @@ public class BoardDAO {
 		case CommonConst.BOARD_CATEGORY_DEVELOP:
 		case CommonConst.BOARD_CATEGORY_FOOTBALL:
 		case CommonConst.BOARD_CATEGORY_FREE:
-			query.addCriteria(Criteria.where("categoryName").is(categoty));	
+			query.addCriteria(Criteria.where("category").is(categoty));
 			break;
 		}
 		

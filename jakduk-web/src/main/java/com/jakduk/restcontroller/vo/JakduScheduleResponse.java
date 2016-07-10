@@ -1,4 +1,4 @@
-package com.jakduk.vo;
+package com.jakduk.restcontroller.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

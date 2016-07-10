@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller.vo;
+package com.jakduk.restcontroller.user.vo;
 
 import com.jakduk.common.constraints.*;
 import com.jakduk.exception.FormValidationErrorCode;

@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller.vo;
+package com.jakduk.restcontroller;
 
 import io.swagger.annotations.ApiModel;
 

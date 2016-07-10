@@ -1,8 +1,7 @@
 package com.jakduk.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jakduk.restcontroller.UserRestController;
-import com.jakduk.restcontroller.vo.UserProfileForm;
+import com.jakduk.restcontroller.user.UserRestController;
+import com.jakduk.restcontroller.user.vo.UserProfileForm;
 import com.jakduk.util.AbstractMvcTest;
 import org.junit.Before;
 import org.junit.Ignore;

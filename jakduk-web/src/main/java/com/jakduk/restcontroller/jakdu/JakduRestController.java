@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.jakdu;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.UnauthorizedAccessException;
@@ -10,8 +10,8 @@ import com.jakduk.model.web.jakdu.MyJakduRequest;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.JakduService;
-import com.jakduk.vo.JakduScheduleResponse;
-import com.jakduk.vo.UserFeelingResponse;
+import com.jakduk.restcontroller.vo.JakduScheduleResponse;
+import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

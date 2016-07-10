@@ -76,6 +76,6 @@ public class BoardFreeOnES {
 	@Override
 	public String toString() {
 		return "BoardFreeOnES [id=" + id + ", writer=" + writer + ", subject=" + subject + ", content=" + content
-				+ ", seq=" + seq + ", categoryName=" + categoryName + "]";
+				+ ", seq=" + seq + ", category=" + categoryName + "]";
 	}
 }

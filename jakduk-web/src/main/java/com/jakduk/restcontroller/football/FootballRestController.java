@@ -1,4 +1,4 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.football;
 
 import java.util.List;
 import java.util.Locale;

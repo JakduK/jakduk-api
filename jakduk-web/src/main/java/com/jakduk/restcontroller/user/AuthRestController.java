@@ -1,13 +1,13 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.user;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
 import com.jakduk.model.db.User;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.restcontroller.vo.LoginSocialUserForm;
-import com.jakduk.restcontroller.vo.UserProfileForm;
+import com.jakduk.restcontroller.EmptyJsonResponse;
+import com.jakduk.restcontroller.user.vo.LoginSocialUserForm;
+import com.jakduk.restcontroller.user.vo.UserProfileForm;
 import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

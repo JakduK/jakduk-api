@@ -1,10 +1,10 @@
-package com.jakduk.restcontroller;
+package com.jakduk.restcontroller.home;
 
 import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.HomeService;
-import com.jakduk.vo.HomeResponse;
+import com.jakduk.restcontroller.home.vo.HomeResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
