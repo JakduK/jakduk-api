@@ -68,38 +68,7 @@ public class UserRestController {
     @ApiOperation(value = "이메일 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
     public EmptyJsonResponse addJakdukUser(
-            @RequestBody UserForm form,
-            HttpServletRequest request) {
-
-        Locale locale = localeResolver.resolveLocale(request);
-
-        if (Objects.isNull(form.getEmail()))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.need.validation.email"));
-
-        if (Objects.isNull(form.getUsername()))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.need.validation.username"));
-
-        String password = form.getPassword();
-        String passwordConfirm = form.getPasswordConfirm();
-
-        if (Objects.isNull(password))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.placeholder.password"));
-
-        if (Objects.isNull(passwordConfirm))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.placeholder.password.confirm"));
-
-        if (!password.equals(passwordConfirm))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.password.mismatch"));
-
-        UserProfile existEmail = userService.findOneByEmail(form.getEmail());
-
-        if (Objects.nonNull(existEmail))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.email"));
-
-        UserProfile existUsername = userService.findOneByUsername(form.getUsername());
-
-        if (Objects.nonNull(existUsername))
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.username"));
+            @Valid @RequestBody UserForm form) {
 
         User user = User.builder()
                 .email(form.getEmail().trim())
@@ -151,12 +120,12 @@ public class UserRestController {
         CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
         String providerUserId = connectionKey.getProviderUserId();
 
-        User user = new User();
-
-        user.setEmail(form.getEmail().trim());
-        user.setUsername(form.getUsername().trim());
-        user.setProviderId(providerId);
-        user.setProviderUserId(providerUserId);
+        User user = User.builder()
+                .email(form.getEmail().trim())
+                .username(form.getUsername().trim())
+                .providerId(providerId)
+                .providerUserId(providerUserId)
+                .build();
 
         ArrayList<Integer> roles = new ArrayList<>();
         roles.add(CommonRole.ROLE_NUMBER_USER_01);

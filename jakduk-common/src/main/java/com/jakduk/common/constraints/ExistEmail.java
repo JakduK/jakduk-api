@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ExistEmailValidator.class)
 public @interface ExistEmail {
 
-    String message() default "EXIST_EMAIL";
+    String message() default "email_Exists";
 
     Class<?>[] groups() default {};
 

@@ -255,6 +255,7 @@ public class UserService {
 				true, true, true, true, getAuthorities(user.getRoles()));
 
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
