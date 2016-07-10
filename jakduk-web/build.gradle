@@ -4,7 +4,7 @@ apply plugin: 'war'
 description = 'jakduk-web'
 
 dependencies {
-  compile project(':jakduk-core')
+  compile project(':jakduk-common')
 
   compile group: 'javax.servlet', name: 'jstl', version:'1.2'
   compile group: 'ro.isdc.wro4j', name: 'wro4j-core', version:'1.8.0'
