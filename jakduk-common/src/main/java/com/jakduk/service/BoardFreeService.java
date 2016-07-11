@@ -538,9 +538,16 @@ public class BoardFreeService {
 		return HttpServletResponse.SC_OK;
 	}
 
-	public Page<BoardFreeOnList> getPosts(CommonConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
+	/**
+	 * 자유 게시판 글 목록
+	 * @param category
+	 * @param page
+	 * @param size
+     * @return
+     */
+	public Page<BoardFreeOnList> getFreePosts(CommonConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
 
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 		Page<BoardFreeOnList> posts = null;
 
@@ -556,6 +563,19 @@ public class BoardFreeService {
 		}
 
 		return posts;
+	}
+
+	/**
+	 * 자유 게시판 공지글 목록
+     * @return
+     */
+	public Page<BoardFreeOnList> getFreeNotices() {
+
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+		Pageable noticePageable = new PageRequest(0, 10, sort);
+		Page<BoardFreeOnList> notices = boardFreeRepository.findByNotice(noticePageable);
+
+		return notices;
 	}
 
 	/**

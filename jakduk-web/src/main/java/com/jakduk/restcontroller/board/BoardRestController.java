@@ -2,24 +2,30 @@ package com.jakduk.restcontroller.board;
 
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardDAO;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardItem;
+import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.restcontroller.board.vo.BoardCommentRequest;
 import com.jakduk.restcontroller.board.vo.BoardCommentsResponse;
-import com.jakduk.restcontroller.board.vo.PostsResponse;
+import com.jakduk.restcontroller.board.vo.FreePostsOnList;
+import com.jakduk.restcontroller.board.vo.FreePostsOnListResponse;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.ui.Model;
@@ -29,6 +35,8 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author pyohwan
@@ -52,27 +60,14 @@ public class BoardRestController {
     @Autowired
     private CommonService commonService;
 
-    @ApiOperation(value = "게시물 목록", produces = "application/json")
+    @Autowired
+    private BoardDAO boardDAO;
+
+    @ApiOperation(value = "게시물 목록", produces = "application/json", response = FreePostsOnListResponse.class)
     @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
-    public Map<String, Object> freeList(@RequestParam(required = false) String page,
-                                        @RequestParam(required = false) String size,
-                                        @RequestParam(required = false) String category,
-                                        HttpServletRequest request) {
-
-        BoardListInfo paging = new BoardListInfo();
-        paging.setPage(Objects.isNull(page) ? 1 : Integer.parseInt(page));
-        paging.setSize(Objects.isNull(size) ? CommonConst.BOARD_MAX_LIMIT : Integer.parseInt(size));
-        paging.setCategory(Objects.isNull(category) ? CommonConst.BOARD_CATEGORY_ALL : category);
-        Locale locale = localeResolver.resolveLocale(request);
-        return boardFreeService.getFreePostsList(locale, paging);
-    }
-
-    @ApiOperation(value = "게시물 목록", produces = "application/json", response = PostsResponse.class)
-    @RequestMapping(value = "/free/posts2", method = RequestMethod.GET)
-    public PostsResponse getPosts(@RequestParam(required = false) Integer page,
-                                        @RequestParam(required = false) Integer size,
-                                        @RequestParam(required = false, defaultValue = "ALL") CommonConst.BOARD_CATEGORY_TYPE category,
-                                        HttpServletRequest request) {
+    public FreePostsOnListResponse getPosts(@RequestParam(required = false) Integer page,
+                                            @RequestParam(required = false) Integer size,
+                                            @RequestParam(required = false, defaultValue = "ALL") CommonConst.BOARD_CATEGORY_TYPE category) {
 
         if (Objects.isNull(page))
             page = 1;
@@ -83,11 +78,63 @@ public class BoardRestController {
         if (Objects.isNull(category))
             category = CommonConst.BOARD_CATEGORY_TYPE.ALL;
 
-        Page<BoardFreeOnList> posts = boardFreeService.getPosts(category, page, size);
+        Page<BoardFreeOnList> posts = boardFreeService.getFreePosts(category, page, size);
+        Page<BoardFreeOnList> notices = boardFreeService.getFreeNotices();
 
+        ArrayList<Integer> seqs = new ArrayList<>();
+        ArrayList<ObjectId> ids = new ArrayList<>();
 
-        PostsResponse response = PostsResponse.builder()
-                .posts(posts.getContent())
+        // id와 seq 뽑아내기.
+        Consumer<BoardFreeOnList> extractIdAndSeq = board -> {
+            String tempId = board.getId();
+            Integer tempSeq = board.getSeq();
+
+            ObjectId objId = new ObjectId(tempId);
+
+            seqs.add(tempSeq);
+            ids.add(objId);
+        };
+
+        posts.getContent().stream().forEach(extractIdAndSeq);
+        notices.getContent().stream().forEach(extractIdAndSeq);
+
+        Map<String, Integer> commentCounts = boardDAO.getBoardFreeCommentCount(seqs);
+        Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
+
+        // 댓글수, 감정 표현수 합치기.
+        Consumer<FreePostsOnList> applyCounts = board -> {
+            String tempId = board.getId();
+
+            Integer commentCount = commentCounts.get(tempId);
+
+            if (Objects.nonNull(commentCount))
+                board.setCommentCount(commentCount);
+
+            BoardFeelingCount feelingCount = feelingCounts.get(tempId);
+
+            if (Objects.nonNull(feelingCount)) {
+                board.setLikingCount(feelingCount.getUsersLikingCount());
+                board.setDislikingCount(feelingCount.getUsersDisLikingCount());
+            }
+        };
+
+        List<FreePostsOnList> freePosts = posts.getContent().stream()
+                .map(FreePostsOnList::new)
+                .collect(Collectors.toList());
+
+        freePosts.stream()
+                .forEach(applyCounts);
+
+        List<FreePostsOnList> freeNotices = notices.getContent().stream()
+                .map(FreePostsOnList::new)
+                .collect(Collectors.toList());
+
+        freeNotices.stream()
+                .forEach(applyCounts);
+
+        FreePostsOnListResponse response = FreePostsOnListResponse.builder()
+                .posts(freePosts)
+                .notices(freeNotices)
                 .first(posts.isFirst())
                 .last(posts.isLast())
                 .totalPages(posts.getTotalPages())

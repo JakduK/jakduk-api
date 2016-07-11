@@ -41,16 +41,6 @@ public class HomeController {
 		
 		return "redirect:/home";
 	}
-	
-	@RequestMapping(value = "/home")
-	public String home(Model model,
-			HttpServletRequest request) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		homeService.getHome(model, locale);
-		
-		return "home/home";
-	}
 
 	@RequestMapping(value = "/error/{code}", method = RequestMethod.GET)
 	public String error(Model model, @PathVariable String code) {
