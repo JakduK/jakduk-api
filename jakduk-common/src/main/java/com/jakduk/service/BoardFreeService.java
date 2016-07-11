@@ -1114,6 +1114,61 @@ public class BoardFreeService {
 		return HttpServletResponse.SC_OK;
 	}
 
+	/**
+	 * 자유게시판 주간 좋아요수 선두
+	 * @return
+     */
+	public List<BoardFreeOnBest> getFreeTopLikes() {
+		LocalDate date = LocalDate.now().minusWeeks(1);
+		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+
+		List<BoardFreeOnBest> posts = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+
+		return posts;
+	}
+
+	/**
+	 * 자유게시판 주간 댓글수 선두
+	 * @return
+	 */
+	public List<BoardFreeOnBest> getFreeTopComments() {
+		LocalDate date = LocalDate.now().minusWeeks(1);
+		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+
+		HashMap<String, Integer> boardFreeCommentCount = boardDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
+
+		ArrayList<ObjectId> commentIds = new ArrayList<>();
+
+		Iterator<?> commentIterator = boardFreeCommentCount.entrySet().iterator();
+
+		// 댓글 많은 글 id 뽑아내기
+		while (commentIterator.hasNext()) {
+			Entry<String, Integer> entry = (Entry<String, Integer>) commentIterator.next();
+			ObjectId objId = new ObjectId(entry.getKey());
+			commentIds.add(objId);
+		}
+
+		// commentIds를 파라미터로 다시 글을 가져온다.
+		List<BoardFreeOnBest> posts = boardDAO.getBoardFreeListOfTop(commentIds);
+
+		for (BoardFreeOnBest boardFree : posts) {
+			String id = boardFree.getId();
+			Integer count = boardFreeCommentCount.get(id);
+			boardFree.setCount(count);
+		}
+
+		// sort and limit
+		Comparator<BoardFreeOnBest> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
+		Comparator<BoardFreeOnBest> byView = (b1, b2) -> b2.getViews() - b1.getViews();
+
+		posts = posts.stream()
+				.sorted(byCount.thenComparing(byView))
+				.limit(CommonConst.BOARD_TOP_LIMIT)
+				.collect(Collectors.toList());
+
+		return posts;
+	}
+
 	public Integer getDataFreeTopList(Model model) {
 		
 		LocalDate date = LocalDate.now().minusWeeks(1);

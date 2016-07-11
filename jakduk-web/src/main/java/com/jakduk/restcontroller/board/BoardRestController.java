@@ -8,13 +8,10 @@ import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.etc.BoardFeelingCount;
+import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.model.web.BoardListInfo;
-import com.jakduk.restcontroller.board.vo.BoardCommentRequest;
-import com.jakduk.restcontroller.board.vo.BoardCommentsResponse;
-import com.jakduk.restcontroller.board.vo.FreePostsOnList;
-import com.jakduk.restcontroller.board.vo.FreePostsOnListResponse;
+import com.jakduk.restcontroller.board.vo.*;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
@@ -24,8 +21,6 @@ import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.ui.Model;
@@ -63,7 +58,7 @@ public class BoardRestController {
     @Autowired
     private BoardDAO boardDAO;
 
-    @ApiOperation(value = "게시물 목록", produces = "application/json", response = FreePostsOnListResponse.class)
+    @ApiOperation(value = "자유게시판 글 목록", produces = "application/json", response = FreePostsOnListResponse.class)
     @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
     public FreePostsOnListResponse getPosts(@RequestParam(required = false) Integer page,
                                             @RequestParam(required = false) Integer size,
@@ -132,7 +127,7 @@ public class BoardRestController {
         freeNotices.stream()
                 .forEach(applyCounts);
 
-        FreePostsOnListResponse response = FreePostsOnListResponse.builder()
+        return FreePostsOnListResponse.builder()
                 .posts(freePosts)
                 .notices(freeNotices)
                 .first(posts.isFirst())
@@ -143,14 +138,19 @@ public class BoardRestController {
                 .size(posts.getSize())
                 .number(posts.getNumber())
                 .build();
-
-        return response;
     }
 
+    @ApiOperation(value = "자유게시판 주간 선두 글", produces = "application/json", response = FreeTopsResponse.class)
     @RequestMapping(value = "/free/tops", method = RequestMethod.GET)
-    public void dataFreeTopList(Model model) {
+    public FreeTopsResponse getFreeTops() {
 
-        Integer status = boardFreeService.getDataFreeTopList(model);
+        List<BoardFreeOnBest> topLikes = boardFreeService.getFreeTopLikes();
+        List<BoardFreeOnBest> topComments = boardFreeService.getFreeTopComments();
+
+        return FreeTopsResponse.builder()
+                .topLikes(topLikes)
+                .topComments(topComments)
+                .build();
     }
 
     @RequestMapping(value = "/data/free/comments", method = RequestMethod.GET)
