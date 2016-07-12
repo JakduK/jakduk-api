@@ -5,10 +5,7 @@ Version 0.6.3 /
 db.boardFree.update({"categoryName":"football"}, {$set:{"category":"FOOTBALL"}}, {multi:true})
 db.boardFree.update({"categoryName":"free"}, {$set:{"category":"FREE"}}, {multi:true})
 db.boardFree.update({"categoryName":"develop"}, {$set:{"category":"FREE"}}, {multi:true})
-
-db.boardFree.update({"categoryName":"football"}, {$unset:{"categoryName":""}}, {multi:true})
-db.boardFree.update({"categoryName":"free"}, {$unset:{"categoryName":""}}, {multi:true})
-db.boardFree.update({"categoryName":"develop"}, {$unset:{"categoryName":""}}, {multi:true})
+db.boardFree.update({}, {$unset:{"categoryName":""}}, {multi:true})
 
 Version 0.6.1 / 2016-05-07
 

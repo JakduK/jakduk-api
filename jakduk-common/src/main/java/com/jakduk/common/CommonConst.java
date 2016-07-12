@@ -59,8 +59,7 @@ public class CommonConst {
 	public enum BOARD_CATEGORY_TYPE {
 		ALL,		// 전체
 		FREE,		// 자유
-		FOOTBALL,	// 축구
-		DEVELOP		// 개발
+		FOOTBALL	// 축구
 	}
 
 	

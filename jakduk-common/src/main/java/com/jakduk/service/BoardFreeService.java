@@ -541,20 +541,19 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 말머리 목록
-	 * @return
+	 * @return 말머리 목록
      */
 	public List<BoardCategory> getFreeCategories() {
-		List<BoardCategory> boardCategories = boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
 
-		return boardCategories;
+		return boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
 	}
 
 	/**
 	 * 자유게시판 글 목록
-	 * @param category
-	 * @param page
-	 * @param size
-     * @return
+	 * @param category 말머리
+	 * @param page 페이지
+	 * @param size 크기
+     * @return 글 목록
      */
 	public Page<BoardFreeOnList> getFreePosts(CommonConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
 
@@ -567,7 +566,6 @@ public class BoardFreeService {
 				posts = boardFreeOnListRepository.findAll(pageable);
 				break;
 			case FOOTBALL:
-			case DEVELOP:
 			case FREE:
 				posts = boardFreeOnListRepository.findByCategory(category, pageable);
 				break;
@@ -578,15 +576,14 @@ public class BoardFreeService {
 
 	/**
 	 * 자유 게시판 공지글 목록
-     * @return
+     * @return 공지글 목록
      */
 	public Page<BoardFreeOnList> getFreeNotices() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable noticePageable = new PageRequest(0, 10, sort);
-		Page<BoardFreeOnList> notices = boardFreeRepository.findByNotice(noticePageable);
 
-		return notices;
+		return boardFreeRepository.findByNotice(noticePageable);
 	}
 
 	/**

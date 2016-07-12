@@ -130,6 +130,7 @@ public class BoardRestController {
 
         List<BoardCategory> categories = boardFreeService.getFreeCategories();
         Map<String, String> categoriesMap = categories.stream().collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+        categoriesMap.put("ALL", commonService.getResourceBundleMessage("messages.board", "board.category.all"));
 
         return FreePostsOnListResponse.builder()
                 .categories(categoriesMap)
