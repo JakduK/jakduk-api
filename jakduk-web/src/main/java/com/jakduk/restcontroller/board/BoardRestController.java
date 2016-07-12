@@ -4,6 +4,7 @@ import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
 import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.embedded.BoardItem;
@@ -127,7 +128,11 @@ public class BoardRestController {
         freeNotices.stream()
                 .forEach(applyCounts);
 
+        List<BoardCategory> categories = boardFreeService.getFreeCategories();
+        Map<String, String> categoriesMap = categories.stream().collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+
         return FreePostsOnListResponse.builder()
+                .categories(categoriesMap)
                 .posts(freePosts)
                 .notices(freeNotices)
                 .first(posts.isFirst())

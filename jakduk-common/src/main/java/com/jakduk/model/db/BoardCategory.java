@@ -1,5 +1,6 @@
 package com.jakduk.model.db;
 
+import com.jakduk.model.embedded.LocalSimpleName;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,9 +16,8 @@ public class BoardCategory {
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
-	private String name;
-	
-	private String resName;
-	
-	private List<String> usingBoard;
+	private String code;
+
+	private List<LocalSimpleName> names;
+
 }

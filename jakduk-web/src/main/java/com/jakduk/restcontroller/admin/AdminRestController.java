@@ -4,7 +4,9 @@ package com.jakduk.restcontroller.admin;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.embedded.LocalSimpleName;
 import com.jakduk.model.web.BoardCategoryWrite;
+import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.vo.FootballClubRequest;
 import com.jakduk.restcontroller.vo.HomeDescriptionRequest;
 import com.jakduk.restcontroller.vo.LeagueAttendanceForm;
@@ -410,9 +412,15 @@ public class AdminRestController {
       @PathVariable String id, @RequestBody BoardCategory boardCategory) {
 
         BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
-        boardCategoryWrite.setName(boardCategory.getName());
-        boardCategoryWrite.setResName(boardCategory.getResName());
-        boardCategoryWrite.setUsingBoard(boardCategory.getUsingBoard().toArray(new String[0]));
+        boardCategoryWrite.setCode(boardCategory.getCode());
+
+        for (LocalSimpleName fcName : boardCategory.getNames()) {
+            if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+                boardCategoryWrite.setNameKr(fcName.getName());
+            } else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+                boardCategoryWrite.setNameEn(fcName.getName());
+            }
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
@@ -422,21 +430,11 @@ public class AdminRestController {
 
     @ApiOperation(value = "새 게시판 말머리 저장")
     @RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
-    public Map<String, Object> writeBoardCategory(@RequestBody BoardCategory boardCategory) {
+    public EmptyJsonResponse writeBoardCategory(@RequestBody BoardCategory boardCategory) {
 
-        if (Objects.isNull(boardCategory.getName()) || Objects.isNull(boardCategory.getResName()) || Objects.isNull(boardCategory.getUsingBoard())) {
-            throw new IllegalArgumentException("필수값이 누락되었습니다.");
-        }
+        // spring-data-rest를 사용하자.
 
-        BoardCategoryWrite boardCategoryWrite = new BoardCategoryWrite();
-        boardCategoryWrite.setName(boardCategory.getName());
-        boardCategoryWrite.setResName(boardCategory.getResName());
-        boardCategoryWrite.setUsingBoard(boardCategory.getUsingBoard().toArray(new String[0]));
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
-
-        return response;
+        return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "대회별 관중수 목록")

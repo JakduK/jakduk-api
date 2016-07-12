@@ -8,6 +8,7 @@ import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
 import com.jakduk.model.embedded.JakduScheduleScore;
 import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.embedded.LocalSimpleName;
 import com.jakduk.model.web.AttendanceClubWrite;
 import com.jakduk.model.web.BoardCategoryWrite;
 import com.jakduk.model.web.CompetitionWrite;
@@ -192,30 +193,20 @@ public class AdminService {
 		
 		if (boardCategoryRepository.count() == 0) {
 			BoardCategory boardCategory01 = new BoardCategory();
-			List<String> usingBoard = new ArrayList<String>();
-			usingBoard.add(CommonConst.BOARD_NAME_FREE);
-			boardCategory01.setName(CommonConst.BOARD_CATEGORY_FREE);
-			boardCategory01.setResName("board.category.free");
-			boardCategory01.setUsingBoard(usingBoard);
+			ArrayList<LocalSimpleName> names01 = new ArrayList<>();
+			names01.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), "자유"));
+			names01.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), "FREE"));
+			boardCategory01.setCode("FREE");
+			boardCategory01.setNames(names01);
 			boardCategoryRepository.save(boardCategory01);
-			
-			usingBoard.clear();
-			
+
 			BoardCategory boardCategory02 = new BoardCategory();
-			boardCategory02.setResName("board.category.football");
-			boardCategory02.setName(CommonConst.BOARD_CATEGORY_FOOTBALL);
-			usingBoard.add(CommonConst.BOARD_NAME_FREE);
-			boardCategory02.setUsingBoard(usingBoard);
+			ArrayList<LocalSimpleName> names02 = new ArrayList<>();
+			names02.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), "축구"));
+			names02.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), "FOOTBALL"));
+			boardCategory02.setCode("FOOTBALL");
+			boardCategory02.setNames(names02);
 			boardCategoryRepository.save(boardCategory02);
-			
-			usingBoard.clear();
-			
-			BoardCategory boardCategory03 = new BoardCategory();
-			boardCategory03.setResName("board.category.develop");
-			boardCategory03.setName(CommonConst.BOARD_CATEGORY_DEVELOP);
-			usingBoard.add(CommonConst.BOARD_NAME_FREE);
-			boardCategory03.setUsingBoard(usingBoard);
-			boardCategoryRepository.save(boardCategory03);
 
 			log.debug("input board category.");
 
@@ -441,16 +432,14 @@ public class AdminService {
 			boardCategory.setId(boardCategoryWrite.getId());
 		}
 		
-		boardCategory.setName(boardCategoryWrite.getName());
-		boardCategory.setResName(boardCategoryWrite.getResName());
-		
-		String[] originUsingBoard = boardCategoryWrite.getUsingBoard();
+		boardCategory.setCode(boardCategoryWrite.getCode());
 
-		if (originUsingBoard != null) {
-			ArrayList<String> usingBoard = new ArrayList<String>(Arrays.asList(originUsingBoard));
-			boardCategory.setUsingBoard(usingBoard);			
-		}
-		
+		ArrayList<LocalSimpleName> names = new ArrayList<>();
+		names.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), boardCategoryWrite.getNameKr()));
+		names.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), boardCategoryWrite.getNameEn()));
+
+		boardCategory.setNames(names);
+
 		if (log.isDebugEnabled()) {
 			log.debug("boardCategory=" + boardCategory);
 		}
@@ -492,10 +481,15 @@ public class AdminService {
 		
 		BoardCategoryWrite boardCategoryWrite = new BoardCategoryWrite();
 		boardCategoryWrite.setId(boardCategory.getId());
-		boardCategoryWrite.setName(boardCategory.getName());
-		boardCategoryWrite.setResName(boardCategory.getResName());
-		String[] usingBoard = boardCategory.getUsingBoard().toArray(new String[boardCategory.getUsingBoard().size()]);
-		boardCategoryWrite.setUsingBoard(usingBoard);
+		boardCategoryWrite.setCode(boardCategory.getCode());
+
+		for (LocalSimpleName fcName : boardCategory.getNames()) {
+			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+				boardCategoryWrite.setNameKr(fcName.getName());
+			} else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+				boardCategoryWrite.setNameEn(fcName.getName());
+			}
+		}
 
 		return boardCategoryWrite;
 	}

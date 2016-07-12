@@ -2,6 +2,7 @@ package com.jakduk;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
+import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.etc.BoardFeelingCount;
@@ -10,6 +11,7 @@ import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.service.BoardFreeService;
 import com.jakduk.util.AbstractSpringTest;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -53,6 +55,9 @@ public class BoardTest extends AbstractSpringTest {
 
 	@Autowired
 	private Jongo jongo;
+
+	@Autowired
+	private BoardFreeService boardFreeService;
 
 	@Test
 	public void test01() throws ParseException {
@@ -265,5 +270,11 @@ public class BoardTest extends AbstractSpringTest {
 		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
 
 		System.out.println(CommonConst.FEELING_TYPE.DISLIKE);
+	}
+
+	@Test
+	public void 자유게시판_말머리_목록() {
+		List<BoardCategory> categories = boardFreeService.getFreeCategories();
+		System.out.println("categories=" + categories.stream().collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName())));
 	}
 }

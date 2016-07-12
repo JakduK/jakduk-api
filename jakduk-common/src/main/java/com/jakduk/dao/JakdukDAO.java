@@ -1,13 +1,16 @@
 package com.jakduk.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.*;
-
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
+import com.jakduk.model.etc.CommonCount;
+import com.jakduk.model.etc.SupporterCount;
+import com.jakduk.model.simple.BoardFreeOnGallery;
+import com.jakduk.model.simple.BoardFreeOnRSS;
+import com.jakduk.model.simple.GalleryOnList;
+import com.jakduk.model.simple.UserOnHome;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -20,16 +23,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.model.elasticsearch.CommentOnES;
-import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.etc.CommonCount;
-import com.jakduk.model.etc.SupporterCount;
-import com.jakduk.model.simple.BoardFreeOnGallery;
-import com.jakduk.model.simple.BoardFreeOnRSS;
-import com.jakduk.model.simple.GalleryOnList;
-import com.jakduk.model.simple.UserOnHome;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>

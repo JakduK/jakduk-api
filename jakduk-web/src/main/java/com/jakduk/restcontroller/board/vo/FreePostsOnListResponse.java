@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author pyohwan
@@ -18,6 +19,9 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 public class FreePostsOnListResponse {
+
+    @ApiModelProperty(value = "말머리 맵")
+    Map<String, String> categories;
 
     @ApiModelProperty(value = "글 목록")
     List<FreePostsOnList> posts;

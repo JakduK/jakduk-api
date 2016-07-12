@@ -29,6 +29,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -104,8 +105,8 @@ public class BoardFreeService {
 	 * @return
 	 */
 	public Model getWrite(Model model) {
-		
-		List<BoardCategory> boardCategories = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+
+		List<BoardCategory> boardCategories = this.getFreeCategories();
 		
 		model.addAttribute("boardFreeWrite", new BoardFreeWrite());
 		model.addAttribute("boardCategories", boardCategories);
@@ -168,7 +169,7 @@ public class BoardFreeService {
 		boardFreeWrite.setViews(boardFree.getViews());
 		boardFreeWrite.setWriter(boardFree.getWriter());
 		
-		List<BoardCategory> boardCategories = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
+		List<BoardCategory> boardCategories = this.getFreeCategories();
 		
 		model.addAttribute("boardFreeWrite", boardFreeWrite);
 		model.addAttribute("boardCategories", boardCategories);
@@ -539,7 +540,17 @@ public class BoardFreeService {
 	}
 
 	/**
-	 * 자유 게시판 글 목록
+	 * 자유게시판 말머리 목록
+	 * @return
+     */
+	public List<BoardCategory> getFreeCategories() {
+		List<BoardCategory> boardCategories = boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+
+		return boardCategories;
+	}
+
+	/**
+	 * 자유게시판 글 목록
 	 * @param category
 	 * @param page
 	 * @param size
@@ -641,14 +652,8 @@ public class BoardFreeService {
 			ids.add(objId);
 		}
 
-		List<BoardCategory> boardCategories = boardCategoryRepository.findByUsingBoard(CommonConst.BOARD_NAME_FREE);
-
-		HashMap<String, String> categorys = new HashMap<String, String>();
-		categorys.put("all", "board.category.all");
-
-		for (BoardCategory category : boardCategories) {
-			categorys.put(category.getName(), category.getResName());
-		}
+		List<BoardCategory> boardCategories = boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+		Map<String, String> categories = boardCategories.stream().collect(Collectors.toMap(BoardCategory::getCode, BoardCategory::getId));
 
 		Map<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
 		Map<String, BoardFeelingCount> feelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
@@ -656,7 +661,7 @@ public class BoardFreeService {
 		Map<String, Object> data = new HashMap<>();
 		data.put("posts", posts);
 		data.put("notices", notices);
-		data.put("categorys", categorys);
+		data.put("categorys", categories);
 		data.put("boardListInfo", boardListInfo);
 		data.put("totalPosts", totalPosts);
 		data.put("commentCount", commentCount);
@@ -709,7 +714,9 @@ public class BoardFreeService {
 			}
 			
 			List<BoardImage> images = boardFree.getGalleries();
-			BoardCategory boardCategory = boardCategoryRepository.findByName(boardFree.getCategory().toString());
+
+			// TODO : 임시로 했다. 바꾸자.
+			BoardCategory boardCategory = boardCategoryRepository.findOneByCode(boardFree.getCategory().toString());
 			
 			if (isAddCookie == true) {
 				int views = boardFree.getViews();

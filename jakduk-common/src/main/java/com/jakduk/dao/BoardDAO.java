@@ -1,6 +1,7 @@
 package com.jakduk.dao;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
@@ -210,6 +211,22 @@ public class BoardDAO {
 		BoardFreeOfMinimum post = mongoTemplate.findOne(query, BoardFreeOfMinimum.class);
 		
 		return post;
+	}
+
+	/**
+	 * 해당 언어에 맞는 게시판 말머리 목록을 가져온다.
+	 * @param language
+	 * @return
+     */
+	public List<BoardCategory> getBoardCategories(String language) {
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("names.language").is(language));
+		query.fields().include("code").include("names.$");
+
+		List<BoardCategory> categories = mongoTemplate.find(query, BoardCategory.class);
+
+		return categories;
 	}
 
 }
