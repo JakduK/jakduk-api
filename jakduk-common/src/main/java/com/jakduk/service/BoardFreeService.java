@@ -586,95 +586,6 @@ public class BoardFreeService {
 		return boardFreeRepository.findByNotice(noticePageable);
 	}
 
-	/**
-	 * 자유게시판 목록 페이지
-	 * @param boardListInfo
-	 * @return
-	 */
-	public Map<String, Object> getFreePostsList(Locale locale, BoardListInfo boardListInfo) {
-		Map<String, Date> createDate = new HashMap<String, Date>();
-		List<BoardFreeOnList> posts = new ArrayList<BoardFreeOnList>();
-		ArrayList<Integer> seqs = new ArrayList<Integer>();
-		ArrayList<ObjectId> ids = new ArrayList<ObjectId>();
-		Long totalPosts = (long) 0;
-
-		Integer page = boardListInfo.getPage();
-		Integer size = boardListInfo.getSize();
-		String categoryName = boardListInfo.getCategory();
-
-		if (categoryName == null || commonService.isNumeric(categoryName)) {
-			categoryName = CommonConst.BOARD_CATEGORY_ALL;
-			boardListInfo.setCategory(categoryName);
-		}
-
-		if (page < 1) {
-			page = 1;
-			boardListInfo.setPage(page);
-		}
-
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
-		Pageable pageable = new PageRequest(page - 1, size, sort);
-
-		if (categoryName != null &&
-			(categoryName.equals(CommonConst.BOARD_CATEGORY_NONE) || categoryName.equals(CommonConst.BOARD_CATEGORY_ALL))) {
-			posts = boardFreeOnListRepository.findAll(pageable).getContent();
-			totalPosts = boardFreeOnListRepository.count();
-		} else {
-			posts = boardFreeRepository.findByCategoryName(categoryName, pageable).getContent();
-			totalPosts = boardFreeRepository.countByCategoryName(categoryName);
-		}
-
-		Pageable noticePageable = new PageRequest(0, 10, sort);
-		List<BoardFreeOnList> notices = boardFreeRepository.findByNotice(noticePageable).getContent();
-
-		for (BoardFreeOnList tempPost : posts) {
-			String tempId = tempPost.getId();
-			Integer tempSeq = tempPost.getSeq();
-
-			ObjectId objId = new ObjectId(tempId);
-			createDate.put(tempId, objId.getDate());
-
-			seqs.add(tempSeq);
-			ids.add(objId);
-		}
-
-		for (BoardFreeOnList tempNotice : notices) {
-			String tempId = tempNotice.getId();
-			Integer tempSeq = tempNotice.getSeq();
-
-			ObjectId objId = new ObjectId(tempId);
-			createDate.put(tempId, objId.getDate());
-
-			seqs.add(tempSeq);
-			ids.add(objId);
-		}
-
-		List<BoardCategory> boardCategories = boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
-		Map<String, String> categories = boardCategories.stream().collect(Collectors.toMap(BoardCategory::getCode, BoardCategory::getId));
-
-		Map<String, Integer> commentCount = boardDAO.getBoardFreeCommentCount(seqs);
-		Map<String, BoardFeelingCount> feelingCount = boardDAO.getBoardFreeUsersFeelingCount(ids);
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("posts", posts);
-		data.put("notices", notices);
-		data.put("categorys", categories);
-		data.put("boardListInfo", boardListInfo);
-		data.put("totalPosts", totalPosts);
-		data.put("commentCount", commentCount);
-		data.put("feelingCount", feelingCount);
-		data.put("createDate", createDate);
-		data.put("dateTimeFormat", commonService.getDateTimeFormat(locale));
-
-		return data;
-	}
-
-	public Model getFreePostsList(Model model, Locale locale, BoardListInfo boardListInfo) {
-		Map<String, Object> data = getFreePostsList(locale, boardListInfo);
-		data.forEach(model::addAttribute);
-		return model;
-	}
-	
 	public Model getFreeCommentsList(Model model, Locale locale, BoardListInfo boardListInfo) {
 		
 		long totalComments = boardFreeCommentRepository.count();
@@ -692,8 +603,6 @@ public class BoardFreeService {
 
 	}
 
-
-	
 	/**
 	 * 자유게시판 게시물 보기 페이지
 	 * @param model
@@ -1173,68 +1082,17 @@ public class BoardFreeService {
 		return posts;
 	}
 
-	public Integer getDataFreeTopList(Model model) {
-		
-		LocalDate date = LocalDate.now().minusWeeks(1);
-		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+	/**
+	 * 자유게시판 댓글 목록
+	 * @param page
+	 * @param size
+     * @return
+     */
+	public Page<BoardFreeComment> getBoardFreeComments(int page, int size) {
 
-		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
-		HashMap<String, Integer> boardFreeCommentCount = boardDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
-		
-		ArrayList<ObjectId> commentIds = new ArrayList<ObjectId>();
-
-		Iterator<?> commentIterator = boardFreeCommentCount.entrySet().iterator();
-
-		// 댓글 많은 글 id 뽑아내기
-		while (commentIterator.hasNext()) {
-			Entry<String, Integer> entry = (Entry<String, Integer>) commentIterator.next();
-			ObjectId objId = new ObjectId(entry.getKey().toString());
-			commentIds.add(objId);
-		}
-
-		// commentIds를 파라미터로 다시 글을 가져온다.
-		List<BoardFreeOnBest> boardFreeCommentList = boardDAO.getBoardFreeListOfTop(commentIds);
-		
-		for (BoardFreeOnBest boardFree : boardFreeCommentList) {
-			String id = boardFree.getId().toString();
-			Integer count = boardFreeCommentCount.get(id);
-			boardFree.setCount(count);
-		}
-
-		// sort and limit
-		Comparator<BoardFreeOnBest> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
-		Comparator<BoardFreeOnBest> byView = (b1, b2) -> b2.getViews() - b1.getViews();
-
-		boardFreeCommentList = boardFreeCommentList.stream()
-				.sorted(byCount.thenComparing(byView))
-				.limit(CommonConst.BOARD_TOP_LIMIT)
-				.collect(Collectors.toList());
-
-		model.addAttribute("topLike", boardFreeList);
-		model.addAttribute("topComment", boardFreeCommentList);
-		
-		return HttpServletResponse.SC_OK;		
-	}
-	
-	public Integer getDataFreeCommentsList(Model model, int page, int size) {
-
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
-		
-		List<BoardFreeComment> comments = boardFreeCommentRepository.findAll(pageable).getContent();
-		
-		List<ObjectId> ids = new ArrayList<ObjectId>();
-		
-		for (BoardFreeComment comment : comments) {
-			if (comment.getBoardItem() != null) {
-				String id = comment.getBoardItem().getId();
-				ids.add(new ObjectId(id));	
-			}
-		}
 
-		model.addAttribute("comments", comments);
-		model.addAttribute("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
-		
-		return HttpServletResponse.SC_OK;		
+		return boardFreeCommentRepository.findAll(pageable);
 	}
 }

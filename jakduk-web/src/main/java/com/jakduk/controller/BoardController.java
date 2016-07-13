@@ -29,51 +29,12 @@ public class BoardController {
 	@Resource
 	LocaleResolver localeResolver;
 
-	@RequestMapping
-	public String root() {
-		
-		return "redirect:/board/free/posts";
-	}
-
-	@RequestMapping(value = "/free/refresh", method = RequestMethod.GET)
-	public String freeRefresh() {
-		
-		return "redirect:/board/free/posts";
-	}	
-	
-	@RequestMapping(value = "/free/posts/refresh", method = RequestMethod.GET)
-	public String freePostsRefresh() {
-		
-		return "redirect:/board/free/posts";
-	}	
-	
 	@RequestMapping(value = "/free/comments/refresh", method = RequestMethod.GET)
 	public String freeCommentsRefresh() {
 		
 		return "redirect:/board/free/comments";
 	}	
-	
-	@RequestMapping(value = "/free", method = RequestMethod.GET)
-	public String freeList(@ModelAttribute BoardListInfo boardListInfo,
-						   HttpServletRequest request,
-						   Model model) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		boardFreeService.getFreePostsList(model, locale, boardListInfo);
-		
-		return "board/freePosts";
-	}
-	
-	@RequestMapping(value = "/free/posts", method = RequestMethod.GET)
-	public String freePostsList(@ModelAttribute BoardListInfo boardListInfo,
-								HttpServletRequest request,
-								Model model) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		boardFreeService.getFreePostsList(model, locale, boardListInfo);
-		
-		return "board/freePosts";
-	}
+
 	
 	@RequestMapping(value = "/free/comments", method = RequestMethod.GET)
 	public String freeCommentsList(@ModelAttribute BoardListInfo boardListInfo, Model model
@@ -163,20 +124,6 @@ public class BoardController {
 		}
 		
 		return null;	
-	}
-	
-	@RequestMapping(value = "/data/free/top", method = RequestMethod.GET)
-	public void dataFreeTopList(Model model) {
-		
-		Integer status = boardFreeService.getDataFreeTopList(model);
-	}		
-	
-	@RequestMapping(value = "/data/free/comments", method = RequestMethod.GET)
-	public void dataFreeCommentsList(Model model,
-			@RequestParam(required = false, defaultValue = "1") int page,
-			@RequestParam(required = false, defaultValue = "20") int size) {
-		
-		Integer status = boardFreeService.getDataFreeCommentsList(model, page, size);
 	}
 
 }

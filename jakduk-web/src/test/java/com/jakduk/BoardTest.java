@@ -9,6 +9,7 @@ import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.service.BoardFreeService;
@@ -269,7 +270,15 @@ public class BoardTest extends AbstractSpringTest {
 		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(58);
 		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
 
-		System.out.println(CommonConst.FEELING_TYPE.DISLIKE);
+		ArrayList<ObjectId> ids = new ArrayList<>();
+		ids.add(new ObjectId("572603fdccbfc31fbbce46a3"));
+		ids.add(new ObjectId("5551d32ee4b01fe0b11da90d"));
+		ids.add(new ObjectId("54de095b8bf814167dbc59b1"));
+
+		Map<String, BoardFreeOnSearchComment> postsHavingComments = boardDAO.getBoardFreeOnSearchComment(ids);
+
+		System.out.println("postsHavingComments=" + postsHavingComments);
+
 	}
 
 	@Test

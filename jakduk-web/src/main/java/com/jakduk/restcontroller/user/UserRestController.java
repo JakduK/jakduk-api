@@ -9,6 +9,7 @@ import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
+import com.jakduk.model.etc.AuthUserProfile;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.user.vo.UserForm;
@@ -258,14 +259,13 @@ public class UserRestController {
 
     @ApiOperation(value = "내 프로필", produces = "application/json")
     @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
-    public CommonPrincipal getMyProfile(HttpServletRequest request) {
-        Locale locale = localeResolver.resolveLocale(request);
+    public AuthUserProfile getMyProfile() {
 
-        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+        AuthUserProfile authUserProfile = commonService.getAuthUserProfile();
 
-        if (Objects.isNull(commonPrincipal))
-            throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+        if (Objects.isNull(authUserProfile))
+            throw new NoSuchElementException(commonService.getResourceBundleMessage("messages.common", "common.exception.no.such.element"));
 
-        return commonPrincipal;
+        return authUserProfile;
     }
 }

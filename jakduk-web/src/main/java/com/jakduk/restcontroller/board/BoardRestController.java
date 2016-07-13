@@ -12,19 +12,21 @@ import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.restcontroller.board.vo.*;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
  * 16. 3. 26 오후 11:05
  */
 
+@Slf4j
 @Api(tags = "게시판", description = "게시판 관련")
 @RestController
 @RequestMapping("/api/board")
@@ -61,15 +64,9 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 목록", produces = "application/json", response = FreePostsOnListResponse.class)
     @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
-    public FreePostsOnListResponse getPosts(@RequestParam(required = false) Integer page,
-                                            @RequestParam(required = false) Integer size,
+    public FreePostsOnListResponse getPosts(@RequestParam(required = false, defaultValue = "1") Integer page,
+                                            @RequestParam(required = false, defaultValue = "20") Integer size,
                                             @RequestParam(required = false, defaultValue = "ALL") CommonConst.BOARD_CATEGORY_TYPE category) {
-
-        if (Objects.isNull(page))
-            page = 1;
-
-        if (Objects.isNull(size))
-            size = CommonConst.BOARD_MAX_LIMIT;
 
         if (Objects.isNull(category))
             category = CommonConst.BOARD_CATEGORY_TYPE.ALL;
@@ -159,15 +156,57 @@ public class BoardRestController {
                 .build();
     }
 
-    @RequestMapping(value = "/data/free/comments", method = RequestMethod.GET)
-    public void dataFreeCommentsList(Model model,
-                                     @RequestParam(required = false, defaultValue = "1") int page,
-                                     @RequestParam(required = false, defaultValue = "20") int size) {
+    @ApiOperation(value = "자유게시판 댓글 목록", produces = "application/json", response = FreeCommentsOnListResponse.class)
+    @RequestMapping(value = "/free/comments", method = RequestMethod.GET)
+    public FreeCommentsOnListResponse getBoardFreeComments(
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
 
-        Integer status = boardFreeService.getDataFreeCommentsList(model, page, size);
+        Page<BoardFreeComment> comments = boardFreeService.getBoardFreeComments(page, size);
+
+        List<ObjectId> boardIds = new ArrayList<>();
+
+        // id 뽑아내기.
+        Consumer<BoardFreeComment> extractId = comment -> {
+            String tempId = comment.getBoardItem().getId();
+            ObjectId objId = new ObjectId(tempId);
+            boardIds.add(objId);
+        };
+
+        comments.getContent().stream().forEach(extractId);
+
+        List<FreeCommentsOnList> freeComments = comments.getContent().stream()
+                .map(FreeCommentsOnList::new)
+                .collect(Collectors.toList());
+
+        Map<String, BoardFreeOnSearchComment> postsHavingComments = boardDAO.getBoardFreeOnSearchComment(boardIds);
+
+        // 글 정보 합치기.
+        Consumer<FreeCommentsOnList> applyPosts = comment -> {
+            String tempBoardId = comment.getBoardItem().getId();
+
+            BoardFreeOnSearchComment tempBoardItem = postsHavingComments.get(tempBoardId);
+
+            if (Objects.nonNull(tempBoardItem))
+                comment.setBoardItem(tempBoardItem);
+        };
+
+        freeComments.stream()
+                .forEach(applyPosts);
+
+        return FreeCommentsOnListResponse.builder()
+                .comments(freeComments)
+                .first(comments.isFirst())
+                .last(comments.isLast())
+                .totalPages(comments.getTotalPages())
+                .totalElements(comments.getTotalElements())
+                .numberOfElements(comments.getNumberOfElements())
+                .size(comments.getSize())
+                .number(comments.getNumber())
+                .build();
     }
 
-    @ApiOperation(value = "게시판 댓글 목록")
+    @ApiOperation(value = "자유게시판 글 댓글 목록")
     @RequestMapping(value = "/free/comments/{seq}", method = RequestMethod.GET)
     public BoardCommentsResponse freeComment(@PathVariable Integer seq,
                             @RequestParam(required = false) String commentId) {

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -167,20 +168,14 @@ public class BoardDAO {
 		return commentCount;
 	}	
 	
-	public HashMap<String, BoardFreeOnSearchComment> getBoardFreeOnSearchComment(List<ObjectId> arrId) {
+	public Map<String, BoardFreeOnSearchComment> getBoardFreeOnSearchComment(List<ObjectId> arrId) {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
 		Aggregation aggregation = Aggregation.newAggregation(match1);
 		AggregationResults<BoardFreeOnSearchComment> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnSearchComment.class);
 		
-		List<BoardFreeOnSearchComment> postsL = results.getMappedResults();
+		List<BoardFreeOnSearchComment> posts = results.getMappedResults();
 
-		HashMap<String, BoardFreeOnSearchComment> postsM = new HashMap<String, BoardFreeOnSearchComment>();
-		
-		for (BoardFreeOnSearchComment item : postsL) {
-			postsM.put(item.getId(), item);
-		}
-		
-		return postsM;
+		return posts.stream().collect(Collectors.toMap(BoardFreeOnSearchComment::getId, Function.identity()));
 	}
 	
 	/**

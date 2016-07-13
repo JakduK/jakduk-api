@@ -201,7 +201,7 @@ public class UserService {
 
 	/**
 	 * 로그인 중인 회원의 정보를 가져온다.
-	 * @return
+	 * @return 로그인 회원 객체.
      */
 	public CommonPrincipal getCommonPrincipal() {
 		CommonPrincipal commonPrincipal = null;

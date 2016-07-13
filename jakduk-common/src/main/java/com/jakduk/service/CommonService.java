@@ -1,8 +1,12 @@
 package com.jakduk.service;
 
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Sequence;
 import com.jakduk.model.db.Token;
+import com.jakduk.model.etc.AuthUserProfile;
 import com.jakduk.repository.SequenceRepository;
 import com.jakduk.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -316,5 +320,55 @@ public class CommonService {
 	// 토큰 가져오기.
 	public Token getTokenByCode(String code) {
 		return tokenRepository.findByCode(code);
+	}
+
+	/**
+	 * 로그인 중인 회원 정보를 가져온다.
+	 * @return 회원 객체
+	 */
+	public AuthUserProfile getAuthUserProfile() {
+		AuthUserProfile authUserProfile = null;
+
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
+				SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+				Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+				List<String> roles = new ArrayList<>();
+
+				for (GrantedAuthority grantedAuthority : authorities) {
+					String authority = grantedAuthority.getAuthority();
+					roles.add(authority);
+				}
+
+				authUserProfile = AuthUserProfile.builder()
+						.id(userDetail.getId())
+						.email(userDetail.getUserId())
+						.username(userDetail.getUsername())
+						.providerId(userDetail.getProviderId())
+						.roles(roles)
+						.build();
+			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+				Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+				List<String> roles = new ArrayList<>();
+
+				for (GrantedAuthority grantedAuthority : authorities) {
+					String authority = grantedAuthority.getAuthority();
+					roles.add(authority);
+				}
+
+				authUserProfile = AuthUserProfile.builder()
+						.id(principal.getId())
+						.email(principal.getUsername())
+						.username(principal.getNickname())
+						.providerId(principal.getProviderId())
+						.roles(roles)
+						.build();
+			}
+		}
+
+		return authUserProfile;
 	}
 }
