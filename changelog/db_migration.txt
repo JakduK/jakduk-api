@@ -14,6 +14,9 @@ db.boardFree.update({'status.device':'tablet'}, {$set:{'status.device':'TABLET'}
 db.boardFreeComment.update({'status.device':'normal'}, {$set:{'status.device':'NORMAL'}}, {multi:true})
 db.boardFreeComment.update({'status.device':'mobile'}, {$set:{'status.device':'MOBILE'}}, {multi:true})
 db.boardFreeComment.update({'status.device':'tablet'}, {$set:{'status.device':'TABLET'}}, {multi:true})
+db.jakduComment.update({'status.device':'normal'}, {$set:{'status.device':'NORMAL'}}, {multi:true})
+db.jakduComment.update({'status.device':'mobile'}, {$set:{'status.device':'MOBILE'}}, {multi:true})
+db.jakduComment.update({'status.device':'tablet'}, {$set:{'status.device':'TABLET'}}, {multi:true})
 
 Version 0.6.1 / 2016-05-07
 

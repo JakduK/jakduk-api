@@ -17,7 +17,7 @@ subprojects {
     // test task에서 spring profile을 위한 설정.
     test {
         systemProperties = [
-                'spring.profiles.active':'production'
+                'spring.profiles.active':'local'
         ]
     }
 
