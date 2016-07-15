@@ -1,5 +1,6 @@
 package com.jakduk.model.embedded;
 
+import com.jakduk.common.CommonConst;
 import lombok.Data;
 
 /**
@@ -16,6 +17,6 @@ public class BoardStatus {
 	
 	private String delete;
 	
-	private String device;
+	private CommonConst.DEVICE_TYPE device;
 
 }

@@ -239,7 +239,7 @@ public class BoardRestController {
         if (Objects.nonNull(images)) {
             List<String> ids = new ArrayList<>();
 
-            galleries.forEach(gallery -> {ids.add(gallery.getId());});
+            images.forEach(gallery -> {ids.add(gallery.getId());});
             galleries = galleryService.findByIds(ids);
         }
 

@@ -45,11 +45,9 @@ import org.springframework.validation.BindingResult;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -219,15 +217,8 @@ public class BoardFreeService {
 		
 		BoardStatus boardStatus = new BoardStatus();
 		Device device = DeviceUtils.getCurrentDevice(request);
-		
-		if (device.isNormal()) {
-			boardStatus.setDevice(CommonConst.DEVICE_TYPE_NORMAL);
-		} else if (device.isMobile()) {
-			boardStatus.setDevice(CommonConst.DEVICE_TYPE_MOBILE);
-		} else if (device.isTablet()) {
-			boardStatus.setDevice(CommonConst.DEVICE_TYPE_TABLET);
-		}
-		
+        boardStatus.setDevice(commonService.getDeviceInfo(device));
+
 		boardFree.setStatus(boardStatus);
 		
 		List<BoardHistory> historys = new ArrayList<BoardHistory>();
@@ -405,15 +396,9 @@ public class BoardFreeService {
 		}
 		
 		Device device = DeviceUtils.getCurrentDevice(request);
-		
-		if (device.isNormal()) {
-			boardStatus.setDevice(CommonConst.DEVICE_TYPE_NORMAL);
-		} else if (device.isMobile()) {
-			boardStatus.setDevice(CommonConst.DEVICE_TYPE_MOBILE);
-		} else if (device.isTablet()) {
-			boardStatus.setDevice(CommonConst.DEVICE_TYPE_TABLET);
-		}
-		
+
+        boardStatus.setDevice(commonService.getDeviceInfo(device));
+
 		boardFree.setStatus(boardStatus);
 		
 		List<BoardHistory> historys = boardFree.getHistory();
@@ -679,7 +664,7 @@ public class BoardFreeService {
 	}
 
 	// 게시판 댓글 추가.
-	public BoardFreeComment addFreeComment(Integer seq, String contents, String device) {
+	public BoardFreeComment addFreeComment(Integer seq, String contents, CommonConst.DEVICE_TYPE device) {
 		BoardFreeComment boardFreeComment = new BoardFreeComment();
 
 		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);

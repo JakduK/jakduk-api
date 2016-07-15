@@ -139,13 +139,15 @@ public class CommonConst {
 	 */
 	public final static String GALLERY_NAME_STATUS_INPUT = "input";
 	public final static String GALLERY_NAME_STATUS_SUBJECT = "subject";
-	
+
 	/**
-	 * 클라이언트 종류.
-	 */
-	public final static String DEVICE_TYPE_NORMAL = "normal";
-	public final static String DEVICE_TYPE_MOBILE = "mobile";
-	public final static String DEVICE_TYPE_TABLET = "tablet";
+	 * 디바이스 타입
+     */
+	public enum DEVICE_TYPE {
+		NORMAL,	// PC
+		MOBILE,	// 모바일
+		TABLET	// 태블릿
+	}
 	
 	/**
 	 * 그림의 용량을 축소시키는 기준 값.

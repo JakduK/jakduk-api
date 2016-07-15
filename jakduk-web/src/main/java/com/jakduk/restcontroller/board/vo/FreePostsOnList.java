@@ -57,9 +57,10 @@ public class FreePostsOnList {
 
     public FreePostsOnList(BoardFreeOnList posts) {
         this.id = posts.getId();
-        this.writer = posts.getWriter();
-        this.subject = posts.getSubject();
         this.seq = posts.getSeq();
+        this.writer = posts.getWriter();
+        this.status = posts.getStatus();
+        this.subject = posts.getSubject();
         this.category = posts.getCategory();
         this.views = posts.getViews();
         this.galleries = posts.getGalleries();

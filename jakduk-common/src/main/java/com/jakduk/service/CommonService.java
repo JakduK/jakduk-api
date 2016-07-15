@@ -305,15 +305,15 @@ public class CommonService {
 	 * @param device
 	 * @return
      */
-	public String getDeviceInfo(Device device) {
+	public CommonConst.DEVICE_TYPE getDeviceInfo(Device device) {
 		if (device.isNormal()) {
-			return CommonConst.DEVICE_TYPE_NORMAL;
+			return CommonConst.DEVICE_TYPE.NORMAL;
 		} else if (device.isMobile()) {
-			return CommonConst.DEVICE_TYPE_MOBILE;
+			return CommonConst.DEVICE_TYPE.MOBILE;
 		} else if (device.isTablet()) {
-			return CommonConst.DEVICE_TYPE_TABLET;
+			return CommonConst.DEVICE_TYPE.TABLET;
 		} else {
-			return CommonConst.DEVICE_TYPE_NORMAL;
+			return CommonConst.DEVICE_TYPE.NORMAL;
 		}
 	}
 
