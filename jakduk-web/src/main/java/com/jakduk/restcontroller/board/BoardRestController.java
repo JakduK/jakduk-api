@@ -3,10 +3,14 @@ package com.jakduk.restcontroller.board;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
@@ -17,14 +21,16 @@ import com.jakduk.restcontroller.board.vo.*;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
+import com.jakduk.service.GalleryService;
 import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +38,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -58,6 +65,9 @@ public class BoardRestController {
 
     @Autowired
     private CommonService commonService;
+
+    @Autowired
+    private GalleryService galleryService;
 
     @Autowired
     private BoardDAO boardDAO;
@@ -88,8 +98,8 @@ public class BoardRestController {
             ids.add(objId);
         };
 
-        posts.getContent().stream().forEach(extractIdAndSeq);
-        notices.getContent().stream().forEach(extractIdAndSeq);
+        posts.getContent().forEach(extractIdAndSeq);
+        notices.getContent().forEach(extractIdAndSeq);
 
         Map<String, Integer> commentCounts = boardDAO.getBoardFreeCommentCount(seqs);
         Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
@@ -115,15 +125,13 @@ public class BoardRestController {
                 .map(FreePostsOnList::new)
                 .collect(Collectors.toList());
 
-        freePosts.stream()
-                .forEach(applyCounts);
+        freePosts.forEach(applyCounts);
 
         List<FreePostsOnList> freeNotices = notices.getContent().stream()
                 .map(FreePostsOnList::new)
                 .collect(Collectors.toList());
 
-        freeNotices.stream()
-                .forEach(applyCounts);
+        freeNotices.forEach(applyCounts);
 
         List<BoardCategory> categories = boardFreeService.getFreeCategories();
         Map<String, String> categoriesMap = categories.stream().collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
@@ -173,7 +181,7 @@ public class BoardRestController {
             boardIds.add(objId);
         };
 
-        comments.getContent().stream().forEach(extractId);
+        comments.getContent().forEach(extractId);
 
         List<FreeCommentsOnList> freeComments = comments.getContent().stream()
                 .map(FreeCommentsOnList::new)
@@ -191,8 +199,7 @@ public class BoardRestController {
                 comment.setBoardItem(tempBoardItem);
         };
 
-        freeComments.stream()
-                .forEach(applyPosts);
+        freeComments.forEach(applyPosts);
 
         return FreeCommentsOnListResponse.builder()
                 .comments(freeComments)
@@ -206,10 +213,65 @@ public class BoardRestController {
                 .build();
     }
 
+    @ApiOperation(value = "자유게시판 글 상세", produces = "application/json", response = FreePostResponse.class)
+    @RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
+    public FreePostResponse freeView(@PathVariable Integer seq,
+                         HttpServletRequest request,
+                         HttpServletResponse response) {
+
+        Optional<BoardFree> boardFree = boardFreeService.getFreePost(seq);
+
+        if (!boardFree.isPresent())
+            throw new ServiceException(ServiceError.POST_NOT_FOUND);
+
+        BoardFree getBoardFree = boardFree.get();
+        boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.COOKIE_NAME_BOARD_FREE, String.valueOf(seq));
+
+        if (isAddCookie) {
+            int views = getBoardFree.getViews();
+            getBoardFree.setViews(++views);
+            boardFreeService.saveBoardFree(getBoardFree);
+        }
+
+        List<BoardImage> images = getBoardFree.getGalleries();
+        List<Gallery> galleries = null;
+
+        if (Objects.nonNull(images)) {
+            List<String> ids = new ArrayList<>();
+
+            galleries.forEach(gallery -> {ids.add(gallery.getId());});
+            galleries = galleryService.findByIds(ids);
+        }
+
+        BoardCategory boardCategory = boardDAO.getBoardCategory(getBoardFree.getCategory().name(), commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+
+        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(getBoardFree.getId())
+                , boardFree.get().getCategory(), Sort.Direction.ASC);
+        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(getBoardFree.getId())
+                , boardFree.get().getCategory(), Sort.Direction.DESC);
+
+        return FreePostResponse.builder()
+                .id(getBoardFree.getId())
+                .seq(getBoardFree.getSeq())
+                .writer(getBoardFree.getWriter())
+                .category(boardCategory)
+                .subject(getBoardFree.getSubject())
+                .content(getBoardFree.getContent())
+                .views(getBoardFree.getViews())
+                .usersLiking(getBoardFree.getUsersLiking())
+                .usersDisliking(getBoardFree.getUsersDisliking())
+                .status(getBoardFree.getStatus())
+                .history(getBoardFree.getHistory())
+                .galleries(galleries)
+                .prevPost(prevPost)
+                .nextPost(nextPost)
+                .build();
+    }
+
     @ApiOperation(value = "자유게시판 글 댓글 목록")
     @RequestMapping(value = "/free/comments/{seq}", method = RequestMethod.GET)
     public BoardCommentsResponse freeComment(@PathVariable Integer seq,
-                            @RequestParam(required = false) String commentId) {
+                                             @RequestParam(required = false) String commentId) {
 
         BoardFreeOfMinimum boardFreeOnComment = boardFreeService.findBoardFreeOfMinimumBySeq(seq);
 

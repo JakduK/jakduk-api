@@ -62,7 +62,7 @@ public class BoardTest extends AbstractSpringTest {
 
 	@Test
 	public void test01() throws ParseException {
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(11);
+		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(11);
 		
 		System.out.println("date=" + Locale.ENGLISH.getDisplayName());
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.ENGLISH);
@@ -96,21 +96,7 @@ public class BoardTest extends AbstractSpringTest {
 		Date date2 = f.parse(ld.format(df02));
 		System.out.println("date2=" + date2.getTime());
 	}
-	
-	@Test
-	public void test02() {
-		System.out.println(boardFreeRepository.findOne("5460cfe9e4b06faf36d26efc"));
-		
-		List<String> usingBoard = new ArrayList<String>();
-		usingBoard.add(CommonConst.BOARD_NAME_FREE);
-		System.out.println("usingBoard=" + usingBoard);
-		
-		usingBoard = Collections.emptyList();
-		System.out.println("usingBoard=" + usingBoard);
-//		usingBoard.add(CommonConst.BOARD_NAME_FREE);
-		System.out.println("usingBoard=" + usingBoard);
-	}
-	
+
 	@Test
 	public void mongoAggregationTest01() {
 		

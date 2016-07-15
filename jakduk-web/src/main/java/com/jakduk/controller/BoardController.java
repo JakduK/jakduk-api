@@ -45,27 +45,6 @@ public class BoardController {
 		
 		return "board/freeComments";
 	}
-	
-	@RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
-	public String freeView(@PathVariable int seq, @ModelAttribute BoardListInfo listInfo, Model model
-			, HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(required = false) String result) throws IOException {
-		
-		Locale locale = localeResolver.resolveLocale(request);	
-		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.COOKIE_NAME_BOARD_FREE, String.valueOf(seq));
-		Integer status = boardFreeService.getFreeView(model, locale, seq, listInfo, isAddCookie);
-		
-		if (!status.equals(HttpServletResponse.SC_OK)) {
-			response.sendError(status);
-			return null;
-		}
-		
-		if (result != null && !result.isEmpty()) {
-			model.addAttribute("result", result);
-		}
-		
-		return "board/freeView";
-	}
 
 	@RequestMapping(value = "/free/delete/{seq}", method = RequestMethod.GET)
 	public String deleteFree(@PathVariable int seq, Model model,

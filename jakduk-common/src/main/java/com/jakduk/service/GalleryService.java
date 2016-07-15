@@ -92,9 +92,13 @@ public class GalleryService {
 		return jakdukDAO.findGalleryUsersDislikingCount(ids);
 	}
 
-	public Gallery findById(String id) {
+	public Gallery findOneById(String id) {
 		return galleryRepository.findOne(id);
 	}
+
+    public List<Gallery> findByIds(List<String> ids) {
+        return galleryRepository.findByIdIn(ids);
+    }
 	
 	public void getList(Model model, Locale locale) {
 		try {

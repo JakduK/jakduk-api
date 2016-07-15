@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UserFeelingException;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
@@ -13,7 +15,6 @@ import com.jakduk.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.model.elasticsearch.CommentOnES;
 import com.jakduk.model.elasticsearch.GalleryOnES;
 import com.jakduk.model.embedded.*;
-import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
@@ -99,6 +100,14 @@ public class BoardFreeService {
 		return boardFreeCommentRepository.countByBoardItem(boardItem);
 	}
 
+	public Optional<BoardCategory>  findCategoryByCode(String code) {
+		return boardCategoryRepository.findOneByCode(code);
+	}
+
+	public void saveBoardFree(BoardFree boardFree) {
+		boardFreeRepository.save(boardFree);
+	}
+
 	/**
 	 * 자유게시판 글쓰기 페이지
 	 * @param model
@@ -124,26 +133,27 @@ public class BoardFreeService {
 		}
 		
 		//BoardFreeWrite boardFreeWrite = boardFreeRepository.boardFreeWriteFindOneBySeq(seq);
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 		
-		if (boardFree == null) {
+		if (!boardFree.isPresent())
 			return HttpServletResponse.SC_NOT_FOUND;
-		}
-		
-		if (boardFree.getWriter() == null) {
+
+		BoardFree getBoardFree = boardFree.get();
+
+		if (getBoardFree.getWriter() == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
-		if (!accountId.equals(boardFree.getWriter().getUserId())) {
+		if (!accountId.equals(getBoardFree.getWriter().getUserId())) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
 		BoardFreeWrite boardFreeWrite = new BoardFreeWrite();
 		
-		if (boardFree.getGalleries() != null) {
+		if (getBoardFree.getGalleries() != null) {
 			List<String> images = new ArrayList<String>();
 			
-			for (BoardImage gallery : boardFree.getGalleries()) {
+			for (BoardImage gallery : getBoardFree.getGalleries()) {
 				Gallery tempGallery = galleryRepository.findOne(gallery.getId());
 				
 				if (tempGallery != null) {
@@ -161,13 +171,13 @@ public class BoardFreeService {
 			boardFreeWrite.setImages(images.toString());
 		}
 		
-		boardFreeWrite.setId(boardFree.getId());
-		boardFreeWrite.setSeq(boardFree.getSeq());
-		boardFreeWrite.setCategoryName(boardFree.getCategory().toString());
-		boardFreeWrite.setSubject(boardFree.getSubject());
-		boardFreeWrite.setContent(boardFree.getContent());
-		boardFreeWrite.setViews(boardFree.getViews());
-		boardFreeWrite.setWriter(boardFree.getWriter());
+		boardFreeWrite.setId(getBoardFree.getId());
+		boardFreeWrite.setSeq(getBoardFree.getSeq());
+		boardFreeWrite.setCategoryName(getBoardFree.getCategory().toString());
+		boardFreeWrite.setSubject(getBoardFree.getSubject());
+		boardFreeWrite.setContent(getBoardFree.getContent());
+		boardFreeWrite.setViews(getBoardFree.getViews());
+		boardFreeWrite.setWriter(getBoardFree.getWriter());
 		
 		List<BoardCategory> boardCategories = this.getFreeCategories();
 		
@@ -603,78 +613,11 @@ public class BoardFreeService {
 
 	}
 
-	/**
-	 * 자유게시판 게시물 보기 페이지
-	 * @param model
-	 * @param seq
-	 * @param boardListInfo
-	 * @return
-	 */
-	public Integer getFreeView(Model model, Locale locale, int seq, BoardListInfo boardListInfo, Boolean isAddCookie) {
-		
-		try {
-			BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-			
-			if (boardFree == null) {
-				return HttpServletResponse.SC_UNAUTHORIZED;
-			}
-			
-			List<BoardImage> images = boardFree.getGalleries();
-
-			// TODO : 임시로 했다. 바꾸자.
-			BoardCategory boardCategory = boardCategoryRepository.findOneByCode(boardFree.getCategory().toString());
-			
-			if (isAddCookie == true) {
-				int views = boardFree.getViews();
-				boardFree.setViews(++views);
-				boardFreeRepository.save(boardFree);
-			}
-			
-			LocalDate date = LocalDate.now();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			DateTimeFormatter format = DateTimeFormatter.ISO_DATE;
-			
-			Long timeNow = sdf.parse(date.format(format)).getTime();
-			
-			if (images != null) {
-				List<Gallery> galleries = new ArrayList<Gallery>();
-				
-				for(BoardImage image : images) {
-					Gallery gallery = galleryRepository.findOne(image.getId());
-					
-					if (gallery != null) {
-						galleries.add(gallery);
-					}
-				}
-				
-				if (galleries.size() > 0) {
-					model.addAttribute("galleries", galleries);
-				}
-			}
-			
-			BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
-				, boardListInfo.getCategory(), Sort.Direction.ASC);
-			BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
-			, boardListInfo.getCategory(), Sort.Direction.DESC);
-			
-			//# URL 에서 URI 를 제거, 필요 값만 사용(프로토콜, 호스트, 포트)
-			//String frontUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
-			
-			model.addAttribute("post", boardFree);
-			model.addAttribute("category", boardCategory);
-			model.addAttribute("listInfo", boardListInfo);
-			model.addAttribute("prev", prevPost);
-			model.addAttribute("next", nextPost);
-			model.addAttribute("timeNow", timeNow);
-			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-			model.addAttribute("kakaoKey", kakaoJavascriptKey);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		
-		return HttpServletResponse.SC_OK;
+	public Optional<BoardFree> getFreePost(int seq) {
+		return boardFreeRepository.findOneBySeq(seq);
 	}
+
+
 
 	// 글 감정 표현.
 	public BoardFree setFreeFeelings(Locale locale, Integer seq, CommonConst.FEELING_TYPE feeling) {
@@ -682,11 +625,15 @@ public class BoardFreeService {
 		String userId = principal.getId();
 		String username = principal.getUsername();
 
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-		CommonWriter writer = boardFree.getWriter();
+		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
+		if (!boardFree.isPresent())
+			throw new ServiceException(ServiceError.POST_NOT_FOUND);
 
-		List<CommonFeelingUser> usersLiking = boardFree.getUsersLiking();
-		List<CommonFeelingUser> usersDisliking = boardFree.getUsersDisliking();
+		BoardFree getBoardFree = boardFree.get();
+		CommonWriter writer = getBoardFree.getWriter();
+
+		List<CommonFeelingUser> usersLiking = getBoardFree.getUsersLiking();
+		List<CommonFeelingUser> usersDisliking = getBoardFree.getUsersDisliking();
 
 		if (Objects.isNull(usersLiking)) usersLiking = new ArrayList<>();
 		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
@@ -718,17 +665,17 @@ public class BoardFreeService {
 		switch (feeling) {
 			case LIKE:
 				usersLiking.add(feelingUser);
-				boardFree.setUsersLiking(usersLiking);
+				getBoardFree.setUsersLiking(usersLiking);
 				break;
 			case DISLIKE:
 				usersDisliking.add(feelingUser);
-				boardFree.setUsersDisliking(usersDisliking);
+				getBoardFree.setUsersDisliking(usersDisliking);
 				break;
 		}
 
-		boardFreeRepository.save(boardFree);
+		boardFreeRepository.save(getBoardFree);
 
-		return boardFree;
+		return getBoardFree;
 	}
 
 	// 게시판 댓글 추가.
@@ -782,16 +729,6 @@ public class BoardFreeService {
 		return comments;
 	}
 	
-	public void getFreeCommentCount(Model model, int seq) {
-		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
-		
-		BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
-
-		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
-		
-		model.addAttribute("count", count);
-	}
-
 	/**
 	 * 자유게시판 감정 표현.
 	 * @param locale
@@ -867,17 +804,22 @@ public class BoardFreeService {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
+		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
+
+		if (!boardFree.isPresent())
+			throw new ServiceException(ServiceError.POST_NOT_FOUND);
+
+		BoardFree getBoardFree = boardFree.get();
 		
-		if (boardFree.getWriter() == null) {
+		if (getBoardFree.getWriter() == null) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
-		if (!accountId.equals(boardFree.getWriter().getUserId())) {
+		if (!accountId.equals(getBoardFree.getWriter().getUserId())) {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
-		BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+		BoardItem boardItem = new BoardItem(getBoardFree.getId(), getBoardFree.getSeq());
 
 		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 		
@@ -892,15 +834,15 @@ public class BoardFreeService {
 		
 		switch (type) {
 		case CommonConst.BOARD_DELETE_TYPE_POSTONLY:
+
+			getBoardFree.setContent(null);
+			getBoardFree.setSubject(null);
+			getBoardFree.setWriter(null);
 			
-			boardFree.setContent(null);
-			boardFree.setSubject(null);
-			boardFree.setWriter(null);
-			
-			List<BoardHistory> historys = boardFree.getHistory();
+			List<BoardHistory> historys = getBoardFree.getHistory();
 			
 			if (historys == null) {
-				historys = new ArrayList<BoardHistory>();
+				historys = new ArrayList<>();
 			}
 			
 			BoardHistory history = new BoardHistory();
@@ -908,21 +850,21 @@ public class BoardFreeService {
 			history.setType(CommonConst.BOARD_HISTORY_TYPE_DELETE);
 			history.setWriter(writer);
 			historys.add(history);
-			boardFree.setHistory(historys);
+			getBoardFree.setHistory(historys);
 			
-			BoardStatus boardStatus = boardFree.getStatus();
+			BoardStatus boardStatus = getBoardFree.getStatus();
 			
 			if (boardStatus == null) {
 				boardStatus = new BoardStatus();
 			}
 			
 			boardStatus.setDelete(CommonConst.BOARD_HISTORY_TYPE_DELETE);
-			boardFree.setStatus(boardStatus);
+			getBoardFree.setStatus(boardStatus);
 			
-			boardFreeRepository.save(boardFree);
+			boardFreeRepository.save(getBoardFree);
 
 			if (log.isInfoEnabled()) {
-				log.info("A post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+				log.info("A post was deleted(post only). post seq=" + getBoardFree.getSeq() + ", subject=" + getBoardFree.getSubject());
 			}
 
 			if (log.isDebugEnabled()) {
@@ -932,10 +874,10 @@ public class BoardFreeService {
 			break;
 			
 		case CommonConst.BOARD_DELETE_TYPE_ALL:
-			boardFreeRepository.delete(boardFree);
+			boardFreeRepository.delete(getBoardFree);
 
 			if (log.isInfoEnabled()) {
-				log.info("A post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+				log.info("A post was deleted(all). post seq=" + getBoardFree.getSeq() + ", subject=" + getBoardFree.getSubject());
 			}
 
 			if (log.isDebugEnabled()) {
@@ -945,7 +887,7 @@ public class BoardFreeService {
 			break;
 		}
 		
-		searchService.deleteDocumentBoard(boardFree.getId());
+		searchService.deleteDocumentBoard(getBoardFree.getId());
 		
 		return HttpServletResponse.SC_OK;
 	}
@@ -967,8 +909,13 @@ public class BoardFreeService {
 			return HttpServletResponse.SC_UNAUTHORIZED;
 		}
 		
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq);
-		BoardStatus status = boardFree.getStatus();
+		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
+		if (!boardFree.isPresent())
+			throw new ServiceException(ServiceError.POST_NOT_FOUND);
+
+		BoardFree getBoardFree = boardFree.get();
+
+		BoardStatus status = getBoardFree.getStatus();
 		
 		if (status == null) {
 			status = new BoardStatus();
@@ -996,14 +943,14 @@ public class BoardFreeService {
 			noticeType = CommonConst.BOARD_HISTORY_TYPE_CANCEL_NOTICE;
 			break;
 		}
-		
-		boardFree.setStatus(status);
+
+		getBoardFree.setStatus(status);
 		
 		if (!noticeType.isEmpty()) {
-			List<BoardHistory> historys = boardFree.getHistory();
+			List<BoardHistory> historys = getBoardFree.getHistory();
 			
 			if (historys == null) {
-				historys = new ArrayList<BoardHistory>();
+				historys = new ArrayList<>();
 			}
 			
 			BoardHistory history = new BoardHistory();
@@ -1011,17 +958,17 @@ public class BoardFreeService {
 			history.setType(noticeType);
 			history.setWriter(writer);
 			historys.add(history);
-			boardFree.setHistory(historys);
+			getBoardFree.setHistory(historys);
 		}
 		
-		boardFreeRepository.save(boardFree);
+		boardFreeRepository.save(getBoardFree);
 		
 		if (log.isInfoEnabled()) {
-			log.info("Set notice. post seq=" + boardFree.getSeq() + ", type=" + status.getNotice());
+			log.info("Set notice. post seq=" + getBoardFree.getSeq() + ", type=" + status.getNotice());
 		}
 
 		if (log.isDebugEnabled()) {
-			log.debug("Set notice. BoardFree = " + boardFree);
+			log.debug("Set notice. BoardFree = " + getBoardFree);
 		}
 		
 		return HttpServletResponse.SC_OK;

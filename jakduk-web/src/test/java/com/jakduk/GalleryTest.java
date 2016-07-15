@@ -33,10 +33,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -173,7 +170,7 @@ public class GalleryTest extends AbstractSpringTest {
 		Aggregation aggregation = Aggregation.newAggregation(match, /*group, */ sort /*, limit*/);
 		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
 		
-		System.out.println("findById=" + results.getMappedResults());
+		System.out.println("findOneById=" + results.getMappedResults());
 	}
 	
 	@Test
@@ -212,6 +209,12 @@ public class GalleryTest extends AbstractSpringTest {
 		System.out.format("imageCapacity01 = %f\n", 11.22);
 		System.out.println("imageCapacity01 = " + (long)(width * bb) + ", " + height * bb);
 
+	}
+
+	@Test
+	public void 그림목록() {
+		List<Gallery> galleries = galleryRepository.findByIdIn(Arrays.asList("54c4d42a3d9675d9e50e1bed", "54c4d42e3d9675d9e50e1bee"));
+		System.out.println("galleries=" + galleries);
 	}
 
 }

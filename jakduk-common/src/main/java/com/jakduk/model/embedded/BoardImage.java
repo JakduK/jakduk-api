@@ -1,5 +1,6 @@
 package com.jakduk.model.embedded;
 
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -9,23 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+@Data
 @Document
 public class BoardImage {
 	
 	private String id;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	@Override
-	public String toString() {
-		return "BoardImage [id=" + id + "]";
-	}
-	
 	
 }

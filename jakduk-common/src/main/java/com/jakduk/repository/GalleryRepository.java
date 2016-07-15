@@ -23,4 +23,6 @@ public interface GalleryRepository extends MongoRepository<Gallery, String>{
 	
 	@Query(value="{'status.status' : 'use'}")
 	List<Gallery> findAll();
+
+	List<Gallery> findByIdIn(List<String> ids);
 }

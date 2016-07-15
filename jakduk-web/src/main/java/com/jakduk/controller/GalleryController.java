@@ -75,7 +75,7 @@ public class GalleryController {
 
 		Locale locale = localeResolver.resolveLocale(request);
 
-		Gallery gallery = galleryService.findById(id);
+		Gallery gallery = galleryService.findOneById(id);
 
 		if (Objects.isNull(gallery))
 			throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
@@ -100,7 +100,7 @@ public class GalleryController {
 
 		Locale locale = localeResolver.resolveLocale(request);
 
-		Gallery gallery = galleryService.findById(id);
+		Gallery gallery = galleryService.findOneById(id);
 
 		if (Objects.isNull(gallery))
 			throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));

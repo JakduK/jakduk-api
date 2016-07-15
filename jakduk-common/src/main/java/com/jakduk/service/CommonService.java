@@ -98,7 +98,7 @@ public class CommonService {
 	 * @param id
      * @return 쿠키를 새로 저장했다면 true, 아니면 false.
      */
-	public Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, String prefix, String id) {
+	public boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, String prefix, String id) {
 		
 		Boolean findSameCookie = false;
 		String cookieName = prefix + "_" + id;

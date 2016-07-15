@@ -3,6 +3,8 @@ package com.jakduk.repository;
 import com.jakduk.model.db.BoardCategory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Optional;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -10,6 +12,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @desc     :
  */
 public interface BoardCategoryRepository extends MongoRepository<BoardCategory, String> {
-	BoardCategory findOneByCode(String code);
+	Optional<BoardCategory> findOneByCode(String code);
 
 }
