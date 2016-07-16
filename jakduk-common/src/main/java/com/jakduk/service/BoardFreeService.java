@@ -777,7 +777,7 @@ public class BoardFreeService {
 
 
 	// 글 감정 표현.
-	public BoardFree setFreeFeelings(Locale locale, Integer seq, CommonConst.FEELING_TYPE feeling) {
+	public BoardFree setFreeFeelings(Integer seq, CommonConst.FEELING_TYPE feeling) {
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String userId = principal.getId();
 		String username = principal.getUsername();
@@ -798,14 +798,14 @@ public class BoardFreeService {
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
 		if (userId.equals(writer.getUserId())) {
 			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-					, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.you.are.writer"));
+					, commonService.getResourceBundleMessage("messages.common", "common.exception.you.are.writer"));
 		}
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+						, commonService.getResourceBundleMessage("messages.common", "common.exception.select.already.like"));
 			}
 		}
 
@@ -813,7 +813,7 @@ public class BoardFreeService {
 		for (CommonFeelingUser feelingUser : usersDisliking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+						, commonService.getResourceBundleMessage("messages.common", "common.exception.select.already.like"));
 			}
 		}
 
@@ -887,13 +887,12 @@ public class BoardFreeService {
 	}
 	
 	/**
-	 * 자유게시판 감정 표현.
-	 * @param locale
-	 * @param commentId
-	 * @param feeling
-     * @return
+	 * 자유게시판 댓글 감정 표현.
+	 * @param commentId 댓글 ID
+	 * @param feeling 감정표현 종류
+     * @return 자유게시판 댓글 객체
      */
-	public BoardFreeComment setFreeCommentFeeling(Locale locale, String commentId, CommonConst.FEELING_TYPE feeling) {
+	public BoardFreeComment setFreeCommentFeeling(String commentId, CommonConst.FEELING_TYPE feeling) {
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String userId = principal.getId();
@@ -911,14 +910,14 @@ public class BoardFreeService {
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
 		if (userId.equals(writer.getUserId())) {
 			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-					, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.you.are.writer"));
+					, commonService.getResourceBundleMessage("messages.common", "common.exception.you.are.writer"));
 		}
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+						, commonService.getResourceBundleMessage("messages.common", "common.exception.select.already.like"));
 			}
 		}
 
@@ -926,7 +925,7 @@ public class BoardFreeService {
 		for (CommonFeelingUser feelingUser : usersDisliking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+						, commonService.getResourceBundleMessage("messages.common", "common.exception.select.already.like"));
 			}
 		}
 

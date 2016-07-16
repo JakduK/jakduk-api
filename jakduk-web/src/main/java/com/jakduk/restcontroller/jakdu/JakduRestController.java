@@ -7,11 +7,11 @@ import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.model.web.jakdu.MyJakduRequest;
+import com.jakduk.restcontroller.vo.JakduScheduleResponse;
+import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.JakduService;
-import com.jakduk.restcontroller.vo.JakduScheduleResponse;
-import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,11 +179,10 @@ public class JakduRestController {
         Integer numberOfLike = Objects.nonNull(jakduComment.getUsersLiking()) ? jakduComment.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;
 
-        UserFeelingResponse response = new UserFeelingResponse();
-        response.setFeeling(feeling);
-        response.setNumberOfLike(numberOfLike);
-        response.setNumberOfDislike(numberOfDisLike);
-
-        return response;
+        return UserFeelingResponse.builder()
+                .feeling(feeling)
+                .numberOfLike(numberOfLike)
+                .numberOfDislike(numberOfDisLike)
+                .build();
     }
 }

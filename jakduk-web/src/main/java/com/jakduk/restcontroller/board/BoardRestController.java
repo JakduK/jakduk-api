@@ -6,10 +6,7 @@ import com.jakduk.dao.BoardDAO;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.db.BoardCategory;
-import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.db.Gallery;
+import com.jakduk.model.db.*;
 import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.etc.BoardFeelingCount;
@@ -332,59 +329,43 @@ public class BoardRestController {
         return boardFreeComment;
     }
 
-    @ApiOperation(value = "글 감정 표현")
+    @ApiOperation(value = "글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
     @RequestMapping(value = "/free/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setFreeFeeling(@PathVariable Integer seq,
-                               @PathVariable CommonConst.FEELING_TYPE feeling,
-                               HttpServletRequest request) {
+                                              @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        Locale locale = localeResolver.resolveLocale(request);
+        if (!commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal principal = userService.getCommonPrincipal();
-        String userId = principal.getId();
-
-        // 인증되지 않은 회원
-        if (Objects.isNull(userId))
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-
-        BoardFree boardFree = boardFreeService.setFreeFeelings(locale, seq, feeling);
+        BoardFree boardFree = boardFreeService.setFreeFeelings(seq, feeling);
 
         Integer numberOfLike = Objects.nonNull(boardFree.getUsersLiking()) ? boardFree.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(boardFree.getUsersDisliking()) ? boardFree.getUsersDisliking().size() : 0;
 
-        UserFeelingResponse response = new UserFeelingResponse();
-        response.setFeeling(feeling);
-        response.setNumberOfLike(numberOfLike);
-        response.setNumberOfDislike(numberOfDisLike);
-
-        return response;
+        return UserFeelingResponse.builder()
+                .feeling(feeling)
+                .numberOfLike(numberOfLike)
+                .numberOfDislike(numberOfDisLike)
+                .build();
     }
 
-    @ApiOperation(value = "댓글 감정 표현")
+    @ApiOperation(value = "댓글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setFreeCommentFeeling(@PathVariable String commentId,
-                                                     @PathVariable CommonConst.FEELING_TYPE feeling,
-                                                     HttpServletRequest request) {
+                                                     @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        Locale locale = localeResolver.resolveLocale(request);
+        if (!commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal principal = userService.getCommonPrincipal();
-        String userId = principal.getId();
-
-        // 인증되지 않은 회원
-        if (Objects.isNull(userId))
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-
-        BoardFreeComment boardFreeComment = boardFreeService.setFreeCommentFeeling(locale, commentId, feeling);
+        BoardFreeComment boardFreeComment = boardFreeService.setFreeCommentFeeling(commentId, feeling);
 
         Integer numberOfLike = Objects.nonNull(boardFreeComment.getUsersLiking()) ? boardFreeComment.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(boardFreeComment.getUsersDisliking()) ? boardFreeComment.getUsersDisliking().size() : 0;
 
-        UserFeelingResponse response = new UserFeelingResponse();
-        response.setFeeling(feeling);
-        response.setNumberOfLike(numberOfLike);
-        response.setNumberOfDislike(numberOfDisLike);
-
-        return response;
+        return UserFeelingResponse.builder()
+                .feeling(feeling)
+                .numberOfLike(numberOfLike)
+                .numberOfDislike(numberOfDisLike)
+                .build();
     }
 }
