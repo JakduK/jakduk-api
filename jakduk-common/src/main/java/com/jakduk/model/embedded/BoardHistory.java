@@ -2,6 +2,7 @@ package com.jakduk.model.embedded;
 
 import com.jakduk.common.CommonConst;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -18,9 +19,10 @@ import javax.persistence.GenerationType;
 
 @AllArgsConstructor
 @Setter
+@Getter
 public class BoardHistory {
 	
-	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
 	private String id;
 	
 	private CommonConst.BOARD_HISTORY_TYPE type;
