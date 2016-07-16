@@ -197,6 +197,7 @@ public class BoardFreeService {
 	/**
 	 * 자유게시판 글쓰기 데이터 DB에 삽입
 	 */
+	/*
 	public Integer write(HttpServletRequest request, BoardFreeWrite boardFreeWrite) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
@@ -363,7 +364,177 @@ public class BoardFreeService {
 
 		return HttpServletResponse.SC_OK;		
 	}
-	
+	*/
+
+	public void addFreePost(String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode, String images, CommonConst.DEVICE_TYPE device) {
+
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String accountId = principal.getId();
+		String username = principal.getUsername();
+		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
+
+		if (Objects.isNull(accountId))
+			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+		Optional<BoardCategory> boardCategory = boardCategoryRepository.findOneByCode(categoryCode.name());
+
+		if (!boardCategory.isPresent())
+			throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+
+		BoardFree boardFree = new BoardFree();
+
+		boardFree.setCategory(categoryCode);
+		boardFree.setSubject(subject);
+		boardFree.setContent(content);
+		boardFree.setViews(0);
+		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
+
+		CommonWriter writer = new CommonWriter(accountId, username, accountType);
+		boardFree.setWriter(writer);
+
+		BoardStatus boardStatus = new BoardStatus(device);
+		boardFree.setStatus(boardStatus);
+
+		List<BoardHistory> historys = new ArrayList<>();
+		BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.CREATE, writer);
+		historys.add(history);
+		boardFree.setHistory(historys);
+
+		/*
+		JSONArray jsonArray = null;
+
+		if (!boardFreeWrite.getImages().isEmpty()) {
+			JSONParser jsonParser = new JSONParser();
+			try {
+				jsonArray = (JSONArray) jsonParser.parse(boardFreeWrite.getImages());
+				List<BoardImage> galleries = new ArrayList<BoardImage>();
+
+				for (int i = 0 ; i < jsonArray.size() ; i++) {
+					JSONObject obj = (JSONObject)jsonArray.get(i);
+					String id = (String) obj.get("uid");
+
+					Gallery gallery = galleryRepository.findOne(id);
+
+					if (gallery != null) {
+						BoardImage boardImage = new BoardImage();
+						boardImage.setId(gallery.getId());
+						galleries.add(boardImage);
+					}
+				}
+
+				if (galleries.size() > 0) {
+					boardFree.setGalleries(galleries);
+				}
+
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		*/
+
+		boardFreeRepository.save(boardFree);
+
+		/*
+		// 글과 연동 된 사진 처리
+		if (jsonArray != null) {
+			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+
+			for (int i = 0 ; i < jsonArray.size() ; i++) {
+				JSONObject obj = (JSONObject)jsonArray.get(i);
+				String id = (String) obj.get("uid");
+				String name = (String) obj.get("name");
+
+				Gallery gallery = galleryRepository.findOne(id);
+
+				if (gallery != null) {
+					GalleryStatus status = gallery.getStatus();
+					List<BoardItem> posts = gallery.getPosts();
+
+					if (posts == null) {
+						posts = new ArrayList<BoardItem>();
+					}
+
+					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
+					long itemCount = 0;
+
+					if (gallery.getPosts() != null) {
+						Stream<BoardItem> sPosts = gallery.getPosts().stream();
+						itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();
+					}
+
+					if (itemCount == 0) {
+						posts.add(boardItem);
+						gallery.setPosts(posts);
+					}
+
+					if (name != null && !name.isEmpty()) {
+						status.setName(CommonConst.GALLERY_NAME_STATUS_INPUT);
+						gallery.setName(name);
+					} else {
+						status.setName(CommonConst.GALLERY_NAME_STATUS_SUBJECT);
+						gallery.setName(boardFree.getSubject());
+					}
+
+					status.setFrom(CommonConst.BOARD_NAME_FREE);
+					status.setStatus(CommonConst.GALLERY_STATUS_USE);
+					gallery.setStatus(status);
+					galleryRepository.save(gallery);
+
+					// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
+					GalleryOnES galleryOnES = new GalleryOnES();
+					galleryOnES.setId(gallery.getId());
+					galleryOnES.setWriter(gallery.getWriter());
+					galleryOnES.setName(gallery.getName());
+
+					searchService.createDocumentGallery(galleryOnES);
+				}
+			}
+		}
+		*/
+
+		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
+		/*
+		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
+		boardFreeOnEs.setId(boardFree.getId());
+		boardFreeOnEs.setSeq(boardFree.getSeq());
+		boardFreeOnEs.setWriter(boardFree.getWriter());
+		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
+
+		boardFreeOnEs.setSubject(boardFree.getSubject()
+				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+				.replaceAll("\r|\n|&nbsp;",""));
+
+		boardFreeOnEs.setContent(boardFree.getContent()
+				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
+				.replaceAll("\r|\n|&nbsp;",""));
+
+		searchService.createDocumentBoard(boardFreeOnEs);
+		*/
+
+		/*
+		// 슬랙 알림
+		slackService.sendPost(
+				boardFree.getWriter().getUsername(),
+				boardFree.getSubject(),
+				"New post created.",
+				UrlUtils.buildFullRequestUrl(
+						request.getScheme(),
+						request.getServerName(),
+						request.getServerPort(),
+						request.getContextPath(), null) + "/board/free/" + boardFree.getSeq()
+		);
+		*/
+
+		if (log.isInfoEnabled()) {
+			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("boardFree(new) = " + boardFree);
+		}
+	}
+
+	/*
 	public Integer edit(HttpServletRequest request, BoardFreeWrite boardFreeWrite) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
@@ -533,6 +704,7 @@ public class BoardFreeService {
 		
 		return HttpServletResponse.SC_OK;
 	}
+	*/
 
 	/**
 	 * 자유게시판 말머리 목록
@@ -775,7 +947,8 @@ public class BoardFreeService {
 
 		return boardComment;
 	}
-	
+
+	/*
 	public Integer deleteFree(Model model, int seq, String type) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
@@ -876,7 +1049,9 @@ public class BoardFreeService {
 		
 		return HttpServletResponse.SC_OK;
 	}
-	
+	*/
+
+	/*
 	public Integer setNotice(int seq, String type) {
 		
 		if (!commonService.isAdmin()) {
@@ -958,23 +1133,22 @@ public class BoardFreeService {
 		
 		return HttpServletResponse.SC_OK;
 	}
+	*/
 
 	/**
 	 * 자유게시판 주간 좋아요수 선두
-	 * @return
+	 * @return 게시물 목록
      */
 	public List<BoardFreeOnBest> getFreeTopLikes() {
 		LocalDate date = LocalDate.now().minusWeeks(1);
 		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
 
-		List<BoardFreeOnBest> posts = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
-
-		return posts;
+		return boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
 	}
 
 	/**
 	 * 자유게시판 주간 댓글수 선두
-	 * @return
+	 * @return 게시물 목록
 	 */
 	public List<BoardFreeOnBest> getFreeTopComments() {
 		LocalDate date = LocalDate.now().minusWeeks(1);

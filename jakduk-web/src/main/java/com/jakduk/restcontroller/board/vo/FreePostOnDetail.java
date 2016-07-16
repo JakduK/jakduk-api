@@ -2,15 +2,13 @@ package com.jakduk.restcontroller.board.vo;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.*;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -20,11 +18,8 @@ import java.util.List;
  */
 
 @ApiModel(value = "자유게시판 글 상세")
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-public class FreePostResponse {
+@Data
+public class FreePostOnDetail {
 
     @ApiModelProperty(value = "글 ID")
     private String id;
@@ -62,9 +57,16 @@ public class FreePostResponse {
     @ApiModelProperty(value = "글 사진")
     private List<Gallery> galleries;
 
-    @ApiModelProperty(value = "앞 글")
-    private BoardFreeOfMinimum prevPost;
-
-    @ApiModelProperty(value = "뒷 글")
-    private BoardFreeOfMinimum nextPost;
+    public FreePostOnDetail(BoardFree boardFree) {
+        this.id = boardFree.getId();
+        this.seq = boardFree.getSeq();
+        this.writer = boardFree.getWriter();
+        this.subject = boardFree.getSubject();
+        this.content = boardFree.getContent();
+        this.views = boardFree.getViews();
+        this.usersLiking = boardFree.getUsersLiking();
+        this.usersDisliking = boardFree.getUsersDisliking();
+        this.status = boardFree.getStatus();
+        this.history = boardFree.getHistory();
+    }
 }

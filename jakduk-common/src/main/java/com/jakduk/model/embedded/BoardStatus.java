@@ -2,6 +2,9 @@ package com.jakduk.model.embedded;
 
 import com.jakduk.common.CommonConst;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,7 +13,9 @@ import lombok.Data;
  * @desc     :
  */
 
-@Data
+@NoArgsConstructor
+@Setter
+@Getter
 public class BoardStatus {
 	
 	private String notice;
@@ -18,5 +23,9 @@ public class BoardStatus {
 	private String delete;
 	
 	private CommonConst.DEVICE_TYPE device;
+
+	public BoardStatus(CommonConst.DEVICE_TYPE device) {
+		this.device = device;
+	}
 
 }

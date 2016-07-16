@@ -34,30 +34,6 @@ public class BoardFreeWriteController {
 	@Autowired
 	private BoardFreeService boardFreeService;
 
-	@RequestMapping(value = "/free/write", method = RequestMethod.GET)
-	public String freeWrite(Model model) {
-
-		boardFreeService.getWrite(model);
-
-		return "board/freeWrite";
-	}
-
-	@RequestMapping(value = "/free/write", method = RequestMethod.POST)
-	public String freeWrite(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus
-			, HttpServletRequest request) {
-		
-		if (result.hasErrors()) {
-			if (log.isDebugEnabled()) {
-				log.debug("result=" + result);
-			}
-			return "board/freeWrite";
-		}
-
-		Integer status = boardFreeService.write(request, boardFreeWrite);
-		sessionStatus.setComplete();
-
-		return "redirect:/board/free";
-	}
 
 	@RequestMapping(value = "/free/edit/{seq}", method = RequestMethod.GET)
 	public String freeEdit(@PathVariable int seq, Model model,
@@ -93,7 +69,7 @@ public class BoardFreeWriteController {
 			return "board/freeEdit";
 		}
 		
-		Integer status = boardFreeService.edit(request, boardFreeWrite);
+		//Integer status = boardFreeService.edit(request, boardFreeWrite);
 		sessionStatus.setComplete();
 		
 		return "redirect:/board/free/" + boardFreeWrite.getSeq();

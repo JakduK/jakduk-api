@@ -17,6 +17,7 @@ import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.board.vo.*;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
@@ -33,12 +34,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.beans.PropertyEditorSupport;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -213,11 +217,11 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 상세", produces = "application/json", response = FreePostResponse.class)
+    @ApiOperation(value = "자유게시판 글 상세", produces = "application/json", response = FreePostOnDetailResponse.class)
     @RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
-    public FreePostResponse freeView(@PathVariable Integer seq,
-                         HttpServletRequest request,
-                         HttpServletResponse response) {
+    public FreePostOnDetailResponse getFreeView(@PathVariable Integer seq,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) {
 
         Optional<BoardFree> boardFree = boardFreeService.getFreePost(seq);
 
@@ -250,22 +254,30 @@ public class BoardRestController {
         BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(getBoardFree.getId())
                 , boardFree.get().getCategory(), Sort.Direction.DESC);
 
-        return FreePostResponse.builder()
-                .id(getBoardFree.getId())
-                .seq(getBoardFree.getSeq())
-                .writer(getBoardFree.getWriter())
-                .category(boardCategory)
-                .subject(getBoardFree.getSubject())
-                .content(getBoardFree.getContent())
-                .views(getBoardFree.getViews())
-                .usersLiking(getBoardFree.getUsersLiking())
-                .usersDisliking(getBoardFree.getUsersDisliking())
-                .status(getBoardFree.getStatus())
-                .history(getBoardFree.getHistory())
-                .galleries(galleries)
+        FreePostOnDetail post = new FreePostOnDetail(getBoardFree);
+        post.setCategory(boardCategory);
+        post.setGalleries(galleries);
+
+        return FreePostOnDetailResponse.builder()
+                .post(post)
                 .prevPost(prevPost)
                 .nextPost(nextPost)
                 .build();
+    }
+
+    @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = EmptyJsonResponse.class)
+    @RequestMapping(value = "/free", method = RequestMethod.POST)
+    public EmptyJsonResponse addFree(@Valid @RequestBody FreePostForm form,
+                                     HttpServletRequest request) {
+
+        if (!commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        Device device = DeviceUtils.getCurrentDevice(request);
+
+        boardFreeService.addFreePost(form.getSubject(), form.getContent(), form.getCategoryCode(), form.getImages(), commonService.getDeviceInfo(device));
+
+        return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "자유게시판 글 댓글 목록")

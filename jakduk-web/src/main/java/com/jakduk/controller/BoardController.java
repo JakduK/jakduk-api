@@ -1,6 +1,5 @@
 package com.jakduk.controller;
 
-import com.jakduk.common.CommonConst;
 import com.jakduk.model.web.BoardListInfo;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
@@ -50,7 +49,8 @@ public class BoardController {
 	public String deleteFree(@PathVariable int seq, Model model,
 			HttpServletResponse response,
 			@RequestParam(required = true) String type) throws IOException {
-		
+
+		/*
 		Integer status = boardFreeService.deleteFree(model, seq, type);
 		
 		if (status.equals(HttpServletResponse.SC_UNAUTHORIZED)) {
@@ -63,6 +63,7 @@ public class BoardController {
 				return "redirect:/board/free/" + seq + "?result=emptyComment";
 			}
 		}
+		*/
 
 		return "redirect:/board/free";
 	}
@@ -70,7 +71,8 @@ public class BoardController {
 	@RequestMapping(value = "/notice/set/{seq}", method = RequestMethod.GET)
 	public String setFreeNotice(@PathVariable int seq, Model model,
 			HttpServletResponse response) throws IOException {
-		
+
+		/*
 		Integer status = boardFreeService.setNotice(seq, CommonConst.COMMON_TYPE_SET);
 		
 		if (status.equals(HttpServletResponse.SC_OK)) {
@@ -82,6 +84,7 @@ public class BoardController {
 		} else {
 			response.sendError(status);
 		}
+		*/
 		
 		return null;	
 	}
@@ -89,7 +92,8 @@ public class BoardController {
 	@RequestMapping(value = "/notice/cancel/{seq}", method = RequestMethod.GET)
 	public String releaseFreeNotice(@PathVariable int seq, Model model,
 			HttpServletResponse response) throws IOException {
-		
+
+		/*
 		Integer status = boardFreeService.setNotice(seq, CommonConst.COMMON_TYPE_CANCEL);
 		
 		if (status.equals(HttpServletResponse.SC_OK)) {
@@ -101,6 +105,7 @@ public class BoardController {
 		} else {
 			response.sendError(status);
 		}
+		*/
 		
 		return null;	
 	}

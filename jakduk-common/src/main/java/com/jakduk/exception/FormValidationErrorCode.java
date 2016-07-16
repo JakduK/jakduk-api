@@ -21,5 +21,13 @@ public class FormValidationErrorCode {
     public final static String PASSWORD_CONFIRM_NOT_EMPTY = "passwordConfirm_NotEmpty";
     public final static String PASSWORD_CONFIRM_SIZE = "passwordConfirm_Size";
     public final static String PASSWORD_MISMATCH = "password_Mismatch";
+
+    public final static String SUBJECT_SIZE = "subject_Size";
+    public final static String SUBJECT_NOT_EMPTY = "subject_NotEmpty";
+
+    public final static String CONTENT_SIZE = "content_Size";
+    public final static String CONTENT_NOT_EMPTY = "content_NotEmpty";
+
+    public final static String CATEGORY_NOT_EMPTY = "category_NotEmpty";
 }
 

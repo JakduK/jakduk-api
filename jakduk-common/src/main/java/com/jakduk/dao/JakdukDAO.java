@@ -175,7 +175,7 @@ public class JakdukDAO {
 	}
 	
 	public List<BoardFreeOnRSS> getRSS() {
-		AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE_DELETE));
+		AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE.DELETE));
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
 		AggregationOperation limit = Aggregation.limit(CommonConst.RSS_SIZE_ITEM);
 		Aggregation aggregation = Aggregation.newAggregation(match, sort, limit);
@@ -215,7 +215,7 @@ public class JakdukDAO {
 	}
 	
 	public List<BoardFreeOnES> getBoardFreeOnES(ObjectId commentId) {
-		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE_DELETE));
+		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE.DELETE));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
 		AggregationOperation limit = Aggregation.limit(CommonConst.ELASTICSEARCH_BULK_LIMIT);

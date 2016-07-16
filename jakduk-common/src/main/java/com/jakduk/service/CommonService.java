@@ -229,8 +229,8 @@ public class CommonService {
 	}
 
 	// 회원인지 검사.
-	public Boolean isUser() {
-		Boolean result = false;
+	public boolean isUser() {
+		boolean result = false;
 
 		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
 			result = true;
