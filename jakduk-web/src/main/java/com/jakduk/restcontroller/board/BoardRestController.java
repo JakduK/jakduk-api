@@ -37,9 +37,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -57,9 +55,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/board")
 public class BoardRestController {
-
-    @Resource
-    private LocaleResolver localeResolver;
 
     @Autowired
     private BoardFreeService boardFreeService;
@@ -220,8 +215,8 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글 상세", produces = "application/json", response = FreePostOnDetailResponse.class)
     @RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
     public FreePostOnDetailResponse getFreeView(@PathVariable Integer seq,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response) {
+                                                HttpServletRequest request,
+                                                HttpServletResponse response) {
 
         Optional<BoardFree> boardFree = boardFreeService.getFreePost(seq);
 
@@ -243,7 +238,7 @@ public class BoardRestController {
         if (Objects.nonNull(images)) {
             List<String> ids = new ArrayList<>();
 
-            images.forEach(gallery -> {ids.add(gallery.getId());});
+            images.forEach(gallery -> ids.add(gallery.getId()));
             galleries = galleryService.findByIds(ids);
         }
 
@@ -303,19 +298,16 @@ public class BoardRestController {
     @ApiOperation(value = "게시판 댓글 달기")
     @RequestMapping(value ="/free/comment", method = RequestMethod.POST)
     public BoardFreeComment commentWrite(@RequestBody BoardCommentRequest commentRequest,
-                             HttpServletRequest request) {
+                                         HttpServletRequest request) {
 
-        Locale locale = localeResolver.resolveLocale(request);
-
-        if (Objects.isNull(commentRequest)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
-        }
+        if (Objects.isNull(commentRequest))
+            throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
         Integer seq = commentRequest.getSeq();
         String contents = commentRequest.getContents();
 
         if (Objects.isNull(seq) || Objects.isNull(contents)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
         }
 
         CommonPrincipal principal = userService.getCommonPrincipal();
@@ -323,13 +315,11 @@ public class BoardRestController {
 
         // 인증되지 않은 회원
         if (Objects.isNull(accountId))
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
 
         Device device = DeviceUtils.getCurrentDevice(request);
 
-        BoardFreeComment boardFreeComment = boardFreeService.addFreeComment(seq, contents, commonService.getDeviceInfo(device));
-
-        return boardFreeComment;
+        return boardFreeService.addFreeComment(seq, contents, commonService.getDeviceInfo(device));
     }
 
     @ApiOperation(value = "글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)

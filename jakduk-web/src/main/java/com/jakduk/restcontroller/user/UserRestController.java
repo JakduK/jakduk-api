@@ -9,7 +9,6 @@ import com.jakduk.exception.ServiceException;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.LocalName;
-import com.jakduk.model.etc.AuthUserProfile;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.user.vo.UserForm;
@@ -32,8 +31,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -241,8 +238,7 @@ public class UserRestController {
         if (!commonService.isJakdukUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        Locale locale = LocaleContextHolder.getLocale();
-        String language = commonService.getLanguageCode(locale, null);
+        String language = commonService.getLanguageCode(LocaleContextHolder.getLocale(), null);
 
         CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
 

@@ -1,12 +1,18 @@
 package com.jakduk.restcontroller.gallery;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.simple.GalleryOnList;
+import com.jakduk.restcontroller.EmptyJsonResponse;
+import com.jakduk.restcontroller.user.vo.UserProfileResponse;
 import com.jakduk.restcontroller.vo.GalleriesResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.GalleryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +28,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Created by pyohwan on 16. 3. 20.
+ * @author pyohwan
+ * 16. 3. 20 오후 11:17
  */
 
+@Api(tags = "사진첩", description = "사진 관련")
 @RestController
 @RequestMapping("/api")
 public class GalleryRestController {
@@ -38,20 +46,18 @@ public class GalleryRestController {
     @Autowired
     private GalleryService galleryService;
 
-    // 사진 목록
+    @ApiOperation(value = "사진 목록", produces = "application/json", response = GalleriesResponse.class)
     @RequestMapping(value = "/galleries", method = RequestMethod.GET)
     public GalleriesResponse getGalleries(@RequestParam(required = false) String id,
-                             @RequestParam(required = false, defaultValue = "0") int size,
-                             HttpServletRequest request) {
-
-        Locale locale = localeResolver.resolveLocale(request);
+                                          @RequestParam(required = false, defaultValue = "0") int size,
+                                          HttpServletRequest request) {
 
         if (size < CommonConst.GALLERY_SIZE) size = CommonConst.GALLERY_SIZE;
 
         List<GalleryOnList> galleries = galleryService.getGalleriesById(id, size);
 
         if (Objects.isNull(galleries))
-            throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+            throw new ServiceException(ServiceError.NOT_FOUND);
 
         List<ObjectId> ids = galleries.stream()
                 .map(gallery -> new ObjectId(gallery.getId()))
@@ -68,30 +74,29 @@ public class GalleryRestController {
         return response;
     }
 
-    // 사진 올리기.
+    @ApiOperation(value = "사진 올리기", produces = "application/json", response = Gallery.class)
     @RequestMapping(value = "/gallery", method = RequestMethod.POST)
-    public Gallery uploadImage(@RequestParam(required = true) MultipartFile file,
-                            HttpServletRequest request) {
+    public Gallery uploadImage(@RequestParam() MultipartFile file) {
 
-        Locale locale = localeResolver.resolveLocale(request);
+        if (!commonService.isJakdukUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
-        }
+        if (file.isEmpty())
+            throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
-        Gallery gallery = galleryService.uploadImage(locale, file);
-
-        return gallery;
+        return galleryService.uploadImage(file);
     }
 
-    // 사진 삭제.
+    @ApiOperation(value = "사진 지움", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/gallery/{id}", method = RequestMethod.DELETE)
-    public void removeImage(@PathVariable String id,
-                            HttpServletRequest request) {
+    public EmptyJsonResponse removeImage(@PathVariable String id) {
 
-        Locale locale = localeResolver.resolveLocale(request);
+        if (!commonService.isJakdukUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        galleryService.removeImage(locale, id);
+        galleryService.removeImage(id);
+
+        return EmptyJsonResponse.newInstance();
     }
 
 }

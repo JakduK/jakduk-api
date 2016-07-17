@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.CommonFeelingUser;
@@ -26,7 +28,10 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -108,8 +113,13 @@ public class GalleryService {
 			e.printStackTrace();
 		}
 	}
-	
-	public Gallery uploadImage(Locale locale, MultipartFile file) {
+
+	/**
+	 * 사진 올리기.
+	 * @param file 멀티파트 객체
+	 * @return Gallery 객체
+     */
+	public Gallery uploadImage(MultipartFile file) {
 		
 		try {
 			Gallery gallery = new Gallery();
@@ -135,7 +145,7 @@ public class GalleryService {
 			String formatName = "jpg";
 			String splitContentType[] = file.getContentType().split("/");
 
-			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
+			if (!splitContentType[1].equals("octet-stream")) {
 				formatName = splitContentType[1];
 				gallery.setContentType(file.getContentType());
 			} else {
@@ -211,7 +221,7 @@ public class GalleryService {
 			return gallery;
 
 		} catch (IOException e) {
-			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.gallery", "gallery.exception.io"));
+			throw new RuntimeException(commonService.getResourceBundleMessage("messages.gallery", "gallery.exception.io"));
 		}
 	}
 
@@ -257,27 +267,23 @@ public class GalleryService {
 	 * @param id
 	 * @return
 	 */
-	public void removeImage(Locale locale, String id) {
+	public void removeImage(String id) {
 		
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 
-		if (Objects.isNull(accountId)) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-		}
-		
 		Gallery gallery = galleryRepository.findOne(id);
 		
 		if (Objects.isNull(gallery)) {
-			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+			throw new ServiceException(ServiceError.NOT_FOUND);
 		}
 		
 		if (Objects.isNull(gallery.getWriter())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
 		}
 		
 		if (!accountId.equals(gallery.getWriter().getUserId())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
 		}
 		
 		ObjectId objId = new ObjectId(gallery.getId());
@@ -300,7 +306,7 @@ public class GalleryService {
 				galleryRepository.delete(gallery);
 				
 			} catch (IOException e) {
-				throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.gallery", "gallery.exception.io"));
+				throw new RuntimeException(commonService.getResourceBundleMessage("messages.gallery", "gallery.exception.io"));
 			}
 		}
 		
