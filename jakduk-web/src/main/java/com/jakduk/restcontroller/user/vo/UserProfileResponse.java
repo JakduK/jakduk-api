@@ -1,4 +1,4 @@
-package com.jakduk.model.web.user;
+package com.jakduk.restcontroller.user.vo;
 
 import com.jakduk.model.embedded.LocalName;
 import lombok.Data;
@@ -11,7 +11,7 @@ import lombok.Data;
  */
 
 @Data
-public class UserProfileInfo {
+public class UserProfileResponse {
 
 	private String email;
 	

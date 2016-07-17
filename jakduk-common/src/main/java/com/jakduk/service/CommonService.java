@@ -1,6 +1,5 @@
 package com.jakduk.service;
 
-import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.authentication.common.JakdukPrincipal;
 import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
@@ -24,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -89,44 +87,7 @@ public class CommonService {
 			return nextSeq;
 		}
 	}
-	
-	/**
-	 * 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
-	 * @param request
-	 * @param response
-	 * @param prefix
-	 * @param id
-     * @return 쿠키를 새로 저장했다면 true, 아니면 false.
-     */
-	public boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, String prefix, String id) {
-		
-		Boolean findSameCookie = false;
-		String cookieName = prefix + "_" + id;
-		
-		Cookie cookies[] = request.getCookies();
-		
-		if (cookies != null) {
-			for (int i = 0 ; i < cookies.length ; i++) {
-				String name = cookies[i].getName();
-				
-				if (cookieName.equals(name)) {
-					findSameCookie = true;
-					break;
-				}
-			}
-		}
-		
-		if (findSameCookie == false) {
-			Cookie cookie = new Cookie(cookieName, "r");
-			cookie.setMaxAge(CommonConst.BOARD_COOKIE_EXPIRE_SECONDS);
-			response.addCookie(cookie);
-			
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
+
 	public String getLanguageCode(Locale locale, String lang) {
 		
 		String getLanguage = Locale.ENGLISH.getLanguage();
@@ -188,11 +149,11 @@ public class CommonService {
 	public Boolean isAnonymousUser() {
 		Boolean result = false;
 		
-		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			result = true;
 		}
 		
-		if (result == false) {
+		if (!result) {
 			Collection<? extends GrantedAuthority> authoritys = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			
 			for (GrantedAuthority authority : authoritys) {
@@ -210,11 +171,11 @@ public class CommonService {
 	public Boolean isAdmin() {
 		Boolean result = false;
 		
-		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			result = true;
 		}
 		
-		if (result == false) {
+		if (!result) {
 			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			
 			for (GrantedAuthority authority : authorities) {
@@ -232,11 +193,11 @@ public class CommonService {
 	public boolean isUser() {
 		boolean result = false;
 
-		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			result = true;
 		}
 
-		if (result == false) {
+		if (!result) {
 			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
 			for (GrantedAuthority grantedAuthority : authorities) {
@@ -249,6 +210,18 @@ public class CommonService {
 		}
 
 		return result;
+	}
+
+	/**
+	 * 이메일 기반 회원인지 검사.
+	 * @return 이메일 기반이면 true, 아니면 false
+     */
+	public boolean isJakdukUser() {
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public Boolean isRedirectUrl(String url) {

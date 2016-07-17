@@ -118,20 +118,20 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public Boolean existEmail(Locale locale, String email) {
+	public Boolean existEmail(String email) {
 		Boolean result;
 
 		if (commonService.isAnonymousUser()) {
 			User user = userRepository.findOneByEmail(email);
 			result = Objects.nonNull(user);
 		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.already.you.are.user"));
 		}
 		
 		return result;
 	}
 	
-	public Boolean existUsernameOnWrite(Locale locale, String username) {
+	public Boolean existUsernameOnWrite(String username) {
 
 		Boolean result;
 
@@ -139,7 +139,7 @@ public class UserService {
 			User user = userRepository.findOneByUsername(username);
 			result = Objects.nonNull(user);
 		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.already.you.are.user"));
 		}
 
 		return result;

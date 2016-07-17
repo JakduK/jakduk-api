@@ -8,7 +8,7 @@ import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.model.web.user.UserPasswordUpdate;
-import com.jakduk.model.web.user.UserProfileInfo;
+import com.jakduk.restcontroller.user.vo.UserProfileResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
@@ -81,41 +81,6 @@ public class UserController {
 		model.addAttribute("list", users);
 	}
 
-	// jakduk 회원 정보 페이지.
-	@RequestMapping(value = "/profile", method = RequestMethod.GET)
-	public String profile(@RequestParam(required = false) String lang,
-						  @RequestParam(required = false) Integer status,
-						  HttpServletRequest request,
-						  Model model) {
-
-		Locale locale = localeResolver.resolveLocale(request);
-		String language = commonService.getLanguageCode(locale, lang);
-
-		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
-			JakdukPrincipal authUser = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-			UserProfile user = userService.findUserProfileById(authUser.getId());
-
-			UserProfileInfo userProfileInfo = new UserProfileInfo();
-			userProfileInfo.setEmail(user.getEmail());
-			userProfileInfo.setUsername(user.getUsername());
-			userProfileInfo.setAbout(user.getAbout());
-
-			FootballClub footballClub = user.getSupportFC();
-
-			LocalName localName = footballService.getLocalNameOfFootballClub(footballClub, language);
-
-			if (Objects.nonNull(localName)) userProfileInfo.setFootballClubName(localName);
-
-			model.addAttribute("status", status);
-			model.addAttribute("userProfile", userProfileInfo);
-
-			return "user/profile";
-		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-		}
-	}
-
 	// jakduk 비밀번호 변경 페이지.
 	@RequestMapping(value = "/password/update", method = RequestMethod.GET)
 	public String passwordUpdate(Model model) {
@@ -163,7 +128,7 @@ public class UserController {
 
 			UserProfile user = userService.findUserProfileById(userDetail.getId());
 
-			UserProfileInfo profileInfo = new UserProfileInfo();
+			UserProfileResponse profileInfo = new UserProfileResponse();
 			profileInfo.setEmail(user.getEmail());
 			profileInfo.setUsername(user.getUsername());
 			profileInfo.setAbout(user.getAbout());

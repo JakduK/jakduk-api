@@ -1,12 +1,17 @@
 package com.jakduk.restcontroller.board;
 
 import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.ApiConst;
+import com.jakduk.common.ApiUtils;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.db.*;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.db.Gallery;
 import com.jakduk.model.embedded.BoardImage;
 import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.etc.BoardFeelingCount;
@@ -31,7 +36,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -39,7 +43,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.beans.PropertyEditorSupport;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -226,7 +229,7 @@ public class BoardRestController {
             throw new ServiceException(ServiceError.POST_NOT_FOUND);
 
         BoardFree getBoardFree = boardFree.get();
-        boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.COOKIE_NAME_BOARD_FREE, String.valueOf(seq));
+        boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.COOKIE_VIEWS_TYPE.FREE_BOARD, String.valueOf(seq));
 
         if (isAddCookie) {
             int views = getBoardFree.getViews();

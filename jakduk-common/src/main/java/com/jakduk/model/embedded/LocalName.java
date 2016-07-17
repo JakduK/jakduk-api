@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by pyohwan on 15. 12. 26.
+ * @author pyohwan
+ * 15. 12. 26 오후 8:50
  */
 
 @Data

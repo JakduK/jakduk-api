@@ -1,5 +1,7 @@
 package com.jakduk.controller;
 
+import com.jakduk.common.ApiConst;
+import com.jakduk.common.ApiUtils;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.model.db.Gallery;
@@ -121,7 +123,7 @@ public class GalleryController {
 			, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		Locale locale = localeResolver.resolveLocale(request);
-		Boolean isAddCookie = commonService.addViewsCookie(request, response, CommonConst.COOKIE_NAME_BOARD_FREE, id);
+		Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.COOKIE_VIEWS_TYPE.GALLERY, id);
 		Integer status = galleryService.getGallery(model, locale, id, isAddCookie);
 		
 		if (!status.equals(HttpServletResponse.SC_OK)) {

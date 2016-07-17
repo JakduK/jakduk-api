@@ -1,12 +1,19 @@
 package com.jakduk.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.ApiKeyVehicle;
+import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author pyohwan
@@ -16,18 +23,40 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
+    @Autowired
+    private Environment environment;
+
     @Bean
     public Docket api() {
+
+        Set<String> protocols = new HashSet<>();
+        protocols.add(environment.getProperty("swagger.protocol"));
+
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
 //                .apis(RequestHandlerSelectors.basePackage("com.jakduk.restcontroller"))
-                .paths(PathSelectors.ant("/api/**"))
+                    .paths(PathSelectors.ant("/api/**"))
                 .build()
+                .protocols(protocols)
+                .host(environment.getProperty("swagger.host"))
                 .apiInfo(apiInfo());
     }
 
+    @Bean
+    SecurityConfiguration security() {
+        return new SecurityConfiguration(
+                "test-app-client-id",
+                "test-app-client-secret",
+                "test-app-realm",
+                "test-app",
+                "",
+                ApiKeyVehicle.HEADER,
+                "Cookie",
+                "," /*scope separator*/);
+    }
+
     private ApiInfo apiInfo() {
-        ApiInfo apiInfo = new ApiInfo(
+        return new ApiInfo(
                 "JakduK REST API",
                 "Some custom description of API.",
                 "API TOS",
@@ -35,6 +64,5 @@ public class SwaggerConfig {
                 new Contact("pio.", "https://jakduk.com", "phjang1983@daum.net"),
                 "License of API",
                 "https://github.com/JakduK/JakduK/blob/master/LICENSE");
-        return apiInfo;
     }
 }

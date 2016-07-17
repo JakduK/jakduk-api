@@ -38,13 +38,6 @@ public class CommonConst {
 	public final static Integer BOARD_TOP_LIMIT = 3;
 
 	/**
-	 * 게시물 쿠키의 만료되는 시간(초)
-	 */
-	public final static Integer BOARD_COOKIE_EXPIRE_SECONDS = 30;
-	public final static String COOKIE_NAME_BOARD_FREE = "freeBoard";
-	public final static String COOKIE_NAME_GALLERY = "gallery";
-	
-	/**
 	 * 게시판 말머리.
 	 */
 	public final static String BOARD_CATEGORY_NONE = "none";
