@@ -281,7 +281,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/free", method = RequestMethod.POST)
-    public String addFree(@Valid @RequestBody FreePostForm form,
+    public int addFree(@Valid @RequestBody FreePostForm form,
                                      HttpServletRequest request) {
 
         if (!commonService.isUser())
@@ -291,7 +291,7 @@ public class BoardRestController {
 
         BoardFree boardFree = boardFreeService.addFreePost(form.getSubject(), form.getContent(), form.getCategoryCode(), form.getImages(), commonService.getDeviceInfo(device));
 
-        return boardFree.getId();
+        return boardFree.getSeq();
     }
 
     @ApiOperation(value = "자유게시판 글 댓글 목록")
