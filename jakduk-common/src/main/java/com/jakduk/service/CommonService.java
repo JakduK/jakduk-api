@@ -217,11 +217,7 @@ public class CommonService {
 	 * @return 이메일 기반이면 true, 아니면 false
      */
 	public boolean isJakdukUser() {
-		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
-			return true;
-		} else {
-			return false;
-		}
+		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal;
 	}
 
 	public Boolean isRedirectUrl(String url) {
@@ -262,10 +258,10 @@ public class CommonService {
 
 	/**
 	 * ResourceBundle에서 메시지 가져오기.
-	 * @param bundle
-	 * @param getString
-	 * @param params
-     * @return
+	 * @param bundle 번들 이름 ex) messages.common
+	 * @param getString 메시지 이름 ex) common.exception.you.are.writer
+	 * @param params 파라미터가 있을 경우 계속 넣을 수 있음
+     * @return 언어별 메시지 결과 반환
      */
 	public String getResourceBundleMessage(String bundle, String getString, Object... params) {
 		Locale locale = LocaleContextHolder.getLocale();
@@ -275,8 +271,8 @@ public class CommonService {
 
 	/**
 	 * 모바일 디바이스 정보 가져오기.
-	 * @param device
-	 * @return
+	 * @param device Device 객체
+	 * @return CommonConst.DEVICE_TYPE enum 타입
      */
 	public CommonConst.DEVICE_TYPE getDeviceInfo(Device device) {
 		if (device.isNormal()) {

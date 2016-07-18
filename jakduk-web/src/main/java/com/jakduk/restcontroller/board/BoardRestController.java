@@ -259,6 +259,16 @@ public class BoardRestController {
                 .build();
     }
 
+    @ApiOperation(value = "자유게시판 말머리 목록", produces = "application/json", response = FreeCategoriesResponse.class)
+    @RequestMapping(value = "/free/categories", method = RequestMethod.GET)
+    public FreeCategoriesResponse getFreeCategories() {
+
+        List<BoardCategory> categories = boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+        return FreeCategoriesResponse.builder()
+                .categories(categories)
+                .build();
+    }
+
     @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = FreePostOnWriteResponse.class)
     @RequestMapping(value = "/free", method = RequestMethod.POST)
     public FreePostOnWriteResponse addFree(@Valid @RequestBody FreePostForm form,
