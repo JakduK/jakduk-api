@@ -377,7 +377,7 @@ public class BoardFreeService {
 	}
 	*/
 
-	public BoardFree addFreePost(String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode, String images, CommonConst.DEVICE_TYPE device) {
+	public Integer addFreePost(String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode, String images, CommonConst.DEVICE_TYPE device) {
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
@@ -442,6 +442,8 @@ public class BoardFreeService {
 			}
 		}
 		*/
+
+		boardFreeRepository.save(boardFree);
 
 		/*
 		// 글과 연동 된 사진 처리
@@ -542,7 +544,7 @@ public class BoardFreeService {
 			log.debug("boardFree(new) = " + boardFree);
 		}
 
-		return boardFreeRepository.save(boardFree);
+		return boardFree.getSeq();
 	}
 
 	/*

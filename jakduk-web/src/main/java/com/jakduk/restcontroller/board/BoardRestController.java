@@ -1,33 +1,5 @@
 package com.jakduk.restcontroller.board;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.ApiConst;
 import com.jakduk.common.ApiUtils;
@@ -47,22 +19,30 @@ import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.simple.BoardFreeOnSearchComment;
-import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.board.vo.BoardCommentRequest;
-import com.jakduk.restcontroller.board.vo.BoardCommentsResponse;
-import com.jakduk.restcontroller.board.vo.FreeCommentsOnList;
-import com.jakduk.restcontroller.board.vo.FreeCommentsOnListResponse;
-import com.jakduk.restcontroller.board.vo.FreePostForm;
-import com.jakduk.restcontroller.board.vo.FreePostOnDetail;
-import com.jakduk.restcontroller.board.vo.FreePostOnDetailResponse;
-import com.jakduk.restcontroller.board.vo.FreePostsOnList;
-import com.jakduk.restcontroller.board.vo.FreePostsOnListResponse;
-import com.jakduk.restcontroller.board.vo.FreeTopsResponse;
+import com.jakduk.restcontroller.board.vo.*;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.BoardFreeService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.GalleryService;
 import com.jakduk.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author pyohwan
@@ -279,19 +259,20 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = FreePostOnWriteResponse.class)
     @RequestMapping(value = "/free", method = RequestMethod.POST)
-    public String addFree(@Valid @RequestBody FreePostForm form,
+    public FreePostOnWriteResponse addFree(@Valid @RequestBody FreePostForm form,
                                      HttpServletRequest request) {
 
         if (!commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Device device = DeviceUtils.getCurrentDevice(request);
+        Integer seq = boardFreeService.addFreePost(form.getSubject(), form.getContent(), form.getCategoryCode(), form.getImages(), commonService.getDeviceInfo(device));
 
-        BoardFree boardFree = boardFreeService.addFreePost(form.getSubject(), form.getContent(), form.getCategoryCode(), form.getImages(), commonService.getDeviceInfo(device));
-
-        return boardFree.getId();
+        return FreePostOnWriteResponse.builder()
+                .seq(seq)
+                .build();
     }
 
     @ApiOperation(value = "자유게시판 글 댓글 목록")

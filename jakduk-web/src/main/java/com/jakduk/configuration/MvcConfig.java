@@ -6,6 +6,9 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.accept.ContentNegotiationManager;
@@ -82,7 +85,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                         HttpMethod.DELETE.name(), HttpMethod.OPTIONS.name())
                 .allowedHeaders(CrossOrigin.DEFAULT_ALLOWED_HEADERS)
                 .allowCredentials(CrossOrigin.DEFAULT_ALLOW_CREDENTIALS);
-
     }
 
     @Bean
@@ -114,9 +116,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
 
-        return sessionLocaleResolver;
+        return new SessionLocaleResolver();
     }
 
     @Bean
