@@ -6,9 +6,6 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.accept.ContentNegotiationManager;

@@ -377,6 +377,15 @@ public class BoardFreeService {
 	}
 	*/
 
+    /**
+     * 자유게시판 글쓰기
+     * @param subject 제목
+     * @param content 내용
+     * @param categoryCode 말머리 Code
+     * @param images 연동 이미지
+     * @param device 디바이스 정보
+     * @return 글 seq
+     */
 	public Integer addFreePost(String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode, String images, CommonConst.DEVICE_TYPE device) {
 
 		CommonPrincipal principal = userService.getCommonPrincipal();

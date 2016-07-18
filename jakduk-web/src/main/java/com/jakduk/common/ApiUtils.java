@@ -1,5 +1,7 @@
 package com.jakduk.common;
 
+import org.springframework.security.web.util.UrlUtils;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,5 +47,19 @@ public class ApiUtils {
         } else {
             return false;
         }
+    }
+
+    /**
+     * URL 생성
+     * @param request HttpServletRequest
+     * @param uri URI
+     * @return 만들어진 URL
+     */
+    public static String buildFullRequestUrl(HttpServletRequest request, String uri) {
+        return UrlUtils.buildFullRequestUrl(
+                request.getScheme(),
+                request.getServerName(),
+                request.getServerPort(),
+                request.getContextPath() + uri, null);
     }
 }

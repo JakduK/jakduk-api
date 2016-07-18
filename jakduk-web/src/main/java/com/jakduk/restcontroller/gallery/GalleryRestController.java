@@ -1,13 +1,13 @@
 package com.jakduk.restcontroller.gallery;
 
+import com.jakduk.common.ApiUtils;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
-import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.user.vo.UserProfileResponse;
+import com.jakduk.restcontroller.gallery.vo.GalleryOnUploadResponse;
 import com.jakduk.restcontroller.vo.GalleriesResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.GalleryService;
@@ -22,7 +22,6 @@ import org.springframework.web.servlet.LocaleResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -74,9 +73,10 @@ public class GalleryRestController {
         return response;
     }
 
-    @ApiOperation(value = "사진 올리기", produces = "application/json", response = Gallery.class)
+    @ApiOperation(value = "사진 올리기", produces = "application/json", response = GalleryOnUploadResponse.class)
     @RequestMapping(value = "/gallery", method = RequestMethod.POST)
-    public Gallery uploadImage(@RequestParam() MultipartFile file) {
+    public GalleryOnUploadResponse uploadImage(@RequestParam() MultipartFile file,
+                                               HttpServletRequest request) {
 
         if (!commonService.isJakdukUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -84,7 +84,20 @@ public class GalleryRestController {
         if (file.isEmpty())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
-        return galleryService.uploadImage(file);
+        Gallery gallery = galleryService.uploadImage(file);
+
+        return GalleryOnUploadResponse.builder()
+                .id(gallery.getId())
+                .name(gallery.getName())
+                .fileName(gallery.getFileName())
+                .writer(gallery.getWriter())
+                .size(gallery.getSize())
+                .fileSize(gallery.getFileSize())
+                .contentType(gallery.getContentType())
+                .status(gallery.getStatus())
+                .imageUrl(ApiUtils.buildFullRequestUrl(request, "/galley/" + gallery.getId()))
+                .thumbnailUrl(ApiUtils.buildFullRequestUrl(request, "/galley/thumbnail/" + gallery.getId()))
+                .build();
     }
 
     @ApiOperation(value = "사진 지움", produces = "application/json", response = EmptyJsonResponse.class)
