@@ -15,6 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.LocaleResolver;
@@ -36,14 +37,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class GalleryRestController {
 
-    @Resource
-    LocaleResolver localeResolver;
-
     @Autowired
     private CommonService commonService;
 
     @Autowired
     private GalleryService galleryService;
+
+    @Value("#{gallery.image.path}")
+    private String imagePath;
+
+    @Value("#{gallery.thumbnail.path}")
+    private String thumbnailPath;
 
     @ApiOperation(value = "사진 목록", produces = "application/json", response = GalleriesResponse.class)
     @RequestMapping(value = "/galleries", method = RequestMethod.GET)
@@ -95,8 +99,8 @@ public class GalleryRestController {
                 .fileSize(gallery.getFileSize())
                 .contentType(gallery.getContentType())
                 .status(gallery.getStatus())
-                .imageUrl(ApiUtils.buildFullRequestUrl(request, "/galley/" + gallery.getId()))
-                .thumbnailUrl(ApiUtils.buildFullRequestUrl(request, "/galley/thumbnail/" + gallery.getId()))
+                .imageUrl(ApiUtils.buildFullRequestUrl(request, imagePath + gallery.getId()))
+                .thumbnailUrl(ApiUtils.buildFullRequestUrl(request, thumbnailPath + gallery.getId()))
                 .build();
     }
 

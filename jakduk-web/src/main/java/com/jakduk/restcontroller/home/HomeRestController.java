@@ -1,5 +1,6 @@
 package com.jakduk.restcontroller.home;
 
+import com.jakduk.common.ApiUtils;
 import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.model.db.Encyclopedia;
 import com.jakduk.service.CommonService;
@@ -14,7 +15,9 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -67,4 +70,18 @@ public class HomeRestController {
 
         return response;
     }
+
+    // 홈에서 보여줄 각종 최근 데이터 가져오기.
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public Map<String, Object> test(HttpServletRequest request) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("URL", ApiUtils.buildFullRequestUrl(request, "/hello"));
+        response.put("getServletPath", request.getServletPath());
+        response.put("getServerPort", request.getServerPort());
+        response.put("getRequestURL", request.getRequestURL());
+
+        return response;
+    }
 }
+

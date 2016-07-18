@@ -56,6 +56,7 @@ public class ApiUtils {
      * @return 만들어진 URL
      */
     public static String buildFullRequestUrl(HttpServletRequest request, String uri) {
+
         return UrlUtils.buildFullRequestUrl(
                 request.getScheme(),
                 request.getServerName(),
