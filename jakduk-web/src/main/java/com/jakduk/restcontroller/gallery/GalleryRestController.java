@@ -43,10 +43,10 @@ public class GalleryRestController {
     @Autowired
     private GalleryService galleryService;
 
-    @Value("#{gallery.image.path}")
+    @Value("${gallery.image.path}")
     private String imagePath;
 
-    @Value("#{gallery.thumbnail.path}")
+    @Value("${gallery.thumbnail.path}")
     private String thumbnailPath;
 
     @ApiOperation(value = "사진 목록", produces = "application/json", response = GalleriesResponse.class)
