@@ -70,7 +70,7 @@ public class JakdukDAO {
 	// 사진 목록.
 	public List<GalleryOnList> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {
 		
-		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is("use"));
+		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").lt(galleryId));
 		AggregationOperation sort = Aggregation.sort(direction, "_id");
 		AggregationOperation limit = Aggregation.limit(size);
@@ -106,7 +106,7 @@ public class JakdukDAO {
 	 */
 	public Gallery getGalleryById(ObjectId id, Direction direction) {
 		Query query = new Query();
-		query.addCriteria(Criteria.where("status.status").is("use"));
+		query.addCriteria(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE));
 		
 		if (direction.equals(Sort.Direction.ASC)) {
 			query.addCriteria(Criteria.where("_id").gt(id));
@@ -125,7 +125,7 @@ public class JakdukDAO {
 		
 		AggregationOperation unwind = Aggregation.unwind("usersLiking");
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is("use"));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE));
 		AggregationOperation group = Aggregation.group("_id").count().as("count");
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);
@@ -143,7 +143,7 @@ public class JakdukDAO {
 		
 		AggregationOperation unwind = Aggregation.unwind("usersDisliking");
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is("use"));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE));
 		AggregationOperation group = Aggregation.group("_id").count().as("count");
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);

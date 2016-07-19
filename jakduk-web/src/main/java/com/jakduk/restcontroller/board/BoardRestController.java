@@ -7,7 +7,6 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
-import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
@@ -330,7 +329,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 댓글 목록")
+    @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @RequestMapping(value = "/free/comments/{seq}", method = RequestMethod.GET)
     public BoardCommentsResponse freeComment(@PathVariable Integer seq,
                                              @RequestParam(required = false) String commentId) {
@@ -350,31 +349,17 @@ public class BoardRestController {
         return response;
     }
 
-    @ApiOperation(value = "게시판 댓글 달기")
+    @ApiOperation(value = "자유게시판 글의 댓글 달기", produces = "application/json", response = BoardFreeComment.class)
     @RequestMapping(value ="/free/comment", method = RequestMethod.POST)
-    public BoardFreeComment commentWrite(@RequestBody BoardCommentRequest commentRequest,
+    public BoardFreeComment commentWrite(@Valid @RequestBody BoardCommentForm commentRequest,
                                          HttpServletRequest request) {
 
-        if (Objects.isNull(commentRequest))
-            throw new ServiceException(ServiceError.INVALID_PARAMETER);
-
-        Integer seq = commentRequest.getSeq();
-        String contents = commentRequest.getContents();
-
-        if (Objects.isNull(seq) || Objects.isNull(contents)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage("messages.common", "common.exception.invalid.parameter"));
-        }
-
-        CommonPrincipal principal = userService.getCommonPrincipal();
-        String accountId = principal.getId();
-
-        // 인증되지 않은 회원
-        if (Objects.isNull(accountId))
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
+          if (!commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Device device = DeviceUtils.getCurrentDevice(request);
 
-        return boardFreeService.addFreeComment(seq, contents, commonService.getDeviceInfo(device));
+        return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContents().trim(), commonService.getDeviceInfo(device));
     }
 
     @ApiOperation(value = "글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)

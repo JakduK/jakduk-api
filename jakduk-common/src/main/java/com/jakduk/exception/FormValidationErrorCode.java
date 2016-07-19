@@ -1,7 +1,8 @@
 package com.jakduk.exception;
 
 /**
- * Created by pyohwan on 16. 7. 6.
+ * @author pyohwan
+ * 16. 7. 6 오후 11:13
  */
 public class FormValidationErrorCode {
 
@@ -28,6 +29,9 @@ public class FormValidationErrorCode {
     public final static String CONTENT_SIZE = "content_Size";
     public final static String CONTENT_NOT_EMPTY = "content_NotEmpty";
 
-    public final static String CATEGORY_NOT_EMPTY = "category_NotEmpty";
+    public final static String COMMENT_CONTENTS_SIZE = "contents_Size";
+
+    public final static String SEQ_MIN = "seq_Min";
+    public final static String SEQ_NOT_NULL = "seq_NotNull";
 }
 
