@@ -6,15 +6,14 @@ package com.jakduk.common;
  * @desc     :
  */
 public class CommonConst {
-	
-	public final static String COMMON_TYPE_SET = "set";
-	public final static String COMMON_TYPE_CANCEL = "cancel";
-	
+
 	/**
 	 * 게시판 종류.
 	 */
-	public final static String BOARD_NAME_FREE = "freeBoard";
-	
+	public enum BOARD_TYPE {
+		BOARD_FREE
+	}
+
 	/**
 	 * 백과사전 언어 구분.
 	 */
@@ -115,26 +114,27 @@ public class CommonConst {
 		DISABLE_NOTICE
 	}
 
-	
+    /**
+     * 사진을 등록한 출처
+     */
+    public enum GALLERY_FROM_TYPE {
+        BOARD_FREE
+    }
+
 	/**
 	 * 사진 썸네일 크기.
 	 */
 	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 360;
 	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 230;
-	
+
 	/**
 	 * 사진 상태값.
 	 */
-	public final static String GALLERY_STATUS_TEMP = "temp";
-	public final static String GALLERY_STATUS_USE = "use";
-	public final static String GALLERY_STATUS_UNUSE = "unuse";
+	public enum GALLERY_STATUS_TYPE {
+		TEMP,
+		ENABLE,
+	}
 	
-	/**
-	 * 사진 이름 입력 상태값.
-	 */
-	public final static String GALLERY_NAME_STATUS_INPUT = "input";
-	public final static String GALLERY_NAME_STATUS_SUBJECT = "subject";
-
 	/**
 	 * 디바이스 타입
      */

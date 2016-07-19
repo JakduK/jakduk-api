@@ -1,14 +1,15 @@
 package com.jakduk.restcontroller.board.vo;
 
-import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.Gallery;
-import com.jakduk.model.embedded.*;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.embedded.BoardHistory;
+import com.jakduk.model.embedded.BoardStatus;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.Data;
 
 import java.util.List;
 

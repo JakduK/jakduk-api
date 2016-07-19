@@ -12,19 +12,17 @@ import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.Gallery;
-import com.jakduk.model.embedded.BoardImage;
-import com.jakduk.model.embedded.BoardItem;
+import com.jakduk.model.embedded.*;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
+import com.jakduk.model.etc.GalleryOnBoard;
+import com.jakduk.restcontroller.board.vo.GalleryOnUpload;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.restcontroller.board.vo.*;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
-import com.jakduk.service.BoardFreeService;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.GalleryService;
-import com.jakduk.service.UserService;
+import com.jakduk.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +55,9 @@ public class BoardRestController {
 
     @Autowired
     private BoardFreeService boardFreeService;
+
+    @Autowired
+    private BoardCategoryService boardCategoryService;
 
     @Autowired
     private UserService userService;
@@ -272,16 +273,60 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = FreePostOnWriteResponse.class)
     @RequestMapping(value = "/free", method = RequestMethod.POST)
     public FreePostOnWriteResponse addFree(@Valid @RequestBody FreePostForm form,
-                                     HttpServletRequest request) {
+                                           HttpServletRequest request) {
 
         if (!commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
+        Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
+
+        if (!boardCategory.isPresent())
+            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+
+        BoardFree boardFree = new BoardFree();
+
+        boardFree.setCategory(form.getCategoryCode());
+        boardFree.setSubject(form.getSubject().trim());
+        boardFree.setContent(form.getContent().trim());
+        boardFree.setViews(0);
+        boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_TYPE.BOARD_FREE.name()));
+
+        CommonPrincipal principal = userService.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+        boardFree.setWriter(writer);
+
         Device device = DeviceUtils.getCurrentDevice(request);
-        Integer seq = boardFreeService.addFreePost(form.getSubject(), form.getContent(), form.getCategoryCode(), form.getImages(), commonService.getDeviceInfo(device));
+        BoardStatus boardStatus = new BoardStatus(commonService.getDeviceInfo(device));
+        boardFree.setStatus(boardStatus);
+
+        List<BoardHistory> histories = new ArrayList<>();
+        BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.CREATE, writer);
+        histories.add(history);
+        boardFree.setHistory(histories);
+
+        if (!form.getGalleries().isEmpty()) {
+            List<BoardImage> galleries = new ArrayList<>();
+
+            for (GalleryOnUpload galleryOnUpload : form.getGalleries()) {
+                Gallery gallery = galleryService.findOneById(galleryOnUpload.getId());
+
+                if (Objects.nonNull(gallery))
+                    galleries.add(new BoardImage(gallery.getId()));
+            }
+
+            if (galleries.size() > 0) {
+                boardFree.setGalleries(galleries);
+            }
+        }
+
+        List<GalleryOnBoard> galleries = form.getGalleries().stream()
+                .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
+                .collect(Collectors.toList());
+
+        boardFreeService.addFreePost(boardFree, galleries);
 
         return FreePostOnWriteResponse.builder()
-                .seq(seq)
+                .seq(boardFree.getSeq())
                 .build();
     }
 

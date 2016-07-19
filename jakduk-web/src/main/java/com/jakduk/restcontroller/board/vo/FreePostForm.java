@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * @author pyohwan
@@ -34,6 +35,6 @@ public class FreePostForm {
     @ApiModelProperty(required = true, value = "말머리 코드", example = "FREE")
     private CommonConst.BOARD_CATEGORY_TYPE categoryCode;
 
-    @ApiModelProperty(value = "이미지 ID 목록", example = "abcde111;abcde222")
-    private String images;
+    @ApiModelProperty(value = "이미지 목록")
+    private List<GalleryOnUpload> galleries;
 }

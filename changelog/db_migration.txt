@@ -22,6 +22,9 @@ db.boardFree.update({'history.type':'delete'}, {$set:{'history.$.type':'DELETE'}
 db.boardFree.update({'history.type':'edit'}, {$set:{'history.$.type':'EDIT'}}, {multi:true})
 db.boardFree.update({'history.type':'notice'}, {$set:{'history.$.type':'ENABLE_NOTICE'}}, {multi:true})
 db.boardFree.update({'history.type':'c.notice'}, {$set:{'history.$.type':'DISABLE_NOTICE'}}, {multi:true})
+db.gallery.update({'status.from':'freeBoard'}, {$set:{'status.from':'BOARD_FREE'}}, {multi:true})
+db.gallery.update({'status.status':'temp'}, {$set:{'status.status':'TEMP'}}, {multi:true})
+db.gallery.update({'status.status':'use'}, {$set:{'status.status':'ENABLE'}}, {multi:true})
 
 Version 0.6.1 / 2016-05-07
 

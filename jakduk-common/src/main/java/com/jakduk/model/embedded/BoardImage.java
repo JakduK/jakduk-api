@@ -1,6 +1,8 @@
 package com.jakduk.model.embedded;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,10 +12,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@Data
-@Document
+@AllArgsConstructor
+@Getter
 public class BoardImage {
-	
 	private String id;
-	
 }

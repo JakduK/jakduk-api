@@ -134,7 +134,7 @@ public class GalleryService {
 			gallery.setWriter(writer);
 
 			GalleryStatus status = new GalleryStatus();
-			status.setStatus(CommonConst.GALLERY_STATUS_TEMP);
+			status.setStatus(CommonConst.GALLERY_STATUS_TYPE.TEMP);
 			gallery.setStatus(status);
 
 			gallery.setFileName(file.getOriginalFilename());

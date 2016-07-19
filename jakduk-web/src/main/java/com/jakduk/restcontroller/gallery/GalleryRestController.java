@@ -1,6 +1,5 @@
 package com.jakduk.restcontroller.gallery;
 
-import com.jakduk.common.ApiUtils;
 import com.jakduk.common.CommonConst;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
@@ -18,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +39,9 @@ public class GalleryRestController {
 
     @Autowired
     private GalleryService galleryService;
+
+    @Value("${api.server.url}")
+    private String apiServerUrl;
 
     @Value("${gallery.image.path}")
     private String imagePath;
@@ -79,8 +79,7 @@ public class GalleryRestController {
 
     @ApiOperation(value = "사진 올리기", produces = "application/json", response = GalleryOnUploadResponse.class)
     @RequestMapping(value = "/gallery", method = RequestMethod.POST)
-    public GalleryOnUploadResponse uploadImage(@RequestParam() MultipartFile file,
-                                               HttpServletRequest request) {
+    public GalleryOnUploadResponse uploadImage(@RequestParam() MultipartFile file) {
 
         if (!commonService.isJakdukUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -99,8 +98,8 @@ public class GalleryRestController {
                 .fileSize(gallery.getFileSize())
                 .contentType(gallery.getContentType())
                 .status(gallery.getStatus())
-                .imageUrl(ApiUtils.buildFullRequestUrl(request, imagePath + gallery.getId()))
-                .thumbnailUrl(ApiUtils.buildFullRequestUrl(request, thumbnailPath + gallery.getId()))
+                .imageUrl(apiServerUrl + imagePath + gallery.getId())
+                .thumbnailUrl(apiServerUrl + thumbnailPath + gallery.getId())
                 .build();
     }
 
