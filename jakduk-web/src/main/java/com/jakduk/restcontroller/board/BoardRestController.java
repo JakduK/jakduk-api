@@ -15,7 +15,6 @@ import com.jakduk.model.embedded.*;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.etc.GalleryOnBoard;
-import com.jakduk.restcontroller.board.vo.GalleryOnUpload;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.simple.BoardFreeOnSearchComment;
@@ -72,7 +71,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 목록", produces = "application/json", response = FreePostsOnListResponse.class)
     @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
-    public FreePostsOnListResponse getPosts(@RequestParam(required = false, defaultValue = "1") Integer page,
+    public FreePostsOnListResponse getFreePosts(@RequestParam(required = false, defaultValue = "1") Integer page,
                                             @RequestParam(required = false, defaultValue = "20") Integer size,
                                             @RequestParam(required = false, defaultValue = "ALL") CommonConst.BOARD_CATEGORY_TYPE category) {
 
@@ -151,7 +150,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 주간 선두 글", produces = "application/json", response = FreeTopsResponse.class)
     @RequestMapping(value = "/free/tops", method = RequestMethod.GET)
-    public FreeTopsResponse getFreeTops() {
+    public FreeTopsResponse getFreePostsTops() {
 
         List<BoardFreeOnBest> topLikes = boardFreeService.getFreeTopLikes();
         List<BoardFreeOnBest> topComments = boardFreeService.getFreeTopComments();
@@ -164,7 +163,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 댓글 목록", produces = "application/json", response = FreeCommentsOnListResponse.class)
     @RequestMapping(value = "/free/comments", method = RequestMethod.GET)
-    public FreeCommentsOnListResponse getBoardFreeComments(
+    public FreeCommentsOnListResponse getFreeComments(
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {
 
@@ -271,7 +270,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = FreePostOnWriteResponse.class)
     @RequestMapping(value = "/free", method = RequestMethod.POST)
-    public FreePostOnWriteResponse addFree(@Valid @RequestBody FreePostForm form,
+    public FreePostOnWriteResponse addFreePost(@Valid @RequestBody FreePostForm form,
                                            HttpServletRequest request) {
 
         if (!commonService.isUser())
@@ -322,16 +321,47 @@ public class BoardRestController {
                 .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
                 .collect(Collectors.toList());
 
-        boardFreeService.addFreePost(boardFree, galleries);
+        boardFreeService.insertFreePost(boardFree, galleries);
 
         return FreePostOnWriteResponse.builder()
                 .seq(boardFree.getSeq())
                 .build();
     }
 
+    @ApiOperation(value = "자유게시판 글 편집", produces = "application/json", response = FreePostOnWriteResponse.class)
+    @RequestMapping(value = "/free", method = RequestMethod.PUT)
+    public FreePostOnWriteResponse editFreePost(@Valid @RequestBody FreePostForm form,
+                                                HttpServletRequest request) {
+
+        if (!commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
+
+        if (!boardCategory.isPresent())
+            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+
+        List<GalleryOnBoard> galleries = new ArrayList<>();
+
+        if (Objects.nonNull(form.getGalleries())) {
+            galleries = form.getGalleries().stream()
+                    .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
+                    .collect(Collectors.toList());
+        }
+
+        Device device = DeviceUtils.getCurrentDevice(request);
+
+        int boardSeq = boardFreeService.updateFreePost(form.getId().trim(), form.getSubject().trim(), form.getContent().trim(),
+                form.getCategoryCode(), galleries, commonService.getDeviceInfo(device));
+
+        return FreePostOnWriteResponse.builder()
+                .seq(boardSeq)
+                .build();
+    }
+
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @RequestMapping(value = "/free/comments/{seq}", method = RequestMethod.GET)
-    public BoardCommentsResponse freeComment(@PathVariable Integer seq,
+    public BoardCommentsResponse getFreeComments(@PathVariable Integer seq,
                                              @RequestParam(required = false) String commentId) {
 
         BoardFreeOfMinimum boardFreeOnComment = boardFreeService.findBoardFreeOfMinimumBySeq(seq);
@@ -351,7 +381,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글의 댓글 달기", produces = "application/json", response = BoardFreeComment.class)
     @RequestMapping(value ="/free/comment", method = RequestMethod.POST)
-    public BoardFreeComment commentWrite(@Valid @RequestBody BoardCommentForm commentRequest,
+    public BoardFreeComment addFreeComment(@Valid @RequestBody BoardCommentForm commentRequest,
                                          HttpServletRequest request) {
 
           if (!commonService.isUser())
@@ -359,12 +389,12 @@ public class BoardRestController {
 
         Device device = DeviceUtils.getCurrentDevice(request);
 
-        return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContents().trim(), commonService.getDeviceInfo(device));
+        return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContent().trim(), commonService.getDeviceInfo(device));
     }
 
     @ApiOperation(value = "글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
     @RequestMapping(value = "/free/{seq}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse setFreeFeeling(@PathVariable Integer seq,
+    public UserFeelingResponse addFreeFeeling(@PathVariable Integer seq,
                                               @PathVariable CommonConst.FEELING_TYPE feeling) {
 
         if (!commonService.isUser())
@@ -384,7 +414,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "댓글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse setFreeCommentFeeling(@PathVariable String commentId,
+    public UserFeelingResponse addFreeCommentFeeling(@PathVariable String commentId,
                                                      @PathVariable CommonConst.FEELING_TYPE feeling) {
 
         if (!commonService.isUser())

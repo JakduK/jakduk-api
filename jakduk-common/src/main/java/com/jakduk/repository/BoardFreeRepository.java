@@ -13,6 +13,8 @@ import java.util.Optional;
 
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String> {
 
+	Optional<BoardFree> findOneById(String id);
+
 	Page<BoardFreeOnList> findByCategoryName(String categoryName, Pageable pageable);
 	Optional<BoardFree> findOneBySeq(Integer seq);
 	BoardFree findByWriter(String writer);

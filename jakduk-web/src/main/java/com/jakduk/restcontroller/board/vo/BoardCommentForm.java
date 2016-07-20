@@ -26,5 +26,5 @@ public class BoardCommentForm {
 
     @ApiModelProperty(value = "댓글 내용")
     @Size(min = 3, max=800, message = FormValidationErrorCode.COMMENT_CONTENTS_SIZE)
-    private String contents;
+    private String content;
 }

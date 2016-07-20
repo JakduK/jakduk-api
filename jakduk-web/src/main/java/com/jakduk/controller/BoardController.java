@@ -28,23 +28,6 @@ public class BoardController {
 	@Resource
 	LocaleResolver localeResolver;
 
-	@RequestMapping(value = "/free/comments/refresh", method = RequestMethod.GET)
-	public String freeCommentsRefresh() {
-		
-		return "redirect:/board/free/comments";
-	}	
-
-	
-	@RequestMapping(value = "/free/comments", method = RequestMethod.GET)
-	public String freeCommentsList(@ModelAttribute BoardListInfo boardListInfo, Model model
-			, HttpServletRequest request) {
-		
-		Locale locale = localeResolver.resolveLocale(request);
-		boardFreeService.getFreeCommentsList(model, locale, boardListInfo);
-		
-		return "board/freeComments";
-	}
-
 	@RequestMapping(value = "/free/delete/{seq}", method = RequestMethod.GET)
 	public String deleteFree(@PathVariable int seq, Model model,
 			HttpServletResponse response,

@@ -35,20 +35,6 @@ public class BoardFreeWriteController {
 	private BoardFreeService boardFreeService;
 
 
-	@RequestMapping(value = "/free/edit/{seq}", method = RequestMethod.GET)
-	public String freeEdit(@PathVariable int seq, Model model,
-			HttpServletResponse response) throws IOException {
-
-		Integer status = boardFreeService.getEdit(model, seq, response);
-		
-		if (!status.equals(HttpServletResponse.SC_OK)) {
-			response.sendError(status);
-			return null;
-		}
-
-		return "board/freeEdit";
-	}
-
 	@RequestMapping(value = "/free/edit", method = RequestMethod.POST)
 	public String freeEdit(@Valid BoardFreeWrite boardFreeWrite, BindingResult result, SessionStatus sessionStatus
 			, HttpServletRequest request) {

@@ -1,10 +1,15 @@
 package com.jakduk.restcontroller.home;
 
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.SuccessButNoContentException;
 import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.home.vo.HomeResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.HomeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +27,7 @@ import java.util.Objects;
  * 16. 3. 20 오후 9:13
  */
 
+@Api(tags = "홈", description = "홈 관련")
 @RestController
 @RequestMapping("/api")
 public class HomeRestController {
@@ -35,7 +41,7 @@ public class HomeRestController {
     @Autowired
     private HomeService homeService;
 
-    // 백과사전 가져오기.
+    @ApiOperation(value = "백과사전 가져오기", produces = "application/json", response = Encyclopedia.class)
     @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
     public Encyclopedia getEncyclopedia(@RequestParam(required = false) String lang,
                                         HttpServletRequest request) {
@@ -46,12 +52,12 @@ public class HomeRestController {
         Encyclopedia encyclopedia = homeService.getEncyclopedia(language);
 
         if (Objects.isNull(encyclopedia))
-            throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+            throw new ServiceException(ServiceError.NOT_FOUND);
 
         return encyclopedia;
     }
 
-    // 홈에서 보여줄 각종 최근 데이터 가져오기.
+    @ApiOperation(value = "홈에서 보여줄 각종 최근 데이터 가져오기", produces = "application/json", response = HomeResponse.class)
     @RequestMapping(value = "/home/latest", method = RequestMethod.GET)
     public HomeResponse dataLatest(@RequestParam(required = false) String lang,
                            HttpServletRequest request) {

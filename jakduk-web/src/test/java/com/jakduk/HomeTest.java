@@ -4,6 +4,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.simple.BoardFreeCommentOnHome;
+import com.jakduk.model.simple.GalleryOnList;
 import com.jakduk.model.simple.UserOnHome;
 import com.jakduk.repository.BoardFreeCommentOnHomeRepository;
 import com.jakduk.repository.BoardFreeOnHomeRepository;
@@ -18,7 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,10 +55,10 @@ public class HomeTest extends AbstractSpringTest {
 	@Test
 	public void getBoardLatest() {
 		
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
 		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
 		
-		//System.out.println("getBoardLatest=" + boardFreeOnHomeRepository.findAll(pageable).getContent());
+		System.out.println("getBoardLatest=" + boardFreeOnHomeRepository.findAll(pageable).getContent());
 	}
 	
 	@Test
@@ -65,7 +66,7 @@ public class HomeTest extends AbstractSpringTest {
 		
 		List<UserOnHome> users = jakdukDAO.getUserOnHome("ko");
 		
-		//System.out.println("getUsersLatest=" +users);
+		System.out.println("getUsersLatest=" +users);
 	}
 	
 	@Test
@@ -81,6 +82,13 @@ public class HomeTest extends AbstractSpringTest {
 		List<FootballClub> footballClubs = footballService.getFootballClubs("ko", CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.shortName);
 
 		System.out.println("getFootballClubs=" + footballClubs);
+	}
+
+	@Test
+	public void 최근사진목록() {
+		List<GalleryOnList> galleries = homeService.getGalleriesLatest();
+
+		System.out.println("galleries=" + galleries);
 	}
 
 }
