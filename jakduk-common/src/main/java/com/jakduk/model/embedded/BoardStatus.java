@@ -20,7 +20,7 @@ public class BoardStatus {
 	
 	private String notice;
 	
-	private String delete;
+	private boolean delete;
 	
 	private CommonConst.DEVICE_TYPE device;
 

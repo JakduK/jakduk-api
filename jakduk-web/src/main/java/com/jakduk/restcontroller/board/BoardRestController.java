@@ -299,7 +299,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 편집", produces = "application/json", response = FreePostOnWriteResponse.class)
+    @ApiOperation(value = "자유게시판 글 고치기", produces = "application/json", response = FreePostOnWriteResponse.class)
     @RequestMapping(value = "/free", method = RequestMethod.PUT)
     public FreePostOnWriteResponse editFreePost(@Valid @RequestBody FreePostForm form,
                                                 HttpServletRequest request) {
@@ -322,12 +322,24 @@ public class BoardRestController {
 
         Device device = DeviceUtils.getCurrentDevice(request);
 
-        Integer boardSeq = boardFreeService.updateFreePost(form.getId().trim(), form.getSubject().trim(), form.getContent().trim(),
+        Integer boardSeq = boardFreeService.updateFreePost(form.getSeq(), form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleries, commonService.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
                 .seq(boardSeq)
                 .build();
+    }
+
+    @ApiOperation(value = "자유게시판 글 지움", produces = "application/json", response = FreePostOnDeleteResponse.class)
+    @RequestMapping(value = "/free/{seq}", method = RequestMethod.DELETE)
+    public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
+
+        if (!commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+		CommonConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(seq);
+
+        return FreePostOnDeleteResponse.builder().result(deleteType).build();
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")

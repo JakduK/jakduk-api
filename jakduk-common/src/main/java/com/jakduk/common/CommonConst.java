@@ -100,8 +100,10 @@ public class CommonConst {
 	/**
 	 * 글 지움 종류
 	 */
-	public final static String BOARD_DELETE_TYPE_POSTONLY = "postonly";
-	public final static String BOARD_DELETE_TYPE_ALL = "all";
+	public enum BOARD_DELETE_TYPE {
+		CONTENT,	// 글 본문만 지움(댓글 유지)
+		ALL			// 모두 지움
+	}
 
 	/**
 	 * 글 히스토리 상태

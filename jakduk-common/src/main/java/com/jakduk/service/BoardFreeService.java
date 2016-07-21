@@ -179,180 +179,14 @@ public class BoardFreeService {
 		}
 	}
 
-	/**
-	 * 자유게시판 글쓰기 데이터 DB에 삽입
-	 */
-	/*
-	public Integer write(HttpServletRequest request, BoardFreeWrite boardFreeWrite) {
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String accountId = principal.getId();
-		String username = principal.getUsername();
-		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
-
-		if (accountId == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		BoardFree boardFree = new BoardFree();
-
-		CommonWriter writer = new CommonWriter(accountId, username, accountType);
-
-		boardFree.setWriter(writer);
-		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_NAME_FREE));
-
-		BoardStatus boardStatus = new BoardStatus();
-		Device device = DeviceUtils.getCurrentDevice(request);
-        boardStatus.setDevice(commonService.getDeviceInfo(device));
-
-		boardFree.setStatus(boardStatus);
-
-		List<BoardHistory> historys = new ArrayList<BoardHistory>();
-		BoardHistory history = new BoardHistory();
-		history.setId(new ObjectId().toString());
-		history.setType(CommonConst.BOARD_HISTORY_TYPE_CREATE);
-		history.setWriter(writer);
-		historys.add(history);
-		boardFree.setHistory(historys);
-
-		JSONArray jsonArray = null;
-
-		if (!boardFreeWrite.getImages().isEmpty()) {
-			JSONParser jsonParser = new JSONParser();
-			try {
-				jsonArray = (JSONArray) jsonParser.parse(boardFreeWrite.getImages());
-				List<BoardImage> galleries = new ArrayList<BoardImage>();
-
-				for (int i = 0 ; i < jsonArray.size() ; i++) {
-					JSONObject obj = (JSONObject)jsonArray.get(i);
-					String id = (String) obj.get("uid");
-
-					Gallery gallery = galleryRepository.findOne(id);
-
-					if (gallery != null) {
-						BoardImage boardImage = new BoardImage();
-						boardImage.setId(gallery.getId());
-						galleries.add(boardImage);
-					}
-				}
-
-				if (galleries.size() > 0) {
-					boardFree.setGalleries(galleries);
-				}
-
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// 임시 처리.
-		//boardFree.setCategory(boardFreeWrite.getCategoryName());
-		boardFree.setCategory(CommonConst.BOARD_CATEGORY_TYPE.ALL);
-		boardFree.setSubject(boardFreeWrite.getSubject());
-		boardFree.setContent(boardFreeWrite.getContent());
-		boardFree.setViews(0);
-
-		boardFreeRepository.save(boardFree);
-
-		// 글과 연동 된 사진 처리
-		if (jsonArray != null) {
-			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
-
-			for (int i = 0 ; i < jsonArray.size() ; i++) {
-				JSONObject obj = (JSONObject)jsonArray.get(i);
-				String id = (String) obj.get("uid");
-				String name = (String) obj.get("name");
-
-				Gallery gallery = galleryRepository.findOne(id);
-
-				if (gallery != null) {
-					GalleryStatus status = gallery.getStatus();
-					List<BoardItem> posts = gallery.getPosts();
-
-					if (posts == null) {
-						posts = new ArrayList<BoardItem>();
-					}
-
-					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-					long itemCount = 0;
-
-					if (gallery.getPosts() != null) {
-						Stream<BoardItem> sPosts = gallery.getPosts().stream();
-						itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();
-					}
-
-					if (itemCount == 0) {
-						posts.add(boardItem);
-						gallery.setPosts(posts);
-					}
-
-					if (name != null && !name.isEmpty()) {
-						status.setName(CommonConst.GALLERY_NAME_STATUS_INPUT);
-						gallery.setName(name);
-					} else {
-						status.setName(CommonConst.GALLERY_NAME_STATUS_SUBJECT);
-						gallery.setName(boardFree.getSubject());
-					}
-
-					status.setFrom(CommonConst.BOARD_NAME_FREE);
-					status.setStatus(CommonConst.GALLERY_STATUS_USE);
-					gallery.setStatus(status);
-					galleryRepository.save(gallery);
-
-					// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
-					GalleryOnES galleryOnES = new GalleryOnES();
-					galleryOnES.setId(gallery.getId());
-					galleryOnES.setWriter(gallery.getWriter());
-					galleryOnES.setName(gallery.getName());
-
-					searchService.createDocumentGallery(galleryOnES);
-				}
-			}
-		}
-
-		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
-		boardFreeOnEs.setId(boardFree.getId());
-		boardFreeOnEs.setSeq(boardFree.getSeq());
-		boardFreeOnEs.setWriter(boardFree.getWriter());
-		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
-
-		boardFreeOnEs.setSubject(boardFree.getSubject()
-				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;",""));
-
-		boardFreeOnEs.setContent(boardFree.getContent()
-				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;",""));
-
-		searchService.createDocumentBoard(boardFreeOnEs);
-
-		// 슬랙 알림
-		slackService.sendPost(
-			boardFree.getWriter().getUsername(),
-			boardFree.getSubject(),
-			"New post created.",
-			UrlUtils.buildFullRequestUrl(
-				request.getScheme(),
-				request.getServerName(),
-				request.getServerPort(),
-				request.getContextPath(), null) + "/board/free/" + boardFree.getSeq()
-		);
-
-		if (log.isInfoEnabled()) {
-			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
-		}
-
-		if (log.isDebugEnabled()) {
-			log.debug("boardFree(new) = " + boardFree);
-		}
-
-		return HttpServletResponse.SC_OK;
-	}
-	*/
-
     /**
      * 자유게시판 글쓰기
+     * @param subject 글 제목
+     * @param content 글 내용
+     * @param categoryCode 글 말머리 Code
+     * @param galleries 글과 연동된 사진들
+     * @param device 디바이스
+     * @return 글 seq
      */
 	public Integer insertFreePost(String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
 							   List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
@@ -475,18 +309,18 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 글 편집
-	 * @param id 글 ID
+	 * @param seq 글 seq
 	 * @param subject 글 제목
 	 * @param content 글 내용
-	 * @param categoryCode 글 말머리 COde
+	 * @param categoryCode 글 말머리 Code
 	 * @param galleries 글과 연동된 사진들
      * @param device 디바이스
      * @return 글 seq
      */
-	public Integer updateFreePost(String id, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
+	public Integer updateFreePost(Integer seq, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
 								  List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
 
-		Optional<BoardFree> boardFree = boardFreeRepository.findOneById(id);
+		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 
 		if (! boardFree.isPresent())
 			throw new ServiceException(ServiceError.POST_NOT_FOUND);
@@ -606,6 +440,73 @@ public class BoardFreeService {
 		return updateBoardFree.getSeq();
 	}
 
+	/**
+	 * 자유게시판 글 지움
+	 * @param seq 글 seq
+	 * @return CommonConst.BOARD_DELETE_TYPE
+     */
+    public CommonConst.BOARD_DELETE_TYPE deleteFreePost(Integer seq) {
+
+        Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
+
+        if (! boardFree.isPresent())
+            throw new ServiceException(ServiceError.POST_NOT_FOUND);
+
+        CommonPrincipal principal = userService.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        BoardFree updateBoardFree = boardFree.get();
+
+        if (! updateBoardFree.getWriter().getUserId().equals(principal.getId()))
+            throw new ServiceException(ServiceError.FORBIDDEN);
+
+        BoardFree deleteBoardFree = boardFree.get();
+
+        BoardItem boardItem = new BoardItem(deleteBoardFree.getId(), deleteBoardFree.getSeq());
+
+        Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
+
+        // 글이 지워질 때, 연동된 사진도 끊어주어야 한다.
+        // 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
+        if (count > 0) {
+            deleteBoardFree.setContent(null);
+            deleteBoardFree.setSubject(null);
+            deleteBoardFree.setWriter(null);
+
+            List<BoardHistory> histories = deleteBoardFree.getHistory();
+
+            if (Objects.isNull(histories))
+                histories = new ArrayList<>();
+
+            BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.DELETE, writer);
+            histories.add(history);
+            deleteBoardFree.setHistory(histories);
+
+            BoardStatus boardStatus = deleteBoardFree.getStatus();
+
+            if (Objects.isNull(boardStatus))
+                boardStatus = new BoardStatus();
+
+            boardStatus.setDelete(true);
+            deleteBoardFree.setStatus(boardStatus);
+
+            boardFreeRepository.save(deleteBoardFree);
+
+            if (log.isInfoEnabled()) {
+                log.info("A post was deleted(post only). post seq=" + deleteBoardFree.getSeq() + ", subject=" + deleteBoardFree.getSubject());
+            }
+        } else { // 몽땅 지우기.
+            boardFreeRepository.delete(deleteBoardFree);
+
+            if (log.isInfoEnabled()) {
+                log.info("A post was deleted(all). post seq=" + deleteBoardFree.getSeq() + ", subject=" + deleteBoardFree.getSubject());
+            }
+        }
+
+        searchService.deleteDocumentBoard(deleteBoardFree.getId());
+
+        return count > 0 ? CommonConst.BOARD_DELETE_TYPE.CONTENT : CommonConst.BOARD_DELETE_TYPE.ALL;
+    }
 
 	/**
 	 * 자유게시판 말머리 목록
@@ -830,109 +731,6 @@ public class BoardFreeService {
 
 		return boardComment;
 	}
-
-	/*
-	public Integer deleteFree(Model model, int seq, String type) {
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String accountId = principal.getId();
-		String accountUsername = principal.getUsername();
-		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
-
-		CommonWriter writer = new CommonWriter(accountId, accountUsername, accountType);
-
-		if (accountId == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
-
-		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceError.POST_NOT_FOUND);
-
-		BoardFree getBoardFree = boardFree.get();
-
-		if (getBoardFree.getWriter() == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		if (!accountId.equals(getBoardFree.getWriter().getUserId())) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		BoardItem boardItem = new BoardItem(getBoardFree.getId(), getBoardFree.getSeq());
-
-		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
-
-		if (type.equals(CommonConst.BOARD_DELETE_TYPE_POSTONLY) && count < 1) {
-			return HttpServletResponse.SC_NOT_ACCEPTABLE;
-		} else if (type.equals(CommonConst.BOARD_DELETE_TYPE_ALL) && count > 0) {
-			return HttpServletResponse.SC_NOT_ACCEPTABLE;
-		}
-
-		// 글이 지워질 때, 연동된 사진도 끊어주어야 한다.
-		// 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
-
-		switch (type) {
-		case CommonConst.BOARD_DELETE_TYPE_POSTONLY:
-
-			getBoardFree.setContent(null);
-			getBoardFree.setSubject(null);
-			getBoardFree.setWriter(null);
-
-			List<BoardHistory> historys = getBoardFree.getHistory();
-
-			if (historys == null) {
-				historys = new ArrayList<>();
-			}
-
-			BoardHistory history = new BoardHistory();
-			history.setId(new ObjectId().toString());
-			history.setType(CommonConst.BOARD_HISTORY_TYPE_DELETE);
-			history.setWriter(writer);
-			historys.add(history);
-			getBoardFree.setHistory(historys);
-
-			BoardStatus boardStatus = getBoardFree.getStatus();
-
-			if (boardStatus == null) {
-				boardStatus = new BoardStatus();
-			}
-
-			boardStatus.setDelete(CommonConst.BOARD_HISTORY_TYPE_DELETE);
-			getBoardFree.setStatus(boardStatus);
-
-			boardFreeRepository.save(getBoardFree);
-
-			if (log.isInfoEnabled()) {
-				log.info("A post was deleted(post only). post seq=" + getBoardFree.getSeq() + ", subject=" + getBoardFree.getSubject());
-			}
-
-			if (log.isDebugEnabled()) {
-				log.debug("Delete(post only) post. BoardFree = " + boardFree);
-			}
-
-			break;
-
-		case CommonConst.BOARD_DELETE_TYPE_ALL:
-			boardFreeRepository.delete(getBoardFree);
-
-			if (log.isInfoEnabled()) {
-				log.info("A post was deleted(all). post seq=" + getBoardFree.getSeq() + ", subject=" + getBoardFree.getSubject());
-			}
-
-			if (log.isDebugEnabled()) {
-				log.debug("Delete(all) post. BoardFree = " + boardFree);
-			}
-
-			break;
-		}
-
-		searchService.deleteDocumentBoard(getBoardFree.getId());
-
-		return HttpServletResponse.SC_OK;
-	}
-	*/
 
 	/*
 	public Integer setNotice(int seq, String type) {
