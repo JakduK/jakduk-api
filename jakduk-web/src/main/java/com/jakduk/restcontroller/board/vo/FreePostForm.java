@@ -19,9 +19,6 @@ import java.util.List;
 @ApiModel(value = "글쓰기 & 글편집 폼")
 public class FreePostForm {
 
-    @ApiModelProperty(value = "글 seq. 글편집 시에면 입력")
-    private Integer seq;
-
     @ApiModelProperty(required = true, value = "글 제목")
     @Size(min = 3, max=60, message = FormValidationErrorCode.SUBJECT_SIZE)
     @NotEmpty(message = FormValidationErrorCode.SUBJECT_NOT_EMPTY)

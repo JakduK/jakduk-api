@@ -273,7 +273,7 @@ public class BoardRestController {
     public FreePostOnWriteResponse addFreePost(@Valid @RequestBody FreePostForm form,
                                                HttpServletRequest request) {
 
-        if (!commonService.isUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
@@ -300,11 +300,12 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 고치기", produces = "application/json", response = FreePostOnWriteResponse.class)
-    @RequestMapping(value = "/free", method = RequestMethod.PUT)
-    public FreePostOnWriteResponse editFreePost(@Valid @RequestBody FreePostForm form,
+    @RequestMapping(value = "/free/{seq}", method = RequestMethod.PUT)
+    public FreePostOnWriteResponse editFreePost(@PathVariable Integer seq,
+                                                @Valid @RequestBody FreePostForm form,
                                                 HttpServletRequest request) {
 
-        if (!commonService.isUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
@@ -322,7 +323,7 @@ public class BoardRestController {
 
         Device device = DeviceUtils.getCurrentDevice(request);
 
-        Integer boardSeq = boardFreeService.updateFreePost(form.getSeq(), form.getSubject().trim(), form.getContent().trim(),
+        Integer boardSeq = boardFreeService.updateFreePost(seq, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleries, commonService.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
@@ -334,7 +335,7 @@ public class BoardRestController {
     @RequestMapping(value = "/free/{seq}", method = RequestMethod.DELETE)
     public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
 
-        if (!commonService.isUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
 		CommonConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(seq);
@@ -367,7 +368,7 @@ public class BoardRestController {
     public BoardFreeComment addFreeComment(@Valid @RequestBody BoardCommentForm commentRequest,
                                          HttpServletRequest request) {
 
-          if (!commonService.isUser())
+          if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Device device = DeviceUtils.getCurrentDevice(request);
@@ -380,7 +381,7 @@ public class BoardRestController {
     public UserFeelingResponse addFreeFeeling(@PathVariable Integer seq,
                                               @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        if (!commonService.isUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         BoardFree boardFree = boardFreeService.setFreeFeelings(seq, feeling);
@@ -400,7 +401,7 @@ public class BoardRestController {
     public UserFeelingResponse addFreeCommentFeeling(@PathVariable String commentId,
                                                      @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        if (!commonService.isUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         BoardFreeComment boardFreeComment = boardFreeService.setFreeCommentFeeling(commentId, feeling);
