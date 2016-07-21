@@ -1,6 +1,5 @@
 package com.jakduk.restcontroller.board;
 
-import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.ApiConst;
 import com.jakduk.common.ApiUtils;
 import com.jakduk.common.CommonConst;
@@ -11,7 +10,8 @@ import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.db.Gallery;
-import com.jakduk.model.embedded.*;
+import com.jakduk.model.embedded.BoardImage;
+import com.jakduk.model.embedded.BoardItem;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.etc.GalleryOnBoard;
@@ -271,7 +271,7 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = FreePostOnWriteResponse.class)
     @RequestMapping(value = "/free", method = RequestMethod.POST)
     public FreePostOnWriteResponse addFreePost(@Valid @RequestBody FreePostForm form,
-                                           HttpServletRequest request) {
+                                               HttpServletRequest request) {
 
         if (!commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -281,50 +281,21 @@ public class BoardRestController {
         if (!boardCategory.isPresent())
             throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
 
-        BoardFree boardFree = new BoardFree();
+        List<GalleryOnBoard> galleries = new ArrayList<>();
 
-        boardFree.setCategory(form.getCategoryCode());
-        boardFree.setSubject(form.getSubject().trim());
-        boardFree.setContent(form.getContent().trim());
-        boardFree.setViews(0);
-        boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_TYPE.BOARD_FREE.name()));
-
-        CommonPrincipal principal = userService.getCommonPrincipal();
-        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
-        boardFree.setWriter(writer);
-
-        Device device = DeviceUtils.getCurrentDevice(request);
-        BoardStatus boardStatus = new BoardStatus(commonService.getDeviceInfo(device));
-        boardFree.setStatus(boardStatus);
-
-        List<BoardHistory> histories = new ArrayList<>();
-        BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.CREATE, writer);
-        histories.add(history);
-        boardFree.setHistory(histories);
-
-        if (!form.getGalleries().isEmpty()) {
-            List<BoardImage> galleries = new ArrayList<>();
-
-            for (GalleryOnUpload galleryOnUpload : form.getGalleries()) {
-                Gallery gallery = galleryService.findOneById(galleryOnUpload.getId());
-
-                if (Objects.nonNull(gallery))
-                    galleries.add(new BoardImage(gallery.getId()));
-            }
-
-            if (galleries.size() > 0) {
-                boardFree.setGalleries(galleries);
-            }
+        if (Objects.nonNull(form.getGalleries())) {
+            galleries = form.getGalleries().stream()
+                    .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
+                    .collect(Collectors.toList());
         }
 
-        List<GalleryOnBoard> galleries = form.getGalleries().stream()
-                .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
-                .collect(Collectors.toList());
+        Device device = DeviceUtils.getCurrentDevice(request);
 
-        boardFreeService.insertFreePost(boardFree, galleries);
+        Integer boardSeq = boardFreeService.insertFreePost(form.getSubject().trim(), form.getContent().trim(), form.getCategoryCode(),
+                galleries, commonService.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
-                .seq(boardFree.getSeq())
+                .seq(boardSeq)
                 .build();
     }
 
@@ -351,7 +322,7 @@ public class BoardRestController {
 
         Device device = DeviceUtils.getCurrentDevice(request);
 
-        int boardSeq = boardFreeService.updateFreePost(form.getId().trim(), form.getSubject().trim(), form.getContent().trim(),
+        Integer boardSeq = boardFreeService.updateFreePost(form.getId().trim(), form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleries, commonService.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()

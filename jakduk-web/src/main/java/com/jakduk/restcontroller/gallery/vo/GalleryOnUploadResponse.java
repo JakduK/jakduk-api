@@ -17,11 +17,11 @@ import java.util.List;
  *         16. 7. 18 오후 9:31
  */
 
-@ApiModel(value = "사진 올리기 응답 객체")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ApiModel(value = "사진 올리기 응답 객체")
 public class GalleryOnUploadResponse {
 
     @ApiModelProperty(value = "사진 ID")

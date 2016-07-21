@@ -44,7 +44,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -355,60 +354,84 @@ public class BoardFreeService {
     /**
      * 자유게시판 글쓰기
      */
-	public void insertFreePost(BoardFree boardFree, List<GalleryOnBoard> galleries) {
+	public Integer insertFreePost(String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
+							   List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
+
+		BoardFree boardFree = new BoardFree();
+
+		boardFree.setCategory(categoryCode);
+		boardFree.setSubject(subject);
+		boardFree.setContent(content);
+		boardFree.setViews(0);
+		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_TYPE.BOARD_FREE.name()));
+
+		List<BoardImage> galleriesOnBoard = new ArrayList<>();
+		galleries.forEach(gallery -> galleriesOnBoard.add(new BoardImage(gallery.getId())));
+
+		if (! galleriesOnBoard.isEmpty())
+			boardFree.setGalleries(galleriesOnBoard);
+
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+		boardFree.setWriter(writer);
+
+		BoardStatus boardStatus = new BoardStatus(device);
+		boardFree.setStatus(boardStatus);
+
+		List<BoardHistory> histories = new ArrayList<>();
+		BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.CREATE, writer);
+		histories.add(history);
+		boardFree.setHistory(histories);
 
 		boardFreeRepository.save(boardFree);
 
 		// 글과 연동 된 사진 처리
-		if (!boardFree.getGalleries().isEmpty()) {
-			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+		BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
-			for (GalleryOnBoard galleryOnBoard : galleries) {
+		for (GalleryOnBoard galleryOnBoard : galleries) {
 
-				Gallery gallery = galleryRepository.findOne(galleryOnBoard.getId());
+			Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
 
-				if (Objects.nonNull(gallery)) {
-					GalleryStatus status = gallery.getStatus();
-					List<BoardItem> posts = gallery.getPosts();
+			if (getGallery.isPresent()) {
+				Gallery updateGallery = getGallery.get();
 
-					if (Objects.nonNull(posts))
-						posts = new ArrayList<>();
+				GalleryStatus status = updateGallery.getStatus();
+				List<BoardItem> posts = updateGallery.getPosts();
 
-					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-					long itemCount = 0;
+				if (Objects.nonNull(posts))
+					posts = new ArrayList<>();
 
-					if (gallery.getPosts() != null) {
-						Stream<BoardItem> sPosts = gallery.getPosts().stream();
-						itemCount = sPosts.filter(item -> item.getId().equals(boardItem.getId())).count();
-					}
+				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
+				long itemCount = 0;
 
-					if (itemCount == 0) {
-						posts.add(boardItem);
-						gallery.setPosts(posts);
-					}
+				if (! posts.isEmpty())
+					itemCount = posts.stream().filter(item -> item.getId().equals(boardItem.getId())).count();
 
-					if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
-						gallery.setName(galleryOnBoard.getName());
-					} else {
-						gallery.setName(boardFree.getSubject());
-					}
-
-					status.setFrom(CommonConst.GALLERY_FROM_TYPE.BOARD_FREE);
-					status.setStatus(CommonConst.GALLERY_STATUS_TYPE.ENABLE);
-					gallery.setStatus(status);
-					galleryRepository.save(gallery);
-
-					// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
-					GalleryOnES galleryOnES = new GalleryOnES();
-					galleryOnES.setId(gallery.getId());
-					galleryOnES.setWriter(gallery.getWriter());
-					galleryOnES.setName(gallery.getName());
-
-					searchService.createDocumentGallery(galleryOnES);
+				if (itemCount == 0) {
+					posts.add(boardItem);
+					updateGallery.setPosts(posts);
 				}
+
+				if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
+					updateGallery.setName(galleryOnBoard.getName());
+				} else {
+					updateGallery.setName(boardFree.getSubject());
+				}
+
+				status.setFrom(CommonConst.GALLERY_FROM_TYPE.BOARD_FREE);
+				status.setStatus(CommonConst.GALLERY_STATUS_TYPE.ENABLE);
+				updateGallery.setStatus(status);
+				galleryRepository.save(updateGallery);
+
+				// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
+				GalleryOnES galleryOnES = new GalleryOnES();
+				galleryOnES.setId(updateGallery.getId());
+				galleryOnES.setWriter(updateGallery.getWriter());
+				galleryOnES.setName(updateGallery.getName());
+
+				searchService.createDocumentGallery(galleryOnES);
 			}
 		}
-
 
 		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
 		/*
@@ -447,9 +470,7 @@ public class BoardFreeService {
 			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 		}
 
-		if (log.isDebugEnabled()) {
-			log.debug("boardFree(new) = " + boardFree);
-		}
+		return boardFree.getSeq();
 	}
 
 	/**
@@ -508,8 +529,9 @@ public class BoardFreeService {
 		boardFreeRepository.save(updateBoardFree);
 
 		// 글과 연동 된 사진 처리
+		BoardItem boardItem = new BoardItem(updateBoardFree.getId(), updateBoardFree.getSeq());
+
 		for (GalleryOnBoard galleryOnBoard : galleries) {
-			BoardItem boardItem = new BoardItem(updateBoardFree.getId(), updateBoardFree.getSeq());
 
 			Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
 
@@ -575,15 +597,11 @@ public class BoardFreeService {
 				.replaceAll("\r|\n|&nbsp;",""));
 
 		searchService.createDocumentBoard(boardFreeOnEs);
+		*/
 
 		if (log.isInfoEnabled()) {
-			log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+			log.info("post was edited. post seq=" + updateBoardFree.getSeq() + ", subject=" + updateBoardFree.getSubject());
 		}
-
-		if (log.isDebugEnabled()) {
-			log.debug("BoardFree(edit) = " + boardFree);
-		}
-		*/
 
 		return updateBoardFree.getSeq();
 	}
