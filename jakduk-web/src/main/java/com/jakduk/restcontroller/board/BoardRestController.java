@@ -59,9 +59,6 @@ public class BoardRestController {
     private BoardCategoryService boardCategoryService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private CommonService commonService;
 
     @Autowired
@@ -223,7 +220,7 @@ public class BoardRestController {
             throw new ServiceException(ServiceError.POST_NOT_FOUND);
 
         BoardFree getBoardFree = boardFree.get();
-        boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.COOKIE_VIEWS_TYPE.FREE_BOARD, String.valueOf(seq));
+        boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
         if (isAddCookie) {
             int views = getBoardFree.getViews();
@@ -377,7 +374,7 @@ public class BoardRestController {
         return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContent().trim(), commonService.getDeviceInfo(device));
     }
 
-    @ApiOperation(value = "글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
+    @ApiOperation(value = "자유게시판 글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
     @RequestMapping(value = "/free/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeFeeling(@PathVariable Integer seq,
                                               @PathVariable CommonConst.FEELING_TYPE feeling) {
@@ -397,7 +394,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "댓글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
+    @ApiOperation(value = "자유게시판 댓글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(@PathVariable String commentId,
                                                      @PathVariable CommonConst.FEELING_TYPE feeling) {

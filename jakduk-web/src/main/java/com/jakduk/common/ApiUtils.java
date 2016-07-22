@@ -5,6 +5,8 @@ import org.springframework.security.web.util.UrlUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author pyohwan
@@ -16,31 +18,24 @@ public class ApiUtils {
      * 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
      * @param request HttpServletRequest
      * @param response HttpServletResponse
-     * @param prefix
-     * @param id
+     * @param prefix 쿠키 이름의 Prefix
+     * @param id 쿠키 이름에 쓰일 고유 ID
      * @return 쿠키를 새로 저장했다면 true, 아니면 false.
      */
-    public static boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, ApiConst.COOKIE_VIEWS_TYPE prefix, String id) {
+    public static boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, ApiConst.VIEWS_COOKIE_TYPE prefix, String id) {
 
-        boolean findSameCookie = false;
         String cookieName = prefix + "_" + id;
 
-        Cookie cookies[] = request.getCookies();
+        Stream<Cookie> cookies = Stream.of(request.getCookies());
 
-        if (cookies != null) {
-            for (int i = 0 ; i < cookies.length ; i++) {
-                String name = cookies[i].getName();
+        Optional<Cookie> findCookie = cookies
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .findAny();
 
-                if (cookieName.equals(name)) {
-                    findSameCookie = true;
-                    break;
-                }
-            }
-        }
-
-        if (!findSameCookie) {
+        if (! findCookie.isPresent()) {
             Cookie cookie = new Cookie(cookieName, "r");
-            cookie.setMaxAge(ApiConst.BOARD_COOKIE_EXPIRE_SECONDS);
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(ApiConst.VIEWS_COOKIE_EXPIRE_SECONDS);
             response.addCookie(cookie);
 
             return true;

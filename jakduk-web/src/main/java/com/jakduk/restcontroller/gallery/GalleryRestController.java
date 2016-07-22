@@ -1,24 +1,5 @@
 package com.jakduk.restcontroller.gallery;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.jakduk.common.ApiConst;
 import com.jakduk.common.ApiUtils;
 import com.jakduk.common.CommonConst;
@@ -34,6 +15,20 @@ import com.jakduk.restcontroller.vo.GalleriesResponse;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.GalleryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author pyohwan
@@ -130,7 +125,7 @@ public class GalleryRestController {
     @RequestMapping(value = "/gallery/{id}", method = RequestMethod.GET)
     public GalleryResponse view(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
 
-        Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.COOKIE_VIEWS_TYPE.GALLERY, id);
+        Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
         Map<String, Object> gallery = galleryService.getGallery(id, isAddCookie);
 
         if (Objects.isNull(gallery)) {
