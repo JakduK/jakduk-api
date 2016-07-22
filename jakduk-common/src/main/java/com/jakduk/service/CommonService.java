@@ -167,45 +167,46 @@ public class CommonService {
 		return result;
 	}
 
-	// 관리자인지 검사.
-	public Boolean isAdmin() {
-		Boolean result = false;
+	/**
+	 * 로그인 중인 회원이 관리자인지 검사.
+	 * @return 관리자 이면 true
+     */
+	public boolean isAdmin() {
+		boolean result = false;
 		
-		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-			result = true;
-		}
-		
-		if (!result) {
-			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-			
-			for (GrantedAuthority authority : authorities) {
-				if (authority.getAuthority().equals("ROLE_ROOT")) {
-					result = true;
-					break;
-				}
+		if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+			return false;
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+
+		for (GrantedAuthority authority : authorities) {
+			if (authority.getAuthority().equals("ROLE_ROOT")) {
+				result = true;
+				break;
 			}
 		}
 		
 		return result;
 	}
 
-	// 회원인지 검사.
+	/**
+	 * 로그인 중인 회원이 USER 권한인지 검사.
+	 * @return 회원이면 true
+     */
+	//
 	public boolean isUser() {
 		boolean result = false;
 
-		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-			result = true;
-		}
+		if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+			return false;
 
-		if (!result) {
-			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
-			for (GrantedAuthority grantedAuthority : authorities) {
-				String authority = grantedAuthority.getAuthority();
-				if (authority.equals("ROLE_USER_01") || authority.equals("ROLE_USER_02") || authority.equals("ROLE_USER_03")) {
-					result = true;
-					break;
-				}
+		for (GrantedAuthority grantedAuthority : authorities) {
+			String authority = grantedAuthority.getAuthority();
+			if (authority.equals("ROLE_USER_01") || authority.equals("ROLE_USER_02") || authority.equals("ROLE_USER_03")) {
+				result = true;
+				break;
 			}
 		}
 
@@ -213,7 +214,7 @@ public class CommonService {
 	}
 
 	/**
-	 * 이메일 기반 회원인지 검사.
+	 * 로그인 중인 회원이 이메일 기반인지 검사.
 	 * @return 이메일 기반이면 true, 아니면 false
      */
 	public boolean isJakdukUser() {

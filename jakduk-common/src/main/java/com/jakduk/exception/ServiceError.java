@@ -19,6 +19,8 @@ public enum ServiceError {
     CANNOT_GET_SNS_PROFILE(HttpStatus.NOT_FOUND, "CANNOT_GET_SNS_PROFILE", "common.exception.cannot.get.sns.profile"),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "common.exception.post.not.found"),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", "common.exception.category.not.found"),
+    ALREADY_ENABLE(HttpStatus.NOT_FOUND, "ALREADY_ENABLE", "common.exception.already.enable"),
+    ALREADY_DISABLE(HttpStatus.NOT_FOUND, "ALREADY_DISABLE", "common.exception.already.disable"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED_ACCESS", "common.exception.access.denied"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "common.exception.forbidden");

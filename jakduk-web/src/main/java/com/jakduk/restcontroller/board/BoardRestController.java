@@ -18,6 +18,7 @@ import com.jakduk.model.etc.GalleryOnBoard;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
 import com.jakduk.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.board.vo.*;
 import com.jakduk.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.service.*;
@@ -414,5 +415,29 @@ public class BoardRestController {
                 .numberOfLike(numberOfLike)
                 .numberOfDislike(numberOfDisLike)
                 .build();
+    }
+
+    @ApiOperation(value = "자유게시판 글의 공지 활성화", produces = "application/json", response = EmptyJsonResponse.class)
+    @RequestMapping(value = "/free/{seq}/notice", method = RequestMethod.POST)
+    public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
+
+        if (! commonService.isAdmin())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+		boardFreeService.setFreeNotice(seq, true);
+
+        return EmptyJsonResponse.newInstance();
+    }
+
+    @ApiOperation(value = "자유게시판 글의 공지 비활성화", produces = "application/json", response = EmptyJsonResponse.class)
+    @RequestMapping(value = "/free/{seq}/notice", method = RequestMethod.DELETE)
+    public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
+
+        if (! commonService.isAdmin())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        boardFreeService.setFreeNotice(seq, false);
+
+        return EmptyJsonResponse.newInstance();
     }
 }

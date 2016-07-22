@@ -1,22 +1,28 @@
 package com.jakduk.service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletResponse;
-
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardDAO;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
+import com.jakduk.exception.UserFeelingException;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
+import com.jakduk.model.embedded.*;
+import com.jakduk.model.etc.BoardFreeOnBest;
+import com.jakduk.model.etc.GalleryOnBoard;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.web.BoardFreeWrite;
+import com.jakduk.notification.SlackService;
+import com.jakduk.repository.BoardFreeCommentRepository;
+import com.jakduk.repository.BoardFreeOnListRepository;
+import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
@@ -31,36 +37,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardDAO;
-import com.jakduk.exception.ServiceError;
-import com.jakduk.exception.ServiceException;
-import com.jakduk.exception.UserFeelingException;
-import com.jakduk.model.db.BoardCategory;
-import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.elasticsearch.CommentOnES;
-import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.embedded.BoardCommentStatus;
-import com.jakduk.model.embedded.BoardHistory;
-import com.jakduk.model.embedded.BoardImage;
-import com.jakduk.model.embedded.BoardItem;
-import com.jakduk.model.embedded.BoardStatus;
-import com.jakduk.model.embedded.CommonFeelingUser;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.GalleryStatus;
-import com.jakduk.model.etc.BoardFreeOnBest;
-import com.jakduk.model.etc.GalleryOnBoard;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.model.web.BoardFreeWrite;
-import com.jakduk.notification.SlackService;
-import com.jakduk.repository.BoardFreeCommentRepository;
-import com.jakduk.repository.BoardFreeOnListRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.GalleryRepository;
+import javax.servlet.http.HttpServletResponse;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -750,89 +733,62 @@ public class BoardFreeService {
 		return boardComment;
 	}
 
-	/*
-	public Integer setNotice(int seq, String type) {
-
-		if (!commonService.isAdmin()) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String accountId = principal.getId();
-		String accountUsername = principal.getUsername();
-		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
-
-		CommonWriter writer = new CommonWriter(accountId, accountUsername, accountType);
-
-		if (accountId == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
+	/**
+	 * 자유게시판 글의 공지를 활성화/비활성화 한다.
+	 * @param seq 글 seq
+	 * @param isEnable 활성화/비활성화
+     */
+	public void setFreeNotice(int seq, boolean isEnable) {
 
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
+
 		if (!boardFree.isPresent())
 			throw new ServiceException(ServiceError.POST_NOT_FOUND);
 
-		BoardFree getBoardFree = boardFree.get();
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
+		BoardFree getBoardFree = boardFree.get();
 		BoardStatus status = getBoardFree.getStatus();
 
-		if (status == null) {
+		if (Objects.isNull(status))
 			status = new BoardStatus();
+
+		Boolean isNotice = status.getNotice();
+
+		if (Objects.nonNull(isNotice)) {
+			if (isEnable && isNotice)
+				throw new ServiceException(ServiceError.ALREADY_ENABLE);
+
+			if (! isEnable && ! isNotice)
+				throw new ServiceException(ServiceError.ALREADY_DISABLE);
 		}
 
-		String notice = status.getNotice();
-		String noticeType = "";
-
-		switch (type) {
-		case CommonConst.COMMON_TYPE_SET:
-			if (notice != null && notice.equals(CommonConst.BOARD_HISTORY_TYPE_NOTICE)) {
-				return HttpServletResponse.SC_NOT_ACCEPTABLE;
-			}
-
-			status.setNotice(CommonConst.BOARD_HISTORY_TYPE_NOTICE);
-			noticeType = CommonConst.BOARD_HISTORY_TYPE_NOTICE;
-			break;
-
-		case CommonConst.COMMON_TYPE_CANCEL:
-			if (notice == null) {
-				return HttpServletResponse.SC_NOT_ACCEPTABLE;
-			}
-
+		if (isEnable) {
+			status.setNotice(true);
+		} else {
 			status.setNotice(null);
-			noticeType = CommonConst.BOARD_HISTORY_TYPE_CANCEL_NOTICE;
-			break;
 		}
 
 		getBoardFree.setStatus(status);
 
-		if (!noticeType.isEmpty()) {
-			List<BoardHistory> historys = getBoardFree.getHistory();
+		List<BoardHistory> histories = getBoardFree.getHistory();
 
-			if (historys == null) {
-				historys = new ArrayList<>();
-			}
+		if (Objects.isNull(histories))
+			histories = new ArrayList<>();
 
-			BoardHistory history = new BoardHistory();
-			history.setId(new ObjectId().toString());
-			history.setType(noticeType);
-			history.setWriter(writer);
-			historys.add(history);
-			getBoardFree.setHistory(historys);
-		}
+		BoardHistory history = new BoardHistory(new ObjectId().toString(),
+				isEnable ? CommonConst.BOARD_HISTORY_TYPE.ENABLE_NOTICE : CommonConst.BOARD_HISTORY_TYPE.DISABLE_NOTICE, writer);
+		histories.add(history);
+
+		getBoardFree.setHistory(histories);
 
 		boardFreeRepository.save(getBoardFree);
 
-		if (log.isInfoEnabled()) {
+		if (log.isInfoEnabled())
 			log.info("Set notice. post seq=" + getBoardFree.getSeq() + ", type=" + status.getNotice());
-		}
-
-		if (log.isDebugEnabled()) {
-			log.debug("Set notice. BoardFree = " + getBoardFree);
-		}
-
-		return HttpServletResponse.SC_OK;
 	}
-	*/
+
 
 	/**
 	 * 자유게시판 주간 좋아요수 선두

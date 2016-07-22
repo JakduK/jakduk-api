@@ -92,7 +92,7 @@ public class GalleryRestController {
     @RequestMapping(value = "/gallery", method = RequestMethod.POST)
     public GalleryOnUploadResponse uploadImage(@RequestParam() MultipartFile file) {
 
-        if (!commonService.isJakdukUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         if (file.isEmpty())
@@ -118,7 +118,7 @@ public class GalleryRestController {
     @RequestMapping(value = "/gallery/{id}", method = RequestMethod.DELETE)
     public EmptyJsonResponse removeImage(@PathVariable String id) {
 
-        if (!commonService.isJakdukUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         galleryService.removeImage(id);
@@ -148,6 +148,9 @@ public class GalleryRestController {
     @ApiOperation(value = "사진 좋아요 싫어요", produces = "application/json")
     @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CommonConst.FEELING_TYPE feeling) {
+
+        if (! commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Map<String, Object> data = galleryService.setUserFeeling(id, feeling);
 

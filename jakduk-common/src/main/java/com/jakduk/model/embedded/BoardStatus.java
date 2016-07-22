@@ -18,9 +18,9 @@ import lombok.Setter;
 @Getter
 public class BoardStatus {
 	
-	private String notice;
+	private Boolean notice;
 	
-	private boolean delete;
+	private Boolean delete;
 	
 	private CommonConst.DEVICE_TYPE device;
 
