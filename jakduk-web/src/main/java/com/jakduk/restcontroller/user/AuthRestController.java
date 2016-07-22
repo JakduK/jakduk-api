@@ -1,16 +1,12 @@
 package com.jakduk.restcontroller.user;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.exception.ServiceError;
-import com.jakduk.exception.ServiceException;
-import com.jakduk.model.db.User;
-import com.jakduk.model.etc.AuthUserProfile;
-import com.jakduk.model.simple.UserProfile;
-import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.user.vo.LoginSocialUserForm;
-import com.jakduk.restcontroller.user.vo.UserProfileForm;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.UserService;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import javax.validation.Valid;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +21,24 @@ import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 
-import javax.validation.Valid;
-import java.util.*;
+import com.jakduk.common.CommonConst;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
+import com.jakduk.model.db.User;
+import com.jakduk.model.etc.AuthUserProfile;
+import com.jakduk.model.simple.UserProfile;
+import com.jakduk.restcontroller.EmptyJsonResponse;
+import com.jakduk.restcontroller.user.vo.LoginSocialUserForm;
+import com.jakduk.restcontroller.user.vo.UserProfileForm;
+import com.jakduk.service.CommonService;
+import com.jakduk.service.UserService;
 
 /**
  * @author pyohwan
@@ -121,7 +130,7 @@ public class AuthRestController {
 
         UserProfileForm user = new UserProfileForm();
         user.setEmail(socialProfile.getEmail());
-        user.setUsername(socialProfile.getName());
+        user.setUsername(socialProfile.getUsername());
 
         if (Objects.nonNull(existUser)) {
             user.setId(existUser.getId());
