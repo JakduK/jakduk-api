@@ -1,28 +1,39 @@
 package com.jakduk.restcontroller.gallery;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.exception.ServiceError;
-import com.jakduk.exception.ServiceException;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.simple.GalleryOnList;
-import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.gallery.vo.GalleryOnUploadResponse;
-import com.jakduk.restcontroller.vo.GalleriesResponse;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.GalleryService;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import com.jakduk.common.ApiConst;
+import com.jakduk.common.ApiUtils;
+import com.jakduk.common.CommonConst;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.simple.BoardFreeOnGallery;
+import com.jakduk.model.simple.GalleryOnList;
+import com.jakduk.restcontroller.EmptyJsonResponse;
+import com.jakduk.restcontroller.gallery.vo.GalleryOnUploadResponse;
+import com.jakduk.restcontroller.gallery.vo.GalleryResponse;
+import com.jakduk.restcontroller.vo.GalleriesResponse;
+import com.jakduk.restcontroller.vo.UserFeelingResponse;
+import com.jakduk.service.CommonService;
+import com.jakduk.service.GalleryService;
 
 /**
  * @author pyohwan
@@ -115,4 +126,35 @@ public class GalleryRestController {
         return EmptyJsonResponse.newInstance();
     }
 
+    @ApiOperation(value = "사진 정보", produces = "application/json")
+    @RequestMapping(value = "/gallery/{id}", method = RequestMethod.GET)
+    public GalleryResponse view(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
+
+        Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.COOKIE_VIEWS_TYPE.GALLERY, id);
+        Map<String, Object> gallery = galleryService.getGallery(id, isAddCookie);
+
+        if (Objects.isNull(gallery)) {
+            throw new ServiceException(ServiceError.NOT_FOUND);
+        }
+
+        return GalleryResponse.builder()
+          .gallery((Gallery) gallery.get("gallery"))
+          .next((Gallery) gallery.get("next"))
+          .prev((Gallery) gallery.get("prev"))
+          .linkedPosts((List<BoardFreeOnGallery>) gallery.get("linkedPosts"))
+          .build();
+    }
+
+    @ApiOperation(value = "사진 좋아요 싫어요", produces = "application/json")
+    @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
+    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CommonConst.FEELING_TYPE feeling) {
+
+        Map<String, Object> data = galleryService.setUserFeeling(id, feeling);
+
+        return UserFeelingResponse.builder()
+          .feeling((CommonConst.FEELING_TYPE) data.get("feeling"))
+          .numberOfLike((Integer) data.get("numberOfLike"))
+          .numberOfDislike((Integer) data.get("numberOfDislike"))
+          .build();
+    }
 }
