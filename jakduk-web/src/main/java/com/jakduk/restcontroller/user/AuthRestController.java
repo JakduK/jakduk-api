@@ -128,9 +128,23 @@ public class AuthRestController {
         UserProfile existUser = userService.findUserProfileByProviderIdAndProviderUserId(convertProviderId, connectionKey.getProviderUserId());
         org.springframework.social.connect.UserProfile socialProfile = connection.fetchUserProfile();
 
+        String username = null;
+        if (Objects.nonNull(socialProfile.getName())) {
+            username = socialProfile.getName();
+        } else if (Objects.nonNull(socialProfile.getUsername())) {
+            username = socialProfile.getUsername();
+        } else {
+            if (Objects.nonNull(socialProfile.getFirstName())) {
+                username = socialProfile.getFirstName();
+            }
+            if (Objects.nonNull(socialProfile.getLastName())) {
+                username = Objects.isNull(username) ? socialProfile.getLastName() : ' ' + socialProfile.getLastName();
+            }
+        }
+
         UserProfileForm user = new UserProfileForm();
         user.setEmail(socialProfile.getEmail());
-        user.setUsername(socialProfile.getUsername());
+        user.setUsername(username);
 
         if (Objects.nonNull(existUser)) {
             user.setId(existUser.getId());
