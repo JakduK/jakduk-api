@@ -1,28 +1,22 @@
 package com.jakduk.service;
 
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardDAO;
-import com.jakduk.exception.ServiceError;
-import com.jakduk.exception.ServiceException;
-import com.jakduk.exception.UserFeelingException;
-import com.jakduk.model.db.BoardCategory;
-import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.db.BoardFreeComment;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.elasticsearch.CommentOnES;
-import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.embedded.*;
-import com.jakduk.model.etc.BoardFreeOnBest;
-import com.jakduk.model.etc.GalleryOnBoard;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.model.web.BoardFreeWrite;
-import com.jakduk.notification.SlackService;
-import com.jakduk.repository.BoardFreeCommentRepository;
-import com.jakduk.repository.BoardFreeOnListRepository;
-import com.jakduk.repository.BoardFreeRepository;
-import com.jakduk.repository.GalleryRepository;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
@@ -37,13 +31,36 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-import javax.servlet.http.HttpServletResponse;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardDAO;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
+import com.jakduk.exception.UserFeelingException;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.db.BoardFreeComment;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
+import com.jakduk.model.embedded.BoardCommentStatus;
+import com.jakduk.model.embedded.BoardHistory;
+import com.jakduk.model.embedded.BoardImage;
+import com.jakduk.model.embedded.BoardItem;
+import com.jakduk.model.embedded.BoardStatus;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.etc.BoardFreeOnBest;
+import com.jakduk.model.etc.GalleryOnBoard;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.web.BoardFreeWrite;
+import com.jakduk.notification.SlackService;
+import com.jakduk.repository.BoardFreeCommentRepository;
+import com.jakduk.repository.BoardFreeOnListRepository;
+import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.repository.GalleryRepository;
 
 @Slf4j
 @Service
@@ -232,8 +249,9 @@ public class BoardFreeService {
 				GalleryStatus status = updateGallery.getStatus();
 				List<BoardItem> posts = updateGallery.getPosts();
 
-				if (Objects.nonNull(posts))
+				if (Objects.isNull(posts)) {
 					posts = new ArrayList<>();
+				}
 
 				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
 				long itemCount = 0;
