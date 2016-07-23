@@ -1,5 +1,25 @@
 package com.jakduk.restcontroller.user;
 
+import java.util.ArrayList;
+import java.util.Objects;
+import javax.validation.Valid;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionKey;
+import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.NativeWebRequest;
+
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
@@ -11,25 +31,14 @@ import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.user.vo.*;
+import com.jakduk.restcontroller.user.vo.UserForm;
+import com.jakduk.restcontroller.user.vo.UserPasswordForm;
+import com.jakduk.restcontroller.user.vo.UserProfileForm;
+import com.jakduk.restcontroller.user.vo.UserProfileOnEditForm;
+import com.jakduk.restcontroller.user.vo.UserProfileResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionKey;
-import org.springframework.social.connect.web.ProviderSignInUtils;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.NativeWebRequest;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * @author pyohawan
@@ -266,26 +275,39 @@ public class UserRestController {
 
         CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
 
-        String email = form.getEmail().trim();
-        String username = form.getUsername().trim();
-        String footballClub = form.getFootballClub().trim();
-        String about = form.getAbout().trim();
+        String email = form.getEmail();
+        String username = form.getUsername();
+        String footballClub = form.getFootballClub();
+        String about = form.getAbout();
+
+        if (Objects.nonNull(email)) {
+            email = email.trim();
+        }
+        if (Objects.nonNull(username)) {
+            username = username.trim();
+        }
+        if (Objects.nonNull(footballClub)) {
+            footballClub = footballClub.trim();
+        }
+        if (Objects.nonNull(about)) {
+            about = about.trim();
+        }
 
         User user = userService.findById(commonPrincipal.getId());
 
-        if (! email.isEmpty())
-            user.setEmail(email.trim());
+        if (Objects.nonNull(email) && ! email.isEmpty())
+            user.setEmail(email);
 
-        if (! username.isEmpty())
-            user.setUsername(username.trim());
+        if (Objects.nonNull(username) && ! username.isEmpty())
+            user.setUsername(username);
 
-        if (! footballClub.isEmpty()) {
+        if (Objects.nonNull(footballClub) && ! footballClub.isEmpty()) {
             FootballClub supportFC = footballService.findById(footballClub);
             user.setSupportFC(supportFC);
         }
 
-        if (! about.isEmpty())
-            user.setAbout(about.trim());
+        if (Objects.nonNull(about) && ! about.isEmpty())
+            user.setAbout(about);
 
         userService.save(user);
 
