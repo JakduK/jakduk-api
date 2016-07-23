@@ -1,9 +1,12 @@
 package com.jakduk.common.constraints;
 
 import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
+import com.jakduk.service.CommonService;
 import com.jakduk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -13,13 +16,19 @@ import java.util.Objects;
  * @author pyohwan
  * 16. 7. 3 오후 9:40
  */
-class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUsernameOnEdit, String> {
+public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, String> {
+
+    @Autowired
+    private StandardPasswordEncoder encoder;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CommonService commonService;
+
     @Override
-    public void initialize(ExistUsernameOnEdit constraintAnnotation) {
+    public void initialize(PasswordMatch constraintAnnotation) {
 
     }
 
@@ -31,9 +40,13 @@ class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUsernameO
 
         CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
 
-        UserProfile existUsername = userService.findByNEIdAndUsername(commonPrincipal.getId().trim(), value.trim());
+        if (! commonService.isJakdukUser())
+            return true;
 
-        return ! Objects.nonNull(existUsername);
+        UserOnPasswordUpdate user = userService.findUserOnPasswordUpdateById(commonPrincipal.getId());
+        String oldPassword = user.getPassword();
+
+        return encoder.matches(value, oldPassword);
 
     }
 }

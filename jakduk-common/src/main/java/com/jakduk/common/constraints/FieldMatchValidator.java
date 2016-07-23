@@ -9,7 +9,7 @@ import javax.validation.ConstraintValidatorContext;
  * @author pyohwan
  * 16. 7. 3 오후 9:40
  */
-public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Object> {
+class FieldMatchValidator implements ConstraintValidator<FieldMatch, Object> {
 
     private String firstFieldName;
     private String secondFieldName;

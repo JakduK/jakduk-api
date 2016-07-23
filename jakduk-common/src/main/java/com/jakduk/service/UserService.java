@@ -5,13 +5,14 @@ import com.jakduk.authentication.common.JakdukPrincipal;
 import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.user.UserPasswordUpdate;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
@@ -27,8 +28,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 
 import java.util.*;
 
@@ -96,28 +95,22 @@ public class UserService {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
+	/**
+	 * 비밀번호 변경을 위한 이메일 기반 회원 가져오기
+	 *
+	 * @param id userID
+	 * @return UserOnPasswordUpdate
+     */
+	public UserOnPasswordUpdate findUserOnPasswordUpdateById(String id){
+
+		return userRepository.findUserOnPasswordUpdateById(id);
+	}
+
 	// 회원 정보 저장.
 	public void save(User user) {
 		userRepository.save(user);
 	}
 
-	public CommonWriter testFindId(String userid) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("email").is(userid));
-		
-		return mongoTemplate.findOne(query, CommonWriter.class);
-	}
-
-	public void oauthUserWrite(SocialUserOnAuthentication oauthUserOnLogin) {
-		User user = new User();
-		
-		user.setUsername(oauthUserOnLogin.getUsername());
-		//user.setSocialInfo(oauthUserOnLogin.getSocialInfo());
-		user.setRoles(oauthUserOnLogin.getRoles());
-		
-		userRepository.save(user);
-	}
-	
 	public Boolean existEmail(String email) {
 		Boolean result;
 
@@ -145,47 +138,28 @@ public class UserService {
 		return result;
 	}
 
-	public Model getUserPasswordUpdate(Model model) {
+	/**
+	 * 이메일 기반 회원의 비밀번호 변경.
+	 *
+	 * @param newPassword 새 비밀번호
+     */
+	public void updateUserPassword(String newPassword) {
+		
+		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = jakdukPrincipal.getId();
+		
+		Optional<User> user = userRepository.findOneById(id);
 
-		model.addAttribute("userPasswordUpdate", new UserPasswordUpdate());
+		if (!user.isPresent())
+			throw new ServiceException(ServiceError.NOT_FOUND_USER);
+
+		User updateUser = user.get();
+		updateUser.setPassword(encoder.encode(newPassword));
 		
-		return model;
-	}
-	
-	public void checkUserPasswordUpdate(UserPasswordUpdate userPasswordUpdate, BindingResult result) {
-		
-		String oldPwd = userPasswordUpdate.getOldPassword();
-		String newPwd = userPasswordUpdate.getNewPassword();
-		String newPwdCfm = userPasswordUpdate.getNewPasswordConfirm();
-		
-		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = jakdukPrincipal.getId();
-		
-		UserOnPasswordUpdate user = userRepository.userOnPasswordUpdateFindById(id);
-		String pwd = user.getPassword();
-		
-		if (!encoder.matches(oldPwd, pwd)) {
-			result.rejectValue("oldPassword", "user.msg.old.password.is.not.vaild");
-		}
-		
-		if (!newPwd.equals(newPwdCfm)) {
-			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
-		}
-	}
-	
-	public void userPasswordUpdate(UserPasswordUpdate userPasswordUpdate) {
-		
-		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = jakdukPrincipal.getId();
-		
-		User user = userRepository.findById(id);
-		
-		user.setPassword(encoder.encode(userPasswordUpdate.getNewPassword()));
-		
-		this.save(user);
+		this.save(updateUser);
 		
 		if (log.isInfoEnabled()) {
-			log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
+			log.info("jakduk user password changed. email=" + updateUser.getEmail() + ", username=" + updateUser.getUsername());
 		}
 	}
 

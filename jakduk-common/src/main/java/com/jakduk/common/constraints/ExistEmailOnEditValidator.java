@@ -13,7 +13,7 @@ import java.util.Objects;
  * @author pyohwan
  * 16. 7. 3 오후 9:30
  */
-public class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmailOnEdit, String> {
+class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmailOnEdit, String> {
 
     @Autowired
     private UserService userService;
@@ -25,6 +25,9 @@ public class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmail
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
+
+        if (Objects.isNull(value))
+            return false;
 
         CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
 

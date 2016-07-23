@@ -11,10 +11,7 @@ import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.user.vo.UserForm;
-import com.jakduk.restcontroller.user.vo.UserProfileForm;
-import com.jakduk.restcontroller.user.vo.UserProfileOnEditForm;
-import com.jakduk.restcontroller.user.vo.UserProfileResponse;
+import com.jakduk.restcontroller.user.vo.*;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
@@ -169,7 +166,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "비로그인 상태(id를 제외한)에서 Email 중복 검사", produces = "application/json")
+    @ApiOperation(value = "비로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사", produces = "application/json")
     @RequestMapping(value = "/exist/email/anonymous", method = RequestMethod.GET)
     public Boolean existEmailOnAnonymous(@RequestParam() String email,
                                          @RequestParam() String id) {
@@ -199,7 +196,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "비 로그인 상태(id를 제외한)에서 별명 중복 검사", produces = "application/json")
+    @ApiOperation(value = "비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사", produces = "application/json")
     @RequestMapping(value = "/exist/username/anonymous", method = RequestMethod.GET)
     public Boolean existUsernameOnAnonymous(@RequestParam() String username,
                                             @RequestParam() String id) {
@@ -299,6 +296,18 @@ public class UserRestController {
         } else if (commonService.isSocialUser()) {
             userService.signInSocialUser(user);
         }
+
+        return EmptyJsonResponse.newInstance();
+    }
+
+    @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경", produces = "application/json", response = EmptyJsonResponse.class)
+    @RequestMapping(value = "/password", method = RequestMethod.PUT)
+    public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
+
+        if (! commonService.isJakdukUser())
+            throw new ServiceException(ServiceError.FORBIDDEN);
+
+        userService.updateUserPassword(form.getNewPassword());
 
         return EmptyJsonResponse.newInstance();
     }

@@ -2,7 +2,6 @@ package com.jakduk.common.constraints;
 
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,8 +14,7 @@ import java.util.Objects;
  * 16. 7. 3 오후 9:28
  */
 
-@Slf4j
-public class ExistEmailCompatibilityValidator implements ConstraintValidator<ExistEmailCompatibility, Object> {
+class ExistEmailCompatibilityValidator implements ConstraintValidator<ExistEmailCompatibility, Object> {
 
     private String userIdField;
     private String emailField;
@@ -42,7 +40,6 @@ public class ExistEmailCompatibilityValidator implements ConstraintValidator<Exi
             // Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
             if (Objects.nonNull(userId) && ! userId.isEmpty()) {
                 existEmail = userService.findByNEIdAndEmail(userId, email);
-                log.debug("existEmail=" + existEmail);
             } else {
                 existEmail = userService.findOneByEmail(email);
             }

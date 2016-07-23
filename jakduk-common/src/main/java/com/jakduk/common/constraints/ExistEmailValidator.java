@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author pyohwan
  * 16. 7. 3 오후 9:30
  */
-public class ExistEmailValidator implements ConstraintValidator<ExistEmail, String> {
+class ExistEmailValidator implements ConstraintValidator<ExistEmail, String> {
 
     @Autowired
     private UserService userService;

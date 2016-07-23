@@ -9,9 +9,11 @@ import com.jakduk.model.simple.UserOnPasswordUpdate;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Optional;
+
 public interface UserRepository extends MongoRepository<User, String> {
 	
-	User findById(String id);
+	Optional<User> findOneById(String id);
 	User findByUsername(String username);
 	User findOneByUsername(String username);
 	User findByEmail(String email);
@@ -23,7 +25,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	User writerFindById(String id);
 
 	@Query(value="{'id' : ?0}")
-	UserOnPasswordUpdate userOnPasswordUpdateFindById(String id);
+	UserOnPasswordUpdate findUserOnPasswordUpdateById(String id);
 
 	// SNS 계정으로 가입한 회원 찾기(로그인).
 	User findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId);

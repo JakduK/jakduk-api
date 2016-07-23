@@ -26,10 +26,7 @@ import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -70,10 +67,10 @@ public class UserTest extends AbstractSpringTest {
 	public void 회원_정보_편집() {
 		String id = "5703d2e2e4b07a2fcef75ec3";
 		UserProfile userProfile = userProfileRepository.findOne(id);
-		User user = userRepository.findById(id);
+		Optional<User> user = userRepository.findOneById(id);
 
 		System.out.println("UserProfile=" + userProfile);
-		System.out.println("user=" + user);
+		System.out.println("user=" + user.get());
 	}
 	
 	@Test
