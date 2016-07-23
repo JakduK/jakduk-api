@@ -1,12 +1,13 @@
 package com.jakduk.common;
 
-import org.springframework.security.web.util.UrlUtils;
-
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
-import java.util.stream.Stream;
+
+import org.springframework.security.web.util.UrlUtils;
 
 /**
  * @author pyohwan
@@ -25,10 +26,12 @@ public class ApiUtils {
     public static boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, ApiConst.VIEWS_COOKIE_TYPE prefix, String id) {
 
         String cookieName = prefix + "_" + id;
+        Cookie[] cookies = request.getCookies();
+        if (Objects.isNull(cookies)) {
+            return true;
+        }
 
-        Stream<Cookie> cookies = Stream.of(request.getCookies());
-
-        Optional<Cookie> findCookie = cookies
+        Optional<Cookie> findCookie = Stream.of(cookies)
                 .filter(cookie -> cookie.getName().equals(cookieName))
                 .findAny();
 
