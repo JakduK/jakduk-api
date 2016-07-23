@@ -1,17 +1,16 @@
 package com.jakduk;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.Gallery;
 import com.jakduk.repository.GalleryRepository;
 import com.jakduk.util.AbstractSpringTest;
 import org.bson.types.ObjectId;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,45 +115,68 @@ public class GalleryTest extends AbstractSpringTest {
 			}
 		}
 	}
-	
+
 	@Test
-	public void json01() throws JsonParseException, JsonMappingException, IOException {		
-		String tempJson = "[{\"uid\":\"54c4bf443d96ae38d537c5bf\",\"name\":\"t1.search.daumcdn.net.jpeg\",\"size\":7599,\"thumbUrl\":\"/jakduk/gallery/thumbnail/54c4bf443d96ae38d537c5bf\"}, {\"uid\":\"54c4bf443d96ae38d537c5bf\",\"name\":\"t1.search.daumcdn.net.jpeg\",\"size\":7599,\"thumbUrl\":\"/jakduk/gallery/thumbnail/54c4bf443d96ae38d537c5bf\"}]";
-		
-		JSONParser jsonParser = new JSONParser();
-		try {
-			JSONArray jsonArray = (JSONArray) jsonParser.parse(tempJson);
-			
-			for (int i = 0 ; i < jsonArray.size() ; i++) {
-				JSONObject obj = (JSONObject)jsonArray.get(i);
-				System.out.println("obj=" + obj.get("thumbUrl"));
-			}
-			
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			System.out.println("error");
-			e.printStackTrace();
+	public void JSON객체_문자열을_자바객체로변환() throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+
+		String jsn = "{\"age\":\"32\",\"name\":\"steave\",\"job\":\"baker\"}";
+
+		Map<String, String> map = mapper.readValue(jsn, new TypeReference<HashMap<String, String>>() {});
+
+		Assert.assertEquals(map.get("age"), "32");
+		Assert.assertEquals(map.get("name"), "steave");
+		Assert.assertEquals(map.get("job"), "baker");
+	}
+
+	@Test
+	public void JSON배열_문자열을_자바객체로변환() throws IOException {
+		String tempJson = "[{\"uid\":\"54c4bf443d96ae38d537c5bf\",\"name\":\"t1.search.daumcdn.net.jpeg\",\"size\":7599,\"thumbUrl\":\"/jakduk/gallery/thumbnail/54c4bf443d96ae38d537c5bf\"}, " +
+				"{\"uid\":\"54c4bf443d96ae38d537c5bf\",\"name\":\"t1.search.daumcdn.net.jpeg\",\"size\":7599,\"thumbUrl\":\"/jakduk/gallery/thumbnail/54c4bf443d96ae38d537c5bf\"}]";
+
+
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root = mapper.readTree(tempJson);
+
+		if (root.isArray()) {
+			JsonNode node = root.get(0);
+
+			Assert.assertEquals("54c4bf443d96ae38d537c5bf", node.path("uid").asText());
+			Assert.assertEquals("t1.search.daumcdn.net.jpeg", node.path("name").asText());
+			Assert.assertEquals(7599, node.path("size").asInt());
+
+		} else {
+			Assert.fail();
 		}
 	}
-	
-	@Test
-	public void arrayToJson() {
-		
-		List<String> images = new ArrayList<String>();
 
-		Map<String, String> image01 = new HashMap<String, String>();
-		image01.put("uid", "123123");
+
+	@Test
+	public void 자바배열객체를_JSON문자열로변환() throws JsonProcessingException {
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		String expectResult = "[{\"uid\":\"a1\",\"size\":100,\"name\":\"test01\"},{\"uid\":\"a2\",\"size\":200,\"name\":\"test02\"}]";
+
+		List<Map<String, Object>> images = new ArrayList<>();
+
+		Map<String, Object> image01 = new HashMap<>();
+		image01.put("uid", "a1");
 		image01.put("name", "test01");
-		image01.put("size", String.valueOf(100));
-		images.add(JSONObject.toJSONString(image01));
-		Map<String, String> image02 = new HashMap<String, String>();
-		image02.put("uid", "123123");
-		image02.put("name", "test01");
-		image02.put("size", String.valueOf(100));
-		images.add(JSONObject.toJSONString(image02));
-		
-		System.out.println(images);
+		image01.put("size", 100);
+		images.add(image01);
+
+		Map<String, Object> image02 = new HashMap<>();
+		image02.put("uid", "a2");
+		image02.put("name", "test02");
+		image02.put("size", 200);
+		images.add(image02);
+
+		String result = mapper.writeValueAsString(images);
+
+		Assert.assertEquals(expectResult, result);
 	}
+
 	
 	@Test
 	public void findById() {

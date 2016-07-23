@@ -269,20 +269,25 @@ public class UserRestController {
 
         CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
 
+        String email = form.getEmail().trim();
+        String username = form.getUsername().trim();
+        String footballClub = form.getFootballClub().trim();
+        String about = form.getAbout().trim();
+
         User user = userService.findById(commonPrincipal.getId());
-        user.setUsername(form.getUsername().trim());
-        user.setEmail(form.getEmail().trim());
 
-        String footballClub = form.getFootballClub();
-        String about = form.getAbout();
+        if (! email.isEmpty())
+            user.setEmail(email.trim());
 
-        if (Objects.nonNull(footballClub) && ! footballClub.isEmpty()) {
+        if (! username.isEmpty())
+            user.setUsername(username.trim());
+
+        if (! footballClub.isEmpty()) {
             FootballClub supportFC = footballService.findById(footballClub);
-
             user.setSupportFC(supportFC);
         }
 
-        if (Objects.nonNull(about) && ! about.isEmpty())
+        if (! about.isEmpty())
             user.setAbout(about.trim());
 
         userService.save(user);
