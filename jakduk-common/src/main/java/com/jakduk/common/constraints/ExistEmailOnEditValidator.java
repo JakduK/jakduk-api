@@ -1,5 +1,6 @@
 package com.jakduk.common.constraints;
 
+import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,20 +13,22 @@ import java.util.Objects;
  * @author pyohwan
  * 16. 7. 3 오후 9:30
  */
-public class ExistEmailValidator implements ConstraintValidator<ExistEmail, String> {
+public class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmailOnEdit, String> {
 
     @Autowired
     private UserService userService;
 
     @Override
-    public void initialize(ExistEmail constraintAnnotation) {
+    public void initialize(ExistEmailOnEdit constraintAnnotation) {
 
     }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        UserProfile existEmail = userService.findOneByEmail(value);
+        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+
+        UserProfile existEmail = userService.findByNEIdAndEmail(commonPrincipal.getId(), value.trim());
 
         return ! Objects.nonNull(existEmail);
 

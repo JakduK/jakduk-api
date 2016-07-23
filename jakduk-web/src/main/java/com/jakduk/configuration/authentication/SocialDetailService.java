@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Created by pyohwan on 16. 4. 8.
+ * @author pyohwan
+ * 16. 4. 8 오후 9:53
  */
 
 @Slf4j
@@ -40,10 +41,8 @@ public class SocialDetailService implements SocialUserDetailsService {
 
             log.debug("user=" + user);
 
-            SocialUserDetail userDetail = new SocialUserDetail(user.getId(), userId, user.getUsername(), user.getProviderId(), user.getEmail(),
+            return new SocialUserDetail(user.getId(), userId, user.getUsername(), user.getProviderId(), user.getEmail(),
                     true, true, true, true, getAuthorities(user.getRoles()));
-
-            return userDetail;
         }
     }
 

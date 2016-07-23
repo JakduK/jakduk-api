@@ -6,7 +6,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * Created by pyohwan on 16. 7. 3.
+ * @author pyohwan
+ * 16. 7. 3 오후 9:40
  */
 public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Object> {
 

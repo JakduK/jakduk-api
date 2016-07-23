@@ -9,7 +9,8 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Objects;
 
 /**
- * Created by pyohwan on 16. 7. 3.
+ * @author pyohwan
+ * 16. 7. 3 오후 9:40
  */
 public class ExistUsernameValidator implements ConstraintValidator<ExistUsername, String> {
 
@@ -25,10 +26,8 @@ public class ExistUsernameValidator implements ConstraintValidator<ExistUsername
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
         UserProfile existUsername = userService.findOneByUsername(value);
-        if (Objects.nonNull(existUsername)) {
-            return false;
-        }
 
-        return true;
+        return ! Objects.nonNull(existUsername);
+
     }
 }

@@ -221,6 +221,14 @@ public class CommonService {
 		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal;
 	}
 
+	/**
+	 * 로그인 중인 회원이 소셜 기반인지 검사.
+	 * @return 이메일 기반이면 true, 아니면 false
+	 */
+	public boolean isSocialUser() {
+		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail;
+	}
+
 	public Boolean isRedirectUrl(String url) {
 		Boolean result = true;
 		

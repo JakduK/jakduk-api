@@ -10,7 +10,8 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Created by pyohwan on 16. 4. 8.
+ * @author pyohwan
+ * 16. 4. 8 오후 9:10
  */
 public class SocialUserDetail implements SocialUserDetails {
 

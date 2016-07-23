@@ -17,7 +17,6 @@ import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.etc.GalleryOnBoard;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.model.web.BoardFreeWrite;
 import com.jakduk.notification.SlackService;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeOnListRepository;
@@ -25,7 +24,6 @@ import com.jakduk.repository.BoardFreeRepository;
 import com.jakduk.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -34,10 +32,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 
-import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -89,94 +84,6 @@ public class BoardFreeService {
 
 	public void saveBoardFree(BoardFree boardFree) {
 		boardFreeRepository.save(boardFree);
-	}
-
-	/**
-	 * 자유게시판 글쓰기 페이지
-	 * @param model
-	 * @return
-	 */
-	public Model getWrite(Model model) {
-
-		List<BoardCategory> boardCategories = this.getFreeCategories();
-
-		model.addAttribute("boardFreeWrite", new BoardFreeWrite());
-		model.addAttribute("boardCategories", boardCategories);
-
-		return model;
-	}
-
-	public Integer getEdit(Model model, int seq, HttpServletResponse response) {
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String accountId = principal.getId();
-
-		if (accountId == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		//BoardFreeWrite boardFreeWrite = boardFreeRepository.boardFreeWriteFindOneBySeq(seq);
-		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
-
-		if (!boardFree.isPresent())
-			return HttpServletResponse.SC_NOT_FOUND;
-
-		BoardFree getBoardFree = boardFree.get();
-
-		if (getBoardFree.getWriter() == null) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		if (!accountId.equals(getBoardFree.getWriter().getUserId())) {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-
-		BoardFreeWrite boardFreeWrite = new BoardFreeWrite();
-
-		if (getBoardFree.getGalleries() != null) {
-			List<String> images = new ArrayList<String>();
-
-			for (BoardImage gallery : getBoardFree.getGalleries()) {
-				Gallery tempGallery = galleryRepository.findOne(gallery.getId());
-
-				if (tempGallery != null) {
-					Map<String, String> image = new HashMap<String, String>();
-
-					image.put("uid", tempGallery.getId());
-					image.put("name", tempGallery.getName());
-					image.put("fileName", tempGallery.getFileName());
-					image.put("size", String.valueOf(tempGallery.getSize()));
-
-					images.add(JSONObject.toJSONString(image));
-				}
-			}
-
-			boardFreeWrite.setImages(images.toString());
-		}
-
-		boardFreeWrite.setId(getBoardFree.getId());
-		boardFreeWrite.setSeq(getBoardFree.getSeq());
-		boardFreeWrite.setCategoryName(getBoardFree.getCategory().toString());
-		boardFreeWrite.setSubject(getBoardFree.getSubject());
-		boardFreeWrite.setContent(getBoardFree.getContent());
-		boardFreeWrite.setViews(getBoardFree.getViews());
-		boardFreeWrite.setWriter(getBoardFree.getWriter());
-
-		List<BoardCategory> boardCategories = this.getFreeCategories();
-
-		model.addAttribute("boardFreeWrite", boardFreeWrite);
-		model.addAttribute("boardCategories", boardCategories);
-
-		return HttpServletResponse.SC_OK;
-	}
-
-	public void checkBoardFreeEdit(BoardFreeWrite boardFreeWrite, BindingResult result) {
-
-		String id = boardFreeWrite.getId();
-
-		if (id.isEmpty()) {
-			result.rejectValue("id", "board.msg.cannot.edit");
-		}
 	}
 
     /**

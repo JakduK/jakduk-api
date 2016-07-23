@@ -231,7 +231,10 @@ public class UserService {
 		return commonPrincipal;
 	}
 
-	// jakduk 회원의 로그인 처리.
+	/**
+	 * 이메일 기반 회원의 로그인 처리
+	 * @param user User 객체
+     */
 	public void signInJakdukUser(User user) {
 
 		boolean enabled = true;
@@ -248,7 +251,10 @@ public class UserService {
 		SecurityContextHolder.getContext().setAuthentication(token);
 	}
 
-	// SNS 인증 회원의 로그인 처리.
+	/**
+	 * SNS 기반 회원의 로그인 처리
+	 * @param user User 객체
+     */
 	public void signInSocialUser(User user) {
 
 		SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
@@ -259,13 +265,13 @@ public class UserService {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
-	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
+	private Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
 		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));
 
 		return authList;
 	}
 
-	public List<String> getRoles(List<Integer> roles) {
+	private List<String> getRoles(List<Integer> roles) {
 		List<String> newRoles = new ArrayList<String>();
 
 		if (roles != null) {
@@ -280,7 +286,7 @@ public class UserService {
 		return newRoles;
 	}
 
-	public static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {
+	private static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 
 		for (String role : roles) {

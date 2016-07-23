@@ -8,14 +8,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 회원 프로필 편집 시 별명 중복 검사
+ *
  * @author pyohwan
  * 16. 7. 3 오후 9:41
  */
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ExistUsernameValidator.class)
-public @interface ExistUsername {
+@Constraint(validatedBy = ExistUsernameOnEditValidator.class)
+public @interface ExistUsernameOnEdit {
 
     String message() default "username_Exists";
 

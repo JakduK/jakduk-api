@@ -5,7 +5,8 @@ import javax.validation.Payload;
 import java.lang.annotation.*;
 
 /**
- * Created by pyohwan on 16. 7. 3.
+ * @author pyohwan
+ * 16. 7. 3 오후 9:41
  */
 
 @Target({ ElementType.TYPE})

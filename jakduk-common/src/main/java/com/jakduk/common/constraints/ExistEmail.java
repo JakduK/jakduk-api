@@ -8,7 +8,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by pyohwan on 16. 7. 3.
+ * 이메일 중복 검사
+ *
+ * @author pyohwan
+ * 16. 7. 3 오후 9:30
  */
 
 @Target({ElementType.FIELD})

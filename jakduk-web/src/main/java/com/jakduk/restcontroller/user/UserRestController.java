@@ -13,6 +13,7 @@ import com.jakduk.model.simple.UserProfile;
 import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.user.vo.UserForm;
 import com.jakduk.restcontroller.user.vo.UserProfileForm;
+import com.jakduk.restcontroller.user.vo.UserProfileOnEditForm;
 import com.jakduk.restcontroller.user.vo.UserProfileResponse;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
@@ -151,11 +152,11 @@ public class UserRestController {
 
     }
 
-    @ApiOperation(value = "회원 프로필 업데이트 시 Email 중복 체크", produces = "application/json")
-    @RequestMapping(value = "/exist/email/update", method = RequestMethod.GET)
-    public Boolean existEmailOnUpdate(@RequestParam() String email) {
+    @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사", produces = "application/json")
+    @RequestMapping(value = "/exist/email/edit", method = RequestMethod.GET)
+    public Boolean existEmailOnEdit(@RequestParam() String email) {
 
-        if (!commonService.isUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
@@ -168,7 +169,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "비로그인 상태(id를 제외한)에서 Email 중복 체크", produces = "application/json")
+    @ApiOperation(value = "비로그인 상태(id를 제외한)에서 Email 중복 검사", produces = "application/json")
     @RequestMapping(value = "/exist/email/anonymous", method = RequestMethod.GET)
     public Boolean existEmailOnAnonymous(@RequestParam() String email,
                                          @RequestParam() String id) {
@@ -181,11 +182,11 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "회원 프로필 업데이트 시 별명 중복 체크", produces = "application/json")
-    @RequestMapping(value = "/exist/username/update", method = RequestMethod.GET)
-    public Boolean existUsernameOnUpdate(@RequestParam() String username) {
+    @ApiOperation(value = "회원 프로필 편집 시 별명 중복 검사", produces = "application/json")
+    @RequestMapping(value = "/exist/username/edit", method = RequestMethod.GET)
+    public Boolean existUsernameOnEdit(@RequestParam() String username) {
 
-        if (!commonService.isUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
@@ -198,7 +199,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "비 로그인 상태(id를 제외한)에서 별명 중복 체크", produces = "application/json")
+    @ApiOperation(value = "비 로그인 상태(id를 제외한)에서 별명 중복 검사", produces = "application/json")
     @RequestMapping(value = "/exist/username/anonymous", method = RequestMethod.GET)
     public Boolean existUsernameOnAnonymous(@RequestParam() String username,
                                             @RequestParam() String id) {
@@ -211,7 +212,7 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "이메일 중복 여부", produces = "application/json")
+    @ApiOperation(value = "이메일 중복 검사", produces = "application/json")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
     public Boolean existEmail(@RequestParam String email) {
 
@@ -221,7 +222,7 @@ public class UserRestController {
         return userService.existEmail(email.trim());
     }
 
-    @ApiOperation(value = "별명 중복 여부", produces = "application/json")
+    @ApiOperation(value = "별명 중복 검사", produces = "application/json")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
     public Boolean existUsername(@RequestParam String username) {
 
@@ -231,11 +232,11 @@ public class UserRestController {
         return userService.existUsernameOnWrite(username.trim());
     }
 
-    @ApiOperation(value = "내(이메일 기반) 프로필", produces = "application/json", response = UserProfileResponse.class)
+    @ApiOperation(value = "로그인 중인 내 프로필 보기", produces = "application/json", response = UserProfileResponse.class)
     @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
-    public UserProfileResponse profile() {
+    public UserProfileResponse getProfileMe() {
 
-        if (!commonService.isJakdukUser())
+        if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         String language = commonService.getLanguageCode(LocaleContextHolder.getLocale(), null);
@@ -248,6 +249,7 @@ public class UserRestController {
         response.setEmail(user.getEmail());
         response.setUsername(user.getUsername());
         response.setAbout(user.getAbout());
+        response.setProviderId(user.getProviderId());
 
         FootballClub footballClub = user.getSupportFC();
 
@@ -257,4 +259,43 @@ public class UserRestController {
 
         return response;
     }
+
+    @ApiOperation(value = "로그인 중인 내 프로필 편집", produces = "application/json", response = EmptyJsonResponse.class)
+    @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
+    public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileOnEditForm form) {
+
+        if (! commonService.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+
+        User user = userService.findById(commonPrincipal.getId());
+        user.setUsername(form.getUsername().trim());
+        user.setEmail(form.getEmail().trim());
+
+        String footballClub = form.getFootballClub();
+        String about = form.getAbout();
+
+        if (Objects.nonNull(footballClub) && ! footballClub.isEmpty()) {
+            FootballClub supportFC = footballService.findById(footballClub);
+
+            user.setSupportFC(supportFC);
+        }
+
+        if (Objects.nonNull(about) && ! about.isEmpty())
+            user.setAbout(about.trim());
+
+        userService.save(user);
+
+        log.debug("user updated. user=" + user);
+
+        if (commonService.isJakdukUser()) {
+            userService.signInJakdukUser(user);
+        } else if (commonService.isSocialUser()) {
+            userService.signInSocialUser(user);
+        }
+
+        return EmptyJsonResponse.newInstance();
+    }
+
 }

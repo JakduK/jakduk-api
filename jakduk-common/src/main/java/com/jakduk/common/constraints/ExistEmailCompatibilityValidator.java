@@ -11,7 +11,8 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Objects;
 
 /**
- * Created by pyohwan on 16. 7. 3.
+ * @author pyohwan
+ * 16. 7. 3 오후 9:28
  */
 
 @Slf4j
@@ -39,7 +40,7 @@ public class ExistEmailCompatibilityValidator implements ConstraintValidator<Exi
             UserProfile existEmail = null;
 
             // Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
-            if (Objects.nonNull(userId) && userId.isEmpty() == false) {
+            if (Objects.nonNull(userId) && ! userId.isEmpty()) {
                 existEmail = userService.findByNEIdAndEmail(userId, email);
                 log.debug("existEmail=" + existEmail);
             } else {
