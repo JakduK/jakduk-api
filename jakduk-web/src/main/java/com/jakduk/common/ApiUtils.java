@@ -28,7 +28,7 @@ public class ApiUtils {
         String cookieName = prefix + "_" + id;
         Cookie[] cookies = request.getCookies();
         if (Objects.isNull(cookies)) {
-            return false;
+            return true;
         }
 
         Optional<Cookie> findCookie = Stream.of(cookies)
