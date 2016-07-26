@@ -1,23 +1,34 @@
 package com.jakduk.restcontroller.stats;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.AttendanceClub;
-import com.jakduk.model.db.AttendanceLeague;
-import com.jakduk.model.db.Competition;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.CompetitionService;
-import com.jakduk.service.StatsService;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.AttendanceClub;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.Competition;
+import com.jakduk.model.etc.SupporterCount;
+import com.jakduk.restcontroller.stats.vo.SupportersDataResponse;
+import com.jakduk.service.CommonService;
+import com.jakduk.service.CompetitionService;
+import com.jakduk.service.StatsService;
 
 /**
  * Created by pyohwan on 16. 3. 20.
@@ -87,5 +98,19 @@ public class StatsRestController {
         List<AttendanceClub> attendances = statsService.getAttendancesSeason(season, league);
 
         return attendances;
+    }
+
+    @RequestMapping(value = "/supporters", method = RequestMethod.GET)
+    public SupportersDataResponse dataSupporter(HttpServletRequest request) {
+
+        Locale locale = localeResolver.resolveLocale(request);
+        String language = commonService.getLanguageCode(locale, null);
+        Map<String, Object> data = statsService.getSupportersData(language);
+
+        return SupportersDataResponse.builder()
+          .supporters((List<SupporterCount>) data.get("supporters"))
+          .supportersTotal((Integer) data.get("supportersTotal"))
+          .usersTotal((Integer) data.get("usersTotal"))
+          .build();
     }
 }
