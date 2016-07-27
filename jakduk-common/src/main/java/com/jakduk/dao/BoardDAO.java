@@ -1,6 +1,7 @@
 package com.jakduk.dao;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -166,37 +168,30 @@ public class BoardDAO {
 		return commentCount;
 	}	
 	
-	public HashMap<String, BoardFreeOnSearchComment> getBoardFreeOnSearchComment(List<ObjectId> arrId) {
+	public Map<String, BoardFreeOnSearchComment> getBoardFreeOnSearchComment(List<ObjectId> arrId) {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
 		Aggregation aggregation = Aggregation.newAggregation(match1);
 		AggregationResults<BoardFreeOnSearchComment> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnSearchComment.class);
 		
-		List<BoardFreeOnSearchComment> postsL = results.getMappedResults();
+		List<BoardFreeOnSearchComment> posts = results.getMappedResults();
 
-		HashMap<String, BoardFreeOnSearchComment> postsM = new HashMap<String, BoardFreeOnSearchComment>();
-		
-		for (BoardFreeOnSearchComment item : postsL) {
-			postsM.put(item.getId(), item);
-		}
-		
-		return postsM;
+		return posts.stream().collect(Collectors.toMap(BoardFreeOnSearchComment::getId, Function.identity()));
 	}
 	
 	/**
 	 * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
-	 * @param id
-	 * @param categoty
-	 * @param direction
-	 * @return
+	 * @param id 글 ID
+	 * @param category 말머리
+	 * @param direction 앞 or 뒤
+	 * @return 글 객체
 	 */
-	public BoardFreeOfMinimum getBoardFreeById(ObjectId id, String categoty, Direction direction) {
+	public BoardFreeOfMinimum getBoardFreeById(ObjectId id, CommonConst.BOARD_CATEGORY_TYPE category, Direction direction) {
 		Query query = new Query();
 		
-		switch (categoty) {
-		case CommonConst.BOARD_CATEGORY_DEVELOP:
-		case CommonConst.BOARD_CATEGORY_FOOTBALL:
-		case CommonConst.BOARD_CATEGORY_FREE:
-			query.addCriteria(Criteria.where("categoryName").is(categoty));	
+		switch (category) {
+			case FREE:
+			case FOOTBALL:
+			query.addCriteria(Criteria.where("category").is(category));
 			break;
 		}
 		
@@ -207,9 +202,38 @@ public class BoardDAO {
 		}
 		
 		query.with(new Sort(direction, "_id"));
-		BoardFreeOfMinimum post = mongoTemplate.findOne(query, BoardFreeOfMinimum.class);
-		
-		return post;
+
+		return mongoTemplate.findOne(query, BoardFreeOfMinimum.class);
 	}
+
+	/**
+	 * 해당 언어에 맞는 게시판 말머리 목록을 가져온다.
+	 * @param language 언어
+	 * @return 말머리 배열
+     */
+	public List<BoardCategory> getBoardCategories(String language) {
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where("names.language").is(language));
+		query.fields().include("code").include("names.$");
+
+        return mongoTemplate.find(query, BoardCategory.class);
+	}
+
+    /**
+     * 해당 언어에 맞는 게시판 말머리를 가져온다.
+     * @param code 말머리 code
+     * @param language 언어
+     * @return 말머리 객체
+     */
+    public BoardCategory getBoardCategory(String code, String language) {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("code").is(code));
+        query.addCriteria(Criteria.where("names.language").is(language));
+        query.fields().include("code").include("names.$");
+
+        return mongoTemplate.findOne(query, BoardCategory.class);
+    }
 
 }

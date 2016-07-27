@@ -1,6 +1,13 @@
 package com.jakduk.configuration;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet;
 import org.springframework.mobile.device.DeviceResolverRequestFilter;
@@ -9,14 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
-import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-import ro.isdc.wro.http.WroContextFilter;
-import ro.isdc.wro.http.WroFilter;
-import ro.isdc.wro.http.WroServletContextListener;
-
-import javax.servlet.*;
-import java.util.EnumSet;
 
 /**
  * web.xml
@@ -55,7 +55,6 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
 
         servletContext.addListener(new HttpSessionEventPublisher());
         servletContext.addListener(new SessionListener());
-        servletContext.addListener(new WroServletContextListener());
     }
 
     @Override
@@ -72,8 +71,6 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
 
         registerSpringSecurityFilter(servletContext);
         registerDeviceResolverRequestFilter(servletContext);
-        registerWroFilter(servletContext);
-        //registerWroContextFilter(ctx);
 
         //RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
         //ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
@@ -92,18 +89,6 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
     public void registerDeviceResolverRequestFilter(ServletContext servletContext) {
         FilterRegistration.Dynamic filter = servletContext.addFilter("deviceResolverRequestFilter", new DeviceResolverRequestFilter());
         filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/*");
-    }
-
-    // Create the wro filter's Spring application context
-    public void registerWroFilter(ServletContext servletContext) {
-        FilterRegistration.Dynamic wro = servletContext.addFilter("WroFilter", new WroFilter());
-        wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
-    }
-
-    // Create the wroContext filter's Spring application context
-    public void registerWroContextFilter(ServletContext servletContext) {
-        FilterRegistration.Dynamic wro = servletContext.addFilter("WroContextFilter", new WroContextFilter());
-        wro.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/bundles/*");
     }
 
     // Create the dispatcher servlet's Spring application context

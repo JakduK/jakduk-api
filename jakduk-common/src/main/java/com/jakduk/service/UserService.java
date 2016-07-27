@@ -1,20 +1,18 @@
 package com.jakduk.service;
 
 import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.jakduk.JakdukPrincipal;
-import com.jakduk.authentication.social.SocialUserDetail;
+import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
-import com.jakduk.exception.DuplicateDataException;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.db.FootballClub;
 import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.CommonWriter;
 import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.model.web.user.UserPasswordUpdate;
-import com.jakduk.model.web.user.UserProfileForm;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
@@ -30,8 +28,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 
 import java.util.*;
 
@@ -81,17 +77,33 @@ public class UserService {
 
 	// 해당 ID를 제외하고 username과 일치하는 회원 찾기.
 	public UserProfile findByNEIdAndUsername(String id, String username) {
-		return userRepository.findByNEIdAndUsername(id, username);
+		return userProfileRepository.findByNEIdAndUsername(id, username);
 	};
 
 	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
 	public UserProfile findByNEIdAndEmail(String id, String email) {
-		return userRepository.findByNEIdAndEmail(id, email);
+		return userProfileRepository.findByNEIdAndEmail(id, email);
 	}
 
 	// SNS 계정으로 가입한 회원 찾기.
-	public UserProfile findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public UserProfile findUserProfileByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userProfileRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
+	}
+
+	// SNS 계정으로 가입한 회원 찾기(로그인).
+	public User findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
+	}
+
+	/**
+	 * 비밀번호 변경을 위한 이메일 기반 회원 가져오기
+	 *
+	 * @param id userID
+	 * @return UserOnPasswordUpdate
+     */
+	public UserOnPasswordUpdate findUserOnPasswordUpdateById(String id){
+
+		return userRepository.findUserOnPasswordUpdateById(id);
 	}
 
 	// 회원 정보 저장.
@@ -99,94 +111,55 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public CommonWriter testFindId(String userid) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("email").is(userid));
-		
-		return mongoTemplate.findOne(query, CommonWriter.class);
-	}
-
-	public void oauthUserWrite(SocialUserOnAuthentication oauthUserOnLogin) {
-		User user = new User();
-		
-		user.setUsername(oauthUserOnLogin.getUsername());
-		//user.setSocialInfo(oauthUserOnLogin.getSocialInfo());
-		user.setRoles(oauthUserOnLogin.getRoles());
-		
-		userRepository.save(user);
-	}
-	
-	public Boolean existEmail(Locale locale, String email) {
-		Boolean result = false;
+	public Boolean existEmail(String email) {
+		Boolean result;
 
 		if (commonService.isAnonymousUser()) {
 			User user = userRepository.findOneByEmail(email);
-
-			if (Objects.nonNull(user))
-				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.email"));
+			result = Objects.nonNull(user);
 		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.already.you.are.user"));
 		}
 		
 		return result;
 	}
 	
-	public Boolean existUsernameOnWrite(Locale locale, String username) {
-		Boolean result = false;
+	public Boolean existUsernameOnWrite(String username) {
+
+		Boolean result;
 
 		if (commonService.isAnonymousUser()) {
 			User user = userRepository.findOneByUsername(username);
-
-			if (Objects.nonNull(user))
-				throw new DuplicateDataException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.already.username"));
+			result = Objects.nonNull(user);
 		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.already.you.are.user"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.already.you.are.user"));
 		}
 
 		return result;
 	}
 
-	public Model getUserPasswordUpdate(Model model) {
+	/**
+	 * 이메일 기반 회원의 비밀번호 변경.
+	 *
+	 * @param newPassword 새 비밀번호
+     */
+	public void updateUserPassword(String newPassword) {
+		
+		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = jakdukPrincipal.getId();
+		
+		Optional<User> user = userRepository.findOneById(id);
 
-		model.addAttribute("userPasswordUpdate", new UserPasswordUpdate());
+		if (!user.isPresent())
+			throw new ServiceException(ServiceError.NOT_FOUND_USER);
+
+		User updateUser = user.get();
+		updateUser.setPassword(encoder.encode(newPassword));
 		
-		return model;
-	}
-	
-	public void checkUserPasswordUpdate(UserPasswordUpdate userPasswordUpdate, BindingResult result) {
-		
-		String oldPwd = userPasswordUpdate.getOldPassword();
-		String newPwd = userPasswordUpdate.getNewPassword();
-		String newPwdCfm = userPasswordUpdate.getNewPasswordConfirm();
-		
-		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = jakdukPrincipal.getId();
-		
-		UserOnPasswordUpdate user = userRepository.userOnPasswordUpdateFindById(id);
-		String pwd = user.getPassword();
-		
-		if (!encoder.matches(oldPwd, pwd)) {
-			result.rejectValue("oldPassword", "user.msg.old.password.is.not.vaild");
-		}
-		
-		if (!newPwd.equals(newPwdCfm)) {
-			result.rejectValue("passwordConfirm", "user.msg.password.mismatch");
-		}
-	}
-	
-	public void userPasswordUpdate(UserPasswordUpdate userPasswordUpdate) {
-		
-		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = jakdukPrincipal.getId();
-		
-		User user = userRepository.findById(id);
-		
-		user.setPassword(encoder.encode(userPasswordUpdate.getNewPassword()));
-		
-		this.save(user);
+		this.save(updateUser);
 		
 		if (log.isInfoEnabled()) {
-			log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
+			log.info("jakduk user password changed. email=" + updateUser.getEmail() + ", username=" + updateUser.getUsername());
 		}
 	}
 
@@ -200,42 +173,9 @@ public class UserService {
 		}
 	}
 
-	public User editSocialProfile(UserProfileForm userProfileForm) {
-
-		SocialUserDetail principal = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-		User user = userRepository.findById(principal.getId());
-
-		String email = userProfileForm.getEmail();
-		String username = userProfileForm.getUsername();
-		String footballClub = userProfileForm.getFootballClub();
-		String about = userProfileForm.getAbout();
-
-		if (Objects.nonNull(email) && email.isEmpty() == false) {
-			user.setEmail(email.trim());
-		}
-
-		if (Objects.nonNull(username) && username.isEmpty() == false) {
-			user.setUsername(username.trim());
-		}
-
-		if (Objects.nonNull(footballClub) && footballClub.isEmpty() == false) {
-			FootballClub supportFC = footballClubRepository.findOne(userProfileForm.getFootballClub());
-			user.setSupportFC(supportFC);
-		}
-
-		if (Objects.nonNull(about) && about.isEmpty() == false) {
-			user.setAbout(about.trim());
-		}
-
-		userRepository.save(user);
-
-		return user;
-	}
-
 	/**
 	 * 로그인 중인 회원의 정보를 가져온다.
-	 * @return
+	 * @return 로그인 회원 객체.
      */
 	public CommonPrincipal getCommonPrincipal() {
 		CommonPrincipal commonPrincipal = null;
@@ -265,8 +205,11 @@ public class UserService {
 		return commonPrincipal;
 	}
 
-	// jakduk 회원의 로그인 처리.
-	public void signUpJakdukUser(User user) {
+	/**
+	 * 이메일 기반 회원의 로그인 처리
+	 * @param user User 객체
+     */
+	public void signInJakdukUser(User user) {
 
 		boolean enabled = true;
 		boolean accountNonExpired = true;
@@ -282,23 +225,27 @@ public class UserService {
 		SecurityContextHolder.getContext().setAuthentication(token);
 	}
 
-	// SNS 인증 회원의 로그인 처리.
-	public void signUpSocialUser(User user) {
+	/**
+	 * SNS 기반 회원의 로그인 처리
+	 * @param user User 객체
+     */
+	public void signInSocialUser(User user) {
 
 		SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
 				true, true, true, true, getAuthorities(user.getRoles()));
 
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
-	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
+	private Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
 		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));
 
 		return authList;
 	}
 
-	public List<String> getRoles(List<Integer> roles) {
+	private List<String> getRoles(List<Integer> roles) {
 		List<String> newRoles = new ArrayList<String>();
 
 		if (roles != null) {
@@ -313,7 +260,7 @@ public class UserService {
 		return newRoles;
 	}
 
-	public static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {
+	private static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 
 		for (String role : roles) {

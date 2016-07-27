@@ -2,6 +2,8 @@ package com.jakduk.model.simple;
 
 import java.util.List;
 
+import com.jakduk.common.CommonConst;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,6 +18,7 @@ import com.jakduk.model.embedded.CommonWriter;
  * @desc     :
  */
 
+@Data
 @Document(collection = "boardFree")
 public class BoardFreeOnList {
 	
@@ -43,7 +46,7 @@ public class BoardFreeOnList {
 	/**
 	 * 분류 ID
 	 */
-	private String categoryName;
+	private CommonConst.BOARD_CATEGORY_TYPE category;
 	
 	/**
 	 * 조회
@@ -53,76 +56,4 @@ public class BoardFreeOnList {
 	private BoardStatus status;
 	
 	private List<BoardImage> galleries;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public CommonWriter getWriter() {
-		return writer;
-	}
-
-	public void setWriter(CommonWriter writer) {
-		this.writer = writer;
-	}
-
-	public String getSubject() {
-		return subject;
-	}
-
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
-	public int getSeq() {
-		return seq;
-	}
-
-	public void setSeq(int seq) {
-		this.seq = seq;
-	}
-
-	public String getCategoryName() {
-		return categoryName;
-	}
-
-	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
-	}
-
-	public int getViews() {
-		return views;
-	}
-
-	public void setViews(int views) {
-		this.views = views;
-	}
-
-	public BoardStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(BoardStatus status) {
-		this.status = status;
-	}
-
-	public List<BoardImage> getGalleries() {
-		return galleries;
-	}
-
-	public void setGalleries(List<BoardImage> galleries) {
-		this.galleries = galleries;
-	}
-
-	@Override
-	public String toString() {
-		return "BoardFreeOnList [id=" + id + ", writer=" + writer + ", subject=" + subject + ", seq=" + seq
-				+ ", categoryName=" + categoryName + ", views=" + views + ", status=" + status + ", galleries="
-				+ galleries + "]";
-	}
-	
 }

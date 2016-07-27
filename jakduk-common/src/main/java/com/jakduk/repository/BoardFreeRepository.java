@@ -9,10 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Optional;
+
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String> {
 
+	Optional<BoardFree> findOneById(String id);
+	Optional<BoardFree> findOneBySeq(Integer seq);
+
 	Page<BoardFreeOnList> findByCategoryName(String categoryName, Pageable pageable);
-	BoardFree findOneBySeq(Integer seq);
 	BoardFree findByWriter(String writer);
 	long countByCategoryName(String categoryName);
 	long count();

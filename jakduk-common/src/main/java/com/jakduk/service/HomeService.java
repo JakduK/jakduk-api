@@ -85,15 +85,16 @@ public class HomeService {
 
 	}
 
-	// 최근 글 가져오기.
+	/**
+	 * 최근 글 가져오기
+	 * @return 글 목록
+     */
 	public List<BoardFreeOnHome> getBoardLatest() {
 
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
 		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_POST, sort);
-		
-		List<BoardFreeOnHome> posts = boardFreeOnHomeRepository.findAll(pageable).getContent();
 
-		return posts;
+		return boardFreeOnHomeRepository.findAll(pageable).getContent();
 	}
 
 	// 최근 가입 회원 가져오기.
@@ -101,7 +102,10 @@ public class HomeService {
 		return jakdukDAO.getUserOnHome(language);
 	}
 
-	// 최근 그림 목록 가져오기.
+	/**
+	 * 최근 그림 목록 가져오기
+	 * @return 사진 목록
+     */
 	public List<GalleryOnList> getGalleriesLatest() {
 		return jakdukDAO.findGalleriesById(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
 	}

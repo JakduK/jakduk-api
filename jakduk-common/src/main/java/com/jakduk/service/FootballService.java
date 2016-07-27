@@ -10,10 +10,12 @@ import com.jakduk.repository.FootballClubOriginRepository;
 import com.jakduk.repository.FootballClubRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -63,7 +65,7 @@ public class FootballService {
      * @param language 언어
      * @param sortNameType 정렬 기준
      * @param ids footballClub Id 배열
-     * @return
+     * @return 축구단 배열
      */
     public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CommonConst.NAME_TYPE sortNameType ) {
 
@@ -72,7 +74,12 @@ public class FootballService {
         return footballClubs;
     }
 
-    // 해당 언어에 맞는 축구단 이름 가져오기.
+    /**
+     * 해당 언어에 맞는 축구단 이름 가져오기.
+     * @param footballClub 축구단 객체
+     * @param language 언어
+     * @return LocalName 객체
+     */
     public LocalName getLocalNameOfFootballClub(FootballClub footballClub, String language) {
         LocalName localName = null;
 

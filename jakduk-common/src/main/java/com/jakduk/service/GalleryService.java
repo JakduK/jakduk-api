@@ -1,17 +1,31 @@
 package com.jakduk.service;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.stream.Stream;
+import javax.imageio.ImageIO;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.exception.UnauthorizedAccessException;
-import com.jakduk.model.db.Gallery;
-import com.jakduk.model.embedded.CommonFeelingUser;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.embedded.GalleryStatus;
-import com.jakduk.model.simple.BoardFreeOnGallery;
-import com.jakduk.model.simple.GalleryOnList;
-import com.jakduk.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,22 +36,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Stream;
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
+import com.jakduk.exception.UnauthorizedAccessException;
+import com.jakduk.exception.UserFeelingException;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.embedded.CommonFeelingUser;
+import com.jakduk.model.embedded.CommonWriter;
+import com.jakduk.model.embedded.GalleryStatus;
+import com.jakduk.model.simple.BoardFreeOnGallery;
+import com.jakduk.model.simple.GalleryOnList;
+import com.jakduk.repository.GalleryRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -49,28 +61,28 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 public class GalleryService {
-	
+
 	@Value("${storage.image.path}")
 	private String storageImagePath;
-	
+
 	@Value("${storage.thumbnail.path}")
 	private String storageThumbnailPath;
-	
+
 	@Value("${kakao.javascript.key}")
 	private String kakaoJavascriptKey;
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private GalleryRepository galleryRepository;
-	
+
 	@Autowired
 	private JakdukDAO jakdukDAO;
-	
+
 	@Autowired
 	private CommonService commonService;
-	
+
 	@Autowired
 	private SearchService searchService;
 
@@ -92,10 +104,14 @@ public class GalleryService {
 		return jakdukDAO.findGalleryUsersDislikingCount(ids);
 	}
 
-	public Gallery findById(String id) {
+	public Gallery findOneById(String id) {
 		return galleryRepository.findOne(id);
 	}
-	
+
+    public List<Gallery> findByIds(List<String> ids) {
+        return galleryRepository.findByIdIn(ids);
+    }
+
 	public void getList(Model model, Locale locale) {
 		try {
 			model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
@@ -104,9 +120,14 @@ public class GalleryService {
 			e.printStackTrace();
 		}
 	}
-	
-	public Gallery uploadImage(Locale locale, MultipartFile file) {
-		
+
+	/**
+	 * 사진 올리기.
+	 * @param file 멀티파트 객체
+	 * @return Gallery 객체
+     */
+	public Gallery uploadImage(MultipartFile file) {
+
 		try {
 			Gallery gallery = new Gallery();
 
@@ -120,7 +141,7 @@ public class GalleryService {
 			gallery.setWriter(writer);
 
 			GalleryStatus status = new GalleryStatus();
-			status.setStatus(CommonConst.GALLERY_STATUS_TEMP);
+			status.setStatus(CommonConst.GALLERY_STATUS_TYPE.TEMP);
 			gallery.setStatus(status);
 
 			gallery.setFileName(file.getOriginalFilename());
@@ -131,7 +152,7 @@ public class GalleryService {
 			String formatName = "jpg";
 			String splitContentType[] = file.getContentType().split("/");
 
-			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
+			if (!splitContentType[1].equals("octet-stream")) {
 				formatName = splitContentType[1];
 				gallery.setContentType(file.getContentType());
 			} else {
@@ -207,7 +228,7 @@ public class GalleryService {
 			return gallery;
 
 		} catch (IOException e) {
-			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.gallery", "gallery.exception.io"));
+			throw new RuntimeException(commonService.getResourceBundleMessage("messages.gallery", "gallery.exception.io"));
 		}
 	}
 
@@ -247,110 +268,105 @@ public class GalleryService {
 			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
 		}
 	}
-	
+
 	/**
 	 * 사진 삭제.
 	 * @param id
 	 * @return
 	 */
-	public void removeImage(Locale locale, String id) {
-		
+	public void removeImage(String id) {
+
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 
-		if (Objects.isNull(accountId)) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
-		}
-		
 		Gallery gallery = galleryRepository.findOne(id);
-		
+
 		if (Objects.isNull(gallery)) {
-			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+			throw new ServiceException(ServiceError.NOT_FOUND);
 		}
-		
+
 		if (Objects.isNull(gallery.getWriter())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
 		}
-		
+
 		if (!accountId.equals(gallery.getWriter().getUserId())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
 		}
-		
+
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-		
+
 		// 사진을 삭제하기 전에, 이 사진과 연동된 글이 있는지 검사를 해야 한다. 최종적으로 연동된 글이 전부 없어진다면 사진은 삭제되어야 한다.
 		// 추가 할것.
-		
-		Path imageFilePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), 
+
+		Path imageFilePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()),
 				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
-		
-		Path thumbThumbnailPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), 
+
+		Path thumbThumbnailPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()),
 				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
-		
+
 		if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS) && Files.exists(thumbThumbnailPath, LinkOption.NOFOLLOW_LINKS)) {
 			try {
 				Files.delete(imageFilePath);
 				Files.delete(thumbThumbnailPath);
 				galleryRepository.delete(gallery);
-				
+
 			} catch (IOException e) {
-				throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.gallery", "gallery.exception.io"));
+				throw new RuntimeException(commonService.getResourceBundleMessage("messages.gallery", "gallery.exception.io"));
 			}
 		}
-		
+
 		// 엘라스틱 서치 document 삭제.
 		searchService.deleteDocumentBoard(gallery.getId());
-	}	
+	}
 
-	public Integer getGallery(Model model, Locale locale, String id, Boolean isAddCookie) {
-		
+	public Map<String, Object> getGallery(String id, Boolean isAddCookie) {
+
 		Gallery gallery = galleryRepository.findOne(id);
-		
+
 		if (gallery == null) {
-			return HttpServletResponse.SC_NOT_FOUND;
+			return null;
 		}
-		
-		if (isAddCookie == true) {
+
+		if (isAddCookie) {
 			int views = gallery.getViews();
 			gallery.setViews(++views);
 			galleryRepository.save(gallery);
 		}
-		
-		Map<String, Date> createDate = new HashMap<String, Date>();
-		
+
+		Map<String, Date> createDate = new HashMap<>();
+
 		Gallery prevGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.ASC);
 		Gallery nextGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.DESC);
 		List<BoardFreeOnGallery> posts = jakdukDAO.getBoardFreeOnGallery(new ObjectId(id));
-		
+
 		ObjectId objId = new ObjectId(id);
 		createDate.put(id, objId.getDate());
-		
+
 		for (BoardFreeOnGallery post : posts) {
 			objId = new ObjectId(post.getId());
 			createDate.put(post.getId(), objId.getDate());
 		}
 
-		model.addAttribute("gallery", gallery);
-		model.addAttribute("prev", prevGall);
-		model.addAttribute("next", nextGall);
-		model.addAttribute("linkedPosts", posts);
-		model.addAttribute("createDate", createDate);
-		model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-		model.addAttribute("kakaoKey", kakaoJavascriptKey);
+		Map<String, Object> data = new HashMap<>();
+		data.put("gallery", gallery);
+		data.put("prev", prevGall);
+		data.put("next", nextGall);
+		data.put("linkedPosts", posts);
+		data.put("createDate", createDate);
 
-		return HttpServletResponse.SC_OK;
+		return data;
 	}
-	
-	public Model setUserFeeling(Model model, String id, CommonConst.FEELING_TYPE feeling) {
-		
+
+	public Map<String, Object> setUserFeeling(String id, CommonConst.FEELING_TYPE feeling) {
+
 		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 		String accountName = principal.getUsername();
-		
+
 		Gallery gallery = galleryRepository.findOne(id);
 		CommonWriter writer = gallery.getWriter();
 
@@ -358,17 +374,17 @@ public class GalleryService {
 		List<CommonFeelingUser> usersDisliking = gallery.getUsersDisliking();
 
 		if (usersLiking == null) {
-			usersLiking = new ArrayList<CommonFeelingUser>(); 
+			usersLiking = new ArrayList<>();
 		}
-		
+
 		if (usersDisliking == null) {
-			usersDisliking = new ArrayList<CommonFeelingUser>(); 
+			usersDisliking = new ArrayList<>();
 		}
-		
+
 		if (accountId != null && accountName != null) {
 			if (writer != null && accountId.equals(writer.getUserId())) {
 				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
-			} 
+			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersLiking.stream();
@@ -377,44 +393,42 @@ public class GalleryService {
 					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 				}
 			}
-			
+
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersDisliking.stream();
 				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
 				if (itemCount > 0) {
 					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
-				}				
+				}
 			}
 
 			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), accountId, accountName);
 
-				switch (feeling) {
-					case LIKE:
-						usersLiking.add(feelingUser);
-						gallery.setUsersLiking(usersLiking);
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_LIKE;
-						break;
-					case DISLIKE:
-						usersDisliking.add(feelingUser);
-						gallery.setUsersDisliking(usersDisliking);
-						errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_DISLIKE;
-						break;
-					default:
-						break;
+				if (CommonConst.FEELING_TYPE.LIKE.equals(feeling)) {
+					usersLiking.add(feelingUser);
+					gallery.setUsersLiking(usersLiking);
+				} else {
+					usersDisliking.add(feelingUser);
+					gallery.setUsersDisliking(usersDisliking);
 				}
-				
+
 				galleryRepository.save(gallery);
+			} else {
+				throw new UserFeelingException(
+					CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
+					commonService.getResourceBundleMessage("messages.common", "common.exception.select.already.like")
+				);
 			}
 		} else {
-			errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ANONYMOUS;
+			throw new ServiceException(ServiceError.FORBIDDEN);
 		}
-		
-		model.addAttribute("errorCode", errCode);
-		model.addAttribute("numberOfLike", usersLiking.size());
-		model.addAttribute("numberOfDislike", usersDisliking.size());
-		
-		return model;
-	}	
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("feeling", feeling);
+		data.put("numberOfLike", usersLiking.size());
+		data.put("numberOfDislike", usersDisliking.size());
+		return data;
+	}
 
 }

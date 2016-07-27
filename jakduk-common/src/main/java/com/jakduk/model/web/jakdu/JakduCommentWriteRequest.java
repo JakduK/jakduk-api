@@ -1,5 +1,6 @@
 package com.jakduk.model.web.jakdu;
 
+import com.jakduk.common.CommonConst;
 import lombok.Data;
 
 /**
@@ -10,6 +11,6 @@ import lombok.Data;
 public class JakduCommentWriteRequest {
     private String contents;            // 댓글 내용
     private String id;                  // 작두일정 ID
-    private String device;              // 모바일 기기 정보
+    private CommonConst.DEVICE_TYPE device;              // 모바일 기기 정보
 
 }

@@ -1,6 +1,7 @@
 package com.jakduk.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +18,14 @@ import com.jakduk.model.simple.GalleryOnList;
  * @desc     :
  */
 public interface GalleryRepository extends MongoRepository<Gallery, String>{
+
+	Optional<Gallery> findOneById(String id);
 	
 	@Query(value="{'status.status' : 'use'}")
 	Page<GalleryOnList> findList(Pageable pageable);
 	
 	@Query(value="{'status.status' : 'use'}")
 	List<Gallery> findAll();
+
+	List<Gallery> findByIdIn(List<String> ids);
 }

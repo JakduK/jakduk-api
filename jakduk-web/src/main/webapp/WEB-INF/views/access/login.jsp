@@ -36,7 +36,7 @@
 				<div class="row">
 					<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
 						<div class="reg-page">
-							<form action="login" name="loginForm" method="POST" ng-submit="onSubmit($event)">
+							<form action="api/login" name="loginForm" method="POST" ng-submit="onSubmit($event)">
 								<!-- CSRF 방어 비활성화
 								<input type="hidden"
 									   name="${_csrf.parameterName}"
@@ -49,24 +49,24 @@
 
 								<div class="form-group">
 									<div class="input-group has-feedback"
-										 ng-class="{'has-success':loginForm.j_username.$valid, 'has-error':loginForm.j_username.$invalid}">
+										 ng-class="{'has-success':loginForm.username.$valid, 'has-error':loginForm.username.$invalid}">
 										<span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span>
-										<input type="email" class="form-control" id="j_username" name="j_username" placeholder='<spring:message code="user.placeholder.email"/>'
+										<input type="email" class="form-control" id="username" name="username" placeholder='<spring:message code="user.placeholder.email"/>'
 											   ng-model="email" ng-required="true" ng-minlength="emailLengthMin" ng-maxlength="emailLengthMax" autofocus>
 									<span class="glyphicon form-control-feedback"
-										  ng-class="{'glyphicon-ok':loginForm.j_username.$valid, 'glyphicon-remove':loginForm.j_username.$invalid}"></span>
+										  ng-class="{'glyphicon-ok':loginForm.username.$valid, 'glyphicon-remove':loginForm.username.$invalid}"></span>
 									</div>
 									<p class="text-danger" ng-model="errorEmail" ng-show="errorEmail" ng-bind="errorEmail"></p>
 								</div>
 
 								<div class="form-group">
 									<div class="input-group has-feedback"
-										 ng-class="{'has-success':loginForm.j_password.$valid, 'has-error':loginForm.j_password.$invalid}">
+										 ng-class="{'has-success':loginForm.password.$valid, 'has-error':loginForm.password.$invalid}">
 										<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
-										<input type="password" class="form-control" id="j_password" name="j_password" placeholder='<spring:message code="user.placeholder.password"/>'
+										<input type="password" class="form-control" id="password" name="password" placeholder='<spring:message code="user.placeholder.password"/>'
 											   ng-model="password" ng-required="true" ng-minlength="passwordLengthMin" ng-maxlength="passwordLengthMax">
 									<span class="glyphicon form-control-feedback"
-										  ng-class="{'glyphicon-ok':loginForm.j_password.$valid, 'glyphicon-remove':loginForm.j_password.$invalid}"></span>
+										  ng-class="{'glyphicon-ok':loginForm.password.$valid, 'glyphicon-remove':loginForm.password.$invalid}"></span>
 									</div>
 									<p class="text-danger" ng-model="errorPassword" ng-show="errorPassword" ng-bind="errorPassword"></p>
 								</div>
@@ -156,9 +156,9 @@
 						} else {
 							$scope.onEmail();
 
-							if ($scope.loginForm.j_password.$error.required) {
+							if ($scope.loginForm.password.$error.required) {
 								$scope.errorPassword = '<spring:message code="common.msg.required"/>';
-							} else if ($scope.loginForm.j_password.$error.minlength || $scope.loginForm.j_password.$error.maxlength) {
+							} else if ($scope.loginForm.password.$error.minlength || $scope.loginForm.password.$error.maxlength) {
 								$scope.errorPassword = '<spring:message code="Size.userWrite.password"/>';
 							}
 							event.preventDefault();
@@ -166,10 +166,10 @@
 					};
 
 					$scope.onEmail = function () {
-						if ($scope.loginForm.j_username.$invalid) {
-							if ($scope.loginForm.j_username.$error.required) {
+						if ($scope.loginForm.username.$invalid) {
+							if ($scope.loginForm.username.$error.required) {
 								$scope.errorEmail = '<spring:message code="common.msg.required"/>';
-							} else if ($scope.loginForm.j_username.$error.minlength || $scope.loginForm.j_username.$error.maxlength) {
+							} else if ($scope.loginForm.username.$error.minlength || $scope.loginForm.username.$error.maxlength) {
 								$scope.errorEmail = '<spring:message code="Size.userWrite.email"/>';
 							} else {
 								$scope.errorEmail = '<spring:message code="user.msg.check.mail.format"/>';

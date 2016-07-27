@@ -1,9 +1,8 @@
 package com.jakduk.configuration;
 
-import com.jakduk.authentication.jakduk.JakdukDetailsService;
-import com.jakduk.authentication.jakduk.JakdukFailureHandler;
-import com.jakduk.authentication.jakduk.JakdukSuccessHandler;
-import com.jakduk.authentication.social.SocialDetailService;
+import com.jakduk.configuration.authentication.JakdukDetailsService;
+import com.jakduk.configuration.authentication.SocialDetailService;
+import com.jakduk.configuration.authentication.handler.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,34 +35,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()           // CSRF 방어 비활성화
                 //Configures form login
                 .formLogin()
-                    .loginPage("/login")
-                    .usernameParameter("j_username")
-                    .passwordParameter("j_password")
+                    .loginProcessingUrl("/api/login")
                     .successHandler(jakdukSuccessHandler())
                     .failureHandler(jakdukFailureHandler())
                 //Configures the logout function
                 .and()
                     .logout()
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessHandler(restLogoutSuccessHandler())
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessUrl("/logout/success")
 //                .and()
 //                    .httpBasic()                // basic auth 사용.
                 .and()
-                    .exceptionHandling().accessDeniedPage("/error/denied")
+                    .exceptionHandling()
+                        .authenticationEntryPoint(restAuthenticationEntryPoint())
+                        .accessDeniedHandler(restAccessDeniedHandler())
                 //Configures url based authorization
                 .and()
                     .authorizeRequests()
                         .antMatchers(
                                 "/check/**",
-                                "/logout",
+                                "/api/logout",
                                 "/home/**",
                                 "/about/**",
                                 "/auth/**"
                             ).permitAll()
                         .antMatchers(
-                                "/login",               // 로그인
+                                "/api/login",           // 로그인
                                 "/auth/*",              // SNS 인증
                                 "/signup",              // SNS 계정으로 회원 가입
                                 "/user/social",         // OAUTH2 콜백
@@ -73,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             ).anonymous()
                         .antMatchers(
                                 "/user/**",
-                                "/swagger-ui.html",     // 스웨거
+//                                "/swagger-ui.html",     // 스웨거
                                 "/rest/**"              // spring-data-rest
                             ).authenticated()
                         .antMatchers(
@@ -130,7 +129,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public RestLogoutSuccessHandler restLogoutSuccessHandler() {
+        return new RestLogoutSuccessHandler();
+    }
+
+    @Bean
+    public RestAccessDeniedHandler restAccessDeniedHandler() {
+        return new RestAccessDeniedHandler();
+    }
+
+    @Bean
+    public RestAuthenticationEntryPoint restAuthenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
+    }
+
+    @Bean
     public JakdukDetailsService jakdukDetailsService() {
         return new JakdukDetailsService();
     }
+
 }

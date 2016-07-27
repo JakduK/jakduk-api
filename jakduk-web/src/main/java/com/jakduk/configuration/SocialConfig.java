@@ -17,6 +17,7 @@ import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.web.ConnectController;
+import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
@@ -31,12 +32,15 @@ import org.springframework.social.security.AuthenticationNameUserIdSource;
 public class SocialConfig implements SocialConfigurer {
 
     @Autowired
+    private Environment environment;
+
+    @Autowired
     private MongoTemplate mongoTemplate;
 
     @Override
     public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
-        connectionFactoryConfigurer.addConnectionFactory(new FacebookConnectionFactory(environment.getProperty("facebook.app.id"), environment.getProperty("facebook.app.secret")));
-        connectionFactoryConfigurer.addConnectionFactory(new DaumConnectionFactory(environment.getProperty("daum.client.id"), environment.getProperty("daum.client.secret")));
+        connectionFactoryConfigurer.addConnectionFactory(facebookConnectionFactory());
+        connectionFactoryConfigurer.addConnectionFactory(daumConnectionFactory());
     }
 
     @Override
@@ -52,6 +56,15 @@ public class SocialConfig implements SocialConfigurer {
         return new GenericUsersConnectionRepository(mongoConnectionDao, connectionFactoryLocator);
     }
 
+    @Bean
+    public FacebookConnectionFactory facebookConnectionFactory() {
+        return new FacebookConnectionFactory(environment.getProperty("facebook.app.id"), environment.getProperty("facebook.app.secret"));
+    }
+
+    @Bean
+    public DaumConnectionFactory daumConnectionFactory() {
+        return new DaumConnectionFactory(environment.getProperty("daum.client.id"), environment.getProperty("daum.client.secret"));
+    }
     /**
      * This bean manages the connection flow between the account provider and
      * the example application.

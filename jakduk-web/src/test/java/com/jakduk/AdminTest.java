@@ -23,17 +23,6 @@ public class AdminTest extends AbstractSpringTest {
 	BoardCategoryRepository boardCategoryRepository;
 	
 	@Test
-	public void boardCategoryTest() {
-		BoardCategory boardCategory = boardCategoryRepository.findByName("free");
-		
-		String[] usingBoard = boardCategory.getUsingBoard().toArray(new String[boardCategory.getUsingBoard().size()]);
-		
-		for (String tempUsingBoard : usingBoard) {
-			System.out.println("boardCategoryTest=" + tempUsingBoard);
-		}
-	}
-	
-	@Test
 	public void getBoard() {
 //		long boardCnt = boardFreeRepository.count();
 		long boardCnt = 101;

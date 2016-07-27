@@ -1,13 +1,17 @@
 package com.jakduk.service;
 
+import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Sequence;
 import com.jakduk.model.db.Token;
+import com.jakduk.model.etc.AuthUserProfile;
 import com.jakduk.repository.SequenceRepository;
 import com.jakduk.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -19,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -84,44 +87,7 @@ public class CommonService {
 			return nextSeq;
 		}
 	}
-	
-	/**
-	 * 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
-	 * @param request
-	 * @param response
-	 * @param prefix
-	 * @param id
-     * @return 쿠키를 새로 저장했다면 true, 아니면 false.
-     */
-	public Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, String prefix, String id) {
-		
-		Boolean findSameCookie = false;
-		String cookieName = prefix + "_" + id;
-		
-		Cookie cookies[] = request.getCookies();
-		
-		if (cookies != null) {
-			for (int i = 0 ; i < cookies.length ; i++) {
-				String name = cookies[i].getName();
-				
-				if (cookieName.equals(name)) {
-					findSameCookie = true;
-					break;
-				}
-			}
-		}
-		
-		if (findSameCookie == false) {
-			Cookie cookie = new Cookie(cookieName, "r");
-			cookie.setMaxAge(CommonConst.BOARD_COOKIE_EXPIRE_SECONDS);
-			response.addCookie(cookie);
-			
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
+
 	public String getLanguageCode(Locale locale, String lang) {
 		
 		String getLanguage = Locale.ENGLISH.getLanguage();
@@ -183,11 +149,11 @@ public class CommonService {
 	public Boolean isAnonymousUser() {
 		Boolean result = false;
 		
-		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 			result = true;
 		}
 		
-		if (result == false) {
+		if (!result) {
 			Collection<? extends GrantedAuthority> authoritys = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			
 			for (GrantedAuthority authority : authoritys) {
@@ -201,49 +167,66 @@ public class CommonService {
 		return result;
 	}
 
-	// 관리자인지 검사.
-	public Boolean isAdmin() {
-		Boolean result = false;
+	/**
+	 * 로그인 중인 회원이 관리자인지 검사.
+	 * @return 관리자 이면 true
+     */
+	public boolean isAdmin() {
+		boolean result = false;
 		
-		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
-			result = true;
-		}
-		
-		if (result == false) {
-			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-			
-			for (GrantedAuthority authority : authorities) {
-				if (authority.getAuthority().equals("ROLE_ROOT")) {
-					result = true;
-					break;
-				}
+		if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+			return false;
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+
+		for (GrantedAuthority authority : authorities) {
+			if (authority.getAuthority().equals("ROLE_ROOT")) {
+				result = true;
+				break;
 			}
 		}
 		
 		return result;
 	}
 
-	// 회원인지 검사.
-	public Boolean isUser() {
-		Boolean result = false;
+	/**
+	 * 로그인 중인 회원이 USER 권한인지 검사.
+	 * @return 회원이면 true
+     */
+	//
+	public boolean isUser() {
+		boolean result = false;
 
-		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated() == false) {
-			result = true;
-		}
+		if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+			return false;
 
-		if (result == false) {
-			Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
-			for (GrantedAuthority grantedAuthority : authorities) {
-				String authority = grantedAuthority.getAuthority();
-				if (authority.equals("ROLE_USER_01") || authority.equals("ROLE_USER_02") || authority.equals("ROLE_USER_03")) {
-					result = true;
-					break;
-				}
+		for (GrantedAuthority grantedAuthority : authorities) {
+			String authority = grantedAuthority.getAuthority();
+			if (authority.equals("ROLE_USER_01") || authority.equals("ROLE_USER_02") || authority.equals("ROLE_USER_03")) {
+				result = true;
+				break;
 			}
 		}
 
 		return result;
+	}
+
+	/**
+	 * 로그인 중인 회원이 이메일 기반인지 검사.
+	 * @return 이메일 기반이면 true, 아니면 false
+     */
+	public boolean isJakdukUser() {
+		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal;
+	}
+
+	/**
+	 * 로그인 중인 회원이 소셜 기반인지 검사.
+	 * @return 이메일 기반이면 true, 아니면 false
+	 */
+	public boolean isSocialUser() {
+		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail;
 	}
 
 	public Boolean isRedirectUrl(String url) {
@@ -275,30 +258,95 @@ public class CommonService {
 	 * @param getString
      * @return
      */
+
+	@Deprecated
 	public String getResourceBundleMessage(Locale locale, String bundle, String getString, Object... params) {
 		ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
 		return MessageFormat.format(resourceBundle.getString(getString), params);
 	}
 
 	/**
-	 * 모바일 디바이스 정보 가져오기.
-	 * @param device
-	 * @return
+	 * ResourceBundle에서 메시지 가져오기.
+	 * @param bundle 번들 이름 ex) messages.common
+	 * @param getString 메시지 이름 ex) common.exception.you.are.writer
+	 * @param params 파라미터가 있을 경우 계속 넣을 수 있음
+     * @return 언어별 메시지 결과 반환
      */
-	public String getDeviceInfo(Device device) {
+	public String getResourceBundleMessage(String bundle, String getString, Object... params) {
+		Locale locale = LocaleContextHolder.getLocale();
+		ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
+		return MessageFormat.format(resourceBundle.getString(getString), params);
+	}
+
+	/**
+	 * 모바일 디바이스 정보 가져오기.
+	 * @param device Device 객체
+	 * @return CommonConst.DEVICE_TYPE enum 타입
+     */
+	public CommonConst.DEVICE_TYPE getDeviceInfo(Device device) {
 		if (device.isNormal()) {
-			return CommonConst.DEVICE_TYPE_NORMAL;
+			return CommonConst.DEVICE_TYPE.NORMAL;
 		} else if (device.isMobile()) {
-			return CommonConst.DEVICE_TYPE_MOBILE;
+			return CommonConst.DEVICE_TYPE.MOBILE;
 		} else if (device.isTablet()) {
-			return CommonConst.DEVICE_TYPE_TABLET;
+			return CommonConst.DEVICE_TYPE.TABLET;
 		} else {
-			return CommonConst.DEVICE_TYPE_NORMAL;
+			return CommonConst.DEVICE_TYPE.NORMAL;
 		}
 	}
 
 	// 토큰 가져오기.
 	public Token getTokenByCode(String code) {
 		return tokenRepository.findByCode(code);
+	}
+
+	/**
+	 * 로그인 중인 회원 정보를 가져온다.
+	 * @return 회원 객체
+	 */
+	public AuthUserProfile getAuthUserProfile() {
+		AuthUserProfile authUserProfile = null;
+
+		if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
+				SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+				Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+				List<String> roles = new ArrayList<>();
+
+				for (GrantedAuthority grantedAuthority : authorities) {
+					String authority = grantedAuthority.getAuthority();
+					roles.add(authority);
+				}
+
+				authUserProfile = AuthUserProfile.builder()
+						.id(userDetail.getId())
+						.email(userDetail.getUserId())
+						.username(userDetail.getUsername())
+						.providerId(userDetail.getProviderId())
+						.roles(roles)
+						.build();
+			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
+				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+				Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+				List<String> roles = new ArrayList<>();
+
+				for (GrantedAuthority grantedAuthority : authorities) {
+					String authority = grantedAuthority.getAuthority();
+					roles.add(authority);
+				}
+
+				authUserProfile = AuthUserProfile.builder()
+						.id(principal.getId())
+						.email(principal.getUsername())
+						.username(principal.getNickname())
+						.providerId(principal.getProviderId())
+						.roles(roles)
+						.build();
+			}
+		}
+
+		return authUserProfile;
 	}
 }

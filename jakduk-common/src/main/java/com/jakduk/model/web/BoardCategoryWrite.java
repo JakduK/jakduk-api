@@ -1,5 +1,6 @@
 package com.jakduk.model.web;
 
+import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 
@@ -10,56 +11,19 @@ import org.springframework.data.annotation.Id;
  * @date     : 2014. 11. 16.
  * @desc     :
  */
+
+@Data
 public class BoardCategoryWrite {
 	
 	@Id
 	private String id;
 	
 	@NotEmpty
-	private String name;
-	
+	private String code;
+
 	@NotEmpty
-	private String resName;
-	
+	private String nameKr;
+
 	@NotEmpty
-	private String[] usingBoard;
-	
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getResName() {
-		return resName;
-	}
-
-	public void setResName(String resName) {
-		this.resName = resName;
-	}
-	
-	public String[] getUsingBoard() {
-		return usingBoard;
-	}
-
-	public void setUsingBoard(String[] usingBoard) {
-		this.usingBoard = usingBoard;
-	}
-
-	@Override
-	public String toString() {
-		return "BoardCategoryWrite [id=" + id + ", name=" + name + ", resName="
-				+ resName + ", usingBoard=" + usingBoard + "]";
-	}
-
+	private String nameEn;
 }

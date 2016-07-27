@@ -6,15 +6,14 @@ package com.jakduk.common;
  * @desc     :
  */
 public class CommonConst {
-	
-	public final static String COMMON_TYPE_SET = "set";
-	public final static String COMMON_TYPE_CANCEL = "cancel";
-	
+
 	/**
 	 * 게시판 종류.
 	 */
-	public final static String BOARD_NAME_FREE = "freeBoard";
-	
+	public enum BOARD_TYPE {
+		BOARD_FREE
+	}
+
 	/**
 	 * 백과사전 언어 구분.
 	 */
@@ -38,13 +37,6 @@ public class CommonConst {
 	public final static Integer BOARD_TOP_LIMIT = 3;
 
 	/**
-	 * 게시물 쿠키의 만료되는 시간(초)
-	 */
-	public final static Integer BOARD_COOKIE_EXPIRE_SECONDS = 30;
-	public final static String COOKIE_NAME_BOARD_FREE = "freeBoard";
-	public final static String COOKIE_NAME_GALLERY = "gallery";
-	
-	/**
 	 * 게시판 말머리.
 	 */
 	public final static String BOARD_CATEGORY_NONE = "none";
@@ -52,7 +44,16 @@ public class CommonConst {
 	public final static String BOARD_CATEGORY_FOOTBALL = "football";
 	public final static String BOARD_CATEGORY_DEVELOP = "develop";
 	public final static String BOARD_CATEGORY_ALL = "all";
-	
+
+	/**
+	 * 게시판 말머리 종류.
+	 */
+	public enum BOARD_CATEGORY_TYPE {
+		ALL,		// 전체
+		FREE,		// 자유
+		FOOTBALL	// 축구
+	}
+
 	/**
 	 * 사용자 쿠키
 	 */
@@ -60,22 +61,6 @@ public class CommonConst {
 	public final static String COOKIE_REMEMBER = "remember";
 	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
-	/**
-	 * Social 프로바이더 종류.
-	 */
-	public enum ACCOUNT_TYPE {
-		JAKDUK,
-		FACEBOOK,
-		DAUM
-	}
-
-	/**
-	 * 축구단 상태
-	 */
-	public final static String FOOTBALL_CLUB_STATUS_NONE = "none";
-	public final static String FOOTBALL_CLUB_STATUS_ACTIVE = "active";
-	public final static String FOOTBALL_CLUB_STATUS_INACTIVE = "inactive";
-	
 	/**
 	 * 글의 좋아요 싫어요에 대한 에러 코드
 	 */
@@ -85,6 +70,18 @@ public class CommonConst {
 	public final static String BOARD_USERS_FEELINGS_STATUS_DISLIKE = "dislike";
 	public final static String BOARD_USERS_FEELINGS_STATUS_WRITER = "writer";
 	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
+
+	public final static String RESPONSE_VOID_OBJECT = "{}";
+	public final static String RESPONSE_ERROR_DEFAULT_CODE = "-";
+
+	/**
+	 * Social 프로바이더 종류.
+	 */
+	public enum ACCOUNT_TYPE {
+		JAKDUK,
+		FACEBOOK,
+		DAUM
+	}
 
 	// 게시물 감정 표현. 좋아요, 싫어요
 	public enum FEELING_TYPE {
@@ -103,48 +100,56 @@ public class CommonConst {
 	/**
 	 * 글 지움 종류
 	 */
-	public final static String BOARD_DELETE_TYPE_POSTONLY = "postonly";
-	public final static String BOARD_DELETE_TYPE_ALL = "all";
-	
+	public enum BOARD_DELETE_TYPE {
+		CONTENT,	// 글 본문만 지움(댓글 유지)
+		ALL			// 모두 지움
+	}
+
 	/**
 	 * 글 히스토리 상태
 	 */
-	public final static String BOARD_HISTORY_TYPE_CREATE = "create";
-	public final static String BOARD_HISTORY_TYPE_EDIT = "edit";
-	public final static String BOARD_HISTORY_TYPE_DELETE = "delete";
-	public final static String BOARD_HISTORY_TYPE_NOTICE = "notice";
-	public final static String BOARD_HISTORY_TYPE_CANCEL_NOTICE = "c.notice";
-	
+	public enum BOARD_HISTORY_TYPE {
+		CREATE,
+		EDIT,
+		DELETE,
+		ENABLE_NOTICE,
+		DISABLE_NOTICE
+	}
+
+    /**
+     * 사진을 등록한 출처
+     */
+    public enum GALLERY_FROM_TYPE {
+        BOARD_FREE
+    }
+
 	/**
 	 * 사진 썸네일 크기.
 	 */
 	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 360;
 	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 230;
-	
+
 	/**
 	 * 사진 상태값.
 	 */
-	public final static String GALLERY_STATUS_TEMP = "temp";
-	public final static String GALLERY_STATUS_USE = "use";
-	public final static String GALLERY_STATUS_UNUSE = "unuse";
+	public enum GALLERY_STATUS_TYPE {
+		TEMP,
+		ENABLE,
+	}
 	
 	/**
-	 * 사진 이름 입력 상태값.
-	 */
-	public final static String GALLERY_NAME_STATUS_INPUT = "input";
-	public final static String GALLERY_NAME_STATUS_SUBJECT = "subject";
-	
-	/**
-	 * 클라이언트 종류.
-	 */
-	public final static String DEVICE_TYPE_NORMAL = "normal";
-	public final static String DEVICE_TYPE_MOBILE = "mobile";
-	public final static String DEVICE_TYPE_TABLET = "tablet";
+	 * 디바이스 타입
+     */
+	public enum DEVICE_TYPE {
+		NORMAL,	// PC
+		MOBILE,	// 모바일
+		TABLET	// 태블릿
+	}
 	
 	/**
 	 * 그림의 용량을 축소시키는 기준 값.
 	 */
-	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte
+	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte 기준인데 현재 1MB.
 	
 	/**
 	 * K리그 줄임말. 삭제 되어야 한다. Competition 클래스를 만들었다.

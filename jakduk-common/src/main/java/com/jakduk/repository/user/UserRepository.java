@@ -2,35 +2,33 @@ package com.jakduk.repository.user;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.User;
-import com.jakduk.model.simple.*;
+import com.jakduk.model.simple.OAuthProfile;
+import com.jakduk.model.simple.SocialUserOnAuthentication;
+import com.jakduk.model.simple.UserOnAuthentication;
+import com.jakduk.model.simple.UserOnPasswordUpdate;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Optional;
+
 public interface UserRepository extends MongoRepository<User, String> {
 	
-	User findById(String id);
+	Optional<User> findOneById(String id);
 	User findByUsername(String username);
 	User findOneByUsername(String username);
 	User findByEmail(String email);
 	User findOneByEmail(String email);
+
 	UserOnAuthentication findOneByEmailAndProviderId(String email, CommonConst.ACCOUNT_TYPE providerId);
 	
 	@Query(value="{'id' : ?0}", fields="{'username' : 1}")
 	User writerFindById(String id);
 
 	@Query(value="{'id' : ?0}")
-	UserOnPasswordUpdate userOnPasswordUpdateFindById(String id);
+	UserOnPasswordUpdate findUserOnPasswordUpdateById(String id);
 
-	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
-	@Query(value="{'id' : {$ne : ?0}, 'email' : ?1}", fields="{'id' : 1, 'email' : 1}")
-	UserProfile findByNEIdAndEmail(String id, String email);
-
-	// 해당 ID를 제외하고 username과 일치하는 회원 찾기.
-	@Query(value="{'id' : {$ne : ?0}, 'username' : ?1}", fields="{'id' : 1, 'username' : 1}")
-	UserProfile findByNEIdAndUsername(String id, String username);
-
-	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
-	User userFindByOauthUser(CommonConst.ACCOUNT_TYPE providerId, String oauthId);
+	// SNS 계정으로 가입한 회원 찾기(로그인).
+	User findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId);
 
 	@Query(value="{'email' : ?0}")
 	SocialUserOnAuthentication findSocialUserByEmail(String email);

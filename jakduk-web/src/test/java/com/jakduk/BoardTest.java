@@ -2,14 +2,17 @@ package com.jakduk;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
+import com.jakduk.model.db.BoardCategory;
 import com.jakduk.model.db.BoardFree;
 import com.jakduk.model.db.BoardFreeComment;
 import com.jakduk.model.etc.BoardFeelingCount;
 import com.jakduk.model.etc.BoardFreeOnBest;
 import com.jakduk.model.simple.BoardFreeOfMinimum;
 import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.repository.BoardFreeCommentRepository;
 import com.jakduk.repository.BoardFreeRepository;
+import com.jakduk.service.BoardFreeService;
 import com.jakduk.util.AbstractSpringTest;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -54,9 +57,12 @@ public class BoardTest extends AbstractSpringTest {
 	@Autowired
 	private Jongo jongo;
 
+	@Autowired
+	private BoardFreeService boardFreeService;
+
 	@Test
 	public void test01() throws ParseException {
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(11);
+		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(11);
 		
 		System.out.println("date=" + Locale.ENGLISH.getDisplayName());
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.ENGLISH);
@@ -90,21 +96,7 @@ public class BoardTest extends AbstractSpringTest {
 		Date date2 = f.parse(ld.format(df02));
 		System.out.println("date2=" + date2.getTime());
 	}
-	
-	@Test
-	public void test02() {
-		System.out.println(boardFreeRepository.findOne("5460cfe9e4b06faf36d26efc"));
-		
-		List<String> usingBoard = new ArrayList<String>();
-		usingBoard.add(CommonConst.BOARD_NAME_FREE);
-		System.out.println("usingBoard=" + usingBoard);
-		
-		usingBoard = Collections.emptyList();
-		System.out.println("usingBoard=" + usingBoard);
-//		usingBoard.add(CommonConst.BOARD_NAME_FREE);
-		System.out.println("usingBoard=" + usingBoard);
-	}
-	
+
 	@Test
 	public void mongoAggregationTest01() {
 		
@@ -264,6 +256,20 @@ public class BoardTest extends AbstractSpringTest {
 		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(58);
 		System.out.println("boardFreeOnComment=" + boardFreeOnComment);
 
-		System.out.println(CommonConst.FEELING_TYPE.DISLIKE);
+		ArrayList<ObjectId> ids = new ArrayList<>();
+		ids.add(new ObjectId("572603fdccbfc31fbbce46a3"));
+		ids.add(new ObjectId("5551d32ee4b01fe0b11da90d"));
+		ids.add(new ObjectId("54de095b8bf814167dbc59b1"));
+
+		Map<String, BoardFreeOnSearchComment> postsHavingComments = boardDAO.getBoardFreeOnSearchComment(ids);
+
+		System.out.println("postsHavingComments=" + postsHavingComments);
+
+	}
+
+	@Test
+	public void 자유게시판_말머리_목록() {
+		List<BoardCategory> categories = boardFreeService.getFreeCategories();
+		System.out.println("categories=" + categories.stream().collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName())));
 	}
 }

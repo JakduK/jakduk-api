@@ -4,10 +4,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.accept.ContentNegotiationManager;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.View;
@@ -71,6 +73,17 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(deviceResolverHandlerInterceptor);
     }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:3000", "https://staging.jakduk.com", "https://jakduk.com")
+                .allowedMethods(
+                        HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(),
+                        HttpMethod.DELETE.name(), HttpMethod.OPTIONS.name())
+                .allowedHeaders(CrossOrigin.DEFAULT_ALLOWED_HEADERS)
+                .allowCredentials(CrossOrigin.DEFAULT_ALLOW_CREDENTIALS);
+    }
+
     @Bean
     public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
         List<ViewResolver> viewResolvers = new ArrayList<>();
@@ -100,9 +113,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
 
-        return sessionLocaleResolver;
+        return new SessionLocaleResolver();
     }
 
     @Bean
