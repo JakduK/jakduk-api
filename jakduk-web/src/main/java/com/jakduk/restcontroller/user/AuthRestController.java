@@ -7,10 +7,20 @@ import java.util.Objects;
 import java.util.Set;
 import javax.validation.Valid;
 
+import com.jakduk.configuration.authentication.JakdukDetailsService;
+import com.jakduk.configuration.authentication.TokenUtils;
+import com.jakduk.restcontroller.user.vo.AuthenticationResponse;
+import com.jakduk.restcontroller.user.vo.LoginEmailUserForm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mobile.device.Device;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.UsersConnectionRepository;
@@ -69,7 +79,37 @@ public class AuthRestController {
     @Autowired
     private ProviderSignInUtils providerSignInUtils;
 
+    @Autowired
+    private TokenUtils tokenUtils;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JakdukDetailsService jakdukDetailsService;
+
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
+
+    @ApiOperation(value = "이메일 기반 로그인", produces = "application/json", response = AuthenticationResponse.class)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public AuthenticationResponse loginSocialUser(@RequestBody LoginEmailUserForm form,
+                                             Device device) {
+
+        // Perform the authentication
+        Authentication authentication = this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        form.getUsername(),
+                        form.getPassword()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Reload password post-authentication so we can generate token
+        UserDetails userDetails = this.jakdukDetailsService.loadUserByUsername(form.getUsername());
+        String token = this.tokenUtils.generateToken(userDetails, device);
+
+        return AuthenticationResponse.builder().token(token).build();
+    }
 
     @ApiOperation(value = "SNS 기반 로그인", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)

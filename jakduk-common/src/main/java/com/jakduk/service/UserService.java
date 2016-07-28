@@ -9,49 +9,37 @@ import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
 import com.jakduk.exception.UnauthorizedAccessException;
 import com.jakduk.model.db.User;
-import com.jakduk.model.embedded.CommonWriter;
-import com.jakduk.model.simple.SocialUserOnAuthentication;
 import com.jakduk.model.simple.UserOnPasswordUpdate;
 import com.jakduk.model.simple.UserProfile;
-import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
 import com.jakduk.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service
 @Slf4j
+@Service
 public class UserService {
 	
 	@Autowired
 	private CommonService commonService;
 	
 	@Autowired
-	private StandardPasswordEncoder encoder;
+	private PasswordEncoder encoder;
 
 	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
 	private UserProfileRepository userProfileRepository;
-	
-	@Autowired
-	private FootballClubRepository footballClubRepository;
-
-	@Autowired
-	private MongoTemplate mongoTemplate;
 
 	public User findById(String id) {
 		return userRepository.findOne(id);
@@ -218,7 +206,7 @@ public class UserService {
 
 		JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId(),
 				user.getPassword(), user.getUsername(), user.getProviderId(),
-				enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
+				enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, new Date(), getAuthorities(user.getRoles()));
 
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukPrincipal, user.getPassword(), jakdukPrincipal.getAuthorities());
 

@@ -15,11 +15,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -31,15 +32,15 @@ public class JakdukDetailsService implements UserDetailsManager {
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-		if (Objects.isNull(email)) {
+		if (ObjectUtils.isEmpty(email)) {
 			throw new IllegalArgumentException("email 은 꼭 필요한 값입니다.");
 		} else {
 			UserOnAuthentication user = userRepository.findAuthUserByEmail(email);
 
-			if (Objects.isNull(user))
+			if (ObjectUtils.isEmpty(user))
 				throw new NotFoundJakdukAccountException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
 
-			if (user.getProviderId().equals(CommonConst.ACCOUNT_TYPE.JAKDUK) == false)
+			if (! user.getProviderId().equals(CommonConst.ACCOUNT_TYPE.JAKDUK))
 				throw new FindUserButNotJakdukAccount("JakduK 계정이 아니라 SNS 계정으로 연동되어 있습니다. email=" + email, user.getProviderId());
 
 			log.debug("Jakduk user=" + user);
@@ -51,7 +52,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 			JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
 					, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
-					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
+					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, new Date(), getAuthorities(user.getRoles()));
 
 			if (log.isInfoEnabled()) {
 				log.info("load Jakduk username=" + jakdukPrincipal.getUsername());
@@ -62,9 +63,8 @@ public class JakdukDetailsService implements UserDetailsManager {
 	}
 	
 	public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
-		List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));
-		
-		return authList;
+
+		return getGrantedAuthorities(getRoles(roles));
 	}
 	
 	public List<String> getRoles(List<Integer> roles) {

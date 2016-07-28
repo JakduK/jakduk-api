@@ -1,17 +1,21 @@
 package com.jakduk.configuration;
 
+import com.jakduk.configuration.authentication.AuthenticationTokenFilter;
 import com.jakduk.configuration.authentication.JakdukDetailsService;
 import com.jakduk.configuration.authentication.SocialDetailService;
 import com.jakduk.configuration.authentication.handler.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
 
@@ -33,21 +37,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .csrf().disable()           // CSRF 방어 비활성화
+                .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
+                /*
                 //Configures form login
                 .formLogin()
                     .loginProcessingUrl("/api/login")
                     .successHandler(jakdukSuccessHandler())
                     .failureHandler(jakdukFailureHandler())
                 //Configures the logout function
+
                 .and()
                     .logout()
                         .logoutSuccessHandler(restLogoutSuccessHandler())
                         .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+
 //                .and()
 //                    .httpBasic()                // basic auth 사용.
                 .and()
+                */
                     .exceptionHandling()
                         .authenticationEntryPoint(restAuthenticationEntryPoint())
                         .accessDeniedHandler(restAccessDeniedHandler())
@@ -89,10 +98,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .rememberMe()
                     .key("jakduk_cookie_key_auto_login")
                 .and()
-                    .apply(getSpringSocialConfigurer())
+                    .apply(new SpringSocialConfigurer())
                 .and()
                     .sessionManagement()
-                        .maximumSessions(3).expiredUrl("/error/maxSession");
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Override
@@ -102,10 +111,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder());
     }
 
-    // 로그인 성공 후 특정 URL일 경우 REDIRECT 안 시키는 로직을 추가 해야 한다.
-    private SpringSocialConfigurer getSpringSocialConfigurer() {
-        SpringSocialConfigurer configurer = new SpringSocialConfigurer();
-        return  configurer;
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public AuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
+        AuthenticationTokenFilter authenticationTokenFilter = new AuthenticationTokenFilter();
+        authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
+        return authenticationTokenFilter;
     }
 
     @Bean
@@ -114,7 +130,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public StandardPasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new StandardPasswordEncoder();
     }
 

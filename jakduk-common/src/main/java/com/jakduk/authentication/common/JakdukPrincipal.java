@@ -1,5 +1,6 @@
 package com.jakduk.authentication.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,16 +16,17 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
 	//~ Instance fields ================================================================================================
+	private String id;
+	private String nickname;						// 별명
 	private String password;
 	private String username;							// email
 	private CommonConst.ACCOUNT_TYPE providerId;
-	private final String nickname;						// 별명
-	private final String id;
-	private final Set<GrantedAuthority> authorities;
-	private final boolean accountNonExpired;
-	private final boolean accountNonLocked;
-	private final boolean credentialsNonExpired;
-	private final boolean enabled;
+	private Set<GrantedAuthority> authorities;
+	private boolean accountNonExpired;
+	private boolean accountNonLocked;
+	private boolean credentialsNonExpired;
+	private boolean enabled;
+	private Date lastPasswordReset;
 
 	//~ Constructors ===================================================================================================
 
@@ -52,7 +54,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	 *         <code>GrantedAuthority</code> collection
 	 */
 	public JakdukPrincipal(String username, String id, String password, String nickname, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
-						   boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+						   boolean credentialsNonExpired, boolean accountNonLocked, Date lastPasswordReset, Collection<? extends GrantedAuthority> authorities) {
 
 		if (Objects.isNull(username) || Objects.isNull(password))
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
@@ -66,6 +68,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
 		this.accountNonLocked = accountNonLocked;
+		this.lastPasswordReset = lastPasswordReset;
 		this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
 	}
 
@@ -74,11 +77,33 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		password = "";
 	}
 
+	@JsonIgnore
 	@Override
 	public String getPassword() {
 		return password;
 	}
 
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return accountNonExpired;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return accountNonLocked;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return credentialsNonExpired;
+	}
+
+	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
 		return authorities;
 	}
@@ -99,20 +124,9 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		return nickname;
 	}
 
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public boolean isAccountNonExpired() {
-		return accountNonExpired;
-	}
-
-	public boolean isAccountNonLocked() {
-		return accountNonLocked;
-	}
-
-	public boolean isCredentialsNonExpired() {
-		return credentialsNonExpired;
+	@JsonIgnore
+	public Date getLastPasswordReset() {
+		return lastPasswordReset;
 	}
 
 	public void setUsername(String username) {
@@ -172,37 +186,5 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	@Override
 	public int hashCode() {
 		return username.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append(": ");
-		sb.append("username: ").append(this.username).append("; ");
-		sb.append("id: ").append(this.id).append("; ");
-		sb.append("password: [PROTECTED]; ");
-		sb.append("nickname: ").append(this.nickname).append("; ");
-		sb.append("Enabled: ").append(this.enabled).append("; ");
-		sb.append("AccountNonExpired: ").append(this.accountNonExpired).append("; ");
-		sb.append("credentialsNonExpired: ").append(this.credentialsNonExpired).append("; ");
-		sb.append("AccountNonLocked: ").append(this.accountNonLocked).append("; ");
-
-		if (!authorities.isEmpty()) {
-			sb.append("Granted Authorities: ");
-
-			boolean first = true;
-			for (GrantedAuthority auth : authorities) {
-				if (!first) {
-					sb.append(",");
-				}
-				first = false;
-
-				sb.append(auth);
-			}
-		} else {
-			sb.append("Not granted any authorities");
-		}
-
-		return sb.toString();
 	}
 }
