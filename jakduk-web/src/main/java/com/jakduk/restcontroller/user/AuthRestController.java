@@ -100,7 +100,7 @@ public class AuthRestController {
     @ApiOperation(value = "이메일 기반 로그인", produces = "application/json", response = AuthenticationResponse.class)
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public AuthenticationResponse loginSocialUser(@RequestBody LoginEmailUserForm form,
-                                             Device device) {
+                                                  Device device) {
 
         // Perform the authentication
         Authentication authentication = this.authenticationManager.authenticate(
@@ -135,10 +135,9 @@ public class AuthRestController {
 
     @ApiOperation(value = "SNS 기반 로그인", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
-    public EmptyJsonResponse loginSocialUser(
-            @PathVariable String providerId,
-            @Valid @RequestBody LoginSocialUserForm form,
-            NativeWebRequest request) {
+    public EmptyJsonResponse loginSocialUser(@PathVariable String providerId,
+                                             @Valid @RequestBody LoginSocialUserForm form,
+                                             NativeWebRequest request) {
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
 
