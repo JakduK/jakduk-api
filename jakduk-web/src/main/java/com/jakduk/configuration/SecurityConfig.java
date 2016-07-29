@@ -36,8 +36,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .csrf().disable()           // CSRF 방어 비활성화
+                // we don't need CSRF because our token is invulnerable
+                .csrf().disable()
+
+                // Custom JWT based security filter
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
+
                 /*
                 //Configures form login
                 .formLogin()
@@ -57,51 +61,57 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                    .httpBasic()                // basic auth 사용.
                 .and()
                 */
-                    .exceptionHandling()
-                        .authenticationEntryPoint(restAuthenticationEntryPoint())
-                        .accessDeniedHandler(restAccessDeniedHandler())
+
+                .exceptionHandling()
+                    .authenticationEntryPoint(restAuthenticationEntryPoint())
+                    .accessDeniedHandler(restAccessDeniedHandler())
+
                 //Configures url based authorization
                 .and()
-                    .authorizeRequests()
-                        .antMatchers(
-                                "/check/**",
-                                "/api/logout",
-                                "/home/**",
-                                "/about/**",
-                                "/auth/**"
-                            ).permitAll()
-                        .antMatchers(
-                                "/api/login",           // 로그인
-                                "/auth/*",              // SNS 인증
-                                "/signup",              // SNS 계정으로 회원 가입
-                                "/user/social",         // OAUTH2 콜백
-                                "/user/write",          // JakduK 회원 가입
-                                "/user/*/write",        // SNS 계정으로 회원 가입
-                                "/password/*"           // 비밀번호 찾기
-                            ).anonymous()
-                        .antMatchers(
-                                "/user/**",
-//                                "/swagger-ui.html",     // 스웨거
-                                "/rest/**"              // spring-data-rest
-                            ).authenticated()
-                        .antMatchers(
-                                "/board/*/write",
-                                "/board/*/edit",
-                                "/jakdu/write"
-                            ).hasAnyRole("USER_01", "USER_02", "USER_03")
-                        .antMatchers(
-                                "/admin/**",
-                                "/api/admin/**"
-                            ).hasRole("ROOT")
-                        .anyRequest().permitAll()
+
+                .authorizeRequests()
+                    .antMatchers(
+                        "/check/**",
+                        "/api/logout",
+                        "/home/**",
+                        "/about/**",
+                        "/auth/**"
+                    ).permitAll()
+                    .antMatchers(
+                        "/api/login",           // 로그인
+                        "/auth/*",              // SNS 인증
+                        "/signup",              // SNS 계정으로 회원 가입
+                        "/user/social",         // OAUTH2 콜백
+                        "/user/write",          // JakduK 회원 가입
+                        "/user/*/write",        // SNS 계정으로 회원 가입
+                        "/password/*"           // 비밀번호 찾기
+                    ).anonymous()
+                    .antMatchers(
+                        "/user/**",
+//                      "/swagger-ui.html",     // 스웨거
+                        "/rest/**"              // spring-data-rest
+                        ).authenticated()
+
+                    // RESTful로 전환했기 때문에 바뀌어야 한다
+                    .antMatchers(
+                        "/board/*/write",
+                        "/board/*/edit",
+                        "/jakdu/write"
+                    ).hasAnyRole("USER_01", "USER_02", "USER_03")
+                    .antMatchers(
+                        "/admin/**",
+                        "/api/admin/**"
+                    ).hasRole("ROOT")
+                    .anyRequest().permitAll()
+
                 .and()
-                    .rememberMe()
-                    .key("jakduk_cookie_key_auto_login")
+                .rememberMe().key("jakduk_cookie_key_auto_login")
+
                 .and()
-                    .apply(new SpringSocialConfigurer())
+                .apply(new SpringSocialConfigurer())
+
                 .and()
-                    .sessionManagement()
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Override
