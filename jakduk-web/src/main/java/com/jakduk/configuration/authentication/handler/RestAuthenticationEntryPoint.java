@@ -18,14 +18,12 @@ import java.io.PrintWriter;
 import java.util.Locale;
 
 /**
- * Created by pyohwan on 16. 6. 22.
+ * @author pyohwan
+ * 16. 6. 22 오전 12:43
  */
 
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
-
-    @Resource
-    LocaleResolver localeResolver;
 
     @Autowired
     CommonService commonService;
@@ -33,13 +31,11 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
-        Locale locale = localeResolver.resolveLocale(request);
-
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setCharacterEncoding("utf-8");
 
-        RestError error = new RestError("-", commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.unauthorized"));
+        RestError error = new RestError("-", commonService.getResourceBundleMessage("messages.common", "common.exception.unauthorized"));
 
         String errorJson = new ObjectMapper().writeValueAsString(error);
 

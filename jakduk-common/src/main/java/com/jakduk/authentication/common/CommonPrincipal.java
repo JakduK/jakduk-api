@@ -30,4 +30,18 @@ public class CommonPrincipal {
 	private String username;
 	
 	private CommonConst.ACCOUNT_TYPE providerId;
+
+	public CommonPrincipal(JakdukPrincipal jakdukPrincipal) {
+		this.id = jakdukPrincipal.getId();
+		this.email = jakdukPrincipal.getUsername();
+		this.username = jakdukPrincipal.getNickname();
+		this.providerId = jakdukPrincipal.getProviderId();
+	}
+
+	public CommonPrincipal(SocialUserDetail socialUserDetail) {
+		this.id = socialUserDetail.getId();
+		this.email = socialUserDetail.getUserId();
+		this.username = socialUserDetail.getUsername();
+		this.providerId = socialUserDetail.getProviderId();
+	}
 }

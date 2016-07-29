@@ -18,7 +18,8 @@ import java.util.ResourceBundle;
 
 
 /**
- * Created by pyohwan on 16. 3. 5.
+ * @author pyohwan
+ * 16. 3. 5 오전 12:31
  */
 
 @Data
@@ -46,9 +47,8 @@ public class RestError {
 
         Locale locale = LocaleContextHolder.getLocale();
         ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.common", locale);
-        String resourceMessage = resourceBundle.getString(serviceError.getMessage());
 
-        this.message = resourceMessage;
+        this.message = resourceBundle.getString(serviceError.getMessage());
     }
 
     public RestError(ServiceError serviceError, List<String> fields) {
@@ -57,8 +57,7 @@ public class RestError {
 
         Locale locale = LocaleContextHolder.getLocale();
         ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.common", locale);
-        String resourceMessage = resourceBundle.getString(serviceError.getMessage());
 
-        this.message = resourceMessage;
+        this.message = resourceBundle.getString(serviceError.getMessage());
     }
 }

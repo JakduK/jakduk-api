@@ -5,7 +5,8 @@ import lombok.Getter;
 import javax.xml.ws.Service;
 
 /**
- * Created by pyohwan on 16. 7. 1.
+ * @author pyohwan
+ * 16. 7. 1 오전 12:30
  */
 
 @Getter

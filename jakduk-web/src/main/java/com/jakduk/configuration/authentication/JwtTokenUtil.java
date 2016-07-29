@@ -1,5 +1,6 @@
 package com.jakduk.configuration.authentication;
 
+import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.authentication.common.JakdukPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,15 +15,16 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -3301605591108950415L;
 
-    private static final String CLAIM_KEY_USERNAME = "sub";
-    private static final String CLAIM_KEY_AUDIENCE = "audience";
-    private static final String CLAIM_KEY_CREATED = "created";
+    private static final String CLAIM_KEY_USER_ID = "uid";
+    private static final String CLAIM_KEY_NAME = "name";
+    private static final String CLAIM_KEY_PROVIDER_ID = "pid";
 
     private static final String AUDIENCE_UNKNOWN = "unknown";
     private static final String AUDIENCE_WEB = "web";
@@ -46,17 +48,6 @@ public class JwtTokenUtil implements Serializable {
         return username;
     }
 
-    public Date getCreatedDateFromToken(String token) {
-        Date created;
-        try {
-            final Claims claims = getClaimsFromToken(token);
-            created = new Date((Long) claims.get(CLAIM_KEY_CREATED));
-        } catch (Exception e) {
-            created = null;
-        }
-        return created;
-    }
-
     public Date getExpirationDateFromToken(String token) {
         Date expiration;
         try {
@@ -72,11 +63,38 @@ public class JwtTokenUtil implements Serializable {
         String audience;
         try {
             final Claims claims = getClaimsFromToken(token);
-            audience = (String) claims.get(CLAIM_KEY_AUDIENCE);
+            audience = (String) claims.get(Claims.AUDIENCE);
         } catch (Exception e) {
             audience = null;
         }
         return audience;
+    }
+
+    public Map<String, Object> getAttemptedFromToken(String token) {
+        Map<String, Object> attempted = new HashMap<>();
+        try {
+            final Claims claims = getClaimsFromToken(token);
+
+            if (claims.containsKey("email"))
+                attempted.put("email", claims.get("email", String.class));
+
+            if (claims.containsKey("username"))
+                attempted.put("username", claims.get("username", String.class));
+
+            if (claims.containsKey("id"))
+                attempted.put("id", claims.get("id", String.class));
+
+            if (claims.containsKey("about"))
+                attempted.put("about", claims.get("about", String.class));
+
+            if (claims.containsKey("footballClub"))
+                attempted.put("footballClub", claims.get("footballClub", String.class));
+
+        } catch (Exception ignored) {
+
+        }
+
+        return attempted;
     }
 
     private Claims getClaimsFromToken(String token) {
@@ -124,18 +142,27 @@ public class JwtTokenUtil implements Serializable {
         return (AUDIENCE_TABLET.equals(audience) || AUDIENCE_MOBILE.equals(audience));
     }
 
-    public String generateToken(UserDetails userDetails, Device device) {
+    public String generateToken(CommonPrincipal userDetails, Device device) {
+
         Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-        claims.put(CLAIM_KEY_AUDIENCE, generateAudience(device));
-        claims.put(CLAIM_KEY_CREATED, new Date());
-        return generateToken(claims);
+        claims.put(Claims.ISSUER, userDetails.getEmail());
+        claims.put(Claims.AUDIENCE, generateAudience(device));
+        claims.put(CLAIM_KEY_USER_ID, userDetails.getId());
+        claims.put(CLAIM_KEY_NAME, userDetails.getUsername());
+        claims.put(CLAIM_KEY_PROVIDER_ID, userDetails.getProviderId());
+
+        return generateToken(claims, generateExpirationDate());
     }
 
-    private String generateToken(Map<String, Object> claims) {
+    public String generateAttemptedToken(Map<String, Object> claims) {
+
+        return generateToken(claims, new Date(System.currentTimeMillis() + 600 * 1000));
+    }
+
+    private String generateToken(Map<String, Object> claims, Date expirationDate) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setExpiration(generateExpirationDate())
+                .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
@@ -148,8 +175,7 @@ public class JwtTokenUtil implements Serializable {
         String refreshedToken;
         try {
             final Claims claims = getClaimsFromToken(token);
-            claims.put(CLAIM_KEY_CREATED, new Date());
-            refreshedToken = generateToken(claims);
+            refreshedToken = generateToken(claims, generateExpirationDate());
         } catch (Exception e) {
             refreshedToken = null;
         }

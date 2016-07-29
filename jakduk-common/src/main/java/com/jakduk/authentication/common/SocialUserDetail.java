@@ -1,5 +1,6 @@
 package com.jakduk.authentication.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
@@ -15,11 +16,11 @@ import java.util.*;
  */
 public class SocialUserDetail implements SocialUserDetails {
 
-    private String id;
-    private String userId;
-    private String username;
-    private CommonConst.ACCOUNT_TYPE providerId;
-    private String email;
+    private final String id;
+    private final String userId;
+    private final String username;
+    private final CommonConst.ACCOUNT_TYPE providerId;
+    private final String email;
 
     private final Set<GrantedAuthority> authorities;
     private final boolean accountNonExpired;
@@ -84,16 +85,19 @@ public class SocialUserDetail implements SocialUserDetails {
         return authorities;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return accountNonExpired;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return accountNonLocked;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return credentialsNonExpired;
@@ -104,6 +108,7 @@ public class SocialUserDetail implements SocialUserDetails {
         return enabled;
     }
 
+    @JsonIgnore
     @Override
     public String getPassword() {
         return null;

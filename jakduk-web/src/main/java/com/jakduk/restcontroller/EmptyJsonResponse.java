@@ -3,7 +3,8 @@ package com.jakduk.restcontroller;
 import io.swagger.annotations.ApiModel;
 
 /**
- * Created by pyohwan on 16. 7. 8.
+ * @author pyohwan
+ * 16. 7. 8 오전 12:55
  */
 
 @ApiModel(value = "JSON 타입의 빈 객체")
