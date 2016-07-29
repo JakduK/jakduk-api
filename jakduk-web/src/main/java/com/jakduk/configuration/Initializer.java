@@ -71,6 +71,7 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
 
         registerSpringSecurityFilter(servletContext);
         registerDeviceResolverRequestFilter(servletContext);
+        //registerCorsFilter(servletContext);
 
         //RepositoryRestDispatcherServlet exporter = new RepositoryRestDispatcherServlet();
         //ServletRegistration.Dynamic reg = ctx.addServlet("rest-exporter", exporter);
@@ -88,6 +89,12 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
     // DeviceResolverRequest Filter
     public void registerDeviceResolverRequestFilter(ServletContext servletContext) {
         FilterRegistration.Dynamic filter = servletContext.addFilter("deviceResolverRequestFilter", new DeviceResolverRequestFilter());
+        filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/*");
+    }
+
+    // DeviceResolverRequest Filter
+    public void registerCorsFilter(ServletContext servletContext) {
+        FilterRegistration.Dynamic filter = servletContext.addFilter("corsFilter", new CorsFilter());
         filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/*");
     }
 

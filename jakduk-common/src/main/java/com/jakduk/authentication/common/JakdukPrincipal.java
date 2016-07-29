@@ -1,5 +1,6 @@
 package com.jakduk.authentication.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,11 +16,11 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
 	//~ Instance fields ================================================================================================
+	private final String id;
+	private final String nickname;						// 별명
 	private String password;
 	private String username;							// email
-	private CommonConst.ACCOUNT_TYPE providerId;
-	private final String nickname;						// 별명
-	private final String id;
+	private final CommonConst.ACCOUNT_TYPE providerId;
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
 	private final boolean accountNonLocked;
@@ -71,14 +72,39 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 
 	@Override
 	public void eraseCredentials() {
-		password = "";
+		this.password = "";
 	}
 
+	@JsonIgnore
 	@Override
 	public String getPassword() {
 		return password;
 	}
 
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonExpired() {
+		return accountNonExpired;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonLocked() {
+		return accountNonLocked;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return credentialsNonExpired;
+	}
+
+	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
 		return authorities;
 	}
@@ -97,22 +123,6 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 
 	public String getNickname() {
 		return nickname;
-	}
-
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public boolean isAccountNonExpired() {
-		return accountNonExpired;
-	}
-
-	public boolean isAccountNonLocked() {
-		return accountNonLocked;
-	}
-
-	public boolean isCredentialsNonExpired() {
-		return credentialsNonExpired;
 	}
 
 	public void setUsername(String username) {
@@ -172,37 +182,5 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	@Override
 	public int hashCode() {
 		return username.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append(": ");
-		sb.append("username: ").append(this.username).append("; ");
-		sb.append("id: ").append(this.id).append("; ");
-		sb.append("password: [PROTECTED]; ");
-		sb.append("nickname: ").append(this.nickname).append("; ");
-		sb.append("Enabled: ").append(this.enabled).append("; ");
-		sb.append("AccountNonExpired: ").append(this.accountNonExpired).append("; ");
-		sb.append("credentialsNonExpired: ").append(this.credentialsNonExpired).append("; ");
-		sb.append("AccountNonLocked: ").append(this.accountNonLocked).append("; ");
-
-		if (!authorities.isEmpty()) {
-			sb.append("Granted Authorities: ");
-
-			boolean first = true;
-			for (GrantedAuthority auth : authorities) {
-				if (!first) {
-					sb.append(",");
-				}
-				first = false;
-
-				sb.append(auth);
-			}
-		} else {
-			sb.append("Not granted any authorities");
-		}
-
-		return sb.toString();
 	}
 }

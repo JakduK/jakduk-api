@@ -4,7 +4,8 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 /**
- * Created by pyohwan on 16. 4. 2.
+ * @author pyohwan
+ * 16. 4. 2 오전 12:16
  */
 public class SessionListener implements HttpSessionListener {
 

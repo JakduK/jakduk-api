@@ -1,5 +1,6 @@
 package com.jakduk.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -27,7 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by pyohwan on 16. 4. 2.
+ * @author pyohwan
+ * 16. 4. 2 오후 10:58
  */
 
 @Configuration
@@ -35,6 +37,9 @@ import java.util.List;
 @ComponentScan(basePackages = {"com.jakduk"}, useDefaultFilters = false, includeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
 @Import(SwaggerConfig.class)
 public class MvcConfig extends WebMvcConfigurerAdapter {
+
+    @Value("${jwt.token.header}")
+    private String tokenHeader;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -73,6 +78,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(deviceResolverHandlerInterceptor);
     }
 
+/*
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
@@ -80,9 +86,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                 .allowedMethods(
                         HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(),
                         HttpMethod.DELETE.name(), HttpMethod.OPTIONS.name())
-                .allowedHeaders(CrossOrigin.DEFAULT_ALLOWED_HEADERS)
+                .allowedHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", tokenHeader)
                 .allowCredentials(CrossOrigin.DEFAULT_ALLOW_CREDENTIALS);
     }
+*/
 
     @Bean
     public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
