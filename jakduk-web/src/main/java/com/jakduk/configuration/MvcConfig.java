@@ -38,7 +38,7 @@ import java.util.List;
 @Import(SwaggerConfig.class)
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-    @Value("${cerberus.token.header}")
+    @Value("${jwt.token.header}")
     private String tokenHeader;
 
     @Override

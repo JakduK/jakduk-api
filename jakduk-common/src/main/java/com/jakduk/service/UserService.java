@@ -206,7 +206,7 @@ public class UserService {
 
 		JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId(),
 				user.getPassword(), user.getUsername(), user.getProviderId(),
-				enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, new Date(), getAuthorities(user.getRoles()));
+				enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukPrincipal, user.getPassword(), jakdukPrincipal.getAuthorities());
 

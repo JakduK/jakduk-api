@@ -5,16 +5,20 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.jakduk.authentication.common.JakdukPrincipal;
 import com.jakduk.configuration.authentication.JakdukDetailsService;
-import com.jakduk.configuration.authentication.TokenUtils;
+import com.jakduk.configuration.authentication.JwtTokenUtil;
 import com.jakduk.restcontroller.user.vo.AuthenticationResponse;
 import com.jakduk.restcontroller.user.vo.LoginEmailUserForm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -80,13 +84,16 @@ public class AuthRestController {
     private ProviderSignInUtils providerSignInUtils;
 
     @Autowired
-    private TokenUtils tokenUtils;
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private JakdukDetailsService jakdukDetailsService;
+
+    @Value("${jwt.token.header}")
+    private String tokenHeader;
 
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
 
@@ -106,9 +113,24 @@ public class AuthRestController {
 
         // Reload password post-authentication so we can generate token
         UserDetails userDetails = this.jakdukDetailsService.loadUserByUsername(form.getUsername());
-        String token = this.tokenUtils.generateToken(userDetails, device);
+        String token = this.jwtTokenUtil.generateToken(userDetails, device);
 
+        // Return the token
         return AuthenticationResponse.builder().token(token).build();
+    }
+
+    @ApiOperation(value = "이메일 기반 토큰 갱신", produces = "application/json", response = AuthenticationResponse.class)
+    @RequestMapping(value = "/auth/refresh", method = RequestMethod.GET)
+    public AuthenticationResponse refreshAndGetAuthenticationToken(HttpServletRequest request) {
+
+        String token = request.getHeader(tokenHeader);
+
+        if (jwtTokenUtil.canTokenBeRefreshed(token)) {
+            String refreshedToken = jwtTokenUtil.refreshToken(token);
+            return new AuthenticationResponse(refreshedToken);
+        } else {
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+        }
     }
 
     @ApiOperation(value = "SNS 기반 로그인", produces = "application/json", response = EmptyJsonResponse.class)

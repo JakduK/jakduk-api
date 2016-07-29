@@ -20,7 +20,8 @@ import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
 
 /**
- * Created by pyohwan on 16. 4. 6.
+ * @author pyohwan
+ * 16. 4. 6 오후 9:51
  */
 
 @Configuration
@@ -42,26 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Custom JWT based security filter
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
 
-                /*
-                //Configures form login
-                .formLogin()
-                    .loginProcessingUrl("/api/login")
-                    .successHandler(jakdukSuccessHandler())
-                    .failureHandler(jakdukFailureHandler())
-                //Configures the logout function
-
-                .and()
-                    .logout()
-                        .logoutSuccessHandler(restLogoutSuccessHandler())
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-
-//                .and()
-//                    .httpBasic()                // basic auth 사용.
-                .and()
-                */
-
                 .exceptionHandling()
                     .authenticationEntryPoint(restAuthenticationEntryPoint())
                     .accessDeniedHandler(restAccessDeniedHandler())
@@ -71,11 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                     .antMatchers(
-                        "/check/**",
-                        "/api/logout",
-                        "/home/**",
-                        "/about/**",
-                        "/auth/**"
+
                     ).permitAll()
                     .antMatchers(
                         "/api/login",           // 로그인
@@ -104,12 +81,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     ).hasRole("ROOT")
                     .anyRequest().permitAll()
 
-                .and()
-                .rememberMe().key("jakduk_cookie_key_auto_login")
+//                .and()
+//                .rememberMe().key("jakduk_cookie_key_auto_login")
 
                 .and()
                 .apply(new SpringSocialConfigurer())
 
+                // don't create session
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
@@ -129,9 +107,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
-        AuthenticationTokenFilter authenticationTokenFilter = new AuthenticationTokenFilter();
-        authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
-        return authenticationTokenFilter;
+        return new AuthenticationTokenFilter();
     }
 
     @Bean
@@ -142,21 +118,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new StandardPasswordEncoder();
-    }
-
-    @Bean
-    public JakdukSuccessHandler jakdukSuccessHandler() {
-        return new JakdukSuccessHandler();
-    }
-
-    @Bean
-    public JakdukFailureHandler jakdukFailureHandler() {
-        return new JakdukFailureHandler();
-    }
-
-    @Bean
-    public RestLogoutSuccessHandler restLogoutSuccessHandler() {
-        return new RestLogoutSuccessHandler();
     }
 
     @Bean

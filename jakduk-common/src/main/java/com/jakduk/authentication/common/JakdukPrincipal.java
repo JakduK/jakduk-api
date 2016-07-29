@@ -16,17 +16,16 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
 	//~ Instance fields ================================================================================================
-	private String id;
-	private String nickname;						// 별명
+	private final String id;
+	private final String nickname;						// 별명
 	private String password;
 	private String username;							// email
-	private CommonConst.ACCOUNT_TYPE providerId;
-	private Set<GrantedAuthority> authorities;
-	private boolean accountNonExpired;
-	private boolean accountNonLocked;
-	private boolean credentialsNonExpired;
-	private boolean enabled;
-	private Date lastPasswordReset;
+	private final CommonConst.ACCOUNT_TYPE providerId;
+	private final Set<GrantedAuthority> authorities;
+	private final boolean accountNonExpired;
+	private final boolean accountNonLocked;
+	private final boolean credentialsNonExpired;
+	private final boolean enabled;
 
 	//~ Constructors ===================================================================================================
 
@@ -54,7 +53,7 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	 *         <code>GrantedAuthority</code> collection
 	 */
 	public JakdukPrincipal(String username, String id, String password, String nickname, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
-						   boolean credentialsNonExpired, boolean accountNonLocked, Date lastPasswordReset, Collection<? extends GrantedAuthority> authorities) {
+						   boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		if (Objects.isNull(username) || Objects.isNull(password))
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
@@ -68,13 +67,12 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;
 		this.accountNonLocked = accountNonLocked;
-		this.lastPasswordReset = lastPasswordReset;
 		this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
 	}
 
 	@Override
 	public void eraseCredentials() {
-		password = "";
+		this.password = "";
 	}
 
 	@JsonIgnore
@@ -88,16 +86,19 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 		return enabled;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
 		return accountNonExpired;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
 		return accountNonLocked;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return credentialsNonExpired;
@@ -122,11 +123,6 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 
 	public String getNickname() {
 		return nickname;
-	}
-
-	@JsonIgnore
-	public Date getLastPasswordReset() {
-		return lastPasswordReset;
 	}
 
 	public void setUsername(String username) {

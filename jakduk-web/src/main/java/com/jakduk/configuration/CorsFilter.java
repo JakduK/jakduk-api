@@ -15,7 +15,7 @@ import java.io.IOException;
 @Component
 public class CorsFilter implements Filter {
 
-    @Value("${cerberus.token.header}")
+    @Value("${jwt.token.header}")
     private String tokenHeader;
 
     @Override

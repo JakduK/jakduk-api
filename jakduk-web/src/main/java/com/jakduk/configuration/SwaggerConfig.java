@@ -51,7 +51,7 @@ public class SwaggerConfig {
                 "test-app",
                 "",
                 ApiKeyVehicle.HEADER,
-                "Cookie",
+                "Authorization",
                 "," /*scope separator*/);
     }
 

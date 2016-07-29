@@ -52,7 +52,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 			JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
 					, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
-					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, new Date(), getAuthorities(user.getRoles()));
+					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 
 			if (log.isInfoEnabled()) {
 				log.info("load Jakduk username=" + jakdukPrincipal.getUsername());
