@@ -1,58 +1,45 @@
 package com.jakduk.restcontroller.user;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.common.CommonConst;
 import com.jakduk.configuration.authentication.JakdukDetailsService;
 import com.jakduk.configuration.authentication.JwtTokenUtil;
-import com.jakduk.restcontroller.user.vo.AuthenticationResponse;
+import com.jakduk.exception.ServiceError;
+import com.jakduk.exception.ServiceException;
+import com.jakduk.model.db.User;
+import com.jakduk.model.etc.AuthUserProfile;
+import com.jakduk.restcontroller.EmptyJsonResponse;
 import com.jakduk.restcontroller.user.vo.LoginEmailUserForm;
+import com.jakduk.restcontroller.user.vo.LoginSocialUserForm;
+import com.jakduk.service.CommonService;
+import com.jakduk.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.web.HttpSessionSessionStrategy;
-import org.springframework.social.connect.web.ProviderSignInAttempt;
 import org.springframework.social.connect.web.ProviderSignInUtils;
-import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import springfox.documentation.annotations.ApiIgnore;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.exception.ServiceError;
-import com.jakduk.exception.ServiceException;
-import com.jakduk.model.db.User;
-import com.jakduk.model.etc.AuthUserProfile;
-import com.jakduk.model.simple.UserProfile;
-import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.user.vo.LoginSocialUserForm;
-import com.jakduk.restcontroller.user.vo.UserProfileForm;
-import com.jakduk.service.CommonService;
-import com.jakduk.service.UserService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.*;
 
 /**
  * @author pyohwan
@@ -95,39 +82,47 @@ public class AuthRestController {
     @Value("${jwt.token.header}")
     private String tokenHeader;
 
-    private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
+    @Value("${jwt.token.attempted.header}")
+    private String attemptedTokenHeader;
 
-    @ApiOperation(value = "이메일 기반 로그인", produces = "application/json", response = AuthenticationResponse.class)
+    @ApiOperation(value = "이메일 기반 로그인", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public AuthenticationResponse loginSocialUser(@RequestBody LoginEmailUserForm form,
-                                                  Device device) {
+    public EmptyJsonResponse loginSocialUser(@RequestBody LoginEmailUserForm form,
+                                             @ApiIgnore Device device,
+                                             HttpServletResponse response) {
 
         // Perform the authentication
-        Authentication authentication = this.authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         form.getUsername(),
                         form.getPassword()
                 )
         );
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Reload password post-authentication so we can generate token
-        UserDetails userDetails = this.jakdukDetailsService.loadUserByUsername(form.getUsername());
-        String token = this.jwtTokenUtil.generateToken(userDetails, device);
+        JakdukPrincipal userDetails = (JakdukPrincipal) jakdukDetailsService.loadUserByUsername(form.getUsername());
 
-        // Return the token
-        return AuthenticationResponse.builder().token(token).build();
+        String token = jwtTokenUtil.generateToken(new CommonPrincipal(userDetails), device);
+
+        response.setHeader(tokenHeader, token);
+
+        return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "이메일 기반 토큰 갱신", produces = "application/json", response = AuthenticationResponse.class)
+    @ApiOperation(value = "JWT 토큰 갱신", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/auth/refresh", method = RequestMethod.GET)
-    public AuthenticationResponse refreshAndGetAuthenticationToken(HttpServletRequest request) {
+    public EmptyJsonResponse refreshAndGetAuthenticationToken(HttpServletRequest request,
+                                                              HttpServletResponse response) {
 
         String token = request.getHeader(tokenHeader);
 
         if (jwtTokenUtil.canTokenBeRefreshed(token)) {
             String refreshedToken = jwtTokenUtil.refreshToken(token);
-            return new AuthenticationResponse(refreshedToken);
+            response.setHeader(tokenHeader, refreshedToken);
+
+            return EmptyJsonResponse.newInstance();
         } else {
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
         }
@@ -137,7 +132,8 @@ public class AuthRestController {
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
     public EmptyJsonResponse loginSocialUser(@PathVariable String providerId,
                                              @Valid @RequestBody LoginSocialUserForm form,
-                                             NativeWebRequest request) {
+                                             @ApiIgnore NativeWebRequest request,
+                                             HttpServletResponse response) {
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
 
@@ -160,33 +156,13 @@ public class AuthRestController {
         User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, connectionKey.getProviderUserId());
 
         // 로그인 처리.
-        if (!userIds.isEmpty()) {
+        if (! ObjectUtils.isEmpty(userIds)) {
             userService.signInSocialUser(existUser);
 
             return EmptyJsonResponse.newInstance();
         }
 
         // SNS 신규 가입.
-        ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
-        sessionStrategy.setAttribute(request, ProviderSignInAttempt.SESSION_ATTRIBUTE, signInAttempt);
-
-        throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
-    }
-
-    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json", response = UserProfileForm.class)
-    @RequestMapping(value = "/social/attempted", method = RequestMethod.GET)
-    public UserProfileForm loginSocialUser(
-                NativeWebRequest request) {
-
-        Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
-
-        if (Objects.isNull(connection))
-            throw new ServiceException(ServiceError.CANNOT_GET_SNS_PROFILE);
-
-        ConnectionKey connectionKey = connection.getKey();
-
-        CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
-        UserProfile existUser = userService.findUserProfileByProviderIdAndProviderUserId(convertProviderId, connectionKey.getProviderUserId());
         org.springframework.social.connect.UserProfile socialProfile = connection.fetchUserProfile();
 
         String username = null;
@@ -203,19 +179,30 @@ public class AuthRestController {
             }
         }
 
-        UserProfileForm user = new UserProfileForm();
-        user.setEmail(socialProfile.getEmail());
-        user.setUsername(username);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", socialProfile.getEmail());
+        claims.put("username", username);
 
+        // connections 컬렉션엔 있지만 user 컬렉션에 없는 경우는 spring-social 이전에 가입한 회원이다.
         if (Objects.nonNull(existUser)) {
-            user.setId(existUser.getId());
-            user.setAbout(existUser.getAbout());
+            claims.put("id", existUser.getId());
+            claims.put("about", existUser.getAbout());
 
             if (Objects.nonNull(existUser.getSupportFC()))
-                user.setFootballClub(existUser.getSupportFC().getId());
+                claims.put("footballClub", existUser.getSupportFC().getId());
         }
 
-        return user;
+        String attemptedToken = jwtTokenUtil.generateAttemptedToken(claims);
+        response.setHeader(attemptedTokenHeader, attemptedToken);
+
+        throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
+    }
+
+    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json")
+    @RequestMapping(value = "/social/attempted", method = RequestMethod.GET)
+    public Map<String, Object> getSocialAttemptedUser(@RequestHeader(value = "x-attempted-token") String token) {
+
+        return jwtTokenUtil.getAttemptedFromToken(token);
     }
 
     @ApiOperation(value = "로그인 중인 내 프로필", produces = "application/json", response = AuthUserProfile.class)
