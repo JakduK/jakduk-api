@@ -1,28 +1,10 @@
 package com.jakduk.restcontroller.user;
 
-import java.util.ArrayList;
-import java.util.Objects;
-import javax.validation.Valid;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionKey;
-import org.springframework.social.connect.web.ProviderSignInUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.NativeWebRequest;
-
 import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
+import com.jakduk.common.util.JwtTokenUtil;
+import com.jakduk.common.vo.AttemptedSocialUser;
 import com.jakduk.exception.DuplicateDataException;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
@@ -31,14 +13,22 @@ import com.jakduk.model.db.User;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.restcontroller.EmptyJsonResponse;
-import com.jakduk.restcontroller.user.vo.UserForm;
-import com.jakduk.restcontroller.user.vo.UserPasswordForm;
-import com.jakduk.restcontroller.user.vo.UserProfileForm;
-import com.jakduk.restcontroller.user.vo.UserProfileOnEditForm;
-import com.jakduk.restcontroller.user.vo.UserProfileResponse;
+import com.jakduk.restcontroller.user.vo.*;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.FootballService;
 import com.jakduk.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * @author pyohawan
@@ -52,10 +42,13 @@ import com.jakduk.service.UserService;
 public class UserRestController {
 
     @Autowired
-    private StandardPasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
     private ProviderSignInUtils providerSignInUtils;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     private UserService userService;
@@ -107,25 +100,19 @@ public class UserRestController {
 
     @ApiOperation(value = "SNS 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/social", method = RequestMethod.POST)
-    public EmptyJsonResponse addSocialUser(
-            @Valid @RequestBody UserProfileForm form,
-            NativeWebRequest request) {
+    public EmptyJsonResponse addSocialUser(@Valid @RequestBody UserProfileForm form,
+                                           @RequestHeader(value = "x-attempted-token") String attemptedToken) {
 
-        Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+        if (! jwtTokenUtil.isValidateToken(attemptedToken))
+            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
-        if (Objects.isNull(connection))
-            throw new ServiceException(ServiceError.CANNOT_GET_SNS_PROFILE);
-
-        ConnectionKey connectionKey = connection.getKey();
-
-        CommonConst.ACCOUNT_TYPE providerId = CommonConst.ACCOUNT_TYPE.valueOf(connectionKey.getProviderId().toUpperCase());
-        String providerUserId = connectionKey.getProviderUserId();
+        AttemptedSocialUser attemptedSocialUser = jwtTokenUtil.getAttemptedFromToken(attemptedToken);
 
         User user = User.builder()
                 .email(form.getEmail().trim())
                 .username(form.getUsername().trim())
-                .providerId(providerId)
-                .providerUserId(providerUserId)
+                .providerId(attemptedSocialUser.getProviderId())
+                .providerUserId(attemptedSocialUser.getProviderUserId())
                 .build();
 
         ArrayList<Integer> roles = new ArrayList<>();
@@ -142,17 +129,14 @@ public class UserRestController {
             user.setSupportFC(supportFC);
         }
 
-        if (Objects.nonNull(about) && !about.isEmpty()) {
+        if (Objects.nonNull(about) && !about.isEmpty())
             user.setAbout(form.getAbout().trim());
-        }
 
-        providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
+        //providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
 
         userService.save(user);
 
         log.debug("social user created. user=" + user);
-
-        userService.signInSocialUser(user);
 
         return EmptyJsonResponse.newInstance();
 
@@ -238,7 +222,7 @@ public class UserRestController {
         return userService.existUsernameOnWrite(username.trim());
     }
 
-    @ApiOperation(value = "로그인 중인 내 프로필 보기", produces = "application/json", response = UserProfileResponse.class)
+    @ApiOperation(value = "내 프로필 정보 보기", produces = "application/json", response = UserProfileResponse.class)
     @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
     public UserProfileResponse getProfileMe() {
 
@@ -266,7 +250,7 @@ public class UserRestController {
         return response;
     }
 
-    @ApiOperation(value = "로그인 중인 내 프로필 편집", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "내 프로필 정보 편집", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
     public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileOnEditForm form) {
 

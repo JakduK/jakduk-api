@@ -1,10 +1,13 @@
 package com.jakduk.restcontroller.user;
 
 import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.JakdukUserDetail;
+import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
+import com.jakduk.common.util.JwtTokenUtil;
+import com.jakduk.common.vo.AttemptedSocialUser;
 import com.jakduk.configuration.authentication.JakdukDetailsService;
-import com.jakduk.configuration.authentication.JwtTokenUtil;
+import com.jakduk.configuration.authentication.SocialDetailService;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
 import com.jakduk.model.db.User;
@@ -27,13 +30,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionKey;
 import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.social.connect.web.ProviderSignInAttempt;
 import org.springframework.social.daum.connect.DaumConnectionFactory;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.NativeWebRequest;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,9 +70,6 @@ public class AuthRestController {
     private CommonService commonService;
 
     @Autowired
-    private ProviderSignInUtils providerSignInUtils;
-
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
@@ -78,6 +77,9 @@ public class AuthRestController {
 
     @Autowired
     private JakdukDetailsService jakdukDetailsService;
+
+    @Autowired
+    private SocialDetailService socialDetailService;
 
     @Value("${jwt.token.header}")
     private String tokenHeader;
@@ -102,7 +104,7 @@ public class AuthRestController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Reload password post-authentication so we can generate token
-        JakdukPrincipal userDetails = (JakdukPrincipal) jakdukDetailsService.loadUserByUsername(form.getUsername());
+        JakdukUserDetail userDetails = (JakdukUserDetail) jakdukDetailsService.loadUserByUsername(form.getUsername());
 
         String token = jwtTokenUtil.generateToken(new CommonPrincipal(userDetails), device);
 
@@ -132,7 +134,7 @@ public class AuthRestController {
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
     public EmptyJsonResponse loginSocialUser(@PathVariable String providerId,
                                              @Valid @RequestBody LoginSocialUserForm form,
-                                             @ApiIgnore NativeWebRequest request,
+                                             Device device,
                                              HttpServletResponse response) {
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
@@ -157,7 +159,11 @@ public class AuthRestController {
 
         // 로그인 처리.
         if (! ObjectUtils.isEmpty(userIds)) {
-            userService.signInSocialUser(existUser);
+
+            SocialUserDetail userDetails = (SocialUserDetail) socialDetailService.loadUserByUsername(existUser.getEmail());
+            String token = jwtTokenUtil.generateToken(new CommonPrincipal(userDetails), device);
+
+            response.setHeader(tokenHeader, token);
 
             return EmptyJsonResponse.newInstance();
         }
@@ -179,33 +185,42 @@ public class AuthRestController {
             }
         }
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", socialProfile.getEmail());
-        claims.put("username", username);
+        AttemptedSocialUser attemptedSocialUser = new AttemptedSocialUser();
+        attemptedSocialUser.setEmail(socialProfile.getEmail());
+        attemptedSocialUser.setUsername(username);
+        attemptedSocialUser.setProviderId(convertProviderId);
+
+        String providerUserId = connectionKey.getProviderUserId();
+        attemptedSocialUser.setProviderUserId(providerUserId);
 
         // connections 컬렉션엔 있지만 user 컬렉션에 없는 경우는 spring-social 이전에 가입한 회원이다.
         if (Objects.nonNull(existUser)) {
-            claims.put("id", existUser.getId());
-            claims.put("about", existUser.getAbout());
+            attemptedSocialUser.setId(existUser.getId());
+            attemptedSocialUser.setAbout(existUser.getAbout());
 
             if (Objects.nonNull(existUser.getSupportFC()))
-                claims.put("footballClub", existUser.getSupportFC().getId());
+                attemptedSocialUser.setFootballClub(existUser.getSupportFC().getId());
         }
 
-        String attemptedToken = jwtTokenUtil.generateAttemptedToken(claims);
+        ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
+        //String attemptedToken = jwtTokenUtil.generateAttemptedToken(attemptedSocialUser);
+        String attemptedToken = jwtTokenUtil.generateAttemptedToken(signInAttempt);
         response.setHeader(attemptedTokenHeader, attemptedToken);
 
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
-    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json")
+    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json", response = AttemptedSocialUser.class)
     @RequestMapping(value = "/social/attempted", method = RequestMethod.GET)
-    public Map<String, Object> getSocialAttemptedUser(@RequestHeader(value = "x-attempted-token") String token) {
+    public AttemptedSocialUser getSocialAttemptedUser(@RequestHeader(value = "x-attempted-token") String attemptedToken) {
 
-        return jwtTokenUtil.getAttemptedFromToken(token);
+        if (! jwtTokenUtil.isValidateToken(attemptedToken))
+            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
+
+        return jwtTokenUtil.getAttemptedFromToken(attemptedToken);
     }
 
-    @ApiOperation(value = "로그인 중인 내 프로필", produces = "application/json", response = AuthUserProfile.class)
+    @ApiOperation(value = "JWT 토큰 속 프로필 정보", produces = "application/json", response = AuthUserProfile.class)
     @RequestMapping(value = "/auth/user", method = RequestMethod.GET)
     public AuthUserProfile getMyProfile() {
 

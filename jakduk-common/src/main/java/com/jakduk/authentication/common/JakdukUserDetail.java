@@ -11,7 +11,7 @@ import org.springframework.util.Assert;
 import java.io.Serializable;
 import java.util.*;
 
-public class JakdukPrincipal implements UserDetails, CredentialsContainer {
+public class JakdukUserDetail implements UserDetails, CredentialsContainer {
 
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
@@ -52,8 +52,8 @@ public class JakdukPrincipal implements UserDetails, CredentialsContainer {
 	 *         either as a parameter or as an element in the
 	 *         <code>GrantedAuthority</code> collection
 	 */
-	public JakdukPrincipal(String username, String id, String password, String nickname, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
-						   boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+	public JakdukUserDetail(String username, String id, String password, String nickname, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
+                            boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		if (Objects.isNull(username) || Objects.isNull(password))
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");

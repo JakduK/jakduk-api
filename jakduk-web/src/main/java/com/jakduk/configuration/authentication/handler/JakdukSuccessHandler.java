@@ -2,7 +2,7 @@ package com.jakduk.configuration.authentication.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.JakdukUserDetail;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -57,7 +57,7 @@ public class JakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler	
 	}
 
 	private void generateRestJson(HttpServletResponse response) throws IOException {
-		JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		JakdukUserDetail principal = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		CommonPrincipal commonPrincipal = CommonPrincipal.builder()
 				.id(principal.getId())

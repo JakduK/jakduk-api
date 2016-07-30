@@ -1,21 +1,24 @@
-package com.jakduk.configuration.authentication;
+package com.jakduk.common.util;
+
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.vo.AttemptedSocialUser;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.collections.map.HashedMap;
+import org.springframework.aop.AopInvocationException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mobile.device.Device;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.social.connect.web.ProviderSignInAttempt;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.aop.AopInvocationException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mobile.device.Device;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.common.JakdukPrincipal;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -70,31 +73,38 @@ public class JwtTokenUtil implements Serializable {
         return audience;
     }
 
-    public Map<String, Object> getAttemptedFromToken(String token) {
-        Map<String, Object> attempted = new HashMap<>();
+    public AttemptedSocialUser getAttemptedFromToken(String token) {
+
+        AttemptedSocialUser attemptedSocialUser = new AttemptedSocialUser();
+
         try {
             final Claims claims = getClaimsFromToken(token);
 
+            if (claims.containsKey("id"))
+                attemptedSocialUser.setId(claims.get("id", String.class));
+
             if (claims.containsKey("email"))
-                attempted.put("email", claims.get("email", String.class));
+                attemptedSocialUser.setEmail(claims.get("email", String.class));
 
             if (claims.containsKey("username"))
-                attempted.put("username", claims.get("username", String.class));
+                attemptedSocialUser.setUsername(claims.get("username", String.class));
 
-            if (claims.containsKey("id"))
-                attempted.put("id", claims.get("id", String.class));
+            if (claims.containsKey("providerId"))
+                attemptedSocialUser.setProviderId(claims.get("providerId", CommonConst.ACCOUNT_TYPE.class));
+
+            if (claims.containsKey("providerUserId"))
+                attemptedSocialUser.setProviderUserId(claims.get("providerUserId", String.class));
 
             if (claims.containsKey("about"))
-                attempted.put("about", claims.get("about", String.class));
+                attemptedSocialUser.setAbout(claims.get("about", String.class));
 
             if (claims.containsKey("footballClub"))
-                attempted.put("footballClub", claims.get("footballClub", String.class));
+                attemptedSocialUser.setFootballClub(claims.get("footballClub", String.class));
 
         } catch (Exception ignored) {
-
         }
 
-        return attempted;
+        return attemptedSocialUser;
     }
 
     private Claims getClaimsFromToken(String token) {
@@ -120,11 +130,11 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private String generateAudience(Device device) {
-        String audience = this.AUDIENCE_UNKNOWN;
+        String audience = AUDIENCE_UNKNOWN;
 
         try {
             if (device.isNormal()) {
-                audience = this.AUDIENCE_WEB;
+                audience = AUDIENCE_WEB;
             } else if (device.isTablet()) {
                 audience = AUDIENCE_TABLET;
             } else if (device.isMobile()) {
@@ -139,6 +149,7 @@ public class JwtTokenUtil implements Serializable {
 
     private Boolean ignoreTokenExpiration(String token) {
         String audience = getAudienceFromToken(token);
+
         return (AUDIENCE_TABLET.equals(audience) || AUDIENCE_MOBILE.equals(audience));
     }
 
@@ -154,12 +165,20 @@ public class JwtTokenUtil implements Serializable {
         return generateToken(claims, generateExpirationDate());
     }
 
-    public String generateAttemptedToken(Map<String, Object> claims) {
+    public String generateAttemptedToken(ProviderSignInAttempt attemptedSocialUser) {
 
-        return generateToken(claims, new Date(System.currentTimeMillis() + 600 * 1000));
+        Map<String, Object> temp = new HashedMap();
+        temp.put("attempt", attemptedSocialUser);
+
+        return generateToken(temp,
+                new Date(System.currentTimeMillis() + 600 * 1000));
+
+//        return generateToken(convertAttemptedSocialUserToMap(attemptedSocialUser),
+//                new Date(System.currentTimeMillis() + 600 * 1000));
     }
 
     private String generateToken(Map<String, Object> claims, Date expirationDate) {
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(expirationDate)
@@ -182,10 +201,41 @@ public class JwtTokenUtil implements Serializable {
         return refreshedToken;
     }
 
-    public Boolean isValidateTokenJakdukUser(String token, UserDetails userDetails) {
-        JakdukPrincipal user = (JakdukPrincipal) userDetails;
+    public Boolean isValidateToken(String token, UserDetails userDetails) {
         final String username = this.getUsernameFromToken(token);
 
-        return (username.equals(user.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public Boolean isValidateToken(String token) {
+
+        return ! isTokenExpired(token);
+    }
+
+    private Map<String, Object> convertAttemptedSocialUserToMap(AttemptedSocialUser attemptedSocialUser) {
+        Map<String, Object> attempted = new HashMap<>();
+
+        if (! ObjectUtils.isEmpty(attemptedSocialUser.getId()))
+            attempted.put("id", attemptedSocialUser.getId());
+
+        if (! ObjectUtils.isEmpty(attemptedSocialUser.getEmail()))
+            attempted.put("email", attemptedSocialUser.getEmail());
+
+        if (! ObjectUtils.isEmpty(attemptedSocialUser.getUsername()))
+            attempted.put("username", attemptedSocialUser.getUsername());
+
+        if (! ObjectUtils.isEmpty(attemptedSocialUser.getProviderId()))
+            attempted.put("providerId", attemptedSocialUser.getProviderId());
+
+        if (! ObjectUtils.isEmpty(attemptedSocialUser.getProviderUserId()))
+            attempted.put("providerUserId", attemptedSocialUser.getProviderUserId());
+
+        if (! ObjectUtils.isEmpty(attemptedSocialUser.getFootballClub()))
+            attempted.put("footballClub", attemptedSocialUser.getFootballClub());
+
+        if (! ObjectUtils.isEmpty(attemptedSocialUser.getAbout()))
+            attempted.put("about", attemptedSocialUser.getAbout());
+
+        return attempted;
     }
 }

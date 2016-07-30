@@ -24,7 +24,8 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
 /**
- * Created by pyohwan on 16. 4. 8.
+ * @author pyohwan
+ * 16. 4. 8 오후 10:21
  */
 
 @Configuration
@@ -71,6 +72,7 @@ public class SocialConfig implements SocialConfigurer {
      */
     @Bean
     public ConnectController connectController(ConnectionFactoryLocator connectionFactoryLocator, ConnectionRepository connectionRepository) {
+
         return new ConnectController(connectionFactoryLocator, connectionRepository);
     }
 

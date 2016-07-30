@@ -1,7 +1,7 @@
 package com.jakduk.restcontroller.board;
 
 import com.jakduk.common.ApiConst;
-import com.jakduk.common.ApiUtils;
+import com.jakduk.common.util.ApiUtils;
 import com.jakduk.common.CommonConst;
 import com.jakduk.dao.BoardDAO;
 import com.jakduk.exception.ServiceError;

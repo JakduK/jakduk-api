@@ -8,9 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.social.security.SocialUserDetails;
-import org.springframework.social.security.SocialUserDetailsService;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,33 +24,33 @@ import java.util.Objects;
  */
 
 @Slf4j
-public class SocialDetailService implements SocialUserDetailsService {
+@Service
+public class SocialDetailService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
+    public SocialUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        if (Objects.isNull(userId)) {
-            throw new IllegalArgumentException("userId 는 꼭 필요한 값입니다.");
+        if (Objects.isNull(username)) {
+            throw new IllegalArgumentException("username 는 꼭 필요한 값입니다.");
         } else {
-            UserOnAuthentication user = userRepository.userFindByProviderUserId(userId);
+            UserOnAuthentication user = userRepository.userFindByProviderUserId(username);
 
             if (Objects.isNull(user))
-                throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. userId=" + userId);
+                throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. userId=" + username);
 
             log.debug("user=" + user);
 
-            return new SocialUserDetail(user.getId(), userId, user.getUsername(), user.getProviderId(), user.getEmail(),
+            return new SocialUserDetail(user.getId(), username, user.getUsername(), user.getProviderId(), user.getEmail(),
                     true, true, true, true, getAuthorities(user.getRoles()));
         }
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
-        List<GrantedAuthority> authList = getGrantedAuthorities(getRoles(roles));
 
-        return authList;
+        return getGrantedAuthorities(getRoles(roles));
     }
 
     public List<String> getRoles(List<Integer> roles) {

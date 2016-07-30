@@ -1,7 +1,7 @@
 package com.jakduk.service;
 
 import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.JakdukUserDetail;
 import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
@@ -133,8 +133,8 @@ public class UserService {
      */
 	public void updateUserPassword(String newPassword) {
 		
-		JakdukPrincipal jakdukPrincipal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String id = jakdukPrincipal.getId();
+		JakdukUserDetail jakdukUserDetail = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = jakdukUserDetail.getId();
 		
 		Optional<User> user = userRepository.findOneById(id);
 
@@ -178,8 +178,8 @@ public class UserService {
 						.username(userDetail.getUsername())
 						.providerId(userDetail.getProviderId())
 						.build();
-			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
-				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail) {
+				JakdukUserDetail principal = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 				commonPrincipal = CommonPrincipal.builder()
 						.id(principal.getId())
@@ -204,11 +204,11 @@ public class UserService {
 		boolean credentialsNonExpired = true;
 		boolean accountNonLocked = true;
 
-		JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId(),
+		JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(user.getEmail(), user.getId(),
 				user.getPassword(), user.getUsername(), user.getProviderId(),
 				enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 
-		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukPrincipal, user.getPassword(), jakdukPrincipal.getAuthorities());
+		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukUserDetail, user.getPassword(), jakdukUserDetail.getAuthorities());
 
 		SecurityContextHolder.getContext().setAuthentication(token);
 	}
