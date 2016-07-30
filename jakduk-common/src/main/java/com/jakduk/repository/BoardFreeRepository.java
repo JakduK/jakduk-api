@@ -1,15 +1,16 @@
 package com.jakduk.repository;
 
-import com.jakduk.model.db.BoardFree;
-import com.jakduk.model.simple.BoardFreeOfMinimum;
-import com.jakduk.model.simple.BoardFreeOnList;
-import com.jakduk.model.web.BoardFreeWrite;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import java.util.Optional;
+import com.jakduk.model.db.BoardFree;
+import com.jakduk.model.simple.BoardFreeOfMinimum;
+import com.jakduk.model.simple.BoardFreeOnList;
+import com.jakduk.model.web.BoardFreeWrite;
 
 public interface BoardFreeRepository extends MongoRepository<BoardFree, String> {
 
@@ -21,7 +22,7 @@ public interface BoardFreeRepository extends MongoRepository<BoardFree, String> 
 	long countByCategoryName(String categoryName);
 	long count();
 	
-	@Query(value="{'status.notice' : 'notice'}")
+	@Query(value="{'status.notice' : true}")
 	Page<BoardFreeOnList> findByNotice(Pageable pageable);
 	
 	@Query(value="{'seq' : ?0}")
