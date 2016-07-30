@@ -1,8 +1,34 @@
 package com.jakduk.restcontroller.admin;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.jakduk.common.CommonConst;
-import com.jakduk.model.db.*;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.Competition;
+import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.HomeDescription;
 import com.jakduk.model.embedded.LocalName;
 import com.jakduk.model.embedded.LocalSimpleName;
 import com.jakduk.model.web.BoardCategoryWrite;
@@ -14,14 +40,6 @@ import com.jakduk.service.AdminService;
 import com.jakduk.service.CommonService;
 import com.jakduk.service.CompetitionService;
 import com.jakduk.service.StatsService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 
 /**
@@ -29,7 +47,7 @@ import java.util.*;
  */
 
 @Slf4j
-@Api(value = "ADMIN", description = "관리자 API")
+@Api(tags = "관리자", description = "관리자 API")
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
