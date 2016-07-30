@@ -1,12 +1,13 @@
 package com.jakduk.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.BoardDAO;
-import com.jakduk.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.model.elasticsearch.CommentOnES;
-import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.elasticsearch.JakduCommentOnES;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
@@ -18,19 +19,16 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.BoardDAO;
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
+import com.jakduk.model.elasticsearch.JakduCommentOnES;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
-* @company  : http://jakduk.com
-* @date     : 2015. 8. 6.
-* @desc     :
 */
 
 @Service
@@ -49,21 +47,24 @@ public class SearchService {
 	@Autowired
 	private BoardDAO boardDAO;
 
-	public void getSearch(Model model, Locale locale, String q, String w, int from, int size) {
-		model.addAttribute("q", q);
-		model.addAttribute("w", w);
-		model.addAttribute("from", from);
-		model.addAttribute("size", size);
+	public Map<String, Object> getSearch(Locale locale, String q, String w, int from, int size) {
+		Map<String, Object> data = new HashMap<>();
+		data.put("q", q);
+		data.put("w", w);
+		data.put("from", from);
+		data.put("size", size);
 		try {
-			model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
+			data.put("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
+
+		return data;
 	}
 	
-	public void getDataSearch(Model model, String q, String w, int from, int size) {
-		
+	public Map<String, Object> getDataSearch(String q, String w, int from, int size) {
+		Map<String, Object> data = new HashMap<>();
+
 		if (log.isDebugEnabled()) {
 			log.debug("q=" + q + ", w=" + w + ", from=" + from + ", size=" + size);
 		}
@@ -72,28 +73,25 @@ public class SearchService {
 		
 		if (w != null && !w.isEmpty()) {
 			if (w.contains("PO")) {
-				model.addAttribute("posts", this.searchDocumentBoard(q, from, size));				
+				data.put("posts", this.searchDocumentBoard(q, from, size));
 			}
+
 			if (w.contains("CO")) {
-				List<ObjectId> ids = new ArrayList<ObjectId>();
-				
+				List<ObjectId> ids = new ArrayList<>();
 				SearchResult result = this.searchDocumentComment(q, from, size);
-				
-				List<SearchResult.Hit<CommentOnES, Void>> hits = result.getHits(CommentOnES.class);
-				
-				Iterator<SearchResult.Hit<CommentOnES, Void>> hitsItr = hits.iterator();
-				
-				while (hitsItr.hasNext()) {
-					SearchResult.Hit<CommentOnES, Void> itr = hitsItr.next();
-					
-					String id = itr.source.getBoardItem().getId();
-					
-					ids.add(new ObjectId(id));
+
+				if (result.isSucceeded()) {
+					List<SearchResult.Hit<CommentOnES, Void>> hits = result.getHits(CommentOnES.class);
+					hits.forEach(hit -> {
+						String id = hit.source.getBoardItem().getId();
+						ids.add(new ObjectId(id));
+					});
 				}
-				
-				model.addAttribute("comments", result.getJsonString());
-				model.addAttribute("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
+
+				data.put("comments", result.getJsonString());
+				data.put("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
 			}
+
 			if (w.contains("GA")) {
 				int tempSize = size;
 				
@@ -102,9 +100,11 @@ public class SearchService {
 				}
 				
 				SearchResult result = this.searchDocumentGallery(q, from, tempSize);
-				model.addAttribute("galleries", result.getJsonString());
+				data.put("galleries", result.getJsonString());
 			}
 		}
+
+		return data;
 	}
 	
 	public String searchDocumentBoard(String q, int from, int size) {
@@ -142,15 +142,11 @@ public class SearchService {
 				.build();
 		
 		try {
-			SearchResult result = jestClient.execute(search);
-			
-			return result.getJsonObject().toString();
-			
+			return jestClient.execute(search).getJsonObject().toString();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "";
+			log.warn(e.getMessage(), e);
 		}
+		return "";
 	}
 	
 	public void createDocumentBoard(BoardFreeOnES boardFreeOnEs) {
@@ -158,13 +154,11 @@ public class SearchService {
 		
 		try {
 			JestResult jestResult = jestClient.execute(index);
-			
 			if (!jestResult.isSucceeded()) {
 				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 	}
 	
@@ -186,8 +180,7 @@ public class SearchService {
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 	}
 	
@@ -217,15 +210,11 @@ public class SearchService {
 				.build();
 		
 		try {
-			SearchResult result = jestClient.execute(search);
-			
-			return result;
-			
+			return jestClient.execute(search);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+			log.warn(e.getMessage(), e);
 		}
+		return null;
 	}
 
 	public void createDocumentComment(CommentOnES commentOnES) {
@@ -233,13 +222,11 @@ public class SearchService {
 
 		try {
 			JestResult jestResult = jestClient.execute(index);
-
 			if (!jestResult.isSucceeded()) {
 				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 	}
 
@@ -248,13 +235,11 @@ public class SearchService {
 
 		try {
 			JestResult jestResult = jestClient.execute(index);
-
 			if (!jestResult.isSucceeded()) {
 				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 	}
 
@@ -284,15 +269,11 @@ public class SearchService {
 				.build();
 
 		try {
-			SearchResult result = jestClient.execute(search);
-
-			return result;
-
+			return jestClient.execute(search);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+			log.warn(e.getMessage(), e);
 		}
+		return null;
 	}
 
 	public SearchResult searchDocumentGallery(String q, int from, int size) {
@@ -318,15 +299,11 @@ public class SearchService {
 				.build();
 		
 		try {
-			SearchResult result = jestClient.execute(search);
-			
-			return result;
-			
+			return jestClient.execute(search);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+			log.warn(e.getMessage(), e);
 		}
+		return null;
 	}
 	
 	public void createDocumentGallery(GalleryOnES galleryOnES) {
@@ -334,13 +311,11 @@ public class SearchService {
 		
 		try {
 			JestResult jestResult = jestClient.execute(index);
-			
 			if (!jestResult.isSucceeded()) {
 				log.error(jestResult.getErrorMessage());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 	}
 	
@@ -362,8 +337,7 @@ public class SearchService {
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 	}	
 }
