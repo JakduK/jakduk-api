@@ -27,7 +27,7 @@ import com.jakduk.notification.EmailService;
 import com.jakduk.service.UserService;
 
 @Slf4j
-@Api(value = "PASSWORD", description = "회원 비밀번호 API")
+@Api(tags = "회원 비밀번호", description = "회원 비밀번호 API")
 @RestController
 @RequestMapping("/api/password")
 public class PasswordRestController {

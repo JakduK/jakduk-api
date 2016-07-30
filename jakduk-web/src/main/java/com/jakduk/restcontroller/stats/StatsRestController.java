@@ -35,7 +35,7 @@ import com.jakduk.service.StatsService;
  */
 
 @Slf4j
-@Api(value = "STATS", description = "통계 API")
+@Api(tags = "통계", description = "통계 API")
 @RestController
 @RequestMapping("/api/stats")
 public class StatsRestController {
