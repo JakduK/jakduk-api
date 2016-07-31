@@ -1,7 +1,7 @@
 package com.jakduk.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.common.vo.DaumProfile;
+import com.jakduk.common.vo.SocialProfile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 public class UserUtils {
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
+    private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.7/me?fields=id,name,email&format=json";
 
     private JsonNode fetchProfile(String url, String accessToken) {
 
@@ -31,18 +32,26 @@ public class UserUtils {
         return responseEntity.getBody();
     }
 
-    public DaumProfile getDaumProfile(String accessToken) {
+    public SocialProfile getDaumProfile(String accessToken) {
 
         JsonNode jsonNode = fetchProfile(DAUM_PROFILE_API_URL, accessToken);
 
         JsonNode resultJson = jsonNode.get("result");
-        DaumProfile profile = new DaumProfile();
-        profile.setUserId(resultJson.get("userid").asText());
-        profile.setId(resultJson.get("id").asInt());
+        SocialProfile profile = new SocialProfile();
+        profile.setId(resultJson.get("userid").asText());
         profile.setNickname(resultJson.get("nickname").asText());
-        profile.setImagePath(resultJson.get("imagePath").asText());
-        profile.setBigImagePath(resultJson.get("bigImagePath").asText());
-        profile.setOpenProfile(resultJson.get("openProfile").asBoolean());
+
+        return profile;
+    }
+
+    public SocialProfile getFacebookProfile(String accessToken) {
+
+        JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
+
+        SocialProfile profile = new SocialProfile();
+        profile.setId(jsonNode.get("id").asText());
+        profile.setNickname(jsonNode.get("name").asText());
+        profile.setEmail(jsonNode.get("email").asText());
 
         return profile;
     }

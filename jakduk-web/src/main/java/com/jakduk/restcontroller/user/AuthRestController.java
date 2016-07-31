@@ -7,7 +7,7 @@ import com.jakduk.common.CommonConst;
 import com.jakduk.common.util.JwtTokenUtil;
 import com.jakduk.common.util.UserUtils;
 import com.jakduk.common.vo.AttemptSocialUser;
-import com.jakduk.common.vo.DaumProfile;
+import com.jakduk.common.vo.SocialProfile;
 import com.jakduk.configuration.authentication.JakdukDetailsService;
 import com.jakduk.configuration.authentication.SocialDetailService;
 import com.jakduk.exception.ServiceError;
@@ -50,7 +50,7 @@ import java.util.Objects;
 @RequestMapping("/api")
 public class AuthRestController {
 
-      @Autowired
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -128,15 +128,19 @@ public class AuthRestController {
                                              HttpServletResponse response) {
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
-        DaumProfile daumProfile = null;
+        SocialProfile socialProfile = null;
 
         switch (convertProviderId) {
             case DAUM:
-                daumProfile = userUtils.getDaumProfile(form.getAccessToken());
+                socialProfile = userUtils.getDaumProfile(form.getAccessToken());
+                break;
+            case FACEBOOK:
+                socialProfile = userUtils.getFacebookProfile(form.getAccessToken());
                 break;
         }
 
-        User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, daumProfile.getUserId());
+        assert socialProfile != null;
+        User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
         // 로그인 처리.
         if (! ObjectUtils.isEmpty(existUser)) {
@@ -149,13 +153,15 @@ public class AuthRestController {
             return EmptyJsonResponse.newInstance();
         }
 
-        log.debug("daumProfile=" + daumProfile);
-
+        // 신규 가입.
         AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
-        //attemptSocialUser.setEmail(socialProfile.getEmail());
-        attemptSocialUser.setUsername(daumProfile.getNickname());
+        attemptSocialUser.setUsername(socialProfile.getNickname());
         attemptSocialUser.setProviderId(convertProviderId);
-        attemptSocialUser.setProviderUserId(daumProfile.getUserId());
+        attemptSocialUser.setProviderUserId(socialProfile.getId());
+
+        // Daum은 이메일을 안 알려준다.
+        if (! ObjectUtils.isEmpty(socialProfile.getEmail()))
+            attemptSocialUser.setEmail(socialProfile.getEmail());
 
         String attemptedToken = jwtTokenUtil.generateAttemptedToken(attemptSocialUser);
 

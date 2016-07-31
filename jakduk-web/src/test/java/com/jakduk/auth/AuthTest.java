@@ -21,7 +21,7 @@ public class AuthTest extends AbstractSpringTest {
     private UserUtils userUtils;
 
     @Test
-    public void DAUM프로필가져오기() {
+    public void DAUM_프로필가져오기() {
 
         String daumApiUrl = "https://apis.daum.net/user/v1/show.json";
 
@@ -42,6 +42,32 @@ public class AuthTest extends AbstractSpringTest {
         System.out.println("result=" + responseEntity.getBody().get("result"));
 
         System.out.println(userUtils.getDaumProfile("261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095"));
+
+    }
+
+    @Test
+    public void Facebook_프로필가져오기() {
+
+        String daumApiUrl = "https://graph.facebook.com/v2.7/me?fields=id,name,email&format=json";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer EAALwXK7RDAIBABRLhRHZB8DV9GXKSLfSlvZBGkjXbVziSQRuPTqpc2eAvZBXcd9XM130euKDAF9wiZCCBroeZCT3PUpedn9U8WzZAY5q4rKCyQSRUkcGtON0aS95r46s1a2i4OTYMXDE5F8yEZBiw3X20VWXZBz33VjjMMG3hbNbtguVYjlZBJWXq");
+        //headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        System.out.println("entity=" + entity);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        //Map<String, String> result = (Map<String, String>) restTemplate.getForObject("https://apis.daum.net/user/v1/show.json?access_token=261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095", Map.class);
+        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(daumApiUrl, HttpMethod.GET, entity, JsonNode.class);
+
+        System.out.println("responseEntity=" + responseEntity);
+        responseEntity.getBody().get("result");
+
+        System.out.println("result=" + responseEntity.getBody().get("result"));
+
+        //System.out.println(userUtils.getDaumProfile("261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095"));
 
     }
 }

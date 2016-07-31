@@ -9,11 +9,8 @@ import lombok.Data;
  */
 
 @Data
-public class DaumProfile {
-    private Integer id;
-    private String userId;
+public class SocialProfile {
+    private String id;
     private String nickname;
-    private String imagePath;
-    private String bigImagePath;
-    private Boolean openProfile;
+    private String email;
 }
