@@ -1,6 +1,12 @@
 package com.jakduk.configuration.authentication;
 
-import com.jakduk.common.util.JwtTokenUtil;
+import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,12 +16,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.util.JwtTokenUtil;
 
 public class AuthenticationTokenFilter extends GenericFilterBean {
 
@@ -37,9 +39,15 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     String authToken = httpRequest.getHeader(tokenHeader);
     String username = jwtTokenUtil.getUsernameFromToken(authToken);
+    String providerId = jwtTokenUtil.getProviderIdFromToken(authToken);
 
     if (! ObjectUtils.isEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = jakdukDetailsService.loadUserByUsername(username);
+      UserDetails userDetails;
+      if (CommonConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
+        userDetails = jakdukDetailsService.loadUserByUsername(username);
+      } else {
+        userDetails = socialDetailService.loadUserByUsername(username);
+      }
 
       if (jwtTokenUtil.isValidateToken(authToken, userDetails)) {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

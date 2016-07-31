@@ -1,8 +1,10 @@
 package com.jakduk.common.util;
 
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.common.CommonConst;
-import com.jakduk.common.vo.AttemptSocialUser;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,10 +15,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.authentication.common.SocialUserDetail;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.vo.AttemptSocialUser;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -47,6 +49,17 @@ public class JwtTokenUtil implements Serializable {
             username = null;
         }
         return username;
+    }
+
+    public String getProviderIdFromToken(String token) {
+        String providerId;
+        try {
+            final Claims claims = getClaimsFromToken(token);
+            providerId = (String) claims.get(CLAIM_KEY_PROVIDER_ID);
+        } catch (Exception e) {
+            providerId = null;
+        }
+        return providerId;
     }
 
     public Date getExpirationDateFromToken(String token) {
@@ -187,9 +200,14 @@ public class JwtTokenUtil implements Serializable {
     }
 
     public Boolean isValidateToken(String token, UserDetails userDetails) {
-        final String username = this.getUsernameFromToken(token);
-
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        String username = this.getUsernameFromToken(token);
+        String email;
+        if (userDetails instanceof SocialUserDetail) {
+            email = ((SocialUserDetail) userDetails).getEmail();
+        } else {
+            email = userDetails.getUsername();
+        }
+        return (username.equals(email) && !isTokenExpired(token));
     }
 
     public Boolean isValidateToken(String token) {
