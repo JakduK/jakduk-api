@@ -3,6 +3,7 @@ package com.jakduk.auth;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jakduk.common.util.UserUtils;
 import com.jakduk.util.AbstractSpringTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -20,6 +21,8 @@ public class AuthTest extends AbstractSpringTest {
     @Autowired
     private UserUtils userUtils;
 
+    // access_token 만료됨.
+    @Ignore
     @Test
     public void DAUM_프로필가져오기() {
 
