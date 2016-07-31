@@ -4,7 +4,7 @@ import com.jakduk.authentication.common.CommonPrincipal;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.common.util.JwtTokenUtil;
-import com.jakduk.common.vo.AttemptedSocialUser;
+import com.jakduk.common.vo.AttemptSocialUser;
 import com.jakduk.exception.DuplicateDataException;
 import com.jakduk.exception.ServiceError;
 import com.jakduk.exception.ServiceException;
@@ -21,11 +21,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.mobile.device.Device;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -45,9 +47,6 @@ public class UserRestController {
     private PasswordEncoder encoder;
 
     @Autowired
-    private ProviderSignInUtils providerSignInUtils;
-
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
@@ -58,6 +57,9 @@ public class UserRestController {
 
     @Autowired
     private FootballService footballService;
+
+    @Value("${jwt.token.header}")
+    private String tokenHeader;
 
     @ApiOperation(value = "이메일 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -100,19 +102,21 @@ public class UserRestController {
 
     @ApiOperation(value = "SNS 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/social", method = RequestMethod.POST)
-    public EmptyJsonResponse addSocialUser(@Valid @RequestBody UserProfileForm form,
-                                           @RequestHeader(value = "x-attempted-token") String attemptedToken) {
+    public EmptyJsonResponse addSocialUser(@RequestHeader(value = "x-attempt-token") String attemptedToken,
+                                           @Valid @RequestBody UserProfileForm form,
+                                           Device device,
+                                           HttpServletResponse response) {
 
         if (! jwtTokenUtil.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
-        AttemptedSocialUser attemptedSocialUser = jwtTokenUtil.getAttemptedFromToken(attemptedToken);
+        AttemptSocialUser attemptSocialUser = jwtTokenUtil.getAttemptedFromToken(attemptedToken);
 
         User user = User.builder()
                 .email(form.getEmail().trim())
                 .username(form.getUsername().trim())
-                .providerId(attemptedSocialUser.getProviderId())
-                .providerUserId(attemptedSocialUser.getProviderUserId())
+                .providerId(attemptSocialUser.getProviderId())
+                .providerUserId(attemptSocialUser.getProviderUserId())
                 .build();
 
         ArrayList<Integer> roles = new ArrayList<>();
@@ -132,11 +136,13 @@ public class UserRestController {
         if (Objects.nonNull(about) && !about.isEmpty())
             user.setAbout(form.getAbout().trim());
 
-        //providerSignInUtils.doPostSignUp(user.getProviderUserId(), request);
-
         userService.save(user);
 
         log.debug("social user created. user=" + user);
+
+        String token = jwtTokenUtil.generateToken(new CommonPrincipal(user), device);
+
+        response.setHeader(tokenHeader, token);
 
         return EmptyJsonResponse.newInstance();
 

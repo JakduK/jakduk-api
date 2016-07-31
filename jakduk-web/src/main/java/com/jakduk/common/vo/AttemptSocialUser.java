@@ -10,12 +10,9 @@ import lombok.*;
 
 @Getter
 @Setter
-public class AttemptedSocialUser {
-    private String id;
+public class AttemptSocialUser {
     private String email;
     private String username;
     private CommonConst.ACCOUNT_TYPE providerId;
     private String providerUserId;
-    private String footballClub;
-    private String about;
 }

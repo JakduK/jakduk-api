@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.social.daum.connect.DaumConnectionFactory;
 
 public class CommonTest extends AbstractSpringTest {
 	
@@ -34,8 +33,6 @@ public class CommonTest extends AbstractSpringTest {
 	public void environmentTest() {
 		System.out.println(storageTempPath);
 		System.out.println(environment.getProperty("mongo.db.name"));
-
-		new DaumConnectionFactory(environment.getProperty("daum.client.id"), environment.getProperty("daum.client.secret"));
 
 	}
 	

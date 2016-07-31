@@ -1,6 +1,7 @@
 package com.jakduk.authentication.common;
 
 import com.jakduk.common.CommonConst;
+import com.jakduk.model.db.User;
 import lombok.*;
 
 /**
@@ -36,5 +37,12 @@ public class CommonPrincipal {
 		this.email = socialUserDetail.getUserId();
 		this.username = socialUserDetail.getUsername();
 		this.providerId = socialUserDetail.getProviderId();
+	}
+
+	public CommonPrincipal(User user) {
+		this.id = user.getId();
+		this.email = user.getEmail();
+		this.username = user.getUsername();
+		this.providerId = user.getProviderId();
 	}
 }

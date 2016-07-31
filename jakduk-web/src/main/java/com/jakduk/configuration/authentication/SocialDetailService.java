@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.social.security.SocialUserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,19 +31,19 @@ public class SocialDetailService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public SocialUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        if (Objects.isNull(username)) {
-            throw new IllegalArgumentException("username 는 꼭 필요한 값입니다.");
+        if (Objects.isNull(email)) {
+            throw new IllegalArgumentException("email 는 꼭 필요한 값입니다.");
         } else {
-            UserOnAuthentication user = userRepository.userFindByProviderUserId(username);
+            UserOnAuthentication user = userRepository.findAuthUserByEmail(email);
 
             if (Objects.isNull(user))
-                throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. userId=" + username);
+                throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
 
             log.debug("user=" + user);
 
-            return new SocialUserDetail(user.getId(), username, user.getUsername(), user.getProviderId(), user.getEmail(),
+            return new SocialUserDetail(user.getId(), email, user.getUsername(), user.getProviderId(), user.getEmail(),
                     true, true, true, true, getAuthorities(user.getRoles()));
         }
     }

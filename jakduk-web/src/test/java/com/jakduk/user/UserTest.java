@@ -5,8 +5,6 @@ import com.jakduk.common.CommonRole;
 import com.jakduk.dao.JakdukDAO;
 import com.jakduk.model.db.User;
 import com.jakduk.model.etc.SupporterCount;
-import com.jakduk.model.simple.SocialUserOnAuthentication;
-import com.jakduk.model.simple.UserOnAuthentication;
 import com.jakduk.model.simple.UserProfile;
 import com.jakduk.repository.FootballClubRepository;
 import com.jakduk.repository.user.UserProfileRepository;
@@ -18,15 +16,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.web.ProviderSignInAttempt;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.social.facebook.connect.FacebookConnectionFactory;
-import org.springframework.social.oauth2.AccessGrant;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -52,9 +44,6 @@ public class UserTest extends AbstractSpringTest {
 
 	@Autowired
 	private StandardPasswordEncoder encoder;
-
-	@Autowired
-	private UsersConnectionRepository usersConnectionRepository;
 
 	@Autowired
 	private Environment environment;
@@ -111,47 +100,6 @@ public class UserTest extends AbstractSpringTest {
 		List<SupporterCount> users = jakdukDAO.getSupportFCCount("ko");
 		System.out.println("getSupportFCCount=" + users);
 		
-	}
-
-	@Test
-	public void getSocialUser() {
-
-		String email = "phjang1983@daum.net";
-
-		FacebookTemplate facebookTemplate = new FacebookTemplate("EAALwXK7RDAIBABRLhRHZB8DV9GXKSLfSlvZBGkjXbVziSQRuPTqpc2eAvZBXcd9XM130euKDAF9wiZCCBroeZCT3PUpedn9U8WzZAY5q4rKCyQSRUkcGtON0aS95r46s1a2i4OTYMXDE5F8yEZBiw3X20VWXZBz33VjjMMG3hbNbtguVYjlZBJWXq");
-
-		org.springframework.social.facebook.api.User user = facebookTemplate.userOperations().getUserProfile();
-
-		System.out.println("userProfile=" + user.getEmail());
-		System.out.println("userProfile=" + user.getId());
-		System.out.println("userProfile=" + user.getName());
-
-
-		Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo("facebook", new HashSet<String>(Arrays.asList("917745831573018")));
-
-		System.out.println("phjang=" + userIds);
-
-		UserOnAuthentication user1 = userRepository.findAuthUserByEmail(email);
-		System.out.println("user1=" + user1);
-
-		SocialUserOnAuthentication user3 = userRepository.findSocialUserByEmail(email);
-		System.out.println("user3=" + user3);
-
-		User user2 = userRepository.findOneByEmail(email);
-		System.out.println("user2=" + user2);
-	}
-
-	@Test
-	public void 페이스북_OAUTH2() {
-		String accessToken = "EAALwXK7RDAIBABRLhRHZB8DV9GXKSLfSlvZBGkjXbVziSQRuPTqpc2eAvZBXcd9XM130euKDAF9wiZCCBroeZCT3PUpedn9U8WzZAY5q4rKCyQSRUkcGtON0aS95r46s1a2i4OTYMXDE5F8yEZBiw3X20VWXZBz33VjjMMG3hbNbtguVYjlZBJWXq";
-		FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(environment.getProperty("facebook.app.id"), environment.getProperty("facebook.app.secret"));
-
-		AccessGrant accessGrant = new AccessGrant(accessToken);
-		Connection<Facebook> connection = connectionFactory.createConnection(accessGrant);
-
-		ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
-
-		System.out.println("profile=" + connection.getDisplayName());
 	}
 
 	@Test

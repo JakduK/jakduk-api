@@ -5,7 +5,9 @@ import com.jakduk.authentication.common.JakdukUserDetail;
 import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.util.JwtTokenUtil;
-import com.jakduk.common.vo.AttemptedSocialUser;
+import com.jakduk.common.util.UserUtils;
+import com.jakduk.common.vo.AttemptSocialUser;
+import com.jakduk.common.vo.DaumProfile;
 import com.jakduk.configuration.authentication.JakdukDetailsService;
 import com.jakduk.configuration.authentication.SocialDetailService;
 import com.jakduk.exception.ServiceError;
@@ -27,13 +29,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionKey;
-import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.web.ProviderSignInAttempt;
-import org.springframework.social.daum.connect.DaumConnectionFactory;
-import org.springframework.social.facebook.connect.FacebookConnectionFactory;
-import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -41,7 +36,8 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * @author pyohwan
@@ -54,16 +50,7 @@ import java.util.*;
 @RequestMapping("/api")
 public class AuthRestController {
 
-    @Autowired
-    private UsersConnectionRepository usersConnectionRepository;
-
-    @Autowired
-    private FacebookConnectionFactory facebookConnectionFactory;
-
-    @Autowired
-    private DaumConnectionFactory daumConnectionFactory;
-
-    @Autowired
+      @Autowired
     private UserService userService;
 
     @Autowired
@@ -71,6 +58,9 @@ public class AuthRestController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private UserUtils userUtils;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -138,27 +128,18 @@ public class AuthRestController {
                                              HttpServletResponse response) {
 
         CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
-
-        AccessGrant accessGrant = new AccessGrant(form.getAccessToken());
-        Connection<?> connection = null;
+        DaumProfile daumProfile = null;
 
         switch (convertProviderId) {
-            case FACEBOOK:
-                connection = facebookConnectionFactory.createConnection(accessGrant);
-                break;
             case DAUM:
-                connection = daumConnectionFactory.createConnection(accessGrant);
+                daumProfile = userUtils.getDaumProfile(form.getAccessToken());
                 break;
         }
 
-        assert connection != null;
-        ConnectionKey connectionKey = connection.getKey();
-
-        Set<String> userIds = usersConnectionRepository.findUserIdsConnectedTo(providerId, new HashSet<>(Collections.singletonList(connectionKey.getProviderUserId())));
-        User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, connectionKey.getProviderUserId());
+        User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, daumProfile.getUserId());
 
         // 로그인 처리.
-        if (! ObjectUtils.isEmpty(userIds)) {
+        if (! ObjectUtils.isEmpty(existUser)) {
 
             SocialUserDetail userDetails = (SocialUserDetail) socialDetailService.loadUserByUsername(existUser.getEmail());
             String token = jwtTokenUtil.generateToken(new CommonPrincipal(userDetails), device);
@@ -168,51 +149,24 @@ public class AuthRestController {
             return EmptyJsonResponse.newInstance();
         }
 
-        // SNS 신규 가입.
-        org.springframework.social.connect.UserProfile socialProfile = connection.fetchUserProfile();
+        log.debug("daumProfile=" + daumProfile);
 
-        String username = null;
-        if (Objects.nonNull(socialProfile.getName())) {
-            username = socialProfile.getName();
-        } else if (Objects.nonNull(socialProfile.getUsername())) {
-            username = socialProfile.getUsername();
-        } else {
-            if (Objects.nonNull(socialProfile.getFirstName())) {
-                username = socialProfile.getFirstName();
-            }
-            if (Objects.nonNull(socialProfile.getLastName())) {
-                username = Objects.isNull(username) ? socialProfile.getLastName() : ' ' + socialProfile.getLastName();
-            }
-        }
+        AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
+        //attemptSocialUser.setEmail(socialProfile.getEmail());
+        attemptSocialUser.setUsername(daumProfile.getNickname());
+        attemptSocialUser.setProviderId(convertProviderId);
+        attemptSocialUser.setProviderUserId(daumProfile.getUserId());
 
-        AttemptedSocialUser attemptedSocialUser = new AttemptedSocialUser();
-        attemptedSocialUser.setEmail(socialProfile.getEmail());
-        attemptedSocialUser.setUsername(username);
-        attemptedSocialUser.setProviderId(convertProviderId);
+        String attemptedToken = jwtTokenUtil.generateAttemptedToken(attemptSocialUser);
 
-        String providerUserId = connectionKey.getProviderUserId();
-        attemptedSocialUser.setProviderUserId(providerUserId);
-
-        // connections 컬렉션엔 있지만 user 컬렉션에 없는 경우는 spring-social 이전에 가입한 회원이다.
-        if (Objects.nonNull(existUser)) {
-            attemptedSocialUser.setId(existUser.getId());
-            attemptedSocialUser.setAbout(existUser.getAbout());
-
-            if (Objects.nonNull(existUser.getSupportFC()))
-                attemptedSocialUser.setFootballClub(existUser.getSupportFC().getId());
-        }
-
-        ProviderSignInAttempt signInAttempt = new ProviderSignInAttempt(connection);
-        //String attemptedToken = jwtTokenUtil.generateAttemptedToken(attemptedSocialUser);
-        String attemptedToken = jwtTokenUtil.generateAttemptedToken(signInAttempt);
         response.setHeader(attemptedTokenHeader, attemptedToken);
 
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
-    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json", response = AttemptedSocialUser.class)
-    @RequestMapping(value = "/social/attempted", method = RequestMethod.GET)
-    public AttemptedSocialUser getSocialAttemptedUser(@RequestHeader(value = "x-attempted-token") String attemptedToken) {
+    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json", response = AttemptSocialUser.class)
+    @RequestMapping(value = "/social/attempt", method = RequestMethod.GET)
+    public AttemptSocialUser getSocialAttemptedUser(@RequestHeader(value = "x-attempt-token") String attemptedToken) {
 
         if (! jwtTokenUtil.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
