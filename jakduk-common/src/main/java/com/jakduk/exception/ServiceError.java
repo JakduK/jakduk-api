@@ -13,6 +13,7 @@ public enum ServiceError {
 
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "INVALID_PARAMETER", "common.exception.invalid.parameter"),
     FORM_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "FORM_VALIDATION_FAILED", "common.exception.invalid.parameter"),
+    EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST, "EXPIRATION_TOKEN", "common.exception.expiration.token"),
 
     NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND", "common.exception.no.such.element"),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "NOT_FOUND_USER", "common.exception.not.found.user"),

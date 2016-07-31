@@ -1,6 +1,6 @@
 package com.jakduk.service;
 
-import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.JakdukUserDetail;
 import com.jakduk.authentication.common.SocialUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.model.db.Sequence;
@@ -218,7 +218,7 @@ public class CommonService {
 	 * @return 이메일 기반이면 true, 아니면 false
      */
 	public boolean isJakdukUser() {
-		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal;
+		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail;
 	}
 
 	/**
@@ -326,8 +326,8 @@ public class CommonService {
 						.providerId(userDetail.getProviderId())
 						.roles(roles)
 						.build();
-			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukPrincipal) {
-				JakdukPrincipal principal = (JakdukPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			} else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail) {
+				JakdukUserDetail principal = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 				Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 				List<String> roles = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.jakduk.configuration.authentication;
 
-import com.jakduk.authentication.common.JakdukPrincipal;
+import com.jakduk.authentication.common.JakdukUserDetail;
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.CommonRole;
 import com.jakduk.exception.FindUserButNotJakdukAccount;
@@ -19,11 +19,10 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
-@Service
 @Slf4j
+@Service
 public class JakdukDetailsService implements UserDetailsManager {
 	
 	@Autowired
@@ -50,15 +49,15 @@ public class JakdukDetailsService implements UserDetailsManager {
 			boolean credentialsNonExpired = true;
 			boolean accountNonLocked = true;
 
-			JakdukPrincipal jakdukPrincipal = new JakdukPrincipal(user.getEmail(), user.getId()
+			JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(user.getEmail(), user.getId()
 					, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
 					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 
 			if (log.isInfoEnabled()) {
-				log.info("load Jakduk username=" + jakdukPrincipal.getUsername());
+				log.info("load Jakduk username=" + jakdukUserDetail.getUsername());
 			}
 
-			return jakdukPrincipal;
+			return jakdukUserDetail;
 		}
 	}
 	

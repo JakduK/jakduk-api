@@ -9,7 +9,7 @@ public class ApiConst {
     /**
      * 읽음 수의 쿠키 만료 시간(초)
      */
-    final static Integer VIEWS_COOKIE_EXPIRE_SECONDS = 30;
+    public final static Integer VIEWS_COOKIE_EXPIRE_SECONDS = 30;
 
     /**
      * 읽음 중복 방지를 위한 쿠키

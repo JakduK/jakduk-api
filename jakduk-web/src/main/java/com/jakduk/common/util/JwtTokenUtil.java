@@ -1,10 +1,8 @@
-package com.jakduk.configuration.authentication;
+package com.jakduk.common.util;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.jakduk.authentication.common.CommonPrincipal;
+import com.jakduk.common.CommonConst;
+import com.jakduk.common.vo.AttemptSocialUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,9 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
-import com.jakduk.authentication.common.CommonPrincipal;
-import com.jakduk.authentication.common.JakdukPrincipal;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -70,31 +71,31 @@ public class JwtTokenUtil implements Serializable {
         return audience;
     }
 
-    public Map<String, Object> getAttemptedFromToken(String token) {
-        Map<String, Object> attempted = new HashMap<>();
+    public AttemptSocialUser getAttemptedFromToken(String token) {
+
+        AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
+
         try {
             final Claims claims = getClaimsFromToken(token);
 
             if (claims.containsKey("email"))
-                attempted.put("email", claims.get("email", String.class));
+                attemptSocialUser.setEmail(claims.get("email", String.class));
 
             if (claims.containsKey("username"))
-                attempted.put("username", claims.get("username", String.class));
+                attemptSocialUser.setUsername(claims.get("username", String.class));
 
-            if (claims.containsKey("id"))
-                attempted.put("id", claims.get("id", String.class));
+            if (claims.containsKey("providerId")) {
+                String temp =claims.get("providerId", String.class);
+                attemptSocialUser.setProviderId(CommonConst.ACCOUNT_TYPE.valueOf(temp));
+            }
 
-            if (claims.containsKey("about"))
-                attempted.put("about", claims.get("about", String.class));
-
-            if (claims.containsKey("footballClub"))
-                attempted.put("footballClub", claims.get("footballClub", String.class));
+            if (claims.containsKey("providerUserId"))
+                attemptSocialUser.setProviderUserId(claims.get("providerUserId", String.class));
 
         } catch (Exception ignored) {
-
         }
 
-        return attempted;
+        return attemptSocialUser;
     }
 
     private Claims getClaimsFromToken(String token) {
@@ -120,11 +121,11 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private String generateAudience(Device device) {
-        String audience = this.AUDIENCE_UNKNOWN;
+        String audience = AUDIENCE_UNKNOWN;
 
         try {
             if (device.isNormal()) {
-                audience = this.AUDIENCE_WEB;
+                audience = AUDIENCE_WEB;
             } else if (device.isTablet()) {
                 audience = AUDIENCE_TABLET;
             } else if (device.isMobile()) {
@@ -139,6 +140,7 @@ public class JwtTokenUtil implements Serializable {
 
     private Boolean ignoreTokenExpiration(String token) {
         String audience = getAudienceFromToken(token);
+
         return (AUDIENCE_TABLET.equals(audience) || AUDIENCE_MOBILE.equals(audience));
     }
 
@@ -154,12 +156,14 @@ public class JwtTokenUtil implements Serializable {
         return generateToken(claims, generateExpirationDate());
     }
 
-    public String generateAttemptedToken(Map<String, Object> claims) {
+    public String generateAttemptedToken(AttemptSocialUser attemptSocialUser) {
 
-        return generateToken(claims, new Date(System.currentTimeMillis() + 600 * 1000));
+        return generateToken(convertAttemptedSocialUserToMap(attemptSocialUser),
+                new Date(System.currentTimeMillis() + 600 * 1000));
     }
 
     private String generateToken(Map<String, Object> claims, Date expirationDate) {
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(expirationDate)
@@ -182,10 +186,32 @@ public class JwtTokenUtil implements Serializable {
         return refreshedToken;
     }
 
-    public Boolean isValidateTokenJakdukUser(String token, UserDetails userDetails) {
-        JakdukPrincipal user = (JakdukPrincipal) userDetails;
+    public Boolean isValidateToken(String token, UserDetails userDetails) {
         final String username = this.getUsernameFromToken(token);
 
-        return (username.equals(user.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public Boolean isValidateToken(String token) {
+
+        return ! isTokenExpired(token);
+    }
+
+    private Map<String, Object> convertAttemptedSocialUserToMap(AttemptSocialUser attemptSocialUser) {
+        Map<String, Object> attempted = new HashMap<>();
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getEmail()))
+            attempted.put("email", attemptSocialUser.getEmail());
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getUsername()))
+            attempted.put("username", attemptSocialUser.getUsername());
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getProviderId()))
+            attempted.put("providerId", attemptSocialUser.getProviderId());
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getProviderUserId()))
+            attempted.put("providerUserId", attemptSocialUser.getProviderUserId());
+
+        return attempted;
     }
 }

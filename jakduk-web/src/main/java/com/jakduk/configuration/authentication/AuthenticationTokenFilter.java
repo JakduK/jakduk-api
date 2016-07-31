@@ -1,11 +1,11 @@
 package com.jakduk.configuration.authentication;
 
+import com.jakduk.common.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.GenericFilterBean;
@@ -26,7 +26,10 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
   private JwtTokenUtil jwtTokenUtil;
 
   @Autowired
-  private UserDetailsService userDetailsService;
+  private JakdukDetailsService jakdukDetailsService;
+
+  @Autowired
+  private SocialDetailService socialDetailService;
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -36,9 +39,9 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
     String username = jwtTokenUtil.getUsernameFromToken(authToken);
 
     if (! ObjectUtils.isEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+      UserDetails userDetails = jakdukDetailsService.loadUserByUsername(username);
 
-      if (jwtTokenUtil.isValidateTokenJakdukUser(authToken, userDetails)) {
+      if (jwtTokenUtil.isValidateToken(authToken, userDetails)) {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, userDetails.getPassword(), userDetails.getAuthorities());
 

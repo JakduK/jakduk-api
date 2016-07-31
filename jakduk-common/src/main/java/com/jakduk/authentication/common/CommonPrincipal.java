@@ -1,14 +1,8 @@
 package com.jakduk.authentication.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.jakduk.common.CommonConst;
-import com.jakduk.service.CommonService;
+import com.jakduk.model.db.User;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -31,11 +25,11 @@ public class CommonPrincipal {
 	
 	private CommonConst.ACCOUNT_TYPE providerId;
 
-	public CommonPrincipal(JakdukPrincipal jakdukPrincipal) {
-		this.id = jakdukPrincipal.getId();
-		this.email = jakdukPrincipal.getUsername();
-		this.username = jakdukPrincipal.getNickname();
-		this.providerId = jakdukPrincipal.getProviderId();
+	public CommonPrincipal(JakdukUserDetail jakdukUserDetail) {
+		this.id = jakdukUserDetail.getId();
+		this.email = jakdukUserDetail.getUsername();
+		this.username = jakdukUserDetail.getNickname();
+		this.providerId = jakdukUserDetail.getProviderId();
 	}
 
 	public CommonPrincipal(SocialUserDetail socialUserDetail) {
@@ -43,5 +37,12 @@ public class CommonPrincipal {
 		this.email = socialUserDetail.getUserId();
 		this.username = socialUserDetail.getUsername();
 		this.providerId = socialUserDetail.getProviderId();
+	}
+
+	public CommonPrincipal(User user) {
+		this.id = user.getId();
+		this.email = user.getEmail();
+		this.username = user.getUsername();
+		this.providerId = user.getProviderId();
 	}
 }

@@ -3,7 +3,9 @@ package com.jakduk.configuration;
 import com.jakduk.configuration.authentication.AuthenticationTokenFilter;
 import com.jakduk.configuration.authentication.JakdukDetailsService;
 import com.jakduk.configuration.authentication.SocialDetailService;
-import com.jakduk.configuration.authentication.handler.*;
+import com.jakduk.configuration.authentication.handler.RestAccessDeniedHandler;
+import com.jakduk.configuration.authentication.handler.RestAuthenticationEntryPoint;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,8 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.social.security.SocialUserDetailsService;
-import org.springframework.social.security.SpringSocialConfigurer;
 
 /**
  * @author pyohwan
@@ -27,6 +27,12 @@ import org.springframework.social.security.SpringSocialConfigurer;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private JakdukDetailsService jakdukDetailsService;
+
+    @Autowired
+    private SocialDetailService socialDetailService;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -41,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
 
                 // Custom JWT based security filter
-                .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
                     .authenticationEntryPoint(restAuthenticationEntryPoint())
@@ -84,20 +90,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
 //                .rememberMe().key("jakduk_cookie_key_auto_login")
 
-                .and()
-                .apply(new SpringSocialConfigurer())
+//                .and()
+//                .apply(new SpringSocialConfigurer())
 
                 // don't create session
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(jakdukDetailsService())
+                .userDetailsService(jakdukDetailsService)
                 .passwordEncoder(passwordEncoder());
+
+        auth.userDetailsService(socialDetailService);
     }
+
+
 
     @Bean
     @Override
@@ -106,13 +117,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
+    public AuthenticationTokenFilter authenticationTokenFilter() throws Exception {
         return new AuthenticationTokenFilter();
-    }
-
-    @Bean
-    public SocialUserDetailsService socialUsersDetailService() {
-        return new SocialDetailService();
     }
 
     @Bean
@@ -128,11 +134,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public RestAuthenticationEntryPoint restAuthenticationEntryPoint() {
         return new RestAuthenticationEntryPoint();
-    }
-
-    @Bean
-    public JakdukDetailsService jakdukDetailsService() {
-        return new JakdukDetailsService();
     }
 
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.common.CommonConst;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
-import org.springframework.social.security.SocialUserDetails;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -14,7 +14,7 @@ import java.util.*;
  * @author pyohwan
  * 16. 4. 8 오후 9:10
  */
-public class SocialUserDetail implements SocialUserDetails {
+public class SocialUserDetail implements UserDetails {
 
     private final String id;
     private final String userId;
@@ -75,7 +75,6 @@ public class SocialUserDetail implements SocialUserDetails {
         }
     }
 
-    @Override
     public String getUserId() {
         return userId;
     }

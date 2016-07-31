@@ -1,13 +1,14 @@
-package com.jakduk.common;
+package com.jakduk.common.util;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
+import com.jakduk.common.ApiConst;
+import org.springframework.security.web.util.UrlUtils;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.security.web.util.UrlUtils;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author pyohwan
