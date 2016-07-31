@@ -1,23 +1,27 @@
 package com.jakduk.service;
 
-import com.jakduk.common.CommonConst;
-import com.jakduk.dao.JakdukDAO;
-import com.jakduk.model.db.*;
-import com.jakduk.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.model.elasticsearch.CommentOnES;
-import com.jakduk.model.elasticsearch.GalleryOnES;
-import com.jakduk.model.embedded.JakduScheduleScore;
-import com.jakduk.model.embedded.LocalName;
-import com.jakduk.model.embedded.LocalSimpleName;
-import com.jakduk.model.web.AttendanceClubWrite;
-import com.jakduk.model.web.BoardCategoryWrite;
-import com.jakduk.model.web.CompetitionWrite;
-import com.jakduk.model.web.ThumbnailSizeWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.repository.*;
-import com.jakduk.repository.jakdu.JakduScheduleGroupRepository;
-import com.jakduk.repository.jakdu.JakduScheduleRepository;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import javax.imageio.ImageIO;
+
+import com.google.gson.Gson;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -33,27 +37,45 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.List;
+import com.jakduk.common.CommonConst;
+import com.jakduk.dao.JakdukDAO;
+import com.jakduk.model.db.AttendanceClub;
+import com.jakduk.model.db.AttendanceLeague;
+import com.jakduk.model.db.BoardCategory;
+import com.jakduk.model.db.Competition;
+import com.jakduk.model.db.Encyclopedia;
+import com.jakduk.model.db.FootballClub;
+import com.jakduk.model.db.FootballClubOrigin;
+import com.jakduk.model.db.Gallery;
+import com.jakduk.model.db.HomeDescription;
+import com.jakduk.model.db.JakduSchedule;
+import com.jakduk.model.db.JakduScheduleGroup;
+import com.jakduk.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.model.elasticsearch.CommentOnES;
+import com.jakduk.model.elasticsearch.GalleryOnES;
+import com.jakduk.model.embedded.JakduScheduleScore;
+import com.jakduk.model.embedded.LocalName;
+import com.jakduk.model.embedded.LocalSimpleName;
+import com.jakduk.model.web.AttendanceClubWrite;
+import com.jakduk.model.web.BoardCategoryWrite;
+import com.jakduk.model.web.CompetitionWrite;
+import com.jakduk.model.web.ThumbnailSizeWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.repository.AttendanceClubRepository;
+import com.jakduk.repository.AttendanceLeagueRepository;
+import com.jakduk.repository.BoardCategoryRepository;
+import com.jakduk.repository.CompetitionRepository;
+import com.jakduk.repository.EncyclopediaRepository;
+import com.jakduk.repository.FootballClubOriginRepository;
+import com.jakduk.repository.FootballClubRepository;
+import com.jakduk.repository.GalleryRepository;
+import com.jakduk.repository.HomeDescriptionRepository;
+import com.jakduk.repository.jakdu.JakduScheduleGroupRepository;
+import com.jakduk.repository.jakdu.JakduScheduleRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
- * @company  : http://jakduk.com
- * @date     : 2014. 5. 1.
- * @desc     :
  */
 
 @Service
@@ -248,69 +270,69 @@ public class AdminService {
 	}
 
 	public HashMap<String, Object> initSearchType() {
+		// 매핑 초기화.
+		Map<String, Object> source = new HashMap<>();
+		Map<String, Object> properties = new HashMap<>();
+		Map<String, Object> subject = new HashMap<>();
+		Map<String, Object> content = new HashMap<>();
+		subject.put("type", "string");
+		subject.put("analyzer", "korean");
+		content.put("type", "string");
+		content.put("analyzer", "korean");
+		properties.put("subject", subject);
+		properties.put("content", content);
+		source.put("properties", properties);
+		PutMapping putMapping1 = new PutMapping.Builder(
+			elasticsearchIndexName,
+			CommonConst.ELASTICSEARCH_TYPE_BOARD,
+			new Gson().toJson(source)
+		).build();
+
+		// 매핑 초기화.
+		properties = new HashMap<>();
+		source = new HashMap<>();
+		content = new HashMap<>();
+		content.put("type", "string");
+		content.put("analyzer", "korean");
+		properties.put("content", content);
+		source.put("properties", properties);
+		PutMapping putMapping2 = new PutMapping.Builder(
+			elasticsearchIndexName,
+			CommonConst.ELASTICSEARCH_TYPE_COMMENT,
+			new Gson().toJson(source)
+		).build();
+
+		// 매핑 초기화.
+		properties = new HashMap<>();
+		source = new HashMap<>();
+		content = new HashMap<>();
+		content.put("type", "string");
+		content.put("analyzer", "korean");
+		properties.put("name", content);
+		source.put("properties", properties);
+		PutMapping putMapping3 = new PutMapping.Builder(
+			elasticsearchIndexName,
+			CommonConst.ELASTICSEARCH_TYPE_GALLERY,
+			new Gson().toJson(source)
+		).build();
 
 		HashMap<String, Object> result = new HashMap<>();
 
-		// 매핑 초기화.
-		PutMapping putMapping1 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_BOARD,
-				"{ \"properties\" : { \"subject\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"}"
-						+ ", \"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} }"
-						+ "}"
-		).build();
-
 		try {
-			JestResult jestResult = jestClient.execute(putMapping1);
-
-			if (!jestResult.isSucceeded()) {
-				log.debug(jestResult.getErrorMessage());
+			JestResult jestResult1 = jestClient.execute(putMapping1);
+			JestResult jestResult2 = jestClient.execute(putMapping2);
+			JestResult jestResult3 = jestClient.execute(putMapping3);
+			if (!jestResult1.isSucceeded()) {
+				log.debug(jestResult1.getErrorMessage());
+			}
+			if (!jestResult2.isSucceeded()) {
+				log.debug(jestResult2.getErrorMessage());
+			}
+			if (!jestResult3.isSucceeded()) {
+				log.debug(jestResult3.getErrorMessage());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// 매핑 초기화.
-		PutMapping putMapping2 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_COMMENT,
-				"{ \"properties\" : { " +
-						"\"content\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} " +
-						"}" +
-						"}"
-		).build();
-
-		try {
-			JestResult jestResult = jestClient.execute(putMapping2);
-
-			if (!jestResult.isSucceeded()) {
-				log.debug(jestResult.getErrorMessage());
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// 매핑 초기화.
-		PutMapping putMapping3 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_GALLERY,
-				"{ \"properties\" : { " +
-						"\"name\" : {\"type\" : \"string\", \"analyzer\" : \"korean\"} " +
-						"}" +
-						"}"
-		).build();
-
-		try {
-			JestResult jestResult = jestClient.execute(putMapping3);
-
-			if (!jestResult.isSucceeded()) {
-				log.debug(jestResult.getErrorMessage());
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 
 		return result;
@@ -322,7 +344,7 @@ public class AdminService {
 
 		// 게시물을 엘라스틱 서치에 모두 넣기.
 		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
-		BoardFreeOnES lastPost = posts.get(posts.size() - 1);
+		BoardFreeOnES lastPost = posts.size() > 0 ? posts.get(posts.size() - 1) : null;
 
 		while (posts.size() > 0) {
 			List<Index> idxList = new ArrayList<>();
@@ -339,24 +361,24 @@ public class AdminService {
 
 			try {
 				JestResult jestResult = jestClient.execute(bulk);
-
 				if (!jestResult.isSucceeded()) {
 					log.debug(jestResult.getErrorMessage());
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.warn(e.getMessage(), e);
 			}
 
-			posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
-			if (posts.size() > 0) {
-				lastPost = posts.get(posts.size() - 1);
+			if (Objects.nonNull(lastPost)) {
+				posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
+				if (posts.size() > 0) {
+					lastPost = posts.get(posts.size() - 1);
+				}
 			}
 		}
 
 		// 게시물을 엘라스틱 서치에 모두 넣기.
 		List<CommentOnES> comments = jakdukDAO.getCommentOnES(null);
-		CommentOnES lastComment = comments.get(comments.size() - 1);
+		CommentOnES lastComment = comments.size() > 0 ? comments.get(comments.size() - 1) : null;
 
 		while (comments.size() > 0) {
 			List<Index> idxList = new ArrayList<>();
@@ -373,24 +395,24 @@ public class AdminService {
 
 			try {
 				JestResult jestResult = jestClient.execute(bulk);
-
 				if (!jestResult.isSucceeded()) {
 					log.debug(jestResult.getErrorMessage());
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.warn(e.getMessage(), e);
 			}
 
-			comments = jakdukDAO.getCommentOnES(new ObjectId(lastComment.getId()));
-			if (comments.size() > 0) {
-				lastComment = comments.get(comments.size() - 1);
+			if (Objects.nonNull(lastComment)) {
+				comments = jakdukDAO.getCommentOnES(new ObjectId(lastComment.getId()));
+				if (comments.size() > 0) {
+					lastComment = comments.get(comments.size() - 1);
+				}
 			}
 		}
 
 		// 사진첩을 엘라스틱 서치에 모두 넣기.
 		List<GalleryOnES> galleries = jakdukDAO.getGalleryOnES(null);
-		GalleryOnES lastGallery = galleries.get(galleries.size() - 1);
+		GalleryOnES lastGallery = galleries.size() > 0 ? galleries.get(galleries.size() - 1) : null;
 
 		while (galleries.size() > 0) {
 			List<Index> idxList = new ArrayList<>();
@@ -407,18 +429,18 @@ public class AdminService {
 
 			try {
 				JestResult jestResult = jestClient.execute(bulk);
-
 				if (!jestResult.isSucceeded()) {
 					log.debug(jestResult.getErrorMessage());
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.warn(e.getMessage(), e);
 			}
 
-			galleries = jakdukDAO.getGalleryOnES(new ObjectId(lastGallery.getId()));
-			if (galleries.size() > 0) {
-				lastGallery = galleries.get(galleries.size() - 1);
+			if (Objects.nonNull(lastGallery)) {
+				galleries = jakdukDAO.getGalleryOnES(new ObjectId(lastGallery.getId()));
+				if (galleries.size() > 0) {
+					lastGallery = galleries.get(galleries.size() - 1);
+				}
 			}
 		}
 
@@ -524,7 +546,7 @@ public class AdminService {
 			String formatName = "jpg";
 			
 			String splitContentType[] = gallery.getContentType().split("/");
-			if (splitContentType != null && !splitContentType[1].equals("octet-stream")) {
+			if (!splitContentType[1].equals("octet-stream")) {
 				formatName = splitContentType[1];
 			}
 			
@@ -550,8 +572,7 @@ public class AdminService {
 					
 					in.close();					
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.warn(e.getMessage(), e);
 				}
 			}				
 		}

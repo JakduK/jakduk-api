@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
@@ -73,7 +74,10 @@ public class SearchService {
 		
 		if (w != null && !w.isEmpty()) {
 			if (w.contains("PO")) {
-				data.put("posts", this.searchDocumentBoard(q, from, size));
+				SearchResult result = this.searchDocumentBoard(q, from, size);
+				if (result.isSucceeded()) {
+					data.put("posts", result.getJsonString());
+				}
 			}
 
 			if (w.contains("CO")) {
@@ -86,10 +90,9 @@ public class SearchService {
 						String id = hit.source.getBoardItem().getId();
 						ids.add(new ObjectId(id));
 					});
+					data.put("comments", result.getJsonString());
+					data.put("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
 				}
-
-				data.put("comments", result.getJsonString());
-				data.put("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
 			}
 
 			if (w.contains("GA")) {
@@ -100,53 +103,63 @@ public class SearchService {
 				}
 				
 				SearchResult result = this.searchDocumentGallery(q, from, tempSize);
-				data.put("galleries", result.getJsonString());
+				if (result.isSucceeded()) {
+					data.put("galleries", result.getJsonString());
+				}
 			}
 		}
 
 		return data;
 	}
 	
-	public String searchDocumentBoard(String q, int from, int size) {
-		
-		String query = "{\n" +
-				//"\"fields\" : [\"seq\", \"writer.type\", \"writer.userId\", \"writer.username\", \"subject\", \"contentPreview\"]," +
-				"\"from\" : " + from + "," + 
-				"\"size\" : " + size + "," + 
-				"\"_source\" : { \"exclude\" : \"content\"}, " +
-				"\"query\": {" +
-				"\"multi_match\" : {" +
-				"\"fields\" : [\"subject\", \"content\"]," +
-				"\"query\" : \"" + q + "\"" + 
-				"}" +
-				"}, " +
-				"\"highlight\" : {" +
-				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
-				"\"post_tags\" : [\"</span>\"]," +
-				"\"fields\" : { \"subject\" : {}, \"content\" : {}" +
-				"}" + 
-				"}," +
-				"\"script_fields\" : {" +
-				"\"content_preview\" : {" +
-				"\"script\" : \"_source.content.length() > " + CommonConst.SEARCH_CONTENT_MAX_LENGTH + 
-				"? _source.content.substring(0," + CommonConst.SEARCH_CONTENT_MAX_LENGTH + ") : _source.content\"" +
-				"}" +
-				"}" +				
-				"}";
+	public SearchResult searchDocumentBoard(String q, int from, int size) {
+		Map<String, Object> query = new HashMap<>();
+		Map<String, Object> querySource = new HashMap<>();
+		Map<String, Object> queryQuery = new HashMap<>();
+		Map<String, Object> queryQueryMultiMatch = new HashMap<>();
+		Map<String, Object> queryHighlight = new HashMap<>();
+		Map<String, Object> queryHighlightFields = new HashMap<>();
+		Map<String, Object> queryScriptFields = new HashMap<>();
+		Map<String, Object> queryScriptFieldsContentPreview = new HashMap<>();
 
-//		logger.debug("query=" + query);
+		querySource.put("exclude", "content");
 
-		Search search = new Search.Builder(query)
+		queryQueryMultiMatch.put("fields", new Object[]{"subject", "content"});
+		queryQueryMultiMatch.put("query", q);
+		queryQuery.put("multi_match", queryQueryMultiMatch);
+
+		queryHighlightFields.put("subject", new HashMap<>());
+		queryHighlightFields.put("content", new HashMap<>());
+		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
+		queryHighlight.put("post_tags", new Object[]{"</span>"});
+		queryHighlight.put("fields", queryHighlightFields);
+
+		queryScriptFieldsContentPreview.put("script",
+			String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
+				CommonConst.SEARCH_CONTENT_MAX_LENGTH,
+				CommonConst.SEARCH_CONTENT_MAX_LENGTH
+			)
+		);
+		queryScriptFields.put("content_preview", queryScriptFieldsContentPreview);
+
+		query.put("from", from);
+		query.put("size", size);
+		query.put("_source", querySource);
+		query.put("query", queryQuery);
+		query.put("highlight", queryHighlight);
+		query.put("script_fields", queryScriptFields);
+
+		Search search = new Search.Builder(new Gson().toJson(query))
 				.addIndex(elasticsearchIndexName)
 				.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
 				.build();
 		
 		try {
-			return jestClient.execute(search).getJsonObject().toString();
+			return jestClient.execute(search);
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}
-		return "";
+		return null;
 	}
 	
 	public void createDocumentBoard(BoardFreeOnES boardFreeOnEs) {
@@ -185,29 +198,29 @@ public class SearchService {
 	}
 	
 	public SearchResult searchDocumentComment(String q, int from, int size) {
-		
-		String query = "{\n" +
-				"\"from\" : " + from + "," + 
-				"\"size\" : " + size + "," + 
-				"\"query\": {" +
-				"\"match\" : {" +
-				"\"content\" : \"" + q + "\"" + 
-				"}" +
-				"}, " +
-				"\"highlight\" : {" +
-				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
-				"\"post_tags\" : [\"</span>\"]," +
-				"\"fields\" : {\"content\" : {}" +
-				"}" + 
-				"}" +
-				"}";
+		Map<String, Object> query = new HashMap<>();
+		Map<String, Object> queryQuery = new HashMap<>();
+		Map<String, Object> queryQueryMatch = new HashMap<>();
+		Map<String, Object> queryHighlight = new HashMap<>();
+		Map<String, Object> queryHighlightFields = new HashMap<>();
 
-//		logger.debug("query=" + query);
+		queryQueryMatch.put("content", q);
+		queryQuery.put("match", queryQueryMatch);
 
-		Search search = new Search.Builder(query)
-				.addIndex(elasticsearchIndexName)
-				.addType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
-				.build();
+		queryHighlightFields.put("content", new HashMap<>());
+		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
+		queryHighlight.put("post_tags", new Object[]{"</span>"});
+		queryHighlight.put("fields", queryHighlightFields);
+
+		query.put("from", from);
+		query.put("size", size);
+		query.put("query", queryQuery);
+		query.put("highlight", queryHighlight);
+
+		Search search = new Search.Builder(new Gson().toJson(query))
+			.addIndex(elasticsearchIndexName)
+			.addType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+			.build();
 		
 		try {
 			return jestClient.execute(search);
@@ -277,26 +290,29 @@ public class SearchService {
 	}
 
 	public SearchResult searchDocumentGallery(String q, int from, int size) {
-		String query = "{\n" +
-				"\"from\" : " + from + "," + 
-				"\"size\" : " + size + "," + 
-				"\"query\": {" +
-				"\"match\" : {" +
-				"\"name\" : \"" + q + "\"" + 
-				"}" +
-				"}, " +
-				"\"highlight\" : {" +
-				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
-				"\"post_tags\" : [\"</span>\"]," +
-				"\"fields\" : {\"name\" : {}" +
-				"}" + 
-				"}" +
-				"}";
+		Map<String, Object> query = new HashMap<>();
+		Map<String, Object> queryQuery = new HashMap<>();
+		Map<String, Object> queryQueryMatch = new HashMap<>();
+		Map<String, Object> queryHighlight = new HashMap<>();
+		Map<String, Object> queryHighlightFields = new HashMap<>();
 
-		Search search = new Search.Builder(query)
-				.addIndex(elasticsearchIndexName)
-				.addType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
-				.build();
+		queryQueryMatch.put("name", q);
+		queryQuery.put("match", queryQueryMatch);
+
+		queryHighlightFields.put("name", new HashMap<>());
+		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
+		queryHighlight.put("post_tags", new Object[]{"</span>"});
+		queryHighlight.put("fields", queryHighlightFields);
+
+		query.put("from", from);
+		query.put("size", size);
+		query.put("query", queryQuery);
+		query.put("highlight", queryHighlight);
+
+		Search search = new Search.Builder(new Gson().toJson(query))
+			.addIndex(elasticsearchIndexName)
+			.addType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+			.build();
 		
 		try {
 			return jestClient.execute(search);
