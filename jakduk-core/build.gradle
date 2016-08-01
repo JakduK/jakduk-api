@@ -1,0 +1,7 @@
+
+description = 'jakduk-core'
+
+dependencies {
+    // service에 HttpServlceRequest등 과같은 것이 없어질때 이것도 없애자.
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.1.0'
+}
