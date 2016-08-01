@@ -7,6 +7,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +19,9 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import com.jakduk.common.CommonConst;
 import com.jakduk.common.util.JwtTokenUtil;
+import com.jakduk.exception.NotFoundJakdukAccountException;
 
+@Slf4j
 public class AuthenticationTokenFilter extends GenericFilterBean {
 
   @Value("${jwt.token.header}")
@@ -42,20 +45,24 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
     String providerId = jwtTokenUtil.getProviderIdFromToken(authToken);
 
     if (! ObjectUtils.isEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails;
-      if (CommonConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
-        userDetails = jakdukDetailsService.loadUserByUsername(username);
-      } else {
-        userDetails = socialDetailService.loadUserByUsername(username);
-      }
+    	try {
+		    UserDetails userDetails;
+		    if (CommonConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
+			    userDetails = jakdukDetailsService.loadUserByUsername(username);
+		    } else {
+			    userDetails = socialDetailService.loadUserByUsername(username);
+		    }
 
-      if (jwtTokenUtil.isValidateToken(authToken, userDetails)) {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+		    if (jwtTokenUtil.isValidateToken(authToken, userDetails)) {
+			    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+				    userDetails, userDetails.getPassword(), userDetails.getAuthorities());
 
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-      }
+			    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+			    SecurityContextHolder.getContext().setAuthentication(authentication);
+		    }
+	    } catch (NotFoundJakdukAccountException e) {
+				log.info(e.getMessage(), e);
+	    }
     }
 
     chain.doFilter(request, response);
