@@ -1,0 +1,31 @@
+package com.jakduk.core.model.db;
+
+import com.jakduk.core.model.embedded.CommonWriter;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+
+/**
+ * @author pyohwan
+ * 16. 1. 2 오후 11:07
+ */
+
+@Data
+public class Jakdu {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private String id;
+
+    private CommonWriter writer;
+
+    @DBRef
+    private JakduSchedule schedule;
+
+    private int homeScore;
+
+    private int awayScore;
+}
