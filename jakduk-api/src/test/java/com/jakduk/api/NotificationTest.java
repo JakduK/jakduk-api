@@ -1,8 +1,8 @@
 package com.jakduk.api;
 
-import com.jakduk.api.notification.EmailService;
-import com.jakduk.api.notification.SlackService;
 import com.jakduk.api.util.AbstractSpringTest;
+import com.jakduk.core.notification.EmailService;
+import com.jakduk.core.notification.SlackService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

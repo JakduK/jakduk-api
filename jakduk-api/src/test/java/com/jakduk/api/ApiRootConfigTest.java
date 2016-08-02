@@ -4,7 +4,8 @@ import com.jakduk.api.util.AbstractSpringTest;
 import org.junit.Test;
 
 /**
- * Created by pyohwan on 16. 4. 2.
+ * @author pyohwan
+ * 16. 4. 2 오후 11:56
  */
 
 public class ApiRootConfigTest extends AbstractSpringTest {

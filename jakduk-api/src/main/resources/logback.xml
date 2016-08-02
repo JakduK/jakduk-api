@@ -129,7 +129,7 @@
     -->
     <logger name="org.mongodb.driver.cluster" level="INFO"/>
 
-    <logger name="com.jakduk.controller.user" level="DEBUG">
+    <logger name="com.jakduk.api.restcontroller.user" level="DEBUG">
         <appender-ref ref="userDailyRollingFile" />
     </logger>
 

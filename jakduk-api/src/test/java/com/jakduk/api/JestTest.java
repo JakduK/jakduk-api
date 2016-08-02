@@ -1,14 +1,14 @@
 package com.jakduk.api;
 
 import com.google.gson.JsonObject;
-import com.jakduk.api.common.CommonConst;
-import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.Article;
-import com.jakduk.api.service.SearchService;
-import com.jakduk.api.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.api.model.elasticsearch.CommentOnES;
-import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.util.AbstractSpringTest;
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.core.model.elasticsearch.CommentOnES;
+import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.service.SearchService;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.*;

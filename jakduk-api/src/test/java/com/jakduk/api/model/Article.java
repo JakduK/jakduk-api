@@ -1,7 +1,6 @@
 package com.jakduk.api.model;
 
-import com.jakduk.api.model.embedded.CommonWriter;
-
+import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;
 
 /**

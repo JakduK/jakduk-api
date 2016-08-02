@@ -1,8 +1,7 @@
 package com.jakduk.api;
 
-import com.jakduk.api.service.CommonService;
 import com.jakduk.api.util.AbstractSpringTest;
-import org.junit.Assert;
+import com.jakduk.core.service.CommonService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,16 +18,6 @@ public class CommonTest extends AbstractSpringTest {
 	@Autowired
 	private Environment environment;
 	
-	@Test
-	public void urlTest() {
-
-		Assert.assertTrue(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/about/intro"));
-		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/login"));
-		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/board/free/write"));
-		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/password/reset"));
-		Assert.assertFalse(commonService.isRedirectUrl("http://localhost:8080/jakduk-web/password/find?lang=ko_kr"));
-	}
-
 	@Test
 	public void environmentTest() {
 		System.out.println(storageTempPath);

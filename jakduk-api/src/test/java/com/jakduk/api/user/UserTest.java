@@ -1,21 +1,21 @@
 package com.jakduk.api.user;
 
-import com.jakduk.api.common.CommonConst;
-import com.jakduk.api.common.CommonRole;
-import com.jakduk.api.dao.JakdukDAO;
-import com.jakduk.api.model.db.User;
-import com.jakduk.api.model.etc.SupporterCount;
-import com.jakduk.api.model.simple.UserProfile;
-import com.jakduk.api.repository.FootballClubRepository;
-import com.jakduk.api.repository.user.UserProfileRepository;
-import com.jakduk.api.repository.user.UserRepository;
 import com.jakduk.api.util.AbstractSpringTest;
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CommonRole;
+import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.model.db.User;
+import com.jakduk.core.model.etc.SupporterCount;
+import com.jakduk.core.model.simple.UserProfile;
+import com.jakduk.core.repository.FootballClubRepository;
+import com.jakduk.core.repository.user.UserProfileRepository;
+import com.jakduk.core.repository.user.UserRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +43,7 @@ public class UserTest extends AbstractSpringTest {
 	private JakdukDAO jakdukDAO;
 
 	@Autowired
-	private StandardPasswordEncoder encoder;
+	private PasswordEncoder encoder;
 
 	@Autowired
 	private Environment environment;

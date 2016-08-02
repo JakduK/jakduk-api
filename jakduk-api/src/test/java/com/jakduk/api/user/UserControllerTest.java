@@ -16,7 +16,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Created by pyohwan on 16. 6. 30.
+ * @author pyohwan
+ * 16. 6. 30 오후 11:55
  */
 
 @RunWith(MockitoJUnitRunner.class)

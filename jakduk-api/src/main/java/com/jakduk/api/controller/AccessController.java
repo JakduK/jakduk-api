@@ -80,21 +80,6 @@ public class AccessController {
 		return "redirect:/user/social";
 	}
 
-	@RequestMapping(value = "/logout/success", method = RequestMethod.GET)
-	public String logoutSuccess(HttpServletRequest request) {
-		
-		String redirctUrl = "/";
-		String refererUrl = request.getHeader("REFERER");
-		
-		if (refererUrl != null) {
-			if (commonService.isRedirectUrl(refererUrl)) {
-				redirctUrl = refererUrl;
-			}
-		}
-		
-		return "redirect:" + redirctUrl;
-	}
-	
 	@RequestMapping(value = "/denied")
 	public String denied() {
 		return "access/denied";

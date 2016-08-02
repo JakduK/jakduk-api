@@ -1,5 +1,1 @@
 build/
-target/
-/src/main/resources/config/application-production.properties
-/src/main/webapp/resources/bower_components
-/src/main/webapp/resources/summernote

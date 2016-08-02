@@ -52,9 +52,6 @@ public class CommonService {
 	@Autowired
 	private TokenRepository tokenRepository;
 
-	@Value("${deny.redirect.url}")
-	private String denyRedirectUrl;
-
 	/**
 	 * 차기 SEQUENCE를 가져온다.
 	 * @param name 게시판 ID
@@ -229,21 +226,6 @@ public class CommonService {
 		return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail;
 	}
 
-	public Boolean isRedirectUrl(String url) {
-		Boolean result = true;
-		
-		String[] deny = denyRedirectUrl.split(",");
-		
-		for(int idx = 0 ; idx < deny.length ; idx++) {
-			if (url.contains(deny[idx])) {
-				result = false;
-				break;
-			}	
-		}
-		
-		return result;
-	}
-	
 	// 숫자인지 체크
 	public boolean isNumeric(String str) {
 
