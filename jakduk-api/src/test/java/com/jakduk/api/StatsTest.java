@@ -1,10 +1,10 @@
 package com.jakduk.api;
 
-import com.jakduk.api.dao.JakdukDAO;
-import com.jakduk.api.model.db.AttendanceClub;
-import com.jakduk.api.model.etc.SupporterCount;
-import com.jakduk.api.repository.AttendanceClubRepository;
 import com.jakduk.api.util.AbstractSpringTest;
+import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.model.db.AttendanceClub;
+import com.jakduk.core.model.etc.SupporterCount;
+import com.jakduk.core.repository.AttendanceClubRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

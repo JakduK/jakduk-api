@@ -29,7 +29,7 @@ import java.util.List;
  */
 
 @Slf4j
-@ControllerAdvice(value = "com.jakduk.restcontroller")
+@ControllerAdvice(value = "com.jakduk.api.restcontroller")
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**

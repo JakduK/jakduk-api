@@ -1,12 +1,12 @@
 package com.jakduk.api;
 
-import com.jakduk.api.dao.JakdukDAO;
-import com.jakduk.api.model.db.Competition;
-import com.jakduk.api.model.db.JakduComment;
-import com.jakduk.api.model.db.JakduSchedule;
-import com.jakduk.api.repository.jakdu.JakduRepository;
-import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
 import com.jakduk.api.util.AbstractSpringTest;
+import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.model.db.Competition;
+import com.jakduk.core.model.db.JakduComment;
+import com.jakduk.core.model.db.JakduSchedule;
+import com.jakduk.core.repository.jakdu.JakduRepository;
+import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by pyohwan on 15. 12. 27.
+ * @author pyohwan
+ * 15. 12. 27 오후 11:57
  */
 
 public class JakduTest extends AbstractSpringTest {
