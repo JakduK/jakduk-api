@@ -1,4 +1,4 @@
-package com.jakduk.api;
+package com.jakduk.api.common;
 
 import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.service.CommonService;

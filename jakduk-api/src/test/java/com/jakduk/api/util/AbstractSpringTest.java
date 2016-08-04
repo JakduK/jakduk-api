@@ -8,7 +8,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
- * Created by pyohwan on 16. 6. 15.
+ * @author pyohwan
+ * 16. 6. 15 오후 9:31
  */
 
 @Ignore
