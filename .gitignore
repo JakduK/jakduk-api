@@ -1,18 +1,13 @@
 # Java and Eclipse
 *.class
-target/
 build/
 classes/
-out/
 .idea/
 .classpath
 .settings
 .project
 .gradle
 *.iml
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
 
 # Package Files #
 *.war
