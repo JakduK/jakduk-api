@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -481,16 +482,13 @@ public class AdminService {
 		return model;
 	}
 
-	public Model getAttendanceClubList(Model model) {
+	public List<AttendanceClub> getAttendanceClubList() {
 		
 		List<AttendanceClub> attendanceClubs;
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-		
+		Sort sort = new Sort(Sort.Direction.ASC, Collections.singletonList("_id"));
 		attendanceClubs = attendanceClubRepository.findAll(sort);
 		
-		model.addAttribute("attendanceClubs", attendanceClubs);
-		
-		return model;
+		return attendanceClubs;
 	}
 
 	public Model getBoardCategory(Model model, String id) {
@@ -633,36 +631,30 @@ public class AdminService {
 		model.addAttribute("attendanceClubWrite", new AttendanceClubWrite());
 	}
 	
-	public void getAttendanceClubWrite(Model model, String id) {
+	public Map<String, Object> getAttendanceClubWrite(String id) {
+		Map<String, Object> data = new HashMap<>();
+
 		AttendanceClub attendanceClub = attendanceClubRepository.findOne(id);
 		log.debug("attendanceClub=" + attendanceClub);
-		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 		
 		AttendanceClubWrite attendanceClubWrite = new AttendanceClubWrite();
 		attendanceClubWrite.setId(attendanceClub.getId());
 		attendanceClubWrite.setOrigin(attendanceClub.getClub().getId());
+		attendanceClubWrite.setLeague(attendanceClub.getLeague());;
 		attendanceClubWrite.setSeason(attendanceClub.getSeason());
 		attendanceClubWrite.setGames(attendanceClub.getGames());
 		attendanceClubWrite.setTotal(attendanceClub.getTotal());
 		attendanceClubWrite.setAverage(attendanceClub.getAverage());
-		
-		model.addAttribute("footballClubs", footballClubs);
-		model.addAttribute("attendanceClubWrite", attendanceClubWrite);
+
+		data.put("attendanceClubWrite", attendanceClubWrite);
+		return data;
 	}	
 	
-	public void attendanceClubWrite(AttendanceClubWrite attendanceClubWrite) {
-		AttendanceClub attendanceClub = new AttendanceClub();
-		
+	public void attendanceClubWrite(String id, AttendanceClubWrite attendanceClubWrite) {
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOne(attendanceClubWrite.getOrigin());
-		
+
+		AttendanceClub attendanceClub = Objects.isNull(id) ? new AttendanceClub() : attendanceClubRepository.findOne(id);
 		attendanceClub.setClub(footballClubOrigin);
-		
-		if (attendanceClubWrite.getId().isEmpty()) {
-			attendanceClub.setId(null);
-		} else {
-			attendanceClub.setId(attendanceClubWrite.getId());
-		}
-		
 		attendanceClub.setSeason(attendanceClubWrite.getSeason());
 		attendanceClub.setLeague(attendanceClubWrite.getLeague());
 		attendanceClub.setGames(attendanceClubWrite.getGames());
@@ -862,11 +854,7 @@ public class AdminService {
 		return model;
 	}
 
-	public void getCompetition(Model model) {
-		model.addAttribute("competitionWrite", new CompetitionWrite());
-	}
-
-	public void getCompetition(Model model, String id) {
+	public CompetitionWrite getCompetition(String id) {
 		Competition competition = competitionRepository.findOne(id);
 		CompetitionWrite competitionWrite = new CompetitionWrite();
 		competitionWrite.setId(competition.getId());
@@ -882,16 +870,14 @@ public class AdminService {
 			}
 		}
 
-		model.addAttribute("competitionWrite", competitionWrite);
+		return competitionWrite;
 	}
 
-	public void writeCompetition(CompetitionWrite competitionWrite) {
+	public Competition writeCompetition(String id, CompetitionWrite competitionWrite) {
 		Competition competition = new Competition();
 
-		if (competitionWrite.getId().isEmpty()) {
-			competition.setId(null);
-		} else {
-			competition.setId(competitionWrite.getId());
+		if (Objects.nonNull(id)) {
+			competition.setId(id);
 		}
 
 		competition.setCode(competitionWrite.getCode());
@@ -909,13 +895,15 @@ public class AdminService {
 		names.add(nameEn);
 		competition.setNames(names);
 
-		competitionRepository.save(competition);
+		return competitionRepository.save(competition);
 	}
 
-	public void getDataCompetitionList(Model model) {
-		List<Competition> competitions = competitionRepository.findAll();
+	public List<Competition> getCompetitions() {
+		return competitionRepository.findAll();
+	}
 
-		model.addAttribute("competitions", competitions);
+	public void deleteCompetition(String id) {
+		competitionRepository.delete(id);
 	}
 
 }
