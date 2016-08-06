@@ -1,24 +1,28 @@
 package com.jakduk.core.service;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import javax.imageio.ImageIO;
+
 import com.google.gson.Gson;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.db.*;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
-import com.jakduk.core.model.embedded.JakduScheduleScore;
-import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.AttendanceClubWrite;
-import com.jakduk.core.model.web.BoardCategoryWrite;
-import com.jakduk.core.model.web.CompetitionWrite;
-import com.jakduk.core.model.web.ThumbnailSizeWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.core.repository.*;
-import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
-import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -34,21 +38,42 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.List;
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.model.db.AttendanceClub;
+import com.jakduk.core.model.db.AttendanceLeague;
+import com.jakduk.core.model.db.BoardCategory;
+import com.jakduk.core.model.db.Competition;
+import com.jakduk.core.model.db.Encyclopedia;
+import com.jakduk.core.model.db.FootballClub;
+import com.jakduk.core.model.db.FootballClubOrigin;
+import com.jakduk.core.model.db.Gallery;
+import com.jakduk.core.model.db.HomeDescription;
+import com.jakduk.core.model.db.JakduSchedule;
+import com.jakduk.core.model.db.JakduScheduleGroup;
+import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.core.model.elasticsearch.CommentOnES;
+import com.jakduk.core.model.elasticsearch.GalleryOnES;
+import com.jakduk.core.model.embedded.JakduScheduleScore;
+import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.LocalSimpleName;
+import com.jakduk.core.model.web.AttendanceClubWrite;
+import com.jakduk.core.model.web.BoardCategoryWrite;
+import com.jakduk.core.model.web.CompetitionWrite;
+import com.jakduk.core.model.web.ThumbnailSizeWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.core.repository.AttendanceClubRepository;
+import com.jakduk.core.repository.AttendanceLeagueRepository;
+import com.jakduk.core.repository.BoardCategoryRepository;
+import com.jakduk.core.repository.CompetitionRepository;
+import com.jakduk.core.repository.EncyclopediaRepository;
+import com.jakduk.core.repository.FootballClubOriginRepository;
+import com.jakduk.core.repository.FootballClubRepository;
+import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.HomeDescriptionRepository;
+import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
+import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -457,16 +482,13 @@ public class AdminService {
 		return model;
 	}
 
-	public Model getAttendanceClubList(Model model) {
+	public List<AttendanceClub> getAttendanceClubList() {
 		
 		List<AttendanceClub> attendanceClubs;
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-		
+		Sort sort = new Sort(Sort.Direction.ASC, Collections.singletonList("_id"));
 		attendanceClubs = attendanceClubRepository.findAll(sort);
 		
-		model.addAttribute("attendanceClubs", attendanceClubs);
-		
-		return model;
+		return attendanceClubs;
 	}
 
 	public Model getBoardCategory(Model model, String id) {
@@ -497,7 +519,7 @@ public class AdminService {
 		List<Gallery> galleries;
 		
 		if (thumbnailSizeWrite.getGalleryId() != null && !thumbnailSizeWrite.getGalleryId().isEmpty()) {
-			galleries = new ArrayList<Gallery>();
+			galleries = new ArrayList<>();
 			galleries.add(galleryRepository.findOne(thumbnailSizeWrite.getGalleryId()));
 		} else {
 			galleries = galleryRepository.findAll();
@@ -609,36 +631,30 @@ public class AdminService {
 		model.addAttribute("attendanceClubWrite", new AttendanceClubWrite());
 	}
 	
-	public void getAttendanceClubWrite(Model model, String id) {
+	public Map<String, Object> getAttendanceClubWrite(String id) {
+		Map<String, Object> data = new HashMap<>();
+
 		AttendanceClub attendanceClub = attendanceClubRepository.findOne(id);
 		log.debug("attendanceClub=" + attendanceClub);
-		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
 		
 		AttendanceClubWrite attendanceClubWrite = new AttendanceClubWrite();
 		attendanceClubWrite.setId(attendanceClub.getId());
 		attendanceClubWrite.setOrigin(attendanceClub.getClub().getId());
+		attendanceClubWrite.setLeague(attendanceClub.getLeague());;
 		attendanceClubWrite.setSeason(attendanceClub.getSeason());
 		attendanceClubWrite.setGames(attendanceClub.getGames());
 		attendanceClubWrite.setTotal(attendanceClub.getTotal());
 		attendanceClubWrite.setAverage(attendanceClub.getAverage());
-		
-		model.addAttribute("footballClubs", footballClubs);
-		model.addAttribute("attendanceClubWrite", attendanceClubWrite);
+
+		data.put("attendanceClubWrite", attendanceClubWrite);
+		return data;
 	}	
 	
-	public void attendanceClubWrite(AttendanceClubWrite attendanceClubWrite) {
-		AttendanceClub attendanceClub = new AttendanceClub();
-		
+	public void attendanceClubWrite(String id, AttendanceClubWrite attendanceClubWrite) {
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOne(attendanceClubWrite.getOrigin());
-		
+
+		AttendanceClub attendanceClub = Objects.isNull(id) ? new AttendanceClub() : attendanceClubRepository.findOne(id);
 		attendanceClub.setClub(footballClubOrigin);
-		
-		if (attendanceClubWrite.getId().isEmpty()) {
-			attendanceClub.setId(null);
-		} else {
-			attendanceClub.setId(attendanceClubWrite.getId());
-		}
-		
 		attendanceClub.setSeason(attendanceClubWrite.getSeason());
 		attendanceClub.setLeague(attendanceClubWrite.getLeague());
 		attendanceClub.setGames(attendanceClubWrite.getGames());
@@ -661,7 +677,7 @@ public class AdminService {
 		model.addAttribute("jakduScheduleWrite", jakduScheduleWrite);
 	}
 
-	public void getJakduScheduleWrite(Model model, String id) {
+	public JakduScheduleWrite getJakduScheduleWrite(String id) {
 		JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(id);
 		JakduScheduleScore jakduScore = jakduSchedule.getScore();
 
@@ -673,7 +689,7 @@ public class AdminService {
 		if (jakduSchedule.getGroup() != null)
 			jakduScheduleWrite.setGroupSeq(jakduSchedule.getGroup().getSeq());
 		if (jakduSchedule.getCompetition() != null)
-			jakduScheduleWrite.setCompetition(jakduSchedule.getCompetition().getCode());
+			jakduScheduleWrite.setCompetition(jakduSchedule.getCompetition().getId());
 		jakduScheduleWrite.setTimeUp(jakduSchedule.isTimeUp());
 
 		if (jakduScore != null) {
@@ -692,21 +708,16 @@ public class AdminService {
 
 		}
 
-		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
-		List<Competition> competitions = competitionRepository.findAll();
-
-		model.addAttribute("competitions", competitions);
-		model.addAttribute("footballClubs", footballClubs);
-		model.addAttribute("jakduScheduleWrite", jakduScheduleWrite);
+		return jakduScheduleWrite;
 	}
 
-	public void writeJakduSchedule(JakduScheduleWrite jakduScheduleWrite) {
-		JakduSchedule jakduSchedule = new JakduSchedule();
+	public JakduSchedule writeJakduSchedule(String id, JakduScheduleWrite jakduScheduleWrite) {
+		JakduSchedule jakduSchedule = Objects.isNull(id) ? new JakduSchedule() : jakduScheduleRepository.findOne(id);
 
 		FootballClubOrigin home = footballClubOriginRepository.findOne(jakduScheduleWrite.getHome());
 		FootballClubOrigin away = footballClubOriginRepository.findOne(jakduScheduleWrite.getAway());
 		Competition competition = competitionRepository.findOne(jakduScheduleWrite.getCompetition());
-		JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findBySeq(jakduScheduleWrite.getGroupSeq());
+		JakduScheduleGroup jakduScheduleGroup = Objects.isNull(id) ? jakdukDAO.getJakduScheduleGroupOrderBySeq() : jakduScheduleGroupRepository.findBySeq(jakduScheduleWrite.getGroupSeq());
 
 		if (jakduScheduleWrite.isTimeUp()) {
 			JakduScheduleScore jakduScore = new JakduScheduleScore();
@@ -736,17 +747,15 @@ public class AdminService {
 		jakduSchedule.setCompetition(competition);
 		jakduSchedule.setGroup(jakduScheduleGroup);
 
-		if (jakduScheduleWrite.getId().isEmpty()) {
-			jakduSchedule.setId(null);
-		} else {
-			jakduSchedule.setId(jakduScheduleWrite.getId());
+		if (Objects.nonNull(id)) {
+			jakduSchedule.setId(id);
 		}
 
 		if (log.isDebugEnabled()) {
 			log.debug("jakduSchedule=" + jakduSchedule);
 		}
 
-		jakduScheduleRepository.save(jakduSchedule);
+		return jakduScheduleRepository.save(jakduSchedule);
 	}
 
 	public boolean deleteJakduSchedule(String id) {
@@ -764,20 +773,12 @@ public class AdminService {
 		return false;
 	}
 
-	public Model getDataJakduScheduleList(Model model) {
+	public List<JakduSchedule> getDataJakduScheduleList() {
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll(sort);
-
-		model.addAttribute("jakduSchedules", jakduSchedules);
-
-		return model;
+		return jakduScheduleRepository.findAll(sort);
 	}
 
-	public void getJakduScheduleGroupWrite(Model model) {
-		model.addAttribute("jakduScheduleGroupWrite", new JakduScheduleGroupWrite());
-	}
-
-	public void getJakduScheduleGroupWrite(Model model, String id) {
+	public JakduScheduleGroupWrite getJakduScheduleGroupWrite(String id) {
 		JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findOne(id);
 
 		JakduScheduleGroupWrite jakduScheduleGroupWrite = new JakduScheduleGroupWrite();
@@ -787,11 +788,11 @@ public class AdminService {
 		jakduScheduleGroupWrite.setOpenDate(jakduScheduleGroup.getOpenDate());
 		jakduScheduleGroupWrite.setNextSeq(false);
 
-		model.addAttribute("jakduScheduleGroupWrite", jakduScheduleGroupWrite);
+		return jakduScheduleGroupWrite;
 	}
 
-	public void writeJakduScheduleGroup(JakduScheduleGroupWrite jakduScheduleGroupWrite) {
-		JakduScheduleGroup jakduScheduleGroup = new JakduScheduleGroup();
+	public JakduScheduleGroup writeJakduScheduleGroup(String id, JakduScheduleGroupWrite jakduScheduleGroupWrite) {
+		JakduScheduleGroup jakduScheduleGroup = Objects.isNull(id) ? new JakduScheduleGroup() : jakduScheduleGroupRepository.findOne(id);
 
 		jakduScheduleGroup.setOpenDate(jakduScheduleGroupWrite.getOpenDate());
 		jakduScheduleGroup.setState(jakduScheduleGroupWrite.getState());
@@ -802,17 +803,15 @@ public class AdminService {
 			jakduScheduleGroup.setSeq(jakduScheduleGroupWrite.getSeq());
 		}
 
-		if (jakduScheduleGroupWrite.getId().isEmpty()) {
-			jakduScheduleGroup.setId(null);
-		} else {
-			jakduScheduleGroup.setId(jakduScheduleGroupWrite.getId());
+		if (Objects.nonNull(id)) {
+			jakduScheduleGroup.setId(id);
 		}
 
 		if (log.isDebugEnabled()) {
 			log.debug("jakduScheduleGroup=" + jakduScheduleGroup);
 		}
 
-		jakduScheduleGroupRepository.save(jakduScheduleGroup);
+		return jakduScheduleGroupRepository.save(jakduScheduleGroup);
 	}
 
 	public boolean deleteJakduScheduleGroup(String id) {
@@ -830,19 +829,11 @@ public class AdminService {
 		return false;
 	}
 
-	public Model getDataJakduScheduleGroupList(Model model) {
-		List<JakduScheduleGroup> jakduScheduleGroups = jakduScheduleGroupRepository.findAll();
-
-		model.addAttribute("jakduScheduleGroups", jakduScheduleGroups);
-
-		return model;
+	public List<JakduScheduleGroup> getDataJakduScheduleGroupList() {
+		return jakduScheduleGroupRepository.findAll();
 	}
 
-	public void getCompetition(Model model) {
-		model.addAttribute("competitionWrite", new CompetitionWrite());
-	}
-
-	public void getCompetition(Model model, String id) {
+	public CompetitionWrite getCompetition(String id) {
 		Competition competition = competitionRepository.findOne(id);
 		CompetitionWrite competitionWrite = new CompetitionWrite();
 		competitionWrite.setId(competition.getId());
@@ -858,16 +849,14 @@ public class AdminService {
 			}
 		}
 
-		model.addAttribute("competitionWrite", competitionWrite);
+		return competitionWrite;
 	}
 
-	public void writeCompetition(CompetitionWrite competitionWrite) {
+	public Competition writeCompetition(String id, CompetitionWrite competitionWrite) {
 		Competition competition = new Competition();
 
-		if (competitionWrite.getId().isEmpty()) {
-			competition.setId(null);
-		} else {
-			competition.setId(competitionWrite.getId());
+		if (Objects.nonNull(id)) {
+			competition.setId(id);
 		}
 
 		competition.setCode(competitionWrite.getCode());
@@ -885,13 +874,15 @@ public class AdminService {
 		names.add(nameEn);
 		competition.setNames(names);
 
-		competitionRepository.save(competition);
+		return competitionRepository.save(competition);
 	}
 
-	public void getDataCompetitionList(Model model) {
-		List<Competition> competitions = competitionRepository.findAll();
+	public List<Competition> getCompetitions() {
+		return competitionRepository.findAll();
+	}
 
-		model.addAttribute("competitions", competitions);
+	public void deleteCompetition(String id) {
+		competitionRepository.delete(id);
 	}
 
 }

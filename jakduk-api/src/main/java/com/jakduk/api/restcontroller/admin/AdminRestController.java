@@ -1,31 +1,58 @@
 package com.jakduk.api.restcontroller.admin;
 
 
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.vo.FootballClubRequest;
-import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
-import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.model.db.*;
-import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.BoardCategoryWrite;
-import com.jakduk.core.service.AdminService;
-import com.jakduk.core.service.CommonService;
-import com.jakduk.core.service.CompetitionService;
-import com.jakduk.core.service.StatsService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Resource;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
 
-import java.util.*;
+import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.FootballClubRequest;
+import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
+import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.model.db.AttendanceLeague;
+import com.jakduk.core.model.db.BoardCategory;
+import com.jakduk.core.model.db.Competition;
+import com.jakduk.core.model.db.Encyclopedia;
+import com.jakduk.core.model.db.FootballClub;
+import com.jakduk.core.model.db.FootballClubOrigin;
+import com.jakduk.core.model.db.HomeDescription;
+import com.jakduk.core.model.db.JakduSchedule;
+import com.jakduk.core.model.db.JakduScheduleGroup;
+import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.LocalSimpleName;
+import com.jakduk.core.model.web.AttendanceClubWrite;
+import com.jakduk.core.model.web.BoardCategoryWrite;
+import com.jakduk.core.model.web.CompetitionWrite;
+import com.jakduk.core.model.web.ThumbnailSizeWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.core.service.AdminService;
+import com.jakduk.core.service.CommonService;
+import com.jakduk.core.service.CompetitionService;
+import com.jakduk.core.service.StatsService;
 
 /**
  * @author pyohwan
- * 16. 5. 8 오후 11:26
+ *         16. 5. 8 오후 11:26
  */
 
 @Slf4j
@@ -34,588 +61,738 @@ import java.util.*;
 @RequestMapping("/api/admin")
 public class AdminRestController {
 
-    @Autowired
-    private CommonService commonService;
+	@Resource
+	LocaleResolver localeResolver;
 
-    @Autowired
-    private AdminService adminService;
+	@Autowired
+	private CommonService commonService;
 
-    @Autowired
-    private StatsService statsService;
+	@Autowired
+	private AdminService adminService;
 
-    @Autowired
-    private CompetitionService competitionService;
+	@Autowired
+	private StatsService statsService;
 
-    @ApiOperation(value = "알림판 목록")
-    @RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
-    public Map<String, Object> getHomeDescriptions() {
+	@Autowired
+	private CompetitionService competitionService;
 
-        List<HomeDescription> homeDescriptions = adminService.findHomeDescriptions();
+	@ApiOperation(value = "알림판 목록")
+	@RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
+	public Map<String, Object> getHomeDescriptions() {
 
-        Map<String, Object> response = new HashMap<>();
+		List<HomeDescription> homeDescriptions = adminService.findHomeDescriptions();
 
-        response.put("homeDescriptions", homeDescriptions);
+		Map<String, Object> response = new HashMap<>();
 
-        return response;
-    }
+		response.put("homeDescriptions", homeDescriptions);
 
-    @ApiOperation(value = "알림판 하나")
-    @RequestMapping(value = "/home/description/{id}", method = RequestMethod.GET)
-    public Map<String, Object> getHomeDescription(@PathVariable String id) {
+		return response;
+	}
 
-        HomeDescription homeDescription = adminService.findHomeDescriptionById(id);
+	@ApiOperation(value = "알림판 하나")
+	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.GET)
+	public Map<String, Object> getHomeDescription(@PathVariable String id) {
 
-        if (Objects.isNull(homeDescription)) {
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
-        }
+		HomeDescription homeDescription = adminService.findHomeDescriptionById(id);
 
-        Map<String, Object> response = new HashMap<>();
+		if (Objects.isNull(homeDescription)) {
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
+		}
 
-        response.put("homeDescription", homeDescription);
+		Map<String, Object> response = new HashMap<>();
 
-        return response;
-    }
+		response.put("homeDescription", homeDescription);
 
-    @ApiOperation(value = "새 알림판 저장")
-    @RequestMapping(value = "/home/description", method = RequestMethod.POST)
-    public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
+		return response;
+	}
 
-        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
-            throw new IllegalArgumentException("desc는 필수값입니다.");
+	@ApiOperation(value = "새 알림판 저장")
+	@RequestMapping(value = "/home/description", method = RequestMethod.POST)
+	public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
-        if (Objects.isNull(homeDescriptionRequest.getPriority()))
-            throw new IllegalArgumentException("priority는 필수값입니다.");
+		if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
+			throw new IllegalArgumentException("desc는 필수값입니다.");
 
-        HomeDescription homeDescription = HomeDescription.builder()
-                .desc(homeDescriptionRequest.getDesc())
-                .priority(homeDescriptionRequest.getPriority())
-                .build();
+		if (Objects.isNull(homeDescriptionRequest.getPriority()))
+			throw new IllegalArgumentException("priority는 필수값입니다.");
 
-        adminService.saveHomeDescription(homeDescription);
+		HomeDescription homeDescription = HomeDescription.builder()
+			.desc(homeDescriptionRequest.getDesc())
+			.priority(homeDescriptionRequest.getPriority())
+			.build();
 
-        Map<String, Object> response = new HashMap();
+		adminService.saveHomeDescription(homeDescription);
 
-        response.put("homeDescription", homeDescription);
+		Map<String, Object> response = new HashMap();
 
-        return response;
-    }
+		response.put("homeDescription", homeDescription);
 
-    @ApiOperation(value = "알림판 편집")
-    @RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> editHomeDescription(@PathVariable String id,
-                                                   @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
+		return response;
+	}
 
-        if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
-            throw new IllegalArgumentException("desc는 필수값입니다.");
+	@ApiOperation(value = "알림판 편집")
+	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
+	public Map<String, Object> editHomeDescription(@PathVariable String id,
+	                                               @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
-        if (Objects.isNull(homeDescriptionRequest.getPriority()))
-            throw new IllegalArgumentException("priority는 필수값입니다.");
+		if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
+			throw new IllegalArgumentException("desc는 필수값입니다.");
 
-        HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
+		if (Objects.isNull(homeDescriptionRequest.getPriority()))
+			throw new IllegalArgumentException("priority는 필수값입니다.");
 
-        if (Objects.isNull(existHomeDescription))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
+		HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
 
-        HomeDescription homeDescription = HomeDescription.builder()
-                .id(id)
-                .desc(homeDescriptionRequest.getDesc())
-                .priority(homeDescriptionRequest.getPriority())
-                .build();
+		if (Objects.isNull(existHomeDescription))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
 
-        adminService.saveHomeDescription(homeDescription);
+		HomeDescription homeDescription = HomeDescription.builder()
+			.id(id)
+			.desc(homeDescriptionRequest.getDesc())
+			.priority(homeDescriptionRequest.getPriority())
+			.build();
 
-        Map<String, Object> response = new HashMap<>();
+		adminService.saveHomeDescription(homeDescription);
 
-        response.put("homeDescription", homeDescription);
+		Map<String, Object> response = new HashMap<>();
 
-        return response;
-    }
+		response.put("homeDescription", homeDescription);
 
-    @ApiOperation(value = "알림판 지움")
-    @RequestMapping(value = "/home/description/{id}", method = RequestMethod.DELETE)
-    public Map<String, Object> deleteHomeDescription(@PathVariable String id) {
+		return response;
+	}
 
-        HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
+	@ApiOperation(value = "알림판 지움")
+	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.DELETE)
+	public Map<String, Object> deleteHomeDescription(@PathVariable String id) {
 
-        if (Objects.isNull(existHomeDescription))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
+		HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
 
-        adminService.deleteHomeDescriptionById(id);
+		if (Objects.isNull(existHomeDescription))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("result", true);
+		adminService.deleteHomeDescriptionById(id);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("result", true);
 
-    @ApiOperation(value = "백과사전 목록")
-    @RequestMapping(value = "/encyclopedias", method = RequestMethod.GET)
-    public Map<String, Object> getEncyclopedias() {
+		return response;
+	}
 
-        List<Encyclopedia> encyclopedias = adminService.findEncyclopedias();
+	@ApiOperation(value = "백과사전 목록")
+	@RequestMapping(value = "/encyclopedias", method = RequestMethod.GET)
+	public Map<String, Object> getEncyclopedias() {
 
-        Map<String, Object> response = new HashMap<>();
+		List<Encyclopedia> encyclopedias = adminService.findEncyclopedias();
 
-        response.put("encyclopedias", encyclopedias);
+		Map<String, Object> response = new HashMap<>();
 
-        return response;
-    }
+		response.put("encyclopedias", encyclopedias);
 
-    @ApiOperation(value = "백과사전 하나")
-    @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.GET)
-    public Map<String, Object> getEncyclopedia(@PathVariable String id) {
+		return response;
+	}
 
-        Encyclopedia encyclopedia = adminService.findEncyclopediaById(id);
+	@ApiOperation(value = "백과사전 하나")
+	@RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.GET)
+	public Map<String, Object> getEncyclopedia(@PathVariable String id) {
 
-        if (Objects.isNull(encyclopedia))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
+		Encyclopedia encyclopedia = adminService.findEncyclopediaById(id);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("encyclopedia", encyclopedia);
-        return response;
-    }
+		if (Objects.isNull(encyclopedia))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
 
-    @ApiOperation(value = "새 백과사전 저장")
-    @RequestMapping(value = "/encyclopedia", method = RequestMethod.POST)
-    public Map<String, Object> addEncyclopedia(@RequestBody Encyclopedia encyclopedia) {
+		Map<String, Object> response = new HashMap<>();
+		response.put("encyclopedia", encyclopedia);
+		return response;
+	}
 
-        // 신규로 만들기때문에 null로 설정.
-        encyclopedia.setId(null);
+	@ApiOperation(value = "새 백과사전 저장")
+	@RequestMapping(value = "/encyclopedia", method = RequestMethod.POST)
+	public Map<String, Object> addEncyclopedia(@RequestBody Encyclopedia encyclopedia) {
 
-        if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-            encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));
-        } else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-            encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
-        }
+		// 신규로 만들기때문에 null로 설정.
+		encyclopedia.setId(null);
 
-        adminService.saveEncyclopedia(encyclopedia);
+		if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+			encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));
+		} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+			encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
+		}
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("encyclopedia", encyclopedia);
+		adminService.saveEncyclopedia(encyclopedia);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("encyclopedia", encyclopedia);
 
-    @ApiOperation(value = "백과사전 편집")
-    @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> editEncyclopedia(@PathVariable String id,
-                                                @RequestBody Encyclopedia encyclopedia) {
+		return response;
+	}
 
-        Encyclopedia existEncyclopedia = adminService.findEncyclopediaById(id);
+	@ApiOperation(value = "백과사전 편집")
+	@RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.PUT)
+	public Map<String, Object> editEncyclopedia(@PathVariable String id,
+	                                            @RequestBody Encyclopedia encyclopedia) {
 
-        if (Objects.isNull(existEncyclopedia))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
+		Encyclopedia existEncyclopedia = adminService.findEncyclopediaById(id);
 
-        encyclopedia.setId(id);
-        adminService.saveEncyclopedia(encyclopedia);
+		if (Objects.isNull(existEncyclopedia))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("encyclopedia", encyclopedia);
+		encyclopedia.setId(id);
+		adminService.saveEncyclopedia(encyclopedia);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("encyclopedia", encyclopedia);
 
-    @ApiOperation(value = "백과사전 지움")
-    @RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.DELETE)
-    public Map<String, Object> deleteEncyclopedia(@PathVariable String id) {
+		return response;
+	}
 
-        Encyclopedia encyclopedia = adminService.findEncyclopediaById(id);
+	@ApiOperation(value = "백과사전 지움")
+	@RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.DELETE)
+	public Map<String, Object> deleteEncyclopedia(@PathVariable String id) {
 
-        if (Objects.isNull(encyclopedia))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
+		Encyclopedia encyclopedia = adminService.findEncyclopediaById(id);
 
-        adminService.deleteEncyclopediaById(id);
+		if (Objects.isNull(encyclopedia))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 백과사전이 존재하지 않습니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("result", true);
+		adminService.deleteEncyclopediaById(id);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("result", true);
 
-    @ApiOperation(value = "부모 축구단 목록")
-    @RequestMapping(value = "/origin/football/clubs", method = RequestMethod.GET)
-    public Map<String, Object> getOriginFootballClubs() {
+		return response;
+	}
 
-        List<FootballClubOrigin> fcOrigins = adminService.findOriginFootballClubs();
+	@ApiOperation(value = "부모 축구단 목록")
+	@RequestMapping(value = "/origin/football/clubs", method = RequestMethod.GET)
+	public Map<String, Object> getOriginFootballClubs() {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("originFCs", fcOrigins);
+		List<FootballClubOrigin> fcOrigins = adminService.findOriginFootballClubs();
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("originFCs", fcOrigins);
 
-    @ApiOperation(value = "부모 축구단 하나")
-    @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.GET)
-    public Map<String, Object> getOriginFootballClub(@PathVariable String id) {
+		return response;
+	}
 
-        FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(id);
+	@ApiOperation(value = "부모 축구단 하나")
+	@RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.GET)
+	public Map<String, Object> getOriginFootballClub(@PathVariable String id) {
 
-        if (Objects.isNull(footballClubOrigin))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+		FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(id);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("originFC", footballClubOrigin);
+		if (Objects.isNull(footballClubOrigin))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("originFC", footballClubOrigin);
 
-    @ApiOperation(value = "새 부모 축구단 하나 저장")
-    @RequestMapping(value = "/origin/football/club", method = RequestMethod.POST)
-    public Map<String, Object> addOriginFootballClub(@RequestBody FootballClubOrigin footballClubOrigin) {
+		return response;
+	}
 
-        // 신규로 만들기때문에 null로 설정.
-        footballClubOrigin.setId(null);
+	@ApiOperation(value = "새 부모 축구단 하나 저장")
+	@RequestMapping(value = "/origin/football/club", method = RequestMethod.POST)
+	public Map<String, Object> addOriginFootballClub(@RequestBody FootballClubOrigin footballClubOrigin) {
 
-        adminService.saveOriginFootballClub(footballClubOrigin);
+		// 신규로 만들기때문에 null로 설정.
+		footballClubOrigin.setId(null);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("originFC", footballClubOrigin);
+		adminService.saveOriginFootballClub(footballClubOrigin);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("originFC", footballClubOrigin);
 
-    @ApiOperation(value = "부모 축구단 하나 편집")
-    @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> editOriginFootballClub(@PathVariable String id,
-                                                      @RequestBody FootballClubOrigin footballClubOrigin) {
+		return response;
+	}
 
-        FootballClubOrigin existFootballClubOrigin = adminService.findOriginFootballClubById(id);
+	@ApiOperation(value = "부모 축구단 하나 편집")
+	@RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.PUT)
+	public Map<String, Object> editOriginFootballClub(@PathVariable String id,
+	                                                  @RequestBody FootballClubOrigin footballClubOrigin) {
 
-        if (Objects.isNull(existFootballClubOrigin))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+		FootballClubOrigin existFootballClubOrigin = adminService.findOriginFootballClubById(id);
 
-        footballClubOrigin.setId(id);
-        adminService.saveOriginFootballClub(footballClubOrigin);
+		if (Objects.isNull(existFootballClubOrigin))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("originFC", footballClubOrigin);
+		footballClubOrigin.setId(id);
+		adminService.saveOriginFootballClub(footballClubOrigin);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("originFC", footballClubOrigin);
 
-    @ApiOperation(value = "부모 축구단 하나 지움")
-    @RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.DELETE)
-    public Map<String, Object> deleteOriginFootballClub(@PathVariable String id) {
+		return response;
+	}
 
-        FootballClubOrigin existFootballClubOrigin = adminService.findOriginFootballClubById(id);
+	@ApiOperation(value = "부모 축구단 하나 지움")
+	@RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.DELETE)
+	public Map<String, Object> deleteOriginFootballClub(@PathVariable String id) {
 
-        if (Objects.isNull(existFootballClubOrigin))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+		FootballClubOrigin existFootballClubOrigin = adminService.findOriginFootballClubById(id);
 
-        adminService.deleteOriginFootballClub(id);
+		if (Objects.isNull(existFootballClubOrigin))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 부모 축구단이 존재하지 않습니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("result", true);
+		adminService.deleteOriginFootballClub(id);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("result", true);
 
-    @ApiOperation(value = "축구단 목록")
-    @RequestMapping(value = "/football/clubs", method = RequestMethod.GET)
-    public Map<String, Object> getFootballClubs() {
+		return response;
+	}
 
-        List<FootballClub> footballClubs = adminService.findFootballClubs();
+	@ApiOperation(value = "축구단 목록")
+	@RequestMapping(value = "/football/clubs", method = RequestMethod.GET)
+	public Map<String, Object> getFootballClubs() {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("fcs", footballClubs);
+		List<FootballClub> footballClubs = adminService.findFootballClubs();
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("fcs", footballClubs);
 
-    @ApiOperation(value = "축구단 하나")
-    @RequestMapping(value = "/football/club/{id}", method = RequestMethod.GET)
-    public Map<String, Object> getFootballClub(@PathVariable String id) {
+		return response;
+	}
 
-        FootballClub fc = adminService.findFootballClubById(id);
+	@ApiOperation(value = "축구단 하나")
+	@RequestMapping(value = "/football/club/{id}", method = RequestMethod.GET)
+	public Map<String, Object> getFootballClub(@PathVariable String id) {
 
-        if (Objects.isNull(fc))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 축구단이 존재하지 않습니다.");
+		FootballClub fc = adminService.findFootballClubById(id);
 
-        List<FootballClubOrigin> originFCs = adminService.findOriginFootballClubs();
+		if (Objects.isNull(fc))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 축구단이 존재하지 않습니다.");
 
-        FootballClubRequest fcRequest = new FootballClubRequest();
-        fcRequest.setId(fc.getId());
-        fcRequest.setActive(fc.getActive());
-        fcRequest.setOrigin(fc.getOrigin().getId());
+		List<FootballClubOrigin> originFCs = adminService.findOriginFootballClubs();
 
-        for (LocalName fcName : fc.getNames()) {
-            if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-                fcRequest.setFullNameKr(fcName.getFullName());
-                fcRequest.setShortNameKr(fcName.getShortName());
-            } else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-                fcRequest.setFullNameEn(fcName.getFullName());
-                fcRequest.setShortNameEn(fcName.getShortName());
-            }
-        }
+		FootballClubRequest fcRequest = new FootballClubRequest();
+		fcRequest.setId(fc.getId());
+		fcRequest.setActive(fc.getActive());
+		fcRequest.setOrigin(fc.getOrigin().getId());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("originFCs", originFCs);
-        response.put("fcRequest", fcRequest);
+		for (LocalName fcName : fc.getNames()) {
+			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+				fcRequest.setFullNameKr(fcName.getFullName());
+				fcRequest.setShortNameKr(fcName.getShortName());
+			} else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+				fcRequest.setFullNameEn(fcName.getFullName());
+				fcRequest.setShortNameEn(fcName.getShortName());
+			}
+		}
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("originFCs", originFCs);
+		response.put("fcRequest", fcRequest);
 
-    @ApiOperation(value = "새 축구단 하나 저장")
-    @RequestMapping(value = "/football/club", method = RequestMethod.POST)
-    public Map<String, Object> addFootballClub(@RequestBody FootballClubRequest request) {
+		return response;
+	}
 
-        if (Objects.isNull(request.getOrigin()) || request.getOrigin().isEmpty())
-            throw new IllegalArgumentException("origin은 필수값입니다.");
+	@ApiOperation(value = "새 축구단 하나 저장")
+	@RequestMapping(value = "/football/club", method = RequestMethod.POST)
+	public Map<String, Object> addFootballClub(@RequestBody FootballClubRequest request) {
 
-        FootballClub footballClub = buildFootballClub(null, request);
-        adminService.saveFootballClub(footballClub);
+		if (Objects.isNull(request.getOrigin()) || request.getOrigin().isEmpty())
+			throw new IllegalArgumentException("origin은 필수값입니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("fc", footballClub);
+		FootballClub footballClub = buildFootballClub(null, request);
+		adminService.saveFootballClub(footballClub);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("fc", footballClub);
 
-    @ApiOperation(value = "축구단 편집")
-    @RequestMapping(value = "/football/club/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> editFootballClub(@PathVariable String id, @RequestBody FootballClubRequest request) {
-        FootballClub footballClub = buildFootballClub(id, request);
-        adminService.saveFootballClub(footballClub);
+		return response;
+	}
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("fc", footballClub);
+	@ApiOperation(value = "축구단 편집")
+	@RequestMapping(value = "/football/club/{id}", method = RequestMethod.PUT)
+	public Map<String, Object> editFootballClub(@PathVariable String id, @RequestBody FootballClubRequest request) {
+		FootballClub footballClub = buildFootballClub(id, request);
+		adminService.saveFootballClub(footballClub);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("fc", footballClub);
 
-    @ApiOperation(value = "게시판 말머리 목록")
-    @RequestMapping(value = "/board/categories", method = RequestMethod.GET)
-    public Map<String, Object> getBoardCategories() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("boardCategories", adminService.getBoardCategoryList());
+		return response;
+	}
 
-        return response;
-    }
+	@ApiOperation(value = "게시판 말머리 목록")
+	@RequestMapping(value = "/board/categories", method = RequestMethod.GET)
+	public Map<String, Object> getBoardCategories() {
+		Map<String, Object> response = new HashMap<>();
+		response.put("boardCategories", adminService.getBoardCategoryList());
 
-    @ApiOperation(value = "게시판 말머리 하나")
-    @RequestMapping(value = "/board/category/{id}", method = RequestMethod.GET)
-    public Map<String, Object> getBoardCategory(@PathVariable String id) {
-        BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
-        if (Objects.isNull(boardCategoryWrite)) {
-            throw new IllegalArgumentException("유효하지 않은 id입니다.");
-        }
+		return response;
+	}
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("boardCategory", boardCategoryWrite);
+	@ApiOperation(value = "게시판 말머리 하나")
+	@RequestMapping(value = "/board/category/{id}", method = RequestMethod.GET)
+	public Map<String, Object> getBoardCategory(@PathVariable String id) {
+		BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
+		if (Objects.isNull(boardCategoryWrite)) {
+			throw new IllegalArgumentException("유효하지 않은 id입니다.");
+		}
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("boardCategory", boardCategoryWrite);
 
-    @ApiOperation(value = "게시판 말머리 편집")
-    @RequestMapping(value = "/board/category/write/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> editBoardCategory(
-      @PathVariable String id, @RequestBody BoardCategory boardCategory) {
+		return response;
+	}
 
-        BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
-        boardCategoryWrite.setCode(boardCategory.getCode());
+	@ApiOperation(value = "게시판 말머리 편집")
+	@RequestMapping(value = "/board/category/write/{id}", method = RequestMethod.PUT)
+	public Map<String, Object> editBoardCategory(
+		@PathVariable String id, @RequestBody BoardCategory boardCategory) {
 
-        for (LocalSimpleName fcName : boardCategory.getNames()) {
-            if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-                boardCategoryWrite.setNameKr(fcName.getName());
-            } else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-                boardCategoryWrite.setNameEn(fcName.getName());
-            }
-        }
+		BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
+		boardCategoryWrite.setCode(boardCategory.getCode());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
+		for (LocalSimpleName fcName : boardCategory.getNames()) {
+			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
+				boardCategoryWrite.setNameKr(fcName.getName());
+			} else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+				boardCategoryWrite.setNameEn(fcName.getName());
+			}
+		}
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
 
-    @ApiOperation(value = "새 게시판 말머리 저장")
-    @RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
-    public EmptyJsonResponse writeBoardCategory(@RequestBody BoardCategory boardCategory) {
+		return response;
+	}
 
-        // spring-data-rest를 사용하자.
+	@ApiOperation(value = "새 게시판 말머리 저장")
+	@RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
+	public EmptyJsonResponse writeBoardCategory(@RequestBody BoardCategory boardCategory) {
 
-        return EmptyJsonResponse.newInstance();
-    }
+		// spring-data-rest를 사용하자.
 
-    @ApiOperation(value = "대회별 관중수 목록")
-    @RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
-    public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId,
-                                                    @RequestParam(required = false) String competitionCode) {
+		return EmptyJsonResponse.newInstance();
+	}
 
-        Competition competition = null;
-        List<AttendanceLeague> leagueAttendances;
+	@ApiOperation(value = "대회별 관중수 목록")
+	@RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
+	public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId,
+	                                                @RequestParam(required = false) String competitionCode) {
 
-        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+		Competition competition = null;
+		List<AttendanceLeague> leagueAttendances;
 
-        if (Objects.nonNull(competitionId)) {
-            competition = competitionService.findCompetitionById(competitionId);
-        } else if (Objects.nonNull(competitionCode)) {
-            competition = competitionService.findCompetitionByCode(competitionCode);
-        }
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 
-        if (Objects.isNull(competition)) {
-            leagueAttendances = statsService.findLeagueAttendances(sort);
-        } else {
-            leagueAttendances = statsService.findLeagueAttendances(competition, sort);
-        }
+		if (Objects.nonNull(competitionId)) {
+			competition = competitionService.findCompetitionById(competitionId);
+		} else if (Objects.nonNull(competitionCode)) {
+			competition = competitionService.findCompetitionByCode(competitionCode);
+		}
 
-        List<Competition> competitions = competitionService.findCompetitions();
+		if (Objects.isNull(competition)) {
+			leagueAttendances = statsService.findLeagueAttendances(sort);
+		} else {
+			leagueAttendances = statsService.findLeagueAttendances(competition, sort);
+		}
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("leagueAttendances", leagueAttendances);
-        response.put("competitions", competitions);
+		List<Competition> competitions = competitionService.findCompetitions();
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("leagueAttendances", leagueAttendances);
+		response.put("competitions", competitions);
 
-    @ApiOperation(value = "대회별 관중수 하나")
-    @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.GET)
-    public Map<String, Object> getLeagueAttendance(@PathVariable String id) {
+		return response;
+	}
 
-        AttendanceLeague attendanceLeague = statsService.findLeagueAttendance(id);
+	@ApiOperation(value = "대회별 관중수 하나")
+	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.GET)
+	public Map<String, Object> getLeagueAttendance(@PathVariable String id) {
 
-        if (Objects.isNull(attendanceLeague))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회 관중수가 존재하지 않습니다.");
+		AttendanceLeague attendanceLeague = statsService.findLeagueAttendance(id);
 
-        List<Competition> competitions = competitionService.findCompetitions();
+		if (Objects.isNull(attendanceLeague))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회 관중수가 존재하지 않습니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("leagueAttendance", attendanceLeague);
-        response.put("competitions", competitions);
+		List<Competition> competitions = competitionService.findCompetitions();
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("leagueAttendance", attendanceLeague);
+		response.put("competitions", competitions);
 
-    @ApiOperation(value = "새 대회별 관중수 하나 저장")
-    @RequestMapping(value = "/league/attendance", method = RequestMethod.POST)
-    public Map<String, Object> addLeagueAttendance(@RequestBody LeagueAttendanceForm form) {
+		return response;
+	}
 
-        // 신규로 만들기때문에 null로 설정.
-        form.setId(null);
+	@ApiOperation(value = "새 대회별 관중수 하나 저장")
+	@RequestMapping(value = "/league/attendance", method = RequestMethod.POST)
+	public Map<String, Object> addLeagueAttendance(@RequestBody LeagueAttendanceForm form) {
 
-        Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
+		// 신규로 만들기때문에 null로 설정.
+		form.setId(null);
 
-        if (Objects.isNull(competition))
-            throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
+		Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
 
-        AttendanceLeague attendanceLeague = AttendanceLeague.builder()
-                .competition(competition)
-                .season(form.getSeason())
-                .games(form.getGames())
-                .total(form.getTotal())
-                .average(form.getAverage())
-                .numberOfClubs(form.getNumberOfClubs())
-                .build();
+		if (Objects.isNull(competition))
+			throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
 
-        statsService.saveLeagueAttendance(attendanceLeague);
+		AttendanceLeague attendanceLeague = AttendanceLeague.builder()
+			.competition(competition)
+			.season(form.getSeason())
+			.games(form.getGames())
+			.total(form.getTotal())
+			.average(form.getAverage())
+			.numberOfClubs(form.getNumberOfClubs())
+			.build();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("leagueAttendance", attendanceLeague);
+		statsService.saveLeagueAttendance(attendanceLeague);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("leagueAttendance", attendanceLeague);
 
-    @ApiOperation(value = "대회별 관중수 하나 편집")
-    @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.PUT)
-    public Map<String, Object> editLeagueAttendance(@PathVariable String id,
-                                                    @RequestBody LeagueAttendanceForm form) {
+		return response;
+	}
 
-        AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
+	@ApiOperation(value = "대회별 관중수 하나 편집")
+	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.PUT)
+	public Map<String, Object> editLeagueAttendance(@PathVariable String id,
+	                                                @RequestBody LeagueAttendanceForm form) {
 
-        if (Objects.isNull(existAttendanceLeague))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
+		AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
 
-        Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
+		if (Objects.isNull(existAttendanceLeague))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
 
-        if (Objects.isNull(competition))
-            throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
+		Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
 
-        AttendanceLeague attendanceLeague = AttendanceLeague.builder()
-                .id(id)
-                .competition(competition)
-                .season(form.getSeason())
-                .games(form.getGames())
-                .total(form.getTotal())
-                .average(form.getAverage())
-                .numberOfClubs(form.getNumberOfClubs())
-                .build();
+		if (Objects.isNull(competition))
+			throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
 
-        statsService.saveLeagueAttendance(attendanceLeague);
+		AttendanceLeague attendanceLeague = AttendanceLeague.builder()
+			.id(id)
+			.competition(competition)
+			.season(form.getSeason())
+			.games(form.getGames())
+			.total(form.getTotal())
+			.average(form.getAverage())
+			.numberOfClubs(form.getNumberOfClubs())
+			.build();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("leagueAttendance", attendanceLeague);
+		statsService.saveLeagueAttendance(attendanceLeague);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("leagueAttendance", attendanceLeague);
 
-    @ApiOperation(value = "대회별 관중수 하나 지움")
-    @RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.DELETE)
-    public Map<String, Object> deleteLeagueAttendance(@PathVariable String id) {
+		return response;
+	}
 
-        AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
+	@ApiOperation(value = "대회별 관중수 하나 지움")
+	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.DELETE)
+	public Map<String, Object> deleteLeagueAttendance(@PathVariable String id) {
 
-        if (Objects.isNull(existAttendanceLeague))
-            throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
+		AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
 
-        statsService.deleteLeagueAttendance(id);
+		if (Objects.isNull(existAttendanceLeague))
+			throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("result", true);
+		statsService.deleteLeagueAttendance(id);
 
-        return response;
-    }
+		Map<String, Object> response = new HashMap<>();
+		response.put("result", true);
 
-    @ApiOperation(value = "게시판 말머리 초기화")
-    @RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
-    public Map<String, Object> initBoardCategory() {
-        return adminService.initBoardCategory();
-    }
+		return response;
+	}
 
-    @ApiOperation(value = "검색 인덱스 초기화")
-    @RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
-    public Map<String, Object> initSearchIndex() {
-        return adminService.initSearchIndex();
-    }
+	@ApiOperation(value = "클럽 관중")
+	@RequestMapping(value = "/club/attendances", method = RequestMethod.GET)
+	public Map<String, Object> getAttendanceClubs() {
+		Map<String, Object> data = new HashMap<>();
+		data.put("attendanceClubs", adminService.getAttendanceClubList());
+		return data;
+	}
 
-    @ApiOperation(value = "검색 타입 초기화")
-    @RequestMapping(value = "/search/type/init", method = RequestMethod.POST)
-    public Map<String, Object> initSearchType() {
-        return adminService.initSearchType();
-    }
+	@ApiOperation(value = "클럽 관중수 하나")
+	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.GET)
+	public Map<String, Object> getAttendanceClub(@PathVariable String id) {
+		return adminService.getAttendanceClubWrite(id);
+	}
 
-    @ApiOperation(value = "검색 데이터 초기화")
-    @RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
-    public Map<String, Object> initSearchData() {
-        return adminService.initSearchData();
-    }
+	@ApiOperation(value = "클럽 관중수 변경")
+	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.PUT)
+	public EmptyJsonResponse attendanceClubWrite(@PathVariable String id, @RequestBody AttendanceClubWrite attendanceClubWrite) {
+		adminService.attendanceClubWrite(id, attendanceClubWrite);
+		return EmptyJsonResponse.newInstance();
+	}
 
-    private FootballClub buildFootballClub(String id, FootballClubRequest request) {
-        FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(request.getOrigin());
+	@ApiOperation(value = "클럽 관중수 추가")
+	@RequestMapping(value = "/club/attendance", method = RequestMethod.POST)
+	public EmptyJsonResponse attendanceClubWrite(@RequestBody AttendanceClubWrite attendanceClubWrite) {
+		adminService.attendanceClubWrite(null, attendanceClubWrite);
+		return EmptyJsonResponse.newInstance();
+	}
 
-        if (Objects.isNull(footballClubOrigin))
-            throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+	@ApiOperation(value = "게시판 말머리 초기화")
+	@RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
+	public Map<String, Object> initBoardCategory() {
+		return adminService.initBoardCategory();
+	}
 
-        LocalName footballClubNameKr = LocalName.builder()
-                                         .language(Locale.KOREAN.getLanguage())
-                                         .fullName(request.getFullNameKr())
-                                         .shortName(request.getShortNameKr())
-                                         .build();
+	@ApiOperation(value = "검색 인덱스 초기화")
+	@RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
+	public Map<String, Object> initSearchIndex() {
+		return adminService.initSearchIndex();
+	}
 
-        LocalName footballClubNameEn = LocalName.builder()
-                                         .language(Locale.ENGLISH.getLanguage())
-                                         .fullName(request.getFullNameEn())
-                                         .shortName(request.getShortNameEn())
-                                         .build();
+	@ApiOperation(value = "검색 타입 초기화")
+	@RequestMapping(value = "/search/type/init", method = RequestMethod.POST)
+	public Map<String, Object> initSearchType() {
+		return adminService.initSearchType();
+	}
 
-        ArrayList<LocalName> names = new ArrayList<>();
-        names.add(footballClubNameKr);
-        names.add(footballClubNameEn);
+	@ApiOperation(value = "검색 데이터 초기화")
+	@RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
+	public Map<String, Object> initSearchData() {
+		return adminService.initSearchData();
+	}
 
-        return FootballClub.builder()
-                 .id(id)
-                 .active(request.getActive())
-                 .origin(footballClubOrigin)
-                .names(names)
-                .build();
-    }
+	@RequestMapping(value = "/thumbnail/size", method = RequestMethod.GET)
+	public Map<String, Object> thumbnailSizeWrite() {
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("resWidth", CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
+		data.put("resHeight", CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+
+		return data;
+	}
+
+	@ApiOperation(value = "썸네일 크기 지정")
+	@RequestMapping(value = "/thumbnail/size", method = RequestMethod.POST)
+	public EmptyJsonResponse thumbnailSizeWrite(@RequestBody ThumbnailSizeWrite thumbnailSizeWrite) {
+		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
+		return EmptyJsonResponse.newInstance();
+	}
+
+	@ApiOperation(value = "경기 목록")
+	@RequestMapping(value = "/competitions", method = RequestMethod.GET)
+	public Map<String, Object> getCompetitions() {
+		Map<String, Object> data = new HashMap<>();
+		data.put("competitions", adminService.getCompetitions());
+		return data;
+	}
+
+	@ApiOperation(value = "경기 하나")
+	@RequestMapping(value = "/competition/{id}", method = RequestMethod.GET)
+	public CompetitionWrite getCompetition(@PathVariable String id) {
+		return adminService.getCompetition(id);
+	}
+
+	@ApiOperation(value = "경기 추가")
+	@RequestMapping(value = "/competition", method = RequestMethod.POST)
+	public CompetitionWrite addCompetition(@RequestBody CompetitionWrite competitionWrite) {
+		String id = adminService.writeCompetition(null, competitionWrite).getId();
+		return adminService.getCompetition(id);
+	}
+
+	@ApiOperation(value = "경기 수정")
+	@RequestMapping(value = "/competition/{id}", method = RequestMethod.PUT)
+	public EmptyJsonResponse editCompetition(@PathVariable String id, @RequestBody CompetitionWrite competitionWrite) {
+		adminService.writeCompetition(id, competitionWrite);
+		return EmptyJsonResponse.newInstance();
+	}
+
+	@ApiOperation(value = "경기 삭제")
+	@RequestMapping(value = "/competition/{id}", method = RequestMethod.DELETE)
+	public EmptyJsonResponse deleteCompetition(@PathVariable String id) {
+		adminService.deleteCompetition(id);
+		return EmptyJsonResponse.newInstance();
+	}
+
+	@ApiOperation(value = "작두 하나")
+	@RequestMapping(value = "/jakdu/schedule/{id}", method = RequestMethod.GET)
+	public JakduScheduleWrite addJakduSchedule(@PathVariable String id) {
+		return adminService.getJakduScheduleWrite(id);
+	}
+
+	@ApiOperation(value = "작두 추가")
+	@RequestMapping(value = "/jakdu/schedule", method = RequestMethod.POST)
+	public JakduSchedule jakduScheduleWrite(@RequestBody JakduScheduleWrite jakduScheduleWrite) {
+		return adminService.writeJakduSchedule(null, jakduScheduleWrite);
+	}
+
+	@ApiOperation(value = "작두 수정")
+	@RequestMapping(value = "/jakdu/schedule", method = RequestMethod.PUT)
+	public EmptyJsonResponse editJakduSchedule(@PathVariable String id, @RequestBody JakduScheduleWrite jakduScheduleWrite) {
+		adminService.writeJakduSchedule(id, jakduScheduleWrite);
+		return EmptyJsonResponse.newInstance();
+	}
+
+	@ApiOperation(value = "작두 삭제")
+	@RequestMapping(value = "/jakdu/schedule/{id}", method = RequestMethod.DELETE)
+	public EmptyJsonResponse deleteSchedule(@PathVariable String id) {
+		adminService.deleteJakduSchedule(id);
+		return EmptyJsonResponse.newInstance();
+	}
+
+	@ApiOperation(value = "작두 목록")
+	@RequestMapping(value = "/jakdu/schedules", method = RequestMethod.GET)
+	public Map<String, Object> jakduSchedules() {
+		Map<String, Object> data = new HashMap<>();
+		data.put("jakduSchedules", adminService.getDataJakduScheduleList());
+		return data;
+	}
+
+	@ApiOperation(value = "작두그룹 하나")
+	@RequestMapping(value = "/jakdu/schedule/group/{id}", method = RequestMethod.GET)
+	public JakduScheduleGroupWrite getJakduScheduleGroup(@PathVariable String id) {
+		return adminService.getJakduScheduleGroupWrite(id);
+	}
+
+	@ApiOperation(value = "작두그룹 추가")
+	@RequestMapping(value = "/jakdu/schedule/group", method = RequestMethod.POST)
+	public JakduScheduleGroup addJakduScheduleGroup(@RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
+		return adminService.writeJakduScheduleGroup(null, jakduScheduleGroupWrite);
+	}
+
+	@ApiOperation(value = "작두그룹 수정")
+	@RequestMapping(value = "/jakdu/schedule/group", method = RequestMethod.PUT)
+	public JakduScheduleGroup editJakduScheduleGroup(@PathVariable String id, @RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
+		return adminService.writeJakduScheduleGroup(id, jakduScheduleGroupWrite);
+	}
+
+	@ApiOperation(value = "작두그룹 삭제")
+	@RequestMapping(value = "jakdu/schedule/group/{id}", method = RequestMethod.DELETE)
+	public EmptyJsonResponse deleteJakduScheduleGroup(@PathVariable String id) {
+		adminService.deleteJakduScheduleGroup(id);
+		return EmptyJsonResponse.newInstance();
+	}
+
+	@ApiOperation(value = "작두그룹 목록")
+	@RequestMapping(value = "/jakdu/schedule/groups", method = RequestMethod.GET)
+	public Map<String, Object> jakduScheduleGroups() {
+		Map<String, Object> data = new HashMap<>();
+		data.put("jakduScheduleGroups", adminService.getDataJakduScheduleGroupList());
+		return data;
+	}
+
+	private FootballClub buildFootballClub(String id, FootballClubRequest request) {
+		FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(request.getOrigin());
+
+		if (Objects.isNull(footballClubOrigin))
+			throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
+
+		LocalName footballClubNameKr = LocalName.builder()
+			.language(Locale.KOREAN.getLanguage())
+			.fullName(request.getFullNameKr())
+			.shortName(request.getShortNameKr())
+			.build();
+
+		LocalName footballClubNameEn = LocalName.builder()
+			.language(Locale.ENGLISH.getLanguage())
+			.fullName(request.getFullNameEn())
+			.shortName(request.getShortNameEn())
+			.build();
+
+		ArrayList<LocalName> names = new ArrayList<>();
+		names.add(footballClubNameKr);
+		names.add(footballClubNameEn);
+
+		return FootballClub.builder()
+			.id(id)
+			.active(request.getActive())
+			.origin(footballClubOrigin)
+			.names(names)
+			.build();
+	}
 }
