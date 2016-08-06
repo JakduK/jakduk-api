@@ -9,15 +9,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Resource;
-import javax.validation.Valid;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +35,8 @@ import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.FootballClubOrigin;
 import com.jakduk.core.model.db.HomeDescription;
+import com.jakduk.core.model.db.JakduSchedule;
+import com.jakduk.core.model.db.JakduScheduleGroup;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
 import com.jakduk.core.model.web.AttendanceClubWrite;
@@ -700,88 +699,71 @@ public class AdminRestController {
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.GET)
-	public String jakduScheduleWrite(Model model) {
-
-		adminService.getJakduScheduleWrite(model);
-
-		return "admin/jakduScheduleWrite";
+	@ApiOperation(value = "작두 하나")
+	@RequestMapping(value = "/jakdu/schedule/{id}", method = RequestMethod.GET)
+	public JakduScheduleWrite addJakduSchedule(@PathVariable String id) {
+		return adminService.getJakduScheduleWrite(id);
 	}
 
-	@RequestMapping(value = "/jakdu/schedule/write/{id}", method = RequestMethod.GET)
-	public String jakduScheduleWrite(@PathVariable String id, Model model) {
-
-		adminService.getJakduScheduleWrite(model, id);
-
-		return "admin/jakduScheduleWrite";
+	@ApiOperation(value = "작두 추가")
+	@RequestMapping(value = "/jakdu/schedule", method = RequestMethod.POST)
+	public JakduSchedule jakduScheduleWrite(@RequestBody JakduScheduleWrite jakduScheduleWrite) {
+		return adminService.writeJakduSchedule(null, jakduScheduleWrite);
 	}
 
-	@RequestMapping(value = "/jakdu/schedule/write", method = RequestMethod.POST)
-	public String jakduScheduleWrite(@Valid JakduScheduleWrite jakduScheduleWrite, BindingResult result) {
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/jakduScheduleWrite";
-		}
-
-		adminService.writeJakduSchedule(jakduScheduleWrite);
-
-		return "redirect:/admin/jakduSchedule";
+	@ApiOperation(value = "작두 수정")
+	@RequestMapping(value = "/jakdu/schedule", method = RequestMethod.PUT)
+	public EmptyJsonResponse editJakduSchedule(@PathVariable String id, @RequestBody JakduScheduleWrite jakduScheduleWrite) {
+		adminService.writeJakduSchedule(id, jakduScheduleWrite);
+		return EmptyJsonResponse.newInstance();
 	}
 
-	@RequestMapping(value = "/jakdu/schedule/delete/{id}", method = RequestMethod.GET)
-	public String jakduScheduleDelete(@PathVariable String id) {
-
-		boolean result = adminService.deleteJakduSchedule(id);
-
-		return "redirect:/admin/jakduSchedule";
+	@ApiOperation(value = "작두 삭제")
+	@RequestMapping(value = "/jakdu/schedule/{id}", method = RequestMethod.DELETE)
+	public EmptyJsonResponse deleteSchedule(@PathVariable String id) {
+		adminService.deleteJakduSchedule(id);
+		return EmptyJsonResponse.newInstance();
 	}
 
-	@RequestMapping(value = "/data/jakdu/schedule", method = RequestMethod.GET)
-	public void dataJakduSchedule(Model model) {
-
-		adminService.getDataJakduScheduleList(model);
+	@ApiOperation(value = "작두 목록")
+	@RequestMapping(value = "/jakdu/schedules", method = RequestMethod.GET)
+	public Map<String, Object> jakduSchedules() {
+		Map<String, Object> data = new HashMap<>();
+		data.put("jakduSchedules", adminService.getDataJakduScheduleList());
+		return data;
 	}
 
-	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.GET)
-	public String jakduScheduleGroupWrite(Model model) {
-
-		adminService.getJakduScheduleGroupWrite(model);
-
-		return "admin/jakduScheduleGroupWrite";
+	@ApiOperation(value = "작두그룹 하나")
+	@RequestMapping(value = "/jakdu/schedule/group/{id}", method = RequestMethod.GET)
+	public JakduScheduleGroupWrite getJakduScheduleGroup(@PathVariable String id) {
+		return adminService.getJakduScheduleGroupWrite(id);
 	}
 
-	@RequestMapping(value = "/jakdu/schedule/group/write/{id}", method = RequestMethod.GET)
-	public String jakduScheduleGroupWrite(@PathVariable String id, Model model) {
-
-		adminService.getJakduScheduleGroupWrite(model, id);
-
-		return "admin/jakduScheduleGroupWrite";
+	@ApiOperation(value = "작두그룹 추가")
+	@RequestMapping(value = "/jakdu/schedule/group", method = RequestMethod.POST)
+	public JakduScheduleGroup addJakduScheduleGroup(@RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
+		return adminService.writeJakduScheduleGroup(null, jakduScheduleGroupWrite);
 	}
 
-	@RequestMapping(value = "/jakdu/schedule/group/write", method = RequestMethod.POST)
-	public String jakduScheduleGroupWrite(@Valid JakduScheduleGroupWrite jakduScheduleGroupWrite, BindingResult result) {
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/jakduScheduleGroupWrite";
-		}
-
-		adminService.writeJakduScheduleGroup(jakduScheduleGroupWrite);
-
-		return "redirect:/admin/jakduScheduleGroup";
+	@ApiOperation(value = "작두그룹 수정")
+	@RequestMapping(value = "/jakdu/schedule/group", method = RequestMethod.PUT)
+	public JakduScheduleGroup editJakduScheduleGroup(@PathVariable String id, @RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
+		return adminService.writeJakduScheduleGroup(id, jakduScheduleGroupWrite);
 	}
 
-	@RequestMapping(value = "jakdu/schedule/group/delete/{id}", method = RequestMethod.GET)
-	public String jakduScheduleGroupDelete(@PathVariable String id) {
-
-		boolean result = adminService.deleteJakduScheduleGroup(id);
-
-		return "redirect:/admin/jakduScheduleGroup";
+	@ApiOperation(value = "작두그룹 삭제")
+	@RequestMapping(value = "jakdu/schedule/group/{id}", method = RequestMethod.DELETE)
+	public EmptyJsonResponse deleteJakduScheduleGroup(@PathVariable String id) {
+		adminService.deleteJakduScheduleGroup(id);
+		return EmptyJsonResponse.newInstance();
 	}
 
-	@RequestMapping(value = "/data/jakdu/schedule/group", method = RequestMethod.GET)
-	public void dataJakduScheduleGroup(Model model) {
-
-		adminService.getDataJakduScheduleGroupList(model);
+	@ApiOperation(value = "작두그룹 목록")
+	@RequestMapping(value = "/jakdu/schedule/groups", method = RequestMethod.GET)
+	public Map<String, Object> jakduScheduleGroups() {
+		Map<String, Object> data = new HashMap<>();
+		data.put("jakduScheduleGroups", adminService.getDataJakduScheduleGroupList());
+		return data;
 	}
 
 	private FootballClub buildFootballClub(String id, FootballClubRequest request) {
