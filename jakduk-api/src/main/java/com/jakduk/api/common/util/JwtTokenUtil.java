@@ -5,6 +5,7 @@ import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.authentication.common.SocialUserDetail;
 import com.jakduk.core.common.CommonConst;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.aop.AopInvocationException;
@@ -24,14 +25,13 @@ public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -3301605591108950415L;
 
-    private static final String CLAIM_KEY_USER_ID = "uid";
-    private static final String CLAIM_KEY_NAME = "name";
-    private static final String CLAIM_KEY_PROVIDER_ID = "pid";
-
-    private static final String AUDIENCE_UNKNOWN = "unknown";
-    private static final String AUDIENCE_WEB = "web";
-    private static final String AUDIENCE_MOBILE = "mobile";
-    private static final String AUDIENCE_TABLET = "tablet";
+    private final String CLAIM_KEY_USER_ID = "uid";
+    private final String CLAIM_KEY_NAME = "name";
+    private final String CLAIM_KEY_PROVIDER_ID = "pid";
+    private final String AUDIENCE_UNKNOWN = "unknown";
+    private final String AUDIENCE_WEB = "web";
+    private final String AUDIENCE_MOBILE = "mobile";
+    private final String AUDIENCE_TABLET = "tablet";
 
     @Value("${jwt.token.secret}")
     private String secret;
@@ -111,16 +111,10 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getClaimsFromToken(String token) {
-        Claims claims;
-        try {
-            claims = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (Exception e) {
-            claims = null;
-        }
-        return claims;
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Date generateExpirationDate() {
@@ -128,8 +122,15 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
+
+        try {
+            final Date expiration = getClaimsFromToken(token).getExpiration();
+
+            return expiration.before(new Date());
+
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
     private String generateAudience(Device device) {
@@ -143,8 +144,7 @@ public class JwtTokenUtil implements Serializable {
             } else if (device.isMobile()) {
                 audience = AUDIENCE_MOBILE;
             }
-        } catch (AopInvocationException e) {
-            return audience;
+        } catch (AopInvocationException | NullPointerException ignored) {
         }
 
         return audience;
