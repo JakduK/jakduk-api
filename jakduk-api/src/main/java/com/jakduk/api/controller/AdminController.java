@@ -1,12 +1,7 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.model.web.AttendanceClubWrite;
-import com.jakduk.core.model.web.CompetitionWrite;
-import com.jakduk.core.model.web.ThumbnailSizeWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.core.service.AdminService;
+import javax.validation.Valid;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,7 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.validation.Valid;
+import com.jakduk.core.model.web.AttendanceClubWrite;
+import com.jakduk.core.model.web.CompetitionWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.core.service.AdminService;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -171,29 +170,6 @@ public class AdminController {
 	@RequestMapping(value = "/boardCategory/write/{id}", method = RequestMethod.GET)
 	public String editBoardCategory() {
 		return "admin/admin";
-	}
-	
-	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.GET)
-	public String thumbnailSizeWrite(Model model) {
-		
-		model.addAttribute("resWidth", CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
-		model.addAttribute("resHeight", CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
-		model.addAttribute("thumbnailSizeWrite", new ThumbnailSizeWrite());
-
-		return "admin/thumbnailSizeWrite";
-	}	
-	
-	@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.POST)
-	public String thumbnailSizeWrite(@Valid ThumbnailSizeWrite thumbnailSizeWrite, BindingResult result) {
-		
-		if (result.hasErrors()) {
-			log.debug("result=" + result);
-			return "admin/thumbnailSizeWrite";
-		}
-		
-		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
-
-		return "redirect:/admin";
 	}
 
 	@RequestMapping(value = "/attendance/club/write", method = RequestMethod.GET)

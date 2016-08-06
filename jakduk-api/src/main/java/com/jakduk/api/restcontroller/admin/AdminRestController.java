@@ -1,27 +1,46 @@
 package com.jakduk.api.restcontroller.admin;
 
 
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.vo.FootballClubRequest;
-import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
-import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.model.db.*;
-import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.BoardCategoryWrite;
-import com.jakduk.core.service.AdminService;
-import com.jakduk.core.service.CommonService;
-import com.jakduk.core.service.CompetitionService;
-import com.jakduk.core.service.StatsService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.FootballClubRequest;
+import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
+import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.model.db.AttendanceLeague;
+import com.jakduk.core.model.db.BoardCategory;
+import com.jakduk.core.model.db.Competition;
+import com.jakduk.core.model.db.Encyclopedia;
+import com.jakduk.core.model.db.FootballClub;
+import com.jakduk.core.model.db.FootballClubOrigin;
+import com.jakduk.core.model.db.HomeDescription;
+import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.LocalSimpleName;
+import com.jakduk.core.model.web.BoardCategoryWrite;
+import com.jakduk.core.model.web.ThumbnailSizeWrite;
+import com.jakduk.core.service.AdminService;
+import com.jakduk.core.service.CommonService;
+import com.jakduk.core.service.CompetitionService;
+import com.jakduk.core.service.StatsService;
 
 /**
  * @author pyohwan
@@ -588,6 +607,25 @@ public class AdminRestController {
     public Map<String, Object> initSearchData() {
         return adminService.initSearchData();
     }
+
+		@RequestMapping(value = "/thumbnail/size", method = RequestMethod.GET)
+		public Map<String, Object> thumbnailSizeWrite() {
+
+			Map<String, Object> data = new HashMap<>();
+			data.put("resWidth", CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
+			data.put("resHeight", CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+
+			return data;
+		}
+
+		@ApiOperation(value = "썸네일 크기 지정")
+		@RequestMapping(value = "/thumbnail/size/write", method = RequestMethod.POST)
+		public EmptyJsonResponse thumbnailSizeWrite(@RequestBody ThumbnailSizeWrite thumbnailSizeWrite) {
+
+			adminService.thumbnailSizeWrite(thumbnailSizeWrite);
+
+			return EmptyJsonResponse.newInstance();
+		}
 
     private FootballClub buildFootballClub(String id, FootballClubRequest request) {
         FootballClubOrigin footballClubOrigin = adminService.findOriginFootballClubById(request.getOrigin());

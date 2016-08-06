@@ -1,24 +1,27 @@
 package com.jakduk.core.service;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import javax.imageio.ImageIO;
+
 import com.google.gson.Gson;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.db.*;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
-import com.jakduk.core.model.embedded.JakduScheduleScore;
-import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.AttendanceClubWrite;
-import com.jakduk.core.model.web.BoardCategoryWrite;
-import com.jakduk.core.model.web.CompetitionWrite;
-import com.jakduk.core.model.web.ThumbnailSizeWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.core.repository.*;
-import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
-import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -34,21 +37,42 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.List;
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.model.db.AttendanceClub;
+import com.jakduk.core.model.db.AttendanceLeague;
+import com.jakduk.core.model.db.BoardCategory;
+import com.jakduk.core.model.db.Competition;
+import com.jakduk.core.model.db.Encyclopedia;
+import com.jakduk.core.model.db.FootballClub;
+import com.jakduk.core.model.db.FootballClubOrigin;
+import com.jakduk.core.model.db.Gallery;
+import com.jakduk.core.model.db.HomeDescription;
+import com.jakduk.core.model.db.JakduSchedule;
+import com.jakduk.core.model.db.JakduScheduleGroup;
+import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
+import com.jakduk.core.model.elasticsearch.CommentOnES;
+import com.jakduk.core.model.elasticsearch.GalleryOnES;
+import com.jakduk.core.model.embedded.JakduScheduleScore;
+import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.LocalSimpleName;
+import com.jakduk.core.model.web.AttendanceClubWrite;
+import com.jakduk.core.model.web.BoardCategoryWrite;
+import com.jakduk.core.model.web.CompetitionWrite;
+import com.jakduk.core.model.web.ThumbnailSizeWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.core.repository.AttendanceClubRepository;
+import com.jakduk.core.repository.AttendanceLeagueRepository;
+import com.jakduk.core.repository.BoardCategoryRepository;
+import com.jakduk.core.repository.CompetitionRepository;
+import com.jakduk.core.repository.EncyclopediaRepository;
+import com.jakduk.core.repository.FootballClubOriginRepository;
+import com.jakduk.core.repository.FootballClubRepository;
+import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.HomeDescriptionRepository;
+import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
+import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -497,7 +521,7 @@ public class AdminService {
 		List<Gallery> galleries;
 		
 		if (thumbnailSizeWrite.getGalleryId() != null && !thumbnailSizeWrite.getGalleryId().isEmpty()) {
-			galleries = new ArrayList<Gallery>();
+			galleries = new ArrayList<>();
 			galleries.add(galleryRepository.findOne(thumbnailSizeWrite.getGalleryId()));
 		} else {
 			galleries = galleryRepository.findAll();
