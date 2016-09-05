@@ -6,6 +6,12 @@ description = 'jakduk-api'
 dependencies {
   compile project(':jakduk-core')
 
+  compile group: 'org.springframework', name: 'spring-web', version:"${springVersion}"
+  compile group: 'org.springframework', name: 'spring-webmvc', version:"${springVersion}"
+  compile group: 'org.springframework.security', name: 'spring-security-web', version:"${springSecurityVersion}"
+  compile group: 'org.springframework.security', name: 'spring-security-config', version:"${springSecurityVersion}"
+  compile group: 'org.springframework.security', name: 'spring-security-taglibs', version:"${springSecurityVersion}"
+
   compile group: 'javax.servlet', name: 'jstl', version:'1.2'
   compile 'io.springfox:springfox-swagger2:2.5.0'
   compile 'io.springfox:springfox-swagger-ui:2.5.0'

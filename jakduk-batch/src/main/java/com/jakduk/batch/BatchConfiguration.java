@@ -44,7 +44,7 @@ public class BatchConfiguration {
 				.<BoardFree, BoardFree>chunk(1000)
 				.reader(reader())
 				.processor(processor())
-				.writer(writer())
+//				.writer(writer())
 				.build();
 	}
 

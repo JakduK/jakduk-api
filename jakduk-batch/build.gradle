@@ -10,23 +10,22 @@ buildscript {
 	}
 }
 
-apply plugin: 'java'
-apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
-jar {
-	baseName = 'jakduk-batch'
-	version = '0.0.1-SNAPSHOT'
+configurations {
+	all*.exclude group:'org.springframework', module:'spring-context-support'
+	all*.exclude group:'org.springframework.security', module:'spring-security-core'
+	all*.exclude group:'org.springframework.mobile', module:'spring-mobile-device'
+	all*.exclude group:'commons-fileupload', module:'commons-fileupload'
+	all*.exclude group:'rome', module:'rome'
+	all*.exclude group:'org.elasticsearch', module:'elasticsearch'
+	all*.exclude group:'io.searchbox', module:'jest'
+	all*.exclude group:'org.hibernate.javax.persistence'
 }
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-	mavenCentral()
-}
-
 
 dependencies {
+	compile project(':jakduk-core')
+
 	compile('org.springframework.boot:spring-boot-starter-batch')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.projectlombok:lombok')

@@ -15,8 +15,8 @@ import javax.annotation.Resource;
  * @since 2016. 9. 5.
  */
 
-@Configuration
-@EnableMongoRepositories(basePackages = {"com.jakduk.batch.repository"})
+//@Configuration
+//@EnableMongoRepositories(basePackages = {"com.jakduk.batch.repository"})
 public class BatchMongoConfig extends AbstractMongoConfiguration {
 
 	@Resource
