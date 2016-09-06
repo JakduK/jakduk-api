@@ -13,13 +13,14 @@ buildscript {
 apply plugin: 'spring-boot'
 
 configurations {
-	all*.exclude group:'org.springframework', module:'spring-context-support'
 	all*.exclude group:'org.springframework.security', module:'spring-security-core'
 	all*.exclude group:'org.springframework.mobile', module:'spring-mobile-device'
+	all*.exclude group:'org.springframework', module:'spring-webmvc'
+	all*.exclude group:'org.springframework', module:'spring-web'
 	all*.exclude group:'commons-fileupload', module:'commons-fileupload'
+	all*.exclude group:'commons-beanutils', module:'commons-beanutils'
 	all*.exclude group:'rome', module:'rome'
 	all*.exclude group:'org.elasticsearch', module:'elasticsearch'
-	all*.exclude group:'io.searchbox', module:'jest'
 	all*.exclude group:'org.hibernate.javax.persistence'
 }
 
@@ -28,6 +29,6 @@ dependencies {
 
 	compile('org.springframework.boot:spring-boot-starter-batch')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-	compile('org.projectlombok:lombok')
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
