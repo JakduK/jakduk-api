@@ -5,6 +5,8 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
@@ -54,5 +56,10 @@ public class CoreRootConfig {
     @Bean
     public SlackApi slackApi() {
         return new SlackApi(environment.getProperty("slack.board.webhook"));
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new StandardPasswordEncoder();
     }
 }

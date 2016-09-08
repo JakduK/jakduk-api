@@ -1,0 +1,23 @@
+buildscript {
+	ext {
+		springBootVersion = '1.4.0.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'spring-boot'
+
+dependencies {
+	compile project(':jakduk-core')
+
+	compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+	compile("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
+	compile("org.springframework.boot:spring-boot-starter-freemarker:${springBootVersion}")
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}

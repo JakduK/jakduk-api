@@ -39,9 +39,6 @@ import com.jakduk.core.repository.user.UserRepository;
 @Service
 public class StatsService {
 
-	@Value("${kakao.javascript.key}")
-	private String kakaoJavascriptKey;
-
 	@Autowired
 	private JakdukDAO jakdukDAO;
 
@@ -83,17 +80,6 @@ public class StatsService {
 	// 대회별 관중수 하나 지움.
 	public void deleteLeagueAttendance(String id) {
 		attendanceLeagueRepository.delete(id);
-	}
-
-	public Integer getSupporters(Model model, String chartType) {
-
-		model.addAttribute("kakaoKey", kakaoJavascriptKey);
-
-		if (chartType != null && !chartType.isEmpty()) {
-			model.addAttribute("chartType", chartType);
-		}
-
-		return HttpServletResponse.SC_OK;
 	}
 
 	public Map<String, Object> getSupportersData(String language) {

@@ -68,9 +68,6 @@ public class GalleryService {
 	@Value("${storage.thumbnail.path}")
 	private String storageThumbnailPath;
 
-	@Value("${kakao.javascript.key}")
-	private String kakaoJavascriptKey;
-
 	@Autowired
 	private UserService userService;
 

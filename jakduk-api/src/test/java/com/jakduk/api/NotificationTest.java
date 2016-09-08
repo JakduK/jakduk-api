@@ -74,9 +74,6 @@ public class NotificationTest extends AbstractSpringTest {
 
         emailService.sendResetPassword("jakduk.com", "phjang1983@daum.net");
 
-
-
-
         System.out.println("content=" + content);
 
     }
