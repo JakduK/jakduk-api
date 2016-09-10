@@ -25,7 +25,9 @@ public enum ServiceError {
     ALREADY_DISABLE(HttpStatus.NOT_FOUND, "ALREADY_DISABLE", "common.exception.already.disable"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED_ACCESS", "common.exception.access.denied"),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "common.exception.forbidden");
+    FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "common.exception.forbidden"),
+
+    SEND_EMAIL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SEND_EMAIL_FAILED", "common.exception.send.email.failed");
 
     private final HttpStatus httpStatus;
     private final String code;

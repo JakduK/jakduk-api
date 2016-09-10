@@ -3,24 +3,18 @@ package com.jakduk.core.notification;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.*;
 
 @Slf4j
@@ -37,89 +31,98 @@ public class EmailService {
 	private JavaMailSender mailSender;
 
 	@Autowired
-	private FreeMarkerConfigurer freeMarkerConfigurer;
-
-	@Value("${smtp.username}")
-	private String fromMail;
-
-	@Value("${email.url.static.resource}")
-	private String staticResourceUrl;
+	private TemplateEngine htmlTemplateEngine;
 
 	@Async(value = "asyncMailExecutor")
-	public void sendResetPassword(String host, String email) {
+	public void sendResetPassword(final Locale locale, final String host, final String recipientEmail)
+			throws MessagingException {
 
 		if (log.isDebugEnabled()) {
-			log.debug("send email to reset password. email is " + email);
+			log.debug("send email to reset password. email is " + recipientEmail);
 		}
 
-		Locale locale = LocaleContextHolder.getLocale();
+		String code = UUID.randomUUID().toString();
+		ResourceBundle bundle = ResourceBundle.getBundle("messages.user", locale);
 		String language = commonService.getLanguageCode(locale, null);
 
-		try {
-			String code = UUID.randomUUID().toString();
-			ResourceBundle bundle = ResourceBundle.getBundle("messages.user", locale);
+		// Prepare the evaluation context
+		final Context ctx = new Context(locale);
+		ctx.setVariable("email", recipientEmail);
+		ctx.setVariable("host", host + code);
+		ctx.setVariable("linkLabel", bundle.getString("user.password.change"));
 
-			String logoPath = staticResourceUrl;
+		String subject = "jakduk.com-" + bundle.getString("user.password.reset.instructions");
 
-			if (language.equals(Locale.KOREAN.getLanguage())) {
-				logoPath += "/img/logo_type_A_kr.png";
-			} else {
-				logoPath = "/img/logo_type_A_en.png";
-			}
+		// Prepare message using a Spring helper
+		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+		final MimeMessageHelper message
+				= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
+		message.setSubject(subject);
+//		message.setFrom("thymeleaf@example.com");
+		message.setTo(recipientEmail);
 
-			Map<String, Object> model = new HashMap<>();
-			model.put("lang", language);
-			model.put("title", "JakduK - " + bundle.getString("user.password.reset.instructions"));
-			model.put("logo", logoPath);
-			model.put("host", host);
-			model.put("code", code);
-			model.put("greeting", new MessageFormat(bundle.getString("user.password.reset.greeting")).format(new String[]{email}));
-			model.put("linkLabel", bundle.getString("user.password.change"));
+		// Create the HTML body using Thymeleaf
+		final String htmlContent = this.htmlTemplateEngine.process("resetPassword", ctx);
+		message.setText(htmlContent, true /* isHtml */);
 
-			String subject = "jakduk.com-" + bundle.getString("user.password.reset.instructions");
+		String logoPath = "";
 
-			StringBuilder content = new StringBuilder();
-
-			try {
-				Template template = getTemplate("resetPassword.ftl");
-				content.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, model));
-			} catch (TemplateException e) {
-				e.printStackTrace();
-			}
-
-			send(email, subject, content.toString());
-
-			Token token = new Token();
-			token.setEmail(email);
-			token.setCode(code);
-			token.setCreatedTime(new Date());
-
-			if (Objects.nonNull(tokenRepository.findOne(email))) {
-				tokenRepository.delete(email);
-			}
-			tokenRepository.insert(token);
-		} catch (MessagingException e) {
-			log.error("error", e);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (language.equals(Locale.KOREAN.getLanguage())) {
+			logoPath = "mail/images/logo_type_A_kr.png";
+		} else {
+			logoPath = "mail/images/logo_type_A_en.png";
 		}
+
+		message.addInline("logo", new ClassPathResource(logoPath), "image/png");
+
+		// Send mail
+		this.mailSender.send(mimeMessage);
+
+		Token token = new Token();
+		token.setEmail(recipientEmail);
+		token.setCode(code);
+		token.setCreatedTime(new Date());
+
+		if (Objects.nonNull(tokenRepository.findOne(recipientEmail))) {
+			tokenRepository.delete(recipientEmail);
+		}
+
+		tokenRepository.insert(token);
 	}
 
-	private Template getTemplate(String templateName) throws IOException {
-		Configuration cfg = freeMarkerConfigurer.getConfiguration();
+	/**
+	 * Send HTML mail with inline image
+	 */
+	public void sendMailWithInline(
+			final String recipientName, final String recipientEmail, final Locale locale)
+			throws MessagingException {
 
-		return cfg.getTemplate(templateName);
+		// Prepare the evaluation context
+		final Context ctx = new Context(locale);
+		ctx.setVariable("name", recipientName);
+		ctx.setVariable("subscriptionDate", new Date());
+		ctx.setVariable("hobbies", Arrays.asList("Cinema", "Sports", "Music"));
+//		ctx.setVariable("imageResourceName", imageResourceName); // so that we can reference it from HTML
+
+		// Prepare message using a Spring helper
+		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+		final MimeMessageHelper message
+				= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
+		message.setSubject("Example HTML email with inline image");
+		message.setFrom("thymeleaf@example.com");
+		message.setTo(recipientEmail);
+
+		// Create the HTML body using Thymeleaf
+		final String htmlContent = this.htmlTemplateEngine.process("email-inlineimage", ctx);
+		message.setText(htmlContent, true /* isHtml */);
+
+		// Add the inline image, referenced from the HTML code as "cid:${imageResourceName}"
+//		final InputStreamSource imageSource = new ByteArrayResource(imageBytes);
+//		message.addInline(imageResourceName, imageSource, imageContentType);
+		message.addInline("sample-image", new ClassPathResource("mail/images/logo_type_A_en.png"), "image/png");
+
+		// Send mail
+		this.mailSender.send(mimeMessage);
 	}
 
-	private void send(String to, String subject, String htmlBody) throws MessagingException {
-
-		MimeMessage message = mailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-		helper.setTo(to);
-		helper.setSubject(subject);
-		helper.setText(htmlBody, true);
-
-		mailSender.send(message);
-	}
 }

@@ -1,6 +1,8 @@
 package com.jakduk.api.restcontroller.user;
 
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.notification.EmailService;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Locale;
@@ -50,27 +53,29 @@ public class PasswordRestController {
 	@RequestMapping(value = "/find", method = RequestMethod.POST)
 	public Map<String, Object> findPassword(@RequestParam String email,
 	                                        @RequestParam String callbackUrl,
-	                                        HttpServletRequest request) {
-
-		Locale locale = localeResolver.resolveLocale(request);
+											final Locale locale) {
 
 		String message = "";
 
 		UserProfile userProfile = userService.findOneByEmail(email);
 
 		if (Objects.isNull(userProfile)) {
-			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.are.not.registered");
+			message = commonService.getResourceBundleMessage( "messages.user", "user.msg.you.are.not.registered");
 		} else {
 			switch (userProfile.getProviderId()) {
 				case JAKDUK:
-					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.sendok");
-					emailService.sendResetPassword(callbackUrl, email);
+					message = commonService.getResourceBundleMessage("messages.user", "user.msg.reset.password.sendok");
+					try {
+						emailService.sendResetPassword(locale, callbackUrl, email);
+					} catch (MessagingException e) {
+						throw new ServiceException(ServiceError.SEND_EMAIL_FAILED);
+					}
 					break;
 				case DAUM:
-					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);
+					message = commonService.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);
 					break;
 				case FACEBOOK:
-					message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.FACEBOOK);
+					message = commonService.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.FACEBOOK);
 					break;
 			}
 		}
