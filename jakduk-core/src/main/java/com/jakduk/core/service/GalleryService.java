@@ -1,31 +1,7 @@
 package com.jakduk.core.service;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.stream.Stream;
-import javax.imageio.ImageIO;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
@@ -33,6 +9,8 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.UnauthorizedAccessException;
 import com.jakduk.core.exception.UserFeelingException;
 import com.jakduk.core.model.db.Gallery;
+import com.jakduk.core.model.embedded.CommonFeelingUser;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import com.jakduk.core.model.simple.BoardFreeOnGallery;
 import com.jakduk.core.model.simple.GalleryOnList;
@@ -45,11 +23,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.jakduk.core.authentication.common.CommonPrincipal;
-import com.jakduk.core.model.embedded.CommonFeelingUser;
-import com.jakduk.core.model.embedded.CommonWriter;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -120,113 +109,108 @@ public class GalleryService {
 
 	/**
 	 * 사진 올리기.
-	 * @param file 멀티파트 객체
 	 * @return Gallery 객체
      */
-	public Gallery uploadImage(MultipartFile file) {
+	public Gallery uploadImage(String originalFileName, long size, String contentType, byte[] bytes, InputStream inputStream) throws IOException {
 
-		try {
-			Gallery gallery = new Gallery();
+		Gallery gallery = new Gallery();
 
-			CommonPrincipal principal = userService.getCommonPrincipal();
-			String userid = principal.getId();
-			String username = principal.getUsername();
-			CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
+		CommonPrincipal principal = userService.getCommonPrincipal();
+		String userid = principal.getId();
+		String username = principal.getUsername();
+		CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
 
-			CommonWriter writer = new CommonWriter(userid, username, accountType);
+		CommonWriter writer = new CommonWriter(userid, username, accountType);
 
-			gallery.setWriter(writer);
+		gallery.setWriter(writer);
 
-			GalleryStatus status = new GalleryStatus();
-			status.setStatus(CommonConst.GALLERY_STATUS_TYPE.TEMP);
-			gallery.setStatus(status);
+		GalleryStatus status = new GalleryStatus();
+		status.setStatus(CommonConst.GALLERY_STATUS_TYPE.TEMP);
+		gallery.setStatus(status);
 
-			gallery.setFileName(file.getOriginalFilename());
-			gallery.setFileSize(file.getSize());
-			gallery.setSize(file.getSize());
+		gallery.setFileName(originalFileName);
+		gallery.setFileSize(size);
+		gallery.setSize(size);
 
-			// 사진 포맷.
-			String formatName = "jpg";
-			String splitContentType[] = file.getContentType().split("/");
+		// 사진 포맷.
+		String formatName = "jpg";
+		String splitContentType[] = contentType.split("/");
 
-			if (!splitContentType[1].equals("octet-stream")) {
-				formatName = splitContentType[1];
-				gallery.setContentType(file.getContentType());
-			} else {
-				gallery.setContentType("image/jpeg");
-			}
-
-			galleryRepository.save(gallery);
-
-			// 폴더 생성.
-			ObjectId objId = new ObjectId(gallery.getId());
-			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
-			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-
-			Path imageDirPath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()),
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
-
-			Path thumbDirPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()),
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
-
-			if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS)) {
-					Files.createDirectories(imageDirPath);
-			}
-
-			if (Files.notExists(thumbDirPath, LinkOption.NOFOLLOW_LINKS)) {
-				Files.createDirectories(thumbDirPath);
-			}
-
-			// 사진 경로.
-			Path imageFilePath = imageDirPath.resolve(gallery.getId());
-			Path thumbFilePath = thumbDirPath.resolve(gallery.getId());
-
-			// 사진 저장.
-			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				if (CommonConst.GALLERY_MAXIUM_CAPACITY > file.getSize()) {
-					Files.write(imageFilePath, file.getBytes());
-				} else {
-					BufferedImage bi = ImageIO.read(file.getInputStream());
-
-					double ratio = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) file.getSize();
-					int ratioWidth = (int)(bi.getWidth() * ratio);
-					int ratioHeight = (int)(bi.getHeight() * ratio);
-
-					BufferedImage bufferIm = new BufferedImage(ratioWidth, ratioHeight, BufferedImage.TYPE_INT_RGB);
-					Image tempImg = bi.getScaledInstance(ratioWidth, ratioHeight, Image.SCALE_AREA_AVERAGING);
-					Graphics2D g2 = bufferIm.createGraphics();
-					g2.drawImage(tempImg, 0, 0, ratioWidth, ratioHeight, null);
-
-					ImageIO.write(bufferIm, formatName, imageFilePath.toFile());
-
-					BasicFileAttributes attr = Files.readAttributes(imageFilePath, BasicFileAttributes.class);
-
-					gallery.setSize(attr.size());
-					galleryRepository.save(gallery);
-				}
-			}
-
-			// 썸네일 만들기.
-			if (Files.notExists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				//BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-				BufferedImage bi = ImageIO.read(file.getInputStream());
-				BufferedImage bufferIm = new BufferedImage(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, BufferedImage.TYPE_INT_RGB);
-				Image tempImg = bi.getScaledInstance(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, Image.SCALE_AREA_AVERAGING);
-				Graphics2D g2 = bufferIm.createGraphics();
-				g2.drawImage(tempImg, 0, 0, CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, null);
-
-				ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
-			}
-
-			if (log.isDebugEnabled()) {
-				log.debug("gallery info=" + gallery);
-			}
-
-			return gallery;
-
-		} catch (IOException e) {
-			throw new RuntimeException(commonService.getResourceBundleMessage("messages.gallery", "gallery.exception.io"));
+		if (!splitContentType[1].equals("octet-stream")) {
+			formatName = splitContentType[1];
+			gallery.setContentType(contentType);
+		} else {
+			gallery.setContentType("image/jpeg");
 		}
+
+		galleryRepository.save(gallery);
+
+		// 폴더 생성.
+		ObjectId objId = new ObjectId(gallery.getId());
+		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
+		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+		Path imageDirPath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()),
+				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+
+		Path thumbDirPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()),
+				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+
+		if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS)) {
+			Files.createDirectories(imageDirPath);
+		}
+
+		if (Files.notExists(thumbDirPath, LinkOption.NOFOLLOW_LINKS)) {
+			Files.createDirectories(thumbDirPath);
+		}
+
+		// 사진 경로.
+		Path imageFilePath = imageDirPath.resolve(gallery.getId());
+		Path thumbFilePath = thumbDirPath.resolve(gallery.getId());
+
+		// 사진 저장.
+		if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
+			if (CommonConst.GALLERY_MAXIUM_CAPACITY > size) {
+				Files.write(imageFilePath, bytes);
+			} else {
+				BufferedImage bi = ImageIO.read(inputStream);
+
+				double ratio = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) size;
+				int ratioWidth = (int)(bi.getWidth() * ratio);
+				int ratioHeight = (int)(bi.getHeight() * ratio);
+
+				BufferedImage bufferIm = new BufferedImage(ratioWidth, ratioHeight, BufferedImage.TYPE_INT_RGB);
+				Image tempImg = bi.getScaledInstance(ratioWidth, ratioHeight, Image.SCALE_AREA_AVERAGING);
+				Graphics2D g2 = bufferIm.createGraphics();
+				g2.drawImage(tempImg, 0, 0, ratioWidth, ratioHeight, null);
+
+				ImageIO.write(bufferIm, formatName, imageFilePath.toFile());
+
+				BasicFileAttributes attr = Files.readAttributes(imageFilePath, BasicFileAttributes.class);
+
+				gallery.setSize(attr.size());
+				galleryRepository.save(gallery);
+			}
+		}
+
+		// 썸네일 만들기.
+		if (Files.notExists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
+			//BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+			BufferedImage bi = ImageIO.read(inputStream);
+			BufferedImage bufferIm = new BufferedImage(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, BufferedImage.TYPE_INT_RGB);
+			Image tempImg = bi.getScaledInstance(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, Image.SCALE_AREA_AVERAGING);
+			Graphics2D g2 = bufferIm.createGraphics();
+			g2.drawImage(tempImg, 0, 0, CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT, null);
+
+			ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("gallery info=" + gallery);
+		}
+
+		return gallery;
+
 	}
 
 	// 이미지 가져오기.
