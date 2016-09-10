@@ -1,7 +1,9 @@
 package com.jakduk.core.configuration;
 
 import net.gpedro.integrations.slack.SlackApi;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -9,6 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import javax.annotation.Resource;
 import java.util.Properties;
@@ -45,15 +52,6 @@ public class CoreRootConfig {
     }
 
     @Bean
-    public FreeMarkerConfigurer freeMarkerConfigurer() {
-        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setTemplateLoaderPath("classpath:templates/email/");
-        configurer.setDefaultEncoding("UTF-8");
-
-        return configurer;
-    }
-
-    @Bean
     public SlackApi slackApi() {
         return new SlackApi(environment.getProperty("slack.board.webhook"));
     }
@@ -61,5 +59,40 @@ public class CoreRootConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new StandardPasswordEncoder();
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
+                "classpath:messages/about", "classpath:messages/home", "classpath:messages/gallery",
+                "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setCacheSeconds(180);
+
+        return messageSource;
+    }
+
+    /**
+     * THYMELEAF: Template Engine (Spring4-specific version) for HTML email templates.
+     */
+    @Bean
+    public TemplateEngine htmlTemplateEngine() {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(htmlTemplateResolver());
+        return templateEngine;
+    }
+
+    /**
+     * THYMELEAF: Template Resolver for HTML email templates.
+     */
+    private ITemplateResolver htmlTemplateResolver() {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("/mail/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        templateResolver.setCharacterEncoding("UTF-8");
+        templateResolver.setCacheable(false);
+        return templateResolver;
     }
 }

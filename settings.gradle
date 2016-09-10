@@ -4,9 +4,7 @@ rootProject.name = 'jakduk-parent'
 include ':jakduk-core'
 include ':jakduk-api'
 include ':jakduk-batch'
-include ':notification'
 
 project(':jakduk-core').projectDir = "$rootDir/jakduk-core" as File
 project(':jakduk-api').projectDir = "$rootDir/jakduk-api" as File
 project(':jakduk-batch').projectDir = "$rootDir/jakduk-batch" as File
-project(':notification').projectDir = "$rootDir/notification" as File

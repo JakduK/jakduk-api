@@ -5,7 +5,6 @@ description = 'jakduk-api'
 
 dependencies {
   compile project(':jakduk-core')
-  compile project(':notification')
 
   compile group: 'org.springframework', name: 'spring-web', version:"${springVersion}"
   compile group: 'org.springframework', name: 'spring-webmvc', version:"${springVersion}"
