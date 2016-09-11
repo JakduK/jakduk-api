@@ -1,7 +1,7 @@
 package com.jakduk.batch;
 
-import com.jakduk.batch.model.BoardFree;
-import com.jakduk.batch.processor.MyItemProcessor;
+import com.jakduk.batch.processor.ChangeBoardImageUrlProcessor;
+import com.jakduk.core.model.db.BoardFree;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -22,12 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 9. 5.
  */
 
 @Configuration
-public class BatchConfiguration {
+public class ChangeBoardImageUrlBatchConfig {
 
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
@@ -40,7 +40,7 @@ public class BatchConfiguration {
 
 	@Bean
 	public Step step1() {
-		return stepBuilderFactory.get("step1")
+		return stepBuilderFactory.get("changeBoardImageUrlStep01")
 				.<BoardFree, BoardFree>chunk(1000)
 				.reader(reader())
 				.processor(processor())
@@ -50,7 +50,7 @@ public class BatchConfiguration {
 
 	@Bean
 	public Job job(Step step1) throws Exception {
-		return jobBuilderFactory.get("job1")
+		return jobBuilderFactory.get("changeBoardImageUrlJob01")
 				.incrementer(new RunIdIncrementer())
 				.start(step1)
 				.build();
@@ -58,13 +58,11 @@ public class BatchConfiguration {
 
 	@Bean
 	public ItemReader<BoardFree> reader() {
-		//mongoOperations.find(Query.query(Criteria.where("firstName").exists(true)), Account.class);
-
 		MongoItemReader<BoardFree> itemReader = new MongoItemReader<>();
 		itemReader.setTemplate(mongoOperations);
 		itemReader.setTargetType(BoardFree.class);
 		itemReader.setPageSize(100);
-		itemReader.setQuery("{}");
+		itemReader.setQuery("{'galleries':{$exists:true}, 'batch':{$nin:['CHANGE_BOARD_CONTENT_IMAGE_URL_01']}}");
 		Map<String, Sort.Direction> sorts = new HashMap<>();
 		sorts.put("id", Sort.Direction.ASC);
 		itemReader.setSort(sorts);
@@ -74,7 +72,7 @@ public class BatchConfiguration {
 
 	@Bean
 	public ItemProcessor<BoardFree, BoardFree> processor() {
-		return new MyItemProcessor();
+		return new ChangeBoardImageUrlProcessor();
 	}
 
 	@Bean
