@@ -1,6 +1,7 @@
 package com.jakduk.batch.processor;
 
 import com.jakduk.core.model.db.BoardFree;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import java.util.stream.Stream;
  * @author Jang, Pyohwan
  * @since 2016. 9. 5.
  */
+
+@Slf4j
 public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, BoardFree> {
 
 	private final String PROFILE_STAGING_BEFORE_IMAGE_URL_01 = "src=\"/jakduk/gallery/";
@@ -52,7 +55,7 @@ public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, Bo
 			item.setContent(newContent);
 		}
 
-		System.out.println(item.getContent());
+		log.debug("resultItemId=" + item.getId());
 
 		return item;
 	}
