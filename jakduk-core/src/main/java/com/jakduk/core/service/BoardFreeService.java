@@ -44,9 +44,6 @@ import java.util.stream.Collectors;
 @Service
 public class BoardFreeService {
 
-	@Value("${kakao.javascript.key}")
-	private String kakaoJavascriptKey;
-
 	@Autowired
 	private BoardFreeRepository boardFreeRepository;
 

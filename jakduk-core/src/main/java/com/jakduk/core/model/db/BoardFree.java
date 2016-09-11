@@ -66,4 +66,6 @@ public class BoardFree {
 	private List<BoardHistory> history;
 	
 	private List<BoardImage> galleries;
+
+	private List<CommonConst.BATCH_TYPE> batch;
 }

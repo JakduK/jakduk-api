@@ -216,4 +216,9 @@ public class CommonConst {
 		FULL,		// 전체크기
 		THUMBNAIL	// 썸네일
 	}
+
+	// 배치 타입
+	public enum BATCH_TYPE {
+		CHANGE_BOARD_CONTENT_IMAGE_URL_01
+	}
 }
