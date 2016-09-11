@@ -1,9 +1,7 @@
 package com.jakduk.api.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
@@ -92,6 +90,11 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
 */
 
     @Bean
+    public LocaleResolver localeResolver() {
+        return new SessionLocaleResolver();
+    }
+
+    @Bean
     public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
         List<ViewResolver> viewResolvers = new ArrayList<>();
         List<View> defaultViews = new ArrayList<>();
@@ -116,23 +119,6 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         resolver.setDefaultViews(defaultViews);
 
         return resolver;
-    }
-
-    @Bean
-    public LocaleResolver localeResolver() {
-        return new SessionLocaleResolver();
-    }
-
-    @Bean
-    public MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
-                "classpath:messages/about", "classpath:messages/home", "classpath:messages/gallery",
-                "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setCacheSeconds(180);
-
-        return messageSource;
     }
 
     @Bean

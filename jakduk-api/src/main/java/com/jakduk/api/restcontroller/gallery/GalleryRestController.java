@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -93,7 +94,13 @@ public class GalleryRestController {
         if (file.isEmpty())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
-        Gallery gallery = galleryService.uploadImage(file);
+        Gallery gallery = null;
+        try {
+            gallery = galleryService.uploadImage(file.getOriginalFilename(), file.getSize(), file.getContentType(),
+                    file.getBytes(), file.getInputStream());
+        } catch (IOException e) {
+            throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
+        }
 
         return GalleryOnUploadResponse.builder()
                 .id(gallery.getId())

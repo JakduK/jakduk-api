@@ -19,7 +19,6 @@ import javax.annotation.Resource;
  * Created by pyohwan on 16. 3. 30.
  */
 
-@Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
 public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
