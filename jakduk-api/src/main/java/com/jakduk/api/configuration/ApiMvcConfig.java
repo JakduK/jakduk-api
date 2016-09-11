@@ -1,9 +1,7 @@
 package com.jakduk.api.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
@@ -90,6 +88,11 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
                 .allowCredentials(CrossOrigin.DEFAULT_ALLOW_CREDENTIALS);
     }
 */
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        return new SessionLocaleResolver();
+    }
 
     @Bean
     public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
