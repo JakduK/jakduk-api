@@ -74,6 +74,9 @@ public class CommonConst {
 	public final static String RESPONSE_VOID_OBJECT = "{}";
 	public final static String RESPONSE_ERROR_DEFAULT_CODE = "-";
 
+	public final static String REGEX_FIND_HTML_TAG = "<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>";
+	public final static String REGEX_FIND_HTML_WHITESPACE = "\r|\n|&nbsp;";
+
 	/**
 	 * Social 프로바이더 종류.
 	 */

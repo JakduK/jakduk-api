@@ -1,4 +1,4 @@
-package com.jakduk.api.model;
+package com.jakduk.core.search;
 
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;

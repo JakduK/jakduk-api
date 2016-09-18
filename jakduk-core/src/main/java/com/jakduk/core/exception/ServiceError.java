@@ -27,9 +27,9 @@ public enum ServiceError {
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED_ACCESS", "common.exception.access.denied"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "common.exception.forbidden"),
 
-
     SEND_EMAIL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SEND_EMAIL_FAILED", "common.exception.send.email.failed"),
-    GALLERY_IO_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GALLERY_IO_ERROR", "common.gallery.exception.io");
+    GALLERY_IO_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GALLERY_IO_ERROR", "common.gallery.exception.io"),
+    ELASTICSEARCH_NOT_FOUND_INDEX(HttpStatus.INTERNAL_SERVER_ERROR, "ELASTICSEARCH_NOT_FOUND_INDEX", "common.exception.elasticsearch.not.found.index");
 
     private final HttpStatus httpStatus;
     private final String code;

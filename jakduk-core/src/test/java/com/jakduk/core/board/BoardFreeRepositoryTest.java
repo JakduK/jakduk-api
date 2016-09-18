@@ -30,5 +30,4 @@ public class BoardFreeRepositoryTest extends AbstractSpringTest {
         boardFree.setBatch(null);
         //sut.save(boardFree);
     }
-
 }
