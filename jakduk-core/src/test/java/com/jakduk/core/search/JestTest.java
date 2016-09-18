@@ -1,21 +1,21 @@
-package com.jakduk.api;
+package com.jakduk.core.search;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.JsonObject;
-import com.jakduk.api.model.Article;
-import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.core.model.elasticsearch.CommentOnES;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.service.SearchService;
+import com.jakduk.core.util.AbstractSpringTest;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 import org.bson.types.ObjectId;
-import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +45,7 @@ public class JestTest extends AbstractSpringTest {
 	private JakdukDAO jakdukDAO;
 	
 	@Autowired
-	private SearchService searchService;
+	private SearchService sut;
 	
 	@Before
 	public void before() {
@@ -75,12 +76,13 @@ public class JestTest extends AbstractSpringTest {
 		
 		System.out.println("jestClient=" + jestClient);
 		
-		ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder();
+		Settings.Builder settingsBuilder = Settings.settingsBuilder();
 		settingsBuilder.put("number_of_shards", 5);
 		settingsBuilder.put("number_of_replicas", 1);
 		settingsBuilder.put("index.analysis.analyzer.korean.type", "custom");
-		settingsBuilder.put("index.analysis.analyzer.korean.tokenizer", "mecab_ko_standard_tokenizer");
-		
+		settingsBuilder.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer");
+		settingsBuilder.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
+
 		JestResult result = jestClient.execute(new CreateIndex.Builder("articles").settings(settingsBuilder.build().getAsMap()).build());
 		System.out.println("result=" + result.getErrorMessage());
 	}
@@ -167,7 +169,7 @@ public class JestTest extends AbstractSpringTest {
 		try {
 			SearchResult result = jestClient.execute(search);
 //			System.out.println("result=" + result.getJsonString());
-			
+
 			JsonObject jsonObj = result.getJsonObject();
 			
 			System.out.println("jsonObj=" + jsonObj);
@@ -188,7 +190,7 @@ public class JestTest extends AbstractSpringTest {
 				"\"query\": {\n" +
 				"\"multi_match\" : {" +
 				"\"fields\" : [\"subject\", \"content\"]," +
-				"\"query\" : \"테스트\"" + 
+				"\"query\" : \"oiuiou\"" +
 				"}\n" +
 				"}, " +
 				"\"highlight\" : {" +
@@ -259,8 +261,8 @@ public class JestTest extends AbstractSpringTest {
 	
 	@Test
 	public void search04() {
-		//System.out.println(searchService.searchDocumentBoard("사진", 0, 0));
-		//System.out.println(searchService.searchDocumentComment("댓글", 0, 10));
+		//System.out.println(sut.searchDocumentBoard("사진", 0, 0));
+		//System.out.println(sut.searchDocumentComment("댓글", 0, 10));
 	}
 	
 	@Test
@@ -396,5 +398,29 @@ public class JestTest extends AbstractSpringTest {
 				lastPost = posts.get(posts.size() - 1);
 			}
 		}
+	}
+
+	@Ignore
+	@Test
+	public void initSearchIndex() {
+		sut.initSearchIndex();
+	}
+
+	@Ignore
+	@Test
+	public void initSearchType() throws JsonProcessingException {
+		sut.initSearchType();
+	}
+
+	@Ignore
+	@Test
+	public void initSearchDocuments() {
+		sut.initSearchDocuments();
+	}
+
+	@Ignore
+	@Test
+	public void deleteIndex() throws UnknownHostException {
+		sut.deleteIndex();
 	}
 }

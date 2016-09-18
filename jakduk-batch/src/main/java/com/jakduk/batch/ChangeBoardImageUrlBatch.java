@@ -27,7 +27,7 @@ import java.util.Map;
  */
 
 @Configuration
-public class ChangeBoardImageUrlBatchConfig {
+public class ChangeBoardImageUrlBatch {
 
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
