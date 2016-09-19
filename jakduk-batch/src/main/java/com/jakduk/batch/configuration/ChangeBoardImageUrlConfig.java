@@ -1,4 +1,4 @@
-package com.jakduk.batch;
+package com.jakduk.batch.configuration;
 
 import com.jakduk.batch.processor.ChangeBoardImageUrlProcessor;
 import com.jakduk.core.model.db.BoardFree;
@@ -9,10 +9,10 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
@@ -27,7 +27,7 @@ import java.util.Map;
  */
 
 @Configuration
-public class ChangeBoardImageUrlBatch {
+public class ChangeBoardImageUrlConfig {
 
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
@@ -39,17 +39,8 @@ public class ChangeBoardImageUrlBatch {
 	private MongoOperations mongoOperations;
 
 	@Bean
-	public Step step1() {
-		return stepBuilderFactory.get("changeBoardImageUrlStep01")
-				.<BoardFree, BoardFree>chunk(1000)
-				.reader(reader())
-				.processor(processor())
-				.writer(writer())
-				.build();
-	}
+	public Job changeBoardImageUrlJob01(@Qualifier("changeBoardImageUrlStep01") Step step1) throws Exception {
 
-	@Bean
-	public Job job(Step step1) throws Exception {
 		return jobBuilderFactory.get("changeBoardImageUrlJob01")
 				.incrementer(new RunIdIncrementer())
 				.start(step1)
@@ -57,7 +48,17 @@ public class ChangeBoardImageUrlBatch {
 	}
 
 	@Bean
-	public ItemReader<BoardFree> reader() {
+	public Step changeBoardImageUrlStep01() {
+		return stepBuilderFactory.get("changeBoardImageUrlStep01")
+				.<BoardFree, BoardFree>chunk(1000)
+				.reader(changeBoardImageUrlReader())
+				.processor(changeBoardImageUrlProcessor())
+				.writer(changeBoardImageUrlWriter())
+				.build();
+	}
+
+	@Bean
+	public ItemReader<BoardFree> changeBoardImageUrlReader() {
 		MongoItemReader<BoardFree> itemReader = new MongoItemReader<>();
 		itemReader.setTemplate(mongoOperations);
 		itemReader.setTargetType(BoardFree.class);
@@ -71,12 +72,12 @@ public class ChangeBoardImageUrlBatch {
 	}
 
 	@Bean
-	public ItemProcessor<BoardFree, BoardFree> processor() {
+	public ItemProcessor<BoardFree, BoardFree> changeBoardImageUrlProcessor() {
 		return new ChangeBoardImageUrlProcessor();
 	}
 
 	@Bean
-	public ItemWriter<BoardFree> writer() {
+	public MongoItemWriter changeBoardImageUrlWriter() {
 		MongoItemWriter writer = new MongoItemWriter();
 		writer.setTemplate(mongoOperations);
 
