@@ -261,7 +261,7 @@ public class JestTest extends AbstractSpringTest {
 	
 	@Test
 	public void search04() {
-		//System.out.println(sut.searchDocumentBoard("사진", 0, 0));
+		System.out.println("result=" + sut.searchDocumentBoard("조니", 0, 10).getJsonString());
 		//System.out.println(sut.searchDocumentComment("댓글", 0, 10));
 	}
 	
@@ -270,7 +270,7 @@ public class JestTest extends AbstractSpringTest {
 		String query = "{\n" +
 				"\"query\": {" +
 				"\"match\" : {" +
-				"\"content\" : \"테스트\"" + 
+				"\"content\" : \"테스트\"" +
 				"}" +
 				"}, " +
 				"\"highlight\" : {" +
