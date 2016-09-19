@@ -6,6 +6,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
@@ -130,5 +131,13 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         multipartResolver.setUploadTempDir(new FileSystemResource("/tmp/jakduk"));
 
         return multipartResolver;
+    }
+
+    /**
+     * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
+     */
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
     }
 }

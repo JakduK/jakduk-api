@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
  */
 
 @Data
-@ApiModel(value = "SNS 기반 회원 가입 폼")
+@ApiModel(description = "SNS 기반 회원 가입 폼")
 @ExistEmailCompatibility(userId = "id", email = "email")
 @ExistUsernameCompatibility(userId = "id", username = "username")
 public class UserProfileForm {

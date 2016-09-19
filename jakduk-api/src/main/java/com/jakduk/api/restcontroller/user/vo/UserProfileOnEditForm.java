@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
  */
 
 @Data
-@ApiModel(value = "회원 정보 편집 폼")
+@ApiModel(description = "회원 정보 편집 폼")
 public class UserProfileOnEditForm {
 
 	@ApiModelProperty(required = true, example = "example@jakduk.com")

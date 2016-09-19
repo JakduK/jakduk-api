@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
  */
 
 @Getter
-@ApiModel(value = "이메일 기반 회원 가입 폼")
+@ApiModel(description = "이메일 기반 회원 가입 폼")
 @FieldMatch(first = "password", second = "passwordConfirm", message = FormValidationErrorCode.PASSWORD_MISMATCH)
 public class UserForm {
 

@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.core.model.elasticsearch.CommentOnES;
 import com.jakduk.core.model.elasticsearch.GalleryOnES;
@@ -16,6 +18,7 @@ import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
@@ -73,7 +76,7 @@ public class SearchService {
 		return data;
 	}
 	
-	public Map<String, Object> getDataSearch(String q, String w, int from, int size) {
+	public Map<String, Object> getSearch(String q, String w, int from, int size) {
 		Map<String, Object> data = new HashMap<>();
 
 		if (log.isDebugEnabled()) {
@@ -81,10 +84,11 @@ public class SearchService {
 		}
 		
 		if (size <= 0) size = 10;
-		
-		if (w != null && !w.isEmpty()) {
-			if (w.contains("PO")) {
+
+		if (StringUtils.isNotEmpty(w)) {
+			if (StringUtils.contains(w, CommonConst.SEARCH_TYPE.PO.name())) {
 				SearchResult result = this.searchDocumentBoard(q, from, size);
+
 				if (result.isSucceeded()) {
 					data.put("posts", result.getJsonString());
 				}
@@ -121,8 +125,17 @@ public class SearchService {
 
 		return data;
 	}
-	
+
+	/**
+	 * 게시물 검색
+	 * @param q	검색어
+	 * @param from	페이지 시작 위치
+	 * @param size	페이지 크기
+	 * @return	검색 결과
+	 */
 	public SearchResult searchDocumentBoard(String q, int from, int size) {
+		ObjectMapper objectMapper = new ObjectMapper();
+
 		Map<String, Object> query = new HashMap<>();
 		Map<String, Object> querySource = new HashMap<>();
 		Map<String, Object> queryQuery = new HashMap<>();
@@ -150,6 +163,7 @@ public class SearchService {
 				CommonConst.SEARCH_CONTENT_MAX_LENGTH
 			)
 		);
+
 		queryScriptFields.put("content_preview", queryScriptFieldsContentPreview);
 
 		query.put("from", from);
@@ -159,17 +173,17 @@ public class SearchService {
 		query.put("highlight", queryHighlight);
 		query.put("script_fields", queryScriptFields);
 
-		Search search = new Search.Builder(new Gson().toJson(query))
-				.addIndex(elasticsearchIndexName)
-				.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
-				.build();
-		
 		try {
+			Search search = new Search.Builder(objectMapper.writeValueAsString(query))
+					.addIndex(elasticsearchIndexName)
+					.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+					.build();
+
 			return jestClient.execute(search);
+
 		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+			throw new ServiceException(ServiceError.IO_EXCEPTION);
 		}
-		return null;
 	}
 	
 	public void createDocumentBoard(BoardFreeOnES boardFreeOnEs) {

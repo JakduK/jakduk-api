@@ -13,7 +13,7 @@ import lombok.*;
  * @desc     : 회원 정보 열람.
  */
 
-@ApiModel(value = "회원 프로필 응답 객체")
+@ApiModel(description = "회원 프로필 응답 객체")
 @Setter
 @Getter
 public class UserProfileResponse {

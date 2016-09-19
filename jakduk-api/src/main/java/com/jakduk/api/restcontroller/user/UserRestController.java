@@ -38,7 +38,7 @@ import java.util.Objects;
  */
 
 @Slf4j
-@Api(tags = "회원", description = "회원 관련")
+@Api(tags = "회원", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
 public class UserRestController {
