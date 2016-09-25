@@ -16,13 +16,13 @@ import java.util.Map;
 public class SearchResultResponse {
 
 	@ApiModelProperty(value = "검색된 게시물")
-	private JsonObject posts;
+	private Map<String, Object> posts;
 
 	@ApiModelProperty(value = "검색된 댓글")
-	private String comments;
+	private Map<String, Object> comments;
 
 	@ApiModelProperty(value = "검색된 사진첩")
-	private String galleries;
+	private Map<String, Object> galleries;
 
 	@ApiModelProperty(value = "검색된 댓글의 게시물 정보")
 	private Map<String, BoardFreeOnSearchComment> postsHavingComments;

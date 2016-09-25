@@ -1,6 +1,7 @@
 package com.jakduk.core.search;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.JakdukDAO;
@@ -15,7 +16,10 @@ import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 import org.bson.types.ObjectId;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
@@ -46,6 +50,9 @@ public class JestTest extends AbstractSpringTest {
 	
 	@Autowired
 	private SearchService sut;
+
+	@Autowired
+	private Client client;
 	
 	@Before
 	public void before() {
@@ -423,4 +430,21 @@ public class JestTest extends AbstractSpringTest {
 	public void deleteIndex() throws UnknownHostException {
 		sut.deleteIndex();
 	}
+
+	@Test
+	public void queryDSL() throws JsonProcessingException {
+		QueryBuilder qb = QueryBuilders.matchQuery("subject", "test");
+
+		System.out.println("phjang=" + qb.toString());
+
+		SearchResponse response = client.prepareSearch("jakduk_test")
+				.setQuery(qb)
+				.execute()
+				.actionGet();
+
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		System.out.println("phjang=" + response.getHits().getTotalHits());
+	}
+
 }
