@@ -10,9 +10,6 @@ import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
 import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.GalleryOnBoard;
@@ -24,7 +21,6 @@ import com.jakduk.core.repository.BoardFreeOnListRepository;
 import com.jakduk.core.repository.BoardFreeRepository;
 import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -33,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -137,15 +134,18 @@ public class BoardFreeService {
 				GalleryStatus status = updateGallery.getStatus();
 				List<BoardItem> posts = updateGallery.getPosts();
 
-				if (Objects.isNull(posts)) {
+				if (Objects.isNull(posts))
 					posts = new ArrayList<>();
-				}
 
 				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
 				long itemCount = 0;
 
-				if (! posts.isEmpty())
-					itemCount = posts.stream().filter(item -> item.getId().equals(boardItem.getId())).count();
+				if (! posts.isEmpty()) {
+					itemCount = posts.stream()
+							.filter(item -> item.getId().equals(boardItem.getId()))
+							.count();
+				}
+
 
 				if (itemCount == 0) {
 					posts.add(boardItem);
@@ -163,33 +163,11 @@ public class BoardFreeService {
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
-				// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
-				GalleryOnES galleryOnES = new GalleryOnES();
-				galleryOnES.setId(updateGallery.getId());
-				galleryOnES.setWriter(updateGallery.getWriter());
-				galleryOnES.setName(updateGallery.getName());
-
-				searchService.createDocumentGallery(galleryOnES);
+				searchService.createDocumentGallery(updateGallery);
 			}
 		}
 
-		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-
-		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
-		boardFreeOnEs.setId(boardFree.getId());
-		boardFreeOnEs.setSeq(boardFree.getSeq());
-		boardFreeOnEs.setWriter(boardFree.getWriter());
-		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
-
-		String subjectEL = Optional.ofNullable(boardFree.getSubject()).orElse("");
-		subjectEL = StringUtils.replacePattern(subjectEL, CommonConst.REGEX_FIND_HTML_TAG, "");
-		boardFree.setSubject(StringUtils.replacePattern(subjectEL, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
-
-		String contentEL = Optional.ofNullable(boardFree.getContent()).orElse("");
-		contentEL = StringUtils.replacePattern(contentEL, CommonConst.REGEX_FIND_HTML_TAG, "");
-		boardFree.setContent(StringUtils.replacePattern(contentEL, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
-
-		searchService.createDocumentBoard(boardFreeOnEs);
+		searchService.createDocumentBoard(boardFree);
 
 
 		/*
@@ -305,33 +283,12 @@ public class BoardFreeService {
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
-				// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
-				GalleryOnES galleryOnES = new GalleryOnES();
-				galleryOnES.setId(galleryOnBoard.getId());
-				galleryOnES.setWriter(updateGallery.getWriter());
-				galleryOnES.setName(galleryOnBoard.getName());
-
-				searchService.createDocumentGallery(galleryOnES);
+				searchService.createDocumentGallery(updateGallery);
 			}
 
 		}
 
-		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
-		boardFreeOnEs.setId(boardFree.getId());
-		boardFreeOnEs.setSeq(boardFree.getSeq());
-		boardFreeOnEs.setWriter(boardFree.getWriter());
-		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
-
-		String subjectEL = Optional.ofNullable(boardFree.getSubject()).orElse("");
-		subjectEL = StringUtils.replacePattern(subjectEL, CommonConst.REGEX_FIND_HTML_TAG, "");
-		boardFree.setSubject(StringUtils.replacePattern(subjectEL, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
-
-		String contentEL = Optional.ofNullable(boardFree.getContent()).orElse("");
-		contentEL = StringUtils.replacePattern(contentEL, CommonConst.REGEX_FIND_HTML_TAG, "");
-		boardFree.setContent(StringUtils.replacePattern(contentEL, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
-
-		searchService.createDocumentBoard(boardFreeOnEs);
+		searchService.createDocumentBoard(boardFree);
 
 		if (log.isInfoEnabled()) {
 			log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
@@ -535,28 +492,17 @@ public class BoardFreeService {
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
-		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-		CommentOnES commentOnES = new CommentOnES();
-		commentOnES.setId(boardFreeComment.getId());
-		commentOnES.setWriter(boardFreeComment.getWriter());
-		commentOnES.setBoardItem(boardFreeComment.getBoardItem());
-
-		String contentES = Optional.ofNullable(contents).orElse("");
-		contentES = StringUtils.replacePattern(contentES, CommonConst.REGEX_FIND_HTML_TAG, "");
-		commentOnES.setContent(StringUtils.replacePattern(contentES, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
-
-		searchService.createDocumentComment(commentOnES);
+		searchService.createDocumentComment(boardFreeComment);
 
 		return boardFreeComment;
 	}
 
 	// 게시판 댓글 목록
 	public List<BoardFreeComment> getFreeComments(Integer seq, String commentId) {
-		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
 
 		List<BoardFreeComment> comments;
 
-		if (commentId != null && !commentId.isEmpty()) {
+		if (! ObjectUtils.isEmpty(commentId)) {
 			comments  = boardDAO.getBoardFreeComment(seq, new ObjectId(commentId));
 		} else {
 			comments  = boardDAO.getBoardFreeComment(seq, null);
