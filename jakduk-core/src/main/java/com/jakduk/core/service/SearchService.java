@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.core.model.elasticsearch.CommentOnES;
 import com.jakduk.core.model.elasticsearch.GalleryOnES;
@@ -16,11 +18,14 @@ import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -58,71 +63,16 @@ public class SearchService {
 	@Autowired
 	private JakdukDAO jakdukDAO;
 
-	public Map<String, Object> getSearch(Locale locale, String q, String w, int from, int size) {
-		Map<String, Object> data = new HashMap<>();
-		data.put("q", q);
-		data.put("w", w);
-		data.put("from", from);
-		data.put("size", size);
-		try {
-			data.put("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-
-		return data;
-	}
-	
-	public Map<String, Object> getDataSearch(String q, String w, int from, int size) {
-		Map<String, Object> data = new HashMap<>();
-
-		if (log.isDebugEnabled()) {
-			log.debug("q=" + q + ", w=" + w + ", from=" + from + ", size=" + size);
-		}
-		
-		if (size <= 0) size = 10;
-		
-		if (w != null && !w.isEmpty()) {
-			if (w.contains("PO")) {
-				SearchResult result = this.searchDocumentBoard(q, from, size);
-				if (result.isSucceeded()) {
-					data.put("posts", result.getJsonString());
-				}
-			}
-
-			if (w.contains("CO")) {
-				List<ObjectId> ids = new ArrayList<>();
-				SearchResult result = this.searchDocumentComment(q, from, size);
-
-				if (result.isSucceeded()) {
-					List<SearchResult.Hit<CommentOnES, Void>> hits = result.getHits(CommentOnES.class);
-					hits.forEach(hit -> {
-						String id = hit.source.getBoardItem().getId();
-						ids.add(new ObjectId(id));
-					});
-					data.put("comments", result.getJsonString());
-					data.put("postsHavingComments", boardDAO.getBoardFreeOnSearchComment(ids));
-				}
-			}
-
-			if (w.contains("GA")) {
-				int tempSize = size;
-				
-				if (size < 10) {
-					tempSize = 4;
-				}
-				
-				SearchResult result = this.searchDocumentGallery(q, from, tempSize);
-				if (result.isSucceeded()) {
-					data.put("galleries", result.getJsonString());
-				}
-			}
-		}
-
-		return data;
-	}
-	
+	/**
+	 * 게시물 검색
+	 * @param q	검색어
+	 * @param from	페이지 시작 위치
+	 * @param size	페이지 크기
+	 * @return	검색 결과
+	 */
 	public SearchResult searchDocumentBoard(String q, int from, int size) {
+		ObjectMapper objectMapper = new ObjectMapper();
+
 		Map<String, Object> query = new HashMap<>();
 		Map<String, Object> querySource = new HashMap<>();
 		Map<String, Object> queryQuery = new HashMap<>();
@@ -132,24 +82,29 @@ public class SearchService {
 		Map<String, Object> queryScriptFields = new HashMap<>();
 		Map<String, Object> queryScriptFieldsContentPreview = new HashMap<>();
 
+		// _source
 		querySource.put("exclude", "content");
 
+		// query
 		queryQueryMultiMatch.put("fields", new Object[]{"subject", "content"});
 		queryQueryMultiMatch.put("query", q);
 		queryQuery.put("multi_match", queryQueryMultiMatch);
 
+		// highlight
 		queryHighlightFields.put("subject", new HashMap<>());
 		queryHighlightFields.put("content", new HashMap<>());
 		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
 		queryHighlight.put("post_tags", new Object[]{"</span>"});
 		queryHighlight.put("fields", queryHighlightFields);
 
+		// script_fields
 		queryScriptFieldsContentPreview.put("script",
 			String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
 				CommonConst.SEARCH_CONTENT_MAX_LENGTH,
 				CommonConst.SEARCH_CONTENT_MAX_LENGTH
 			)
 		);
+
 		queryScriptFields.put("content_preview", queryScriptFieldsContentPreview);
 
 		query.put("from", from);
@@ -159,17 +114,17 @@ public class SearchService {
 		query.put("highlight", queryHighlight);
 		query.put("script_fields", queryScriptFields);
 
-		Search search = new Search.Builder(new Gson().toJson(query))
-				.addIndex(elasticsearchIndexName)
-				.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
-				.build();
-		
 		try {
+			Search search = new Search.Builder(objectMapper.writeValueAsString(query))
+					.addIndex(elasticsearchIndexName)
+					.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+					.build();
+
 			return jestClient.execute(search);
+
 		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+			throw new ServiceException(ServiceError.IO_EXCEPTION);
 		}
-		return null;
 	}
 	
 	public void createDocumentBoard(BoardFreeOnES boardFreeOnEs) {

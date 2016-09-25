@@ -29,7 +29,8 @@ public enum ServiceError {
 
     SEND_EMAIL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SEND_EMAIL_FAILED", "common.exception.send.email.failed"),
     GALLERY_IO_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GALLERY_IO_ERROR", "common.gallery.exception.io"),
-    ELASTICSEARCH_NOT_FOUND_INDEX(HttpStatus.INTERNAL_SERVER_ERROR, "ELASTICSEARCH_NOT_FOUND_INDEX", "common.exception.elasticsearch.not.found.index");
+    ELASTICSEARCH_NOT_FOUND_INDEX(HttpStatus.INTERNAL_SERVER_ERROR, "ELASTICSEARCH_NOT_FOUND_INDEX", "common.exception.elasticsearch.not.found.index"),
+    IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "IO_EXCEPTION", "common.exception.io");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 
 @Getter
-@ApiModel(value = "이메일 기반 로그인 폼")
+@ApiModel(description = "이메일 기반 로그인 폼")
 public class LoginEmailUserForm implements Serializable {
 
     private String username;

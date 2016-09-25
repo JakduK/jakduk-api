@@ -13,7 +13,7 @@ import java.io.Serializable;
  *         16. 7. 28 오후 10:23
  */
 
-@ApiModel(value = "인증 토큰")
+@ApiModel(description = "인증 토큰")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -45,7 +45,7 @@ import java.util.Objects;
  */
 
 @Slf4j
-@Api(tags = "인증", description = "인증 관련")
+@Api(tags = "인증", description = "인증 API")
 @RestController
 @RequestMapping("/api")
 public class AuthRestController {

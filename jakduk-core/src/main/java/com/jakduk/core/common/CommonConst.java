@@ -224,4 +224,10 @@ public class CommonConst {
 	public enum BATCH_TYPE {
 		CHANGE_BOARD_CONTENT_IMAGE_URL_01
 	}
+
+	public enum SEARCH_TYPE {
+		PO,	// 게시물
+		CO,	// 댓글
+		GA	// 사진첩
+	}
 }
