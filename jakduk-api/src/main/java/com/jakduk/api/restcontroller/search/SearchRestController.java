@@ -102,7 +102,7 @@ public class SearchRestController {
 				SearchResult result = searchService.searchDocumentGallery(q, from, tempSize);
 
 				if (result.isSucceeded())
-					response.setPosts(objectMapper.readValue(result.getJsonString(), Map.class));
+					response.setGalleries(objectMapper.readValue(result.getJsonString(), Map.class));
 
 			}
 		} catch (IOException e) {

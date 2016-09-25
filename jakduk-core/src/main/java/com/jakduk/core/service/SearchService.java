@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.db.BoardFree;
+import com.jakduk.core.model.db.BoardFreeComment;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.core.model.elasticsearch.CommentOnES;
 import com.jakduk.core.model.elasticsearch.GalleryOnES;
@@ -18,16 +20,14 @@ import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -47,18 +47,15 @@ public class SearchService {
 
 	@Value("${elasticsearch.host.name}")
 	private String elasticsearchHostName;
-	
+
+    @Value("${elasticsearch.enable}")
+    private boolean elasticsearchEnabled;
+
 	@Autowired
 	private JestClient jestClient;
 
 	@Autowired
 	private Client client;
-	
-	@Autowired
-	private CommonService commonService;
-	
-	@Autowired
-	private BoardDAO boardDAO;
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
@@ -126,18 +123,24 @@ public class SearchService {
 			throw new ServiceException(ServiceError.IO_EXCEPTION);
 		}
 	}
-	
-	public void createDocumentBoard(BoardFreeOnES boardFreeOnEs) {
-		Index index = new Index.Builder(boardFreeOnEs).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_BOARD).build();
-		
-		try {
-			JestResult jestResult = jestClient.execute(index);
-			if (!jestResult.isSucceeded()) {
-				log.error(jestResult.getErrorMessage());
-			}
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
+
+	@Async
+	public void createDocumentBoard(BoardFree boardFree) {
+
+        if (elasticsearchEnabled) {
+            BoardFreeOnES boardFreeOnES = new BoardFreeOnES(boardFree);
+
+            Index index = new Index.Builder(boardFreeOnES)
+                    .index(elasticsearchIndexName)
+                    .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+                    .build();
+
+            try {
+                jestClient.execute(index);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
 	}
 	
 	public void deleteDocumentBoard(String id) {
@@ -195,17 +198,22 @@ public class SearchService {
 		return null;
 	}
 
-	public void createDocumentComment(CommentOnES commentOnES) {
-		Index index = new Index.Builder(commentOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_COMMENT).build();
+	@Async
+	public void createDocumentComment(BoardFreeComment boardFreeComment) {
+        if (elasticsearchEnabled) {
+            CommentOnES commentOnES = new CommentOnES(boardFreeComment);
 
-		try {
-			JestResult jestResult = jestClient.execute(index);
-			if (!jestResult.isSucceeded()) {
-				log.error(jestResult.getErrorMessage());
-			}
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
+            Index index = new Index.Builder(commentOnES)
+                    .index(elasticsearchIndexName)
+                    .type(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+                    .build();
+
+            try {
+                jestClient.execute(index);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
 	}
 
 	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
@@ -286,18 +294,24 @@ public class SearchService {
 		}
 		return null;
 	}
-	
-	public void createDocumentGallery(GalleryOnES galleryOnES) {
-		Index index = new Index.Builder(galleryOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_GALLERY).build();
-		
-		try {
-			JestResult jestResult = jestClient.execute(index);
-			if (!jestResult.isSucceeded()) {
-				log.error(jestResult.getErrorMessage());
-			}
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
+
+	@Async
+	public void createDocumentGallery(Gallery gallery) {
+
+        if (elasticsearchEnabled) {
+            GalleryOnES galleryOnES = new GalleryOnES(gallery);
+
+            Index index = new Index.Builder(galleryOnES)
+                    .index(elasticsearchIndexName)
+                    .type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+                    .build();
+
+            try {
+                jestClient.execute(index);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
 	}
 	
 	public void deleteDocumentGallery(String id) {

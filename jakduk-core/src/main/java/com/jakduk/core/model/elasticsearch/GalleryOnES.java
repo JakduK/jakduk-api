@@ -1,7 +1,12 @@
 package com.jakduk.core.model.elasticsearch;
 
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -9,6 +14,8 @@ import io.searchbox.annotations.JestId;
 * @date     : 2015. 8. 27.
 * @desc     :
 */
+
+@Getter
 public class GalleryOnES {
 
 	@JestId
@@ -18,33 +25,9 @@ public class GalleryOnES {
 	
 	private CommonWriter writer;
 
-	public String getId() {
-		return id;
+	public GalleryOnES(Gallery gallery) {
+		this.id = gallery.getId();
+		this.name = gallery.getName();
+		this.writer = gallery.getWriter();
 	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public CommonWriter getWriter() {
-		return writer;
-	}
-
-	public void setWriter(CommonWriter writer) {
-		this.writer = writer;
-	}
-
-	@Override
-	public String toString() {
-		return "GalleryOnES [id=" + id + ", name=" + name + ", writer=" + writer + "]";
-	}
-	
 }

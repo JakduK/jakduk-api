@@ -1,9 +1,15 @@
 package com.jakduk.core.model.elasticsearch;
 
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Optional;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -12,7 +18,8 @@ import lombok.Data;
 * @desc     :
 */
 
-@Data
+@Getter
+@Setter
 public class CommentOnES {
 	
 	@JestId
@@ -23,4 +30,16 @@ public class CommentOnES {
 	private CommonWriter writer;
 	
 	private String content;
+
+	public CommentOnES(BoardFreeComment boardFreeComment) {
+
+		String contentES = Optional.ofNullable(boardFreeComment.getContent()).orElse("");
+		contentES = StringUtils.replacePattern(contentES, CommonConst.REGEX_FIND_HTML_TAG, "");
+		contentES = StringUtils.replacePattern(contentES, CommonConst.REGEX_FIND_HTML_WHITESPACE, "");
+
+		this.id = boardFreeComment.getId();
+		this.boardItem = boardFreeComment.getBoardItem();
+		this.writer = boardFreeComment.getWriter();
+		this.content = contentES;
+	}
 }
