@@ -1,7 +1,13 @@
 package com.jakduk.core.exception;
 
+import com.jakduk.core.service.CommonService;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author pyohwan
@@ -11,34 +17,41 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ServiceError {
 
-    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "INVALID_PARAMETER", "common.exception.invalid.parameter"),
-    FORM_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "FORM_VALIDATION_FAILED", "common.exception.invalid.parameter"),
-    EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST, "EXPIRATION_TOKEN", "common.exception.expiration.token"),
+    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "common.exception.invalid.parameter"),
+    FORM_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "common.exception.invalid.parameter"),
+    EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST, "common.exception.expiration.token"),
 
-    NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND", "common.exception.no.such.element"),
-    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "NOT_FOUND_USER", "common.exception.not.found.user"),
-    NOT_REGISTER_WITH_SNS(HttpStatus.NOT_FOUND, "NOT_REGISTER_WITH_SNS", "common.exception.not.register.with.sns"),
-    CANNOT_GET_SNS_PROFILE(HttpStatus.NOT_FOUND, "CANNOT_GET_SNS_PROFILE", "common.exception.cannot.get.sns.profile"),
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "common.exception.post.not.found"),
-    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", "common.exception.category.not.found"),
-    ALREADY_ENABLE(HttpStatus.NOT_FOUND, "ALREADY_ENABLE", "common.exception.already.enable"),
-    ALREADY_DISABLE(HttpStatus.NOT_FOUND, "ALREADY_DISABLE", "common.exception.already.disable"),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "common.exception.no.such.element"),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "common.exception.not.found.user"),
+    NOT_REGISTER_WITH_SNS(HttpStatus.NOT_FOUND, "common.exception.not.register.with.sns"),
+    CANNOT_GET_SNS_PROFILE(HttpStatus.NOT_FOUND, "common.exception.cannot.get.sns.profile"),
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "common.exception.post.not.found"),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "common.exception.category.not.found"),
+    ALREADY_ENABLE(HttpStatus.NOT_FOUND, "common.exception.already.enable"),
+    ALREADY_DISABLE(HttpStatus.NOT_FOUND, "common.exception.already.disable"),
 
-    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED_ACCESS", "common.exception.access.denied"),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "common.exception.forbidden"),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "common.exception.access.denied"),
+    NOT_FOUND_JAKDUK_ACCOUNT(HttpStatus.UNAUTHORIZED, "common.exception.access.denied"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "common.exception.forbidden"),
 
-    SEND_EMAIL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SEND_EMAIL_FAILED", "common.exception.send.email.failed"),
-    GALLERY_IO_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GALLERY_IO_ERROR", "common.gallery.exception.io"),
-    ELASTICSEARCH_NOT_FOUND_INDEX(HttpStatus.INTERNAL_SERVER_ERROR, "ELASTICSEARCH_NOT_FOUND_INDEX", "common.exception.elasticsearch.not.found.index"),
-    IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "IO_EXCEPTION", "common.exception.io");
+    SEND_EMAIL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.send.email.failed"),
+    GALLERY_IO_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"common.gallery.exception.io"),
+    ELASTICSEARCH_NOT_FOUND_INDEX(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.elasticsearch.not.found.index"),
+    IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.io");
+
+    @Autowired
+    private CommonService commonService;
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
 
-    ServiceError(HttpStatus httpStatus, String code, String message) {
+    ServiceError(HttpStatus httpStatus, String message) {
+        Locale locale = LocaleContextHolder.getLocale();
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.common", locale);
+
         this.httpStatus = httpStatus;
-        this.code = code;
-        this.message = message;
+        this.code = this.name();
+        this.message = resourceBundle.getString(message);
     }
 }

@@ -4,11 +4,15 @@ import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.authentication.common.SocialUserDetail;
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.service.CommonService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.aop.AopInvocationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +26,9 @@ import java.util.Map;
 
 @Component
 public class JwtTokenUtil implements Serializable {
+
+    @Autowired
+    private CommonService commonService;
 
     private static final long serialVersionUID = -3301605591108950415L;
 
@@ -40,14 +47,9 @@ public class JwtTokenUtil implements Serializable {
     private Long expiration;
 
     public String getUsernameFromToken(String token) {
-        String username;
-        try {
-            final Claims claims = getClaimsFromToken(token);
-            username = claims.getIssuer();
-        } catch (Exception e) {
-            username = null;
-        }
-        return username;
+        final Claims claims = getClaimsFromToken(token);
+
+        return claims.getIssuer();
     }
 
     public String getProviderIdFromToken(String token) {
@@ -111,10 +113,19 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+
+        Claims claims;
+
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new ServiceException(ServiceError.EXPIRATION_TOKEN, e);
+        }
+
+        return claims;
     }
 
     private Date generateExpirationDate() {

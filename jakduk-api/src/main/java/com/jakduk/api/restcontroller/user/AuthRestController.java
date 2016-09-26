@@ -29,6 +29,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -45,7 +46,7 @@ import java.util.Objects;
  */
 
 @Slf4j
-@Api(tags = "인증", description = "인증 API")
+@Api(tags = "Authentication", description = "인증 API")
 @RestController
 @RequestMapping("/api")
 public class AuthRestController {
@@ -187,7 +188,7 @@ public class AuthRestController {
         AuthUserProfile authUserProfile = commonService.getAuthUserProfile();
 
         if (Objects.isNull(authUserProfile))
-            throw new NoSuchElementException(commonService.getResourceBundleMessage("messages.common", "common.exception.no.such.element"));
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         return authUserProfile;
     }

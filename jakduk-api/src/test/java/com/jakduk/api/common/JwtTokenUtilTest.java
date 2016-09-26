@@ -33,11 +33,11 @@ public class JwtTokenUtilTest {
     @Before
     public void before() {
 
-        ReflectionTestUtils.setField(jwtTokenUtil, "expiration", 0L);
-        ReflectionTestUtils.setField(jwtTokenUtil, "secret", "abcdef");
+        ReflectionTestUtils.setField(jwtTokenUtil, "expiration", 1000L);
+        ReflectionTestUtils.setField(jwtTokenUtil, "secret", "JakduK11!");
 
         commonPrincipal = CommonPrincipal.builder()
-                .email("test01@test.com")
+                .email("test50@test.com")
                 .username("test01")
                 .id("a1b2c3d4")
                 .providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
@@ -50,7 +50,19 @@ public class JwtTokenUtilTest {
 
         String token = jwtTokenUtil.generateToken(commonPrincipal, null);
 
+        System.out.println("token=" + token);
+
+
         Assert.assertTrue(! ObjectUtils.isEmpty(token));
         Assert.assertFalse(jwtTokenUtil.isValidateToken(token));
+    }
+
+    @Test
+    public void 인증토큰() {
+        String token = "eyJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJ1bmtub3duIiwidWlkIjoiYTFiMmMzZDQiLCJpc3MiOiJ0ZXN0NTBAdGVzdC5jb20iLCJuYW1lIjoidGVzdDAxIiwicGlkIjoiSkFLRFVLIiwiZXhwIjoxNDc0OTAyMDg0fQ.cR0oVNqzXkjOywyDiVCvpzz5ykWDZO882IhZwGuItNb9RHH8cqEwALnW1nmGab6Rj_fRhf0yiG0RPA-sIAZm2Q";
+
+        System.out.println(jwtTokenUtil.getUsernameFromToken(token));
+        System.out.println(jwtTokenUtil.isValidateToken(token));
+
     }
 }
