@@ -32,6 +32,9 @@ public class SwaggerConfig {
         Set<String> protocols = new HashSet<>();
         protocols.add(environment.getProperty("swagger.protocol"));
 
+        Set<String> producesList = new HashSet<>();
+        producesList.add("application/json");
+
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
 //                .apis(RequestHandlerSelectors.basePackage("com.jakduk.restcontroller"))
@@ -39,7 +42,9 @@ public class SwaggerConfig {
                 .build()
                 .protocols(protocols)
                 .host(environment.getProperty("swagger.host"))
-                .apiInfo(apiInfo());
+                .apiInfo(apiInfo())
+                .useDefaultResponseMessages(false)
+                .produces(producesList);
     }
 
     @Bean

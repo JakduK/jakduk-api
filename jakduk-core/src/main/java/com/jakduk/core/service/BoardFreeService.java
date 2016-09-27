@@ -10,8 +10,6 @@ import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
 import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.GalleryOnBoard;
@@ -25,13 +23,13 @@ import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -43,9 +41,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class BoardFreeService {
-
-	@Value("${kakao.javascript.key}")
-	private String kakaoJavascriptKey;
 
 	@Autowired
 	private BoardFreeRepository boardFreeRepository;
@@ -139,15 +134,18 @@ public class BoardFreeService {
 				GalleryStatus status = updateGallery.getStatus();
 				List<BoardItem> posts = updateGallery.getPosts();
 
-				if (Objects.isNull(posts)) {
+				if (Objects.isNull(posts))
 					posts = new ArrayList<>();
-				}
 
 				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
 				long itemCount = 0;
 
-				if (! posts.isEmpty())
-					itemCount = posts.stream().filter(item -> item.getId().equals(boardItem.getId())).count();
+				if (! posts.isEmpty()) {
+					itemCount = posts.stream()
+							.filter(item -> item.getId().equals(boardItem.getId()))
+							.count();
+				}
+
 
 				if (itemCount == 0) {
 					posts.add(boardItem);
@@ -165,34 +163,12 @@ public class BoardFreeService {
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
-				// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
-				GalleryOnES galleryOnES = new GalleryOnES();
-				galleryOnES.setId(updateGallery.getId());
-				galleryOnES.setWriter(updateGallery.getWriter());
-				galleryOnES.setName(updateGallery.getName());
-
-				searchService.createDocumentGallery(galleryOnES);
+				searchService.createDocumentGallery(updateGallery);
 			}
 		}
 
-		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-		/*
-		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
-		boardFreeOnEs.setId(boardFree.getId());
-		boardFreeOnEs.setSeq(boardFree.getSeq());
-		boardFreeOnEs.setWriter(boardFree.getWriter());
-		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
+		searchService.createDocumentBoard(boardFree);
 
-		boardFreeOnEs.setSubject(boardFree.getSubject()
-				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;",""));
-
-		boardFreeOnEs.setContent(boardFree.getContent()
-				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;",""));
-
-		searchService.createDocumentBoard(boardFreeOnEs);
-		*/
 
 		/*
 		// 슬랙 알림
@@ -228,50 +204,46 @@ public class BoardFreeService {
 	public Integer updateFreePost(Integer seq, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
 								  List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
 
-		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
-
-		if (! boardFree.isPresent())
-			throw new ServiceException(ServiceError.POST_NOT_FOUND);
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
+				.orElseThrow(() -> new ServiceException(ServiceError.POST_NOT_FOUND));
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
-		BoardFree updateBoardFree = boardFree.get();
-
-		if (! updateBoardFree.getWriter().getUserId().equals(principal.getId()))
+		if (! boardFree.getWriter().getUserId().equals(principal.getId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
-		updateBoardFree.setSubject(subject);
-		updateBoardFree.setContent(content);
-		updateBoardFree.setCategory(categoryCode);
+		boardFree.setSubject(subject);
+		boardFree.setContent(content);
+		boardFree.setCategory(categoryCode);
 
 		List<BoardImage> galleriesOnBoard = new ArrayList<>();
 		galleries.forEach(gallery -> galleriesOnBoard.add(new BoardImage(gallery.getId())));
 
 		if (! galleriesOnBoard.isEmpty())
-			updateBoardFree.setGalleries(galleriesOnBoard);
+			boardFree.setGalleries(galleriesOnBoard);
 
-		BoardStatus boardStatus = updateBoardFree.getStatus();
+		BoardStatus boardStatus = boardFree.getStatus();
 
 		if (Objects.isNull(boardStatus))
 			boardStatus = new BoardStatus();
 
         boardStatus.setDevice(device);
-		updateBoardFree.setStatus(boardStatus);
+		boardFree.setStatus(boardStatus);
 
-		List<BoardHistory> histories = updateBoardFree.getHistory();
+		List<BoardHistory> histories = boardFree.getHistory();
 
 		if (Objects.isNull(histories))
 			histories = new ArrayList<>();
 
 		BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.EDIT, writer);
 		histories.add(history);
-		updateBoardFree.setHistory(histories);
+		boardFree.setHistory(histories);
 
-		boardFreeRepository.save(updateBoardFree);
+		boardFreeRepository.save(boardFree);
 
 		// 글과 연동 된 사진 처리
-		BoardItem boardItem = new BoardItem(updateBoardFree.getId(), updateBoardFree.getSeq());
+		BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
 		for (GalleryOnBoard galleryOnBoard : galleries) {
 
@@ -303,7 +275,7 @@ public class BoardFreeService {
 				if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
 					updateGallery.setName(galleryOnBoard.getName());
 				} else {
-					updateGallery.setName(updateBoardFree.getSubject());
+					updateGallery.setName(boardFree.getSubject());
 				}
 
 				status.setFrom(CommonConst.GALLERY_FROM_TYPE.BOARD_FREE);
@@ -311,41 +283,18 @@ public class BoardFreeService {
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
-				// 엘라스틱 서치 gallery 도큐먼트 생성을 위한 객체.
-				GalleryOnES galleryOnES = new GalleryOnES();
-				galleryOnES.setId(galleryOnBoard.getId());
-				galleryOnES.setWriter(updateGallery.getWriter());
-				galleryOnES.setName(galleryOnBoard.getName());
-
-				searchService.createDocumentGallery(galleryOnES);
+				searchService.createDocumentGallery(updateGallery);
 			}
 
 		}
 
-		/*
-		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-		BoardFreeOnES boardFreeOnEs = new BoardFreeOnES();
-		boardFreeOnEs.setId(boardFree.getId());
-		boardFreeOnEs.setSeq(boardFree.getSeq());
-		boardFreeOnEs.setWriter(boardFree.getWriter());
-		boardFreeOnEs.setCategoryName(boardFree.getCategory().toString());
-
-		boardFreeOnEs.setSubject(boardFree.getSubject()
-				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;",""));
-
-		boardFreeOnEs.setContent(boardFree.getContent()
-				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;",""));
-
-		searchService.createDocumentBoard(boardFreeOnEs);
-		*/
+		searchService.createDocumentBoard(boardFree);
 
 		if (log.isInfoEnabled()) {
-			log.info("post was edited. post seq=" + updateBoardFree.getSeq() + ", subject=" + updateBoardFree.getSubject());
+			log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 		}
 
-		return updateBoardFree.getSeq();
+		return boardFree.getSeq();
 	}
 
 	/**
@@ -355,63 +304,57 @@ public class BoardFreeService {
      */
     public CommonConst.BOARD_DELETE_TYPE deleteFreePost(Integer seq) {
 
-        Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
-
-        if (! boardFree.isPresent())
-            throw new ServiceException(ServiceError.POST_NOT_FOUND);
+        BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
+				.orElseThrow(() -> new ServiceException(ServiceError.POST_NOT_FOUND));
 
         CommonPrincipal principal = userService.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
-        BoardFree updateBoardFree = boardFree.get();
-
-        if (! updateBoardFree.getWriter().getUserId().equals(principal.getId()))
+        if (! boardFree.getWriter().getUserId().equals(principal.getId()))
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        BoardFree deleteBoardFree = boardFree.get();
-
-        BoardItem boardItem = new BoardItem(deleteBoardFree.getId(), deleteBoardFree.getSeq());
+        BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
         Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 
         // 글이 지워질 때, 연동된 사진도 끊어주어야 한다.
         // 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
         if (count > 0) {
-            deleteBoardFree.setContent(null);
-            deleteBoardFree.setSubject(null);
-            deleteBoardFree.setWriter(null);
+			boardFree.setContent(null);
+			boardFree.setSubject(null);
+			boardFree.setWriter(null);
 
-            List<BoardHistory> histories = deleteBoardFree.getHistory();
+            List<BoardHistory> histories = boardFree.getHistory();
 
             if (Objects.isNull(histories))
                 histories = new ArrayList<>();
 
             BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.DELETE, writer);
             histories.add(history);
-            deleteBoardFree.setHistory(histories);
+			boardFree.setHistory(histories);
 
-            BoardStatus boardStatus = deleteBoardFree.getStatus();
+            BoardStatus boardStatus = boardFree.getStatus();
 
             if (Objects.isNull(boardStatus))
                 boardStatus = new BoardStatus();
 
             boardStatus.setDelete(true);
-            deleteBoardFree.setStatus(boardStatus);
+			boardFree.setStatus(boardStatus);
 
-            boardFreeRepository.save(deleteBoardFree);
+            boardFreeRepository.save(boardFree);
 
             if (log.isInfoEnabled()) {
-                log.info("A post was deleted(post only). post seq=" + deleteBoardFree.getSeq() + ", subject=" + deleteBoardFree.getSubject());
+                log.info("A post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
             }
         } else { // 몽땅 지우기.
-            boardFreeRepository.delete(deleteBoardFree);
+            boardFreeRepository.delete(boardFree);
 
             if (log.isInfoEnabled()) {
-                log.info("A post was deleted(all). post seq=" + deleteBoardFree.getSeq() + ", subject=" + deleteBoardFree.getSubject());
+                log.info("A post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
             }
         }
 
-        searchService.deleteDocumentBoard(deleteBoardFree.getId());
+        searchService.deleteDocumentBoard(boardFree.getId());
 
         return count > 0 ? CommonConst.BOARD_DELETE_TYPE.CONTENT : CommonConst.BOARD_DELETE_TYPE.ALL;
     }
@@ -549,28 +492,17 @@ public class BoardFreeService {
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
-		// 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-		CommentOnES commentOnES = new CommentOnES();
-		commentOnES.setId(boardFreeComment.getId());
-		commentOnES.setWriter(boardFreeComment.getWriter());
-		commentOnES.setBoardItem(boardFreeComment.getBoardItem());
-
-		commentOnES.setContent(boardFreeComment.getContent()
-				.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-				.replaceAll("\r|\n|&nbsp;",""));
-
-		searchService.createDocumentComment(commentOnES);
+		searchService.createDocumentComment(boardFreeComment);
 
 		return boardFreeComment;
 	}
 
 	// 게시판 댓글 목록
 	public List<BoardFreeComment> getFreeComments(Integer seq, String commentId) {
-		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
 
 		List<BoardFreeComment> comments;
 
-		if (commentId != null && !commentId.isEmpty()) {
+		if (! ObjectUtils.isEmpty(commentId)) {
 			comments  = boardDAO.getBoardFreeComment(seq, new ObjectId(commentId));
 		} else {
 			comments  = boardDAO.getBoardFreeComment(seq, null);

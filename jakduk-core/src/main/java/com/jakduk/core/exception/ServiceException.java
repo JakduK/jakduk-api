@@ -20,4 +20,14 @@ public class ServiceException extends RuntimeException {
         super(message);
         this.serviceError = serviceError;
     }
+
+    public ServiceException(ServiceError serviceError, Throwable throwable) {
+        super(throwable);
+        this.serviceError = serviceError;
+    }
+
+    public ServiceException(ServiceError serviceError, String message, Throwable throwable) {
+        super(message, throwable);
+        this.serviceError = serviceError;
+    }
 }

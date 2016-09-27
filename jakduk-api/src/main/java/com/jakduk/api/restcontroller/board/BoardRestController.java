@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  */
 
 @Slf4j
-@Api(tags = "게시판", description = "게시판 관련")
+@Api(tags = "BoardFree", description = "자유게시판 API")
 @RestController
 @RequestMapping("/api/board")
 public class BoardRestController {

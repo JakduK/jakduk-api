@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 
 @Getter
-@ApiModel(value = "SNS 기반 로그인 폼")
+@ApiModel(description = "SNS 기반 로그인 폼")
 public class LoginSocialUserForm {
 
     @ApiModelProperty(required = true, example = "EAALwXK...", value = "OAuth 인증에서 사용하는 AccessToken")

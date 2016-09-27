@@ -175,7 +175,8 @@ public class BoardDAO {
 		
 		List<BoardFreeOnSearchComment> posts = results.getMappedResults();
 
-		return posts.stream().collect(Collectors.toMap(BoardFreeOnSearchComment::getId, Function.identity()));
+		return posts.stream()
+				.collect(Collectors.toMap(BoardFreeOnSearchComment::getId, Function.identity()));
 	}
 	
 	/**

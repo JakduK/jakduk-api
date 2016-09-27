@@ -11,6 +11,7 @@ import com.jakduk.core.model.simple.BoardFreeOnGallery;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.model.simple.UserOnHome;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -213,7 +215,12 @@ public class JakdukDAO {
 		
 		return homeDescription;
 	}
-	
+
+	/**
+	 * 엘라스틱서치에 저장할 BoardFree 목록 가져오기.
+	 * @param commentId
+	 * @return
+	 */
 	public List<BoardFreeOnES> getBoardFreeOnES(ObjectId commentId) {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE.DELETE.name()));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
@@ -231,20 +238,25 @@ public class JakdukDAO {
 		AggregationResults<BoardFreeOnES> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnES.class);
 		
 		List<BoardFreeOnES> posts = results.getMappedResults();
-		
-		for (BoardFreeOnES post : posts) {
-			post.setSubject(post.getSubject()
-					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-					.replaceAll("\r|\n|&nbsp;",""));
 
-			post.setContent(post.getContent()
-					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-					.replaceAll("\r|\n|&nbsp;",""));
-		}
-		
+		posts.forEach(post -> {
+			String subject = Optional.ofNullable(post.getSubject()).orElse("");
+			subject = StringUtils.replacePattern(subject, CommonConst.REGEX_FIND_HTML_TAG, "");
+			post.setSubject(StringUtils.replacePattern(subject, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
+
+			String content = Optional.ofNullable(post.getContent()).orElse("");
+			content = StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_TAG, "");
+			post.setContent(StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
+		});
+
 		return posts;
 	}
-	
+
+	/**
+	 * 엘라스틱서치에 저장할 BoardFreeComment 목록 가져오기.
+	 * @param commentId
+	 * @return
+	 */
 	public List<CommentOnES> getCommentOnES(ObjectId commentId) {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
@@ -261,17 +273,21 @@ public class JakdukDAO {
 		AggregationResults<CommentOnES> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommentOnES.class);
 		
 		List<CommentOnES> comments = results.getMappedResults();
-		
-		for (CommentOnES comment : comments) {
 
-			comment.setContent(comment.getContent()
-					.replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
-					.replaceAll("\r|\n|&nbsp;",""));
-		}
+		comments.forEach(comment -> {
+			String content = Optional.ofNullable(comment.getContent()).orElse("");
+			content = StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_TAG, "");
+			comment.setContent(StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
+		});
 		
 		return comments;
 	}
-	
+
+	/**
+	 * 엘라스틱서치에 저장할 Gallery 목록 가져오기.
+	 * @param commentId
+	 * @return
+	 */
 	public List<GalleryOnES> getGalleryOnES(ObjectId commentId) {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");

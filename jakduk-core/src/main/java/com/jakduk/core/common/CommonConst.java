@@ -74,6 +74,9 @@ public class CommonConst {
 	public final static String RESPONSE_VOID_OBJECT = "{}";
 	public final static String RESPONSE_ERROR_DEFAULT_CODE = "-";
 
+	public final static String REGEX_FIND_HTML_TAG = "<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>";
+	public final static String REGEX_FIND_HTML_WHITESPACE = "\r|\n|&nbsp;";
+
 	/**
 	 * Social 프로바이더 종류.
 	 */
@@ -215,5 +218,16 @@ public class CommonConst {
 	public enum IMAGE_TYPE {
 		FULL,		// 전체크기
 		THUMBNAIL	// 썸네일
+	}
+
+	// 배치 타입
+	public enum BATCH_TYPE {
+		CHANGE_BOARD_CONTENT_IMAGE_URL_01
+	}
+
+	public enum SEARCH_TYPE {
+		PO,	// 게시물
+		CO,	// 댓글
+		GA	// 사진첩
 	}
 }

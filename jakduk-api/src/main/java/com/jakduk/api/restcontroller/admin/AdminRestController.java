@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Resource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jakduk.core.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +47,6 @@ import com.jakduk.core.model.web.CompetitionWrite;
 import com.jakduk.core.model.web.ThumbnailSizeWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.core.service.AdminService;
-import com.jakduk.core.service.CommonService;
-import com.jakduk.core.service.CompetitionService;
-import com.jakduk.core.service.StatsService;
 
 /**
  * @author pyohwan
@@ -75,6 +73,9 @@ public class AdminRestController {
 
 	@Autowired
 	private CompetitionService competitionService;
+
+	@Autowired
+	private SearchService searchService;
 
 	@ApiOperation(value = "알림판 목록")
 	@RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
@@ -632,19 +633,19 @@ public class AdminRestController {
 	@ApiOperation(value = "검색 인덱스 초기화")
 	@RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
 	public Map<String, Object> initSearchIndex() {
-		return adminService.initSearchIndex();
+		return searchService.initSearchIndex();
 	}
 
 	@ApiOperation(value = "검색 타입 초기화")
 	@RequestMapping(value = "/search/type/init", method = RequestMethod.POST)
-	public Map<String, Object> initSearchType() {
-		return adminService.initSearchType();
+	public Map<String, Object> initSearchType() throws JsonProcessingException {
+		return searchService.initSearchType();
 	}
 
 	@ApiOperation(value = "검색 데이터 초기화")
 	@RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
 	public Map<String, Object> initSearchData() {
-		return adminService.initSearchData();
+		return searchService.initSearchDocuments();
 	}
 
 	@RequestMapping(value = "/thumbnail/size", method = RequestMethod.GET)

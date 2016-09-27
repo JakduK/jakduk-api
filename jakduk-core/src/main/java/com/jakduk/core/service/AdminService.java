@@ -1,5 +1,29 @@
 package com.jakduk.core.service;
 
+import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.model.db.*;
+import com.jakduk.core.model.embedded.JakduScheduleScore;
+import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.LocalSimpleName;
+import com.jakduk.core.model.web.AttendanceClubWrite;
+import com.jakduk.core.model.web.BoardCategoryWrite;
+import com.jakduk.core.model.web.CompetitionWrite;
+import com.jakduk.core.model.web.ThumbnailSizeWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.core.repository.*;
+import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
+import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
+import io.searchbox.client.JestClient;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -12,68 +36,8 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import javax.imageio.ImageIO;
-
-import com.google.gson.Gson;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.Index;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.mapping.PutMapping;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.db.AttendanceClub;
-import com.jakduk.core.model.db.AttendanceLeague;
-import com.jakduk.core.model.db.BoardCategory;
-import com.jakduk.core.model.db.Competition;
-import com.jakduk.core.model.db.Encyclopedia;
-import com.jakduk.core.model.db.FootballClub;
-import com.jakduk.core.model.db.FootballClubOrigin;
-import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.db.HomeDescription;
-import com.jakduk.core.model.db.JakduSchedule;
-import com.jakduk.core.model.db.JakduScheduleGroup;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
-import com.jakduk.core.model.embedded.JakduScheduleScore;
-import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.AttendanceClubWrite;
-import com.jakduk.core.model.web.BoardCategoryWrite;
-import com.jakduk.core.model.web.CompetitionWrite;
-import com.jakduk.core.model.web.ThumbnailSizeWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.core.repository.AttendanceClubRepository;
-import com.jakduk.core.repository.AttendanceLeagueRepository;
-import com.jakduk.core.repository.BoardCategoryRepository;
-import com.jakduk.core.repository.CompetitionRepository;
-import com.jakduk.core.repository.EncyclopediaRepository;
-import com.jakduk.core.repository.FootballClubOriginRepository;
-import com.jakduk.core.repository.FootballClubRepository;
-import com.jakduk.core.repository.GalleryRepository;
-import com.jakduk.core.repository.HomeDescriptionRepository;
-import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
-import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -242,211 +206,6 @@ public class AdminService {
 		
 		return result;
 	}
-	
-	public HashMap<String, Object> initSearchIndex() {
-
-		HashMap<String, Object> result = new HashMap<>();
-		
-		// 인덱스 초기화.
-		ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder();
-		//settingsBuilder.put("number_of_shards", 5);
-		//settingsBuilder.put("number_of_replicas", 1);
-		settingsBuilder.put("index.analysis.analyzer.korean.type", "custom");
-		settingsBuilder.put("index.analysis.analyzer.korean.tokenizer", "mecab_ko_standard_tokenizer");
-		
-		try {
-			JestResult jestResult = jestClient.execute(new CreateIndex.Builder(elasticsearchIndexName).settings(settingsBuilder.build().getAsMap()).build());
-			
-			if (!jestResult.isSucceeded()) {
-				log.debug(jestResult.getErrorMessage());
-			} else {
-				result.put("result", Boolean.TRUE);
-			}
-		} catch (IOException e) {
-			result.put("result", Boolean.FALSE);
-			log.error(e.getMessage(), e);
-		}
-		
-		return result;
-	}
-
-	public HashMap<String, Object> initSearchType() {
-		// 매핑 초기화.
-		Map<String, Object> source = new HashMap<>();
-		Map<String, Object> properties = new HashMap<>();
-		Map<String, Object> subject = new HashMap<>();
-		Map<String, Object> content = new HashMap<>();
-		subject.put("type", "string");
-		subject.put("analyzer", "korean");
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("subject", subject);
-		properties.put("content", content);
-		source.put("properties", properties);
-		PutMapping putMapping1 = new PutMapping.Builder(
-			elasticsearchIndexName,
-			CommonConst.ELASTICSEARCH_TYPE_BOARD,
-			new Gson().toJson(source)
-		).build();
-
-		// 매핑 초기화.
-		properties = new HashMap<>();
-		source = new HashMap<>();
-		content = new HashMap<>();
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("content", content);
-		source.put("properties", properties);
-		PutMapping putMapping2 = new PutMapping.Builder(
-			elasticsearchIndexName,
-			CommonConst.ELASTICSEARCH_TYPE_COMMENT,
-			new Gson().toJson(source)
-		).build();
-
-		// 매핑 초기화.
-		properties = new HashMap<>();
-		source = new HashMap<>();
-		content = new HashMap<>();
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("name", content);
-		source.put("properties", properties);
-		PutMapping putMapping3 = new PutMapping.Builder(
-			elasticsearchIndexName,
-			CommonConst.ELASTICSEARCH_TYPE_GALLERY,
-			new Gson().toJson(source)
-		).build();
-
-		HashMap<String, Object> result = new HashMap<>();
-
-		try {
-			JestResult jestResult1 = jestClient.execute(putMapping1);
-			JestResult jestResult2 = jestClient.execute(putMapping2);
-			JestResult jestResult3 = jestClient.execute(putMapping3);
-			if (!jestResult1.isSucceeded()) {
-				log.debug(jestResult1.getErrorMessage());
-			}
-			if (!jestResult2.isSucceeded()) {
-				log.debug(jestResult2.getErrorMessage());
-			}
-			if (!jestResult3.isSucceeded()) {
-				log.debug(jestResult3.getErrorMessage());
-			}
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-
-		return result;
-	}
-
-	public HashMap<String, Object> initSearchData() {
-
-		HashMap<String, Object> result = new HashMap<>();
-
-		// 게시물을 엘라스틱 서치에 모두 넣기.
-		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
-		BoardFreeOnES lastPost = posts.size() > 0 ? posts.get(posts.size() - 1) : null;
-
-		while (posts.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (BoardFreeOnES post : posts) {
-				idxList.add(new Index.Builder(post).build());
-			}
-
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
-					.addAction(idxList)
-					.build();
-
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (!jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
-
-			if (Objects.nonNull(lastPost)) {
-				posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
-				if (posts.size() > 0) {
-					lastPost = posts.get(posts.size() - 1);
-				}
-			}
-		}
-
-		// 게시물을 엘라스틱 서치에 모두 넣기.
-		List<CommentOnES> comments = jakdukDAO.getCommentOnES(null);
-		CommentOnES lastComment = comments.size() > 0 ? comments.get(comments.size() - 1) : null;
-
-		while (comments.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (CommentOnES comment : comments) {
-				idxList.add(new Index.Builder(comment).build());
-			}
-
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
-					.addAction(idxList)
-					.build();
-
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (!jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
-
-			if (Objects.nonNull(lastComment)) {
-				comments = jakdukDAO.getCommentOnES(new ObjectId(lastComment.getId()));
-				if (comments.size() > 0) {
-					lastComment = comments.get(comments.size() - 1);
-				}
-			}
-		}
-
-		// 사진첩을 엘라스틱 서치에 모두 넣기.
-		List<GalleryOnES> galleries = jakdukDAO.getGalleryOnES(null);
-		GalleryOnES lastGallery = galleries.size() > 0 ? galleries.get(galleries.size() - 1) : null;
-
-		while (galleries.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (GalleryOnES gallery : galleries) {
-				idxList.add(new Index.Builder(gallery).build());
-			}
-
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
-					.addAction(idxList)
-					.build();
-
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (!jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
-
-			if (Objects.nonNull(lastGallery)) {
-				galleries = jakdukDAO.getGalleryOnES(new ObjectId(lastGallery.getId()));
-				if (galleries.size() > 0) {
-					lastGallery = galleries.get(galleries.size() - 1);
-				}
-			}
-		}
-
-		return result;
-	}
 
 	public BoardCategory boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
 		BoardCategory boardCategory = new BoardCategory();
@@ -474,14 +233,6 @@ public class AdminService {
 		return boardCategoryRepository.findAll();
 	}
 
-	public Model getBoardCategoryList(Model model) {
-		List<BoardCategory> boardCategories = this.getBoardCategoryList();
-		
-		model.addAttribute("boardCategories", boardCategories);
-		
-		return model;
-	}
-
 	public List<AttendanceClub> getAttendanceClubList() {
 		
 		List<AttendanceClub> attendanceClubs;
@@ -489,11 +240,6 @@ public class AdminService {
 		attendanceClubs = attendanceClubRepository.findAll(sort);
 		
 		return attendanceClubs;
-	}
-
-	public Model getBoardCategory(Model model, String id) {
-		model.addAttribute("boardCategoryWrite", this.getBoardCategory(id));
-		return model;
 	}
 
 	public BoardCategoryWrite getBoardCategory(String id) {
@@ -575,62 +321,7 @@ public class AdminService {
 			}				
 		}
 	}
-	
-	public Model getAttendanceLeague(Model model, String id) {
-		AttendanceLeague attendanceLeague = attendanceLeagueReposidory.findOne(id);
-		
-		model.addAttribute("attendanceLeague", attendanceLeague);
-		
-		return model;
-	}
-	
-	public void attendanceLeagueWrite(AttendanceLeague attendanceLeague) {
-		
-		if (attendanceLeague.getId().isEmpty()) {
-			attendanceLeague.setId(null);
-		} 
-		
-		if (log.isDebugEnabled()) {
-			log.debug("attendanceLeague=" + attendanceLeague);
-		}
-		
-		attendanceLeagueReposidory.save(attendanceLeague);
-	}
-	
-	public boolean attendanceLeagueDelete(String id) {
-		
-		if (!id.isEmpty()) {
-			AttendanceLeague attendanceLeague = attendanceLeagueReposidory.findOne(id);
-			
-			if (attendanceLeague != null) {
-				attendanceLeagueReposidory.delete(attendanceLeague);
-				return true;
-			}
-		}
-		
-		return false;
-	}
 
-	public void homeDescriptionWrite(HomeDescription homeDescription) {
-		
-		if (homeDescription.getId().isEmpty()) {
-			homeDescription.setId(null);
-		} 
-		
-		if (log.isDebugEnabled()) {
-			log.debug("homeDescription=" + homeDescription);
-		}
-		
-		homeDescriptionReposotiry.save(homeDescription);
-	}	
-
-	public void getAttendanceClubWrite(Model model) {
-		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
-		
-		model.addAttribute("footballClubs", footballClubs);
-		model.addAttribute("attendanceClubWrite", new AttendanceClubWrite());
-	}
-	
 	public Map<String, Object> getAttendanceClubWrite(String id) {
 		Map<String, Object> data = new HashMap<>();
 
@@ -662,19 +353,6 @@ public class AdminService {
 		attendanceClub.setAverage(attendanceClubWrite.getAverage());
 		
 		attendanceClubRepository.save(attendanceClub);
-	}
-
-	public void getJakduScheduleWrite(Model model) {
-		List<FootballClubOrigin> footballClubs = footballClubOriginRepository.findAll();
-		List<Competition> competitions = competitionRepository.findAll();
-		JakduScheduleGroup jakduScheduleGroup = jakdukDAO.getJakduScheduleGroupOrderBySeq();
-
-		JakduScheduleWrite jakduScheduleWrite = new JakduScheduleWrite();
-		jakduScheduleWrite.setGroupSeq(jakduScheduleGroup.getSeq());
-
-		model.addAttribute("competitions", competitions);
-		model.addAttribute("footballClubs", footballClubs);
-		model.addAttribute("jakduScheduleWrite", jakduScheduleWrite);
 	}
 
 	public JakduScheduleWrite getJakduScheduleWrite(String id) {

@@ -40,20 +40,12 @@ public class RestError {
 
     public RestError(ServiceError serviceError) {
         this.code = serviceError.getCode();
-
-        Locale locale = LocaleContextHolder.getLocale();
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.common", locale);
-
-        this.message = resourceBundle.getString(serviceError.getMessage());
+        this.message = serviceError.getMessage();
     }
 
     public RestError(ServiceError serviceError, List<String> fields) {
         this.code = serviceError.getCode();
+        this.message = serviceError.getMessage();
         this.fields = fields;
-
-        Locale locale = LocaleContextHolder.getLocale();
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.common", locale);
-
-        this.message = resourceBundle.getString(serviceError.getMessage());
     }
 }

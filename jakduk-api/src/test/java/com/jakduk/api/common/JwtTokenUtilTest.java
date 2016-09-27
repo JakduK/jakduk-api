@@ -28,11 +28,11 @@ public class JwtTokenUtilTest {
     @Before
     public void before() {
 
-        ReflectionTestUtils.setField(jwtTokenUtil, "expiration", 0L);
-        ReflectionTestUtils.setField(jwtTokenUtil, "secret", "abcdef");
+        ReflectionTestUtils.setField(jwtTokenUtil, "expiration", 600L);
+        ReflectionTestUtils.setField(jwtTokenUtil, "secret", "JakduK11!");
 
         commonPrincipal = CommonPrincipal.builder()
-                .email("test01@test.com")
+                .email("test50@test.com")
                 .username("test01")
                 .id("a1b2c3d4")
                 .providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
@@ -45,7 +45,7 @@ public class JwtTokenUtilTest {
 
         String token = jwtTokenUtil.generateToken(commonPrincipal, null);
 
-        Assert.assertTrue(! ObjectUtils.isEmpty(token));
-        Assert.assertFalse(jwtTokenUtil.isValidateToken(token));
+        Assert.assertFalse(ObjectUtils.isEmpty(token));
+        Assert.assertTrue(jwtTokenUtil.isValidateToken(token));
     }
 }

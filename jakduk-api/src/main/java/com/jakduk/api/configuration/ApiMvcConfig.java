@@ -1,13 +1,12 @@
 package com.jakduk.api.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
@@ -92,6 +91,11 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
 */
 
     @Bean
+    public LocaleResolver localeResolver() {
+        return new SessionLocaleResolver();
+    }
+
+    @Bean
     public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
         List<ViewResolver> viewResolvers = new ArrayList<>();
         List<View> defaultViews = new ArrayList<>();
@@ -119,23 +123,6 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public LocaleResolver localeResolver() {
-        return new SessionLocaleResolver();
-    }
-
-    @Bean
-    public MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
-                "classpath:messages/about", "classpath:messages/home", "classpath:messages/gallery",
-                "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setCacheSeconds(180);
-
-        return messageSource;
-    }
-
-    @Bean
     public CommonsMultipartResolver multipartResolver() throws IOException {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         multipartResolver.setMaxUploadSize(8388608);
@@ -144,5 +131,13 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         multipartResolver.setUploadTempDir(new FileSystemResource("/tmp/jakduk"));
 
         return multipartResolver;
+    }
+
+    /**
+     * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
+     */
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
     }
 }
