@@ -53,13 +53,4 @@ public class JwtTokenUtilTest {
         Assert.assertFalse(ObjectUtils.isEmpty(token));
         Assert.assertTrue(jwtTokenUtil.isValidateToken(token));
     }
-
-    @Test
-    public void 인증토큰() {
-        String token = "eyJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJ1bmtub3duIiwidWlkIjoiYTFiMmMzZDQiLCJpc3MiOiJ0ZXN0NTBAdGVzdC5jb20iLCJuYW1lIjoidGVzdDAxIiwicGlkIjoiSkFLRFVLIiwiZXhwIjoxNDc0OTAyMDg0fQ.cR0oVNqzXkjOywyDiVCvpzz5ykWDZO882IhZwGuItNb9RHH8cqEwALnW1nmGab6Rj_fRhf0yiG0RPA-sIAZm2Q";
-
-        System.out.println(jwtTokenUtil.getUsernameFromToken(token));
-        System.out.println(jwtTokenUtil.isValidateToken(token));
-
-    }
 }
