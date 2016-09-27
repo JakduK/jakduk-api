@@ -33,7 +33,7 @@ public class JwtTokenUtilTest {
     @Before
     public void before() {
 
-        ReflectionTestUtils.setField(jwtTokenUtil, "expiration", 1000L);
+        ReflectionTestUtils.setField(jwtTokenUtil, "expiration", 600L);
         ReflectionTestUtils.setField(jwtTokenUtil, "secret", "JakduK11!");
 
         commonPrincipal = CommonPrincipal.builder()
@@ -50,11 +50,8 @@ public class JwtTokenUtilTest {
 
         String token = jwtTokenUtil.generateToken(commonPrincipal, null);
 
-        System.out.println("token=" + token);
-
-
-        Assert.assertTrue(! ObjectUtils.isEmpty(token));
-        Assert.assertFalse(jwtTokenUtil.isValidateToken(token));
+        Assert.assertFalse(ObjectUtils.isEmpty(token));
+        Assert.assertTrue(jwtTokenUtil.isValidateToken(token));
     }
 
     @Test

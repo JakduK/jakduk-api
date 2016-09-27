@@ -2,20 +2,16 @@ package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.core.authentication.common.CommonPrincipal;
-import com.jakduk.core.authentication.common.SocialUserDetail;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.service.CommonService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.aop.AopInvocationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -26,9 +22,6 @@ import java.util.Map;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-
-    @Autowired
-    private CommonService commonService;
 
     private static final long serialVersionUID = -3301605591108950415L;
 
@@ -53,36 +46,22 @@ public class JwtTokenUtil implements Serializable {
     }
 
     public String getProviderIdFromToken(String token) {
-        String providerId;
-        try {
-            final Claims claims = getClaimsFromToken(token);
-            providerId = (String) claims.get(CLAIM_KEY_PROVIDER_ID);
-        } catch (Exception e) {
-            providerId = null;
-        }
-        return providerId;
+        final Claims claims = getClaimsFromToken(token);
+
+        return (String) claims.get(CLAIM_KEY_PROVIDER_ID);
     }
 
     public Date getExpirationDateFromToken(String token) {
-        Date expiration;
-        try {
-            final Claims claims = getClaimsFromToken(token);
-            expiration = claims.getExpiration();
-        } catch (Exception e) {
-            expiration = null;
-        }
-        return expiration;
+        final Claims claims = getClaimsFromToken(token);
+
+        return claims.getExpiration();
     }
 
     public String getAudienceFromToken(String token) {
-        String audience;
-        try {
-            final Claims claims = getClaimsFromToken(token);
-            audience = (String) claims.get(Claims.AUDIENCE);
-        } catch (Exception e) {
-            audience = null;
-        }
-        return audience;
+
+        final Claims claims = getClaimsFromToken(token);
+
+        return (String) claims.get(Claims.AUDIENCE);
     }
 
     public AttemptSocialUser getAttemptedFromToken(String token) {
@@ -123,6 +102,11 @@ public class JwtTokenUtil implements Serializable {
                     .getBody();
         } catch (ExpiredJwtException e) {
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN, e);
+        } catch (IllegalArgumentException e) {
+            claims = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, e);
         }
 
         return claims;
@@ -209,15 +193,10 @@ public class JwtTokenUtil implements Serializable {
         return refreshedToken;
     }
 
-    public Boolean isValidateToken(String token, UserDetails userDetails) {
+    public Boolean isValidateToken(String token, String email) {
         String username = this.getUsernameFromToken(token);
-        String email;
-        if (userDetails instanceof SocialUserDetail) {
-            email = ((SocialUserDetail) userDetails).getEmail();
-        } else {
-            email = userDetails.getUsername();
-        }
-        return (username.equals(email) && !isTokenExpired(token));
+
+        return (username.equals(email) && ! isTokenExpired(token));
     }
 
     public Boolean isValidateToken(String token) {

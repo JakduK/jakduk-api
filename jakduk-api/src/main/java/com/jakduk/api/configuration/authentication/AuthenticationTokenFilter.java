@@ -3,10 +3,12 @@ package com.jakduk.api.configuration.authentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.common.util.JwtTokenUtil;
 import com.jakduk.api.restcontroller.exceptionHandler.RestError;
+import com.jakduk.core.authentication.common.SocialUserDetail;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,9 +42,6 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
     @Autowired
     private SocialDetailService socialDetailService;
 
-    @Autowired
-    private CommonService commonService;
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -51,23 +50,30 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
 
         try {
             String authToken = httpRequest.getHeader(tokenHeader);
-            String username = jwtTokenUtil.getUsernameFromToken(authToken);
-            String providerId = jwtTokenUtil.getProviderIdFromToken(authToken);
 
-            if (! ObjectUtils.isEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails;
-                if (CommonConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
-                    userDetails = jakdukDetailsService.loadUserByUsername(username);
-                } else {
-                    userDetails = socialDetailService.loadUserByUsername(username);
-                }
+            if (! StringUtils.isEmpty(authToken)) {
+                String username = jwtTokenUtil.getUsernameFromToken(authToken);
+                String providerId = jwtTokenUtil.getProviderIdFromToken(authToken);
 
-                if (jwtTokenUtil.isValidateToken(authToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+                if (! StringUtils.isEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails;
+                    String email;
 
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    if (CommonConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
+                        userDetails = jakdukDetailsService.loadUserByUsername(username);
+                        email = userDetails.getUsername();
+                    } else {
+                        userDetails = socialDetailService.loadUserByUsername(username);
+                        email = ((SocialUserDetail) userDetails).getEmail();
+                    }
+
+                    if (jwtTokenUtil.isValidateToken(authToken, email)) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             }
 

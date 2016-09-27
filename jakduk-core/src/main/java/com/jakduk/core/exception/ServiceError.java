@@ -37,7 +37,8 @@ public enum ServiceError {
     SEND_EMAIL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.send.email.failed"),
     GALLERY_IO_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"common.gallery.exception.io"),
     ELASTICSEARCH_NOT_FOUND_INDEX(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.elasticsearch.not.found.index"),
-    IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.io");
+    IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.io"),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "common.exception.internal.server.error");
 
     @Autowired
     private CommonService commonService;
