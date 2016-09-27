@@ -4,8 +4,8 @@ import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;
-import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class BoardFreeOnES {
 	
 	@JestId

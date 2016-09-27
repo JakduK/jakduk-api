@@ -3,8 +3,6 @@ package com.jakduk.core.model.elasticsearch;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +14,7 @@ import lombok.NoArgsConstructor;
 */
 
 @Getter
+@NoArgsConstructor
 public class GalleryOnES {
 
 	@JestId
