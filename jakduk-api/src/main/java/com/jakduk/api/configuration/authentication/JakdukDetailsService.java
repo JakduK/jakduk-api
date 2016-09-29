@@ -43,7 +43,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 			if (ObjectUtils.isEmpty(user))
 				throw new ServiceException(ServiceError.NOT_FOUND_JAKDUK_ACCOUNT,
-						commonService.getResourceBundleMessage("messages.common", "common.exception.not.found.jakduk.account", email));
+						commonService.getResourceBundleMessage("messages.exception", "exception.not.found.jakduk.account", email));
 
 			if (! user.getProviderId().equals(CommonConst.ACCOUNT_TYPE.JAKDUK))
 				throw new FindUserButNotJakdukAccount("JakduK 계정이 아니라 SNS 계정으로 연동되어 있습니다. email=" + email, user.getProviderId());

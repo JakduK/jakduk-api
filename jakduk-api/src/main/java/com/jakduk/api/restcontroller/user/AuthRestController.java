@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.user;
 
-import com.jakduk.api.common.util.JwtTokenUtil;
+import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.common.vo.SocialProfile;
@@ -29,7 +29,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -37,7 +36,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -58,7 +56,7 @@ public class AuthRestController {
     private CommonService commonService;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenUtils jwtTokenUtils;
 
     @Autowired
     private UserUtils userUtils;
@@ -97,7 +95,7 @@ public class AuthRestController {
         // Reload password post-authentication so we can generate token
         JakdukUserDetail userDetails = (JakdukUserDetail) jakdukDetailsService.loadUserByUsername(form.getUsername());
 
-        String token = jwtTokenUtil.generateToken(new CommonPrincipal(userDetails), device);
+        String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
         response.setHeader(tokenHeader, token);
 
@@ -111,8 +109,8 @@ public class AuthRestController {
 
         String token = request.getHeader(tokenHeader);
 
-        if (jwtTokenUtil.canTokenBeRefreshed(token)) {
-            String refreshedToken = jwtTokenUtil.refreshToken(token);
+        if (jwtTokenUtils.canTokenBeRefreshed(token)) {
+            String refreshedToken = jwtTokenUtils.refreshToken(token);
             response.setHeader(tokenHeader, refreshedToken);
 
             return EmptyJsonResponse.newInstance();
@@ -147,7 +145,7 @@ public class AuthRestController {
         if (! ObjectUtils.isEmpty(existUser)) {
 
             SocialUserDetail userDetails = (SocialUserDetail) socialDetailService.loadUserByUsername(existUser.getEmail());
-            String token = jwtTokenUtil.generateToken(new CommonPrincipal(userDetails), device);
+            String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
             response.setHeader(tokenHeader, token);
 
@@ -164,7 +162,7 @@ public class AuthRestController {
         if (! ObjectUtils.isEmpty(socialProfile.getEmail()))
             attemptSocialUser.setEmail(socialProfile.getEmail());
 
-        String attemptedToken = jwtTokenUtil.generateAttemptedToken(attemptSocialUser);
+        String attemptedToken = jwtTokenUtils.generateAttemptedToken(attemptSocialUser);
 
         response.setHeader(attemptedTokenHeader, attemptedToken);
 
@@ -175,10 +173,10 @@ public class AuthRestController {
     @RequestMapping(value = "/social/attempt", method = RequestMethod.GET)
     public AttemptSocialUser getSocialAttemptedUser(@RequestHeader(value = "x-attempt-token") String attemptedToken) {
 
-        if (! jwtTokenUtil.isValidateToken(attemptedToken))
+        if (! jwtTokenUtils.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
-        return jwtTokenUtil.getAttemptedFromToken(attemptedToken);
+        return jwtTokenUtils.getAttemptedFromToken(attemptedToken);
     }
 
     @ApiOperation(value = "JWT 토큰 속 프로필 정보", produces = "application/json", response = AuthUserProfile.class)

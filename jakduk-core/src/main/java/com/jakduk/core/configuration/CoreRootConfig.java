@@ -66,7 +66,8 @@ public class CoreRootConfig {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
                 "classpath:messages/about", "classpath:messages/home", "classpath:messages/gallery",
-                "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu", "classpath:messages/email");
+                "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu", "classpath:messages/email",
+                "classpath:messages/exception");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(180);
 

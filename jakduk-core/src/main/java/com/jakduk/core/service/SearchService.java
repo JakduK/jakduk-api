@@ -49,7 +49,7 @@ public class SearchService {
 	private String elasticsearchHostName;
 
     @Value("${elasticsearch.enable}")
-    private boolean elasticsearchEnabled;
+    private boolean elasticsearchEnable;
 
 	@Autowired
 	private JestClient jestClient;
@@ -127,7 +127,7 @@ public class SearchService {
 	@Async
 	public void createDocumentBoard(BoardFree boardFree) {
 
-        if (elasticsearchEnabled) {
+        if (elasticsearchEnable) {
             BoardFreeOnES boardFreeOnES = new BoardFreeOnES(boardFree);
 
             Index index = new Index.Builder(boardFreeOnES)
@@ -200,7 +200,7 @@ public class SearchService {
 
 	@Async
 	public void createDocumentComment(BoardFreeComment boardFreeComment) {
-        if (elasticsearchEnabled) {
+        if (elasticsearchEnable) {
             CommentOnES commentOnES = new CommentOnES(boardFreeComment);
 
             Index index = new Index.Builder(commentOnES)
@@ -298,7 +298,7 @@ public class SearchService {
 	@Async
 	public void createDocumentGallery(Gallery gallery) {
 
-        if (elasticsearchEnabled) {
+        if (elasticsearchEnable) {
             GalleryOnES galleryOnES = new GalleryOnES(gallery);
 
             Index index = new Index.Builder(galleryOnES)

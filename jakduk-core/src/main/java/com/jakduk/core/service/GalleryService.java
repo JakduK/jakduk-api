@@ -246,7 +246,7 @@ public class GalleryService {
 			in.close();
 			return byteStream;
 		} else {
-			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.no.such.element"));
 		}
 	}
 
@@ -267,11 +267,11 @@ public class GalleryService {
 		}
 
 		if (Objects.isNull(gallery.getWriter())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.access.denied"));
 		}
 
 		if (!accountId.equals(gallery.getWriter().getUserId())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.access.denied"));
 		}
 
 		ObjectId objId = new ObjectId(gallery.getId());
@@ -398,7 +398,7 @@ public class GalleryService {
 			} else {
 				throw new UserFeelingException(
 					CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
-					commonService.getResourceBundleMessage("messages.common", "common.exception.select.already.like")
+					commonService.getResourceBundleMessage("messages.exception", "exception.select.already.like")
 				);
 			}
 		} else {
