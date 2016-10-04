@@ -4,21 +4,17 @@ import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author pyohwan
  *         16. 7. 18 오후 9:31
  */
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
 @ApiModel(value = "사진 올리기 응답 객체")
+@Setter
+@Getter
 public class GalleryOnUploadResponse {
 
     @ApiModelProperty(value = "사진 ID")

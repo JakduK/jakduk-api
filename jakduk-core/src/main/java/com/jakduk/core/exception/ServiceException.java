@@ -7,12 +7,13 @@ import lombok.Getter;
  * 16. 7. 1 오전 12:30
  */
 
-@Getter
 public class ServiceException extends RuntimeException {
 
+    @Getter
     private ServiceError serviceError;
 
     public ServiceException(ServiceError serviceError) {
+        super(serviceError.getMessage());
         this.serviceError = serviceError;
     }
 
@@ -22,7 +23,7 @@ public class ServiceException extends RuntimeException {
     }
 
     public ServiceException(ServiceError serviceError, Throwable throwable) {
-        super(throwable);
+        super(serviceError.getMessage(), throwable);
         this.serviceError = serviceError;
     }
 

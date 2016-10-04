@@ -76,7 +76,7 @@ public class StatsRestController {
         Locale locale = localeResolver.resolveLocale(request);
 
         if (Objects.isNull(clubOrigin) || clubOrigin.isEmpty())
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
 
         List<AttendanceClub> attendances = statsService.getAttendanceClub(locale, clubOrigin);
 

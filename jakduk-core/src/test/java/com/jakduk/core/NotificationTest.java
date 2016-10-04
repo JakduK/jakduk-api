@@ -34,6 +34,15 @@ public class NotificationTest extends AbstractSpringTest {
         Locale locale = Locale.KOREAN;
 
         emailService.sendMailWithInline("Pyohwan", "phjang1983@daum.net", locale);
+    }
+
+    @Ignore
+    @Test
+    public void 가입메일() throws MessagingException {
+
+        Locale locale = Locale.KOREAN;
+
+        emailService.sendWelcome(locale, "이은상", "phjang1983@daum.net");
 
     }
 }

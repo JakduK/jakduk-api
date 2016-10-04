@@ -1,7 +1,7 @@
 package com.jakduk.core.model.embedded;
 
 import com.jakduk.core.common.CommonConst;
-import lombok.Data;
+import lombok.*;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,7 +10,11 @@ import lombok.Data;
  * @desc     :
  */
 
-@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class GalleryStatus {
 	
 	private CommonConst.GALLERY_STATUS_TYPE status;

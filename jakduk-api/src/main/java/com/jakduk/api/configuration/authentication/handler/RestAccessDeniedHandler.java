@@ -32,7 +32,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setCharacterEncoding("utf-8");
 
-        RestError error = new RestError("-", commonService.getResourceBundleMessage("messages.common", "common.exception.access.denied"));
+        RestError error = new RestError("-", commonService.getResourceBundleMessage("messages.exception", "exception.access.denied"));
 
         String errorJson = new ObjectMapper().writeValueAsString(error);
 

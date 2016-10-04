@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Api(tags = "회원 비밀번호", description = "회원 비밀번호 API")
+@Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/password")
 public class PasswordRestController {
@@ -96,7 +96,7 @@ public class PasswordRestController {
 		Locale locale = localeResolver.resolveLocale(request);
 
 		if (Objects.isNull(code))
-			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
 
 		Map<String, Object> response = new HashMap<>();
 		Token token = commonService.getTokenByCode(code);

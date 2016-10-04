@@ -1,11 +1,12 @@
 package com.jakduk.core.repository;
 
-import java.util.List;
-
 import com.jakduk.core.model.db.FootballClub;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -17,4 +18,6 @@ public interface FootballClubRepository extends MongoRepository<FootballClub, St
 	
 	@Query(value="{'names.language' : ?0}", fields="{'active' : 1, 'origin' : 1, 'names.$' : 1}")
 	List<FootballClub> findByNamesLanguage(String language, Pageable pageable);
+
+	Optional<FootballClub> findOneById(String id);
 }

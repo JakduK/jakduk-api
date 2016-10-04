@@ -220,7 +220,7 @@ public class BoardRestController {
         Optional<BoardFree> boardFree = boardFreeService.getFreePost(seq);
 
         if (!boardFree.isPresent())
-            throw new ServiceException(ServiceError.POST_NOT_FOUND);
+            throw new ServiceException(ServiceError.NOT_FOUND_POST);
 
         BoardFree getBoardFree = boardFree.get();
         boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));

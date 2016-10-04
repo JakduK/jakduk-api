@@ -1,12 +1,11 @@
 package com.jakduk.api.configuration.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.common.util.JwtTokenUtil;
+import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.restcontroller.exceptionHandler.RestError;
 import com.jakduk.core.authentication.common.SocialUserDetail;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -34,7 +32,7 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
     private String tokenHeader;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenUtils jwtTokenUtils;
 
     @Autowired
     private JakdukDetailsService jakdukDetailsService;
@@ -52,8 +50,8 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
             String authToken = httpRequest.getHeader(tokenHeader);
 
             if (! StringUtils.isEmpty(authToken)) {
-                String username = jwtTokenUtil.getUsernameFromToken(authToken);
-                String providerId = jwtTokenUtil.getProviderIdFromToken(authToken);
+                String username = jwtTokenUtils.getUsernameFromToken(authToken);
+                String providerId = jwtTokenUtils.getProviderIdFromToken(authToken);
 
                 if (! StringUtils.isEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails;
@@ -67,7 +65,7 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
                         email = ((SocialUserDetail) userDetails).getEmail();
                     }
 
-                    if (jwtTokenUtil.isValidateToken(authToken, email)) {
+                    if (jwtTokenUtils.isValidateToken(authToken, email)) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails, userDetails.getPassword(), userDetails.getAuthorities());
 

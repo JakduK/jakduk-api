@@ -176,7 +176,7 @@ public class JakduService {
 
         // 인증되지 않은 회원
         if (Objects.isNull(accountId))
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.access.denied"));
 
         CommonWriter writer = new CommonWriter(accountId, principal.getUsername(), principal.getProviderId());
 
@@ -252,7 +252,7 @@ public class JakduService {
 
         // 인증되지 않은 회원
         if (Objects.isNull(userId))
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.access.denied"));
 
         JakduComment jakduComment = jakduCommentRepository.findOne(commentId);
         CommonWriter writer = jakduComment.getWriter();
@@ -266,14 +266,14 @@ public class JakduService {
         // 이 게시물의 작성자라서 감정 표현을 할 수 없음
         if (userId.equals(writer.getUserId())) {
             throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-                    , commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.you.are.writer"));
+                    , commonService.getResourceBundleMessage(locale, "messages.exception", "exception.you.are.writer"));
         }
 
         // 해당 회원이 좋아요를 이미 했는지 검사
         for (CommonFeelingUser feelingUser : usersLiking) {
             if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
                 throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-                        , commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+                        , commonService.getResourceBundleMessage(locale, "messages.exception", "exception.select.already.like"));
             }
         }
 
@@ -281,7 +281,7 @@ public class JakduService {
         for (CommonFeelingUser feelingUser : usersDisliking) {
             if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
                 throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-                        , commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.select.already.like"));
+                        , commonService.getResourceBundleMessage(locale, "messages.exception", "exception.select.already.like"));
             }
         }
 

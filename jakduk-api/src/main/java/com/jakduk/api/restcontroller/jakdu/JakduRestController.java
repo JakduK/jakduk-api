@@ -127,10 +127,10 @@ public class JakduRestController {
         Locale locale = localeResolver.resolveLocale(request);
 
         if (commonService.isUser() == false)
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.access.denied"));
+            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.access.denied"));
 
         if (Objects.isNull(myJakdu)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
         }
 
         Jakdu jakdu = jakduService.setMyJakdu(locale, myJakdu);
@@ -146,7 +146,7 @@ public class JakduRestController {
         Locale locale = localeResolver.resolveLocale(request);
 
         if (Objects.isNull(jakduCommentWriteRequest)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.invalid.parameter"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
         }
 
         Device device = DeviceUtils.getCurrentDevice(request);

@@ -15,6 +15,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * 엘라스틱서치의 인덱스, 타입, 도큐먼트를 지우고 새로 만든다.
+ * DB에 있는 게시물, 댓글, 사진첩의 데이터를 가져와 벌크 방식으로 입력한다.
+ *
  * Created by pyohwan on 16. 9. 18.
  */
 

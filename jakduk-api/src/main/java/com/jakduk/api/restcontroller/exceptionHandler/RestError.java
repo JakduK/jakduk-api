@@ -20,18 +20,13 @@ import java.util.ResourceBundle;
 
 @Data
 @JsonTypeName(value = "error")
-@JsonTypeInfo(use= JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RestError {
 
     private String code;
     private String message;
     private List<String> fields;
-
-    public RestError(String message) {
-        this.code = CommonConst.RESPONSE_ERROR_DEFAULT_CODE;
-        this.message = message;
-    }
 
     public RestError(String code, String message) {
         this.code = code;

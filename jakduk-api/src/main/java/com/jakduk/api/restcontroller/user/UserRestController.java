@@ -1,12 +1,10 @@
 package com.jakduk.api.restcontroller.user;
 
-import com.jakduk.api.common.util.JwtTokenUtil;
+import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
 import com.jakduk.core.authentication.common.CommonPrincipal;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.exception.DuplicateDataException;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -14,6 +12,7 @@ import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.simple.UserProfile;
+import com.jakduk.core.notification.EmailService;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.UserService;
@@ -24,12 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -38,16 +37,16 @@ import java.util.Objects;
  */
 
 @Slf4j
-@Api(tags = "회원", description = "회원 API")
+@Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
 public class UserRestController {
 
-    @Autowired
-    private PasswordEncoder encoder;
+    @Value("${jwt.token.header}")
+    private String tokenHeader;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenUtils jwtTokenUtils;
 
     @Autowired
     private UserService userService;
@@ -58,89 +57,51 @@ public class UserRestController {
     @Autowired
     private FootballService footballService;
 
-    @Value("${jwt.token.header}")
-    private String tokenHeader;
+    @Autowired
+    private EmailService emailService;
 
-    @ApiOperation(value = "이메일 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "이메일 기반 회원 가입", response = EmptyJsonResponse.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public EmptyJsonResponse addJakdukUser(
-            @Valid @RequestBody UserForm form) {
+    public EmptyJsonResponse addJakdukUser(@Valid @RequestBody UserForm form,
+                                           Locale locale) {
 
-        User user = User.builder()
-                .email(form.getEmail().trim())
-                .username(form.getUsername().trim())
-                .password(encoder.encode(form.getPassword().trim()))
-                .providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
-                .build();
+        User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), form.getPassword(), form.getFootballClub(),
+                form.getAbout());
 
-        String footballClub = form.getFootballClub();
-        String about = form.getAbout();
-
-        if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
-            FootballClub supportFC = footballService.findById(footballClub);
-
-            user.setSupportFC(supportFC);
+        try {
+            emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
+        } catch (MessagingException e) {
+            e.printStackTrace();
         }
-
-        if (Objects.nonNull(about) && !about.isEmpty()) {
-            user.setAbout(about.trim());
-        }
-
-        ArrayList<Integer> roles = new ArrayList<>();
-        roles.add(CommonRole.ROLE_NUMBER_USER_01);
-
-        user.setRoles(roles);
-
-        userService.save(user);
-
-        log.debug("JakduK user created. user=" + user);
 
         userService.signInJakdukUser(user);
 
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "SNS 기반 회원 가입", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "SNS 기반 회원 가입", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/social", method = RequestMethod.POST)
     public EmptyJsonResponse addSocialUser(@RequestHeader(value = "x-attempt-token") String attemptedToken,
                                            @Valid @RequestBody UserProfileForm form,
                                            Device device,
+                                           Locale locale,
                                            HttpServletResponse response) {
 
-        if (! jwtTokenUtil.isValidateToken(attemptedToken))
+        if (! jwtTokenUtils.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
-        AttemptSocialUser attemptSocialUser = jwtTokenUtil.getAttemptedFromToken(attemptedToken);
+        AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
-        User user = User.builder()
-                .email(form.getEmail().trim())
-                .username(form.getUsername().trim())
-                .providerId(attemptSocialUser.getProviderId())
-                .providerUserId(attemptSocialUser.getProviderUserId())
-                .build();
+        User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
+                attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout());
 
-        ArrayList<Integer> roles = new ArrayList<>();
-        roles.add(CommonRole.ROLE_NUMBER_USER_01);
-
-        user.setRoles(roles);
-
-        String footballClub = form.getFootballClub();
-        String about = form.getAbout();
-
-        if (Objects.nonNull(footballClub) && !footballClub.isEmpty()) {
-            FootballClub supportFC = footballService.findById(footballClub);
-
-            user.setSupportFC(supportFC);
+        try {
+            emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
+        } catch (MessagingException e) {
+            e.printStackTrace();
         }
 
-        if (Objects.nonNull(about) && !about.isEmpty())
-            user.setAbout(form.getAbout().trim());
-
-        userService.save(user);
-
-        log.debug("social user created. user=" + user);
-
-        String token = jwtTokenUtil.generateToken(new CommonPrincipal(user), device);
+        String token = jwtTokenUtils.generateToken(new CommonPrincipal(user), device);
 
         response.setHeader(tokenHeader, token);
 
