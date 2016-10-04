@@ -152,7 +152,7 @@ public class CommonConst {
 	/**
 	 * 그림의 용량을 축소시키는 기준 값.
 	 */
-	public final static long GALLERY_MAXIUM_CAPACITY = 1048576; // Byte 기준인데 현재 1MB.
+	public final static long GALLERY_MAXIUM_CAPACITY = 3145728; // Byte 기준인데 현재 3MB.
 	
 	/**
 	 * K리그 줄임말. 삭제 되어야 한다. Competition 클래스를 만들었다.

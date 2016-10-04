@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
@@ -84,6 +85,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(restError, ServiceError.FORM_VALIDATION_FAILED.getHttpStatus());
     }
 
+    /**
+     * 파라미터 검증 실패.
+     */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+        RestError restError = new RestError(ServiceError.FORM_VALIDATION_FAILED.getCode(),
+                String.format(ex.getMessage(), ex.getRequestPartName()));
+
+        return new ResponseEntity<>(restError, ServiceError.FORM_VALIDATION_FAILED.getHttpStatus());
+    }
+
     // 에러는 아니지만 데이터가 없음.
     @ExceptionHandler(SuccessButNoContentException.class)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -102,7 +115,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
     public ResponseEntity<RestError> serviceException(ServiceException ex) {
-
         ServiceError serviceError = ex.getServiceError();
         RestError restError = new RestError(serviceError);
 
@@ -113,7 +125,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public RestError runtimeException(RuntimeException e) {
-        return new RestError(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage());
+        return new RestError(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getMessage());
     }
 }
 

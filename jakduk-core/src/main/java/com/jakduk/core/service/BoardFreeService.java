@@ -205,7 +205,7 @@ public class BoardFreeService {
 								  List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.POST_NOT_FOUND));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -305,7 +305,7 @@ public class BoardFreeService {
     public CommonConst.BOARD_DELETE_TYPE deleteFreePost(Integer seq) {
 
         BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.POST_NOT_FOUND));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
         CommonPrincipal principal = userService.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -420,7 +420,7 @@ public class BoardFreeService {
 
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceError.POST_NOT_FOUND);
+			throw new ServiceException(ServiceError.NOT_FOUND_POST);
 
 		BoardFree getBoardFree = boardFree.get();
 		CommonWriter writer = getBoardFree.getWriter();
@@ -582,7 +582,7 @@ public class BoardFreeService {
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 
 		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceError.POST_NOT_FOUND);
+			throw new ServiceException(ServiceError.NOT_FOUND_POST);
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());

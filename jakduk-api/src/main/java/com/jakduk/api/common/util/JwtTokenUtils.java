@@ -5,10 +5,7 @@ import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
@@ -100,11 +97,13 @@ public class JwtTokenUtils implements Serializable {
                     .setSigningKey(secret)
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new ServiceException(ServiceError.EXPIRATION_TOKEN, e);
         } catch (IllegalArgumentException e) {
             claims = null;
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            throw new ServiceException(ServiceError.EXPIRATION_TOKEN, e);
+        } catch (MalformedJwtException e) {
+            throw new ServiceException(ServiceError.INVALID_TOKEN, e);
+        }  catch (Exception e) {
             e.printStackTrace();
             throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, e);
         }

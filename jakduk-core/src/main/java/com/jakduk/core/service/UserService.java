@@ -13,7 +13,6 @@ import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.notification.EmailService;
 import com.jakduk.core.repository.FootballClubRepository;
 import com.jakduk.core.repository.user.UserProfileRepository;
 import com.jakduk.core.repository.user.UserRepository;
@@ -118,7 +117,7 @@ public class UserService {
 
 		if (StringUtils.isNotEmpty(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.FOOTBALL_CLUB_NOT_FOUND));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(supportFC);
 		}
@@ -144,7 +143,7 @@ public class UserService {
 
 		if (StringUtils.isNotEmpty(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.FOOTBALL_CLUB_NOT_FOUND));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(supportFC);
 		}
