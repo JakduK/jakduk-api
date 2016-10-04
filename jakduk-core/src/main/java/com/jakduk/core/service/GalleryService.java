@@ -53,8 +53,8 @@ import java.util.stream.Stream;
  * @desc     :
  */
 
-@Service
 @Slf4j
+@Service
 public class GalleryService {
 
 	@Value("${storage.image.path}")

@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 게시물 본문에 이미지 경로가 상대경로였는데, 절대경로로 바꾼다.
+ *
  * @author Jang, Pyohwan
  * @since 2016. 9. 5.
  */
@@ -77,8 +79,8 @@ public class ChangeBoardImageUrlConfig {
 	}
 
 	@Bean
-	public MongoItemWriter changeBoardImageUrlWriter() {
-		MongoItemWriter writer = new MongoItemWriter();
+	public MongoItemWriter<BoardFree> changeBoardImageUrlWriter() {
+		MongoItemWriter<BoardFree> writer = new MongoItemWriter<>();
 		writer.setTemplate(mongoOperations);
 
 		return writer;

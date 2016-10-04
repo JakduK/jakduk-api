@@ -2,7 +2,6 @@ package com.jakduk.batch.processor;
 
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.etc.CommonCount;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
@@ -19,7 +18,6 @@ import java.util.stream.Stream;
  * @since 2016. 9. 5.
  */
 
-@Slf4j
 public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, BoardFree> {
 
 	private final String PROFILE_STAGING_BEFORE_IMAGE_URL_01 = "src=\"/jakduk/gallery/";
@@ -56,7 +54,8 @@ public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, Bo
 			String newContent = StringUtils.replace(item.getContent(), beforeImageUrl01, afterImageUrl);
 			item.setContent(newContent);
 
-			List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch()).orElseGet(ArrayList::new);
+			List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
+					.orElseGet(ArrayList::new);
 
 			if (batchList.stream().noneMatch(batch -> batch.equals(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01))) {
 				batchList.add(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01);
@@ -67,7 +66,8 @@ public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, Bo
 			String newContent = StringUtils.replace(item.getContent(), beforeImageUrl02, afterImageUrl);
 			item.setContent(newContent);
 
-			List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch()).orElseGet(ArrayList::new);
+			List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
+					.orElseGet(ArrayList::new);
 
 			if (batchList.stream().noneMatch(batch -> batch.equals(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01))) {
 				batchList.add(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01);
@@ -75,7 +75,7 @@ public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, Bo
 			}
 		}
 
-		log.debug("resultItemId=" + item.getId());
+		System.out.println("BoardFree ID = " + item.getId());
 
 		return item;
 	}

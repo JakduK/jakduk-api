@@ -222,7 +222,8 @@ public class CommonConst {
 
 	// 배치 타입
 	public enum BATCH_TYPE {
-		CHANGE_BOARD_CONTENT_IMAGE_URL_01
+		CHANGE_BOARD_CONTENT_IMAGE_URL_01,
+		APPEND_GALLERY_FILE_EXT_01
 	}
 
 	public enum SEARCH_TYPE {
