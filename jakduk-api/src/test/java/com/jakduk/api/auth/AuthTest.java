@@ -48,6 +48,7 @@ public class AuthTest extends AbstractSpringTest {
 
     }
 
+    @Ignore
     @Test
     public void Facebook_프로필가져오기() {
 
