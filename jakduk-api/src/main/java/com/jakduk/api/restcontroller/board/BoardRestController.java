@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Api(tags = "BoardFree", description = "자유게시판 API")
 @RestController
-@RequestMapping("/api/board")
+@RequestMapping("/api/board/free")
 public class BoardRestController {
 
     @Autowired
@@ -70,8 +70,8 @@ public class BoardRestController {
     @Autowired
     private BoardDAO boardDAO;
 
-    @ApiOperation(value = "자유게시판 글 목록", produces = "application/json", response = FreePostsOnListResponse.class)
-    @RequestMapping(value = "/free/posts", method = RequestMethod.GET)
+    @ApiOperation(value = "자유게시판 글 목록", response = FreePostsOnListResponse.class)
+    @RequestMapping(value = "/posts", method = RequestMethod.GET)
     public FreePostsOnListResponse getFreePosts(@RequestParam(required = false, defaultValue = "1") Integer page,
                                             @RequestParam(required = false, defaultValue = "20") Integer size,
                                             @RequestParam(required = false, defaultValue = "ALL") CommonConst.BOARD_CATEGORY_TYPE category) {
@@ -149,8 +149,8 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 주간 선두 글", produces = "application/json", response = FreeTopsResponse.class)
-    @RequestMapping(value = "/free/tops", method = RequestMethod.GET)
+    @ApiOperation(value = "자유게시판 주간 선두 글", response = FreeTopsResponse.class)
+    @RequestMapping(value = "/tops", method = RequestMethod.GET)
     public FreeTopsResponse getFreePostsTops() {
 
         List<BoardFreeOnBest> topLikes = boardFreeService.getFreeTopLikes();
@@ -162,8 +162,8 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 댓글 목록", produces = "application/json", response = FreeCommentsOnListResponse.class)
-    @RequestMapping(value = "/free/comments", method = RequestMethod.GET)
+    @ApiOperation(value = "자유게시판 댓글 목록", response = FreeCommentsOnListResponse.class)
+    @RequestMapping(value = "/comments", method = RequestMethod.GET)
     public FreeCommentsOnListResponse getFreeComments(
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {
@@ -211,27 +211,24 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 상세", produces = "application/json", response = FreePostOnDetailResponse.class)
-    @RequestMapping(value = "/free/{seq}", method = RequestMethod.GET)
+    @ApiOperation(value = "자유게시판 글 상세", response = FreePostOnDetailResponse.class)
+    @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
     public FreePostOnDetailResponse getFreeView(@PathVariable Integer seq,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
 
-        Optional<BoardFree> boardFree = boardFreeService.getFreePost(seq);
+        BoardFree boardFree = boardFreeService.getFreePost(seq)
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
-        if (!boardFree.isPresent())
-            throw new ServiceException(ServiceError.NOT_FOUND_POST);
-
-        BoardFree getBoardFree = boardFree.get();
         boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
         if (isAddCookie) {
-            int views = getBoardFree.getViews();
-            getBoardFree.setViews(++views);
-            boardFreeService.saveBoardFree(getBoardFree);
+            int views = boardFree.getViews();
+            boardFree.setViews(++views);
+            boardFreeService.saveBoardFree(boardFree);
         }
 
-        List<BoardImage> images = getBoardFree.getGalleries();
+        List<BoardImage> images = boardFree.getGalleries();
         List<Gallery> galleries = null;
 
         if (Objects.nonNull(images)) {
@@ -241,14 +238,14 @@ public class BoardRestController {
             galleries = galleryService.findByIds(ids);
         }
 
-        BoardCategory boardCategory = boardDAO.getBoardCategory(getBoardFree.getCategory().name(), commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+        BoardCategory boardCategory = boardDAO.getBoardCategory(boardFree.getCategory().name(), commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
 
-        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(getBoardFree.getId())
-                , boardFree.get().getCategory(), Sort.Direction.ASC);
-        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(getBoardFree.getId())
-                , boardFree.get().getCategory(), Sort.Direction.DESC);
+        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
+                , boardFree.getCategory(), Sort.Direction.ASC);
+        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
+                , boardFree.getCategory(), Sort.Direction.DESC);
 
-        FreePostOnDetail post = new FreePostOnDetail(getBoardFree);
+        FreePostOnDetail post = new FreePostOnDetail(boardFree);
         post.setCategory(boardCategory);
         post.setGalleries(galleries);
 
@@ -259,18 +256,19 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 말머리 목록", produces = "application/json", response = FreeCategoriesResponse.class)
-    @RequestMapping(value = "/free/categories", method = RequestMethod.GET)
+    @ApiOperation(value = "자유게시판 말머리 목록", response = FreeCategoriesResponse.class)
+    @RequestMapping(value = "/categories", method = RequestMethod.GET)
     public FreeCategoriesResponse getFreeCategories() {
 
         List<BoardCategory> categories = boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+
         return FreeCategoriesResponse.builder()
                 .categories(categories)
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글쓰기", produces = "application/json", response = FreePostOnWriteResponse.class)
-    @RequestMapping(value = "/free", method = RequestMethod.POST)
+    @ApiOperation(value = "자유게시판 글쓰기", response = FreePostOnWriteResponse.class)
+    @RequestMapping(value = "/", method = RequestMethod.POST)
     public FreePostOnWriteResponse addFreePost(@Valid @RequestBody FreePostForm form,
                                                HttpServletRequest request) {
 
@@ -300,8 +298,8 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 고치기", produces = "application/json", response = FreePostOnWriteResponse.class)
-    @RequestMapping(value = "/free/{seq}", method = RequestMethod.PUT)
+    @ApiOperation(value = "자유게시판 글 고치기", response = FreePostOnWriteResponse.class)
+    @RequestMapping(value = "/{seq}", method = RequestMethod.PUT)
     public FreePostOnWriteResponse editFreePost(@PathVariable Integer seq,
                                                 @Valid @RequestBody FreePostForm form,
                                                 HttpServletRequest request) {
@@ -332,8 +330,8 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 지움", produces = "application/json", response = FreePostOnDeleteResponse.class)
-    @RequestMapping(value = "/free/{seq}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "자유게시판 글 지움", response = FreePostOnDeleteResponse.class)
+    @RequestMapping(value = "/{seq}", method = RequestMethod.DELETE)
     public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
 
         if (! commonService.isUser())
@@ -345,7 +343,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
-    @RequestMapping(value = "/free/comments/{seq}", method = RequestMethod.GET)
+    @RequestMapping(value = "/comments/{seq}", method = RequestMethod.GET)
     public BoardCommentsResponse getFreeComments(@PathVariable Integer seq,
                                              @RequestParam(required = false) String commentId) {
 
@@ -364,8 +362,8 @@ public class BoardRestController {
         return response;
     }
 
-    @ApiOperation(value = "자유게시판 글의 댓글 달기", produces = "application/json", response = BoardFreeComment.class)
-    @RequestMapping(value ="/free/comment", method = RequestMethod.POST)
+    @ApiOperation(value = "자유게시판 글의 댓글 달기", response = BoardFreeComment.class)
+    @RequestMapping(value ="/comment", method = RequestMethod.POST)
     public BoardFreeComment addFreeComment(@Valid @RequestBody BoardCommentForm commentRequest,
                                          HttpServletRequest request) {
 
@@ -377,8 +375,8 @@ public class BoardRestController {
         return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContent().trim(), commonService.getDeviceInfo(device));
     }
 
-    @ApiOperation(value = "자유게시판 글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
-    @RequestMapping(value = "/free/{seq}/{feeling}", method = RequestMethod.POST)
+    @ApiOperation(value = "자유게시판 글 감정 표현", response = UserFeelingResponse.class)
+    @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeFeeling(@PathVariable Integer seq,
                                               @PathVariable CommonConst.FEELING_TYPE feeling) {
 
@@ -397,7 +395,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 댓글 감정 표현", produces = "application/json", response = UserFeelingResponse.class)
+    @ApiOperation(value = "자유게시판 댓글 감정 표현", response = UserFeelingResponse.class)
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(@PathVariable String commentId,
                                                      @PathVariable CommonConst.FEELING_TYPE feeling) {
@@ -417,8 +415,8 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글의 공지 활성화", produces = "application/json", response = EmptyJsonResponse.class)
-    @RequestMapping(value = "/free/{seq}/notice", method = RequestMethod.POST)
+    @ApiOperation(value = "자유게시판 글의 공지 활성화", response = EmptyJsonResponse.class)
+    @RequestMapping(value = "/{seq}/notice", method = RequestMethod.POST)
     public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
 
         if (! commonService.isAdmin())
@@ -429,8 +427,8 @@ public class BoardRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "자유게시판 글의 공지 비활성화", produces = "application/json", response = EmptyJsonResponse.class)
-    @RequestMapping(value = "/free/{seq}/notice", method = RequestMethod.DELETE)
+    @ApiOperation(value = "자유게시판 글의 공지 비활성화", response = EmptyJsonResponse.class)
+    @RequestMapping(value = "/{seq}/notice", method = RequestMethod.DELETE)
     public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
 
         if (! commonService.isAdmin())
