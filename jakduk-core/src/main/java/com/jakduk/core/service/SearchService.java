@@ -142,24 +142,25 @@ public class SearchService {
             }
         }
 	}
-	
+
+	@Async
 	public void deleteDocumentBoard(String id) {
+
+		if (! elasticsearchEnable)
+			return;
+
         try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
 			        .index(elasticsearchIndexName)
 			        .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
 			        .build());
-			
-			if (log.isDebugEnabled()) {
-				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
-					log.debug("board id " + id + " is not found. so can't delete it!");
-				}
-			}
-			
-			if (!jestResult.isSucceeded()) {
+
+			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
+				log.debug("board id " + id + " is not found. so can't delete it!");
+
+			if (! jestResult.isSucceeded())
 				log.error(jestResult.getErrorMessage());
-			}
-			
+
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}
@@ -313,24 +314,25 @@ public class SearchService {
             }
         }
 	}
-	
+
+	@Async
 	public void deleteDocumentGallery(String id) {
-        try {
+
+		if (! elasticsearchEnable)
+			return;
+
+		try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
-			        .index(elasticsearchIndexName)
-			        .type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
-			        .build());
-			
-			if (log.isDebugEnabled()) {
-				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
-					log.debug("gallery id " + id + " is not found. so can't delete it!");
-				}
-			}
-			
-			if (!jestResult.isSucceeded()) {
+					.index(elasticsearchIndexName)
+					.type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+					.build());
+
+			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
+				log.debug("gallery id " + id + " is not found. so can't delete it!");
+
+			if (! jestResult.isSucceeded())
 				log.error(jestResult.getErrorMessage());
-			}
-			
+
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}

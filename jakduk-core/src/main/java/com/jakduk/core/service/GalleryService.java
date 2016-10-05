@@ -11,7 +11,6 @@ import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.UnauthorizedAccessException;
 import com.jakduk.core.exception.UserFeelingException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
@@ -30,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -270,41 +270,34 @@ public class GalleryService {
 
 	/**
 	 * 사진 삭제.
-	 * @param id
-	 * @return
 	 */
 	public void removeImage(String id) {
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 
-		Gallery gallery = galleryRepository.findOne(id);
+		Gallery gallery = galleryRepository.findOneById(id)
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 
-		if (Objects.isNull(gallery)) {
-			throw new ServiceException(ServiceError.NOT_FOUND);
-		}
+		if (ObjectUtils.isEmpty(gallery.getWriter()))
+			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		if (Objects.isNull(gallery.getWriter())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.access.denied"));
-		}
-
-		if (!accountId.equals(gallery.getWriter().getUserId())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.access.denied"));
-		}
+		if (! accountId.equals(gallery.getWriter().getUserId()))
+            throw new ServiceException(ServiceError.FORBIDDEN);
 
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
-		// 사진을 삭제하기 전에, 이 사진과 연동된 글이 있는지 검사를 해야 한다. 최종적으로 연동된 글이 전부 없어진다면 사진은 삭제되어야 한다.
-		// 추가 할것.
+        String formatName = StringUtils.split(gallery.getContentType(), "/")[1];
 
-		Path imageFilePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()),
-				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
+		Path imageFilePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
+                String.valueOf(timePoint.getDayOfMonth()), gallery.getId() + "." + formatName);
 
-		Path thumbThumbnailPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()),
-				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
+		Path thumbThumbnailPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
+                String.valueOf(timePoint.getDayOfMonth()), gallery.getId() + "." + formatName);
 
+        // TODO 사진을 삭제하기 전에, 이 사진과 연동된 글이 있는지 검사를 해야 한다. 최종적으로 연동된 글이 전부 없어진다면 사진은 삭제되어야 한다.
 		if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS) && Files.exists(thumbThumbnailPath, LinkOption.NOFOLLOW_LINKS)) {
 			try {
 				Files.delete(imageFilePath);
@@ -312,12 +305,14 @@ public class GalleryService {
 				galleryRepository.delete(gallery);
 
 			} catch (IOException e) {
-				throw new RuntimeException(commonService.getResourceBundleMessage("messages.gallery", "gallery.exception.io"));
+				throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
 			}
-		}
+		} else {
+            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
+        }
 
 		// 엘라스틱 서치 document 삭제.
-		searchService.deleteDocumentBoard(gallery.getId());
+		searchService.deleteDocumentGallery(gallery.getId());
 	}
 
 	public Map<String, Object> getGallery(String id, Boolean isAddCookie) {

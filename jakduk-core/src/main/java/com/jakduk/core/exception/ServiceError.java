@@ -32,6 +32,7 @@ public enum ServiceError {
     ALREADY_DISABLE(HttpStatus.NOT_FOUND, "exception.already.disable"),
     NOT_FOUND_FOOTBALL_CLUB(HttpStatus.NOT_FOUND, "exception.football.club.not.found"),
     NOT_FOUND_GALLERY(HttpStatus.NOT_FOUND, "exception.not.found.gallery"),
+    NOT_FOUND_GALLERY_FILE(HttpStatus.NOT_FOUND, "exception.not.found.gallery.file"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "exception.access.denied"),
     NOT_FOUND_JAKDUK_ACCOUNT(HttpStatus.UNAUTHORIZED, "exception.access.denied"),
