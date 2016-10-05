@@ -6,13 +6,11 @@ import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.UnauthorizedAccessException;
 import com.jakduk.core.exception.UserFeelingException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
@@ -23,6 +21,7 @@ import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +29,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -108,7 +105,7 @@ public class GalleryService {
 	 * 사진 올리기.
 	 * @return Gallery 객체
      */
-	public Gallery uploadImage(String originalFileName, long size, String contentType, byte[] bytes, InputStream inputStream) {
+	public Gallery uploadImage(String originalFileName, long size, String contentType, byte[] bytes) {
 
 		Gallery gallery = new Gallery();
 
@@ -163,7 +160,8 @@ public class GalleryService {
 			Integer orientation = 1;
 			Integer rotate = 0;
 
-			Metadata metadata = ImageMetadataReader.readMetadata(inputStream);
+			InputStream exifInputStream = new ByteArrayInputStream(bytes);
+			Metadata metadata = ImageMetadataReader.readMetadata(exifInputStream);
 			Optional<Directory> directory = Optional.ofNullable(metadata.getFirstDirectoryOfType(ExifIFD0Directory.class));
 
 			if (directory.isPresent())
@@ -188,19 +186,13 @@ public class GalleryService {
 				if ("gif".equals(formatName) || CommonConst.GALLERY_MAXIUM_CAPACITY > size) {
 					Files.write(imageFilePath, bytes);
 				} else {
-					InputStream in = new ByteArrayInputStream(bytes);
-					BufferedImage bufferedImage = ImageIO.read(in);
+                    double scale = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) size;
+                    InputStream originalInputStream = new ByteArrayInputStream(bytes);
 
-					double scale = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) size;
-
-					Thumbnails.of(bufferedImage)
+					Thumbnails.of(originalInputStream)
 							.scale(scale)
-//							.imageType(BufferedImage.TYPE_INT_RGB)
-//							.outputFormat(formatName)
 							.rotate(rotate)
 							.toFile(imageFilePath.toFile());
-
-//					ImageIO.write(buf2, formatName, imageFilePath.toFile());
 
 					BasicFileAttributes attr = Files.readAttributes(imageFilePath, BasicFileAttributes.class);
 
@@ -212,11 +204,11 @@ public class GalleryService {
 
 			// 썸네일 만들기.
 			if (Files.notExists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				InputStream in = new ByteArrayInputStream(bytes);
-				BufferedImage bufferedImage = ImageIO.read(in);
+				InputStream thumbInputStream = new ByteArrayInputStream(bytes);
 
-				Thumbnails.of(bufferedImage)
+				Thumbnails.of(thumbInputStream)
 						.size(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
+                        .crop(Positions.TOP_CENTER)
 						.rotate(rotate)
 						.toFile(thumbFilePath.toFile());
 			}
@@ -278,41 +270,34 @@ public class GalleryService {
 
 	/**
 	 * 사진 삭제.
-	 * @param id
-	 * @return
 	 */
 	public void removeImage(String id) {
 
 		CommonPrincipal principal = userService.getCommonPrincipal();
 		String accountId = principal.getId();
 
-		Gallery gallery = galleryRepository.findOne(id);
+		Gallery gallery = galleryRepository.findOneById(id)
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 
-		if (Objects.isNull(gallery)) {
-			throw new ServiceException(ServiceError.NOT_FOUND);
-		}
+		if (ObjectUtils.isEmpty(gallery.getWriter()))
+			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		if (Objects.isNull(gallery.getWriter())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.access.denied"));
-		}
-
-		if (!accountId.equals(gallery.getWriter().getUserId())) {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.access.denied"));
-		}
+		if (! accountId.equals(gallery.getWriter().getUserId()))
+            throw new ServiceException(ServiceError.FORBIDDEN);
 
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
-		// 사진을 삭제하기 전에, 이 사진과 연동된 글이 있는지 검사를 해야 한다. 최종적으로 연동된 글이 전부 없어진다면 사진은 삭제되어야 한다.
-		// 추가 할것.
+        String formatName = StringUtils.split(gallery.getContentType(), "/")[1];
 
-		Path imageFilePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()),
-				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
+		Path imageFilePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
+                String.valueOf(timePoint.getDayOfMonth()), gallery.getId() + "." + formatName);
 
-		Path thumbThumbnailPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()),
-				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()), gallery.getId());
+		Path thumbThumbnailPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
+                String.valueOf(timePoint.getDayOfMonth()), gallery.getId() + "." + formatName);
 
+        // TODO 사진을 삭제하기 전에, 이 사진과 연동된 글이 있는지 검사를 해야 한다. 최종적으로 연동된 글이 전부 없어진다면 사진은 삭제되어야 한다.
 		if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS) && Files.exists(thumbThumbnailPath, LinkOption.NOFOLLOW_LINKS)) {
 			try {
 				Files.delete(imageFilePath);
@@ -320,12 +305,14 @@ public class GalleryService {
 				galleryRepository.delete(gallery);
 
 			} catch (IOException e) {
-				throw new RuntimeException(commonService.getResourceBundleMessage("messages.gallery", "gallery.exception.io"));
+				throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
 			}
-		}
+		} else {
+            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
+        }
 
 		// 엘라스틱 서치 document 삭제.
-		searchService.deleteDocumentBoard(gallery.getId());
+		searchService.deleteDocumentGallery(gallery.getId());
 	}
 
 	public Map<String, Object> getGallery(String id, Boolean isAddCookie) {
