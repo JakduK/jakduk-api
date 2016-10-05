@@ -104,13 +104,11 @@ public class GalleryRestController {
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
         Gallery gallery = null;
-        try {
-            gallery = galleryService.uploadImage(file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                    file.getBytes(), file.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+        try {
+            gallery = galleryService.uploadImage(file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
+        } catch (IOException ignored) {
+        }
 
         GalleryOnUploadResponse response = new GalleryOnUploadResponse();
         BeanUtils.copyProperties(gallery, response);
