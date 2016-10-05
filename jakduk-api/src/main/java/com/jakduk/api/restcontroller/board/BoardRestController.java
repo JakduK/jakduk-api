@@ -268,7 +268,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글쓰기", response = FreePostOnWriteResponse.class)
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public FreePostOnWriteResponse addFreePost(@Valid @RequestBody FreePostForm form,
                                                HttpServletRequest request) {
 
