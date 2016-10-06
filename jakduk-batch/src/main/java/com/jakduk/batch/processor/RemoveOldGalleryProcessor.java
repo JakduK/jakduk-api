@@ -41,42 +41,42 @@ public class RemoveOldGalleryProcessor implements ItemProcessor<Gallery, Gallery
                 String.valueOf(timePoint.getDayOfMonth()), item.getId());
 
         if (Files.exists(imagePath, LinkOption.NOFOLLOW_LINKS) && Files.exists(thumbPath, LinkOption.NOFOLLOW_LINKS)) {
+            try {
+                deleteGalleryFile(imagePath);
+                deleteGalleryFile(thumbPath);
+                System.out.println("path=" + imagePath + ", gallery id=" + item.getId());
 
-            deleteGalleryFile(imagePath);
-            deleteGalleryFile(thumbPath);
-
-            System.out.println("path=" + imagePath + ", gallery id=" + item.getId());
-
-            galleryRepository.delete(item);
+                galleryRepository.delete(item);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Not exist path=" + imagePath);
         }
 
         return item;
     }
 
-    private void deleteGalleryFile(Path path) {
-        try {
-            Files.deleteIfExists(path);
-            Path imagePathOfDay = path.getParent();
-            DirectoryStream<Path> imagePathOfDayDs = Files.newDirectoryStream(imagePathOfDay);
+    private void deleteGalleryFile(Path path) throws IOException {
+        Files.deleteIfExists(path);
+        Path imagePathOfDay = path.getParent();
+        DirectoryStream<Path> imagePathOfDayDs = Files.newDirectoryStream(imagePathOfDay);
 
-            if (! imagePathOfDayDs.iterator().hasNext()) {
-                Files.deleteIfExists(imagePathOfDay);
+        if (! imagePathOfDayDs.iterator().hasNext()) {
+            Files.deleteIfExists(imagePathOfDay);
 
-                Path imagePathOfMonth = imagePathOfDay.getParent();
-                DirectoryStream<Path> imagePathOfMonthDs = Files.newDirectoryStream(imagePathOfMonth);
+            Path imagePathOfMonth = imagePathOfDay.getParent();
+            DirectoryStream<Path> imagePathOfMonthDs = Files.newDirectoryStream(imagePathOfMonth);
 
-                if (! imagePathOfMonthDs.iterator().hasNext()) {
-                    Files.deleteIfExists(imagePathOfMonth);
+            if (! imagePathOfMonthDs.iterator().hasNext()) {
+                Files.deleteIfExists(imagePathOfMonth);
 
-                    Path imagePathOfYear = imagePathOfMonth.getParent();
-                    DirectoryStream<Path> imagePathOfYearDs = Files.newDirectoryStream(imagePathOfYear);
+                Path imagePathOfYear = imagePathOfMonth.getParent();
+                DirectoryStream<Path> imagePathOfYearDs = Files.newDirectoryStream(imagePathOfYear);
 
-                    if (! imagePathOfYearDs.iterator().hasNext())
-                        Files.deleteIfExists(imagePathOfYear);
-                }
+                if (! imagePathOfYearDs.iterator().hasNext())
+                    Files.deleteIfExists(imagePathOfYear);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

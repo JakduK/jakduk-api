@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * 오래된 사진파일과 DB document를 삭제한다.
+ *
  * Created by pyohwan on 16. 10. 6.
  */
 
@@ -66,7 +67,6 @@ public class RemoveOldGalleryConfig {
         itemReader.setTemplate(mongoOperations);
         itemReader.setTargetType(Gallery.class);
         itemReader.setPageSize(100);
-        itemReader.setMaxItemCount(1);
         itemReader.setQuery(query);
 
         Map<String, Sort.Direction> sorts = new HashMap<>();
