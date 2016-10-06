@@ -33,10 +33,13 @@ public class ApiUtils {
                 .findAny();
 
         if (! findCookie.isPresent()) {
+            /*
+            jakduk-web에서 쿠키를 생성한다.
             Cookie cookie = new Cookie(cookieName, "r");
             cookie.setHttpOnly(true);
             cookie.setMaxAge(ApiConst.VIEWS_COOKIE_EXPIRE_SECONDS);
             response.addCookie(cookie);
+            */
 
             return true;
         } else {
