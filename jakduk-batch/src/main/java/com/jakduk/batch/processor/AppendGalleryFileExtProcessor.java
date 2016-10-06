@@ -41,11 +41,9 @@ public class AppendGalleryFileExtProcessor implements ItemProcessor<Gallery, Gal
         Path moveFromThumb = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
                 String.valueOf(timePoint.getDayOfMonth()), item.getId());
 
-        if (Files.exists(moveFromImage, LinkOption.NOFOLLOW_LINKS)) {
+        if (Files.exists(moveFromImage, LinkOption.NOFOLLOW_LINKS) && Files.exists(moveFromThumb, LinkOption.NOFOLLOW_LINKS)) {
             Files.move(moveFromImage, moveFromImage.resolveSibling(item.getId() + "." + formatName), StandardCopyOption.REPLACE_EXISTING);
-
-            if (Files.exists(moveFromThumb, LinkOption.NOFOLLOW_LINKS))
-                Files.move(moveFromThumb, moveFromThumb.resolveSibling(item.getId() + "." + formatName), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(moveFromThumb, moveFromThumb.resolveSibling(item.getId() + "." + formatName), StandardCopyOption.REPLACE_EXISTING);
 
             List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
                     .orElseGet(ArrayList::new);

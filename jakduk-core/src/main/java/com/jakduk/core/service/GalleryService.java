@@ -183,7 +183,7 @@ public class GalleryService {
 
 			// 사진 저장.
 			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				if ("gif".equals(formatName) || CommonConst.GALLERY_MAXIUM_CAPACITY > size) {
+				if (("gif".equals(formatName) || CommonConst.GALLERY_MAXIUM_CAPACITY > size) && orientation.equals(1)) {
 					Files.write(imageFilePath, bytes);
 				} else {
                     double scale = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) size;
