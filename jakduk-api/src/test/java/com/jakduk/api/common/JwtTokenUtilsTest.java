@@ -1,6 +1,6 @@
 package com.jakduk.api.common;
 
-import com.jakduk.api.common.util.JwtTokenUtil;
+import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
 import org.junit.Assert;
@@ -18,18 +18,18 @@ import org.springframework.util.ObjectUtils;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class JwtTokenUtilTest {
+public class JwtTokenUtilsTest {
 
     @InjectMocks
-    private JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
+    private JwtTokenUtils jwtTokenUtils = new JwtTokenUtils();
 
     private CommonPrincipal commonPrincipal;
 
     @Before
     public void before() {
 
-        ReflectionTestUtils.setField(jwtTokenUtil, "expiration", 600L);
-        ReflectionTestUtils.setField(jwtTokenUtil, "secret", "JakduK11!");
+        ReflectionTestUtils.setField(jwtTokenUtils, "expiration", 600L);
+        ReflectionTestUtils.setField(jwtTokenUtils, "secret", "JakduK11!");
 
         commonPrincipal = CommonPrincipal.builder()
                 .email("test50@test.com")
@@ -43,9 +43,9 @@ public class JwtTokenUtilTest {
     @Test
     public void JWT토큰검사() {
 
-        String token = jwtTokenUtil.generateToken(commonPrincipal, null);
+        String token = jwtTokenUtils.generateToken(commonPrincipal, null);
 
         Assert.assertFalse(ObjectUtils.isEmpty(token));
-        Assert.assertTrue(jwtTokenUtil.isValidateToken(token));
+        Assert.assertTrue(jwtTokenUtils.isValidateToken(token));
     }
 }

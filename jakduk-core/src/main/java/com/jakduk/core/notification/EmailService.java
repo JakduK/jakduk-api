@@ -5,10 +5,12 @@ import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -18,8 +20,11 @@ import javax.mail.internet.MimeMessage;
 import java.util.*;
 
 @Slf4j
-@Service
+@Component
 public class EmailService {
+
+	@Value("${email.enable}")
+	private boolean emailEnabled;
 
 	@Autowired
 	private CommonService commonService;
@@ -36,6 +41,8 @@ public class EmailService {
 	@Async(value = "asyncMailExecutor")
 	public void sendResetPassword(final Locale locale, final String host, final String recipientEmail)
 			throws MessagingException {
+
+		if (! emailEnabled) return;
 
 		if (log.isDebugEnabled()) {
 			log.debug("send email to reset password. email is " + recipientEmail);
@@ -90,11 +97,33 @@ public class EmailService {
 		tokenRepository.insert(token);
 	}
 
+	@Async(value = "asyncMailExecutor")
+	public void sendWelcome(final Locale locale, final String username, final String recipientEmail) throws MessagingException {
+
+		if (! emailEnabled) return;
+
+		// Prepare the evaluation context
+		final Context ctx = new Context(locale);
+		ctx.setVariable("username", username);
+
+		// Prepare message using a Spring helper
+		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+		final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, "UTF-8");
+		message.setSubject("K리그 작두왕에 오신것을 환영합니다.");
+		message.setTo(recipientEmail);
+
+		// Create the HTML body using Thymeleaf
+		final String htmlContent = this.htmlTemplateEngine.process("welcome", ctx);
+		message.setText(htmlContent, true /* isHtml */);
+
+		// Send email
+		this.mailSender.send(mimeMessage);
+	}
+
 	/**
 	 * Send HTML mail with inline image
 	 */
-	public void sendMailWithInline(
-			final String recipientName, final String recipientEmail, final Locale locale)
+	public void sendMailWithInline(final String recipientName, final String recipientEmail, final Locale locale)
 			throws MessagingException {
 
 		// Prepare the evaluation context
@@ -102,7 +131,6 @@ public class EmailService {
 		ctx.setVariable("name", recipientName);
 		ctx.setVariable("subscriptionDate", new Date());
 		ctx.setVariable("hobbies", Arrays.asList("Cinema", "Sports", "Music"));
-//		ctx.setVariable("imageResourceName", imageResourceName); // so that we can reference it from HTML
 
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();

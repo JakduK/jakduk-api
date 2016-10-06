@@ -1,5 +1,11 @@
 package com.jakduk.api.restcontroller.gallery;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
@@ -17,9 +23,12 @@ import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,16 +45,11 @@ import java.util.stream.Collectors;
  * 16. 3. 20 오후 11:17
  */
 
-@Api(tags = "사진첩", description = "사진 관련")
-@RestController
+@Slf4j
+@Api(tags = "Gallery", description = "사진첩 API")
 @RequestMapping("/api")
+@RestController
 public class GalleryRestController {
-
-    @Autowired
-    private CommonService commonService;
-
-    @Autowired
-    private GalleryService galleryService;
 
     @Value("${api.server.url}")
     private String apiServerUrl;
@@ -56,17 +60,22 @@ public class GalleryRestController {
     @Value("${gallery.thumbnail.path}")
     private String thumbnailPath;
 
-    @ApiOperation(value = "사진 목록", produces = "application/json", response = GalleriesResponse.class)
+    @Autowired
+    private CommonService commonService;
+
+    @Autowired
+    private GalleryService galleryService;
+
+    @ApiOperation(value = "사진 목록", response = GalleriesResponse.class)
     @RequestMapping(value = "/galleries", method = RequestMethod.GET)
     public GalleriesResponse getGalleries(@RequestParam(required = false) String id,
-                                          @RequestParam(required = false, defaultValue = "0") int size,
-                                          HttpServletRequest request) {
+                                          @RequestParam(required = false, defaultValue = "0") Integer size) {
 
         if (size < CommonConst.GALLERY_SIZE) size = CommonConst.GALLERY_SIZE;
 
         List<GalleryOnList> galleries = galleryService.getGalleriesById(id, size);
 
-        if (Objects.isNull(galleries))
+        if (ObjectUtils.isEmpty(galleries))
             throw new ServiceException(ServiceError.NOT_FOUND);
 
         List<ObjectId> ids = galleries.stream()
@@ -84,9 +93,9 @@ public class GalleryRestController {
         return response;
     }
 
-    @ApiOperation(value = "사진 올리기", produces = "application/json", response = GalleryOnUploadResponse.class)
+    @ApiOperation(value = "사진 올리기", response = GalleryOnUploadResponse.class)
     @RequestMapping(value = "/gallery", method = RequestMethod.POST)
-    public GalleryOnUploadResponse uploadImage(@RequestParam() MultipartFile file) {
+    public GalleryOnUploadResponse uploadImage(@RequestParam MultipartFile file) {
 
         if (! commonService.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -95,28 +104,21 @@ public class GalleryRestController {
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
         Gallery gallery = null;
+
         try {
-            gallery = galleryService.uploadImage(file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                    file.getBytes(), file.getInputStream());
-        } catch (IOException e) {
-            throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
+            gallery = galleryService.uploadImage(file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
+        } catch (IOException ignored) {
         }
 
-        return GalleryOnUploadResponse.builder()
-                .id(gallery.getId())
-                .name(gallery.getName())
-                .fileName(gallery.getFileName())
-                .writer(gallery.getWriter())
-                .size(gallery.getSize())
-                .fileSize(gallery.getFileSize())
-                .contentType(gallery.getContentType())
-                .status(gallery.getStatus())
-                .imageUrl(apiServerUrl + imagePath + gallery.getId())
-                .thumbnailUrl(apiServerUrl + thumbnailPath + gallery.getId())
-                .build();
+        GalleryOnUploadResponse response = new GalleryOnUploadResponse();
+        BeanUtils.copyProperties(gallery, response);
+        response.setImageUrl(apiServerUrl + imagePath + gallery.getId());
+        response.setThumbnailUrl(apiServerUrl + thumbnailPath + gallery.getId());
+
+        return response;
     }
 
-    @ApiOperation(value = "사진 지움", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "사진 지움", response = EmptyJsonResponse.class)
     @RequestMapping(value = "/gallery/{id}", method = RequestMethod.DELETE)
     public EmptyJsonResponse removeImage(@PathVariable String id) {
 
@@ -128,7 +130,7 @@ public class GalleryRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "사진 정보", produces = "application/json")
+    @ApiOperation(value = "사진 정보")
     @RequestMapping(value = "/gallery/{id}", method = RequestMethod.GET)
     public GalleryResponse view(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
 
@@ -147,7 +149,7 @@ public class GalleryRestController {
           .build();
     }
 
-    @ApiOperation(value = "사진 좋아요 싫어요", produces = "application/json")
+    @ApiOperation(value = "사진 좋아요 싫어요")
     @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CommonConst.FEELING_TYPE feeling) {
 

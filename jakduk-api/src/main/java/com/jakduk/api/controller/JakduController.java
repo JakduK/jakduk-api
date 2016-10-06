@@ -77,7 +77,7 @@ public class JakduController {
         try {
             model.addAttribute("dateTimeFormat", new ObjectMapper().writeValueAsString(commonService.getDateTimeFormat(locale)));
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.parsing.or.generating"));
+            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.parsing.or.generating"));
         }
 
         return "jakdu/scheduleView";

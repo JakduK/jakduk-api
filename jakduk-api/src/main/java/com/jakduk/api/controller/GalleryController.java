@@ -1,27 +1,20 @@
 package com.jakduk.api.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Locale;
-import java.util.Objects;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.exception.SuccessButNoContentException;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.GalleryService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.LocaleResolver;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -30,89 +23,45 @@ import org.springframework.web.servlet.LocaleResolver;
  * @desc     :
  */
 
-@Slf4j
-@Controller
 @RequestMapping("/gallery")
+@Controller
 public class GalleryController {
 
 	@Autowired
 	private GalleryService galleryService;
 
-	@Autowired
-	private CommonService commonService;
-
-	@Resource
-	LocaleResolver localeResolver;
-
-	@RequestMapping
-	public String root() {
-
-		return "redirect:/gallery/list";
-	}
-
-	@RequestMapping(value = "/list/refresh", method = RequestMethod.GET)
-	public String refreshList() {
-
-		return "redirect:/gallery/list";
-	}
-
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String list(Model model,
-			HttpServletRequest request) {
-
-		Locale locale = localeResolver.resolveLocale(request);
-		galleryService.getList(model, locale);
-
-		return "gallery/list";
-	}
-
 	// 사진 가져오기.
-	@ResponseBody
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public void gallery(@PathVariable String id,
-						HttpServletRequest request,
-						HttpServletResponse response) {
-
-		Locale locale = localeResolver.resolveLocale(request);
+	@ResponseBody
+	public void getGallery(@PathVariable String id,	HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
 
-		if (Objects.isNull(gallery))
-			throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CommonConst.IMAGE_TYPE.FULL);
+		response.setContentType(gallery.getContentType());
 
 		try {
-			ByteArrayOutputStream byteStream = galleryService.getImage(locale, gallery, CommonConst.IMAGE_TYPE.FULL);
-
-			response.setContentType(gallery.getContentType());
 			byteStream.writeTo(response.getOutputStream());
-
-		} catch (IOException exception) {
-			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.io"));
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY, e);
 		}
 	}
 
 	// 사진 썸네일 가져오기.
-	@ResponseBody
 	@RequestMapping(value = "/thumbnail/{id}", method = RequestMethod.GET)
-	public void thumbnail(@PathVariable String id,
-						  HttpServletRequest request,
+	@ResponseBody
+	public void getGalleyThumbnail(@PathVariable String id,
 						  HttpServletResponse response) {
-
-		Locale locale = localeResolver.resolveLocale(request);
 
 		Gallery gallery = galleryService.findOneById(id);
 
-		if (Objects.isNull(gallery))
-			throw new SuccessButNoContentException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.no.such.element"));
+		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CommonConst.IMAGE_TYPE.THUMBNAIL);
+		response.setContentType(gallery.getContentType());
 
 		try {
-			ByteArrayOutputStream byteStream = galleryService.getImage(locale, gallery, CommonConst.IMAGE_TYPE.THUMBNAIL);
-
-			response.setContentType(gallery.getContentType());
 			byteStream.writeTo(response.getOutputStream());
-
-		} catch (IOException exception) {
-			throw new RuntimeException(commonService.getResourceBundleMessage(locale, "messages.common", "common.exception.io"));
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY, e);
 		}
 	}
 }

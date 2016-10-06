@@ -1,5 +1,6 @@
 package com.jakduk.core.model.db;
 
+import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -49,4 +50,6 @@ public class Gallery {
 	private List<CommonFeelingUser> usersLiking;
 	
 	private List<CommonFeelingUser> usersDisliking;
+
+	private List<CommonConst.BATCH_TYPE> batch;
 }

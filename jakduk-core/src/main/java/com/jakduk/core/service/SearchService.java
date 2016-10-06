@@ -49,7 +49,7 @@ public class SearchService {
 	private String elasticsearchHostName;
 
     @Value("${elasticsearch.enable}")
-    private boolean elasticsearchEnabled;
+    private boolean elasticsearchEnable;
 
 	@Autowired
 	private JestClient jestClient;
@@ -127,7 +127,7 @@ public class SearchService {
 	@Async
 	public void createDocumentBoard(BoardFree boardFree) {
 
-        if (elasticsearchEnabled) {
+        if (elasticsearchEnable) {
             BoardFreeOnES boardFreeOnES = new BoardFreeOnES(boardFree);
 
             Index index = new Index.Builder(boardFreeOnES)
@@ -142,24 +142,25 @@ public class SearchService {
             }
         }
 	}
-	
+
+	@Async
 	public void deleteDocumentBoard(String id) {
+
+		if (! elasticsearchEnable)
+			return;
+
         try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
 			        .index(elasticsearchIndexName)
 			        .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
 			        .build());
-			
-			if (log.isDebugEnabled()) {
-				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
-					log.debug("board id " + id + " is not found. so can't delete it!");
-				}
-			}
-			
-			if (!jestResult.isSucceeded()) {
+
+			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
+				log.debug("board id " + id + " is not found. so can't delete it!");
+
+			if (! jestResult.isSucceeded())
 				log.error(jestResult.getErrorMessage());
-			}
-			
+
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}
@@ -200,7 +201,7 @@ public class SearchService {
 
 	@Async
 	public void createDocumentComment(BoardFreeComment boardFreeComment) {
-        if (elasticsearchEnabled) {
+        if (elasticsearchEnable) {
             CommentOnES commentOnES = new CommentOnES(boardFreeComment);
 
             Index index = new Index.Builder(commentOnES)
@@ -298,7 +299,7 @@ public class SearchService {
 	@Async
 	public void createDocumentGallery(Gallery gallery) {
 
-        if (elasticsearchEnabled) {
+        if (elasticsearchEnable) {
             GalleryOnES galleryOnES = new GalleryOnES(gallery);
 
             Index index = new Index.Builder(galleryOnES)
@@ -313,24 +314,25 @@ public class SearchService {
             }
         }
 	}
-	
+
+	@Async
 	public void deleteDocumentGallery(String id) {
-        try {
+
+		if (! elasticsearchEnable)
+			return;
+
+		try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
-			        .index(elasticsearchIndexName)
-			        .type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
-			        .build());
-			
-			if (log.isDebugEnabled()) {
-				if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false")) {
-					log.debug("gallery id " + id + " is not found. so can't delete it!");
-				}
-			}
-			
-			if (!jestResult.isSucceeded()) {
+					.index(elasticsearchIndexName)
+					.type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+					.build());
+
+			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
+				log.debug("gallery id " + id + " is not found. so can't delete it!");
+
+			if (! jestResult.isSucceeded())
 				log.error(jestResult.getErrorMessage());
-			}
-			
+
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}

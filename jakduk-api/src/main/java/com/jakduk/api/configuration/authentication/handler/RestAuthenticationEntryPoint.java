@@ -32,7 +32,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setCharacterEncoding("utf-8");
 
-        RestError error = new RestError("-", commonService.getResourceBundleMessage("messages.common", "common.exception.unauthorized"));
+        RestError error = new RestError("-", commonService.getResourceBundleMessage("messages.exception", "exception.unauthorized"));
 
         String errorJson = new ObjectMapper().writeValueAsString(error);
 

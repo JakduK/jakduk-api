@@ -9,12 +9,15 @@ import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.UnauthorizedAccessException;
+import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.core.model.simple.UserProfile;
+import com.jakduk.core.repository.FootballClubRepository;
 import com.jakduk.core.repository.user.UserProfileRepository;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,6 +41,9 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private FootballClubRepository footballClubRepository;
 
 	@Autowired
 	private UserProfileRepository userProfileRepository;
@@ -100,6 +106,58 @@ public class UserService {
 		userRepository.save(user);
 	}
 
+	public User addJakdukUser(String email, String username, String password, String footballClub, String about) {
+		User user = User.builder()
+				.email(email.trim())
+				.username(username.trim())
+				.password(encoder.encode(password.trim()))
+				.providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
+				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.build();
+
+		if (StringUtils.isNotEmpty(footballClub)) {
+			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+
+			user.setSupportFC(supportFC);
+		}
+
+		if (StringUtils.isNotEmpty(about))
+			user.setAbout(about.trim());
+
+		User returnUser = userRepository.save(user);
+
+		log.debug("JakduK user created. user=" + returnUser);
+
+		return returnUser;
+	}
+
+	public User addSocialUser(String email, String username, CommonConst.ACCOUNT_TYPE providerId, String providerUserId, String footballClub, String about) {
+		User user = User.builder()
+				.email(email.trim())
+				.username(username.trim())
+				.providerId(providerId)
+				.providerUserId(providerUserId)
+				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.build();
+
+		if (StringUtils.isNotEmpty(footballClub)) {
+			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+
+			user.setSupportFC(supportFC);
+		}
+
+		if (StringUtils.isNotEmpty(about))
+			user.setAbout(about.trim());
+
+		User returnUser = userRepository.save(user);
+
+		log.debug("social user created. user=" + returnUser);
+
+		return returnUser;
+	}
+
 	public Boolean existEmail(String email) {
 		Boolean result;
 
@@ -107,7 +165,7 @@ public class UserService {
 			User user = userRepository.findOneByEmail(email);
 			result = Objects.nonNull(user);
 		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.already.you.are.user"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.already.you.are.user"));
 		}
 		
 		return result;
@@ -121,7 +179,7 @@ public class UserService {
 			User user = userRepository.findOneByUsername(username);
 			result = Objects.nonNull(user);
 		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.common", "common.exception.already.you.are.user"));
+			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.already.you.are.user"));
 		}
 
 		return result;
