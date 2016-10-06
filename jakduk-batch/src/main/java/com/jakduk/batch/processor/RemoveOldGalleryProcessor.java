@@ -45,7 +45,7 @@ public class RemoveOldGalleryProcessor implements ItemProcessor<Gallery, Gallery
             deleteGalleryFile(imagePath);
             deleteGalleryFile(thumbPath);
 
-            System.out.println(item);
+            System.out.println("path=" + imagePath + ", gallery id=" + item.getId());
 
             galleryRepository.delete(item);
         }
