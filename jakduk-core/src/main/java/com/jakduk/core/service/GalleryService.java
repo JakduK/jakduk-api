@@ -158,7 +158,6 @@ public class GalleryService {
 			Path thumbFilePath = thumbDirPath.resolve(gallery.getId() + "." + formatName);
 
 			Integer orientation = 1;
-			Integer rotate = 0;
 
 			InputStream exifInputStream = new ByteArrayInputStream(bytes);
 			Metadata metadata = ImageMetadataReader.readMetadata(exifInputStream);
@@ -167,33 +166,19 @@ public class GalleryService {
 			if (directory.isPresent())
 				orientation = directory.get().getInt(ExifIFD0Directory.TAG_ORIENTATION);
 
-			switch (orientation) {
-				case 3: // 180도 회전
-					rotate = 180;
-					break;
-				case 6: // 90도 회전
-					rotate = 90;
-					break;
-				case 8: // 270도 회전
-					rotate = 270;
-					break;
-				default:
-					break;
-			}
-
 			// 사진 저장.
 			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				if (("gif".equals(formatName) || CommonConst.GALLERY_MAXIUM_CAPACITY > size) && orientation.equals(1)) {
+				if (("gif".equals(formatName) || CommonConst.GALLERY_MAXIMUM_CAPACITY > size) && orientation.equals(1)) {
 					Files.write(imageFilePath, bytes);
 				} else {
-                    double scale = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) size;
-					if (scale >= 1) scale = 1;
+
+					double scale = CommonConst.GALLERY_MAXIMUM_CAPACITY < size ?
+							CommonConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
 
                     InputStream originalInputStream = new ByteArrayInputStream(bytes);
 
 					Thumbnails.of(originalInputStream)
 							.scale(scale)
-							.rotate(rotate)
 							.toFile(imageFilePath.toFile());
 
 					BasicFileAttributes attr = Files.readAttributes(imageFilePath, BasicFileAttributes.class);
@@ -211,7 +196,6 @@ public class GalleryService {
 				Thumbnails.of(thumbInputStream)
 						.size(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
                         .crop(Positions.TOP_CENTER)
-						.rotate(rotate)
 						.toFile(thumbFilePath.toFile());
 			}
 

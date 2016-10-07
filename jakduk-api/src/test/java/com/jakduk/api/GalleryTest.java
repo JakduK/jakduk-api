@@ -224,7 +224,7 @@ public class GalleryTest extends AbstractSpringTest {
 	public void imageCapacity01() {
 		
 		long temp = 2548576;
-		double bb = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) temp;
+		double bb = CommonConst.GALLERY_MAXIMUM_CAPACITY / (double) temp;
 		long width = 100;
 		long height = 90;
 		
