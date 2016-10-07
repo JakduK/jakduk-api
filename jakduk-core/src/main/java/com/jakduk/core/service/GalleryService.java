@@ -187,6 +187,8 @@ public class GalleryService {
 					Files.write(imageFilePath, bytes);
 				} else {
                     double scale = CommonConst.GALLERY_MAXIUM_CAPACITY / (double) size;
+					if (scale >= 1) scale = 1;
+
                     InputStream originalInputStream = new ByteArrayInputStream(bytes);
 
 					Thumbnails.of(originalInputStream)
