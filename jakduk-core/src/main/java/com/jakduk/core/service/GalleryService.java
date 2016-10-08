@@ -1,11 +1,5 @@
 package com.jakduk.core.service;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
-import com.drew.metadata.exif.ExifIFD0Directory;
 import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.JakdukDAO;
@@ -157,18 +151,10 @@ public class GalleryService {
 			Path imageFilePath = imageDirPath.resolve(gallery.getId() + "." + formatName);
 			Path thumbFilePath = thumbDirPath.resolve(gallery.getId() + "." + formatName);
 
-			Integer orientation = 1;
-
-			InputStream exifInputStream = new ByteArrayInputStream(bytes);
-			Metadata metadata = ImageMetadataReader.readMetadata(exifInputStream);
-			Optional<Directory> directory = Optional.ofNullable(metadata.getFirstDirectoryOfType(ExifIFD0Directory.class));
-
-			if (directory.isPresent())
-				orientation = directory.get().getInt(ExifIFD0Directory.TAG_ORIENTATION);
 
 			// 사진 저장.
 			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				if (("gif".equals(formatName) || CommonConst.GALLERY_MAXIMUM_CAPACITY > size) && orientation.equals(1)) {
+				if ("gif".equals(formatName)) {
 					Files.write(imageFilePath, bytes);
 				} else {
 
@@ -199,7 +185,7 @@ public class GalleryService {
 						.toFile(thumbFilePath.toFile());
 			}
 
-		} catch (IOException | MetadataException | ImageProcessingException e) {
+		} catch (IOException e) {
 			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 		}
 

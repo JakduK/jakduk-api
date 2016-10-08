@@ -1,6 +1,10 @@
 package com.jakduk.core.model.simple;
 
-import lombok.*;
+import com.jakduk.core.model.embedded.BoardStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,9 +15,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 * @desc     :
 */
 
-@Getter
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
+@Builder
+@Getter
 @Document(collection = "boardFree")
 public class BoardFreeOnSearchComment {
 	
@@ -33,8 +38,5 @@ public class BoardFreeOnSearchComment {
 	 */
 	private Integer seq;
 
-	public BoardFreeOnSearchComment(String id, Integer seq) {
-		this.id = id;
-		this.seq = seq;
-	}
+	private BoardStatus status;
 }

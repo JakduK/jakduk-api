@@ -4,7 +4,9 @@ import com.jakduk.core.model.embedded.BoardCommentStatus;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,7 +21,9 @@ import java.util.List;
  * @desc     :
  */
 
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 @Document
 public class BoardFreeComment {
 

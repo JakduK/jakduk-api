@@ -111,7 +111,8 @@ public class BoardFreeService {
 		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 		boardFree.setWriter(writer);
 
-		BoardStatus boardStatus = new BoardStatus(device);
+		BoardStatus boardStatus = new BoardStatus();
+		boardStatus.setDevice(device);
 		boardFree.setStatus(boardStatus);
 
 		List<BoardHistory> histories = new ArrayList<>();
