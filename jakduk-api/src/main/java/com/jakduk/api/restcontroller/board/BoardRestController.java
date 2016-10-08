@@ -29,12 +29,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -170,34 +172,29 @@ public class BoardRestController {
 
         Page<BoardFreeComment> comments = boardFreeService.getBoardFreeComments(page, size);
 
-        List<ObjectId> boardIds = new ArrayList<>();
-
         // id 뽑아내기.
-        Consumer<BoardFreeComment> extractId = comment -> {
-            String tempId = comment.getBoardItem().getId();
-            ObjectId objId = new ObjectId(tempId);
-            boardIds.add(objId);
-        };
-
-        comments.getContent().forEach(extractId);
-
-        List<FreeCommentsOnList> freeComments = comments.getContent().stream()
-                .map(FreeCommentsOnList::new)
+        List<ObjectId> boardIds = comments.getContent().stream()
+                .map(comment -> {
+                    String tempId = comment.getBoardItem().getId();
+                    return new ObjectId(tempId);
+                })
+                .distinct()
                 .collect(Collectors.toList());
 
         Map<String, BoardFreeOnSearchComment> postsHavingComments = boardDAO.getBoardFreeOnSearchComment(boardIds);
 
-        // 글 정보 합치기.
-        Consumer<FreeCommentsOnList> applyPosts = comment -> {
-            String tempBoardId = comment.getBoardItem().getId();
-
-            BoardFreeOnSearchComment tempBoardItem = postsHavingComments.get(tempBoardId);
-
-            if (Objects.nonNull(tempBoardItem))
-                comment.setBoardItem(tempBoardItem);
-        };
-
-        freeComments.forEach(applyPosts);
+        List<FreeCommentsOnList> freeComments = comments.getContent().stream()
+                .map(comment -> {
+                            FreeCommentsOnList newComment = new FreeCommentsOnList();
+                            BeanUtils.copyProperties(comment, newComment);
+                            newComment.setBoardItem(
+                                    Optional.ofNullable(postsHavingComments.get(comment.getBoardItem().getId()))
+                                            .orElse(new BoardFreeOnSearchComment())
+                            );
+                            return newComment;
+                        }
+                )
+                .collect(Collectors.toList());
 
         return FreeCommentsOnListResponse.builder()
                 .comments(freeComments)

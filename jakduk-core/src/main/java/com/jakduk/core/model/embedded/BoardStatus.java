@@ -22,9 +22,4 @@ public class BoardStatus {
 	private Boolean delete;
 	
 	private CommonConst.DEVICE_TYPE device;
-
-	public BoardStatus(CommonConst.DEVICE_TYPE device) {
-		this.device = device;
-	}
-
 }

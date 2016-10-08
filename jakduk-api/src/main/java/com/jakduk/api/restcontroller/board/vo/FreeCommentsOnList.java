@@ -1,14 +1,12 @@
 package com.jakduk.api.restcontroller.board.vo;
 
-import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.embedded.BoardCommentStatus;
-import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -18,6 +16,9 @@ import java.util.List;
  */
 
 @ApiModel(value = "자유게시판 댓글")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Getter
 @Setter
 public class FreeCommentsOnList {
@@ -42,16 +43,4 @@ public class FreeCommentsOnList {
 
     @ApiModelProperty(value = "댓글상태")
     private BoardCommentStatus status;
-
-    public FreeCommentsOnList(BoardFreeComment comment) {
-        this.id = comment.getId();
-        this.writer = comment.getWriter();
-        this.content = comment.getContent();
-        this.usersLiking = comment.getUsersLiking();
-        this.usersDisliking = comment.getUsersDisliking();
-        this.status = comment.getStatus();
-
-        BoardFreeOnSearchComment boardItem = new BoardFreeOnSearchComment(comment.getBoardItem().getId(), comment.getBoardItem().getSeq());
-        this.boardItem = boardItem;
-    }
 }
