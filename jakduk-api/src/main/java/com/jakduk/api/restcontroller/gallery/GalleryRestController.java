@@ -11,7 +11,7 @@ import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.simple.BoardFreeOnGallery;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.GalleryService;
@@ -139,7 +139,7 @@ public class GalleryRestController {
           .gallery((Gallery) gallery.get("gallery"))
           .next((Gallery) gallery.get("next"))
           .prev((Gallery) gallery.get("prev"))
-          .linkedPosts((List<BoardFreeOnGallery>) gallery.get("linkedPosts"))
+          .linkedPosts((List<BoardFreeSimple>) gallery.get("linkedPosts"))
           .build();
     }
 

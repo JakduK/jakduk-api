@@ -1,4 +1,4 @@
-package com.jakduk.core.repository;
+package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.model.simple.BoardFreeOnList;

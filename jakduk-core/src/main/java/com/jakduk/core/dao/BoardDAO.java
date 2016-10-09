@@ -188,12 +188,12 @@ public class BoardDAO {
 	 */
 	public BoardFreeOfMinimum getBoardFreeById(ObjectId id, CommonConst.BOARD_CATEGORY_TYPE category, Direction direction) {
 		Query query = new Query();
-		
+
 		switch (category) {
 			case FREE:
 			case FOOTBALL:
-			query.addCriteria(Criteria.where("category").is(category));
-			break;
+				query.addCriteria(Criteria.where("category").is(category));
+				break;
 		}
 		
 		if (direction.equals(Sort.Direction.ASC)) {

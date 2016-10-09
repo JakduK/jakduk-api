@@ -13,6 +13,7 @@ import com.jakduk.core.model.web.ThumbnailSizeWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
 import com.jakduk.core.repository.*;
+import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 import io.searchbox.client.JestClient;

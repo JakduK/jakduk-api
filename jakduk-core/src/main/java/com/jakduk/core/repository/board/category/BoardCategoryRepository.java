@@ -1,4 +1,4 @@
-package com.jakduk.core.repository;
+package com.jakduk.core.repository.board.category;
 
 import com.jakduk.core.model.db.BoardCategory;
 import org.springframework.data.mongodb.repository.MongoRepository;

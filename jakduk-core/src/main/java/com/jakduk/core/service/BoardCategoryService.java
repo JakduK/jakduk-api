@@ -1,7 +1,7 @@
 package com.jakduk.core.service;
 
 import com.jakduk.core.model.db.BoardCategory;
-import com.jakduk.core.repository.BoardCategoryRepository;
+import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

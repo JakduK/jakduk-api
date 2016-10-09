@@ -2,9 +2,9 @@ package com.jakduk.core.model.embedded;
 
 import com.jakduk.core.common.CommonConst;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Setter;
 
 /**
  * 게시판 작성자
@@ -12,10 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  *
  */
 
-@Document
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class CommonWriter {
 	
 	private String userId;

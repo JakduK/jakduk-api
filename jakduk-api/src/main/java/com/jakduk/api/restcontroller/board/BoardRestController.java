@@ -21,6 +21,7 @@ import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
 import com.jakduk.core.service.CommonService;
@@ -211,11 +212,11 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글 상세", response = FreePostOnDetailResponse.class)
     @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
     public FreePostOnDetailResponse getFreeView(@PathVariable Integer seq,
+                                                Locale locale,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
 
-        BoardFree boardFree = boardFreeService.getFreePost(seq)
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+        BoardFree boardFree = boardFreeService.getFreePost(seq);
 
         boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
@@ -235,14 +236,17 @@ public class BoardRestController {
             galleries = galleryService.findByIds(ids);
         }
 
-        BoardCategory boardCategory = boardDAO.getBoardCategory(boardFree.getCategory().name(), commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+        BoardCategory boardCategory = boardDAO.getBoardCategory(boardFree.getCategory().name(), commonService.getLanguageCode(locale, null));
 
         BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
                 , boardFree.getCategory(), Sort.Direction.ASC);
         BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
                 , boardFree.getCategory(), Sort.Direction.DESC);
 
-        FreePostOnDetail post = new FreePostOnDetail(boardFree);
+        List<BoardFreeSimple> latestPostsByWriter = boardFreeService.findByUserId(boardFree.getWriter().getUserId(), 3);
+
+        FreePostOnDetail post = new FreePostOnDetail();
+        BeanUtils.copyProperties(boardFree, post);
         post.setCategory(boardCategory);
         post.setGalleries(galleries);
 
@@ -250,6 +254,7 @@ public class BoardRestController {
                 .post(post)
                 .prevPost(prevPost)
                 .nextPost(nextPost)
+                .latestPostsByWriter(latestPostsByWriter)
                 .build();
     }
 

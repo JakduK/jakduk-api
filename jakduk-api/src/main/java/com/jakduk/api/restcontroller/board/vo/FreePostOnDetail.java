@@ -1,15 +1,15 @@
 package com.jakduk.api.restcontroller.board.vo;
 
 import com.jakduk.core.model.db.BoardCategory;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardHistory;
 import com.jakduk.core.model.embedded.BoardStatus;
-import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -19,7 +19,8 @@ import java.util.List;
  */
 
 @ApiModel(value = "자유게시판 글 상세")
-@Data
+@Getter
+@Setter
 public class FreePostOnDetail {
 
     @ApiModelProperty(value = "글 ID")
@@ -58,16 +59,4 @@ public class FreePostOnDetail {
     @ApiModelProperty(value = "글 사진")
     private List<Gallery> galleries;
 
-    public FreePostOnDetail(BoardFree boardFree) {
-        this.id = boardFree.getId();
-        this.seq = boardFree.getSeq();
-        this.writer = boardFree.getWriter();
-        this.subject = boardFree.getSubject();
-        this.content = boardFree.getContent();
-        this.views = boardFree.getViews();
-        this.usersLiking = boardFree.getUsersLiking();
-        this.usersDisliking = boardFree.getUsersDisliking();
-        this.status = boardFree.getStatus();
-        this.history = boardFree.getHistory();
-    }
 }

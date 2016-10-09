@@ -9,8 +9,8 @@ import com.jakduk.core.model.etc.AuthUserProfile;
 import com.jakduk.core.repository.SequenceRepository;
 import com.jakduk.core.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -89,16 +89,12 @@ public class CommonService {
 		
 		String getLanguage = Locale.ENGLISH.getLanguage();
 		
-		if (lang == null || lang.isEmpty()) {
+		if (StringUtils.isEmpty(lang))
 			lang = locale.getLanguage();
-		}
-		
-		if (lang != null) {
-			if (lang.contains(Locale.KOREAN.getLanguage())) {
-				getLanguage = Locale.KOREAN.getLanguage();
-			}		
-		}
-		
+
+		if (StringUtils.isNotEmpty(lang) && lang.contains(Locale.KOREAN.getLanguage()))
+			getLanguage = Locale.KOREAN.getLanguage();
+
 		return getLanguage;
 	}
 	

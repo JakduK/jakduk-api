@@ -7,7 +7,7 @@ import com.jakduk.core.model.elasticsearch.CommentOnES;
 import com.jakduk.core.model.elasticsearch.GalleryOnES;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.model.simple.BoardFreeOnGallery;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.model.simple.UserOnHome;
@@ -88,16 +88,17 @@ public class JakdukDAO {
 		
 		return results.getMappedResults();
 	}
-	
-	public List<BoardFreeOnGallery> getBoardFreeOnGallery(ObjectId id) {
+
+	/**
+	 * galleryId에 해당하는 boardFree 가져오기.
+	 */
+	public List<BoardFreeSimple> getBoardFreeOnGallery(ObjectId galleryId) {
 		AggregationOperation unwind = Aggregation.unwind("galleries");
-		AggregationOperation match = Aggregation.match(Criteria.where("galleries._id").is(id));
+		AggregationOperation match = Aggregation.match(Criteria.where("galleries._id").is(galleryId));
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match);
-		AggregationResults<BoardFreeOnGallery> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnGallery.class);
-		
-		List<BoardFreeOnGallery> posts = results.getMappedResults();
-		
-		return posts;
+		AggregationResults<BoardFreeSimple> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeSimple.class);
+
+		return results.getMappedResults();
 	}
 
 	/**

@@ -10,7 +10,7 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
-import com.jakduk.core.model.simple.BoardFreeOnGallery;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -305,12 +305,12 @@ public class GalleryService {
 
 		Gallery prevGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.ASC);
 		Gallery nextGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.DESC);
-		List<BoardFreeOnGallery> posts = jakdukDAO.getBoardFreeOnGallery(new ObjectId(id));
+		List<BoardFreeSimple> posts = jakdukDAO.getBoardFreeOnGallery(new ObjectId(id));
 
 		ObjectId objId = new ObjectId(id);
 		createDate.put(id, objId.getDate());
 
-		for (BoardFreeOnGallery post : posts) {
+		for (BoardFreeSimple post : posts) {
 			objId = new ObjectId(post.getId());
 			createDate.put(post.getId(), objId.getDate());
 		}
