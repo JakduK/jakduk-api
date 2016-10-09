@@ -1,8 +1,8 @@
 package com.jakduk.api;
 
 import com.jakduk.api.util.AbstractSpringTest;
-import com.jakduk.core.repository.BoardCategoryRepository;
-import com.jakduk.core.repository.BoardFreeRepository;
+import com.jakduk.core.repository.board.category.BoardCategoryRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -1,7 +1,6 @@
-package com.jakduk.core.repository;
+package com.jakduk.core.repository.board.free;
 
-import java.util.Optional;
-
+import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.web.BoardFreeWrite;
@@ -10,9 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import com.jakduk.core.model.db.BoardFree;
+import java.util.Optional;
 
-public interface BoardFreeRepository extends MongoRepository<BoardFree, String> {
+public interface BoardFreeRepository extends MongoRepository<BoardFree, String>, BoardFreeCustom {
 
 	Optional<BoardFree> findOneById(String id);
 	Optional<BoardFree> findOneBySeq(Integer seq);

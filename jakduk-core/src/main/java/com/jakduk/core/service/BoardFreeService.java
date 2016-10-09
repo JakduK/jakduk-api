@@ -15,10 +15,11 @@ import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.notification.SlackService;
-import com.jakduk.core.repository.BoardFreeCommentRepository;
-import com.jakduk.core.repository.BoardFreeOnListRepository;
-import com.jakduk.core.repository.BoardFreeRepository;
+import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
+import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -66,9 +67,6 @@ public class BoardFreeService {
 	@Autowired
 	private SearchService searchService;
 
-	@Autowired
-	private SlackService slackService;
-
 	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
 		return boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
 	}
@@ -79,6 +77,10 @@ public class BoardFreeService {
 
 	public void saveBoardFree(BoardFree boardFree) {
 		boardFreeRepository.save(boardFree);
+	}
+
+	public List<BoardFreeSimple> findByUserId(String userId, Integer limit) {
+		return boardFreeRepository.findByUserId(userId, limit);
 	}
 
     /**
@@ -408,8 +410,10 @@ public class BoardFreeService {
 	}
 
 
-	public Optional<BoardFree> getFreePost(int seq) {
-		return boardFreeRepository.findOneBySeq(seq);
+	public BoardFree getFreePost(Integer seq) {
+
+		return boardFreeRepository.findOneBySeq(seq)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 	}
 
 
