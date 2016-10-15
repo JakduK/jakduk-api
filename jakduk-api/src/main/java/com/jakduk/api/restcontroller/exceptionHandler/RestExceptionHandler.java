@@ -46,6 +46,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         List<FieldError> fieldErrors = result.getFieldErrors();
         List<ObjectError> globalErrors = result.getGlobalErrors();
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
         List<String> fields = globalErrors.stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -55,9 +56,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList()));
 
-        RestError restError = new RestError(ServiceError.FORM_VALIDATION_FAILED, fields);
+        RestError restError = new RestError(serviceError, fields);
 
-        return new ResponseEntity<>(restError, ServiceError.FORM_VALIDATION_FAILED.getHttpStatus());
+        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -66,10 +67,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        RestError restError = new RestError(ServiceError.FORM_VALIDATION_FAILED);
+        RestError restError = new RestError(serviceError);
 
-        return new ResponseEntity<>(restError, ServiceError.FORM_VALIDATION_FAILED.getHttpStatus());
+        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -79,10 +81,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        RestError restError = new RestError(ServiceError.FORM_VALIDATION_FAILED.getCode(),
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
+
+        RestError restError = new RestError(serviceError.getCode(),
                 String.format(ex.getMessage(), ex.getParameterType(), ex.getParameterName()));
 
-        return new ResponseEntity<>(restError, ServiceError.FORM_VALIDATION_FAILED.getHttpStatus());
+        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -91,10 +95,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        RestError restError = new RestError(ServiceError.FORM_VALIDATION_FAILED.getCode(),
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
+
+        RestError restError = new RestError(serviceError.getCode(),
                 String.format(ex.getMessage(), ex.getRequestPartName()));
 
-        return new ResponseEntity<>(restError, ServiceError.FORM_VALIDATION_FAILED.getHttpStatus());
+        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     // 에러는 아니지만 데이터가 없음.
@@ -118,7 +124,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ServiceError serviceError = ex.getServiceError();
         RestError restError = new RestError(serviceError);
 
-        return new ResponseEntity<>(restError, serviceError.getHttpStatus());
+        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     @ExceptionHandler({RuntimeException.class, Exception.class})

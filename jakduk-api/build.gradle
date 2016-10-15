@@ -1,4 +1,16 @@
+buildscript {
+  ext {
+    springBootVersion = '1.4.0.RELEASE'
+  }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+  }
+}
 
+apply plugin: 'spring-boot'
 apply plugin: 'war'
 
 description = 'jakduk-api'
@@ -6,11 +18,8 @@ description = 'jakduk-api'
 dependencies {
   compile project(':jakduk-core')
 
-  compile group: 'org.springframework', name: 'spring-web', version:"${springVersion}"
-  compile group: 'org.springframework', name: 'spring-webmvc', version:"${springVersion}"
-  compile group: 'org.springframework.security', name: 'spring-security-web', version:"${springSecurityVersion}"
-  compile group: 'org.springframework.security', name: 'spring-security-config', version:"${springSecurityVersion}"
-  compile group: 'org.springframework.security', name: 'spring-security-taglibs', version:"${springSecurityVersion}"
+  compile('org.springframework.boot:spring-boot-starter-security')
+  compile('org.springframework.boot:spring-boot-starter-web')
 
   compile 'javax.el:javax.el-api:3.0.0'
   compile group: 'javax.servlet', name: 'jstl', version:'1.2'
