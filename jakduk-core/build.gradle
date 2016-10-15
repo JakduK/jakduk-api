@@ -1,7 +1,41 @@
+buildscript {
+    ext {
+        springBootVersion = '1.4.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
 
+apply plugin: 'spring-boot'
 description = 'jakduk-core'
 
+configurations {
+    //all*.exclude group:'org.springframework.mobile', module:'spring-mobile-device'
+    all*.exclude group:'org.springframework', module:'spring-webmvc'
+    all*.exclude group:'org.springframework', module:'spring-web'
+    //all*.exclude group:'commons-fileupload', module:'commons-fileupload'
+    //all*.exclude group:'commons-beanutils', module:'commons-beanutils'
+    //all*.exclude group:'org.elasticsearch', module:'elasticsearch'
+    //all*.exclude group:'org.hibernate.javax.persistence'
+}
+
 dependencies {
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+
+    // Http Client
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
+
+    compile 'commons-beanutils:commons-beanutils:1.9.2'
+    compile 'org.thymeleaf:thymeleaf:3.0.1.RELEASE'
+    compile 'org.thymeleaf:thymeleaf-spring4:3.0.1.RELEASE'
+    compile 'net.coobird:thumbnailator:0.4.8'
+
     // service에 HttpServlceRequest등 과같은 것이 없어질때 이것도 없애자.
     compile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.1.0'
+
+
 }
