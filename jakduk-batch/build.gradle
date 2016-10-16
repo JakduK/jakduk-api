@@ -13,6 +13,4 @@ dependencies {
 	compile project(':jakduk-core')
 
 	compile('org.springframework.boot:spring-boot-starter-batch')
-
-	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

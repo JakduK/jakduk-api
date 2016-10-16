@@ -49,6 +49,8 @@ subprojects {
         compile('org.springframework.boot:spring-boot-starter-mail')
         compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 
+        testCompile('org.springframework.boot:spring-boot-starter-test')
+
         // commonService에서 사용 중임.
         compile group: 'org.springframework.security', name: 'spring-security-core', version:"${springSecurityVersion}"
         compile group: 'org.springframework.data', name: 'spring-data-rest-webmvc', version:'2.5.1.RELEASE'
