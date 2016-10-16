@@ -12,10 +12,10 @@ import org.springframework.stereotype.Controller;
  * Created by pyohwan on 16. 4. 2.
  */
 
-@Configuration
 @ComponentScan(basePackages = {"com.jakduk.api"},
         excludeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
 @Import({CoreRootConfig.class})
+@Configuration
 public class ApiRootConfig {
 
 }

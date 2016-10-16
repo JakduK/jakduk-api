@@ -1,6 +1,8 @@
 package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.core.common.CommonConst;
+import org.springframework.mobile.device.Device;
 import org.springframework.security.web.util.UrlUtils;
 
 import javax.servlet.http.Cookie;
@@ -57,5 +59,22 @@ public class ApiUtils {
                 request.getServerName(),
                 request.getServerPort(),
                 request.getContextPath() + uri, null);
+    }
+
+    /**
+     * 모바일 디바이스 정보 가져오기.
+     * @param device Device 객체
+     * @return CommonConst.DEVICE_TYPE enum 타입
+     */
+    public static CommonConst.DEVICE_TYPE getDeviceInfo(Device device) {
+        if (device.isNormal()) {
+            return CommonConst.DEVICE_TYPE.NORMAL;
+        } else if (device.isMobile()) {
+            return CommonConst.DEVICE_TYPE.MOBILE;
+        } else if (device.isTablet()) {
+            return CommonConst.DEVICE_TYPE.TABLET;
+        } else {
+            return CommonConst.DEVICE_TYPE.NORMAL;
+        }
     }
 }

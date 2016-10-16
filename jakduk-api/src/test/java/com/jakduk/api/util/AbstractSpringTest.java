@@ -3,9 +3,9 @@ package com.jakduk.api.util;
 import com.jakduk.api.configuration.ApiRootConfig;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
  * @author pyohwan
@@ -15,7 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ApiRootConfig.class})
-@WebAppConfiguration
+@SpringBootTest
 public class AbstractSpringTest {
 
     static {

@@ -17,7 +17,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.mobile.device.Device;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -254,23 +253,6 @@ public class CommonService {
 		Locale locale = LocaleContextHolder.getLocale();
 		ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
 		return MessageFormat.format(resourceBundle.getString(getString), params);
-	}
-
-	/**
-	 * 모바일 디바이스 정보 가져오기.
-	 * @param device Device 객체
-	 * @return CommonConst.DEVICE_TYPE enum 타입
-     */
-	public CommonConst.DEVICE_TYPE getDeviceInfo(Device device) {
-		if (device.isNormal()) {
-			return CommonConst.DEVICE_TYPE.NORMAL;
-		} else if (device.isMobile()) {
-			return CommonConst.DEVICE_TYPE.MOBILE;
-		} else if (device.isTablet()) {
-			return CommonConst.DEVICE_TYPE.TABLET;
-		} else {
-			return CommonConst.DEVICE_TYPE.NORMAL;
-		}
 	}
 
 	// 토큰 가져오기.

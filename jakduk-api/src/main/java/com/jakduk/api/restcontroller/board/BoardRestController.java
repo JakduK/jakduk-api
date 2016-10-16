@@ -37,7 +37,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -293,7 +292,7 @@ public class BoardRestController {
         Device device = DeviceUtils.getCurrentDevice(request);
 
         Integer boardSeq = boardFreeService.insertFreePost(form.getSubject().trim(), form.getContent().trim(), form.getCategoryCode(),
-                galleries, commonService.getDeviceInfo(device));
+                galleries, ApiUtils.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
                 .seq(boardSeq)
@@ -325,7 +324,7 @@ public class BoardRestController {
         Device device = DeviceUtils.getCurrentDevice(request);
 
         Integer boardSeq = boardFreeService.updateFreePost(seq, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), galleries, commonService.getDeviceInfo(device));
+                form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
                 .seq(boardSeq)
@@ -374,7 +373,7 @@ public class BoardRestController {
 
         Device device = DeviceUtils.getCurrentDevice(request);
 
-        return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContent().trim(), commonService.getDeviceInfo(device));
+        return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
     }
 
     @ApiOperation(value = "자유게시판 글 감정 표현", response = UserFeelingResponse.class)
