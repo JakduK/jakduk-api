@@ -3,7 +3,7 @@
 <!-- 30초마다 설정 파일의 변경을 확인한다. 파일이 변경되면 다시 로딩한다 -->
 <configuration scan="false" scanPeriod="30 seconds">
 
-    <property name="LOG_DIR" value="/usr/local/tomcat/logs" />
+    <property name="LOG_DIR" value="/jakduk/api/logs" />
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
