@@ -1,5 +1,6 @@
 package com.jakduk.api.restcontroller.jakdu;
 
+import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.restcontroller.vo.JakduScheduleResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.core.common.CommonConst;
@@ -150,7 +151,7 @@ public class JakduRestController {
         }
 
         Device device = DeviceUtils.getCurrentDevice(request);
-        jakduCommentWriteRequest.setDevice(commonService.getDeviceInfo(device));
+        jakduCommentWriteRequest.setDevice(ApiUtils.getDeviceInfo(device));
 
         JakduComment jakduComment = jakduService.setComment(locale, jakduCommentWriteRequest);
 

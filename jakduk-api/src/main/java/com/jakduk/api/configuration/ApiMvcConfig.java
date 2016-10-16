@@ -29,12 +29,11 @@ import java.util.List;
  * 16. 4. 2 오후 10:58
  */
 
-@Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = {"com.jakduk.api"}, useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
-@Import(SwaggerConfig.class)
 @PropertySource("classpath:/properties/api-${spring.profiles.active}.properties")
+@Configuration
 public class ApiMvcConfig extends WebMvcConfigurerAdapter {
 
     @Value("${jwt.token.header}")
@@ -120,17 +119,6 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         resolver.setDefaultViews(defaultViews);
 
         return resolver;
-    }
-
-    @Bean
-    public CommonsMultipartResolver multipartResolver() throws IOException {
-        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(8388608);
-        multipartResolver.setMaxInMemorySize(8388608);
-        multipartResolver.setDefaultEncoding("UTF-8");
-        multipartResolver.setUploadTempDir(new FileSystemResource("/tmp/jakduk"));
-
-        return multipartResolver;
     }
 
     /**

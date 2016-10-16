@@ -2,7 +2,10 @@ package com.jakduk.core.configuration;
 
 import net.gpedro.integrations.slack.SlackApi;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,8 +30,6 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = {"com.jakduk.core"},
         excludeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
-@PropertySource({"classpath:/properties/core.properties",
-        "classpath:/properties/core-${spring.profiles.active}.properties"})
 public class CoreRootConfig {
 
     @Resource
@@ -63,10 +64,7 @@ public class CoreRootConfig {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
-                "classpath:messages/about", "classpath:messages/home", "classpath:messages/gallery",
-                "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu", "classpath:messages/email",
-                "classpath:messages/exception");
+        messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(180);
 

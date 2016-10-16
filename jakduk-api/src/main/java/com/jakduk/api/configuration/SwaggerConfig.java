@@ -2,6 +2,7 @@ package com.jakduk.api.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -21,6 +22,7 @@ import java.util.Set;
  */
 
 @EnableSwagger2
+@Configuration
 public class SwaggerConfig {
 
     @Autowired

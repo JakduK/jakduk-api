@@ -10,8 +10,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * 16. 5. 25 오후 10:49
  */
 
+//@EnableWebMvc
 @Configuration
-@EnableWebMvc
 public class ApiRestMvcConfig extends RepositoryRestMvcConfiguration {
 
     @Override
