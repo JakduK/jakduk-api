@@ -18,6 +18,7 @@ import java.util.EnumSet;
  */
 public class Initializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
+    // 없애도 된다.
     @Override
     protected String[] getServletMappings() {
         return new String[]{"/"};
