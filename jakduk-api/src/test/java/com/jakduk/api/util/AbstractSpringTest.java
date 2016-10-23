@@ -1,11 +1,15 @@
 package com.jakduk.api.util;
 
+import com.jakduk.api.ApiApplication;
 import com.jakduk.api.configuration.ApiRootConfig;
+import com.jakduk.core.CoreApplication;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author pyohwan
@@ -13,14 +17,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 
 @Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ApiRootConfig.class})
-@SpringBootTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {CoreApplication.class})
 public class AbstractSpringTest {
 
-    static {
-        if (System.getProperty("spring.profiles.active") == null) {
-            System.setProperty("spring.profiles.active", "local");
-        }
-    }
 }

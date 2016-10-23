@@ -17,7 +17,6 @@ import org.springframework.web.context.WebApplicationContext;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ApiRootConfig.class)
 @SpringBootTest
 public abstract class AbstractMvcTest<T> {
 

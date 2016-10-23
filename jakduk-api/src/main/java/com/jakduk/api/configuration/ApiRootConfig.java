@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * Created by pyohwan on 16. 4. 2.
  */
 
-
+@Deprecated
 public class ApiRootConfig {
 
 }
