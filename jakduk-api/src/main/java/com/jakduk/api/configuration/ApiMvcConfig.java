@@ -32,7 +32,6 @@ import java.util.List;
 @EnableWebMvc
 @ComponentScan(basePackages = {"com.jakduk.api"}, useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION))
-@PropertySource("classpath:/properties/api-${spring.profiles.active}.properties")
 @Configuration
 public class ApiMvcConfig extends WebMvcConfigurerAdapter {
 

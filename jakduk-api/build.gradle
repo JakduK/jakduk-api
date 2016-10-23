@@ -1,6 +1,10 @@
 
 description = 'jakduk-api'
 
+springBoot {
+  executable = true
+}
+
 dependencies {
   compile project(':jakduk-core')
 

@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Import;
 public class JakdukBatchApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(JakdukBatchApplication.class, args);
+		SpringApplication app = new SpringApplication(JakdukBatchApplication.class);
+		app.setWebEnvironment(false);
+		app.run(args);
 	}
 
 }
