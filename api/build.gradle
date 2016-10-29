@@ -1,12 +1,12 @@
 
-description = 'jakduk-api'
+description = 'api'
 
 springBoot {
   executable = true
 }
 
 dependencies {
-  compile project(':jakduk-core')
+  compile project(':core')
 
   compile('org.springframework.boot:spring-boot-starter-security')
   compile('org.springframework.boot:spring-boot-starter-mobile')

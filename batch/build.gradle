@@ -7,10 +7,11 @@ configurations {
 	all*.exclude group:'commons-beanutils', module:'commons-beanutils'
 	//all*.exclude group:'org.elasticsearch', module:'elasticsearch'
 	all*.exclude group:'org.hibernate.javax.persistence'
+	all*.exclude group:'org.apache.tomcat'
 }
 
 dependencies {
-	compile project(':jakduk-core')
+	compile project(':core')
 
 	compile('org.springframework.boot:spring-boot-starter-batch')
 }
