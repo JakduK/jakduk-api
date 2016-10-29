@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by pyohwan on 16. 10. 9.
  */
-public interface BoardFreeCustom {
+public interface BoardFreeRepositoryCustom {
 
     List<BoardFreeSimple> findByUserId(String userId, Integer limit);
 }

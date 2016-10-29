@@ -16,10 +16,10 @@ import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.notification.SlackService;
+import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
-import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
 import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -44,13 +44,16 @@ import java.util.stream.Collectors;
 public class BoardFreeService {
 
 	@Autowired
-	private BoardFreeRepository boardFreeRepository;
+	private BoardFreeRepositoryRepository boardFreeRepository;
 
 	@Autowired
 	private BoardFreeOnListRepository boardFreeOnListRepository;
 
 	@Autowired
 	private BoardFreeCommentRepository boardFreeCommentRepository;
+
+	@Autowired
+	private BoardCategoryRepository boardCategoryRepository;
 
 	@Autowired
 	private GalleryRepository galleryRepository;
@@ -368,7 +371,7 @@ public class BoardFreeService {
      */
 	public List<BoardCategory> getFreeCategories() {
 
-		return boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+		return boardCategoryRepository.findByLanguage(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
 	}
 
 	/**
