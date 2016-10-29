@@ -45,9 +45,6 @@ public class SearchService {
 	@Value("${elasticsearch.index.name}")
 	private String elasticsearchIndexName;
 
-	@Value("${elasticsearch.host.name}")
-	private String elasticsearchHostName;
-
     @Value("${elasticsearch.enable}")
     private boolean elasticsearchEnable;
 
