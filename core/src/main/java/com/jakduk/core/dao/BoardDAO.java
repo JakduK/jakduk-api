@@ -131,9 +131,7 @@ public class BoardDAO {
 				.and("{$limit:#}", CommonConst.BOARD_TOP_LIMIT)
 				.as(BoardFreeOnBest.class);
 
-		List<BoardFreeOnBest> toList = IteratorUtils.toList(iPosts);
-
-		return toList;
+		return IteratorUtils.toList(iPosts);
 	}
 
 	
@@ -205,20 +203,6 @@ public class BoardDAO {
 		query.with(new Sort(direction, "_id"));
 
 		return mongoTemplate.findOne(query, BoardFreeOfMinimum.class);
-	}
-
-	/**
-	 * 해당 언어에 맞는 게시판 말머리 목록을 가져온다.
-	 * @param language 언어
-	 * @return 말머리 배열
-     */
-	public List<BoardCategory> getBoardCategories(String language) {
-
-		Query query = new Query();
-		query.addCriteria(Criteria.where("names.language").is(language));
-		query.fields().include("code").include("names.$");
-
-        return mongoTemplate.find(query, BoardCategory.class);
 	}
 
     /**

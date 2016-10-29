@@ -11,7 +11,6 @@ import java.util.Optional;
  * @date     : 2014. 4. 29.
  * @desc     :
  */
-public interface BoardCategoryRepository extends MongoRepository<BoardCategory, String> {
+public interface BoardCategoryRepository extends MongoRepository<BoardCategory, String>, BoardCategoryCustom {
 	Optional<BoardCategory> findOneByCode(String code);
-
 }

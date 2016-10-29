@@ -17,7 +17,7 @@ import java.util.List;
  */
 
 @Repository
-public class BoardFreeRepositoryImpl implements BoardFreeCustom {
+public class BoardFreeRepositoryRepositoryImpl implements BoardFreeRepositoryCustom {
 
     @Autowired
     private MongoTemplate mongoTemplate;

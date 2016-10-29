@@ -2,7 +2,7 @@ package com.jakduk.api;
 
 import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
-import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AdminTest extends AbstractSpringTest {
 	
 	@Autowired
-	private BoardFreeRepository boardFreeRepository;
+	private BoardFreeRepositoryRepository boardFreeRepository;
 	
 	@Autowired
 	BoardCategoryRepository boardCategoryRepository;

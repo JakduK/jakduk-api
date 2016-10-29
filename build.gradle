@@ -28,13 +28,6 @@ allprojects  {
 
 subprojects {
 
-    // test task에서 spring profile을 위한 설정.
-    test {
-        systemProperties = [
-                'spring.profiles.active':'local'
-        ]
-    }
-
     repositories {
         mavenLocal()
         jcenter()
@@ -73,7 +66,6 @@ subprojects {
         compile 'org.thymeleaf:thymeleaf-spring4:3.0.1.RELEASE'
         compile 'net.coobird:thumbnailator:0.4.8'
 
-        testCompile group: 'org.springframework', name: 'spring-test', version:"${springVersion}"
         testCompile group: 'junit', name: 'junit', version:'4.12'
         testCompile 'org.mockito:mockito-all:1.10.19'
 

@@ -261,7 +261,7 @@ public class BoardRestController {
     @RequestMapping(value = "/categories", method = RequestMethod.GET)
     public FreeCategoriesResponse getFreeCategories() {
 
-        List<BoardCategory> categories = boardDAO.getBoardCategories(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+        List<BoardCategory> categories = boardFreeService.getFreeCategories();
 
         return FreeCategoriesResponse.builder()
                 .categories(categories)
