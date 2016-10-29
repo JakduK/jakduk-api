@@ -51,16 +51,7 @@ public class HomeTest extends AbstractSpringTest {
 	
 	@Autowired
     JakdukDAO jakdukDAO;
-	
-	@Test
-	public void getBoardLatest() {
-		
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
-		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
-		
-		System.out.println("getBoardLatest=" + boardFreeOnHomeRepository.findAll(pageable).getContent());
-	}
-	
+
 	@Test
 	public void getUserLatest() {
 		
