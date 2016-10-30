@@ -42,6 +42,7 @@ subprojects {
         compile('org.springframework.boot:spring-boot-starter-mail')
         compile('org.springframework.boot:spring-boot-starter-data-mongodb')
         compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
+        compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 
         testCompile('org.springframework.boot:spring-boot-starter-test')
 
@@ -60,10 +61,7 @@ subprojects {
         compile group: 'rome', name: 'rome', version:'1.0'
         compile group: 'io.searchbox', name: 'jest', version:'2.0.3'
         compile group: 'net.gpedro.integrations.slack', name: 'slack-webhook', version:'1.1.1'
-        compile group: 'javax.mail', name: 'mail', version:'1.4.7'
         compile 'commons-beanutils:commons-beanutils:1.9.2'
-        compile 'org.thymeleaf:thymeleaf:3.0.1.RELEASE'
-        compile 'org.thymeleaf:thymeleaf-spring4:3.0.1.RELEASE'
         compile 'net.coobird:thumbnailator:0.4.8'
 
         compileOnly 'org.projectlombok:lombok:1.16.10'
