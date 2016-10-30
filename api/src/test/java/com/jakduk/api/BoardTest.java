@@ -3,16 +3,13 @@ package com.jakduk.api;
 import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
-import com.jakduk.core.service.BoardFreeService;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
@@ -54,15 +51,12 @@ public class BoardTest extends AbstractSpringTest {
 	@Autowired
 	private Jongo jongo;
 
-	@Autowired
-	private BoardFreeService boardFreeService;
-
 	/**
 	 * java.lang.IllegalArgumentException: Given DBObject must be a BasicDBObject! Object of class [org.jongo.bson.BsonDBObject] must be an instance of class com.mongodb.BasicDBObject
 	 *
 	 * FIXME 왜 발생하는지 모르겠다. 근데, 얘만 따로 돌려보면 잘 된다.
+	 * 스프링 부트 mongodb 설정을 하면 안된다. MongoConfig로 설정 하면 됨.
 	 */
-	@Ignore
 	@Test
 	public void test01() throws ParseException {
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(11);
@@ -139,8 +133,8 @@ public class BoardTest extends AbstractSpringTest {
 	 * java.lang.IllegalArgumentException: Given DBObject must be a BasicDBObject! Object of class [org.jongo.bson.BsonDBObject] must be an instance of class com.mongodb.BasicDBObject
 	 *
 	 * FIXME 왜 발생하는지 모르겠다. 근데, 얘만 따로 돌려보면 잘 된다.
+	 * 스프링 부트 mongodb 설정을 하면 안된다. MongoConfig로 설정 하면 됨.
 	 */
-	@Ignore
 	@Test
 	public void getNoticeList01() {
 
