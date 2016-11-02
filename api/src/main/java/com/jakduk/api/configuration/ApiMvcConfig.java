@@ -20,6 +20,7 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author pyohwan
@@ -59,10 +60,7 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("lang");
 
-        DeviceResolverHandlerInterceptor deviceResolverHandlerInterceptor = new DeviceResolverHandlerInterceptor();
-
         registry.addInterceptor(localeChangeInterceptor);
-        registry.addInterceptor(deviceResolverHandlerInterceptor);
     }
 
 /*
@@ -80,7 +78,9 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public LocaleResolver localeResolver() {
-        return new SessionLocaleResolver();
+        SessionLocaleResolver resolver = new SessionLocaleResolver();
+        resolver.setDefaultLocale(Locale.KOREA);
+        return resolver;
     }
 
     @Bean
