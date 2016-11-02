@@ -1,4 +1,4 @@
-package com.jakduk.core.notification;
+package com.jakduk.core.common.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class SlackService {
+public class SlackUtil {
 
     @Value("${slack.enabled}")
     private boolean enabled;
