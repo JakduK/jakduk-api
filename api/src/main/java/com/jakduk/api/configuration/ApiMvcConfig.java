@@ -4,21 +4,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
-import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.view.BeanNameViewResolver;
-import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,6 +56,14 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(localeChangeInterceptor);
     }
 
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        converters.add(jsonConverter);
+
+        super.configureMessageConverters(converters);
+    }
+
 /*
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -80,33 +81,6 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
     public LocaleResolver localeResolver() {
         SessionLocaleResolver resolver = new SessionLocaleResolver();
         resolver.setDefaultLocale(Locale.KOREA);
-        return resolver;
-    }
-
-    @Bean
-    public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
-        List<ViewResolver> viewResolvers = new ArrayList<>();
-        List<View> defaultViews = new ArrayList<>();
-
-        BeanNameViewResolver beanNameViewResolver = new BeanNameViewResolver();
-
-        InternalResourceViewResolver internalResourceViewResolver = new InternalResourceViewResolver();
-        internalResourceViewResolver.setPrefix("/WEB-INF/views/");
-        internalResourceViewResolver.setSuffix(".jsp");
-
-        viewResolvers.add(beanNameViewResolver);
-        viewResolvers.add(internalResourceViewResolver);
-
-        MappingJackson2JsonView mappingJackson2JsonView = new MappingJackson2JsonView();
-        mappingJackson2JsonView.setExtractValueFromSingleKeyModel(true);
-
-        defaultViews.add(mappingJackson2JsonView);
-
-        ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();
-        resolver.setViewResolvers(viewResolvers);
-        resolver.setContentNegotiationManager(manager);
-        resolver.setDefaultViews(defaultViews);
-
         return resolver;
     }
 
