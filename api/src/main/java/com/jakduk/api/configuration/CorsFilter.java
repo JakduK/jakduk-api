@@ -12,7 +12,7 @@ import java.io.IOException;
  *         16. 7. 28 오후 11:01
  */
 
-@Component
+//@Component
 public class CorsFilter implements Filter {
 
     @Value("${jwt.token.header}")
