@@ -1,4 +1,4 @@
-package com.jakduk.core.model.web;
+package com.jakduk.core.model.web.board;
 
 import com.jakduk.core.common.CommonConst;
 import lombok.Data;

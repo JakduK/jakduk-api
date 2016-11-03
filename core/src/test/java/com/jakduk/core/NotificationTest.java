@@ -1,7 +1,7 @@
 package com.jakduk.core;
 
 import com.jakduk.core.notification.EmailService;
-import com.jakduk.core.notification.SlackService;
+import com.jakduk.core.common.util.SlackUtil;
 import com.jakduk.core.util.AbstractSpringTest;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import java.util.Locale;
 public class NotificationTest extends AbstractSpringTest {
 
     @Autowired
-    private SlackService slackService;
+    private SlackUtil slackUtil;
 
     @Autowired
     private EmailService emailService;
@@ -24,7 +24,7 @@ public class NotificationTest extends AbstractSpringTest {
     @Ignore
     @Test
     public void 슬랙알림() {
-        slackService.send("test01", "hello");
+        slackUtil.send("test01", "hello");
     }
 
     @Ignore

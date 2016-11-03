@@ -16,6 +16,7 @@ import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeSimple;
+import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
@@ -23,6 +24,7 @@ import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
 import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -412,13 +414,37 @@ public class BoardFreeService {
 		return boardFreeRepository.findByNotice(noticePageable);
 	}
 
+	public BoardFreeDetail getPost(Integer seq, String language, Boolean isViewsIncreasing) {
 
-	public BoardFree getFreePost(Integer seq) {
-
-		return boardFreeRepository.findOneBySeq(seq)
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
-	}
 
+		List<BoardImage> images = boardFree.getGalleries();
+		List<Gallery> galleries = null;
+
+		if (Objects.nonNull(images)) {
+			List<String> ids =  images.stream()
+					.map(BoardImage::getId)
+					.collect(Collectors.toList());
+
+			galleries = galleryRepository.findByIdIn(ids);
+		}
+
+		BoardCategory boardCategory = boardDAO.getBoardCategory(boardFree.getCategory().name(), language);
+
+		BoardFreeDetail post = new BoardFreeDetail();
+		BeanUtils.copyProperties(boardFree, post);
+		post.setCategory(boardCategory);
+		post.setGalleries(galleries);
+
+		if (isViewsIncreasing) {
+			int views = boardFree.getViews();
+			boardFree.setViews(++views);
+			boardFreeRepository.save(boardFree);
+		}
+
+		return post;
+	}
 
 	// 글 감정 표현.
 	public BoardFree setFreeFeelings(Integer seq, CommonConst.FEELING_TYPE feeling) {

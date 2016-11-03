@@ -7,7 +7,7 @@ import com.jakduk.core.model.embedded.JakduScheduleScore;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
 import com.jakduk.core.model.web.AttendanceClubWrite;
-import com.jakduk.core.model.web.BoardCategoryWrite;
+import com.jakduk.core.model.web.board.BoardCategoryWrite;
 import com.jakduk.core.model.web.CompetitionWrite;
 import com.jakduk.core.model.web.ThumbnailSizeWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
