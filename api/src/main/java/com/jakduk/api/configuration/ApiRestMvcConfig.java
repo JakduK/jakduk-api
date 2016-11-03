@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  */
 
 //@EnableWebMvc
-@Configuration
+//@Configuration
 public class ApiRestMvcConfig extends RepositoryRestMvcConfiguration {
 
     @Override

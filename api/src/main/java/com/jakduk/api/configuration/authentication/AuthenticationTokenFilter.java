@@ -76,6 +76,7 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
             }
 
             chain.doFilter(request, response);
+
         } catch (ServiceException e) {
             httpResponse.setContentType("application/json");
             httpResponse.setStatus(e.getServiceError().getHttpStatus());
