@@ -1,4 +1,4 @@
-package com.jakduk.core.model.web;
+package com.jakduk.core.model.web.board;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;

@@ -26,7 +26,7 @@ public class ApiUtils {
      * @param id 쿠키 이름에 쓰일 고유 ID
      * @return 쿠키를 새로 저장했다면 true, 아니면 false.
      */
-    public static boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, ApiConst.VIEWS_COOKIE_TYPE prefix, String id) {
+    public static Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, ApiConst.VIEWS_COOKIE_TYPE prefix, String id) {
 
         String cookieName = prefix + "_" + id;
         Cookie[] cookies = request.getCookies();

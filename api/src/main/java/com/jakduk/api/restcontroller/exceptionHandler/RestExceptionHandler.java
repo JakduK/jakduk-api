@@ -127,11 +127,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
-    @ExceptionHandler({RuntimeException.class, Exception.class})
+    @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public RestError runtimeException(RuntimeException e) {
-        return new RestError(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getMessage());
+        return new RestError(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getLocalizedMessage());
     }
 }
 

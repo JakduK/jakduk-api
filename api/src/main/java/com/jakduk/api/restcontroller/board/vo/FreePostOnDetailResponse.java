@@ -2,6 +2,7 @@ package com.jakduk.api.restcontroller.board.vo;
 
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeSimple;
+import com.jakduk.core.model.web.board.BoardFreeDetail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ import java.util.List;
 public class FreePostOnDetailResponse {
 
     @ApiModelProperty(value = "글 상세")
-    private FreePostOnDetail post;
+    private BoardFreeDetail post;
 
     @ApiModelProperty(value = "앞 글")
     private BoardFreeOfMinimum prevPost;

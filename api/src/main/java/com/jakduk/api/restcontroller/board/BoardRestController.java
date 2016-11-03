@@ -12,8 +12,6 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
@@ -22,17 +20,17 @@ import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.core.model.simple.BoardFreeSimple;
+import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
 import com.jakduk.core.service.CommonService;
-import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
@@ -65,9 +63,6 @@ public class BoardRestController {
 
     @Autowired
     private CommonService commonService;
-
-    @Autowired
-    private GalleryService galleryService;
 
     @Autowired
     private BoardDAO boardDAO;
@@ -208,49 +203,31 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 상세", response = FreePostOnDetailResponse.class)
+    @ApiOperation(value = "자유게시판 글 상세")
     @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
     public FreePostOnDetailResponse getFreeView(@PathVariable Integer seq,
                                                 Locale locale,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
 
-        BoardFree boardFree = boardFreeService.getFreePost(seq);
+        Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
-        boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
+        BoardFreeDetail boardFreeDetail = boardFreeService.getPost(seq, commonService.getLanguageCode(locale, null), isAddCookie);
 
-        if (isAddCookie) {
-            int views = boardFree.getViews();
-            boardFree.setViews(++views);
-            boardFreeService.saveBoardFree(boardFree);
-        }
+        CommonConst.BOARD_CATEGORY_TYPE categoryType = CommonConst.BOARD_CATEGORY_TYPE.valueOf(boardFreeDetail.getCategory().getCode());
 
-        List<BoardImage> images = boardFree.getGalleries();
-        List<Gallery> galleries = null;
+        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFreeDetail.getId())
+                , categoryType, Sort.Direction.ASC);
+        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFreeDetail.getId())
+                , categoryType, Sort.Direction.DESC);
 
-        if (Objects.nonNull(images)) {
-            List<String> ids = new ArrayList<>();
+        List<BoardFreeSimple> latestPostsByWriter = null;
 
-            images.forEach(gallery -> ids.add(gallery.getId()));
-            galleries = galleryService.findByIds(ids);
-        }
-
-        BoardCategory boardCategory = boardDAO.getBoardCategory(boardFree.getCategory().name(), commonService.getLanguageCode(locale, null));
-
-        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
-                , boardFree.getCategory(), Sort.Direction.ASC);
-        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFree.getId())
-                , boardFree.getCategory(), Sort.Direction.DESC);
-
-        List<BoardFreeSimple> latestPostsByWriter = boardFreeService.findByUserId(boardFree.getWriter().getUserId(), 3);
-
-        FreePostOnDetail post = new FreePostOnDetail();
-        BeanUtils.copyProperties(boardFree, post);
-        post.setCategory(boardCategory);
-        post.setGalleries(galleries);
+        if (BooleanUtils.isFalse(boardFreeDetail.getStatus().getDelete()))
+            latestPostsByWriter = boardFreeService.findByUserId(boardFreeDetail.getWriter().getUserId(), 3);
 
         return FreePostOnDetailResponse.builder()
-                .post(post)
+                .post(boardFreeDetail)
                 .prevPost(prevPost)
                 .nextPost(nextPost)
                 .latestPostsByWriter(latestPostsByWriter)
