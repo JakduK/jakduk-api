@@ -1,6 +1,7 @@
 package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.model.simple.BoardFreeSimple;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -9,5 +10,5 @@ import java.util.List;
  */
 public interface BoardFreeRepositoryCustom {
 
-    List<BoardFreeSimple> findByUserId(String userId, Integer limit);
+    List<BoardFreeSimple> findByIdAndUserId(ObjectId id, String userId, Integer limit);
 }

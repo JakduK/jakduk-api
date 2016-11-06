@@ -29,7 +29,7 @@ public class CoreRootConfig {
 
     @Bean
     public SlackApi slackApi() {
-        return new SlackApi(environment.getProperty("slack.board.webhook"));
+        return new SlackApi(environment.getProperty("core.slack.board.webhook"));
     }
 
     @Bean

@@ -80,12 +80,8 @@ public class BoardFreeService {
 		return boardFreeCommentRepository.countByBoardItem(boardItem);
 	}
 
-	public void saveBoardFree(BoardFree boardFree) {
-		boardFreeRepository.save(boardFree);
-	}
-
-	public List<BoardFreeSimple> findByUserId(String userId, Integer limit) {
-		return boardFreeRepository.findByUserId(userId, limit);
+	public List<BoardFreeSimple> findByUserId(String id, String userId, Integer limit) {
+		return boardFreeRepository.findByIdAndUserId(new ObjectId(id), userId, limit);
 	}
 
     /**

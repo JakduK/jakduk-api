@@ -18,10 +18,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SlackUtil {
 
-    @Value("${slack.enabled}")
+    @Value("${core.slack.board.enabled}")
     private boolean enabled;
 
-    @Value("${slack.board.channel}")
+    @Value("${core.slack.board.channel}")
     private String channel;
 
     @Autowired
