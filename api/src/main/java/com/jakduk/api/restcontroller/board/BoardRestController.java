@@ -224,7 +224,7 @@ public class BoardRestController {
         List<BoardFreeSimple> latestPostsByWriter = null;
 
         if (BooleanUtils.isNotTrue(boardFreeDetail.getStatus().getDelete()))
-            latestPostsByWriter = boardFreeService.findByUserId(boardFreeDetail.getWriter().getUserId(), 3);
+            latestPostsByWriter = boardFreeService.findByUserId(boardFreeDetail.getId(), boardFreeDetail.getWriter().getUserId(), 3);
 
         return FreePostOnDetailResponse.builder()
                 .post(boardFreeDetail)

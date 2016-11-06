@@ -1,6 +1,7 @@
 package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.model.simple.BoardFreeSimple;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -23,11 +24,12 @@ public class BoardFreeRepositoryRepositoryImpl implements BoardFreeRepositoryCus
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<BoardFreeSimple> findByUserId(String userId, Integer limit) {
+    public List<BoardFreeSimple> findByIdAndUserId(ObjectId id, String userId, Integer limit) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("writer.userId").is(userId));
+        AggregationOperation match2 = Aggregation.match(Criteria.where("_id").ne(id));
         AggregationOperation sort1 = Aggregation.sort(Sort.Direction.DESC, "_id");
         AggregationOperation limit1 = Aggregation.limit(limit);
-        Aggregation aggregation = Aggregation.newAggregation(match1, sort1, limit1);
+        Aggregation aggregation = Aggregation.newAggregation(match1, match2, sort1, limit1);
         AggregationResults<BoardFreeSimple> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeSimple.class);
 
         return results.getMappedResults();

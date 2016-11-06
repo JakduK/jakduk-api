@@ -15,18 +15,18 @@ import org.springframework.stereotype.Component;
 @Getter
 public class LogConfig {
 
-    @Value("${slack.enabled}")
+    @Value("${api.slack.log.enabled}")
     private Boolean enabled;
 
-    @Value("${slack.log.level}")
+    @Value("${api.slack.log.level}")
     private Level level;
 
-    @Value("${slack.log.webhook}")
+    @Value("${api.slack.log.webhook}")
     private String webhook;
 
-    @Value("${slack.log.channel}")
+    @Value("${api.slack.log.channel}")
     private String channel;
 
-    @Value("${slack.log.username}")
+    @Value("${api.slack.log.username}")
     private String username;
 }

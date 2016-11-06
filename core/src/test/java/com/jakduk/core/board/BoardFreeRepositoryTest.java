@@ -7,10 +7,10 @@ import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
 import com.jakduk.core.repository.user.UserRepository;
 import com.jakduk.core.util.AbstractSpringTest;
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
@@ -37,11 +37,11 @@ public class BoardFreeRepositoryTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findByEmail() {
+    public void findByIdAndUserId() {
 
         User user = userRepository.findByEmail("test05@test.com");
 
-        List<BoardFreeSimple> boardFrees = sut.findByUserId(user.getId(), 3);
+        List<BoardFreeSimple> boardFrees = sut.findByIdAndUserId(new ObjectId("54c4df933d96600d7f55a04b"), user.getId(), 3);
 
         Assert.assertTrue(boardFrees.size() > 0);
     }
