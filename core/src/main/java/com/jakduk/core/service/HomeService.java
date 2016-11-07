@@ -53,28 +53,6 @@ public class HomeService {
 	@Autowired
 	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
 
-	public Model getHome(Model model, Locale locale) {
-		
-		try {
-			//List<GalleryOnList> galleries = jakdukDAO.findGalleriesById(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
-			
-			LocalDate date = LocalDate.now();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			DateTimeFormatter format = DateTimeFormatter.ISO_DATE;
-			
-			Long timeNow = sdf.parse(date.format(format)).getTime();
-
-			//model.addAttribute("galleries", galleries);
-			model.addAttribute("timeNow", timeNow);
-			model.addAttribute("dateTimeFormat", commonService.getDateTimeFormat(locale));
-		}  catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		} 
-		
-		return model;
-	}
-	
 	public Encyclopedia getEncyclopedia(String language) {
 		
 		Integer count = encyclopediaRepository.countByLanguage(language);

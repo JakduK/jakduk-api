@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ExistUsernameCompatibilityValidator.class)
 public @interface ExistUsernameCompatibility {
 
-    String message() default FormValidationErrorCode.USERNAME_EXISTS;
+    String message() default "{validation.msg.username.exists}";
 
     Class<?>[] groups() default {};
 

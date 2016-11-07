@@ -14,10 +14,10 @@ import java.util.Optional;
 public interface UserRepository extends MongoRepository<User, String> {
 	
 	Optional<User> findOneById(String id);
+	Optional<User> findOneByEmail(String email);
 	User findByUsername(String username);
 	User findOneByUsername(String username);
 	User findByEmail(String email);
-	User findOneByEmail(String email);
 
 	UserOnAuthentication findOneByEmailAndProviderId(String email, CommonConst.ACCOUNT_TYPE providerId);
 	

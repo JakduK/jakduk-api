@@ -18,11 +18,12 @@ import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -36,7 +37,6 @@ import java.util.Objects;
  * 16. 4. 5 오전 12:17
  */
 
-@Slf4j
 @Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
@@ -70,8 +70,7 @@ public class UserRestController {
 
         try {
             emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
-        } catch (MessagingException e) {
-            e.printStackTrace();
+        } catch (MessagingException ignored) {
         }
 
         userService.signInJakdukUser(user);
@@ -169,17 +168,19 @@ public class UserRestController {
         return false;
     }
 
-    @ApiOperation(value = "이메일 중복 검사", produces = "application/json")
+    @ApiOperation(value = "이메일 중복 검사")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public Boolean existEmail(@RequestParam String email) {
+    public EmptyJsonResponse existEmail(@NotEmpty @RequestParam("eamil") String email) {
 
         if (Objects.isNull(email))
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
-        return userService.existEmail(email.trim());
+        userService.existEmail(email);
+
+        return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "별명 중복 검사", produces = "application/json")
+    @ApiOperation(value = "별명 중복 검사")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
     public Boolean existUsername(@RequestParam String username) {
 
@@ -262,7 +263,7 @@ public class UserRestController {
 
         userService.save(user);
 
-        log.debug("user updated. user=" + user);
+        //log.debug("user updated. user=" + user);
 
         if (commonService.isJakdukUser()) {
             userService.signInJakdukUser(user);

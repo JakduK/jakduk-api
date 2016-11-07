@@ -13,6 +13,7 @@ import com.jakduk.core.model.web.jakdu.MyJakduRequest;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.JakduService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  * 16. 3. 4 오후 11:27
  */
 
-@Slf4j
+@Api(tags = "Jakduk", description = "작두 API")
 @RestController
 @RequestMapping("/api/jakdu")
 public class JakduRestController {
@@ -50,16 +51,6 @@ public class JakduRestController {
 
     @Autowired
     private FootballService footballService;
-
-    // /jakdu/write에서 쓰이는데 안쓸것 같다.
-    @RequestMapping(value = "/data", method = RequestMethod.GET)
-    public Map data(HttpServletRequest request) {
-
-        Locale locale = localeResolver.resolveLocale(request);
-        Map<String, Object> result = jakduService.getDataWrite(locale);
-
-        return result;
-    }
 
     // 작두 일정 목록
     @RequestMapping(value = "/schedule", method = RequestMethod.GET)

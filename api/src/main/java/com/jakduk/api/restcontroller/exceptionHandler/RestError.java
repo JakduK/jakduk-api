@@ -2,31 +2,26 @@ package com.jakduk.api.restcontroller.exceptionHandler;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceError;
-import lombok.Data;
-import org.springframework.context.i18n.LocaleContextHolder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 /**
  * @author pyohwan
  * 16. 3. 5 오전 12:31
  */
 
-@Data
-@JsonTypeName(value = "error")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.WRAPPER_OBJECT)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@AllArgsConstructor
+@Getter
 public class RestError {
 
     private String code;
     private String message;
-    private List<String> fields;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Map<String, String> fields;
 
     public RestError(String code, String message) {
         this.code = code;
@@ -38,7 +33,7 @@ public class RestError {
         this.message = serviceError.getMessage();
     }
 
-    public RestError(ServiceError serviceError, List<String> fields) {
+    public RestError(ServiceError serviceError, Map<String, String> fields) {
         this.code = serviceError.getCode();
         this.message = serviceError.getMessage();
         this.fields = fields;

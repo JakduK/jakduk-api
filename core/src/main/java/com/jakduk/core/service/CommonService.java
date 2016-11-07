@@ -2,7 +2,6 @@ package com.jakduk.core.service;
 
 import com.jakduk.core.authentication.common.JakdukUserDetail;
 import com.jakduk.core.authentication.common.SocialUserDetail;
-import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.model.db.Sequence;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.model.etc.AuthUserProfile;
@@ -21,13 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -97,46 +90,6 @@ public class CommonService {
 		return getLanguage;
 	}
 	
-	public Map<String, String> getDateTimeFormat(Locale locale) {
-		
-		HashMap<String, String> dateTimeFormat = new HashMap<String, String>();
-		
-		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, locale);
-		SimpleDateFormat sf = (SimpleDateFormat) df;
-		
-		dateTimeFormat.put("dateTime", sf.toPattern());
-		
-		df = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-		sf = (SimpleDateFormat) df;
-		
-		dateTimeFormat.put("date", sf.toPattern());
-		
-		df = DateFormat.getTimeInstance(DateFormat.SHORT, locale);
-		sf = (SimpleDateFormat) df;
-		
-		dateTimeFormat.put("time", sf.toPattern());
-		
-		return dateTimeFormat;
-	}
-
-	public void setCookie(HttpServletResponse response, String name, String value, String path) {
-		try {
-			Cookie cookie = new Cookie(name, URLEncoder.encode(value, "UTF-8"));
-			cookie.setMaxAge(CommonConst.COOKIE_EMAIL_MAX_AGE); // a day
-			cookie.setPath(path);
-			response.addCookie(cookie);
-		} catch (UnsupportedEncodingException e) {
-			log.error(e.getMessage());
-		}
-	}
-	
-	public void releaseCookie(HttpServletResponse response, String name, String path) {
-		Cookie cookie = new Cookie(name, null);
-		cookie.setMaxAge(0); // remove
-		cookie.setPath(path);
-		response.addCookie(cookie);		
-	}
-
 	// 손님인지 검사.
 	public Boolean isAnonymousUser() {
 		Boolean result = false;

@@ -66,61 +66,6 @@ public class JakduService {
         return jakduScheduleRepository.findAll(pageable);
     }
 
-    public Map getDataWrite(Locale locale) {
-
-        Map<String, Object> result = new HashMap<>();
-
-        CommonPrincipal principal = userService.getCommonPrincipal();
-        String accountId = principal.getId();
-        String accountUsername = principal.getUsername();
-        CommonConst.ACCOUNT_TYPE accountType = principal.getProviderId();
-
-        if (accountId == null)
-            return result;
-
-        CommonWriter writer = new CommonWriter(accountId, accountUsername, accountType);
-
-        String language = commonService.getLanguageCode(locale, null);
-
-        Set<ObjectId> fcIds = new HashSet<>();
-        List<Jakdu> jakdus = new ArrayList<>();
-        Set<ObjectId> competitionIds = new HashSet<>();
-        List<JakduSchedule> schedules = jakduScheduleRepository.findByTimeUpOrderByDateAsc(false);
-
-        for (JakduSchedule jakduSchedule : schedules) {
-            Jakdu jakdu = new Jakdu();
-            jakdu.setSchedule(jakduSchedule);
-            jakdu.setWriter(writer);
-            jakdus.add(jakdu);
-
-            fcIds.add(new ObjectId(jakduSchedule.getHome().getId()));
-            fcIds.add(new ObjectId(jakduSchedule.getAway().getId()));
-            if (jakduSchedule.getCompetition() != null)
-                competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
-        }
-
-        Map<String, LocalName> fcNames = new HashMap<>();
-        Map<String, LocalName> competitionNames = new HashMap<>();
-
-        List<FootballClub> footballClubs = jakdukDAO.getFootballClubs(new ArrayList<>(fcIds), language, CommonConst.NAME_TYPE.fullName);
-        List<Competition> competitions = jakdukDAO.getCompetitions(new ArrayList<>(competitionIds), language);
-
-        for (FootballClub fc : footballClubs) {
-            fcNames.put(fc.getOrigin().getId(), fc.getNames().get(0));
-        }
-
-        for (Competition competition : competitions) {
-            competitionNames.put(competition.getId(), competition.getNames().get(0));
-        }
-
-        result.put("dateTimeFormat", commonService.getDateTimeFormat(locale));
-        result.put("jakdus", jakdus);
-        result.put("fcNames", fcNames);
-        result.put("competitionNames", competitionNames);
-
-        return result;
-    }
-
     // 작두 타기 입력
     public Jakdu setMyJakdu(Locale locale, MyJakduRequest myJakdu) {
         CommonPrincipal principal = userService.getCommonPrincipal();

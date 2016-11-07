@@ -17,7 +17,6 @@ import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
  * 16. 3. 20 오후 11:17
  */
 
-@Slf4j
 @Api(tags = "Gallery", description = "사진첩 API")
 @RequestMapping("/api")
 @RestController

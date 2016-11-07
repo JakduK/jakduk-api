@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * 16. 3. 20 오후 9:13
  */
 
-@Api(tags = "홈", description = "홈 관련")
+@Api(tags = "Home", description = "홈 API")
 @RestController
 @RequestMapping("/api")
 public class HomeRestController {

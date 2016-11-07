@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ExistUsernameValidator.class)
 public @interface ExistUsername {
 
-    String message() default "username_Exists";
+    String message() default "{validation.msg.username.exists}";
 
     Class<?>[] groups() default {};
 

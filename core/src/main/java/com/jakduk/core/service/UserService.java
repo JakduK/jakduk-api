@@ -158,17 +158,9 @@ public class UserService {
 		return returnUser;
 	}
 
-	public Boolean existEmail(String email) {
-		Boolean result;
-
-		if (commonService.isAnonymousUser()) {
-			User user = userRepository.findOneByEmail(email);
-			result = Objects.nonNull(user);
-		} else {
-			throw new UnauthorizedAccessException(commonService.getResourceBundleMessage("messages.exception", "exception.already.you.are.user"));
-		}
-		
-		return result;
+	public void existEmail(String email) {
+		userRepository.findOneByEmail(email)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 	
 	public Boolean existUsernameOnWrite(String username) {

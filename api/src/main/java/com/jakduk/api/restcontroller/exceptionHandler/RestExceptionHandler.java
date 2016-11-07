@@ -23,7 +23,9 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -48,13 +50,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<ObjectError> globalErrors = result.getGlobalErrors();
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        List<String> fields = globalErrors.stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
+        Map<String, String> fields = new HashMap<>();
 
-        fields.addAll(fieldErrors.stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList()));
+        globalErrors.forEach(
+                error -> fields.put(error.getObjectName() + "_" + error.getCode(), error.getDefaultMessage())
+        );
+
+        fieldErrors.forEach(
+                error -> fields.put(error.getField() + "_" + error.getCode(), error.getDefaultMessage())
+        );
 
         RestError restError = new RestError(serviceError, fields);
 
@@ -83,8 +87,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        RestError restError = new RestError(serviceError.getCode(),
-                String.format(ex.getMessage(), ex.getParameterType(), ex.getParameterName()));
+        RestError restError = new RestError(serviceError.getCode(), ex.getLocalizedMessage());
 
         return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
@@ -134,5 +137,3 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new RestError(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getLocalizedMessage());
     }
 }
-
-
