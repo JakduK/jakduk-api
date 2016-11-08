@@ -1,8 +1,7 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.core.common.constraints.ExistEmailOnEdit;
-import com.jakduk.core.common.constraints.ExistUsernameOnEdit;
-import com.jakduk.core.exception.FormValidationErrorCode;
+import com.jakduk.api.common.constraints.ExistEmailOnEdit;
+import com.jakduk.api.common.constraints.ExistUsernameOnEdit;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,15 +22,15 @@ import javax.validation.constraints.Size;
 public class UserProfileOnEditForm {
 
 	@ApiModelProperty(required = true, example = "example@jakduk.com")
-	@NotEmpty(message = FormValidationErrorCode.EMAIL_NOT_EMPTY)
-	@Size(min = 6, max=30, message = FormValidationErrorCode.EMAIL_SIZE)
-	@Email(message = FormValidationErrorCode.EMAIL_NOT_FORMAT)
+	@NotEmpty
+	@Size(min = 6, max=30)
+	@Email
 	@ExistEmailOnEdit
 	private String email;
 
 	@ApiModelProperty(required = true, example = "JakdukUser")
-	@NotEmpty(message = FormValidationErrorCode.USERNAME_NOT_EMPTY)
-	@Size(min = 2, max=20, message = FormValidationErrorCode.USERNAME_SIZE)
+	@NotEmpty
+	@Size(min = 2, max=20)
 	@ExistUsernameOnEdit
 	private String username;
 

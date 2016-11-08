@@ -1,9 +1,8 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.core.common.constraints.ExistEmail;
-import com.jakduk.core.common.constraints.ExistUsername;
-import com.jakduk.core.common.constraints.FieldMatch;
-import com.jakduk.core.exception.FormValidationErrorCode;
+import com.jakduk.api.common.constraints.ExistEmail;
+import com.jakduk.api.common.constraints.ExistUsername;
+import com.jakduk.api.common.constraints.FieldMatch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -19,7 +18,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 @ApiModel(description = "이메일 기반 회원 가입 폼")
-@FieldMatch(first = "password", second = "passwordConfirm", message = FormValidationErrorCode.PASSWORD_MISMATCH)
+@FieldMatch(first = "password", second = "passwordConfirm", message = "{validation.msg.password.mismatch}")
 public class UserForm {
 
     @ApiModelProperty(required = true, example = "example@jakduk.com")

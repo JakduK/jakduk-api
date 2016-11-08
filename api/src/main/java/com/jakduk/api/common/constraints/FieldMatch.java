@@ -1,4 +1,4 @@
-package com.jakduk.core.common.constraints;
+package com.jakduk.api.common.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface FieldMatch {
 
-    String message() default "Field mismatch.";
+    String message() default "{validation.msg.field.mismatch}";
 
     Class<?>[] groups() default {};
 

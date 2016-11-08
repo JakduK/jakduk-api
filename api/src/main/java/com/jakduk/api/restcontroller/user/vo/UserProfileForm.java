@@ -1,8 +1,7 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.core.common.constraints.ExistEmailCompatibility;
-import com.jakduk.core.common.constraints.ExistUsernameCompatibility;
-import com.jakduk.core.exception.FormValidationErrorCode;
+import com.jakduk.api.common.constraints.ExistEmailCompatibility;
+import com.jakduk.api.common.constraints.ExistUsernameCompatibility;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

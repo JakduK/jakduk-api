@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletResponse;
 
+import com.jakduk.core.common.util.CoreUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -102,7 +103,7 @@ public class StatsService {
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findByName(clubOrigin);
 
 		if (Objects.isNull(footballClubOrigin))
-			throw new NoSuchElementException(commonService.getResourceBundleMessage(locale, "messages.jakdu", "stats.msg.not.found.football.origin.exception"));
+			throw new NoSuchElementException(CoreUtils.getResourceBundleMessage("messages.exception", "stats.msg.not.found.football.origin.exception"));
 
 		AttendanceClubResponse response = new AttendanceClubResponse();
 

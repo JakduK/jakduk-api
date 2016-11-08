@@ -1,6 +1,4 @@
-package com.jakduk.core.common.constraints;
-
-import com.jakduk.core.exception.FormValidationErrorCode;
+package com.jakduk.api.common.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

@@ -1,4 +1,4 @@
-package com.jakduk.core.common.constraints;
+package com.jakduk.api.common.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -8,16 +8,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 회원 프로필 편집 시 이메일 중복 검사
+ *
  * @author pyohwan
- * 16. 7. 3 오후 9:41
+ * 16. 7. 3 오후 9:30
  */
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PasswordMatchValidator.class)
-public @interface PasswordMatch {
+@Constraint(validatedBy = ExistEmailOnEditValidator.class)
+public @interface ExistEmailOnEdit {
 
-    String message() default "password_mismatch";
+    String message() default "{validation.msg.email.exists}";
 
     Class<?>[] groups() default {};
 

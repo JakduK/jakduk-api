@@ -1,4 +1,4 @@
-package com.jakduk.core.common.constraints;
+package com.jakduk.api.common.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ExistEmailValidator.class)
 public @interface ExistEmail {
 
-    String message() default "email_Exists";
+    String message() default "{validation.msg.email.exists}";
 
     Class<?>[] groups() default {};
 

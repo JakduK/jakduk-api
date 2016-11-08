@@ -11,6 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 @SpringBootApplication
 @PropertySource("classpath:/application-core.properties")
 public class CoreApplication {
+
     public static void main(String[] args) {
         new SpringApplicationBuilder(CoreApplication.class)
                 .web(false)

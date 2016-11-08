@@ -1,6 +1,7 @@
-package com.jakduk.core.common.constraints;
+package com.jakduk.api.common.constraints;
 
-import com.jakduk.core.authentication.common.CommonPrincipal;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmailOnEdit,
         if (Objects.isNull(value))
             return false;
 
-        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
         UserProfile existEmail = userService.findByNEIdAndEmail(commonPrincipal.getId(), value.trim());
 

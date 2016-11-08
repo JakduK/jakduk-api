@@ -1,4 +1,4 @@
-package com.jakduk.core.authentication.common;
+package com.jakduk.api.configuration.authentication.user;
 
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.model.db.User;

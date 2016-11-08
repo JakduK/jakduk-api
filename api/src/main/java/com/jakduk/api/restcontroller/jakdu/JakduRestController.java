@@ -1,27 +1,30 @@
 package com.jakduk.api.restcontroller.jakdu;
 
 import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.vo.JakduScheduleResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.UnauthorizedAccessException;
 import com.jakduk.core.model.db.*;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.web.jakdu.JakduCommentWriteRequest;
 import com.jakduk.core.model.web.jakdu.JakduCommentsResponse;
 import com.jakduk.core.model.web.jakdu.MyJakduRequest;
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.JakduService;
 import io.swagger.annotations.Api;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -47,9 +50,6 @@ public class JakduRestController {
     private JakduService jakduService;
 
     @Autowired
-    private CommonService commonService;
-
-    @Autowired
     private FootballService footballService;
 
     // 작두 일정 목록
@@ -59,7 +59,7 @@ public class JakduRestController {
                                               HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        String language = commonService.getLanguageCode(locale, null);
+        String language = CoreUtils.getLanguageCode(locale, null);
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
         Pageable pageable = new PageRequest(page - 1, size, sort);
@@ -105,8 +105,10 @@ public class JakduRestController {
         JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
         result.put("jakduSchedule", jakduSchedule);
 
-        if (commonService.isUser() == true) {
-            result.put("myJakdu", jakduService.getMyJakdu(locale, id));
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+
+        if (UserUtils.isUser()) {
+            result.put("myJakdu", jakduService.getMyJakdu(principal.getId(), id));
         }
 
         return result;
@@ -118,14 +120,17 @@ public class JakduRestController {
 
         Locale locale = localeResolver.resolveLocale(request);
 
-        if (commonService.isUser() == false)
-            throw new UnauthorizedAccessException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.access.denied"));
+        if (!UserUtils.isUser())
+            throw new UnauthorizedAccessException(CoreUtils.getExceptionMessage("exception.access.denied"));
 
         if (Objects.isNull(myJakdu)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
+            throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
         }
 
-        Jakdu jakdu = jakduService.setMyJakdu(locale, myJakdu);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        Jakdu jakdu = jakduService.setMyJakdu(writer, myJakdu);
 
         return jakdu;
     }
@@ -133,18 +138,20 @@ public class JakduRestController {
     // 작두 댓글 달기
     @RequestMapping(value ="/schedule/comment", method = RequestMethod.POST)
     public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest,
-                                     HttpServletRequest request) {
+                                     Device device) {
 
-        Locale locale = localeResolver.resolveLocale(request);
+        if (Objects.isNull(jakduCommentWriteRequest))
+            throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
 
-        if (Objects.isNull(jakduCommentWriteRequest)) {
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
-        }
+        if (! UserUtils.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        Device device = DeviceUtils.getCurrentDevice(request);
         jakduCommentWriteRequest.setDevice(ApiUtils.getDeviceInfo(device));
 
-        JakduComment jakduComment = jakduService.setComment(locale, jakduCommentWriteRequest);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        JakduComment jakduComment = jakduService.setComment(writer, jakduCommentWriteRequest);
 
         return jakduComment;
     }
@@ -162,12 +169,15 @@ public class JakduRestController {
     // 작두 댓글 좋아요 싫어요
     @RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
-                                                 @PathVariable CommonConst.FEELING_TYPE feeling,
-                                                 HttpServletRequest request) {
+                                                 @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        Locale locale = localeResolver.resolveLocale(request);
+        if (! UserUtils.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        JakduComment jakduComment = jakduService.setJakduCommentFeeling(locale, commentId, feeling);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        JakduComment jakduComment = jakduService.setJakduCommentFeeling(writer, commentId, feeling);
 
         Integer numberOfLike = Objects.nonNull(jakduComment.getUsersLiking()) ? jakduComment.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;

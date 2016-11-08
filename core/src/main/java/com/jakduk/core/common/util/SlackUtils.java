@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class SlackUtil {
+public class SlackUtils {
 
     @Value("${core.slack.board.enabled}")
     private boolean enabled;

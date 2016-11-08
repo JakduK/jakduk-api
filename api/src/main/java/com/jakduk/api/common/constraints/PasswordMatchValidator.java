@@ -1,8 +1,8 @@
-package com.jakduk.core.common.constraints;
+package com.jakduk.api.common.constraints;
 
-import com.jakduk.core.authentication.common.CommonPrincipal;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
@@ -23,9 +23,6 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private CommonService commonService;
-
     @Override
     public void initialize(PasswordMatch constraintAnnotation) {
 
@@ -37,9 +34,9 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
         if (Objects.isNull(value))
             return false;
 
-        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
-        if (! commonService.isJakdukUser())
+        if (! UserUtils.isJakdukUser())
             return true;
 
         UserOnPasswordUpdate user = userService.findUserOnPasswordUpdateById(commonPrincipal.getId());

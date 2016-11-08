@@ -1,7 +1,7 @@
 package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.vo.AttemptSocialUser;
-import com.jakduk.core.authentication.common.CommonPrincipal;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;

@@ -1,18 +1,19 @@
-package com.jakduk.api.restcontroller.exceptionHandler;
+package com.jakduk.api.restcontroller.exception;
 
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.SuccessButNoContentException;
 import com.jakduk.core.exception.UserFeelingException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -23,9 +24,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +57,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, String> fields = new HashMap<>();
 
         globalErrors.forEach(
-                error -> fields.put(error.getObjectName() + "_" + error.getCode(), error.getDefaultMessage())
+                error -> fields.put("global_" + error.getCode(), error.getDefaultMessage())
         );
 
         fieldErrors.forEach(
@@ -104,6 +108,29 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 String.format(ex.getMessage(), ex.getRequestPartName()));
 
         return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
+    }
+
+    /**
+     * @RequestParam 에서 필드 검증 실패
+     */
+    @ExceptionHandler(value = { ConstraintViolationException.class })
+    public ResponseEntity<Object> constrainViolationException(ConstraintViolationException e) {
+
+        Map<String, String> fields = new HashMap<>();
+        Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+
+        violations.forEach(violation -> {
+            String field = violation.getPropertyPath().toString();
+            String message = violation.getMessage();
+            fields.put(field, message);
+        });
+
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
+
+        RestError restError = new RestError(serviceError, fields);
+
+        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceError.getHttpStatus()));
+
     }
 
     // 에러는 아니지만 데이터가 없음.

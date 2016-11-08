@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.board.vo;
 
 import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.exception.FormValidationErrorCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -20,13 +19,13 @@ import java.util.List;
 public class FreePostForm {
 
     @ApiModelProperty(required = true, value = "글 제목")
-    @Size(min = 3, max=60, message = FormValidationErrorCode.SUBJECT_SIZE)
-    @NotEmpty(message = FormValidationErrorCode.SUBJECT_NOT_EMPTY)
+    @Size(min = 3, max=60)
+    @NotEmpty
     private String subject;
 
     @ApiModelProperty(required = true, value = "글 내용")
-    @Size(min = 5, message = FormValidationErrorCode.CONTENT_SIZE)
-    @NotEmpty(message = FormValidationErrorCode.CONTENT_NOT_EMPTY)
+    @Size(min = 5)
+    @NotEmpty
     private String content;
 
     @ApiModelProperty(required = true, value = "말머리 코드", example = "FREE")

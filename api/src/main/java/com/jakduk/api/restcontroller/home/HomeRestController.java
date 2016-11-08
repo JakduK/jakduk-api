@@ -2,6 +2,7 @@ package com.jakduk.api.restcontroller.home;
 
 import com.jakduk.api.restcontroller.home.vo.GalleryOnHome;
 import com.jakduk.api.restcontroller.home.vo.HomeResponse;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Encyclopedia;
@@ -60,7 +61,7 @@ public class HomeRestController {
                                         HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        String language = commonService.getLanguageCode(locale, lang);
+        String language = CoreUtils.getLanguageCode(locale, lang);
 
         Encyclopedia encyclopedia = homeService.getEncyclopedia(language);
 
@@ -76,7 +77,7 @@ public class HomeRestController {
                                    HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        String language = commonService.getLanguageCode(locale, lang);
+        String language = CoreUtils.getLanguageCode(locale, lang);
 
         HomeResponse response = new HomeResponse();
         response.setHomeDescription(homeService.getHomeDescription());

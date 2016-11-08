@@ -1,7 +1,7 @@
 package com.jakduk.api.common;
 
 import com.jakduk.api.common.util.JwtTokenUtils;
-import com.jakduk.core.authentication.common.CommonPrincipal;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
 import org.junit.Assert;
 import org.junit.Before;

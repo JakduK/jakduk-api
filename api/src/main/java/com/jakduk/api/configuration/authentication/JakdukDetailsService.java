@@ -1,14 +1,13 @@
 package com.jakduk.api.configuration.authentication;
 
-import com.jakduk.core.authentication.common.JakdukUserDetail;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.common.CommonRole;
-import com.jakduk.core.exception.FindUserButNotJakdukAccount;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.UserOnAuthentication;
 import com.jakduk.core.repository.user.UserRepository;
-import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,9 +29,6 @@ public class JakdukDetailsService implements UserDetailsManager {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private CommonService commonService;
-
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
@@ -43,10 +39,11 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 			if (ObjectUtils.isEmpty(user))
 				throw new ServiceException(ServiceError.NOT_FOUND_JAKDUK_ACCOUNT,
-						commonService.getResourceBundleMessage("messages.exception", "exception.not.found.jakduk.account", email));
+						CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email));
 
 			if (! user.getProviderId().equals(CommonConst.ACCOUNT_TYPE.JAKDUK))
-				throw new FindUserButNotJakdukAccount("JakduK 계정이 아니라 SNS 계정으로 연동되어 있습니다. email=" + email, user.getProviderId());
+				throw new ServiceException(ServiceError.NOT_FOUND_JAKDUK_ACCOUNT,
+						CoreUtils.getExceptionMessage("exception.not.jakduk.user", email, user.getProviderId()));
 
 			log.debug("Jakduk user=" + user);
 

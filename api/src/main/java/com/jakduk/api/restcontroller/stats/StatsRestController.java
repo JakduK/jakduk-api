@@ -2,11 +2,11 @@ package com.jakduk.api.restcontroller.stats;
 
 import com.jakduk.api.restcontroller.stats.vo.SupportersDataResponse;
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.AttendanceClub;
 import com.jakduk.core.model.db.AttendanceLeague;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.CompetitionService;
 import com.jakduk.core.service.StatsService;
 import io.swagger.annotations.Api;
@@ -37,9 +37,6 @@ public class StatsRestController {
 
     @Autowired
     private StatsService statsService;
-
-    @Autowired
-    private CommonService commonService;
 
     @Autowired
     private CompetitionService competitionService;
@@ -76,7 +73,7 @@ public class StatsRestController {
         Locale locale = localeResolver.resolveLocale(request);
 
         if (Objects.isNull(clubOrigin) || clubOrigin.isEmpty())
-            throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
+            throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
 
         List<AttendanceClub> attendances = statsService.getAttendanceClub(locale, clubOrigin);
 
@@ -96,7 +93,7 @@ public class StatsRestController {
     public SupportersDataResponse dataSupporter(HttpServletRequest request) {
 
         Locale locale = localeResolver.resolveLocale(request);
-        String language = commonService.getLanguageCode(locale, null);
+        String language = CoreUtils.getLanguageCode(locale, null);
         Map<String, Object> data = statsService.getSupportersData(language);
 
         return SupportersDataResponse.builder()

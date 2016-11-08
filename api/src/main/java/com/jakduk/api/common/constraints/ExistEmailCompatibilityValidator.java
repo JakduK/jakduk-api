@@ -1,4 +1,4 @@
-package com.jakduk.core.common.constraints;
+package com.jakduk.api.common.constraints;
 
 
 import com.jakduk.core.model.simple.UserProfile;

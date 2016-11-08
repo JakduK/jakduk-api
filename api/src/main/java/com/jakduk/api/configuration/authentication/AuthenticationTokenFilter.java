@@ -2,8 +2,8 @@ package com.jakduk.api.configuration.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.common.util.JwtTokenUtils;
-import com.jakduk.api.restcontroller.exceptionHandler.RestError;
-import com.jakduk.core.authentication.common.SocialUserDetail;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
+import com.jakduk.api.restcontroller.exception.RestError;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;

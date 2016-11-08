@@ -1,6 +1,7 @@
 package com.jakduk.api.restcontroller.user;
 
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Token;
@@ -13,6 +14,7 @@ import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -41,6 +43,9 @@ public class PasswordRestController {
 	private CommonService commonService;
 
 	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
 	private UserService userService;
 
 	@Autowired
@@ -60,11 +65,11 @@ public class PasswordRestController {
 		UserProfile userProfile = userService.findOneByEmail(email);
 
 		if (Objects.isNull(userProfile)) {
-			message = commonService.getResourceBundleMessage( "messages.user", "user.msg.you.are.not.registered");
+			message = CoreUtils.getResourceBundleMessage( "messages.user", "user.msg.you.are.not.registered");
 		} else {
 			switch (userProfile.getProviderId()) {
 				case JAKDUK:
-					message = commonService.getResourceBundleMessage("messages.user", "user.msg.reset.password.sendok");
+					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.sendok");
 					try {
 						emailService.sendResetPassword(locale, callbackUrl, email);
 					} catch (MessagingException e) {
@@ -72,10 +77,10 @@ public class PasswordRestController {
 					}
 					break;
 				case DAUM:
-					message = commonService.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);
+					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);
 					break;
 				case FACEBOOK:
-					message = commonService.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.FACEBOOK);
+					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.FACEBOOK);
 					break;
 			}
 		}
@@ -96,13 +101,13 @@ public class PasswordRestController {
 		Locale locale = localeResolver.resolveLocale(request);
 
 		if (Objects.isNull(code))
-			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.exception", "exception.invalid.parameter"));
+			throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
 
 		Map<String, Object> response = new HashMap<>();
 		Token token = commonService.getTokenByCode(code);
 
 		if (Objects.isNull(token) || !token.getCode().equals(code)) {
-			throw new IllegalArgumentException(commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.invalid"));
+			throw new IllegalArgumentException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.invalid"));
 		}
 
 		response.put("subject", token.getEmail());
@@ -113,11 +118,9 @@ public class PasswordRestController {
 
 	// jakduk 비밀번호 재설정 처리.
 	@RequestMapping(value = "/reset", method = RequestMethod.POST)
-	public Map<String, Object> updatePassword(@RequestParam(value = "password") String password,
-	                             @RequestParam(value = "code") String code,
-	                             HttpServletRequest request) {
-
-		Locale locale = localeResolver.resolveLocale(request);
+	public Map<String, Object> updatePassword(
+			@RequestParam(value = "password") String password,
+			@RequestParam(value = "code") String code) {
 
 		long tokenSpanMillis = TimeUnit.MINUTES.toMillis(tokenSpan);
 		Token token = tokenRepository.findByCode(code);
@@ -126,10 +129,10 @@ public class PasswordRestController {
 		String message;
 
 		if (Objects.isNull(token) || token.getCreatedTime().getTime() + tokenSpanMillis <= System.currentTimeMillis()) {
-			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.reset.password.invalid");
+			message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.invalid");
 		} else {
-			userService.userPasswordUpdateByEmail(token.getEmail(), password);
-			message = commonService.getResourceBundleMessage(locale, "messages.user", "user.msg.success.change.password");
+			userService.userPasswordUpdateByEmail(token.getEmail(), passwordEncoder.encode(password.trim()));
+			message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.success.change.password");
 			response.put("subject", token.getEmail());
 		}
 

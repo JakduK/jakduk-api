@@ -1,7 +1,7 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -55,16 +55,10 @@ public class GalleryService {
 	private String storageThumbnailPath;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private GalleryRepository galleryRepository;
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
-
-	@Autowired
-	private CommonService commonService;
 
 	@Autowired
 	private SearchService searchService;
@@ -99,12 +93,10 @@ public class GalleryService {
 	 * 사진 올리기.
 	 * @return Gallery 객체
      */
-	public Gallery uploadImage(String originalFileName, long size, String contentType, byte[] bytes) {
+	public Gallery uploadImage(CommonWriter writer, String originalFileName, long size, String contentType, byte[] bytes) {
 
 		Gallery gallery = new Gallery();
 
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 		gallery.setWriter(writer);
 
 		GalleryStatus status = GalleryStatus.builder()
@@ -243,18 +235,14 @@ public class GalleryService {
 	/**
 	 * 사진 삭제.
 	 */
-	public void removeImage(String id) {
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String accountId = principal.getId();
-
+	public void removeImage(String userId, String id) {
 		Gallery gallery = galleryRepository.findOneById(id)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 
 		if (ObjectUtils.isEmpty(gallery.getWriter()))
 			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		if (! accountId.equals(gallery.getWriter().getUserId()))
+		if (! userId.equals(gallery.getWriter().getUserId()))
             throw new ServiceException(ServiceError.FORBIDDEN);
 
 		ObjectId objId = new ObjectId(gallery.getId());
@@ -325,16 +313,15 @@ public class GalleryService {
 		return data;
 	}
 
-	public Map<String, Object> setUserFeeling(String id, CommonConst.FEELING_TYPE feeling) {
+	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CommonConst.FEELING_TYPE feeling) {
 
 		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String accountId = principal.getId();
-		String accountName = principal.getUsername();
+		String accountId = writer.getUserId();
+		String accountName = writer.getUsername();
 
 		Gallery gallery = galleryRepository.findOne(id);
-		CommonWriter writer = gallery.getWriter();
+		CommonWriter galleryWriter = gallery.getWriter();
 
 		List<CommonFeelingUser> usersLiking = gallery.getUsersLiking();
 		List<CommonFeelingUser> usersDisliking = gallery.getUsersDisliking();
@@ -348,7 +335,7 @@ public class GalleryService {
 		}
 
 		if (accountId != null && accountName != null) {
-			if (writer != null && accountId.equals(writer.getUserId())) {
+			if (galleryWriter != null && accountId.equals(galleryWriter.getUserId())) {
 				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
 			}
 
@@ -383,7 +370,7 @@ public class GalleryService {
 			} else {
 				throw new UserFeelingException(
 					CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
-					commonService.getResourceBundleMessage("messages.exception", "exception.select.already.like")
+						CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like")
 				);
 			}
 		} else {

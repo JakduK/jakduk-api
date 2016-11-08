@@ -1,6 +1,5 @@
 package com.jakduk.api.restcontroller.board.vo;
 
-import com.jakduk.core.exception.FormValidationErrorCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -19,11 +18,11 @@ import javax.validation.constraints.Size;
 public class BoardCommentForm {
 
     @ApiModelProperty(value = "글 seq")
-    @Min(value = 1, message = FormValidationErrorCode.SEQ_MIN)
-    @NotNull(message = FormValidationErrorCode.SEQ_NOT_NULL)
+    @Min(value = 1)
+    @NotNull
     private Integer seq;
 
     @ApiModelProperty(value = "댓글 내용")
-    @Size(min = 3, max=800, message = FormValidationErrorCode.COMMENT_CONTENTS_SIZE)
+    @Size(min = 3, max=800)
     private String content;
 }
