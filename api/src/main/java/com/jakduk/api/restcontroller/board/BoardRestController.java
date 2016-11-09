@@ -2,10 +2,13 @@ package com.jakduk.api.restcontroller.board;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -13,6 +16,7 @@ import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.embedded.BoardItem;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.GalleryOnBoard;
@@ -23,7 +27,6 @@ import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
-import com.jakduk.core.service.CommonService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,12 +65,9 @@ public class BoardRestController {
     private BoardCategoryService boardCategoryService;
 
     @Autowired
-    private CommonService commonService;
-
-    @Autowired
     private BoardDAO boardDAO;
 
-    @ApiOperation(value = "자유게시판 글 목록", response = FreePostsOnListResponse.class)
+    @ApiOperation(value = "자유게시판 글 목록")
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
     public FreePostsOnListResponse getFreePosts(@RequestParam(required = false, defaultValue = "1") Integer page,
                                             @RequestParam(required = false, defaultValue = "20") Integer size,
@@ -130,7 +130,7 @@ public class BoardRestController {
 
         List<BoardCategory> categories = boardFreeService.getFreeCategories();
         Map<String, String> categoriesMap = categories.stream().collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
-        categoriesMap.put("ALL", commonService.getResourceBundleMessage("messages.board", "board.category.all"));
+        categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
 
         return FreePostsOnListResponse.builder()
                 .categories(categoriesMap)
@@ -159,7 +159,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 댓글 목록", response = FreeCommentsOnListResponse.class)
+    @ApiOperation(value = "자유게시판 댓글 목록")
     @RequestMapping(value = "/comments", method = RequestMethod.GET)
     public FreeCommentsOnListResponse getFreeComments(
             @RequestParam(required = false, defaultValue = "1") int page,
@@ -212,7 +212,7 @@ public class BoardRestController {
 
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
-        BoardFreeDetail boardFreeDetail = boardFreeService.getPost(seq, commonService.getLanguageCode(locale, null), isAddCookie);
+        BoardFreeDetail boardFreeDetail = boardFreeService.getPost(seq, CoreUtils.getLanguageCode(locale, null), isAddCookie);
 
         CommonConst.BOARD_CATEGORY_TYPE categoryType = CommonConst.BOARD_CATEGORY_TYPE.valueOf(boardFreeDetail.getCategory().getCode());
 
@@ -223,7 +223,7 @@ public class BoardRestController {
 
         List<BoardFreeSimple> latestPostsByWriter = null;
 
-        if (BooleanUtils.isNotTrue(boardFreeDetail.getStatus().getDelete()))
+        if (ObjectUtils.isEmpty(boardFreeDetail.getStatus()) || BooleanUtils.isNotTrue(boardFreeDetail.getStatus().getDelete()))
             latestPostsByWriter = boardFreeService.findByUserId(boardFreeDetail.getId(), boardFreeDetail.getWriter().getUserId(), 3);
 
         return FreePostOnDetailResponse.builder()
@@ -234,7 +234,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 말머리 목록", response = FreeCategoriesResponse.class)
+    @ApiOperation(value = "자유게시판 말머리 목록")
     @RequestMapping(value = "/categories", method = RequestMethod.GET)
     public FreeCategoriesResponse getFreeCategories() {
 
@@ -245,12 +245,12 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글쓰기", response = FreePostOnWriteResponse.class)
+    @ApiOperation(value = "자유게시판 글쓰기")
     @RequestMapping(value = "", method = RequestMethod.POST)
     public FreePostOnWriteResponse addFreePost(@Valid @RequestBody FreePostForm form,
-                                               HttpServletRequest request) {
+                                               Device device) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
@@ -266,41 +266,10 @@ public class BoardRestController {
                     .collect(Collectors.toList());
         }
 
-        Device device = DeviceUtils.getCurrentDevice(request);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
-        Integer boardSeq = boardFreeService.insertFreePost(form.getSubject().trim(), form.getContent().trim(), form.getCategoryCode(),
-                galleries, ApiUtils.getDeviceInfo(device));
-
-        return FreePostOnWriteResponse.builder()
-                .seq(boardSeq)
-                .build();
-    }
-
-    @ApiOperation(value = "자유게시판 글 고치기", response = FreePostOnWriteResponse.class)
-    @RequestMapping(value = "/{seq}", method = RequestMethod.PUT)
-    public FreePostOnWriteResponse editFreePost(@PathVariable Integer seq,
-                                                @Valid @RequestBody FreePostForm form,
-                                                HttpServletRequest request) {
-
-        if (! commonService.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
-        Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
-
-        if (!boardCategory.isPresent())
-            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
-
-        List<GalleryOnBoard> galleries = new ArrayList<>();
-
-        if (Objects.nonNull(form.getGalleries())) {
-            galleries = form.getGalleries().stream()
-                    .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
-                    .collect(Collectors.toList());
-        }
-
-        Device device = DeviceUtils.getCurrentDevice(request);
-
-        Integer boardSeq = boardFreeService.updateFreePost(seq, form.getSubject().trim(), form.getContent().trim(),
+        Integer boardSeq = boardFreeService.insertFreePost(writer, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
@@ -308,14 +277,50 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 지움", response = FreePostOnDeleteResponse.class)
+    @ApiOperation(value = "자유게시판 글 고치기")
+    @RequestMapping(value = "/{seq}", method = RequestMethod.PUT)
+    public FreePostOnWriteResponse editFreePost(@PathVariable Integer seq,
+                                                @Valid @RequestBody FreePostForm form,
+                                                Device device) {
+
+        if (! UserUtils.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
+
+        if (!boardCategory.isPresent())
+            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+
+        List<GalleryOnBoard> galleries = new ArrayList<>();
+
+        if (Objects.nonNull(form.getGalleries())) {
+            galleries = form.getGalleries().stream()
+                    .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
+                    .collect(Collectors.toList());
+        }
+
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        Integer boardSeq = boardFreeService.updateFreePost(writer, seq, form.getSubject().trim(), form.getContent().trim(),
+                form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
+
+        return FreePostOnWriteResponse.builder()
+                .seq(boardSeq)
+                .build();
+    }
+
+    @ApiOperation(value = "자유게시판 글 지움")
     @RequestMapping(value = "/{seq}", method = RequestMethod.DELETE)
     public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		CommonConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(seq);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+		CommonConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(writer, seq);
 
         return FreePostOnDeleteResponse.builder().result(deleteType).build();
     }
@@ -340,28 +345,32 @@ public class BoardRestController {
         return response;
     }
 
-    @ApiOperation(value = "자유게시판 글의 댓글 달기", response = BoardFreeComment.class)
+    @ApiOperation(value = "자유게시판 글의 댓글 달기")
     @RequestMapping(value ="/comment", method = RequestMethod.POST)
     public BoardFreeComment addFreeComment(@Valid @RequestBody BoardCommentForm commentRequest,
-                                         HttpServletRequest request) {
+                                           Device device) {
 
-          if (! commonService.isUser())
+          if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        Device device = DeviceUtils.getCurrentDevice(request);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
-        return boardFreeService.addFreeComment(commentRequest.getSeq(), commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
+        return boardFreeService.addFreeComment(writer, commentRequest.getSeq(), commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
     }
 
-    @ApiOperation(value = "자유게시판 글 감정 표현", response = UserFeelingResponse.class)
+    @ApiOperation(value = "자유게시판 글 감정 표현")
     @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeFeeling(@PathVariable Integer seq,
                                               @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        BoardFree boardFree = boardFreeService.setFreeFeelings(seq, feeling);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        BoardFree boardFree = boardFreeService.setFreeFeelings(writer, seq, feeling);
 
         Integer numberOfLike = Objects.nonNull(boardFree.getUsersLiking()) ? boardFree.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(boardFree.getUsersDisliking()) ? boardFree.getUsersDisliking().size() : 0;
@@ -373,15 +382,18 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 댓글 감정 표현", response = UserFeelingResponse.class)
+    @ApiOperation(value = "자유게시판 댓글 감정 표현")
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(@PathVariable String commentId,
                                                      @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        BoardFreeComment boardFreeComment = boardFreeService.setFreeCommentFeeling(commentId, feeling);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        BoardFreeComment boardFreeComment = boardFreeService.setFreeCommentFeeling(writer, commentId, feeling);
 
         Integer numberOfLike = Objects.nonNull(boardFreeComment.getUsersLiking()) ? boardFreeComment.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(boardFreeComment.getUsersDisliking()) ? boardFreeComment.getUsersDisliking().size() : 0;
@@ -393,26 +405,32 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글의 공지 활성화", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "자유게시판 글의 공지 활성화")
     @RequestMapping(value = "/{seq}/notice", method = RequestMethod.POST)
     public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
 
-        if (! commonService.isAdmin())
+        if (! UserUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		boardFreeService.setFreeNotice(seq, true);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+		boardFreeService.setFreeNotice(writer, seq, true);
 
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "자유게시판 글의 공지 비활성화", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "자유게시판 글의 공지 비활성화")
     @RequestMapping(value = "/{seq}/notice", method = RequestMethod.DELETE)
     public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
 
-        if (! commonService.isAdmin())
+        if (! UserUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        boardFreeService.setFreeNotice(seq, false);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        boardFreeService.setFreeNotice(writer, seq, false);
 
         return EmptyJsonResponse.newInstance();
     }

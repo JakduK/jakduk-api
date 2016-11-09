@@ -2,6 +2,8 @@ package com.jakduk.api.restcontroller.gallery;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryOnUploadResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;
@@ -11,13 +13,12 @@ import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,6 @@ import java.util.stream.Collectors;
  * 16. 3. 20 오후 11:17
  */
 
-@Slf4j
 @Api(tags = "Gallery", description = "사진첩 API")
 @RequestMapping("/api")
 @RestController
@@ -53,9 +53,6 @@ public class GalleryRestController {
 
     @Value("${gallery.thumbnail.path}")
     private String thumbnailPath;
-
-    @Autowired
-    private CommonService commonService;
 
     @Autowired
     private GalleryService galleryService;
@@ -91,16 +88,19 @@ public class GalleryRestController {
     @RequestMapping(value = "/gallery", method = RequestMethod.POST)
     public GalleryOnUploadResponse uploadImage(@RequestParam MultipartFile file) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         if (file.isEmpty())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
         Gallery gallery = null;
 
         try {
-            gallery = galleryService.uploadImage(file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
+            gallery = galleryService.uploadImage(writer, file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
         } catch (IOException ignored) {
         }
 
@@ -116,10 +116,12 @@ public class GalleryRestController {
     @RequestMapping(value = "/gallery/{id}", method = RequestMethod.DELETE)
     public EmptyJsonResponse removeImage(@PathVariable String id) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        galleryService.removeImage(id);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+
+        galleryService.removeImage(principal.getId(), id);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -147,10 +149,13 @@ public class GalleryRestController {
     @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CommonConst.FEELING_TYPE feeling) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        Map<String, Object> data = galleryService.setUserFeeling(id, feeling);
+        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+
+        Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
 
         return UserFeelingResponse.builder()
           .feeling((CommonConst.FEELING_TYPE) data.get("feeling"))

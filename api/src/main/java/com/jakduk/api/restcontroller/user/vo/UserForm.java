@@ -1,9 +1,8 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.core.common.constraints.ExistEmail;
-import com.jakduk.core.common.constraints.ExistUsername;
-import com.jakduk.core.common.constraints.FieldMatch;
-import com.jakduk.core.exception.FormValidationErrorCode;
+import com.jakduk.api.common.constraints.ExistEmail;
+import com.jakduk.api.common.constraints.ExistUsername;
+import com.jakduk.api.common.constraints.FieldMatch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -19,30 +18,30 @@ import javax.validation.constraints.Size;
 
 @Getter
 @ApiModel(description = "이메일 기반 회원 가입 폼")
-@FieldMatch(first = "password", second = "passwordConfirm", message = FormValidationErrorCode.PASSWORD_MISMATCH)
+@FieldMatch(first = "password", second = "passwordConfirm", message = "{validation.msg.password.mismatch}")
 public class UserForm {
 
     @ApiModelProperty(required = true, example = "example@jakduk.com")
-    @NotEmpty(message = FormValidationErrorCode.EMAIL_NOT_EMPTY)
-    @Size(min = 6, max=30, message = FormValidationErrorCode.EMAIL_SIZE)
-    @Email(message = FormValidationErrorCode.EMAIL_NOT_FORMAT)
+    @NotEmpty
+    @Size(min = 6, max=30)
+    @Email
     @ExistEmail
     private String email;
 
     @ApiModelProperty(required = true, example = "JakdukUser")
-    @NotEmpty(message = FormValidationErrorCode.USERNAME_NOT_EMPTY)
-    @Size(min = 2, max=20, message = FormValidationErrorCode.USERNAME_SIZE)
+    @NotEmpty
+    @Size(min = 2, max=20)
     @ExistUsername
     private String username;
 
     @ApiModelProperty(required = true, example = "password01")
-    @NotEmpty(message = FormValidationErrorCode.PASSWORD_NOT_EMPTY)
-    @Size(min = 4, max=20, message = FormValidationErrorCode.PASSWORD_SIZE)
+    @NotEmpty
+    @Size(min = 4, max=20)
     private String password;
 
     @ApiModelProperty(required = true, example = "password01")
-    @NotEmpty(message = FormValidationErrorCode.PASSWORD_CONFIRM_NOT_EMPTY)
-    @Size(min = 4, max=20, message = FormValidationErrorCode.PASSWORD_CONFIRM_SIZE)
+    @NotEmpty
+    @Size(min = 4, max=20)
     private String passwordConfirm;
 
     @ApiModelProperty(value = "축구단(FootballClub) ID")

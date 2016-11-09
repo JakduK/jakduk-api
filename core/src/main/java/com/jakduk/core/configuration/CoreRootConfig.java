@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
@@ -33,11 +31,6 @@ public class CoreRootConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new StandardPasswordEncoder();
-    }
-
-    @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasenames("classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
@@ -45,7 +38,6 @@ public class CoreRootConfig {
                 "classpath:messages/stats", "classpath:messages/search", "classpath:messages/jakdu", "classpath:messages/email",
                 "classpath:messages/exception");
         messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setCacheSeconds(180);
 
         return messageSource;
     }

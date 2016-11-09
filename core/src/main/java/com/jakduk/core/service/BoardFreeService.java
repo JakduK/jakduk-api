@@ -1,7 +1,7 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.authentication.common.CommonPrincipal;
 import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -17,11 +17,11 @@ import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
+import com.jakduk.core.repository.GalleryRepository;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
-import com.jakduk.core.repository.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
@@ -93,11 +93,12 @@ public class BoardFreeService {
      * @param device 디바이스
      * @return 글 seq
      */
-	public Integer insertFreePost(String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
+	public Integer insertFreePost(CommonWriter writer, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
 								  List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = new BoardFree();
 
+		boardFree.setWriter(writer);
 		boardFree.setCategory(categoryCode);
 		boardFree.setSubject(subject);
 		boardFree.setContent(content);
@@ -109,10 +110,6 @@ public class BoardFreeService {
 
 		if (! galleriesOnBoard.isEmpty())
 			boardFree.setGalleries(galleriesOnBoard);
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
-		boardFree.setWriter(writer);
 
 		BoardStatus boardStatus = new BoardStatus();
 		boardStatus.setDevice(device);
@@ -205,16 +202,13 @@ public class BoardFreeService {
      * @param device 디바이스
      * @return 글 seq
      */
-	public Integer updateFreePost(Integer seq, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
+	public Integer updateFreePost(CommonWriter writer, Integer seq, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
 								  List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
-
-		if (! boardFree.getWriter().getUserId().equals(principal.getId()))
+		if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
 		boardFree.setSubject(subject);
@@ -306,15 +300,12 @@ public class BoardFreeService {
 	 * @param seq 글 seq
 	 * @return CommonConst.BOARD_DELETE_TYPE
      */
-    public CommonConst.BOARD_DELETE_TYPE deleteFreePost(Integer seq) {
+    public CommonConst.BOARD_DELETE_TYPE deleteFreePost(CommonWriter writer, Integer seq) {
 
         BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
-        CommonPrincipal principal = userService.getCommonPrincipal();
-        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
-
-        if (! boardFree.getWriter().getUserId().equals(principal.getId()))
+        if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
             throw new ServiceException(ServiceError.FORBIDDEN);
 
         BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
@@ -369,7 +360,7 @@ public class BoardFreeService {
      */
 	public List<BoardCategory> getFreeCategories() {
 
-		return boardCategoryRepository.findByLanguage(commonService.getLanguageCode(LocaleContextHolder.getLocale(), null));
+		return boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
 	}
 
 	/**
@@ -443,17 +434,16 @@ public class BoardFreeService {
 	}
 
 	// 글 감정 표현.
-	public BoardFree setFreeFeelings(Integer seq, CommonConst.FEELING_TYPE feeling) {
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String userId = principal.getId();
-		String username = principal.getUsername();
+	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, CommonConst.FEELING_TYPE feeling) {
+		String userId = writer.getUserId();
+		String username = writer.getUsername();
 
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 		if (!boardFree.isPresent())
 			throw new ServiceException(ServiceError.NOT_FOUND_POST);
 
 		BoardFree getBoardFree = boardFree.get();
-		CommonWriter writer = getBoardFree.getWriter();
+		CommonWriter postWriter = getBoardFree.getWriter();
 
 		List<CommonFeelingUser> usersLiking = getBoardFree.getUsersLiking();
 		List<CommonFeelingUser> usersDisliking = getBoardFree.getUsersDisliking();
@@ -462,16 +452,16 @@ public class BoardFreeService {
 		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
 
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
-		if (userId.equals(writer.getUserId())) {
+		if (userId.equals(postWriter.getUserId())) {
 			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-					, commonService.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
+					, CoreUtils.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
 		}
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
+						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
 
@@ -479,7 +469,7 @@ public class BoardFreeService {
 		for (CommonFeelingUser feelingUser : usersDisliking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
+						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
 
@@ -502,16 +492,13 @@ public class BoardFreeService {
 	}
 
 	// 게시판 댓글 추가.
-	public BoardFreeComment addFreeComment(Integer seq, String contents, CommonConst.DEVICE_TYPE device) {
+	public BoardFreeComment addFreeComment(CommonWriter writer, Integer seq, String contents, CommonConst.DEVICE_TYPE device) {
 		BoardFreeComment boardFreeComment = new BoardFreeComment();
 
 		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
 
 		BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
 		boardFreeComment.setBoardItem(boardItem);
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
 		boardFreeComment.setWriter(writer);
 		boardFreeComment.setContent(contents);
@@ -547,14 +534,13 @@ public class BoardFreeService {
 	 * @param feeling 감정표현 종류
      * @return 자유게시판 댓글 객체
      */
-	public BoardFreeComment setFreeCommentFeeling(String commentId, CommonConst.FEELING_TYPE feeling) {
+	public BoardFreeComment setFreeCommentFeeling(CommonWriter writer, String commentId, CommonConst.FEELING_TYPE feeling) {
 
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		String userId = principal.getId();
-		String username = principal.getUsername();
+		String userId = writer.getUserId();
+		String username = writer.getUsername();
 
 		BoardFreeComment boardComment = boardFreeCommentRepository.findById(commentId);
-		CommonWriter writer = boardComment.getWriter();
+		CommonWriter postWriter = boardComment.getWriter();
 
 		List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
 		List<CommonFeelingUser> usersDisliking = boardComment.getUsersDisliking();
@@ -563,16 +549,16 @@ public class BoardFreeService {
 		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
 
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
-		if (userId.equals(writer.getUserId())) {
+		if (userId.equals(postWriter.getUserId())) {
 			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-					, commonService.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
+					, CoreUtils.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
 		}
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
+						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
 
@@ -580,7 +566,7 @@ public class BoardFreeService {
 		for (CommonFeelingUser feelingUser : usersDisliking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
 				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, commonService.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
+						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
 
@@ -607,15 +593,12 @@ public class BoardFreeService {
 	 * @param seq 글 seq
 	 * @param isEnable 활성화/비활성화
      */
-	public void setFreeNotice(int seq, boolean isEnable) {
+	public void setFreeNotice(CommonWriter writer, int seq, boolean isEnable) {
 
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 
 		if (!boardFree.isPresent())
 			throw new ServiceException(ServiceError.NOT_FOUND_POST);
-
-		CommonPrincipal principal = userService.getCommonPrincipal();
-		CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
 		BoardFree getBoardFree = boardFree.get();
 		BoardStatus status = getBoardFree.getStatus();

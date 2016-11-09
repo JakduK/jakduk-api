@@ -1,5 +1,6 @@
 package com.jakduk.core.notification;
 
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
@@ -11,7 +12,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -50,7 +50,7 @@ public class EmailService {
 
 		String code = UUID.randomUUID().toString();
 		ResourceBundle bundle = ResourceBundle.getBundle("messages.user", locale);
-		String language = commonService.getLanguageCode(locale, null);
+		String language = CoreUtils.getLanguageCode(locale, null);
 
 		// Prepare the evaluation context
 		final Context ctx = new Context(locale);

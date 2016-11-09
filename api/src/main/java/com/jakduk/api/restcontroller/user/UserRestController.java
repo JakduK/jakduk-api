@@ -1,10 +1,12 @@
 package com.jakduk.api.restcontroller.user;
 
 import com.jakduk.api.common.util.JwtTokenUtils;
+import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
-import com.jakduk.core.authentication.common.CommonPrincipal;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.DuplicateDataException;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -13,16 +15,18 @@ import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.notification.EmailService;
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -36,10 +40,10 @@ import java.util.Objects;
  * 16. 4. 5 오전 12:17
  */
 
-@Slf4j
 @Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
+@Validated
 public class UserRestController {
 
     @Value("${jwt.token.header}")
@@ -49,10 +53,13 @@ public class UserRestController {
     private JwtTokenUtils jwtTokenUtils;
 
     @Autowired
-    private UserService userService;
+    private UserUtils userUtils;
 
     @Autowired
-    private CommonService commonService;
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private FootballService footballService;
@@ -60,21 +67,20 @@ public class UserRestController {
     @Autowired
     private EmailService emailService;
 
-    @ApiOperation(value = "이메일 기반 회원 가입", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "이메일 기반 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
     public EmptyJsonResponse addJakdukUser(@Valid @RequestBody UserForm form,
                                            Locale locale) {
 
-        User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), form.getPassword(), form.getFootballClub(),
-                form.getAbout());
+        User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
+                form.getFootballClub(), form.getAbout());
 
         try {
             emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
-        } catch (MessagingException e) {
-            e.printStackTrace();
+        } catch (MessagingException ignored) {
         }
 
-        userService.signInJakdukUser(user);
+        userUtils.signInJakdukUser(user);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -113,15 +119,15 @@ public class UserRestController {
     @RequestMapping(value = "/exist/email/edit", method = RequestMethod.GET)
     public Boolean existEmailOnEdit(@RequestParam() String email) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
         UserProfile userProfile = userService.findByNEIdAndEmail(commonPrincipal.getId(), email.trim());
 
         if (Objects.nonNull(userProfile))
-            throw new DuplicateDataException(commonService.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
+            throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
 
         return false;
     }
@@ -134,7 +140,7 @@ public class UserRestController {
         UserProfile userProfile = userService.findByNEIdAndEmail(id.trim(), email.trim());
 
         if (Objects.nonNull(userProfile))
-            throw new DuplicateDataException(commonService.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
+            throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
 
         return false;
     }
@@ -143,15 +149,15 @@ public class UserRestController {
     @RequestMapping(value = "/exist/username/edit", method = RequestMethod.GET)
     public Boolean existUsernameOnEdit(@RequestParam() String username) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
         UserProfile userProfile = userService.findByNEIdAndUsername(commonPrincipal.getId().trim(), username.trim());
 
         if (Objects.nonNull(userProfile))
-            throw new DuplicateDataException(commonService.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
+            throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
 
         return false;
     }
@@ -164,41 +170,39 @@ public class UserRestController {
         UserProfile userProfile = userService.findByNEIdAndUsername(id.trim(), username.trim());
 
         if (Objects.nonNull(userProfile))
-            throw new DuplicateDataException(commonService.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
+            throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
 
         return false;
     }
 
-    @ApiOperation(value = "이메일 중복 검사", produces = "application/json")
+    @ApiOperation(value = "이메일 중복 검사")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public Boolean existEmail(@RequestParam String email) {
+    public EmptyJsonResponse existEmail(@NotEmpty @Email @RequestParam String email) {
 
-        if (Objects.isNull(email))
-            throw new ServiceException(ServiceError.INVALID_PARAMETER);
+        userService.existEmail(email.trim());
 
-        return userService.existEmail(email.trim());
+        return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "별명 중복 검사", produces = "application/json")
+    @ApiOperation(value = "별명 중복 검사")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
-    public Boolean existUsername(@RequestParam String username) {
+    public EmptyJsonResponse existUsername(@NotEmpty @RequestParam String username) {
 
-        if (Objects.isNull(username))
-            throw new ServiceException(ServiceError.INVALID_PARAMETER);
+        userService.existUsername(username.trim());
 
-        return userService.existUsernameOnWrite(username.trim());
+        return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "내 프로필 정보 보기", produces = "application/json", response = UserProfileResponse.class)
     @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
     public UserProfileResponse getProfileMe() {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        String language = commonService.getLanguageCode(LocaleContextHolder.getLocale(), null);
+        String language = CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null);
 
-        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
         UserProfile user = userService.findUserProfileById(commonPrincipal.getId());
 
@@ -221,10 +225,10 @@ public class UserRestController {
     @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
     public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileOnEditForm form) {
 
-        if (! commonService.isUser())
+        if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal commonPrincipal = userService.getCommonPrincipal();
+        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
         String email = form.getEmail();
         String username = form.getUsername();
@@ -262,12 +266,12 @@ public class UserRestController {
 
         userService.save(user);
 
-        log.debug("user updated. user=" + user);
+        //log.debug("user updated. user=" + user);
 
-        if (commonService.isJakdukUser()) {
-            userService.signInJakdukUser(user);
-        } else if (commonService.isSocialUser()) {
-            userService.signInSocialUser(user);
+        if (UserUtils.isJakdukUser()) {
+            userUtils.signInJakdukUser(user);
+        } else if (UserUtils.isSocialUser()) {
+            userUtils.signInSocialUser(user);
         }
 
         return EmptyJsonResponse.newInstance();
@@ -277,10 +281,12 @@ public class UserRestController {
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
-        if (! commonService.isJakdukUser())
+        if (! UserUtils.isJakdukUser())
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        userService.updateUserPassword(form.getNewPassword());
+        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
+
+        userService.updateUserPassword(commonPrincipal.getId(), passwordEncoder.encode(form.getNewPassword().trim()));
 
         return EmptyJsonResponse.newInstance();
     }

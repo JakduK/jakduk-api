@@ -9,15 +9,14 @@ import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
 import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
-import com.jakduk.core.authentication.common.CommonPrincipal;
-import com.jakduk.core.authentication.common.JakdukUserDetail;
-import com.jakduk.core.authentication.common.SocialUserDetail;
+import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.etc.AuthUserProfile;
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,9 +50,6 @@ public class AuthRestController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private CommonService commonService;
 
     @Autowired
     private JwtTokenUtils jwtTokenUtils;
@@ -183,7 +179,7 @@ public class AuthRestController {
     @RequestMapping(value = "/auth/user", method = RequestMethod.GET)
     public AuthUserProfile getMyProfile() {
 
-        AuthUserProfile authUserProfile = commonService.getAuthUserProfile();
+        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
         if (Objects.isNull(authUserProfile))
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);

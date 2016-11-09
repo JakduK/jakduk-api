@@ -26,6 +26,9 @@ public enum ServiceError {
     NOT_FOUND_USER(HttpStatus.SC_NOT_FOUND, "exception.not.found.user"),
     NOT_REGISTER_WITH_SNS(HttpStatus.SC_NOT_FOUND, "exception.not.register.with.sns"),
     CANNOT_GET_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.sns.profile"),
+    ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
+    ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
+
     NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.post.not.found"),
     CATEGORY_NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.category.not.found"),
     ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
@@ -35,7 +38,9 @@ public enum ServiceError {
     NOT_FOUND_GALLERY_FILE(HttpStatus.SC_NOT_FOUND, "exception.not.found.gallery.file"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    NEED_TO_LOGIN(HttpStatus.SC_UNAUTHORIZED, "exception.unauthorized"),
     NOT_FOUND_JAKDUK_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    NOT_JAKDUK_USER(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     FORBIDDEN(HttpStatus.SC_FORBIDDEN, "exception.forbidden"),
 
     SEND_EMAIL_FAILED(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.send.email.failed"),
