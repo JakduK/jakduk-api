@@ -42,12 +42,6 @@ public class UserTest extends AbstractSpringTest {
 	@Autowired
 	private JakdukDAO jakdukDAO;
 
-	@Autowired
-	private PasswordEncoder encoder;
-
-	@Autowired
-	private Environment environment;
-
 	@Before
 	public void setUp() {
 	}
@@ -60,17 +54,6 @@ public class UserTest extends AbstractSpringTest {
 
 		System.out.println("UserProfile=" + userProfile);
 		System.out.println("user=" + user.get());
-	}
-	
-	@Test
-	public void 스프링시큐리티_암호_인코딩() {
-		//User user = userRepository.findByUsername("test01");
-		//String pwd = user.getPassword();
-
-		String password = encoder.encode("1111");
-
-		Assert.assertFalse(encoder.matches("1112", password));
-		Assert.assertTrue(encoder.matches("1111", password));
 	}
 
 	@Test
