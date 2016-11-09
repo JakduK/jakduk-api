@@ -15,7 +15,7 @@ public class CoreApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(CoreApplication.class)
                 .web(false)
-                .profiles("core-local")
+                .profiles("core-default")
                 .run(args);
     }
 }
