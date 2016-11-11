@@ -3,15 +3,14 @@ package com.jakduk.api.configuration.slack;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
-import ch.qos.logback.core.util.ContextUtil;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import org.springframework.util.ObjectUtils;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,11 +35,11 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
                 List<SlackField> fields = new ArrayList<>();
 
-                SlackField hostName = new SlackField();
-                hostName.setTitle("호스트명");
-                hostName.setValue(getHostName());
-                hostName.setShorten(false);
-                fields.add(hostName);
+                SlackField date = new SlackField();
+                date.setTitle("발생시간");
+                date.setValue(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                date.setShorten(true);
+                fields.add(date);
 
                 SlackAttachment slackAttachment = new SlackAttachment();
                 slackAttachment.setFallback("옐로우 카드!!");
@@ -48,26 +47,18 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                 slackAttachment.setFields(fields);
                 slackAttachment.setTitle(iLoggingEvent.getFormattedMessage());
 
+                if (! ObjectUtils.isEmpty(iLoggingEvent.getThrowableProxy()))
+                    slackAttachment.setText(getStackTrace(iLoggingEvent.getThrowableProxy().getStackTraceElementProxyArray()));
+
                 SlackMessage slackMessage = new SlackMessage("");
                 slackMessage.setChannel("#" + logConfig.getChannel());
                 slackMessage.setUsername(logConfig.getUsername());
                 slackMessage.setIcon(":exclamation:");
                 slackMessage.setAttachments(Collections.singletonList(slackAttachment));
 
-                if (! ObjectUtils.isEmpty(iLoggingEvent.getThrowableProxy()))
-                    slackMessage.setText(getStackTrace(iLoggingEvent.getThrowableProxy().getStackTraceElementProxyArray()));
-
                 SlackApi api = new SlackApi(logConfig.getWebhook());
                 api.call(slackMessage);
             }
-        }
-    }
-
-    private String getHostName() {
-        try {
-            return ContextUtil.getLocalHostName();
-        } catch (UnknownHostException | SocketException e) {
-            return "UNKNOWN";
         }
     }
 

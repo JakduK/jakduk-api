@@ -2,19 +2,15 @@
 apply plugin: 'base'
 
 buildscript {
-    ext {
-        springBootVersion = '1.4.1.RELEASE'
-    }
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE")
     }
 }
 
 allprojects  {
-    apply plugin: 'maven'
     apply plugin: 'idea'
     apply plugin: 'java'
     apply plugin: 'spring-boot'
