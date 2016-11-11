@@ -1,0 +1,5 @@
+description = 'core'
+
+dependencies {
+    compile 'javax.persistence:persistence-api:1.0.2'
+}

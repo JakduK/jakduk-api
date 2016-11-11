@@ -1,10 +1,10 @@
 // 부모와 자식 프로젝트를 나타낸다.
-rootProject.name = 'jakduk-parent'
+rootProject.name = 'jakduk-api'
 
-include ':jakduk-core'
-include ':jakduk-api'
-include ':jakduk-batch'
+include ':core'
+include ':api'
+include ':batch'
 
-project(':jakduk-core').projectDir = "$rootDir/jakduk-core" as File
-project(':jakduk-api').projectDir = "$rootDir/jakduk-api" as File
-project(':jakduk-batch').projectDir = "$rootDir/jakduk-batch" as File
+project(':core').projectDir = "$rootDir/core" as File
+project(':api').projectDir = "$rootDir/api" as File
+project(':batch').projectDir = "$rootDir/batch" as File
