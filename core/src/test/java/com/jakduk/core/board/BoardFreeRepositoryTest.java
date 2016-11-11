@@ -9,6 +9,7 @@ import com.jakduk.core.repository.user.UserRepository;
 import com.jakduk.core.util.AbstractSpringTest;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
@@ -36,6 +37,10 @@ public class BoardFreeRepositoryTest extends AbstractSpringTest {
         Assert.assertTrue(! ObjectUtils.isEmpty(boardFree));
     }
 
+    /**
+     * PRD 테스트 안됨
+     */
+    @Ignore
     @Test
     public void findByIdAndUserId() {
 
