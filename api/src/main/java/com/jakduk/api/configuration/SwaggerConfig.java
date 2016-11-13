@@ -32,7 +32,7 @@ public class SwaggerConfig {
     public Docket api() {
 
         Set<String> protocols = new HashSet<>();
-//        protocols.add(environment.getProperty("swagger.protocol"));
+        protocols.add(environment.getProperty("swagger.protocol"));
 
         Set<String> producesList = new HashSet<>();
         producesList.add("application/json");
@@ -43,7 +43,7 @@ public class SwaggerConfig {
                     .paths(PathSelectors.ant("/api/**"))
                 .build()
                 .protocols(protocols)
-//                .host(environment.getProperty("swagger.host"))
+                .host(environment.getProperty("swagger.host"))
                 .apiInfo(apiInfo())
                 .useDefaultResponseMessages(false)
                 .produces(producesList);
