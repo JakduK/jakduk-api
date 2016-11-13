@@ -14,7 +14,7 @@ import java.util.Objects;
  * 16. 7. 3 오후 9:41
  */
 
-class ExistUsernameCompatibilityValidator implements ConstraintValidator<ExistUsernameCompatibility, Object> {
+public class ExistUsernameCompatibilityValidator implements ConstraintValidator<ExistUsernameCompatibility, Object> {
 
     private String userIdField;
     private String usernameField;

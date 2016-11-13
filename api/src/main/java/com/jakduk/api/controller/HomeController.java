@@ -1,8 +1,6 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.HomeService;
-import com.jakduk.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -22,13 +20,7 @@ import java.util.Locale;
 public class HomeController {
 	
 	@Autowired
-	private CommonService commonService;
-	
-	@Autowired
 	private HomeService homeService;
-	
-	@Autowired
-	private UserService userService;
 	
 	@Resource
 	LocaleResolver localeResolver;
@@ -36,12 +28,6 @@ public class HomeController {
 	@Resource
 	MessageSource messageSource;
 	
-	@RequestMapping
-	public String root() {
-		
-		return "redirect:/home";
-	}
-
 	@RequestMapping(value = "/error/{code}", method = RequestMethod.GET)
 	public String error(Model model, @PathVariable String code) {
 		
