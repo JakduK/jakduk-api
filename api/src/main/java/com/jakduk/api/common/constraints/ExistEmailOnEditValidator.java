@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author pyohwan
  * 16. 7. 3 오후 9:30
  */
-class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmailOnEdit, String> {
+public class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmailOnEdit, String> {
 
     @Autowired
     private UserService userService;

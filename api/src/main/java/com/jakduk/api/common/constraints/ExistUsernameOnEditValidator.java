@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author pyohwan
  * 16. 7. 3 오후 9:40
  */
-class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUsernameOnEdit, String> {
+public class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUsernameOnEdit, String> {
 
     @Autowired
     private UserService userService;

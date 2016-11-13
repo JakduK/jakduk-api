@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author pyohwan
  * 16. 7. 3 오후 9:40
  */
-class ExistUsernameValidator implements ConstraintValidator<ExistUsername, String> {
+public class ExistUsernameValidator implements ConstraintValidator<ExistUsername, String> {
 
     @Autowired
     private UserService userService;

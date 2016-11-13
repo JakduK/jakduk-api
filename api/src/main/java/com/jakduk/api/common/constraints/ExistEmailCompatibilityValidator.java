@@ -15,7 +15,7 @@ import java.util.Objects;
  * 16. 7. 3 오후 9:28
  */
 
-class ExistEmailCompatibilityValidator implements ConstraintValidator<ExistEmailCompatibility, Object> {
+public class ExistEmailCompatibilityValidator implements ConstraintValidator<ExistEmailCompatibility, Object> {
 
     private String userIdField;
     private String emailField;
