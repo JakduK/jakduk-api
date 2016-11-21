@@ -5,6 +5,7 @@ import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.util.UrlUtils;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -27,7 +28,7 @@ public class AdminTest extends AbstractSpringTest {
 		long boardCnt = 101;
 		int limit = 100;
 		int totalPage = (int)(boardCnt / limit);
-		
+
 		System.out.println("boardCnt=" + boardCnt);
 		System.out.println("totalPage=" + totalPage);
 	}

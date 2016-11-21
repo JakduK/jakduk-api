@@ -15,10 +15,9 @@ public class Token {
 
 	@Id
 	private String email;
-
 	private String code;
 	private CommonConst.TOKEN_TYPE tokenType = CommonConst.TOKEN_TYPE.RESET_PASSWORD;
 
 	@Temporal(TemporalType.DATE)
-	private Date createdTime;
+	private Date expireAt;
 }
