@@ -43,6 +43,7 @@ import java.util.Objects;
 @Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
+@Validated
 public class UserRestController {
 
     @Value("${jwt.token.header}")
@@ -174,20 +175,18 @@ public class UserRestController {
         return false;
     }
 
-    @Validated
     @ApiOperation(value = "이메일 중복 검사")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmail(@NotEmpty @Email @RequestParam String email) {
+    public EmptyJsonResponse existEmail(@Valid @NotEmpty @Email @RequestParam String email) {
 
         userService.existEmail(email.trim());
 
         return EmptyJsonResponse.newInstance();
     }
 
-    @Validated
     @ApiOperation(value = "별명 중복 검사")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
-    public EmptyJsonResponse existUsername(@NotEmpty @RequestParam String username) {
+    public EmptyJsonResponse existUsername(@Valid @NotEmpty @RequestParam String username) {
 
         userService.existUsername(username.trim());
 

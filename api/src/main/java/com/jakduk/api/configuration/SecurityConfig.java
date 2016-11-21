@@ -8,6 +8,7 @@ import com.jakduk.api.configuration.authentication.handler.RestAuthenticationEnt
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -65,23 +66,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(
                         "/api/login",           // 로그인
                         "/auth/*",              // SNS 인증
-                        "/signup",              // SNS 계정으로 회원 가입
-                        "/user/social",         // OAUTH2 콜백
-                        "/user/write",          // JakduK 회원 가입
-                        "/user/*/write",        // SNS 계정으로 회원 가입
-                        "/password/*"           // 비밀번호 찾기
+                        "/signup"               // SNS 계정으로 회원 가입
+                    ).anonymous()
+                    .antMatchers(
+                            HttpMethod.POST,
+                            "/api/user",            // 이메일 기반 회원 가입
+                            "/api/user/social"      // SNS 기반 회원 가입
                     ).anonymous()
                     .antMatchers(
                         "/user/**",
 //                      "/swagger-ui.html",     // 스웨거
                         "/rest/**"              // spring-data-rest
                         ).authenticated()
-
-                    // RESTful로 전환했기 때문에 바뀌어야 한다
                     .antMatchers(
-                        "/board/*/write",
-                        "/board/*/edit",
-                        "/jakdu/write"
+
                     ).hasAnyRole("USER_01", "USER_02", "USER_03")
                     .antMatchers(
                         "/admin/**",
