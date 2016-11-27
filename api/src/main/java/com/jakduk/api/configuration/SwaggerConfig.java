@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiKey;
@@ -66,14 +67,12 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfo(
-                "JakduK REST API",
-                "Some custom description of API.",
-                "API TOS",
-                "Terms of service",
-                new Contact("pio.", "https://jakduk.com", "phjang1983@daum.net"),
-                "License of API",
-                "https://github.com/JakduK/JakduK/blob/master/LICENSE");
+        return new ApiInfoBuilder()
+                .title("JakduK REST API with Swagger")
+                .contact(new Contact("pio.", "https://jakduk.com", "phjang1983@daum.net"))
+                .license("The MIT License (MIT)")
+                .licenseUrl("https://github.com/JakduK/jakduk-api/blob/master/LICENSE")
+                .build();
     }
 
     private ApiKey apiKey() {
