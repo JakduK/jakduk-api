@@ -1,6 +1,5 @@
 package com.jakduk.core.configuration;
 
-import com.jakduk.core.trigger.TokenTerminationTrigger;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
@@ -19,14 +18,6 @@ import java.util.concurrent.Executor;
 @Configuration
 @EnableAsync
 public class CoreAsyncConfig implements AsyncConfigurer {
-
-    @Bean(initMethod = "init")
-    public TokenTerminationTrigger tokenTerminationTrigger() {
-        TokenTerminationTrigger tokenTerminationTrigger = new TokenTerminationTrigger();
-        tokenTerminationTrigger.setSpan(5);
-
-        return tokenTerminationTrigger;
-    }
 
     @Override
     public Executor getAsyncExecutor() {

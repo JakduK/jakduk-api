@@ -82,9 +82,6 @@ public class AdminService {
 	private GalleryRepository galleryRepository;
 	
 	@Autowired
-	private AttendanceLeagueRepository attendanceLeagueReposidory;
-	
-	@Autowired
 	private HomeDescriptionRepository homeDescriptionReposotiry;
 	
 	@Autowired

@@ -13,6 +13,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -67,8 +69,8 @@ public class CommonService {
 	}
 
 	// 토큰 가져오기.
-	public Token getTokenByCode(String code) {
-		return tokenRepository.findByCode(code);
+	public Optional<Token> getTokenByCode(String code) {
+		return tokenRepository.findOneByCode(code);
 	}
 
 }

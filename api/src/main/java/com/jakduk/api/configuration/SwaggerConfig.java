@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -13,6 +15,7 @@ import springfox.documentation.swagger.web.ApiKeyVehicle;
 import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,6 +49,7 @@ public class SwaggerConfig {
                 .host(environment.getProperty("swagger.host"))
                 .apiInfo(apiInfo())
                 .useDefaultResponseMessages(false)
+                .securitySchemes(Collections.singletonList(apiKey()))
                 .produces(producesList);
     }
 
@@ -58,18 +62,20 @@ public class SwaggerConfig {
                 "test-app",
                 "",
                 ApiKeyVehicle.HEADER,
-                "Authorization",
+                "",
                 "," /*scope separator*/);
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfo(
-                "JakduK REST API",
-                "Some custom description of API.",
-                "API TOS",
-                "Terms of service",
-                new Contact("pio.", "https://jakduk.com", "phjang1983@daum.net"),
-                "License of API",
-                "https://github.com/JakduK/JakduK/blob/master/LICENSE");
+        return new ApiInfoBuilder()
+                .title("JakduK REST API with Swagger")
+                .contact(new Contact("pio.", "https://jakduk.com", "phjang1983@daum.net"))
+                .license("The MIT License (MIT)")
+                .licenseUrl("https://github.com/JakduK/jakduk-api/blob/master/LICENSE")
+                .build();
+    }
+
+    private ApiKey apiKey() {
+        return new ApiKey("Authorization", "api_key", "header");
     }
 }

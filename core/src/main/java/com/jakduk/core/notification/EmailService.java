@@ -17,6 +17,8 @@ import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Slf4j
@@ -25,9 +27,6 @@ public class EmailService {
 
 	@Value("${email.enable}")
 	private boolean emailEnabled;
-
-	@Autowired
-	private CommonService commonService;
 
 	@Autowired
 	private TokenRepository tokenRepository;
@@ -49,13 +48,15 @@ public class EmailService {
 		}
 
 		String code = UUID.randomUUID().toString();
+		String callbackUrl = host + "/" + code;
+
 		ResourceBundle bundle = ResourceBundle.getBundle("messages.user", locale);
 		String language = CoreUtils.getLanguageCode(locale, null);
 
 		// Prepare the evaluation context
 		final Context ctx = new Context(locale);
 		ctx.setVariable("email", recipientEmail);
-		ctx.setVariable("host", host + code);
+		ctx.setVariable("callbackUrl", callbackUrl);
 		ctx.setVariable("linkLabel", bundle.getString("user.password.change"));
 
 		String subject = "jakduk.com-" + bundle.getString("user.password.reset.instructions");
@@ -88,7 +89,9 @@ public class EmailService {
 		Token token = new Token();
 		token.setEmail(recipientEmail);
 		token.setCode(code);
-		token.setCreatedTime(new Date());
+		token.setExpireAt(
+				Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
+		);
 
 		if (Objects.nonNull(tokenRepository.findOne(recipientEmail))) {
 			tokenRepository.delete(recipientEmail);
