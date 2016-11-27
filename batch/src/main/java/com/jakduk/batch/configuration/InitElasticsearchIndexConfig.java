@@ -44,8 +44,8 @@ public class InitElasticsearchIndexConfig {
                 .incrementer(new RunIdIncrementer())
                 .start(deleteIndexStep)
                 .next(initSearchIndexStep)
-                .next(initSearchTypeStep)
-                .next(initSearchDocumentsStep)
+//                .next(initSearchTypeStep)
+//                .next(initSearchDocumentsStep)
                 .build();
     }
 
@@ -73,6 +73,8 @@ public class InitElasticsearchIndexConfig {
                 .tasklet((contribution, chunkContext) -> {
 
                     searchService.createIndexBoard();
+                    searchService.createIndexComment();
+                    searchService.createIndexGallery();
 
                     return RepeatStatus.FINISHED;
                 })
@@ -83,7 +85,8 @@ public class InitElasticsearchIndexConfig {
     public Step initSearchTypeStep() {
         return stepBuilderFactory.get("initSearchTypeStep")
                 .tasklet((contribution, chunkContext) -> {
-                    searchService.initSearchType();
+
+                    searchService.createMappingBoard();
 
                     return RepeatStatus.FINISHED;
                 })

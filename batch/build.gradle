@@ -1,10 +1,14 @@
 description = 'batch'
 
+configurations {
+	all*.exclude group:'javax.persistence'
+}
+
 dependencies {
 	compile project(':core')
 
 	compile('org.springframework.boot:spring-boot-starter-batch') {
-		//exclude group:'org.apache.tomcat', module:'tomcat-jdbc'
+		exclude group:'org.apache.tomcat', module:'tomcat-jdbc'
 //		exclude group:'org.springframework', module:'spring-jdbc'
 	}
 }

@@ -409,12 +409,6 @@ public class JestTest extends AbstractSpringTest {
 
 	@Ignore
 	@Test
-	public void initSearchIndex() {
-		sut.initSearchIndex();
-	}
-
-	@Ignore
-	@Test
 	public void initSearchType() throws JsonProcessingException {
 		sut.initSearchType();
 	}
@@ -425,11 +419,6 @@ public class JestTest extends AbstractSpringTest {
 		sut.initSearchDocuments();
 	}
 
-	@Ignore
-	@Test
-	public void deleteIndex() throws UnknownHostException {
-		sut.deleteIndex();
-	}
 
 	@Test
 	public void queryDSL() throws JsonProcessingException {

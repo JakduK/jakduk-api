@@ -1,7 +1,10 @@
 package com.jakduk.core.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.jakduk.core.common.CommonConst;
 import com.jakduk.core.dao.JakdukDAO;
@@ -27,6 +30,8 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -67,6 +72,10 @@ public class SearchService {
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
+
+	private final String ELASTICSEARCH_TYPE_BOARD = "board";
+	private final String ELASTICSEARCH_TYPE_COMEMMNT = "comment";
+	private final String ELASTICSEARCH_TYPE_GALLERY = "gallery";
 
 	/**
 	 * 게시물 검색
@@ -346,45 +355,29 @@ public class SearchService {
 		}
 	}
 
-	/**
-	 * 엘라스틱서치 인덱스 초기화.
-	 * @return
-	 */
-	public HashMap<String, Object> initSearchIndex() {
-
-		HashMap<String, Object> result = new HashMap<>();
-
-		Settings.Builder builder = Settings.builder();
-		//settingsBuilder.put("number_of_shards", 5);
-		//settingsBuilder.put("number_of_replicas", 1);
-		builder.put("index.analysis.analyzer.korean.type", "custom");
-		builder.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer");
-		builder.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
-
-		try {
-			JestResult jestResult = jestClient.execute(
-					new CreateIndex.Builder(elasticsearchIndexName)
-							.settings(builder.build().getAsMap())
-							.build()
-			);
-
-			if (! jestResult.isSucceeded()) {
-				log.debug(jestResult.getErrorMessage());
-			} else {
-				result.put("result", Boolean.TRUE);
-			}
-		} catch (IOException e) {
-			result.put("result", Boolean.FALSE);
-			log.error(e.getMessage(), e);
-		}
-
-		return result;
-	}
-
-	public void createIndexBoard() {
+	public void createIndexBoard() throws IOException {
 
 		//settingsBuilder.put("number_of_shards", 5);
 		//settingsBuilder.put("number_of_replicas", 1);
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		ObjectNode subjectNode = objectMapper.createObjectNode();
+		subjectNode.put("type", "string");
+		subjectNode.put("analyzer", "korean");
+
+		ObjectNode contentNode = objectMapper.createObjectNode();
+		contentNode.put("type", "string");
+		contentNode.put("analyzer", "korean");
+
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("subject", subjectNode);
+		propertiesNode.set("content", contentNode);
+
+		ObjectNode boardMappings = objectMapper.createObjectNode();
+		boardMappings.set("properties", propertiesNode);
 
 		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
 				.setSettings(
@@ -393,9 +386,62 @@ public class SearchService {
 								.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
 								.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
 				)
+				.addMapping(ELASTICSEARCH_TYPE_BOARD, objectMapper.writeValueAsString(boardMappings))
 				.get();
 
-		log.debug(response.toString());
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexBoard + " created");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created");
+		}
+	}
+
+	public void createIndexComment() {
+		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexComment)
+				.setSettings(
+						Settings.builder()
+								.put("index.analysis.analyzer.korean.type", "custom")
+								.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+								.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
+				)
+				.get();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexComment + " created");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexComment + " not created");
+		}
+	}
+
+	public void createIndexGallery() {
+		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
+				.setSettings(
+						Settings.builder()
+								.put("index.analysis.analyzer.korean.type", "custom")
+								.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+								.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
+				)
+				.get();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexGallery + " created");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created");
+		}
+	}
+
+	public void createMappingBoard() {
+
+		Map<String, String> subject = new HashMap<String, String>() {
+			{
+				put("properties.subject.type", "string");
+				put("properties.subject.analyzer", "korean");
+			}
+		};
+
+		client.admin().indices().prepareCreate(elasticsearchIndexBoard)
+				.addMapping(ELASTICSEARCH_TYPE_BOARD, subject)
+				.get();
 	}
 
 	/**
@@ -593,30 +639,42 @@ public class SearchService {
 		return result;
 	}
 
-	public void deleteIndexBoard() throws UnknownHostException {
+	public void deleteIndexBoard() {
 
 		DeleteIndexResponse response = client.admin().indices()
 				.delete(new DeleteIndexRequest(elasticsearchIndexBoard))
 				.actionGet();
 
-		log.debug(response.toString());
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexBoard + " deleted");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not deleted");
+		}
 	}
 
-	public void deleteIndexComment() throws UnknownHostException {
+	public void deleteIndexComment() {
 
 		DeleteIndexResponse response = client.admin().indices()
 				.delete(new DeleteIndexRequest(elasticsearchIndexComment))
 				.actionGet();
 
-		log.debug(response.toString());
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexComment + " deleted");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexComment + " not deleted");
+		}
 	}
 
-	public void deleteIndexGallery() throws UnknownHostException {
+	public void deleteIndexGallery() {
 
 		DeleteIndexResponse response = client.admin().indices()
 				.delete(new DeleteIndexRequest(elasticsearchIndexGallery))
 				.actionGet();
 
-		log.debug(response.toString());
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexGallery + " deleted");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not deleted");
+		}
 	}
 }
