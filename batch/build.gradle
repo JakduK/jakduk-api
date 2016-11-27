@@ -1,18 +1,10 @@
 description = 'batch'
 
-configurations {
-	//all*.exclude group:'org.springframework.mobile', module:'spring-mobile-device'
-	all*.exclude group:'org.springframework', module:'spring-webmvc'
-	all*.exclude group:'org.springframework', module:'spring-web'
-	all*.exclude group:'commons-fileupload', module:'commons-fileupload'
-	all*.exclude group:'commons-beanutils', module:'commons-beanutils'
-	//all*.exclude group:'org.elasticsearch', module:'elasticsearch'
-	all*.exclude group:'org.hibernate.javax.persistence'
-	all*.exclude group:'org.apache.tomcat'
-}
-
 dependencies {
 	compile project(':core')
 
-	compile('org.springframework.boot:spring-boot-starter-batch')
+	compile('org.springframework.boot:spring-boot-starter-batch') {
+		//exclude group:'org.apache.tomcat', module:'tomcat-jdbc'
+//		exclude group:'org.springframework', module:'spring-jdbc'
+	}
 }

@@ -21,9 +21,11 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +49,15 @@ public class SearchService {
 
     @Value("${elasticsearch.enable}")
     private boolean elasticsearchEnable;
+
+	@Value("${core.elasticsearch.index.board}")
+	private String elasticsearchIndexBoard;
+
+	@Value("${core.elasticsearch.index.comment}")
+	private String elasticsearchIndexComment;
+
+	@Value("${core.elasticsearch.index.gallery}")
+	private String elasticsearchIndexGallery;
 
 	@Autowired
 	private JestClient jestClient;
@@ -370,6 +381,23 @@ public class SearchService {
 		return result;
 	}
 
+	public void createIndexBoard() {
+
+		//settingsBuilder.put("number_of_shards", 5);
+		//settingsBuilder.put("number_of_replicas", 1);
+
+		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
+				.setSettings(
+						Settings.builder()
+								.put("index.analysis.analyzer.korean.type", "custom")
+								.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+								.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
+				)
+				.get();
+
+		log.debug(response.toString());
+	}
+
 	/**
 	 * 엘라스틱서치 매핑 초기화.
 	 * @return
@@ -565,13 +593,30 @@ public class SearchService {
 		return result;
 	}
 
-	public void deleteIndex() throws UnknownHostException {
+	public void deleteIndexBoard() throws UnknownHostException {
 
 		DeleteIndexResponse response = client.admin().indices()
-				.delete(new DeleteIndexRequest(elasticsearchIndexName))
+				.delete(new DeleteIndexRequest(elasticsearchIndexBoard))
 				.actionGet();
 
 		log.debug(response.toString());
+	}
 
+	public void deleteIndexComment() throws UnknownHostException {
+
+		DeleteIndexResponse response = client.admin().indices()
+				.delete(new DeleteIndexRequest(elasticsearchIndexComment))
+				.actionGet();
+
+		log.debug(response.toString());
+	}
+
+	public void deleteIndexGallery() throws UnknownHostException {
+
+		DeleteIndexResponse response = client.admin().indices()
+				.delete(new DeleteIndexRequest(elasticsearchIndexGallery))
+				.actionGet();
+
+		log.debug(response.toString());
 	}
 }

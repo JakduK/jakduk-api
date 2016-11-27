@@ -1,13 +1,13 @@
 package com.jakduk.batch.configuration;
 
 import com.jakduk.core.service.SearchService;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * Created by pyohwan on 16. 9. 18.
  */
 
+@Slf4j
 @Configuration
 public class InitElasticsearchIndexConfig {
 
@@ -54,21 +55,24 @@ public class InitElasticsearchIndexConfig {
                 .tasklet((contribution, chunkContext) -> {
 
                     try {
-                        searchService.deleteIndex();
+                        searchService.deleteIndexBoard();
+                        searchService.deleteIndexComment();
+                        searchService.deleteIndexGallery();
                     } catch (IndexNotFoundException e) {
+                        log.error(e.getLocalizedMessage());
                     }
 
                     return RepeatStatus.FINISHED;
                 })
                 .build();
-
     }
 
     @Bean
     public Step initSearchIndexStep() {
         return stepBuilderFactory.get("initSearchIndexStep")
                 .tasklet((contribution, chunkContext) -> {
-                    searchService.initSearchIndex();
+
+                    searchService.createIndexBoard();
 
                     return RepeatStatus.FINISHED;
                 })
