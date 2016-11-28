@@ -1,7 +1,7 @@
 package com.jakduk.core.service;
 
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -67,12 +67,12 @@ public class UserService {
 	}
 
 	// SNS 계정으로 가입한 회원 찾기.
-	public UserProfile findUserProfileByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public UserProfile findUserProfileByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userProfileRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
 	// SNS 계정으로 가입한 회원 찾기(로그인).
-	public User findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public User findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
@@ -97,7 +97,7 @@ public class UserService {
 				.email(email.trim())
 				.username(username.trim())
 				.password(password)
-				.providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
+				.providerId(CoreConst.ACCOUNT_TYPE.JAKDUK)
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
 				.build();
 
@@ -118,7 +118,7 @@ public class UserService {
 		return returnUser;
 	}
 
-	public User addSocialUser(String email, String username, CommonConst.ACCOUNT_TYPE providerId, String providerUserId, String footballClub, String about) {
+	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId, String footballClub, String about) {
 		User user = User.builder()
 				.email(email.trim())
 				.username(username.trim())

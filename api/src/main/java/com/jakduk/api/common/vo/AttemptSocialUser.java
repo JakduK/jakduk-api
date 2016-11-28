@@ -1,6 +1,6 @@
 package com.jakduk.api.common.vo;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.*;
 
 /**
@@ -13,6 +13,6 @@ import lombok.*;
 public class AttemptSocialUser {
     private String email;
     private String username;
-    private CommonConst.ACCOUNT_TYPE providerId;
+    private CoreConst.ACCOUNT_TYPE providerId;
     private String providerUserId;
 }

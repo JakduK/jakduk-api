@@ -3,7 +3,7 @@ package com.jakduk.core.search;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.core.model.elasticsearch.CommentOnES;
@@ -28,7 +28,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -292,7 +291,7 @@ public class JestTest extends AbstractSpringTest {
 
 		Search search = new Search.Builder(query)
 				.addIndex("jakduk_test")
-				.addType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+				.addType(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
 				.build();
 		
 		try {

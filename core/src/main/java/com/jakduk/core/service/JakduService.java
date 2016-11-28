@@ -1,6 +1,6 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.RepositoryExistException;
@@ -162,7 +162,7 @@ public class JakduService {
     /**
      * 작두 댓글 감정 표현
      */
-    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, CommonConst.FEELING_TYPE feeling) {
+    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, CoreConst.FEELING_TYPE feeling) {
 
         String userId = writer.getUserId();
         String username = writer.getUsername();
@@ -178,14 +178,14 @@ public class JakduService {
 
         // 이 게시물의 작성자라서 감정 표현을 할 수 없음
         if (userId.equals(jakdukWriter.getUserId())) {
-            throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
+            throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.WRITER.toString()
                     , CoreUtils.getExceptionMessage("exception.you.are.writer"));
         }
 
         // 해당 회원이 좋아요를 이미 했는지 검사
         for (CommonFeelingUser feelingUser : usersLiking) {
             if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-                throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+                throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
                         , CoreUtils.getExceptionMessage("exception.select.already.like"));
             }
         }
@@ -193,7 +193,7 @@ public class JakduService {
         // 해당 회원이 싫어요를 이미 했는지 검사
         for (CommonFeelingUser feelingUser : usersDisliking) {
             if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-                throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+                throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
                         , CoreUtils.getExceptionMessage("exception.select.already.like"));
             }
         }

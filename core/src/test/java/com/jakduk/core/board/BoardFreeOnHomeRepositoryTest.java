@@ -1,6 +1,6 @@
 package com.jakduk.core.board;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.simple.BoardFreeOnHome;
 import com.jakduk.core.repository.board.free.BoardFreeOnHomeRepository;
 import com.jakduk.core.util.AbstractSpringTest;
@@ -25,7 +25,7 @@ public class BoardFreeOnHomeRepositoryTest extends AbstractSpringTest {
     @Test
     public void findAll() {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
-        Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
+        Pageable pageable = new PageRequest(0, CoreConst.HOME_SIZE_LINE_NUMBER, sort);
 
         Page<BoardFreeOnHome> freeOnHomePage = sut.findAll(pageable);
 

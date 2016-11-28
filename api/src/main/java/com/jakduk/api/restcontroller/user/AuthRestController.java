@@ -12,7 +12,7 @@ import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
@@ -122,7 +122,7 @@ public class AuthRestController {
                                              Device device,
                                              HttpServletResponse response) {
 
-        CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
+        CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
         SocialProfile socialProfile = null;
 
         switch (convertProviderId) {

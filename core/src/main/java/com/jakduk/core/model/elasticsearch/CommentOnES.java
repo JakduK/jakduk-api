@@ -1,6 +1,6 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -36,8 +36,8 @@ public class CommentOnES {
 	public CommentOnES(BoardFreeComment boardFreeComment) {
 
 		String contentES = Optional.ofNullable(boardFreeComment.getContent()).orElse("");
-		contentES = StringUtils.replacePattern(contentES, CommonConst.REGEX_FIND_HTML_TAG, "");
-		contentES = StringUtils.replacePattern(contentES, CommonConst.REGEX_FIND_HTML_WHITESPACE, "");
+		contentES = StringUtils.replacePattern(contentES, CoreConst.REGEX_FIND_HTML_TAG, "");
+		contentES = StringUtils.replacePattern(contentES, CoreConst.REGEX_FIND_HTML_WHITESPACE, "");
 
 		this.id = boardFreeComment.getId();
 		this.boardItem = boardFreeComment.getBoardItem();

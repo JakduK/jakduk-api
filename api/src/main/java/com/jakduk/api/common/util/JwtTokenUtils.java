@@ -2,7 +2,7 @@ package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import io.jsonwebtoken.*;
@@ -76,7 +76,7 @@ public class JwtTokenUtils implements Serializable {
 
             if (claims.containsKey("providerId")) {
                 String temp =claims.get("providerId", String.class);
-                attemptSocialUser.setProviderId(CommonConst.ACCOUNT_TYPE.valueOf(temp));
+                attemptSocialUser.setProviderId(CoreConst.ACCOUNT_TYPE.valueOf(temp));
             }
 
             if (claims.containsKey("providerUserId"))

@@ -1,6 +1,6 @@
 package com.jakduk.core.model.db;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -24,7 +24,7 @@ public class JakduScheduleGroup {
 
     private int seq;
 
-    private CommonConst.JAKDU_GROUP_STATE state;
+    private CoreConst.JAKDU_GROUP_STATE state;
 
     @Temporal(TemporalType.DATE)
     private Date openDate;
@@ -45,11 +45,11 @@ public class JakduScheduleGroup {
         this.seq = seq;
     }
 
-    public CommonConst.JAKDU_GROUP_STATE getState() {
+    public CoreConst.JAKDU_GROUP_STATE getState() {
         return state;
     }
 
-    public void setState(CommonConst.JAKDU_GROUP_STATE state) {
+    public void setState(CoreConst.JAKDU_GROUP_STATE state) {
         this.state = state;
     }
 

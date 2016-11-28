@@ -37,14 +37,12 @@ public class InitElasticsearchIndexConfig {
     @Bean
     public Job initElasticsearchIndexJob(@Qualifier("deleteIndexStep") Step deleteIndexStep,
                                          @Qualifier("initSearchIndexStep") Step initSearchIndexStep,
-                                         @Qualifier("initSearchTypeStep") Step initSearchTypeStep,
                                          @Qualifier("initSearchDocumentsStep") Step initSearchDocumentsStep) throws Exception {
 
         return jobBuilderFactory.get("initElasticsearchIndexJob")
                 .incrementer(new RunIdIncrementer())
                 .start(deleteIndexStep)
                 .next(initSearchIndexStep)
-//                .next(initSearchTypeStep)
 //                .next(initSearchDocumentsStep)
                 .build();
     }
@@ -58,6 +56,7 @@ public class InitElasticsearchIndexConfig {
                         searchService.deleteIndexBoard();
                         searchService.deleteIndexComment();
                         searchService.deleteIndexGallery();
+
                     } catch (IndexNotFoundException e) {
                         log.error(e.getLocalizedMessage());
                     }
@@ -75,18 +74,6 @@ public class InitElasticsearchIndexConfig {
                     searchService.createIndexBoard();
                     searchService.createIndexComment();
                     searchService.createIndexGallery();
-
-                    return RepeatStatus.FINISHED;
-                })
-                .build();
-    }
-
-    @Bean
-    public Step initSearchTypeStep() {
-        return stepBuilderFactory.get("initSearchTypeStep")
-                .tasklet((contribution, chunkContext) -> {
-
-                    searchService.createMappingBoard();
 
                     return RepeatStatus.FINISHED;
                 })

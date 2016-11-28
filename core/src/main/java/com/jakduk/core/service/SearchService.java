@@ -1,12 +1,11 @@
 package com.jakduk.core.service;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.util.SearchUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -20,25 +19,19 @@ import com.jakduk.core.model.elasticsearch.JakduCommentOnES;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.*;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.mapping.PutMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -72,10 +65,6 @@ public class SearchService {
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
-
-	private final String ELASTICSEARCH_TYPE_BOARD = "board";
-	private final String ELASTICSEARCH_TYPE_COMEMMNT = "comment";
-	private final String ELASTICSEARCH_TYPE_GALLERY = "gallery";
 
 	/**
 	 * 게시물 검색
@@ -114,8 +103,8 @@ public class SearchService {
 		// script_fields
 		queryScriptFieldsContentPreview.put("script",
 			String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
-				CommonConst.SEARCH_CONTENT_MAX_LENGTH,
-				CommonConst.SEARCH_CONTENT_MAX_LENGTH
+				CoreConst.SEARCH_CONTENT_MAX_LENGTH,
+				CoreConst.SEARCH_CONTENT_MAX_LENGTH
 			)
 		);
 
@@ -131,7 +120,7 @@ public class SearchService {
 		try {
 			Search search = new Search.Builder(objectMapper.writeValueAsString(query))
 					.addIndex(elasticsearchIndexName)
-					.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+					.addType(CoreConst.ELASTICSEARCH_TYPE_BOARD)
 					.build();
 
 			return jestClient.execute(search);
@@ -149,7 +138,7 @@ public class SearchService {
 
             Index index = new Index.Builder(boardFreeOnES)
                     .index(elasticsearchIndexName)
-                    .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+                    .type(CoreConst.ELASTICSEARCH_TYPE_BOARD)
                     .build();
 
             try {
@@ -169,7 +158,7 @@ public class SearchService {
         try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
 			        .index(elasticsearchIndexName)
-			        .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+			        .type(CoreConst.ELASTICSEARCH_TYPE_BOARD)
 			        .build());
 
 			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
@@ -205,7 +194,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(new Gson().toJson(query))
 			.addIndex(elasticsearchIndexName)
-			.addType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+			.addType(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
 			.build();
 		
 		try {
@@ -223,7 +212,7 @@ public class SearchService {
 
             Index index = new Index.Builder(commentOnES)
                     .index(elasticsearchIndexName)
-                    .type(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+                    .type(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
                     .build();
 
             try {
@@ -235,7 +224,7 @@ public class SearchService {
 	}
 
 	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
-		Index index = new Index.Builder(jakduCommentOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_COMMENT).build();
+		Index index = new Index.Builder(jakduCommentOnES).index(elasticsearchIndexName).type(CoreConst.ELASTICSEARCH_TYPE_COMMENT).build();
 
 		try {
 			JestResult jestResult = jestClient.execute(index);
@@ -269,7 +258,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(query)
 				.addIndex(elasticsearchIndexName)
-				.addType(CommonConst.ELASTICSEARCH_TYPE_JAKDU_COMMENT)
+				.addType(CoreConst.ELASTICSEARCH_TYPE_JAKDU_COMMENT)
 				.build();
 
 		try {
@@ -302,7 +291,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(new Gson().toJson(query))
 			.addIndex(elasticsearchIndexName)
-			.addType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+			.addType(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
 			.build();
 		
 		try {
@@ -321,7 +310,7 @@ public class SearchService {
 
             Index index = new Index.Builder(galleryOnES)
                     .index(elasticsearchIndexName)
-                    .type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+                    .type(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
                     .build();
 
             try {
@@ -341,7 +330,7 @@ public class SearchService {
 		try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
 					.index(elasticsearchIndexName)
-					.type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+					.type(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
 					.build());
 
 			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
@@ -355,14 +344,23 @@ public class SearchService {
 		}
 	}
 
-	public void createIndexBoard() throws IOException {
+	private Settings.Builder getIndexSettings() {
 
 		//settingsBuilder.put("number_of_shards", 5);
 		//settingsBuilder.put("number_of_replicas", 1);
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		return Settings.builder()
+				.put("index.analysis.analyzer.korean.type", "custom")
+				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
+	}
+
+	public void createIndexBoard() throws IOException {
+
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
 
 		ObjectNode subjectNode = objectMapper.createObjectNode();
 		subjectNode.put("type", "string");
@@ -372,21 +370,45 @@ public class SearchService {
 		contentNode.put("type", "string");
 		contentNode.put("analyzer", "korean");
 
+		ObjectNode seqNode = objectMapper.createObjectNode();
+		seqNode.put("type", "integer");
+		seqNode.put("index", "no");
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
 		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
 		propertiesNode.set("subject", subjectNode);
 		propertiesNode.set("content", contentNode);
+		propertiesNode.set("seq", seqNode);
+		propertiesNode.set("writer", writerNode);
 
-		ObjectNode boardMappings = objectMapper.createObjectNode();
-		boardMappings.set("properties", propertiesNode);
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
 
 		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
-				.setSettings(
-						Settings.builder()
-								.put("index.analysis.analyzer.korean.type", "custom")
-								.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
-								.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
-				)
-				.addMapping(ELASTICSEARCH_TYPE_BOARD, objectMapper.writeValueAsString(boardMappings))
+				.setSettings(getIndexSettings())
+				.addMapping(CoreConst.ELASTICSEARCH_TYPE_BOARD, objectMapper.writeValueAsString(mappings))
 				.get();
 
 		if (response.isAcknowledged()) {
@@ -396,14 +418,67 @@ public class SearchService {
 		}
 	}
 
-	public void createIndexComment() {
+	public void createIndexComment() throws JsonProcessingException {
+
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode contentNode = objectMapper.createObjectNode();
+		contentNode.put("type", "string");
+		contentNode.put("analyzer", "korean");
+
+		// boardItem
+		ObjectNode boardItemIdNode = objectMapper.createObjectNode();
+		boardItemIdNode.put("type", "string");
+		boardItemIdNode.put("index", "no");
+
+		ObjectNode boardItemSeqNode = objectMapper.createObjectNode();
+		boardItemSeqNode.put("type", "integer");
+		boardItemSeqNode.put("index", "no");
+
+		ObjectNode boardItemPropertiesNode = objectMapper.createObjectNode();
+		boardItemPropertiesNode.set("id", boardItemIdNode);
+		boardItemPropertiesNode.set("seq", boardItemSeqNode);
+
+		ObjectNode boardItemNode = objectMapper.createObjectNode();
+		boardItemNode.set("properties", boardItemPropertiesNode);
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("content", contentNode);
+		propertiesNode.set("writer", writerNode);
+		propertiesNode.set("boardItem", boardItemNode);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
 		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexComment)
-				.setSettings(
-						Settings.builder()
-								.put("index.analysis.analyzer.korean.type", "custom")
-								.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
-								.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
-				)
+				.setSettings(getIndexSettings())
+				.addMapping(CoreConst.ELASTICSEARCH_TYPE_COMMENT, objectMapper.writeValueAsString(mappings))
 				.get();
 
 		if (response.isAcknowledged()) {
@@ -413,14 +488,50 @@ public class SearchService {
 		}
 	}
 
-	public void createIndexGallery() {
+	public void createIndexGallery() throws JsonProcessingException {
+
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode nameNode = objectMapper.createObjectNode();
+		nameNode.put("type", "string");
+		nameNode.put("analyzer", "korean");
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("name", nameNode);
+		propertiesNode.set("writer", writerNode);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
 		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
-				.setSettings(
-						Settings.builder()
-								.put("index.analysis.analyzer.korean.type", "custom")
-								.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
-								.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
-				)
+				.setSettings(getIndexSettings())
+				.addMapping(CoreConst.ELASTICSEARCH_TYPE_GALLERY, objectMapper.writeValueAsString(mappings))
 				.get();
 
 		if (response.isAcknowledged()) {
@@ -428,102 +539,6 @@ public class SearchService {
 		} else {
 			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created");
 		}
-	}
-
-	public void createMappingBoard() {
-
-		Map<String, String> subject = new HashMap<String, String>() {
-			{
-				put("properties.subject.type", "string");
-				put("properties.subject.analyzer", "korean");
-			}
-		};
-
-		client.admin().indices().prepareCreate(elasticsearchIndexBoard)
-				.addMapping(ELASTICSEARCH_TYPE_BOARD, subject)
-				.get();
-	}
-
-	/**
-	 * 엘라스틱서치 매핑 초기화.
-	 * @return
-	 */
-	public HashMap<String, Object> initSearchType() throws JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		Map<String, Object> source = new HashMap<>();
-
-		// 게시물 매핑 초기화.
-		Map<String, Object> properties = new HashMap<>();
-		Map<String, Object> subject = new HashMap<>();
-		Map<String, Object> content = new HashMap<>();
-
-		subject.put("type", "string");
-		subject.put("analyzer", "korean");
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("subject", subject);
-		properties.put("content", content);
-		source.put("properties", properties);
-
-		PutMapping putMapping1 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_BOARD,
-				objectMapper.writeValueAsString(source)
-		).build();
-
-		// 댓글 매핑 초기화.
-		properties = new HashMap<>();
-		source = new HashMap<>();
-		content = new HashMap<>();
-
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("content", content);
-		source.put("properties", properties);
-
-		PutMapping putMapping2 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_COMMENT,
-				objectMapper.writeValueAsString(source)
-		).build();
-
-		// 사진첩 매핑 초기화.
-		properties = new HashMap<>();
-		source = new HashMap<>();
-		content = new HashMap<>();
-
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("name", content);
-		source.put("properties", properties);
-
-		PutMapping putMapping3 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_GALLERY,
-				objectMapper.writeValueAsString(source)
-		).build();
-
-		HashMap<String, Object> result = new HashMap<>();
-
-		try {
-			JestResult jestResult1 = jestClient.execute(putMapping1);
-			JestResult jestResult2 = jestClient.execute(putMapping2);
-			JestResult jestResult3 = jestClient.execute(putMapping3);
-
-			if (! jestResult1.isSucceeded())
-				log.debug(jestResult1.getErrorMessage());
-
-			if (! jestResult2.isSucceeded())
-				log.debug(jestResult2.getErrorMessage());
-
-			if (! jestResult3.isSucceeded())
-				log.debug(jestResult3.getErrorMessage());
-
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-
-		return result;
 	}
 
 	/**
@@ -547,7 +562,7 @@ public class SearchService {
 
 			Bulk bulk = new Bulk.Builder()
 					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
+					.defaultType(CoreConst.ELASTICSEARCH_TYPE_BOARD)
 					.addAction(idxList)
 					.build();
 
@@ -581,7 +596,7 @@ public class SearchService {
 
 			Bulk bulk = new Bulk.Builder()
 					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+					.defaultType(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
 					.addAction(idxList)
 					.build();
 
@@ -615,7 +630,7 @@ public class SearchService {
 
 			Bulk bulk = new Bulk.Builder()
 					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+					.defaultType(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
 					.addAction(idxList)
 					.build();
 

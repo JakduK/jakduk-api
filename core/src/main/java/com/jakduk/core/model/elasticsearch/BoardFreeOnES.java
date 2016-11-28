@@ -1,6 +1,6 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;
@@ -39,12 +39,12 @@ public class BoardFreeOnES {
 	public BoardFreeOnES(BoardFree boardFree) {
 
 		String subjectEL = Optional.ofNullable(boardFree.getSubject()).orElse("");
-		subjectEL = StringUtils.replacePattern(subjectEL, CommonConst.REGEX_FIND_HTML_TAG, "");
-		subjectEL = StringUtils.replacePattern(subjectEL, CommonConst.REGEX_FIND_HTML_WHITESPACE, "");
+		subjectEL = StringUtils.replacePattern(subjectEL, CoreConst.REGEX_FIND_HTML_TAG, "");
+		subjectEL = StringUtils.replacePattern(subjectEL, CoreConst.REGEX_FIND_HTML_WHITESPACE, "");
 
 		String contentEL = Optional.ofNullable(boardFree.getContent()).orElse("");
-		contentEL = StringUtils.replacePattern(contentEL, CommonConst.REGEX_FIND_HTML_TAG, "");
-		contentEL = StringUtils.replacePattern(contentEL, CommonConst.REGEX_FIND_HTML_WHITESPACE, "");
+		contentEL = StringUtils.replacePattern(contentEL, CoreConst.REGEX_FIND_HTML_TAG, "");
+		contentEL = StringUtils.replacePattern(contentEL, CoreConst.REGEX_FIND_HTML_WHITESPACE, "");
 
 		this.id = boardFree.getId();
 		this.writer = boardFree.getWriter();

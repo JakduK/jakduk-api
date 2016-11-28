@@ -1,6 +1,6 @@
 package com.jakduk.core.model.embedded;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.Data;
 
 /**
@@ -13,5 +13,5 @@ import lombok.Data;
 @Data
 public class BoardCommentStatus {
 	
-	private CommonConst.DEVICE_TYPE device;
+	private CoreConst.DEVICE_TYPE device;
 }

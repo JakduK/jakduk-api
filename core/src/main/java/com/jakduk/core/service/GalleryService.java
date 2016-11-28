@@ -1,6 +1,6 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
@@ -100,7 +100,7 @@ public class GalleryService {
 		gallery.setWriter(writer);
 
 		GalleryStatus status = GalleryStatus.builder()
-				.status(CommonConst.GALLERY_STATUS_TYPE.TEMP)
+				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
 				.build();
 
 		gallery.setStatus(status);
@@ -150,8 +150,8 @@ public class GalleryService {
 					Files.write(imageFilePath, bytes);
 				} else {
 
-					double scale = CommonConst.GALLERY_MAXIMUM_CAPACITY < size ?
-							CommonConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
+					double scale = CoreConst.GALLERY_MAXIMUM_CAPACITY < size ?
+							CoreConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
 
                     InputStream originalInputStream = new ByteArrayInputStream(bytes);
 
@@ -172,7 +172,7 @@ public class GalleryService {
 				InputStream thumbInputStream = new ByteArrayInputStream(bytes);
 
 				Thumbnails.of(thumbInputStream)
-						.size(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
+						.size(CoreConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CoreConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
                         .crop(Positions.TOP_CENTER)
 						.toFile(thumbFilePath.toFile());
 			}
@@ -188,7 +188,7 @@ public class GalleryService {
 	}
 
 	// 이미지 가져오기.
-	public ByteArrayOutputStream getGalleryOutStream(Gallery gallery, CommonConst.IMAGE_TYPE imageType) {
+	public ByteArrayOutputStream getGalleryOutStream(Gallery gallery, CoreConst.IMAGE_TYPE imageType) {
 
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
@@ -313,9 +313,9 @@ public class GalleryService {
 		return data;
 	}
 
-	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CommonConst.FEELING_TYPE feeling) {
+	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CoreConst.FEELING_TYPE feeling) {
 
-		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
+		String errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
 		String accountId = writer.getUserId();
 		String accountName = writer.getUsername();
@@ -336,29 +336,29 @@ public class GalleryService {
 
 		if (accountId != null && accountName != null) {
 			if (galleryWriter != null && accountId.equals(galleryWriter.getUserId())) {
-				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
+				errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
 			}
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersLiking.stream();
 				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
 				if (itemCount > 0) {
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+					errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 				}
 			}
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersDisliking.stream();
 				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
 				if (itemCount > 0) {
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+					errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 				}
 			}
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), accountId, accountName);
 
-				if (CommonConst.FEELING_TYPE.LIKE.equals(feeling)) {
+				if (CoreConst.FEELING_TYPE.LIKE.equals(feeling)) {
 					usersLiking.add(feelingUser);
 					gallery.setUsersLiking(usersLiking);
 				} else {
@@ -369,7 +369,7 @@ public class GalleryService {
 				galleryRepository.save(gallery);
 			} else {
 				throw new UserFeelingException(
-					CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
+					CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
 						CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like")
 				);
 			}

@@ -1,7 +1,7 @@
 package com.jakduk.api;
 
 import com.jakduk.api.util.AbstractSpringTest;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
@@ -15,11 +15,7 @@ import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.HomeService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -70,7 +66,7 @@ public class HomeTest extends AbstractSpringTest {
 	@Test
 	public void getFootballClubList() {
 
-		List<FootballClub> footballClubs = footballService.getFootballClubs("ko", CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.shortName);
+		List<FootballClub> footballClubs = footballService.getFootballClubs("ko", CoreConst.CLUB_TYPE.FOOTBALL_CLUB, CoreConst.NAME_TYPE.shortName);
 
 		System.out.println("getFootballClubs=" + footballClubs);
 	}

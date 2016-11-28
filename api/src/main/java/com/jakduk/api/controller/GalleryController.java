@@ -1,6 +1,6 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
@@ -37,7 +37,7 @@ public class GalleryController {
 
 		Gallery gallery = galleryService.findOneById(id);
 
-		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CommonConst.IMAGE_TYPE.FULL);
+		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CoreConst.IMAGE_TYPE.FULL);
 		response.setContentType(gallery.getContentType());
 
 		try {
@@ -55,7 +55,7 @@ public class GalleryController {
 
 		Gallery gallery = galleryService.findOneById(id);
 
-		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CommonConst.IMAGE_TYPE.THUMBNAIL);
+		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CoreConst.IMAGE_TYPE.THUMBNAIL);
 		response.setContentType(gallery.getContentType());
 
 		try {

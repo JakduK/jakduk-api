@@ -1,6 +1,6 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.JakduScheduleScore;
@@ -474,7 +474,7 @@ public class AdminService {
 		jakduScheduleGroup.setState(jakduScheduleGroupWrite.getState());
 
 		if (jakduScheduleGroupWrite.isNextSeq()) {
-			jakduScheduleGroup.setSeq(commonService.getNextSequence(CommonConst.SEQ_JAKDU_SCHEDULE_GROUP));
+			jakduScheduleGroup.setSeq(commonService.getNextSequence(CoreConst.SEQ_JAKDU_SCHEDULE_GROUP));
 		} else {
 			jakduScheduleGroup.setSeq(jakduScheduleGroupWrite.getSeq());
 		}

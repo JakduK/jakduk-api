@@ -1,6 +1,6 @@
 package com.jakduk.core.dao;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.BoardFeelingCount;
@@ -51,7 +51,7 @@ public class BoardDAO {
 		AggregationOperation match = Aggregation.match(Criteria.where("boardItem.seq").in(arrSeq));
 		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
 		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
+		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
 
@@ -85,7 +85,7 @@ public class BoardDAO {
 		AggregationOperation match = Aggregation.match(Criteria.where("seq").in(arrSeq));
 		AggregationOperation group = Aggregation.group("_id").count().as("count");
 		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
+		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFree", CommonCount.class);
 		
@@ -104,7 +104,7 @@ public class BoardDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem.seq").is(boardSeq));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CommonConst.COMMENT_MAX_SIZE);
+		AggregationOperation limit = Aggregation.limit(CoreConst.COMMENT_MAX_SIZE);
 		
 		Aggregation aggregation;
 		
@@ -128,7 +128,7 @@ public class BoardDAO {
 		Iterator<BoardFreeOnBest> iPosts = boardFreeC.aggregate("{$match:{_id:{$gt:#}}}", commentId)
 				.and("{$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}}")
 				.and("{$sort:{count:-1, views:-1}}")
-				.and("{$limit:#}", CommonConst.BOARD_TOP_LIMIT)
+				.and("{$limit:#}", CoreConst.BOARD_TOP_LIMIT)
 				.as(BoardFreeOnBest.class);
 
 		return IteratorUtils.toList(iPosts);
@@ -151,7 +151,7 @@ public class BoardDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(commentId));
 		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
-		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_TOP_LIMIT);
+		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_TOP_LIMIT);
 		Aggregation aggregation = Aggregation.newAggregation(match1, group, sort/*, limit*/);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
 		
@@ -184,7 +184,7 @@ public class BoardDAO {
 	 * @param direction 앞 or 뒤
 	 * @return 글 객체
 	 */
-	public BoardFreeOfMinimum getBoardFreeById(ObjectId id, CommonConst.BOARD_CATEGORY_TYPE category, Direction direction) {
+	public BoardFreeOfMinimum getBoardFreeById(ObjectId id, CoreConst.BOARD_CATEGORY_TYPE category, Direction direction) {
 		Query query = new Query();
 
 		switch (category) {

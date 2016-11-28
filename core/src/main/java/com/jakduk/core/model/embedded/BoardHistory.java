@@ -1,6 +1,6 @@
 package com.jakduk.core.model.embedded;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class BoardHistory {
 	@Id
 	private String id;
 	
-	private CommonConst.BOARD_HISTORY_TYPE type;
+	private CoreConst.BOARD_HISTORY_TYPE type;
 	
 	private CommonWriter writer;
 	

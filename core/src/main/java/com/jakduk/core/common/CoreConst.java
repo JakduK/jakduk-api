@@ -5,7 +5,7 @@ package com.jakduk.core.common;
  * @date     : 2014. 4. 29.
  * @desc     :
  */
-public class CommonConst {
+public class CoreConst {
 
 	/**
 	 * 게시판 종류.

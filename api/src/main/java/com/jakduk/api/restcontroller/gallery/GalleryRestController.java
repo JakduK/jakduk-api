@@ -9,7 +9,7 @@ import com.jakduk.api.restcontroller.gallery.vo.GalleryOnUploadResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;
 import com.jakduk.api.restcontroller.vo.GalleriesResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
@@ -62,7 +62,7 @@ public class GalleryRestController {
     public GalleriesResponse getGalleries(@RequestParam(required = false) String id,
                                           @RequestParam(required = false, defaultValue = "0") Integer size) {
 
-        if (size < CommonConst.GALLERY_SIZE) size = CommonConst.GALLERY_SIZE;
+        if (size < CoreConst.GALLERY_SIZE) size = CoreConst.GALLERY_SIZE;
 
         List<GalleryOnList> galleries = galleryService.getGalleriesById(id, size);
 
@@ -147,7 +147,7 @@ public class GalleryRestController {
 
     @ApiOperation(value = "사진 좋아요 싫어요")
     @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CommonConst.FEELING_TYPE feeling) {
+    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -158,7 +158,7 @@ public class GalleryRestController {
         Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
 
         return UserFeelingResponse.builder()
-          .feeling((CommonConst.FEELING_TYPE) data.get("feeling"))
+          .feeling((CoreConst.FEELING_TYPE) data.get("feeling"))
           .numberOfLike((Integer) data.get("numberOfLike"))
           .numberOfDislike((Integer) data.get("numberOfDislike"))
           .build();

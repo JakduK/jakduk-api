@@ -1,6 +1,6 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.db.HomeDescription;
@@ -19,13 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -70,7 +66,7 @@ public class HomeService {
 	public List<BoardFreeOnHome> getBoardLatest() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
-		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_POST, sort);
+		Pageable pageable = new PageRequest(0, CoreConst.HOME_SIZE_POST, sort);
 
 		return boardFreeOnHomeRepository.findAll(pageable).getContent();
 	}
@@ -85,7 +81,7 @@ public class HomeService {
 	 * @return 사진 목록
      */
 	public List<GalleryOnList> getGalleriesLatest() {
-		return jakdukDAO.findGalleriesById(Direction.DESC, CommonConst.HOME_SIZE_GALLERY, null);
+		return jakdukDAO.findGalleriesById(Direction.DESC, CoreConst.HOME_SIZE_GALLERY, null);
 	}
 	
 	public Integer getRss(HttpServletResponse response, Locale locale, MessageSource messageSource) {
@@ -121,7 +117,7 @@ public class HomeService {
 				Stream<BoardHistory> sHistory = history.stream();
 				
 				List<BoardHistory> uHistory = sHistory
-						.filter(item -> item.getProviderId().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT) || item.getProviderId().equals(CommonConst.BOARD_HISTORY_TYPE_EDIT))
+						.filter(item -> item.getProviderId().equals(CoreConst.BOARD_HISTORY_TYPE_EDIT) || item.getProviderId().equals(CoreConst.BOARD_HISTORY_TYPE_EDIT))
 						.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
 						.limit(1)
 						.collect(Collectors.toList());
@@ -158,7 +154,7 @@ public class HomeService {
 	public List<BoardFreeCommentOnHome> getBoardCommentsLatest() {
 		
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, CommonConst.HOME_SIZE_LINE_NUMBER, sort);
+		Pageable pageable = new PageRequest(0, CoreConst.HOME_SIZE_LINE_NUMBER, sort);
 		
 		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
 		
@@ -170,8 +166,8 @@ public class HomeService {
 
 				Integer contentLength = content.length() + comment.getWriter().getUsername().length();
 
-				if (contentLength > CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
-					content = content.substring(0, CommonConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
+				if (contentLength > CoreConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+					content = content.substring(0, CoreConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
 					content = String.format("%s...", content);
 				}
 				comment.setContent(content);

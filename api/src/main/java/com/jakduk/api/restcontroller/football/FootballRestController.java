@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.football;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.service.CommonService;
@@ -41,6 +41,6 @@ public class FootballRestController {
         Locale locale = localeResolver.resolveLocale(request);
         String language = CoreUtils.getLanguageCode(locale, lang);
 
-        return footballService.getFootballClubs(language, CommonConst.CLUB_TYPE.FOOTBALL_CLUB, CommonConst.NAME_TYPE.fullName);
+        return footballService.getFootballClubs(language, CoreConst.CLUB_TYPE.FOOTBALL_CLUB, CoreConst.NAME_TYPE.fullName);
     }
 }

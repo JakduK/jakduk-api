@@ -1,12 +1,13 @@
 package com.jakduk.api.restcontroller.admin;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
 import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -194,9 +196,9 @@ public class AdminRestController {
 		encyclopedia.setId(null);
 
 		if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));
+			encyclopedia.setSeq(commonService.getNextSequence(CoreConst.ENCYCLOPEDIA_EN));
 		} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
+			encyclopedia.setSeq(commonService.getNextSequence(CoreConst.ENCYCLOPEDIA_KO));
 		}
 
 		adminService.saveEncyclopedia(encyclopedia);
@@ -614,17 +616,15 @@ public class AdminRestController {
 	@RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
 	public EmptyJsonResponse initSearchIndex() {
 
-		searchService.createIndexBoard();
-		searchService.createIndexComment();
-		searchService.createIndexGallery();
+		try {
+			searchService.createIndexBoard();
+			searchService.createIndexComment();
+			searchService.createIndexGallery();
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, e.getCause());
+		}
 
 		return EmptyJsonResponse.newInstance();
-	}
-
-	@ApiOperation(value = "검색 타입 초기화")
-	@RequestMapping(value = "/search/type/init", method = RequestMethod.POST)
-	public Map<String, Object> initSearchType() throws JsonProcessingException {
-		return searchService.initSearchType();
 	}
 
 	@ApiOperation(value = "검색 데이터 초기화")
@@ -637,8 +637,8 @@ public class AdminRestController {
 	public Map<String, Object> thumbnailSizeWrite() {
 
 		Map<String, Object> data = new HashMap<>();
-		data.put("resWidth", CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
-		data.put("resHeight", CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+		data.put("resWidth", CoreConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
+		data.put("resHeight", CoreConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
 
 		return data;
 	}

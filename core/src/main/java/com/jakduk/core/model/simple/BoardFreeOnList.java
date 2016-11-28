@@ -1,6 +1,6 @@
 package com.jakduk.core.model.simple;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardStatus;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -45,7 +45,7 @@ public class BoardFreeOnList {
 	/**
 	 * 분류 ID
 	 */
-	private CommonConst.BOARD_CATEGORY_TYPE category;
+	private CoreConst.BOARD_CATEGORY_TYPE category;
 	
 	/**
 	 * 조회

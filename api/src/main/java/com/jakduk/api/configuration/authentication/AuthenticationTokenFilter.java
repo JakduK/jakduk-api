@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
 import com.jakduk.api.restcontroller.exception.RestError;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +57,7 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
                     UserDetails userDetails;
                     String email;
 
-                    if (CommonConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
+                    if (CoreConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
                         userDetails = jakdukDetailsService.loadUserByUsername(username);
                         email = userDetails.getUsername();
                     } else {

@@ -1,16 +1,12 @@
 package com.jakduk.api.restcontroller.search;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.search.vo.SearchResultResponse;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.core.service.SearchService;
 import io.searchbox.core.SearchResult;
 import io.swagger.annotations.Api;
@@ -27,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.sql.rowset.serial.SerialException;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,14 +64,14 @@ public class SearchRestController {
 		SearchResultResponse response = new SearchResultResponse();
 
 		try {
-			if (StringUtils.contains(w, CommonConst.SEARCH_TYPE.PO.name())) {
+			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.PO.name())) {
 				SearchResult result = searchService.searchDocumentBoard(q, from, size);
 
 				if (result.isSucceeded())
 					response.setPosts(objectMapper.readValue(result.getJsonString(), Map.class));
 			}
 
-			if (StringUtils.contains(w, CommonConst.SEARCH_TYPE.CO.name())) {
+			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.CO.name())) {
 				List<ObjectId> ids = new ArrayList<>();
 				SearchResult result = searchService.searchDocumentComment(q, from, size);
 
@@ -93,7 +87,7 @@ public class SearchRestController {
 				}
 			}
 
-			if (StringUtils.contains(w, CommonConst.SEARCH_TYPE.GA.name())) {
+			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.GA.name())) {
 				int tempSize = size;
 
 				if (size < 10)

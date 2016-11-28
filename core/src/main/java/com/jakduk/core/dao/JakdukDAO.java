@@ -1,6 +1,6 @@
 package com.jakduk.core.dao;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
 import com.jakduk.core.model.elasticsearch.CommentOnES;
@@ -48,7 +48,7 @@ public class JakdukDAO {
 	 * @param language
 	 * @return
 	 */
-	public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CommonConst.NAME_TYPE sortNameType) {
+	public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CoreConst.NAME_TYPE sortNameType) {
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where("names.language").is(language));
@@ -72,7 +72,7 @@ public class JakdukDAO {
 	// 사진 목록.
 	public List<GalleryOnList> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {
 		
-		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").lt(galleryId));
 		AggregationOperation sort = Aggregation.sort(direction, "_id");
 		AggregationOperation limit = Aggregation.limit(size);
@@ -109,7 +109,7 @@ public class JakdukDAO {
 	 */
 	public Gallery getGalleryById(ObjectId id, Direction direction) {
 		Query query = new Query();
-		query.addCriteria(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+		query.addCriteria(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
 		
 		if (direction.equals(Sort.Direction.ASC)) {
 			query.addCriteria(Criteria.where("_id").gt(id));
@@ -128,7 +128,7 @@ public class JakdukDAO {
 		
 		AggregationOperation unwind = Aggregation.unwind("usersLiking");
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
 		AggregationOperation group = Aggregation.group("_id").count().as("count");
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);
@@ -146,7 +146,7 @@ public class JakdukDAO {
 		
 		AggregationOperation unwind = Aggregation.unwind("usersDisliking");
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CommonConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
 		AggregationOperation group = Aggregation.group("_id").count().as("count");
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);
@@ -178,9 +178,9 @@ public class JakdukDAO {
 	}
 	
 	public List<BoardFreeOnRSS> getRSS() {
-		AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE.DELETE.name()));
+		AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(CoreConst.BOARD_HISTORY_TYPE.DELETE.name()));
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
-		AggregationOperation limit = Aggregation.limit(CommonConst.RSS_SIZE_ITEM);
+		AggregationOperation limit = Aggregation.limit(CoreConst.RSS_SIZE_ITEM);
 		Aggregation aggregation = Aggregation.newAggregation(match, sort, limit);
 		
 		AggregationResults<BoardFreeOnRSS> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnRSS.class);
@@ -192,7 +192,7 @@ public class JakdukDAO {
 	
 	public List<UserOnHome> getUserOnHome(String language) {
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
-		AggregationOperation limit = Aggregation.limit(CommonConst.HOME_SIZE_LINE_NUMBER);
+		AggregationOperation limit = Aggregation.limit(CoreConst.HOME_SIZE_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(sort, limit);
 		
 		AggregationResults<UserOnHome> results = mongoTemplate.aggregate(aggregation, "user", UserOnHome.class);
@@ -223,10 +223,10 @@ public class JakdukDAO {
 	 * @return
 	 */
 	public List<BoardFreeOnES> getBoardFreeOnES(ObjectId commentId) {
-		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CommonConst.BOARD_HISTORY_TYPE.DELETE.name()));
+		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CoreConst.BOARD_HISTORY_TYPE.DELETE.name()));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CommonConst.ELASTICSEARCH_BULK_LIMIT);
+		AggregationOperation limit = Aggregation.limit(CoreConst.ELASTICSEARCH_BULK_LIMIT);
 		
 		Aggregation aggregation;
 		
@@ -242,12 +242,12 @@ public class JakdukDAO {
 
 		posts.forEach(post -> {
 			String subject = Optional.ofNullable(post.getSubject()).orElse("");
-			subject = StringUtils.replacePattern(subject, CommonConst.REGEX_FIND_HTML_TAG, "");
-			post.setSubject(StringUtils.replacePattern(subject, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
+			subject = StringUtils.replacePattern(subject, CoreConst.REGEX_FIND_HTML_TAG, "");
+			post.setSubject(StringUtils.replacePattern(subject, CoreConst.REGEX_FIND_HTML_WHITESPACE, ""));
 
 			String content = Optional.ofNullable(post.getContent()).orElse("");
-			content = StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_TAG, "");
-			post.setContent(StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
+			content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_TAG, "");
+			post.setContent(StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_WHITESPACE, ""));
 		});
 
 		return posts;
@@ -261,7 +261,7 @@ public class JakdukDAO {
 	public List<CommentOnES> getCommentOnES(ObjectId commentId) {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CommonConst.ELASTICSEARCH_BULK_LIMIT);
+		AggregationOperation limit = Aggregation.limit(CoreConst.ELASTICSEARCH_BULK_LIMIT);
 		
 		Aggregation aggregation;
 		
@@ -277,8 +277,8 @@ public class JakdukDAO {
 
 		comments.forEach(comment -> {
 			String content = Optional.ofNullable(comment.getContent()).orElse("");
-			content = StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_TAG, "");
-			comment.setContent(StringUtils.replacePattern(content, CommonConst.REGEX_FIND_HTML_WHITESPACE, ""));
+			content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_TAG, "");
+			comment.setContent(StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_WHITESPACE, ""));
 		});
 		
 		return comments;
@@ -292,7 +292,7 @@ public class JakdukDAO {
 	public List<GalleryOnES> getGalleryOnES(ObjectId commentId) {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CommonConst.ELASTICSEARCH_BULK_LIMIT);
+		AggregationOperation limit = Aggregation.limit(CoreConst.ELASTICSEARCH_BULK_LIMIT);
 		
 		Aggregation aggregation;
 		
@@ -340,7 +340,7 @@ public class JakdukDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("jakduScheduleId").is(jakduScheduleId));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CommonConst.COMMENT_MAX_SIZE);
+		AggregationOperation limit = Aggregation.limit(CoreConst.COMMENT_MAX_SIZE);
 
 		Aggregation aggregation;
 

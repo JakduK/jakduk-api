@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.board.vo;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class FreePostForm {
     private String content;
 
     @ApiModelProperty(required = true, value = "말머리 코드", example = "FREE")
-    private CommonConst.BOARD_CATEGORY_TYPE categoryCode;
+    private CoreConst.BOARD_CATEGORY_TYPE categoryCode;
 
     @ApiModelProperty(value = "이미지 목록")
     private List<GalleryOnUpload> galleries;

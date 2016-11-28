@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
@@ -41,7 +41,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 				throw new ServiceException(ServiceError.NOT_FOUND_JAKDUK_ACCOUNT,
 						CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email));
 
-			if (! user.getProviderId().equals(CommonConst.ACCOUNT_TYPE.JAKDUK))
+			if (! user.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK))
 				throw new ServiceException(ServiceError.NOT_FOUND_JAKDUK_ACCOUNT,
 						CoreUtils.getExceptionMessage("exception.not.jakduk.user", email, user.getProviderId()));
 
@@ -53,7 +53,7 @@ public class JakdukDetailsService implements UserDetailsManager {
 			boolean accountNonLocked = true;
 
 			JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(user.getEmail(), user.getId()
-					, user.getPassword(), user.getUsername(), CommonConst.ACCOUNT_TYPE.JAKDUK
+					, user.getPassword(), user.getUsername(), CoreConst.ACCOUNT_TYPE.JAKDUK
 					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
 
 			if (log.isInfoEnabled()) {

@@ -1,7 +1,7 @@
 package com.jakduk.api.user;
 
 import com.jakduk.api.util.AbstractSpringTest;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.User;
@@ -66,7 +66,7 @@ public class UserTest extends AbstractSpringTest {
 		UserProfile userProfile01 = userProfileRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
 		System.out.println("userProfile01=" + userProfile01);
 
-		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE.DAUM, "1lnkE");
+		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE.DAUM, "1lnkE");
 		System.out.println("userProfile02=" + userProfile02);
 	}
 	

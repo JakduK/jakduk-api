@@ -1,6 +1,6 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
@@ -93,8 +93,8 @@ public class BoardFreeService {
      * @param device 디바이스
      * @return 글 seq
      */
-	public Integer insertFreePost(CommonWriter writer, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
-								  List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
+	public Integer insertFreePost(CommonWriter writer, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
+								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = new BoardFree();
 
@@ -103,7 +103,7 @@ public class BoardFreeService {
 		boardFree.setSubject(subject);
 		boardFree.setContent(content);
 		boardFree.setViews(0);
-		boardFree.setSeq(commonService.getNextSequence(CommonConst.BOARD_TYPE.BOARD_FREE.name()));
+		boardFree.setSeq(commonService.getNextSequence(CoreConst.BOARD_TYPE.BOARD_FREE.name()));
 
 		List<BoardImage> galleriesOnBoard = new ArrayList<>();
 		galleries.forEach(gallery -> galleriesOnBoard.add(new BoardImage(gallery.getId())));
@@ -116,7 +116,7 @@ public class BoardFreeService {
 		boardFree.setStatus(boardStatus);
 
 		List<BoardHistory> histories = new ArrayList<>();
-		BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.CREATE, writer);
+		BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.CREATE, writer);
 		histories.add(history);
 		boardFree.setHistory(histories);
 
@@ -159,8 +159,8 @@ public class BoardFreeService {
 					updateGallery.setName(boardFree.getSubject());
 				}
 
-				status.setFrom(CommonConst.GALLERY_FROM_TYPE.BOARD_FREE);
-				status.setStatus(CommonConst.GALLERY_STATUS_TYPE.ENABLE);
+				status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
+				status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
@@ -202,8 +202,8 @@ public class BoardFreeService {
      * @param device 디바이스
      * @return 글 seq
      */
-	public Integer updateFreePost(CommonWriter writer, Integer seq, String subject, String content, CommonConst.BOARD_CATEGORY_TYPE categoryCode,
-								  List<GalleryOnBoard> galleries, CommonConst.DEVICE_TYPE device) {
+	public Integer updateFreePost(CommonWriter writer, Integer seq, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
+								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -234,7 +234,7 @@ public class BoardFreeService {
 		if (Objects.isNull(histories))
 			histories = new ArrayList<>();
 
-		BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.EDIT, writer);
+		BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.EDIT, writer);
 		histories.add(history);
 		boardFree.setHistory(histories);
 
@@ -276,8 +276,8 @@ public class BoardFreeService {
 					updateGallery.setName(boardFree.getSubject());
 				}
 
-				status.setFrom(CommonConst.GALLERY_FROM_TYPE.BOARD_FREE);
-				status.setStatus(CommonConst.GALLERY_STATUS_TYPE.ENABLE);
+				status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
+				status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
@@ -298,9 +298,9 @@ public class BoardFreeService {
 	/**
 	 * 자유게시판 글 지움
 	 * @param seq 글 seq
-	 * @return CommonConst.BOARD_DELETE_TYPE
+	 * @return CoreConst.BOARD_DELETE_TYPE
      */
-    public CommonConst.BOARD_DELETE_TYPE deleteFreePost(CommonWriter writer, Integer seq) {
+    public CoreConst.BOARD_DELETE_TYPE deleteFreePost(CommonWriter writer, Integer seq) {
 
         BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -324,7 +324,7 @@ public class BoardFreeService {
             if (Objects.isNull(histories))
                 histories = new ArrayList<>();
 
-            BoardHistory history = new BoardHistory(new ObjectId().toString(), CommonConst.BOARD_HISTORY_TYPE.DELETE, writer);
+            BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.DELETE, writer);
             histories.add(history);
 			boardFree.setHistory(histories);
 
@@ -351,7 +351,7 @@ public class BoardFreeService {
 
         searchService.deleteDocumentBoard(boardFree.getId());
 
-        return count > 0 ? CommonConst.BOARD_DELETE_TYPE.CONTENT : CommonConst.BOARD_DELETE_TYPE.ALL;
+        return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
     }
 
 	/**
@@ -370,7 +370,7 @@ public class BoardFreeService {
 	 * @param size 크기
      * @return 글 목록
      */
-	public Page<BoardFreeOnList> getFreePosts(CommonConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
+	public Page<BoardFreeOnList> getFreePosts(CoreConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
@@ -434,7 +434,7 @@ public class BoardFreeService {
 	}
 
 	// 글 감정 표현.
-	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, CommonConst.FEELING_TYPE feeling) {
+	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, CoreConst.FEELING_TYPE feeling) {
 		String userId = writer.getUserId();
 		String username = writer.getUsername();
 
@@ -453,14 +453,14 @@ public class BoardFreeService {
 
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
 		if (userId.equals(postWriter.getUserId())) {
-			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
+			throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.WRITER.toString()
 					, CoreUtils.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
 		}
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
 						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
@@ -468,7 +468,7 @@ public class BoardFreeService {
 		// 해당 회원이 싫어요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersDisliking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
 						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
@@ -492,7 +492,7 @@ public class BoardFreeService {
 	}
 
 	// 게시판 댓글 추가.
-	public BoardFreeComment addFreeComment(CommonWriter writer, Integer seq, String contents, CommonConst.DEVICE_TYPE device) {
+	public BoardFreeComment addFreeComment(CommonWriter writer, Integer seq, String contents, CoreConst.DEVICE_TYPE device) {
 		BoardFreeComment boardFreeComment = new BoardFreeComment();
 
 		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
@@ -534,7 +534,7 @@ public class BoardFreeService {
 	 * @param feeling 감정표현 종류
      * @return 자유게시판 댓글 객체
      */
-	public BoardFreeComment setFreeCommentFeeling(CommonWriter writer, String commentId, CommonConst.FEELING_TYPE feeling) {
+	public BoardFreeComment setFreeCommentFeeling(CommonWriter writer, String commentId, CoreConst.FEELING_TYPE feeling) {
 
 		String userId = writer.getUserId();
 		String username = writer.getUsername();
@@ -550,14 +550,14 @@ public class BoardFreeService {
 
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
 		if (userId.equals(postWriter.getUserId())) {
-			throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.WRITER.toString()
+			throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.WRITER.toString()
 					, CoreUtils.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
 		}
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
 						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
@@ -565,7 +565,7 @@ public class BoardFreeService {
 		// 해당 회원이 싫어요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersDisliking) {
 			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
+				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
 						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
 			}
 		}
@@ -630,7 +630,7 @@ public class BoardFreeService {
 			histories = new ArrayList<>();
 
 		BoardHistory history = new BoardHistory(new ObjectId().toString(),
-				isEnable ? CommonConst.BOARD_HISTORY_TYPE.ENABLE_NOTICE : CommonConst.BOARD_HISTORY_TYPE.DISABLE_NOTICE, writer);
+				isEnable ? CoreConst.BOARD_HISTORY_TYPE.ENABLE_NOTICE : CoreConst.BOARD_HISTORY_TYPE.DISABLE_NOTICE, writer);
 		histories.add(history);
 
 		getBoardFree.setHistory(histories);
@@ -689,7 +689,7 @@ public class BoardFreeService {
 
 		posts = posts.stream()
 				.sorted(byCount.thenComparing(byView))
-				.limit(CommonConst.BOARD_TOP_LIMIT)
+				.limit(CoreConst.BOARD_TOP_LIMIT)
 				.collect(Collectors.toList());
 
 		return posts;
