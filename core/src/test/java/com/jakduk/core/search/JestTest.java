@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
+import com.jakduk.core.model.elasticsearch.ESBoardFree;
+import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.service.SearchService;
 import com.jakduk.core.util.AbstractSpringTest;
@@ -291,7 +291,7 @@ public class JestTest extends AbstractSpringTest {
 
 		Search search = new Search.Builder(query)
 				.addIndex("jakduk_test")
-				.addType(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
+				.addType(CoreConst.ES_TYPE_COMMENT)
 				.build();
 		
 		try {
@@ -299,17 +299,17 @@ public class JestTest extends AbstractSpringTest {
 			
 			JsonObject jsonObject = result.getJsonObject();
 			
-			List<SearchResult.Hit<CommentOnES, Void>> hits = result.getHits(CommentOnES.class);
+			List<SearchResult.Hit<ESComment, Void>> hits = result.getHits(ESComment.class);
 			
-			Iterator<SearchResult.Hit<CommentOnES, Void>> hitsItr = hits.iterator();
+			Iterator<SearchResult.Hit<ESComment, Void>> hitsItr = hits.iterator();
 			
 			while (hitsItr.hasNext()) {
-				SearchResult.Hit<CommentOnES, Void> itr = hitsItr.next();
+				SearchResult.Hit<ESComment, Void> itr = hitsItr.next();
 				System.out.println(itr.source.getBoardItem());
 			}
 			
 			/*
-			for (SearchResult.Hit<CommentOnES, Void> hit : hits) {
+			for (SearchResult.Hit<ESComment, Void> hit : hits) {
 				System.out.println(hit.source.getBoardItem());
 			}
 			*/
@@ -372,13 +372,13 @@ public class JestTest extends AbstractSpringTest {
 	@Ignore
 	public void bulk02() {
 		
-		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
-		BoardFreeOnES lastPost = posts.get(posts.size() - 1);
+		List<ESBoardFree> posts = jakdukDAO.getBoardFreeOnES(null);
+		ESBoardFree lastPost = posts.get(posts.size() - 1);
 		
 		while (posts.size() > 0) {
 			List<Index> idxList = new ArrayList<>();
 			
-			for (BoardFreeOnES post : posts) {
+			for (ESBoardFree post : posts) {
 				idxList.add(new Index.Builder(post).build());
 			}
 			

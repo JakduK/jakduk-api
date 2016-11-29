@@ -6,33 +6,48 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.SearchUtils;
-import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
+import com.jakduk.core.model.elasticsearch.ESBoardFree;
+import com.jakduk.core.model.elasticsearch.ESComment;
+import com.jakduk.core.model.elasticsearch.ESGallery;
 import com.jakduk.core.model.elasticsearch.JakduCommentOnES;
+import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
-import io.searchbox.core.*;
+import io.searchbox.core.Delete;
+import io.searchbox.core.Index;
+import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -57,6 +72,18 @@ public class SearchService {
 	@Value("${core.elasticsearch.index.gallery}")
 	private String elasticsearchIndexGallery;
 
+	@Value("${core.elasticsearch.bulk.actions}")
+	private Integer bulkActions;
+
+	@Value("${core.elasticsearch.bulk.size.mb}")
+	private Integer bulkMbSize;
+
+	@Value("${core.elasticsearch.bulk.flush.interval.seconds}")
+	private Integer bulkFlushIntervalSeconds;
+
+	@Value("${core.elasticsearch.bulk.concurrent.requests}")
+	private Integer bulkConcurrentRequests;
+
 	@Autowired
 	private JestClient jestClient;
 
@@ -64,7 +91,13 @@ public class SearchService {
 	private Client client;
 
 	@Autowired
-	private JakdukDAO jakdukDAO;
+	private BoardFreeRepository boardFreeRepository;
+
+	@Autowired
+	private BoardFreeCommentRepository boardFreeCommentRepository;
+
+	@Autowired
+	private GalleryRepository galleryRepository;
 
 	/**
 	 * 게시물 검색
@@ -120,7 +153,7 @@ public class SearchService {
 		try {
 			Search search = new Search.Builder(objectMapper.writeValueAsString(query))
 					.addIndex(elasticsearchIndexName)
-					.addType(CoreConst.ELASTICSEARCH_TYPE_BOARD)
+					.addType(CoreConst.ES_TYPE_BOARD)
 					.build();
 
 			return jestClient.execute(search);
@@ -134,11 +167,11 @@ public class SearchService {
 	public void createDocumentBoard(BoardFree boardFree) {
 
         if (elasticsearchEnable) {
-            BoardFreeOnES boardFreeOnES = new BoardFreeOnES(boardFree);
+            ESBoardFree ESBoardFree = new ESBoardFree(boardFree);
 
-            Index index = new Index.Builder(boardFreeOnES)
+            Index index = new Index.Builder(ESBoardFree)
                     .index(elasticsearchIndexName)
-                    .type(CoreConst.ELASTICSEARCH_TYPE_BOARD)
+                    .type(CoreConst.ES_TYPE_BOARD)
                     .build();
 
             try {
@@ -158,7 +191,7 @@ public class SearchService {
         try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
 			        .index(elasticsearchIndexName)
-			        .type(CoreConst.ELASTICSEARCH_TYPE_BOARD)
+			        .type(CoreConst.ES_TYPE_BOARD)
 			        .build());
 
 			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
@@ -194,7 +227,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(new Gson().toJson(query))
 			.addIndex(elasticsearchIndexName)
-			.addType(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
+			.addType(CoreConst.ES_TYPE_COMMENT)
 			.build();
 		
 		try {
@@ -208,11 +241,11 @@ public class SearchService {
 	@Async
 	public void createDocumentComment(BoardFreeComment boardFreeComment) {
         if (elasticsearchEnable) {
-            CommentOnES commentOnES = new CommentOnES(boardFreeComment);
+            ESComment ESComment = new ESComment(boardFreeComment);
 
-            Index index = new Index.Builder(commentOnES)
+            Index index = new Index.Builder(ESComment)
                     .index(elasticsearchIndexName)
-                    .type(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
+                    .type(CoreConst.ES_TYPE_COMMENT)
                     .build();
 
             try {
@@ -224,7 +257,7 @@ public class SearchService {
 	}
 
 	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
-		Index index = new Index.Builder(jakduCommentOnES).index(elasticsearchIndexName).type(CoreConst.ELASTICSEARCH_TYPE_COMMENT).build();
+		Index index = new Index.Builder(jakduCommentOnES).index(elasticsearchIndexName).type(CoreConst.ES_TYPE_COMMENT).build();
 
 		try {
 			JestResult jestResult = jestClient.execute(index);
@@ -258,7 +291,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(query)
 				.addIndex(elasticsearchIndexName)
-				.addType(CoreConst.ELASTICSEARCH_TYPE_JAKDU_COMMENT)
+				.addType(CoreConst.ES_TYPE_JAKDU_COMMENT)
 				.build();
 
 		try {
@@ -291,7 +324,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(new Gson().toJson(query))
 			.addIndex(elasticsearchIndexName)
-			.addType(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
+			.addType(CoreConst.ES_TYPE_GALLERY)
 			.build();
 		
 		try {
@@ -306,11 +339,11 @@ public class SearchService {
 	public void createDocumentGallery(Gallery gallery) {
 
         if (elasticsearchEnable) {
-            GalleryOnES galleryOnES = new GalleryOnES(gallery);
+            ESGallery ESGallery = new ESGallery(gallery);
 
-            Index index = new Index.Builder(galleryOnES)
+            Index index = new Index.Builder(ESGallery)
                     .index(elasticsearchIndexName)
-                    .type(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
+                    .type(CoreConst.ES_TYPE_GALLERY)
                     .build();
 
             try {
@@ -330,7 +363,7 @@ public class SearchService {
 		try {
 			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
 					.index(elasticsearchIndexName)
-					.type(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
+					.type(CoreConst.ES_TYPE_GALLERY)
 					.build());
 
 			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
@@ -374,6 +407,10 @@ public class SearchService {
 		seqNode.put("type", "integer");
 		seqNode.put("index", "no");
 
+		ObjectNode categoryNode = objectMapper.createObjectNode();
+		categoryNode.put("type", "string");
+		categoryNode.put("index", "not_analyzed");
+
 		// writer
 		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
 		writerProviderIdNode.put("type", "string");
@@ -402,13 +439,14 @@ public class SearchService {
 		propertiesNode.set("content", contentNode);
 		propertiesNode.set("seq", seqNode);
 		propertiesNode.set("writer", writerNode);
+		propertiesNode.set("category", categoryNode);
 
 		ObjectNode mappings = objectMapper.createObjectNode();
 		mappings.set("properties", propertiesNode);
 
 		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
 				.setSettings(getIndexSettings())
-				.addMapping(CoreConst.ELASTICSEARCH_TYPE_BOARD, objectMapper.writeValueAsString(mappings))
+				.addMapping(CoreConst.ES_TYPE_BOARD, objectMapper.writeValueAsString(mappings))
 				.get();
 
 		if (response.isAcknowledged()) {
@@ -478,7 +516,7 @@ public class SearchService {
 
 		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexComment)
 				.setSettings(getIndexSettings())
-				.addMapping(CoreConst.ELASTICSEARCH_TYPE_COMMENT, objectMapper.writeValueAsString(mappings))
+				.addMapping(CoreConst.ES_TYPE_COMMENT, objectMapper.writeValueAsString(mappings))
 				.get();
 
 		if (response.isAcknowledged()) {
@@ -531,7 +569,7 @@ public class SearchService {
 
 		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
 				.setSettings(getIndexSettings())
-				.addMapping(CoreConst.ELASTICSEARCH_TYPE_GALLERY, objectMapper.writeValueAsString(mappings))
+				.addMapping(CoreConst.ES_TYPE_GALLERY, objectMapper.writeValueAsString(mappings))
 				.get();
 
 		if (response.isAcknowledged()) {
@@ -541,117 +579,178 @@ public class SearchService {
 		}
 	}
 
-	/**
-	 * bulk document 생성.
-	 * @return
-	 */
-	public HashMap<String, Object> initSearchDocuments() {
-
-		HashMap<String, Object> result = new HashMap<>();
-
-		// 게시물을 엘라스틱 서치에 모두 넣기.
-		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
-		BoardFreeOnES lastPost = posts.size() > 0 ? posts.get(posts.size() - 1) : null;
-
-		while (posts.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (BoardFreeOnES post : posts) {
-				idxList.add(new Index.Builder(post).build());
+	public void processBulkInsertBoard() throws InterruptedException {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
 			}
 
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CoreConst.ELASTICSEARCH_TYPE_BOARD)
-					.addAction(idxList)
-					.build();
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+			}
 
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (! jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
+
+		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
+
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+
+		Boolean hasPost = true;
+		ObjectId lastPostId = null;
+
+		do {
+			List<ESBoardFree> posts = boardFreeRepository.findPostsGreaterThanId(lastPostId, CoreConst.ES_BULK_LIMIT);
+
+			if (posts.isEmpty()) {
+				hasPost = false;
+			} else {
+				ESBoardFree lastPost = posts.get(posts.size() - 1);
+				lastPostId = new ObjectId(lastPost.getId());
+			}
+
+			posts.forEach(post -> {
+				IndexRequestBuilder index = client.prepareIndex(
+						elasticsearchIndexBoard,
+						CoreConst.ES_TYPE_BOARD,
+						post.getId()
+				);
+
+				try {
+
+					index.setSource(objectMapper.writeValueAsString(post));
+					bulkProcessor.add(index.request());
+
+				} catch (JsonProcessingException e) {
+					log.error(e.getLocalizedMessage());
 				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
+
+			});
+
+		} while (hasPost);
+
+		bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+	}
+
+	public void processBulkInsertComment() throws InterruptedException {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
 			}
 
-			if (Objects.nonNull(lastPost)) {
-				posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
-				if (posts.size() > 0) {
-					lastPost = posts.get(posts.size() - 1);
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+			}
+
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
+
+		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
+
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+
+		Boolean hasComment = true;
+		ObjectId lastCommentId = null;
+
+		do {
+			List<ESComment> comments = boardFreeCommentRepository.findCommentsGreaterThanId(lastCommentId, CoreConst.ES_BULK_LIMIT);
+
+			if (comments.isEmpty()) {
+				hasComment = false;
+			} else {
+				ESComment lastComment = comments.get(comments.size() - 1);
+				lastCommentId = new ObjectId(lastComment.getId());
+			}
+
+			comments.forEach(comment -> {
+				IndexRequestBuilder index = client.prepareIndex(
+						elasticsearchIndexComment,
+						CoreConst.ES_TYPE_COMMENT,
+						comment.getId()
+				);
+
+				try {
+
+					index.setSource(objectMapper.writeValueAsString(comment));
+					bulkProcessor.add(index.request());
+
+				} catch (JsonProcessingException e) {
+					log.error(e.getLocalizedMessage());
 				}
+
+			});
+
+		} while (hasComment);
+
+		bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+	}
+
+	public void processBulkInsertGallery() throws InterruptedException {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
 			}
-		}
 
-		// 게시물을 엘라스틱 서치에 모두 넣기.
-		List<CommentOnES> comments = jakdukDAO.getCommentOnES(null);
-		CommentOnES lastComment = comments.size() > 0 ? comments.get(comments.size() - 1) : null;
-
-		while (comments.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (CommentOnES comment : comments) {
-				idxList.add(new Index.Builder(comment).build());
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
 			}
 
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CoreConst.ELASTICSEARCH_TYPE_COMMENT)
-					.addAction(idxList)
-					.build();
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
 
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (! jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
+		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
+
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+
+		Boolean hasGallery = true;
+		ObjectId lastGalleryId = null;
+
+		do {
+			List<ESGallery> comments = galleryRepository.findGalleriesGreaterThanId(lastGalleryId, CoreConst.ES_BULK_LIMIT);
+
+			if (comments.isEmpty()) {
+				hasGallery = false;
+			} else {
+				ESGallery lastGallery = comments.get(comments.size() - 1);
+				lastGalleryId = new ObjectId(lastGallery.getId());
+			}
+
+			comments.forEach(comment -> {
+				IndexRequestBuilder index = client.prepareIndex(
+						elasticsearchIndexGallery,
+						CoreConst.ES_TYPE_GALLERY,
+						comment.getId()
+				);
+
+				try {
+
+					index.setSource(objectMapper.writeValueAsString(comment));
+					bulkProcessor.add(index.request());
+
+				} catch (JsonProcessingException e) {
+					log.error(e.getLocalizedMessage());
 				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
 
-			if (Objects.nonNull(lastComment)) {
-				comments = jakdukDAO.getCommentOnES(new ObjectId(lastComment.getId()));
-				if (comments.size() > 0) {
-					lastComment = comments.get(comments.size() - 1);
-				}
-			}
-		}
+			});
 
-		// 사진첩을 엘라스틱 서치에 모두 넣기.
-		List<GalleryOnES> galleries = jakdukDAO.getGalleryOnES(null);
-		GalleryOnES lastGallery = galleries.size() > 0 ? galleries.get(galleries.size() - 1) : null;
+		} while (hasGallery);
 
-		while (galleries.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (GalleryOnES gallery : galleries) {
-				idxList.add(new Index.Builder(gallery).build());
-			}
-
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CoreConst.ELASTICSEARCH_TYPE_GALLERY)
-					.addAction(idxList)
-					.build();
-
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (! jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
-
-			if (Objects.nonNull(lastGallery)) {
-				galleries = jakdukDAO.getGalleryOnES(new ObjectId(lastGallery.getId()));
-				if (galleries.size() > 0) {
-					lastGallery = galleries.get(galleries.size() - 1);
-				}
-			}
-		}
-
-		return result;
+		bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
 	}
 
 	public void deleteIndexBoard() {

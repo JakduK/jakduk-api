@@ -17,11 +17,11 @@ import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
-import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
-import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class BoardFreeService {
 
 	@Autowired
-	private BoardFreeRepositoryRepository boardFreeRepository;
+	private BoardFreeRepository boardFreeRepository;
 
 	@Autowired
 	private BoardFreeOnListRepository boardFreeOnListRepository;

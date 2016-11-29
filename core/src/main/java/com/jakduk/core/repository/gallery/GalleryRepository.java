@@ -1,4 +1,4 @@
-package com.jakduk.core.repository;
+package com.jakduk.core.repository.gallery;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +17,7 @@ import com.jakduk.core.model.simple.GalleryOnList;
  * @date     : 2015. 1. 18.
  * @desc     :
  */
-public interface GalleryRepository extends MongoRepository<Gallery, String>{
+public interface GalleryRepository extends MongoRepository<Gallery, String>, GalleryRepositoryCustom {
 
 	Optional<Gallery> findOneById(String id);
 	

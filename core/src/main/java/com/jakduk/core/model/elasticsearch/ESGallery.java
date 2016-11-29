@@ -3,6 +3,7 @@ package com.jakduk.core.model.elasticsearch;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.searchbox.annotations.JestId;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,9 +14,9 @@ import lombok.NoArgsConstructor;
 * @desc     :
 */
 
-@Getter
 @NoArgsConstructor
-public class GalleryOnES {
+@Getter
+public class ESGallery {
 
 	@JestId
     private String id;
@@ -24,7 +25,7 @@ public class GalleryOnES {
 	
 	private CommonWriter writer;
 
-	public GalleryOnES(Gallery gallery) {
+	public ESGallery(Gallery gallery) {
 		this.id = gallery.getId();
 		this.name = gallery.getName();
 		this.writer = gallery.getWriter();

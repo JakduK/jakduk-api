@@ -43,7 +43,7 @@ public class InitElasticsearchIndexConfig {
                 .incrementer(new RunIdIncrementer())
                 .start(deleteIndexStep)
                 .next(initSearchIndexStep)
-//                .next(initSearchDocumentsStep)
+                .next(initSearchDocumentsStep)
                 .build();
     }
 
@@ -84,11 +84,13 @@ public class InitElasticsearchIndexConfig {
     public Step initSearchDocumentsStep() {
         return stepBuilderFactory.get("initSearchDocumentsStep")
                 .tasklet((contribution, chunkContext) -> {
-                    searchService.initSearchDocuments();
+
+                    searchService.processBulkInsertBoard();
+                    searchService.processBulkInsertComment();
+                    searchService.processBulkInsertGallery();
 
                     return RepeatStatus.FINISHED;
                 })
                 .build();
     }
-
 }

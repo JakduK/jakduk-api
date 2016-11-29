@@ -21,7 +21,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BoardFreeOnES {
+public class ESBoardFree {
 	
 	@JestId
     private String id;
@@ -32,11 +32,11 @@ public class BoardFreeOnES {
 	
 	private String content;
 	
-	private int seq;
+	private Integer seq;
 	
-	private String categoryName;
+	private String category;
 
-	public BoardFreeOnES(BoardFree boardFree) {
+	public ESBoardFree(BoardFree boardFree) {
 
 		String subjectEL = Optional.ofNullable(boardFree.getSubject()).orElse("");
 		subjectEL = StringUtils.replacePattern(subjectEL, CoreConst.REGEX_FIND_HTML_TAG, "");
@@ -51,6 +51,6 @@ public class BoardFreeOnES {
 		this.subject = subjectEL;
 		this.content = contentEL;
 		this.seq = boardFree.getSeq();
-		this.categoryName = boardFree.getCategory().name();
+		this.category = boardFree.getCategory().name();
 	}
 }

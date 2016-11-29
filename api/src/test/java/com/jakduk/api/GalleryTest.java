@@ -8,7 +8,7 @@ import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Ignore;

@@ -22,7 +22,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommentOnES {
+public class ESComment {
 	
 	@JestId
     private String id;
@@ -33,7 +33,7 @@ public class CommentOnES {
 	
 	private String content;
 
-	public CommentOnES(BoardFreeComment boardFreeComment) {
+	public ESComment(BoardFreeComment boardFreeComment) {
 
 		String contentES = Optional.ofNullable(boardFreeComment.getContent()).orElse("");
 		contentES = StringUtils.replacePattern(contentES, CoreConst.REGEX_FIND_HTML_TAG, "");

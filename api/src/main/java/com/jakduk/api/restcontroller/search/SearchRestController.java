@@ -6,7 +6,7 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
+import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.service.SearchService;
 import io.searchbox.core.SearchResult;
 import io.swagger.annotations.Api;
@@ -76,7 +76,7 @@ public class SearchRestController {
 				SearchResult result = searchService.searchDocumentComment(q, from, size);
 
 				if (result.isSucceeded()) {
-					List<SearchResult.Hit<CommentOnES, Void>> hits = result.getHits(CommentOnES.class);
+					List<SearchResult.Hit<ESComment, Void>> hits = result.getHits(ESComment.class);
 					hits.forEach(hit -> {
 						String id = hit.source.getBoardItem().getId();
 						ids.add(new ObjectId(id));

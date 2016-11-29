@@ -9,7 +9,7 @@ import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
-import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class BoardTest extends AbstractSpringTest {
 	
 	@Autowired
-	private BoardFreeRepositoryRepository boardFreeRepository;
+	private BoardFreeRepository boardFreeRepository;
 	
 	@Autowired
     private BoardDAO boardDAO;

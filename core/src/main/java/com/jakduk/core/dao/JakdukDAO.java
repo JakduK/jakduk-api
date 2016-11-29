@@ -2,13 +2,12 @@ package com.jakduk.core.dao;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.*;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
+import com.jakduk.core.model.elasticsearch.ESComment;
+import com.jakduk.core.model.elasticsearch.ESGallery;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.model.simple.UserOnHome;
 import org.apache.commons.lang3.StringUtils;
@@ -215,98 +214,6 @@ public class JakdukDAO {
 		HomeDescription homeDescription = mongoTemplate.findOne(query, HomeDescription.class);
 		
 		return homeDescription;
-	}
-
-	/**
-	 * 엘라스틱서치에 저장할 BoardFree 목록 가져오기.
-	 * @param commentId
-	 * @return
-	 */
-	public List<BoardFreeOnES> getBoardFreeOnES(ObjectId commentId) {
-		AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(CoreConst.BOARD_HISTORY_TYPE.DELETE.name()));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CoreConst.ELASTICSEARCH_BULK_LIMIT);
-		
-		Aggregation aggregation;
-		
-		if (commentId != null) {
-			aggregation = Aggregation.newAggregation(match1, match2, sort, limit);
-		} else {
-			aggregation = Aggregation.newAggregation(match1, sort, limit);
-		}
-		
-		AggregationResults<BoardFreeOnES> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnES.class);
-		
-		List<BoardFreeOnES> posts = results.getMappedResults();
-
-		posts.forEach(post -> {
-			String subject = Optional.ofNullable(post.getSubject()).orElse("");
-			subject = StringUtils.replacePattern(subject, CoreConst.REGEX_FIND_HTML_TAG, "");
-			post.setSubject(StringUtils.replacePattern(subject, CoreConst.REGEX_FIND_HTML_WHITESPACE, ""));
-
-			String content = Optional.ofNullable(post.getContent()).orElse("");
-			content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_TAG, "");
-			post.setContent(StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_WHITESPACE, ""));
-		});
-
-		return posts;
-	}
-
-	/**
-	 * 엘라스틱서치에 저장할 BoardFreeComment 목록 가져오기.
-	 * @param commentId
-	 * @return
-	 */
-	public List<CommentOnES> getCommentOnES(ObjectId commentId) {
-		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CoreConst.ELASTICSEARCH_BULK_LIMIT);
-		
-		Aggregation aggregation;
-		
-		if (commentId != null) {
-			aggregation = Aggregation.newAggregation(match1, sort, limit);
-		} else {
-			aggregation = Aggregation.newAggregation(sort, limit);
-		}
-		
-		AggregationResults<CommentOnES> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommentOnES.class);
-		
-		List<CommentOnES> comments = results.getMappedResults();
-
-		comments.forEach(comment -> {
-			String content = Optional.ofNullable(comment.getContent()).orElse("");
-			content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_TAG, "");
-			comment.setContent(StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_WHITESPACE, ""));
-		});
-		
-		return comments;
-	}
-
-	/**
-	 * 엘라스틱서치에 저장할 Gallery 목록 가져오기.
-	 * @param commentId
-	 * @return
-	 */
-	public List<GalleryOnES> getGalleryOnES(ObjectId commentId) {
-		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(commentId));
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CoreConst.ELASTICSEARCH_BULK_LIMIT);
-		
-		Aggregation aggregation;
-		
-		if (commentId != null) {
-			aggregation = Aggregation.newAggregation(match1, sort, limit);
-		} else {
-			aggregation = Aggregation.newAggregation(sort, limit);
-		}
-		
-		AggregationResults<GalleryOnES> results = mongoTemplate.aggregate(aggregation, "gallery", GalleryOnES.class);
-		
-		List<GalleryOnES> galleries = results.getMappedResults();
-		
-		return galleries;
 	}
 
 	// 대회 목록.

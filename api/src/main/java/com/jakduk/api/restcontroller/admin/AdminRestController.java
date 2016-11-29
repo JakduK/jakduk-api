@@ -620,6 +620,7 @@ public class AdminRestController {
 			searchService.createIndexBoard();
 			searchService.createIndexComment();
 			searchService.createIndexGallery();
+
 		} catch (IOException e) {
 			throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, e.getCause());
 		}
@@ -629,8 +630,17 @@ public class AdminRestController {
 
 	@ApiOperation(value = "검색 데이터 초기화")
 	@RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
-	public Map<String, Object> initSearchData() {
-		return searchService.initSearchDocuments();
+	public EmptyJsonResponse initSearchData() {
+		try {
+			searchService.processBulkInsertBoard();
+			searchService.processBulkInsertComment();
+			searchService.processBulkInsertGallery();
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		return EmptyJsonResponse.newInstance();
 	}
 
 	@RequestMapping(value = "/thumbnail/size", method = RequestMethod.GET)

@@ -161,11 +161,13 @@ public class CoreConst {
 	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
 	public final static String K_LEAGUE_CHALLENGE_ABBREVIATION = "KLCH";
 
-	public final static int ELASTICSEARCH_BULK_LIMIT = 500;
-	public final static String ELASTICSEARCH_TYPE_BOARD = "board";
-	public final static String ELASTICSEARCH_TYPE_COMMENT = "comment";
-	public final static String ELASTICSEARCH_TYPE_JAKDU_COMMENT = "jakduComment";
-	public final static String ELASTICSEARCH_TYPE_GALLERY = "gallery";
+	public final static Integer ES_BULK_LIMIT = 1000;
+	public final static Integer ES_AWAIT_CLOSE_TIMEOUT_MINUTES = 2;
+	public final static String ES_TYPE_BOARD = "board";
+	public final static String ES_TYPE_COMMENT = "comment";
+	public final static String ES_TYPE_JAKDU_COMMENT = "jakduComment";
+	public final static String ES_TYPE_GALLERY = "gallery";
+
 
 	// 이름 타입.
 	public enum NAME_TYPE {

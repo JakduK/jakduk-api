@@ -12,7 +12,7 @@ import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
-import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;

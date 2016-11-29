@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.util.Optional;
 
-public interface BoardFreeRepositoryRepository extends MongoRepository<BoardFree, String>, BoardFreeRepositoryCustom {
+public interface BoardFreeRepository extends MongoRepository<BoardFree, String>, BoardFreeRepositoryCustom {
 
 	Optional<BoardFree> findOneById(String id);
 	Optional<BoardFree> findOneBySeq(Integer seq);
