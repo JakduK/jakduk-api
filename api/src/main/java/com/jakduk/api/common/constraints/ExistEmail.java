@@ -14,9 +14,9 @@ import java.lang.annotation.Target;
  * 16. 7. 3 오후 9:30
  */
 
-@Target({ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ExistEmailValidator.class)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface ExistEmail {
 
     String message() default "{validation.msg.email.exists}";

@@ -22,18 +22,18 @@ import javax.validation.constraints.Size;
 public class UserPasswordForm {
 
 	@ApiModelProperty(required = true, example = "password01")
-	@NotEmpty
 	@Size(min = 4, max=20)
+	@NotEmpty
 	@PasswordMatch
 	private String password;
 
 	@ApiModelProperty(required = true, example = "password02")
-	@NotEmpty
 	@Size(min = 4, max=20)
+	@NotEmpty
 	private String newPassword;
 
 	@ApiModelProperty(required = true, example = "password02")
-	@NotEmpty
 	@Size(min = 4, max=20)
+	@NotEmpty
 	private String newPasswordConfirm;
 }

@@ -37,9 +37,9 @@ import java.util.Map;
 
 @Slf4j
 @Api(tags = "Search", description = "찾기 API")
-@Validated
 @RestController
 @RequestMapping("/api/search")
+@Validated
 public class SearchRestController {
 	
 	@Autowired

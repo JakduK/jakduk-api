@@ -2,7 +2,9 @@ package com.jakduk.api.common.constraints;
 
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -19,15 +21,17 @@ public class ExistUsernameValidator implements ConstraintValidator<ExistUsername
 
     @Override
     public void initialize(ExistUsername constraintAnnotation) {
-
     }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
+        if (StringUtils.isEmpty(value))
+            return false;
+
         UserProfile existUsername = userService.findOneByUsername(value);
 
-        return ! Objects.nonNull(existUsername);
+        return ObjectUtils.isEmpty(existUsername);
 
     }
 }

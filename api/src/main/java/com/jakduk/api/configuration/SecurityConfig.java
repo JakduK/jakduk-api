@@ -53,39 +53,53 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
-                    .authenticationEntryPoint(restAuthenticationEntryPoint())
-                    .accessDeniedHandler(restAccessDeniedHandler())
+                .authenticationEntryPoint(restAuthenticationEntryPoint())
+                .accessDeniedHandler(restAccessDeniedHandler())
 
                 //Configures url based authorization
                 .and()
 
                 .authorizeRequests()
-                    .antMatchers(
+                .antMatchers(
 
-                    ).permitAll()
-                    .antMatchers(
+                ).permitAll()
+                .antMatchers(
                         "/api/login",           // 로그인
                         "/auth/*",              // SNS 인증
                         "/signup"               // SNS 계정으로 회원 가입
-                    ).anonymous()
-                    .antMatchers(
-                            HttpMethod.POST,
-                            "/api/user",            // 이메일 기반 회원 가입
-                            "/api/user/social"      // SNS 기반 회원 가입
-                    ).anonymous()
-                    .antMatchers(
-                        "/user/**",
+                ).anonymous()
+                .antMatchers(
+                        HttpMethod.POST,
+                        "/api/user",            // 이메일 기반 회원 가입
+                        "/api/user/social"      // SNS 기반 회원 가입
+                ).anonymous()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/api/user/exist/email",                // 이메일 중복 검사
+                        "/api/user/exist/username",             // 별명 중복 검사
+                        "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
+                        "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
+                ).anonymous()
+                .antMatchers(
 //                      "/swagger-ui.html",     // 스웨거
                         "/rest/**"              // spring-data-rest
-                        ).authenticated()
-                    .antMatchers(
-
-                    ).hasAnyRole("USER_01", "USER_02", "USER_03")
-                    .antMatchers(
+                ).authenticated()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/api/user/exist/email/edit",       // 회원 프로필 편집 시 Email 중복 검사
+                        "/api/user/exist/username/edit",    // 회원 프로필 편집 시 별명 중복 검사
+                        "/api/user/profile/me"              // 내 프로필 정보 보기
+                ).hasAnyRole("USER_01", "USER_02", "USER_03")
+                .antMatchers(
+                        HttpMethod.PUT,
+                        "/api/user/profile/me",     // 내 프로필 정보 편집
+                        "/api/user/password"        // 이메일 기반 회원의 비밀번호 변경
+                ).hasAnyRole("USER_01", "USER_02", "USER_03")
+                .antMatchers(
                         "/admin/**",
                         "/api/admin/**"
-                    ).hasRole("ROOT")
-                    .anyRequest().permitAll()
+                ).hasRole("ROOT")
+                .anyRequest().permitAll()
 
                 // don't create session
                 .and()

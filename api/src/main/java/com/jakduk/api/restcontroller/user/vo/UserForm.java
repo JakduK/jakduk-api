@@ -22,26 +22,26 @@ import javax.validation.constraints.Size;
 public class UserForm {
 
     @ApiModelProperty(required = true, example = "example@jakduk.com")
-    @NotEmpty
     @Size(min = 6, max=30)
+    @NotEmpty
     @Email
     @ExistEmail
     private String email;
 
     @ApiModelProperty(required = true, example = "JakdukUser")
-    @NotEmpty
     @Size(min = 2, max=20)
+    @NotEmpty
     @ExistUsername
     private String username;
 
     @ApiModelProperty(required = true, example = "password01")
-    @NotEmpty
     @Size(min = 4, max=20)
+    @NotEmpty
     private String password;
 
     @ApiModelProperty(required = true, example = "password01")
-    @NotEmpty
     @Size(min = 4, max=20)
+    @NotEmpty
     private String passwordConfirm;
 
     @ApiModelProperty(value = "축구단(FootballClub) ID")

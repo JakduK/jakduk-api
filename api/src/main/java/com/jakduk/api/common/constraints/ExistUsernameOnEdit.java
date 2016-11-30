@@ -1,5 +1,7 @@
 package com.jakduk.api.common.constraints;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.ElementType;
@@ -14,9 +16,9 @@ import java.lang.annotation.Target;
  * 16. 7. 3 오후 9:41
  */
 
-@Target({ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ExistUsernameOnEditValidator.class)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface ExistUsernameOnEdit {
 
     String message() default "{validation.msg.username.exists}";

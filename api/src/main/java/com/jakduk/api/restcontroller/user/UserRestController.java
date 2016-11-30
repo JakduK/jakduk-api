@@ -1,9 +1,12 @@
 package com.jakduk.api.restcontroller.user;
 
+import com.jakduk.api.common.constraints.ExistEmail;
+import com.jakduk.api.common.constraints.ExistEmailOnEdit;
+import com.jakduk.api.common.constraints.ExistUsername;
+import com.jakduk.api.common.constraints.ExistUsernameOnEdit;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
-import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
@@ -28,11 +31,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -44,6 +47,7 @@ import java.util.Objects;
 @Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
+@Validated
 public class UserRestController {
 
     @Value("${jwt.token.header}")
@@ -67,16 +71,12 @@ public class UserRestController {
     @Autowired
     private EmailService emailService;
 
-    @Autowired
-    private JakdukDetailsService jakdukDetailsService;
-
     @ApiOperation(value = "이메일 기반 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public EmptyJsonResponse addJakdukUser(
-            @Valid @RequestBody UserForm form,
-            Device device,
-            Locale locale,
-            HttpServletResponse response) {
+    public EmptyJsonResponse addJakdukUser(@Validated @RequestBody UserForm form,
+                                           Device device,
+                                           Locale locale,
+                                           HttpServletResponse response) {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout());
@@ -95,10 +95,10 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "SNS 기반 회원 가입", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "SNS 기반 회원 가입")
     @RequestMapping(value = "/social", method = RequestMethod.POST)
     public EmptyJsonResponse addSocialUser(@RequestHeader(value = "x-attempt-token") String attemptedToken,
-                                           @Valid @RequestBody UserProfileForm form,
+                                           @Validated @RequestBody UserProfileForm form,
                                            Device device,
                                            Locale locale,
                                            HttpServletResponse response) {
@@ -125,90 +125,67 @@ public class UserRestController {
 
     }
 
-    @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사", produces = "application/json")
+    @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사")
     @RequestMapping(value = "/exist/email/edit", method = RequestMethod.GET)
-    public Boolean existEmailOnEdit(@RequestParam() String email) {
+    public EmptyJsonResponse existEmailOnEdit(@NotEmpty @Email @ExistEmailOnEdit @RequestParam String email) {
 
-        if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
-        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
-
-        UserProfile userProfile = userService.findByNEIdAndEmail(commonPrincipal.getId(), email.trim());
-
-        if (Objects.nonNull(userProfile))
-            throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
-
-        return false;
+        return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "비로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사", produces = "application/json")
+    @ApiOperation(value = "비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사")
     @RequestMapping(value = "/exist/email/anonymous", method = RequestMethod.GET)
-    public Boolean existEmailOnAnonymous(@RequestParam() String email,
-                                         @RequestParam() String id) {
+    public EmptyJsonResponse existEmailOnAnonymous(@NotEmpty @Email @RequestParam String email,
+                                                   @NotEmpty @RequestParam String id) {
 
         UserProfile userProfile = userService.findByNEIdAndEmail(id.trim(), email.trim());
 
         if (Objects.nonNull(userProfile))
             throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
 
-        return false;
+        return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "회원 프로필 편집 시 별명 중복 검사", produces = "application/json")
+    @ApiOperation(value = "회원 프로필 편집 시 별명 중복 검사")
     @RequestMapping(value = "/exist/username/edit", method = RequestMethod.GET)
-    public Boolean existUsernameOnEdit(@RequestParam() String username) {
+    public EmptyJsonResponse existUsernameOnEdit(@NotEmpty @ExistUsernameOnEdit @RequestParam String username) {
 
-        if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
-        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
-
-        UserProfile userProfile = userService.findByNEIdAndUsername(commonPrincipal.getId().trim(), username.trim());
-
-        if (Objects.nonNull(userProfile))
-            throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
-
-        return false;
+        return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사", produces = "application/json")
+    @ApiOperation(value = "비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사")
     @RequestMapping(value = "/exist/username/anonymous", method = RequestMethod.GET)
-    public Boolean existUsernameOnAnonymous(@RequestParam() String username,
-                                            @RequestParam() String id) {
+    public EmptyJsonResponse existUsernameOnAnonymous(@NotEmpty @RequestParam String username,
+                                                      @NotEmpty @RequestParam String id) {
 
         UserProfile userProfile = userService.findByNEIdAndUsername(id.trim(), username.trim());
 
         if (Objects.nonNull(userProfile))
             throw new DuplicateDataException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.replicated.data"));
 
-        return false;
+        return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "이메일 중복 검사")
     @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmail(@Valid @NotEmpty @Email @RequestParam String email) {
+    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
 
-        userService.existEmail(email.trim());
+        //userService.existEmail(email.trim());
 
         return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "별명 중복 검사")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
-    public EmptyJsonResponse existUsername(@Valid @NotEmpty @RequestParam String username) {
+    public EmptyJsonResponse existUsername(@NotEmpty @ExistUsername @RequestParam String username) {
 
         userService.existUsername(username.trim());
 
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "내 프로필 정보 보기", produces = "application/json", response = UserProfileResponse.class)
+    @ApiOperation(value = "내 프로필 정보 보기")
     @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
     public UserProfileResponse getProfileMe() {
-
-        if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         String language = CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null);
 
@@ -231,12 +208,9 @@ public class UserRestController {
         return response;
     }
 
-    @ApiOperation(value = "내 프로필 정보 편집", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "내 프로필 정보 편집")
     @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
-    public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileOnEditForm form) {
-
-        if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+    public EmptyJsonResponse editProfileMe(@Validated @RequestBody UserProfileOnEditForm form) {
 
         CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
@@ -287,9 +261,9 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
-    public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
+    public EmptyJsonResponse editPassword(@Validated @RequestBody UserPasswordForm form) {
 
         if (! UserUtils.isJakdukUser())
             throw new ServiceException(ServiceError.FORBIDDEN);

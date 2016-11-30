@@ -22,15 +22,15 @@ import javax.validation.constraints.Size;
 public class UserProfileOnEditForm {
 
 	@ApiModelProperty(required = true, example = "example@jakduk.com")
-	@NotEmpty
 	@Size(min = 6, max=30)
+	@NotEmpty
 	@Email
 	@ExistEmailOnEdit
 	private String email;
 
 	@ApiModelProperty(required = true, example = "JakdukUser")
-	@NotEmpty
 	@Size(min = 2, max=20)
+	@NotEmpty
 	@ExistUsernameOnEdit
 	private String username;
 
