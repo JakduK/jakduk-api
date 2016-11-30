@@ -168,8 +168,11 @@ public class BoardFreeService {
 			}
 		}
 
-		searchService.createDocumentBoard(boardFree);
-
+		/**
+		 * 엘라스틱서치 색인 요청
+		 */
+		searchService.indexBoardFree(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+				boardFree.getContent(), boardFree.getCategory().name());
 
 		/*
 		// 슬랙 알림
@@ -185,9 +188,8 @@ public class BoardFreeService {
 		);
 		*/
 
-		if (log.isInfoEnabled()) {
+		if (log.isInfoEnabled())
 			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
-		}
 
 		return boardFree.getSeq();
 	}
@@ -286,11 +288,14 @@ public class BoardFreeService {
 
 		}
 
-		searchService.createDocumentBoard(boardFree);
+		/**
+		 * 엘라스틱서치 색인 요청
+		 */
+		searchService.indexBoardFree(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+				boardFree.getContent(), boardFree.getCategory().name());
 
-		if (log.isInfoEnabled()) {
+		if (log.isInfoEnabled())
 			log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
-		}
 
 		return boardFree.getSeq();
 	}

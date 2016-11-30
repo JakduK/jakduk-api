@@ -1,15 +1,9 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.embedded.CommonWriter;
-import io.searchbox.annotations.JestId;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Optional;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -20,10 +14,9 @@ import java.util.Optional;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder
 public class ESBoardFree {
 	
-	@JestId
     private String id;
 	
 	private CommonWriter writer;
@@ -35,22 +28,4 @@ public class ESBoardFree {
 	private Integer seq;
 	
 	private String category;
-
-	public ESBoardFree(BoardFree boardFree) {
-
-		String subjectEL = Optional.ofNullable(boardFree.getSubject()).orElse("");
-		subjectEL = StringUtils.replacePattern(subjectEL, CoreConst.REGEX_FIND_HTML_TAG, "");
-		subjectEL = StringUtils.replacePattern(subjectEL, CoreConst.REGEX_FIND_HTML_WHITESPACE, "");
-
-		String contentEL = Optional.ofNullable(boardFree.getContent()).orElse("");
-		contentEL = StringUtils.replacePattern(contentEL, CoreConst.REGEX_FIND_HTML_TAG, "");
-		contentEL = StringUtils.replacePattern(contentEL, CoreConst.REGEX_FIND_HTML_WHITESPACE, "");
-
-		this.id = boardFree.getId();
-		this.writer = boardFree.getWriter();
-		this.subject = subjectEL;
-		this.content = contentEL;
-		this.seq = boardFree.getSeq();
-		this.category = boardFree.getCategory().name();
-	}
 }

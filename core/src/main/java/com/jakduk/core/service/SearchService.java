@@ -8,13 +8,13 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.SearchUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.ESBoardFree;
 import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.model.elasticsearch.ESGallery;
 import com.jakduk.core.model.elasticsearch.JakduCommentOnES;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -33,6 +33,7 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
@@ -164,22 +165,32 @@ public class SearchService {
 	}
 
 	@Async
-	public void createDocumentBoard(BoardFree boardFree) {
+	public void indexBoardFree(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
 
-        if (elasticsearchEnable) {
-            ESBoardFree ESBoardFree = new ESBoardFree(boardFree);
+		if (elasticsearchEnable) {
+			ESBoardFree esBoardFree = ESBoardFree.builder()
+					.id(id)
+					.seq(seq)
+					.writer(writer)
+					.subject(subject)
+					.content(content)
+					.category(category)
+					.build();
 
-            Index index = new Index.Builder(ESBoardFree)
-                    .index(elasticsearchIndexName)
-                    .type(CoreConst.ES_TYPE_BOARD)
-                    .build();
+			ObjectMapper objectMapper = SearchUtils.getObjectMapper();
 
-            try {
-                jestClient.execute(index);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
+			try {
+				IndexResponse response = client.prepareIndex()
+						.setIndex(elasticsearchIndexBoard)
+						.setType(CoreConst.ES_TYPE_BOARD)
+						.setId(id)
+						.setSource(objectMapper.writeValueAsString(esBoardFree))
+						.get();
+
+			} catch (IOException e) {
+				throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED);
+			}
+		}
 	}
 
 	@Async
@@ -204,7 +215,7 @@ public class SearchService {
 			log.warn(e.getMessage(), e);
 		}
 	}
-	
+
 	public SearchResult searchDocumentComment(String q, int from, int size) {
 		Map<String, Object> query = new HashMap<>();
 		Map<String, Object> queryQuery = new HashMap<>();

@@ -3,7 +3,9 @@ package com.jakduk.api.restcontroller.user;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
+import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
 import com.jakduk.core.common.util.CoreUtils;
@@ -26,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -43,7 +44,6 @@ import java.util.Objects;
 @Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
-@Validated
 public class UserRestController {
 
     @Value("${jwt.token.header}")
@@ -67,10 +67,16 @@ public class UserRestController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private JakdukDetailsService jakdukDetailsService;
+
     @ApiOperation(value = "이메일 기반 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public EmptyJsonResponse addJakdukUser(@Valid @RequestBody UserForm form,
-                                           Locale locale) {
+    public EmptyJsonResponse addJakdukUser(
+            @Valid @RequestBody UserForm form,
+            Device device,
+            Locale locale,
+            HttpServletResponse response) {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout());
@@ -80,7 +86,11 @@ public class UserRestController {
         } catch (MessagingException ignored) {
         }
 
-        userUtils.signInJakdukUser(user);
+        JakdukUserDetail userDetails = userUtils.signInJakdukUser(user);
+
+        String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
+
+        response.setHeader(tokenHeader, token);
 
         return EmptyJsonResponse.newInstance();
     }
