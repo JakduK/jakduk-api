@@ -35,7 +35,7 @@ import java.util.Set;
 
 @Slf4j
 @ControllerAdvice(value = "com.jakduk.api.restcontroller")
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Hibernate validator Exception
@@ -60,9 +60,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 error -> fields.put(error.getField() + "_" + error.getCode(), error.getDefaultMessage())
         );
 
-        RestError restError = new RestError(serviceExceptionCode, fields);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode, fields);
 
-        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
     }
 
     /**
@@ -73,9 +73,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
 
-        RestError restError = new RestError(serviceExceptionCode);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode);
 
-        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
     }
 
     /**
@@ -87,9 +87,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
 
-        RestError restError = new RestError(serviceExceptionCode.getCode(), ex.getLocalizedMessage());
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode.getCode(), ex.getLocalizedMessage());
 
-        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
     }
 
     /**
@@ -100,10 +100,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
 
-        RestError restError = new RestError(serviceExceptionCode.getCode(),
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode.getCode(),
                 String.format(ex.getMessage(), ex.getRequestPartName()));
 
-        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
     }
 
     /**
@@ -123,32 +123,32 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
 
-        RestError restError = new RestError(serviceExceptionCode, fields);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode, fields);
 
-        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
 
     }
 
     @ExceptionHandler(UserFeelingException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public RestError userFeelingException(UserFeelingException e) {
-        return new RestError(e.getCode(), e.getMessage());
+    public ApiRestErrorResponse userFeelingException(UserFeelingException e) {
+        return new ApiRestErrorResponse(e.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public ResponseEntity<RestError> serviceException(ServiceException ex) {
+    public ResponseEntity<ApiRestErrorResponse> serviceException(ServiceException ex) {
         ServiceExceptionCode serviceExceptionCode = ex.getServiceExceptionCode();
-        RestError restError = new RestError(serviceExceptionCode);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode);
 
-        return new ResponseEntity<>(restError, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public RestError runtimeException(RuntimeException e) {
-        return new RestError(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getLocalizedMessage());
+    public ApiRestErrorResponse runtimeException(RuntimeException e) {
+        return new ApiRestErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getLocalizedMessage());
     }
 }

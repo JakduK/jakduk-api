@@ -272,11 +272,11 @@ public class UserUtils {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
+    public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
         return getGrantedAuthorities(getRoles(roles));
     }
 
-    private List<String> getRoles(List<Integer> roles) {
+    private static List<String> getRoles(List<Integer> roles) {
         List<String> newRoles = new ArrayList<>();
 
         if (roles != null) {

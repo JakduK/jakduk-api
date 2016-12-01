@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration.authentication.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.restcontroller.exception.RestError;
+import com.jakduk.api.restcontroller.exception.ApiRestErrorResponse;
 import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setCharacterEncoding("utf-8");
 
-        RestError error = new RestError(ServiceExceptionCode.NEED_TO_LOGIN);
+        ApiRestErrorResponse error = new ApiRestErrorResponse(ServiceExceptionCode.NEED_TO_LOGIN);
         String errorJson = new ObjectMapper().writeValueAsString(error);
 
         PrintWriter out = response.getWriter();

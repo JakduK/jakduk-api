@@ -3,7 +3,7 @@ package com.jakduk.api.configuration.authentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
-import com.jakduk.api.restcontroller.exception.RestError;
+import com.jakduk.api.restcontroller.exception.ApiRestErrorResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +82,7 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
             httpResponse.setStatus(e.getServiceExceptionCode().getHttpStatus());
             httpResponse.setCharacterEncoding("utf-8");
 
-            RestError error = new RestError(e.getServiceExceptionCode().getCode(), e.getMessage());
+            ApiRestErrorResponse error = new ApiRestErrorResponse(e.getServiceExceptionCode().getCode(), e.getMessage());
 
             String errorJson = new ObjectMapper().writeValueAsString(error);
 

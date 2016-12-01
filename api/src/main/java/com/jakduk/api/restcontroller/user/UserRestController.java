@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -73,7 +74,7 @@ public class UserRestController {
 
     @ApiOperation(value = "이메일 기반 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public EmptyJsonResponse addJakdukUser(@Validated @RequestBody UserForm form,
+    public EmptyJsonResponse addJakdukUser(@Valid @RequestBody UserForm form,
                                            Device device,
                                            Locale locale,
                                            HttpServletResponse response) {
@@ -98,7 +99,7 @@ public class UserRestController {
     @ApiOperation(value = "SNS 기반 회원 가입")
     @RequestMapping(value = "/social", method = RequestMethod.POST)
     public EmptyJsonResponse addSocialUser(@RequestHeader(value = "x-attempt-token") String attemptedToken,
-                                           @Validated @RequestBody UserProfileForm form,
+                                           @Valid @RequestBody UserProfileForm form,
                                            Device device,
                                            Locale locale,
                                            HttpServletResponse response) {
@@ -210,7 +211,7 @@ public class UserRestController {
 
     @ApiOperation(value = "내 프로필 정보 편집")
     @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
-    public EmptyJsonResponse editProfileMe(@Validated @RequestBody UserProfileOnEditForm form) {
+    public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileOnEditForm form) {
 
         CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
@@ -263,7 +264,7 @@ public class UserRestController {
 
     @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
-    public EmptyJsonResponse editPassword(@Validated @RequestBody UserPasswordForm form) {
+    public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
         if (! UserUtils.isJakdukUser())
             throw new ServiceException(ServiceExceptionCode.FORBIDDEN);

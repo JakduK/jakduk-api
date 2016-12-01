@@ -1,7 +1,7 @@
 package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.common.util.SearchUtils;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.elasticsearch.ESBoardFree;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import org.bson.types.ObjectId;
@@ -60,8 +60,8 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         List<ESBoardFree> posts = results.getMappedResults();
 
         posts.forEach(post -> {
-            post.setSubject(SearchUtils.stripHtmlTag(post.getSubject()));
-            post.setContent(SearchUtils.stripHtmlTag(post.getContent()));
+            post.setSubject(CoreUtils.stripHtmlTag(post.getSubject()));
+            post.setContent(CoreUtils.stripHtmlTag(post.getContent()));
         });
 
         return posts;

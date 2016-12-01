@@ -24,9 +24,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 16. 4. 6 오후 9:51
  */
 
-@EnableWebSecurity
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JakdukDetailsService jakdukDetailsService;
@@ -58,16 +58,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //Configures url based authorization
                 .and()
-
                 .authorizeRequests()
                 .antMatchers(
-
+                        HttpMethod.GET,
+                        "/api/user/exist/email",                // 이메일 중복 검사
+                        "/api/user/exist/username"              // 별명 중복 검사
                 ).permitAll()
-                .antMatchers(
-                        "/api/login",           // 로그인
-                        "/auth/*",              // SNS 인증
-                        "/signup"               // SNS 계정으로 회원 가입
-                ).anonymous()
                 .antMatchers(
                         HttpMethod.POST,
                         "/api/user",            // 이메일 기반 회원 가입
@@ -75,8 +71,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).anonymous()
                 .antMatchers(
                         HttpMethod.GET,
-                        "/api/user/exist/email",                // 이메일 중복 검사
-                        "/api/user/exist/username",             // 별명 중복 검사
                         "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
                         "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
                 ).anonymous()
@@ -92,8 +86,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
                 .antMatchers(
                         HttpMethod.PUT,
-                        "/api/user/profile/me",     // 내 프로필 정보 편집
-                        "/api/user/password"        // 이메일 기반 회원의 비밀번호 변경
+                        "/api/user/profile/me",             // 내 프로필 정보 편집
+                        "/api/user/password"                // 이메일 기반 회원의 비밀번호 변경
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
                 .antMatchers(
                         "/admin/**",

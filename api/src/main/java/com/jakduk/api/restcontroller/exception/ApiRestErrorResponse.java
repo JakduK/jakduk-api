@@ -15,7 +15,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 @Getter
-public class RestError {
+public class ApiRestErrorResponse {
 
     private String code;
     private String message;
@@ -23,17 +23,17 @@ public class RestError {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, String> fields;
 
-    public RestError(String code, String message) {
+    public ApiRestErrorResponse(String code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public RestError(ServiceExceptionCode serviceExceptionCode) {
+    public ApiRestErrorResponse(ServiceExceptionCode serviceExceptionCode) {
         this.code = serviceExceptionCode.getCode();
         this.message = serviceExceptionCode.getMessage();
     }
 
-    public RestError(ServiceExceptionCode serviceExceptionCode, Map<String, String> fields) {
+    public ApiRestErrorResponse(ServiceExceptionCode serviceExceptionCode, Map<String, String> fields) {
         this.code = serviceExceptionCode.getCode();
         this.message = serviceExceptionCode.getMessage();
         this.fields = fields;

@@ -1,6 +1,6 @@
 package com.jakduk.core.repository.board.free;
 
-import com.jakduk.core.common.util.SearchUtils;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.elasticsearch.ESComment;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         List<ESComment> comments = results.getMappedResults();
 
         comments.forEach(comment -> {
-            comment.setContent(SearchUtils.stripHtmlTag(comment.getContent()));
+            comment.setContent(CoreUtils.stripHtmlTag(comment.getContent()));
         });
 
         return comments;

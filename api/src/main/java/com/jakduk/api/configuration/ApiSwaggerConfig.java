@@ -24,9 +24,9 @@ import java.util.Set;
  * 16. 6. 7 오후 11:45
  */
 
-@EnableSwagger2
 @Configuration
-public class SwaggerConfig {
+@EnableSwagger2
+public class ApiSwaggerConfig {
 
     @Autowired
     private Environment environment;
