@@ -1,4 +1,4 @@
-package com.jakduk.api.common.constraints;
+package com.jakduk.api.common.constraint;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -8,24 +8,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Social 기반으로 가입시 이메일 중복 검사.
- * Version 0.6.0 이전, User 데이터의 하위 호환성 유지를 위함이다. https://github.com/Pyohwan/JakduK/issues/53
+ * 회원 프로필 편집 시 별명 중복 검사
+ *
  * @author pyohwan
- * 16. 7. 3 오후 9:32
+ * 16. 7. 3 오후 9:41
  */
 
-@Target({ ElementType.TYPE})
+@Constraint(validatedBy = ExistUsernameOnEditValidator.class)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ExistUsernameCompatibilityValidator.class)
-public @interface ExistUsernameCompatibility {
+public @interface ExistUsernameOnEdit {
 
     String message() default "{validation.msg.username.exists}";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    String userId();
-
-    String username();
 }

@@ -1,7 +1,7 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.service.GalleryService;
@@ -43,7 +43,7 @@ public class GalleryController {
 		try {
 			byteStream.writeTo(response.getOutputStream());
 		} catch (IOException e) {
-			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY, e);
+			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY, e);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class GalleryController {
 		try {
 			byteStream.writeTo(response.getOutputStream());
 		} catch (IOException e) {
-			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY, e);
+			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY, e);
 		}
 	}
 }

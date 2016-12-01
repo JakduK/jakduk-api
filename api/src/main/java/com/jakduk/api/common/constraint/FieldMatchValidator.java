@@ -1,4 +1,4 @@
-package com.jakduk.api.common.constraints;
+package com.jakduk.api.common.constraint;
 
 import org.apache.commons.beanutils.BeanUtils;
 

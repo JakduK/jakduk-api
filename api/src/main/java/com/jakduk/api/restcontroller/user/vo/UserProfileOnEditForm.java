@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.api.common.constraints.ExistEmailOnEdit;
-import com.jakduk.api.common.constraints.ExistUsernameOnEdit;
+import com.jakduk.api.common.constraint.ExistEmailOnEdit;
+import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

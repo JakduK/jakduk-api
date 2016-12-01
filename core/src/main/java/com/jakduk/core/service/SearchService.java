@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.SearchUtils;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
@@ -160,7 +160,7 @@ public class SearchService {
 			return jestClient.execute(search);
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceError.IO_EXCEPTION);
+			throw new ServiceException(ServiceExceptionCode.IO_EXCEPTION);
 		}
 	}
 
@@ -188,7 +188,7 @@ public class SearchService {
 						.get();
 
 			} catch (IOException e) {
-				throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED);
+				throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED);
 			}
 		}
 	}

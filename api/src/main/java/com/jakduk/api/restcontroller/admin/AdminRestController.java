@@ -6,7 +6,7 @@ import com.jakduk.api.restcontroller.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
 import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.LocalName;
@@ -622,7 +622,7 @@ public class AdminRestController {
 			searchService.createIndexGallery();
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, e.getCause());
+			throw new ServiceException(ServiceExceptionCode.INTERNAL_SERVER_ERROR, e.getCause());
 		}
 
 		return EmptyJsonResponse.newInstance();

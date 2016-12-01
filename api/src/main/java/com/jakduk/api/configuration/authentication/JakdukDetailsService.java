@@ -4,7 +4,7 @@ import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.UserOnAuthentication;
 import com.jakduk.core.repository.user.UserRepository;
@@ -39,11 +39,11 @@ public class JakdukDetailsService implements UserDetailsManager {
 			UserOnAuthentication user = userRepository.findAuthUserByEmail(email);
 
 			if (ObjectUtils.isEmpty(user))
-				throw new ServiceException(ServiceError.NOT_FOUND_JAKDUK_ACCOUNT,
+				throw new ServiceException(ServiceExceptionCode.NOT_FOUND_JAKDUK_ACCOUNT,
 						CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email));
 
 			if (! user.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK))
-				throw new ServiceException(ServiceError.NOT_FOUND_JAKDUK_ACCOUNT,
+				throw new ServiceException(ServiceExceptionCode.NOT_FOUND_JAKDUK_ACCOUNT,
 						CoreUtils.getExceptionMessage("exception.not.jakduk.user", email, user.getProviderId()));
 
 			log.debug("Jakduk user=" + user);

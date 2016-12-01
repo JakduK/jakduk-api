@@ -1,4 +1,4 @@
-package com.jakduk.api.common.constraints;
+package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;

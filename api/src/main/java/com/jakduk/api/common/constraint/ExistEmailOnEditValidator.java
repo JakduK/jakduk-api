@@ -1,9 +1,7 @@
-package com.jakduk.api.common.constraints;
+package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.core.exception.ServiceError;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -12,19 +10,18 @@ import org.springframework.util.ObjectUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.Objects;
 
 /**
  * @author pyohwan
- * 16. 7. 3 오후 9:40
+ * 16. 7. 3 오후 9:30
  */
-public class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUsernameOnEdit, String> {
+public class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmailOnEdit, String> {
 
     @Autowired
     private UserService userService;
 
     @Override
-    public void initialize(ExistUsernameOnEdit constraintAnnotation) {
+    public void initialize(ExistEmailOnEdit constraintAnnotation) {
     }
 
     @Override
@@ -36,9 +33,9 @@ public class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUs
         CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
         if (ObjectUtils.isEmpty(commonPrincipal))
-            throw new ServiceException(ServiceError.NEED_TO_LOGIN);
+            return false;
 
-        UserProfile userProfile = userService.findByNEIdAndUsername(commonPrincipal.getId().trim(), value.trim());
+        UserProfile userProfile = userService.findByNEIdAndEmail(commonPrincipal.getId(), value.trim());
 
         return ObjectUtils.isEmpty(userProfile);
 

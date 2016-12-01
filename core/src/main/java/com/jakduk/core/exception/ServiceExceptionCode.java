@@ -1,9 +1,7 @@
 package com.jakduk.core.exception;
 
-import com.jakduk.core.service.CommonService;
 import lombok.Getter;
 import org.apache.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Locale;
@@ -15,7 +13,7 @@ import java.util.ResourceBundle;
  */
 
 @Getter
-public enum ServiceError {
+public enum ServiceExceptionCode {
 
     INVALID_PARAMETER(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     FORM_VALIDATION_FAILED(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
@@ -50,14 +48,11 @@ public enum ServiceError {
     IO_EXCEPTION(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.io"),
     INTERNAL_SERVER_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.internal.server.error");
 
-    @Autowired
-    private CommonService commonService;
-
     private final Integer httpStatus;
     private final String code;
     private final String message;
 
-    ServiceError(Integer httpStatus, String message) {
+    ServiceExceptionCode(Integer httpStatus, String message) {
         Locale locale = LocaleContextHolder.getLocale();
         ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.exception", locale);
 

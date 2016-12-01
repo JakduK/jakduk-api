@@ -1,9 +1,9 @@
 package com.jakduk.api.restcontroller.user;
 
-import com.jakduk.api.common.constraints.ExistEmail;
-import com.jakduk.api.common.constraints.ExistEmailOnEdit;
-import com.jakduk.api.common.constraints.ExistUsername;
-import com.jakduk.api.common.constraints.ExistUsernameOnEdit;
+import com.jakduk.api.common.constraint.ExistEmail;
+import com.jakduk.api.common.constraint.ExistEmailOnEdit;
+import com.jakduk.api.common.constraint.ExistUsername;
+import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
@@ -13,7 +13,7 @@ import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.DuplicateDataException;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
@@ -104,7 +104,7 @@ public class UserRestController {
                                            HttpServletResponse response) {
 
         if (! jwtTokenUtils.isValidateToken(attemptedToken))
-            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
+            throw new ServiceException(ServiceExceptionCode.EXPIRATION_TOKEN);
 
         AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
@@ -266,7 +266,7 @@ public class UserRestController {
     public EmptyJsonResponse editPassword(@Validated @RequestBody UserPasswordForm form) {
 
         if (! UserUtils.isJakdukUser())
-            throw new ServiceException(ServiceError.FORBIDDEN);
+            throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
 
         CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 

@@ -3,7 +3,7 @@ package com.jakduk.core.service;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.UserFeelingException;
 import com.jakduk.core.model.db.BoardCategory;
@@ -208,10 +208,10 @@ public class BoardFreeService {
 								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
 
 		if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
-			throw new ServiceException(ServiceError.FORBIDDEN);
+			throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
 
 		boardFree.setSubject(subject);
 		boardFree.setContent(content);
@@ -308,10 +308,10 @@ public class BoardFreeService {
     public CoreConst.BOARD_DELETE_TYPE deleteFreePost(CommonWriter writer, Integer seq) {
 
         BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
 
         if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
-            throw new ServiceException(ServiceError.FORBIDDEN);
+            throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
 
         BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
@@ -409,7 +409,7 @@ public class BoardFreeService {
 	public BoardFreeDetail getPost(Integer seq, String language, Boolean isViewsIncreasing) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
 
 		List<BoardImage> images = boardFree.getGalleries();
 		List<Gallery> galleries = null;
@@ -445,7 +445,7 @@ public class BoardFreeService {
 
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceError.NOT_FOUND_POST);
+			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_POST);
 
 		BoardFree getBoardFree = boardFree.get();
 		CommonWriter postWriter = getBoardFree.getWriter();
@@ -603,7 +603,7 @@ public class BoardFreeService {
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 
 		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceError.NOT_FOUND_POST);
+			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_POST);
 
 		BoardFree getBoardFree = boardFree.get();
 		BoardStatus status = getBoardFree.getStatus();
@@ -615,10 +615,10 @@ public class BoardFreeService {
 
 		if (Objects.nonNull(isNotice)) {
 			if (isEnable && isNotice)
-				throw new ServiceException(ServiceError.ALREADY_ENABLE);
+				throw new ServiceException(ServiceExceptionCode.ALREADY_ENABLE);
 
 			if (! isEnable && ! isNotice)
-				throw new ServiceException(ServiceError.ALREADY_DISABLE);
+				throw new ServiceException(ServiceExceptionCode.ALREADY_DISABLE);
 		}
 
 		if (isEnable) {

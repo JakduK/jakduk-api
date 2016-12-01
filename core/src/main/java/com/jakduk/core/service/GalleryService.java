@@ -3,7 +3,7 @@ package com.jakduk.core.service;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.UserFeelingException;
 import com.jakduk.core.model.db.Gallery;
@@ -82,7 +82,7 @@ public class GalleryService {
 	}
 
 	public Gallery findOneById(String id) {
-		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY));
 	}
 
     public List<Gallery> findByIds(List<String> ids) {
@@ -178,7 +178,7 @@ public class GalleryService {
 			}
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
+			throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR, e);
 		}
 
 		log.debug("gallery=" + gallery);
@@ -225,10 +225,10 @@ public class GalleryService {
 				return byteStream;
 
 			} catch (IOException e) {
-				throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
+				throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR, e);
 			}
 		} else {
-			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY);
+			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY);
 		}
 	}
 
@@ -237,13 +237,13 @@ public class GalleryService {
 	 */
 	public void removeImage(String userId, String id) {
 		Gallery gallery = galleryRepository.findOneById(id)
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+                .orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY));
 
 		if (ObjectUtils.isEmpty(gallery.getWriter()))
-			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+			throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
 		if (! userId.equals(gallery.getWriter().getUserId()))
-            throw new ServiceException(ServiceError.FORBIDDEN);
+            throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
 
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
@@ -265,10 +265,10 @@ public class GalleryService {
 				galleryRepository.delete(gallery);
 
 			} catch (IOException e) {
-				throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
+				throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR);
 			}
 		} else {
-            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
+            throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY_FILE);
         }
 
 		// 엘라스틱 서치 document 삭제.
@@ -374,7 +374,7 @@ public class GalleryService {
 				);
 			}
 		} else {
-			throw new ServiceException(ServiceError.FORBIDDEN);
+			throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
 		}
 
 		Map<String, Object> data = new HashMap<>();

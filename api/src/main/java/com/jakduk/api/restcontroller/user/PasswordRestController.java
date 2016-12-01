@@ -2,7 +2,7 @@ package com.jakduk.api.restcontroller.user;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.model.simple.UserProfile;
@@ -65,7 +65,7 @@ public class PasswordRestController {
 
 						emailService.sendResetPassword(locale, callbackUrl, email);
 					} catch (MessagingException e) {
-						throw new ServiceException(ServiceError.SEND_EMAIL_FAILED);
+						throw new ServiceException(ServiceExceptionCode.SEND_EMAIL_FAILED);
 					}
 					break;
 				case DAUM:

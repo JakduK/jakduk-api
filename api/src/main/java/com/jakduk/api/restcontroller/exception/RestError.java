@@ -2,7 +2,7 @@ package com.jakduk.api.restcontroller.exception;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -28,14 +28,14 @@ public class RestError {
         this.message = message;
     }
 
-    public RestError(ServiceError serviceError) {
-        this.code = serviceError.getCode();
-        this.message = serviceError.getMessage();
+    public RestError(ServiceExceptionCode serviceExceptionCode) {
+        this.code = serviceExceptionCode.getCode();
+        this.message = serviceExceptionCode.getMessage();
     }
 
-    public RestError(ServiceError serviceError, Map<String, String> fields) {
-        this.code = serviceError.getCode();
-        this.message = serviceError.getMessage();
+    public RestError(ServiceExceptionCode serviceExceptionCode, Map<String, String> fields) {
+        this.code = serviceExceptionCode.getCode();
+        this.message = serviceExceptionCode.getMessage();
         this.fields = fields;
     }
 }

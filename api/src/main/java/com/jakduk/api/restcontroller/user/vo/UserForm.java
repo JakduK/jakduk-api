@@ -1,8 +1,8 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.api.common.constraints.ExistEmail;
-import com.jakduk.api.common.constraints.ExistUsername;
-import com.jakduk.api.common.constraints.FieldMatch;
+import com.jakduk.api.common.constraint.ExistEmail;
+import com.jakduk.api.common.constraint.ExistUsername;
+import com.jakduk.api.common.constraint.FieldMatch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.restcontroller.search.vo.SearchResultResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.service.SearchService;
@@ -101,7 +101,7 @@ public class SearchRestController {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new ServiceException(ServiceError.IO_EXCEPTION);
+			throw new ServiceException(ServiceExceptionCode.IO_EXCEPTION);
 		}
 
 		return response;

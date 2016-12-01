@@ -1,4 +1,4 @@
-package com.jakduk.api.common.constraints;
+package com.jakduk.api.common.constraint;
 
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.UserService;
@@ -8,19 +8,19 @@ import org.springframework.util.ObjectUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.Objects;
 
 /**
  * @author pyohwan
- * 16. 7. 3 오후 9:40
+ * 16. 7. 3 오후 9:30
  */
-public class ExistUsernameValidator implements ConstraintValidator<ExistUsername, String> {
+
+public class ExistEmailValidator implements ConstraintValidator<ExistEmail, String> {
 
     @Autowired
     private UserService userService;
 
     @Override
-    public void initialize(ExistUsername constraintAnnotation) {
+    public void initialize(ExistEmail constraintAnnotation) {
     }
 
     @Override
@@ -29,9 +29,8 @@ public class ExistUsernameValidator implements ConstraintValidator<ExistUsername
         if (StringUtils.isEmpty(value))
             return false;
 
-        UserProfile existUsername = userService.findOneByUsername(value);
+        UserProfile existEmail = userService.findOneByEmail(value);
 
-        return ObjectUtils.isEmpty(existUsername);
-
+        return ObjectUtils.isEmpty(existEmail);
     }
 }
