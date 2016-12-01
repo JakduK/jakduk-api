@@ -6,13 +6,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.common.util.SearchUtils;
+import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceExceptionCode;
-import com.jakduk.core.model.elasticsearch.ESBoardFree;
-import com.jakduk.core.model.elasticsearch.ESComment;
-import com.jakduk.core.model.elasticsearch.ESGallery;
-import com.jakduk.core.model.elasticsearch.JakduCommentOnES;
+import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
@@ -32,17 +29,22 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,7 +153,7 @@ public class SearchService {
 
 		try {
 			Search search = new Search.Builder(objectMapper.writeValueAsString(query))
-					.addIndex(elasticsearchIndexName)
+					.addIndex(elasticsearchIndexBoard)
 					.addType(CoreConst.ES_TYPE_BOARD)
 					.build();
 
@@ -160,6 +162,40 @@ public class SearchService {
 		} catch (IOException e) {
 			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
+	}
+
+	public void searchBoardFree(String q, Integer from, Integer size) {
+		SearchResponse response = client.prepareSearch()
+				.setIndices(elasticsearchIndexBoard)
+				.setTypes(CoreConst.ES_TYPE_BOARD)
+				.setFetchSource(null, new String[]{"content"})
+				.setQuery(QueryBuilders.multiMatchQuery(q, "subject", "content"))
+				.addHighlightedField("subject")
+				.addHighlightedField("content")
+				.setHighlighterPreTags("<span class=\"color-orange\">")
+				.setHighlighterPostTags("</span>")
+				.addScriptField("content_preview", new Script(
+						String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
+								CoreConst.SEARCH_CONTENT_MAX_LENGTH,
+								CoreConst.SEARCH_CONTENT_MAX_LENGTH))
+				)
+				.setFrom(from)
+				.setSize(size)
+				.execute()
+				.actionGet();
+
+		SearchHits searchHits = response.getHits();
+
+		Arrays.stream(searchHits.getHits())
+				.forEach(searchHit -> {
+					Map<String, Object> sourceMap = searchHit.getSource();
+					ESBoardFreeSource esBoardFreeSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardFreeSource.class);
+					esBoardFreeSource.setScore(searchHit.getScore());
+					esBoardFreeSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
+					//esBoardFreeSource.setHighlight(searchHit.getHighlightFields());
+
+					log.debug("phjang=" + searchHit.getHighlightFields().get("subject").getFragments());
+				});
 	}
 
 	@Async
@@ -177,14 +213,12 @@ public class SearchService {
 				.category(category)
 				.build();
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
-
 		try {
 			IndexResponse response = client.prepareIndex()
 					.setIndex(elasticsearchIndexBoard)
 					.setType(CoreConst.ES_TYPE_BOARD)
 					.setId(id)
-					.setSource(objectMapper.writeValueAsString(esBoardFree))
+					.setSource(ObjectMapperUtils.writeValueAsString(esBoardFree))
 					.get();
 
 		} catch (IOException e) {
@@ -255,14 +289,12 @@ public class SearchService {
 				.content(CoreUtils.stripHtmlTag(content))
 				.build();
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
-
 		try {
 			IndexResponse response = client.prepareIndex()
 					.setIndex(elasticsearchIndexComment)
 					.setType(CoreConst.ES_TYPE_COMMENT)
 					.setId(id)
-					.setSource(objectMapper.writeValueAsString(esComment))
+					.setSource(ObjectMapperUtils.writeValueAsString(esComment))
 					.get();
 
 		} catch (IOException e) {
@@ -352,14 +384,12 @@ public class SearchService {
 				.name(name)
 				.build();
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
-
 		try {
 			IndexResponse response = client.prepareIndex()
 					.setIndex(elasticsearchIndexGallery)
 					.setType(CoreConst.ES_TYPE_GALLERY)
 					.setId(id)
-					.setSource(objectMapper.writeValueAsString(esGallery))
+					.setSource(ObjectMapperUtils.writeValueAsString(esGallery))
 					.get();
 
 		} catch (IOException e) {
@@ -396,7 +426,7 @@ public class SearchService {
 
 	public void createIndexBoard() throws IOException {
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
 
 		ObjectNode idNode = objectMapper.createObjectNode();
 		idNode.put("type", "string");
@@ -464,7 +494,7 @@ public class SearchService {
 
 	public void createIndexComment() throws JsonProcessingException {
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
 
 		ObjectNode idNode = objectMapper.createObjectNode();
 		idNode.put("type", "string");
@@ -534,7 +564,7 @@ public class SearchService {
 
 	public void createIndexGallery() throws JsonProcessingException {
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
 
 		ObjectNode idNode = objectMapper.createObjectNode();
 		idNode.put("type", "string");
@@ -605,8 +635,6 @@ public class SearchService {
 				.setConcurrentRequests(bulkConcurrentRequests)
 				.build();
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
-
 		Boolean hasPost = true;
 		ObjectId lastPostId = null;
 
@@ -629,7 +657,7 @@ public class SearchService {
 
 				try {
 
-					index.setSource(objectMapper.writeValueAsString(post));
+					index.setSource(ObjectMapperUtils.writeValueAsString(post));
 					bulkProcessor.add(index.request());
 
 				} catch (JsonProcessingException e) {
@@ -663,8 +691,6 @@ public class SearchService {
 				.setConcurrentRequests(bulkConcurrentRequests)
 				.build();
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
-
 		Boolean hasComment = true;
 		ObjectId lastCommentId = null;
 
@@ -687,7 +713,7 @@ public class SearchService {
 
 				try {
 
-					index.setSource(objectMapper.writeValueAsString(comment));
+					index.setSource(ObjectMapperUtils.writeValueAsString(comment));
 					bulkProcessor.add(index.request());
 
 				} catch (JsonProcessingException e) {
@@ -721,8 +747,6 @@ public class SearchService {
 				.setConcurrentRequests(bulkConcurrentRequests)
 				.build();
 
-		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
-
 		Boolean hasGallery = true;
 		ObjectId lastGalleryId = null;
 
@@ -745,7 +769,7 @@ public class SearchService {
 
 				try {
 
-					index.setSource(objectMapper.writeValueAsString(comment));
+					index.setSource(ObjectMapperUtils.writeValueAsString(comment));
 					bulkProcessor.add(index.request());
 
 				} catch (JsonProcessingException e) {

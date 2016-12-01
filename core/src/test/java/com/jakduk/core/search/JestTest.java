@@ -5,17 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.elasticsearch.ESBoardFree;
 import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.service.SearchService;
 import com.jakduk.core.util.AbstractSpringTest;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
-import io.searchbox.core.*;
+import io.searchbox.core.Delete;
+import io.searchbox.core.Index;
+import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
-import org.bson.types.ObjectId;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
@@ -23,12 +24,10 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -368,56 +367,6 @@ public class JestTest extends AbstractSpringTest {
 		}
 		*/
 	}
-	
-	@Ignore
-	public void bulk02() {
-		
-		List<ESBoardFree> posts = jakdukDAO.getBoardFreeOnES(null);
-		ESBoardFree lastPost = posts.get(posts.size() - 1);
-		
-		while (posts.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-			
-			for (ESBoardFree post : posts) {
-				idxList.add(new Index.Builder(post).build());
-			}
-			
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex("articles")
-					.defaultType("tweet")
-					.addAction(idxList)
-					.build();
-			
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				
-				if (!jestResult.isSucceeded()) {
-					System.out.println(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
-			if (posts.size() > 0) {
-				lastPost = posts.get(posts.size() - 1);
-			}
-		}
-	}
-
-	@Ignore
-	@Test
-	public void initSearchType() throws JsonProcessingException {
-		sut.initSearchType();
-	}
-
-	@Ignore
-	@Test
-	public void initSearchDocuments() {
-		sut.initSearchDocuments();
-	}
-
 
 	@Test
 	public void queryDSL() throws JsonProcessingException {

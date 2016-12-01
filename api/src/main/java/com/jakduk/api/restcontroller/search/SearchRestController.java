@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.restcontroller.search.vo.SearchResultResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.service.SearchService;
 import io.searchbox.core.SearchResult;
@@ -36,10 +36,10 @@ import java.util.Map;
 */
 
 @Slf4j
-@Api(tags = "Search", description = "찾기 API")
-@RestController
-@RequestMapping("/api/search")
 @Validated
+@Api(tags = "Search", description = "찾기 API")
+@RequestMapping("/api/search")
+@RestController
 public class SearchRestController {
 	
 	@Autowired
@@ -48,11 +48,11 @@ public class SearchRestController {
 	@Autowired
 	private BoardDAO boardDAO;
 
-	@ApiOperation(value = "찾기", response = SearchResultResponse.class)
+	@ApiOperation(value = "찾기")
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public SearchResultResponse getSearch(
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
-			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam String w,
+			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
 			@ApiParam(value = "페이지 크기")@RequestParam(required = false, defaultValue = "10") Integer size) {
 
