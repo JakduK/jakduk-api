@@ -5,23 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.SearchUtils;
-import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.db.Gallery;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.ESBoardFree;
 import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.model.elasticsearch.ESGallery;
 import com.jakduk.core.model.elasticsearch.JakduCommentOnES;
+import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Delete;
-import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +29,7 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
@@ -160,60 +158,55 @@ public class SearchService {
 			return jestClient.execute(search);
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.IO_EXCEPTION);
+			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
 	@Async
 	public void indexBoardFree(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
 
-		if (elasticsearchEnable) {
-			ESBoardFree esBoardFree = ESBoardFree.builder()
-					.id(id)
-					.seq(seq)
-					.writer(writer)
-					.subject(subject)
-					.content(content)
-					.category(category)
-					.build();
+		if (! elasticsearchEnable)
+			return;
 
-			ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+		ESBoardFree esBoardFree = ESBoardFree.builder()
+				.id(id)
+				.seq(seq)
+				.writer(writer)
+				.subject(CoreUtils.stripHtmlTag(subject))
+				.content(CoreUtils.stripHtmlTag(content))
+				.category(category)
+				.build();
 
-			try {
-				IndexResponse response = client.prepareIndex()
-						.setIndex(elasticsearchIndexBoard)
-						.setType(CoreConst.ES_TYPE_BOARD)
-						.setId(id)
-						.setSource(objectMapper.writeValueAsString(esBoardFree))
-						.get();
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
 
-			} catch (IOException e) {
-				throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED);
-			}
+		try {
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchIndexBoard)
+					.setType(CoreConst.ES_TYPE_BOARD)
+					.setId(id)
+					.setSource(objectMapper.writeValueAsString(esBoardFree))
+					.get();
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
 	@Async
-	public void deleteDocumentBoard(String id) {
+	public void deleteBoardFree(String id) {
 
 		if (! elasticsearchEnable)
 			return;
 
-        try {
-			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
-			        .index(elasticsearchIndexName)
-			        .type(CoreConst.ES_TYPE_BOARD)
-			        .build());
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchIndexName)
+				.setType(CoreConst.ES_TYPE_BOARD)
+				.setId(id)
+				.get();
 
-			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
-				log.debug("board id " + id + " is not found. so can't delete it!");
+		if (! response.isFound())
+			log.info("board id " + id + " is not found. so can't delete it!");
 
-			if (! jestResult.isSucceeded())
-				log.error(jestResult.getErrorMessage());
-
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
 	}
 
 	public SearchResult searchDocumentComment(String q, int from, int size) {
@@ -250,34 +243,35 @@ public class SearchService {
 	}
 
 	@Async
-	public void createDocumentComment(BoardFreeComment boardFreeComment) {
-        if (elasticsearchEnable) {
-            ESComment ESComment = new ESComment(boardFreeComment);
+	public void indexBoardFreeComment(String id, BoardItem boardItem, CommonWriter writer, String content) {
 
-            Index index = new Index.Builder(ESComment)
-                    .index(elasticsearchIndexName)
-                    .type(CoreConst.ES_TYPE_COMMENT)
-                    .build();
+		if (! elasticsearchEnable)
+			return;
 
-            try {
-                jestClient.execute(index);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-	}
+		ESComment esComment = ESComment.builder()
+				.id(id)
+				.boardItem(boardItem)
+				.writer(writer)
+				.content(CoreUtils.stripHtmlTag(content))
+				.build();
 
-	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
-		Index index = new Index.Builder(jakduCommentOnES).index(elasticsearchIndexName).type(CoreConst.ES_TYPE_COMMENT).build();
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
 
 		try {
-			JestResult jestResult = jestClient.execute(index);
-			if (!jestResult.isSucceeded()) {
-				log.error(jestResult.getErrorMessage());
-			}
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchIndexComment)
+					.setType(CoreConst.ES_TYPE_COMMENT)
+					.setId(id)
+					.setSource(objectMapper.writeValueAsString(esComment))
+					.get();
+
 		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
+	}
+
+	// TODO : 구현 해야 함
+	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
 	}
 
 	public SearchResult searchDocumentJakduComment(String q, int from, int size) {
@@ -347,45 +341,46 @@ public class SearchService {
 	}
 
 	@Async
-	public void createDocumentGallery(Gallery gallery) {
-
-        if (elasticsearchEnable) {
-            ESGallery ESGallery = new ESGallery(gallery);
-
-            Index index = new Index.Builder(ESGallery)
-                    .index(elasticsearchIndexName)
-                    .type(CoreConst.ES_TYPE_GALLERY)
-                    .build();
-
-            try {
-                jestClient.execute(index);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-	}
-
-	@Async
-	public void deleteDocumentGallery(String id) {
+	public void indexGallery(String id, CommonWriter writer, String name) {
 
 		if (! elasticsearchEnable)
 			return;
 
+		ESGallery esGallery = ESGallery.builder()
+				.id(id)
+				.writer(writer)
+				.name(name)
+				.build();
+
+		ObjectMapper objectMapper = SearchUtils.getObjectMapper();
+
 		try {
-			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
-					.index(elasticsearchIndexName)
-					.type(CoreConst.ES_TYPE_GALLERY)
-					.build());
-
-			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
-				log.debug("gallery id " + id + " is not found. so can't delete it!");
-
-			if (! jestResult.isSucceeded())
-				log.error(jestResult.getErrorMessage());
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchIndexGallery)
+					.setType(CoreConst.ES_TYPE_GALLERY)
+					.setId(id)
+					.setSource(objectMapper.writeValueAsString(esGallery))
+					.get();
 
 		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
+	}
+
+	@Async
+	public void deleteGallery(String id) {
+
+		if (! elasticsearchEnable)
+			return;
+
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchIndexName)
+				.setType(CoreConst.ES_TYPE_GALLERY)
+				.setId(id)
+				.get();
+
+		if (! response.isFound())
+			log.info("gallery id " + id + " is not found. so can't delete it!");
 	}
 
 	private Settings.Builder getIndexSettings() {

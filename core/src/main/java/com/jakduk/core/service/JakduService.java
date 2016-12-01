@@ -108,8 +108,7 @@ public class JakduService {
             throw new NoSuchElementException(CoreUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
         }
 
-        BoardCommentStatus status = new BoardCommentStatus();
-        status.setDevice(request.getDevice());
+        BoardCommentStatus status = new BoardCommentStatus(request.getDevice());
 
         JakduComment jakduComment = new JakduComment();
 

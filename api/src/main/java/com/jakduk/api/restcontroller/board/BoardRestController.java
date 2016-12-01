@@ -356,7 +356,7 @@ public class BoardRestController {
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
-        return boardFreeService.addFreeComment(writer, commentRequest.getSeq(), commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
+        return boardFreeService.insertFreeComment(commentRequest.getSeq(), writer, commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
     }
 
     @ApiOperation(value = "자유게시판 글 감정 표현")

@@ -67,9 +67,6 @@ public class BoardFreeService {
 	private CommonService commonService;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private SearchService searchService;
 
 	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
@@ -164,7 +161,10 @@ public class BoardFreeService {
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
-				searchService.createDocumentGallery(updateGallery);
+				/**
+				 * 엘라스틱서치 색인 요청
+				 */
+				searchService.indexGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 			}
 		}
 
@@ -283,7 +283,10 @@ public class BoardFreeService {
 				updateGallery.setStatus(status);
 				galleryRepository.save(updateGallery);
 
-				searchService.createDocumentGallery(updateGallery);
+				/**
+				 * 엘라스틱서치 색인 요청
+				 */
+				searchService.indexGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 			}
 
 		}
@@ -354,7 +357,7 @@ public class BoardFreeService {
             }
         }
 
-        searchService.deleteDocumentBoard(boardFree.getId());
+        searchService.deleteBoardFree(boardFree.getId());
 
         return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
     }
@@ -497,24 +500,25 @@ public class BoardFreeService {
 	}
 
 	// 게시판 댓글 추가.
-	public BoardFreeComment addFreeComment(CommonWriter writer, Integer seq, String contents, CoreConst.DEVICE_TYPE device) {
-		BoardFreeComment boardFreeComment = new BoardFreeComment();
+	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String contents, CoreConst.DEVICE_TYPE device) {
 
-		BoardFreeOfMinimum boardFreeOnComment = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
+				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
 
-		BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
-		boardFreeComment.setBoardItem(boardItem);
-
-		boardFreeComment.setWriter(writer);
-		boardFreeComment.setContent(contents);
-
-		BoardCommentStatus status = new BoardCommentStatus();
-		status.setDevice(device);
-		boardFreeComment.setStatus(status);
+		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
+				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
+				.writer(writer)
+				.content(contents)
+				.status(new BoardCommentStatus(device))
+				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
-		searchService.createDocumentComment(boardFreeComment);
+		/**
+		 * 엘라스틱서치 색인 요청
+		 */
+		searchService.indexBoardFreeComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+				boardFreeComment.getContent());
 
 		return boardFreeComment;
 	}

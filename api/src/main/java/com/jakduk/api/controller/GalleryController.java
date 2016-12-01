@@ -1,8 +1,8 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.service.GalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
@@ -23,8 +22,8 @@ import java.io.IOException;
  * @desc     :
  */
 
-@RequestMapping("/gallery")
 @Controller
+@RequestMapping("/gallery")
 public class GalleryController {
 
 	@Autowired
@@ -32,7 +31,6 @@ public class GalleryController {
 
 	// 사진 가져오기.
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	@ResponseBody
 	public void getGallery(@PathVariable String id,	HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
@@ -49,9 +47,7 @@ public class GalleryController {
 
 	// 사진 썸네일 가져오기.
 	@RequestMapping(value = "/thumbnail/{id}", method = RequestMethod.GET)
-	@ResponseBody
-	public void getGalleyThumbnail(@PathVariable String id,
-						  HttpServletResponse response) {
+	public void getGalleyThumbnail(@PathVariable String id, HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
 

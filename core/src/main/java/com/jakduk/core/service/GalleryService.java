@@ -272,7 +272,7 @@ public class GalleryService {
         }
 
 		// 엘라스틱 서치 document 삭제.
-		searchService.deleteDocumentGallery(gallery.getId());
+		searchService.deleteGallery(gallery.getId());
 	}
 
 	public Map<String, Object> getGallery(String id, Boolean isAddCookie) {
