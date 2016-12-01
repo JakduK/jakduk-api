@@ -12,6 +12,7 @@ import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.vo.SearchPostResult;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -32,23 +33,23 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -107,65 +108,8 @@ public class SearchService {
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchResult searchDocumentBoard(String q, int from, int size) {
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		Map<String, Object> query = new HashMap<>();
-		Map<String, Object> querySource = new HashMap<>();
-		Map<String, Object> queryQuery = new HashMap<>();
-		Map<String, Object> queryQueryMultiMatch = new HashMap<>();
-		Map<String, Object> queryHighlight = new HashMap<>();
-		Map<String, Object> queryHighlightFields = new HashMap<>();
-		Map<String, Object> queryScriptFields = new HashMap<>();
-		Map<String, Object> queryScriptFieldsContentPreview = new HashMap<>();
-
-		// _source
-		querySource.put("exclude", "content");
-
-		// query
-		queryQueryMultiMatch.put("fields", new Object[]{"subject", "content"});
-		queryQueryMultiMatch.put("query", q);
-		queryQuery.put("multi_match", queryQueryMultiMatch);
-
-		// highlight
-		queryHighlightFields.put("subject", new HashMap<>());
-		queryHighlightFields.put("content", new HashMap<>());
-		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
-		queryHighlight.put("post_tags", new Object[]{"</span>"});
-		queryHighlight.put("fields", queryHighlightFields);
-
-		// script_fields
-		queryScriptFieldsContentPreview.put("script",
-			String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
-				CoreConst.SEARCH_CONTENT_MAX_LENGTH,
-				CoreConst.SEARCH_CONTENT_MAX_LENGTH
-			)
-		);
-
-		queryScriptFields.put("content_preview", queryScriptFieldsContentPreview);
-
-		query.put("from", from);
-		query.put("size", size);
-		query.put("_source", querySource);
-		query.put("query", queryQuery);
-		query.put("highlight", queryHighlight);
-		query.put("script_fields", queryScriptFields);
-
-		try {
-			Search search = new Search.Builder(objectMapper.writeValueAsString(query))
-					.addIndex(elasticsearchIndexBoard)
-					.addType(CoreConst.ES_TYPE_BOARD)
-					.build();
-
-			return jestClient.execute(search);
-
-		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
-		}
-	}
-
-	public void searchBoardFree(String q, Integer from, Integer size) {
-		SearchResponse response = client.prepareSearch()
+	public SearchPostResult searchBoardFree(String q, Integer from, Integer size) {
+		SearchResponse searchResponse = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"content"})
@@ -184,18 +128,35 @@ public class SearchService {
 				.execute()
 				.actionGet();
 
-		SearchHits searchHits = response.getHits();
+		SearchHits searchHits = searchResponse.getHits();
 
-		Arrays.stream(searchHits.getHits())
-				.forEach(searchHit -> {
+		List<ESBoardFreeSource> searchList = Arrays.stream(searchHits.getHits())
+				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
 					ESBoardFreeSource esBoardFreeSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardFreeSource.class);
 					esBoardFreeSource.setScore(searchHit.getScore());
 					esBoardFreeSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
-					//esBoardFreeSource.setHighlight(searchHit.getHighlightFields());
 
-					log.debug("phjang=" + searchHit.getHighlightFields().get("subject").getFragments());
-				});
+					Map<String, List<String>> highlight = new HashMap<>();
+
+					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
+						List<String> fragments = new ArrayList<>();
+						for (Text text : highlightField.getValue().fragments()) {
+							fragments.add(text.string());
+						}
+						highlight.put(highlightField.getKey(), fragments);
+					}
+
+					esBoardFreeSource.setHighlight(highlight);
+
+					return esBoardFreeSource;
+				})
+				.collect(Collectors.toList());
+
+		return SearchPostResult.builder()
+				.totalCount(searchHits.getTotalHits())
+				.posts(searchList)
+				.build();
 	}
 
 	@Async

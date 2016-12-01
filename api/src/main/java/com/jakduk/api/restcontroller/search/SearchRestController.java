@@ -7,6 +7,7 @@ import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.ESComment;
+import com.jakduk.core.model.vo.SearchPostResult;
 import com.jakduk.core.service.SearchService;
 import io.searchbox.core.SearchResult;
 import io.swagger.annotations.Api;
@@ -65,10 +66,9 @@ public class SearchRestController {
 
 		try {
 			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.PO.name())) {
-				SearchResult result = searchService.searchDocumentBoard(q, from, size);
+				SearchPostResult searchPostResult = searchService.searchBoardFree(q, from, size);
 
-				if (result.isSucceeded())
-					response.setPosts(objectMapper.readValue(result.getJsonString(), Map.class));
+				response.setPostResult(searchPostResult);
 			}
 
 			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.CO.name())) {

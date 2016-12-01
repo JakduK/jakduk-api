@@ -1,10 +1,9 @@
 package com.jakduk.api.restcontroller.search.vo;
 
-import com.google.gson.JsonObject;
 import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.core.model.vo.SearchPostResult;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +15,7 @@ import java.util.Map;
 public class SearchResultResponse {
 
 	@ApiModelProperty(value = "검색된 게시물")
-	private Map<String, Object> posts;
+	private SearchPostResult postResult;
 
 	@ApiModelProperty(value = "검색된 댓글")
 	private Map<String, Object> comments;
