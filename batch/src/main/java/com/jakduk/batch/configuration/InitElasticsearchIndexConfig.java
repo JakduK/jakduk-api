@@ -1,13 +1,13 @@
 package com.jakduk.batch.configuration;
 
 import com.jakduk.core.service.SearchService;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * Created by pyohwan on 16. 9. 18.
  */
 
+@Slf4j
 @Configuration
 public class InitElasticsearchIndexConfig {
 
@@ -36,14 +37,12 @@ public class InitElasticsearchIndexConfig {
     @Bean
     public Job initElasticsearchIndexJob(@Qualifier("deleteIndexStep") Step deleteIndexStep,
                                          @Qualifier("initSearchIndexStep") Step initSearchIndexStep,
-                                         @Qualifier("initSearchTypeStep") Step initSearchTypeStep,
                                          @Qualifier("initSearchDocumentsStep") Step initSearchDocumentsStep) throws Exception {
 
         return jobBuilderFactory.get("initElasticsearchIndexJob")
                 .incrementer(new RunIdIncrementer())
                 .start(deleteIndexStep)
                 .next(initSearchIndexStep)
-                .next(initSearchTypeStep)
                 .next(initSearchDocumentsStep)
                 .build();
     }
@@ -54,32 +53,27 @@ public class InitElasticsearchIndexConfig {
                 .tasklet((contribution, chunkContext) -> {
 
                     try {
-                        searchService.deleteIndex();
+                        searchService.deleteIndexBoard();
+                        searchService.deleteIndexComment();
+                        searchService.deleteIndexGallery();
+
                     } catch (IndexNotFoundException e) {
+                        log.error(e.getLocalizedMessage());
                     }
 
                     return RepeatStatus.FINISHED;
                 })
                 .build();
-
     }
 
     @Bean
     public Step initSearchIndexStep() {
         return stepBuilderFactory.get("initSearchIndexStep")
                 .tasklet((contribution, chunkContext) -> {
-                    searchService.initSearchIndex();
 
-                    return RepeatStatus.FINISHED;
-                })
-                .build();
-    }
-
-    @Bean
-    public Step initSearchTypeStep() {
-        return stepBuilderFactory.get("initSearchTypeStep")
-                .tasklet((contribution, chunkContext) -> {
-                    searchService.initSearchType();
+                    searchService.createIndexBoard();
+                    searchService.createIndexComment();
+                    searchService.createIndexGallery();
 
                     return RepeatStatus.FINISHED;
                 })
@@ -90,11 +84,13 @@ public class InitElasticsearchIndexConfig {
     public Step initSearchDocumentsStep() {
         return stepBuilderFactory.get("initSearchDocumentsStep")
                 .tasklet((contribution, chunkContext) -> {
-                    searchService.initSearchDocuments();
+
+                    searchService.processBulkInsertBoard();
+                    searchService.processBulkInsertComment();
+                    searchService.processBulkInsertGallery();
 
                     return RepeatStatus.FINISHED;
                 })
                 .build();
     }
-
 }

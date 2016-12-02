@@ -1,6 +1,6 @@
 package com.jakduk.core.model.web.board;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.Data;
 
 /**
@@ -13,6 +13,6 @@ import lombok.Data;
 public class BoardListInfo {
 
 	private int page = 1;
-	private int size = CommonConst.BOARD_MAX_LIMIT;
-	private String category = CommonConst.BOARD_CATEGORY_NONE;
+	private int size = CoreConst.BOARD_MAX_LIMIT;
+	private String category = CoreConst.BOARD_CATEGORY_NONE;
 }

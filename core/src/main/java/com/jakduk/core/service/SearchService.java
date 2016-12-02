@@ -2,37 +2,54 @@ package com.jakduk.core.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.elasticsearch.BoardFreeOnES;
-import com.jakduk.core.model.elasticsearch.CommentOnES;
-import com.jakduk.core.model.elasticsearch.GalleryOnES;
-import com.jakduk.core.model.elasticsearch.JakduCommentOnES;
+import com.jakduk.core.exception.ServiceExceptionCode;
+import com.jakduk.core.model.elasticsearch.*;
+import com.jakduk.core.model.embedded.BoardItem;
+import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.vo.SearchPostResult;
+import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.*;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.mapping.PutMapping;
+import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -48,6 +65,27 @@ public class SearchService {
     @Value("${elasticsearch.enable}")
     private boolean elasticsearchEnable;
 
+	@Value("${core.elasticsearch.index.board}")
+	private String elasticsearchIndexBoard;
+
+	@Value("${core.elasticsearch.index.comment}")
+	private String elasticsearchIndexComment;
+
+	@Value("${core.elasticsearch.index.gallery}")
+	private String elasticsearchIndexGallery;
+
+	@Value("${core.elasticsearch.bulk.actions}")
+	private Integer bulkActions;
+
+	@Value("${core.elasticsearch.bulk.size.mb}")
+	private Integer bulkMbSize;
+
+	@Value("${core.elasticsearch.bulk.flush.interval.seconds}")
+	private Integer bulkFlushIntervalSeconds;
+
+	@Value("${core.elasticsearch.bulk.concurrent.requests}")
+	private Integer bulkConcurrentRequests;
+
 	@Autowired
 	private JestClient jestClient;
 
@@ -55,7 +93,13 @@ public class SearchService {
 	private Client client;
 
 	@Autowired
-	private JakdukDAO jakdukDAO;
+	private BoardFreeRepository boardFreeRepository;
+
+	@Autowired
+	private BoardFreeCommentRepository boardFreeCommentRepository;
+
+	@Autowired
+	private GalleryRepository galleryRepository;
 
 	/**
 	 * 게시물 검색
@@ -64,105 +108,102 @@ public class SearchService {
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchResult searchDocumentBoard(String q, int from, int size) {
-		ObjectMapper objectMapper = new ObjectMapper();
+	public SearchPostResult searchBoardFree(String q, Integer from, Integer size) {
+		SearchResponse searchResponse = client.prepareSearch()
+				.setIndices(elasticsearchIndexBoard)
+				.setTypes(CoreConst.ES_TYPE_BOARD)
+				.setFetchSource(null, new String[]{"content"})
+				.setQuery(QueryBuilders.multiMatchQuery(q, "subject", "content"))
+				.addHighlightedField("subject")
+				.addHighlightedField("content")
+				.setHighlighterPreTags("<span class=\"color-orange\">")
+				.setHighlighterPostTags("</span>")
+				.addScriptField("content_preview", new Script(
+						String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
+								CoreConst.SEARCH_CONTENT_MAX_LENGTH,
+								CoreConst.SEARCH_CONTENT_MAX_LENGTH))
+				)
+				.setFrom(from)
+				.setSize(size)
+				.execute()
+				.actionGet();
 
-		Map<String, Object> query = new HashMap<>();
-		Map<String, Object> querySource = new HashMap<>();
-		Map<String, Object> queryQuery = new HashMap<>();
-		Map<String, Object> queryQueryMultiMatch = new HashMap<>();
-		Map<String, Object> queryHighlight = new HashMap<>();
-		Map<String, Object> queryHighlightFields = new HashMap<>();
-		Map<String, Object> queryScriptFields = new HashMap<>();
-		Map<String, Object> queryScriptFieldsContentPreview = new HashMap<>();
+		SearchHits searchHits = searchResponse.getHits();
 
-		// _source
-		querySource.put("exclude", "content");
+		List<ESBoardFreeSource> searchList = Arrays.stream(searchHits.getHits())
+				.map(searchHit -> {
+					Map<String, Object> sourceMap = searchHit.getSource();
+					ESBoardFreeSource esBoardFreeSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardFreeSource.class);
+					esBoardFreeSource.setScore(searchHit.getScore());
+					esBoardFreeSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
 
-		// query
-		queryQueryMultiMatch.put("fields", new Object[]{"subject", "content"});
-		queryQueryMultiMatch.put("query", q);
-		queryQuery.put("multi_match", queryQueryMultiMatch);
+					Map<String, List<String>> highlight = new HashMap<>();
 
-		// highlight
-		queryHighlightFields.put("subject", new HashMap<>());
-		queryHighlightFields.put("content", new HashMap<>());
-		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
-		queryHighlight.put("post_tags", new Object[]{"</span>"});
-		queryHighlight.put("fields", queryHighlightFields);
+					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
+						List<String> fragments = new ArrayList<>();
+						for (Text text : highlightField.getValue().fragments()) {
+							fragments.add(text.string());
+						}
+						highlight.put(highlightField.getKey(), fragments);
+					}
 
-		// script_fields
-		queryScriptFieldsContentPreview.put("script",
-			String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
-				CommonConst.SEARCH_CONTENT_MAX_LENGTH,
-				CommonConst.SEARCH_CONTENT_MAX_LENGTH
-			)
-		);
+					esBoardFreeSource.setHighlight(highlight);
 
-		queryScriptFields.put("content_preview", queryScriptFieldsContentPreview);
+					return esBoardFreeSource;
+				})
+				.collect(Collectors.toList());
 
-		query.put("from", from);
-		query.put("size", size);
-		query.put("_source", querySource);
-		query.put("query", queryQuery);
-		query.put("highlight", queryHighlight);
-		query.put("script_fields", queryScriptFields);
-
-		try {
-			Search search = new Search.Builder(objectMapper.writeValueAsString(query))
-					.addIndex(elasticsearchIndexName)
-					.addType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
-					.build();
-
-			return jestClient.execute(search);
-
-		} catch (IOException e) {
-			throw new ServiceException(ServiceError.IO_EXCEPTION);
-		}
+		return SearchPostResult.builder()
+				.totalCount(searchHits.getTotalHits())
+				.posts(searchList)
+				.build();
 	}
 
 	@Async
-	public void createDocumentBoard(BoardFree boardFree) {
-
-        if (elasticsearchEnable) {
-            BoardFreeOnES boardFreeOnES = new BoardFreeOnES(boardFree);
-
-            Index index = new Index.Builder(boardFreeOnES)
-                    .index(elasticsearchIndexName)
-                    .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
-                    .build();
-
-            try {
-                jestClient.execute(index);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-	}
-
-	@Async
-	public void deleteDocumentBoard(String id) {
+	public void indexBoardFree(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
 
 		if (! elasticsearchEnable)
 			return;
 
-        try {
-			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
-			        .index(elasticsearchIndexName)
-			        .type(CommonConst.ELASTICSEARCH_TYPE_BOARD)
-			        .build());
+		ESBoardFree esBoardFree = ESBoardFree.builder()
+				.id(id)
+				.seq(seq)
+				.writer(writer)
+				.subject(CoreUtils.stripHtmlTag(subject))
+				.content(CoreUtils.stripHtmlTag(content))
+				.category(category)
+				.build();
 
-			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
-				log.debug("board id " + id + " is not found. so can't delete it!");
-
-			if (! jestResult.isSucceeded())
-				log.error(jestResult.getErrorMessage());
+		try {
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchIndexBoard)
+					.setType(CoreConst.ES_TYPE_BOARD)
+					.setId(id)
+					.setSource(ObjectMapperUtils.writeValueAsString(esBoardFree))
+					.get();
 
 		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
-	
+
+	@Async
+	public void deleteBoardFree(String id) {
+
+		if (! elasticsearchEnable)
+			return;
+
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchIndexName)
+				.setType(CoreConst.ES_TYPE_BOARD)
+				.setId(id)
+				.get();
+
+		if (! response.isFound())
+			log.info("board id " + id + " is not found. so can't delete it!");
+
+	}
+
 	public SearchResult searchDocumentComment(String q, int from, int size) {
 		Map<String, Object> query = new HashMap<>();
 		Map<String, Object> queryQuery = new HashMap<>();
@@ -185,7 +226,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(new Gson().toJson(query))
 			.addIndex(elasticsearchIndexName)
-			.addType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
+			.addType(CoreConst.ES_TYPE_COMMENT)
 			.build();
 		
 		try {
@@ -197,34 +238,33 @@ public class SearchService {
 	}
 
 	@Async
-	public void createDocumentComment(BoardFreeComment boardFreeComment) {
-        if (elasticsearchEnable) {
-            CommentOnES commentOnES = new CommentOnES(boardFreeComment);
+	public void indexBoardFreeComment(String id, BoardItem boardItem, CommonWriter writer, String content) {
 
-            Index index = new Index.Builder(commentOnES)
-                    .index(elasticsearchIndexName)
-                    .type(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
-                    .build();
+		if (! elasticsearchEnable)
+			return;
 
-            try {
-                jestClient.execute(index);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-	}
-
-	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
-		Index index = new Index.Builder(jakduCommentOnES).index(elasticsearchIndexName).type(CommonConst.ELASTICSEARCH_TYPE_COMMENT).build();
+		ESComment esComment = ESComment.builder()
+				.id(id)
+				.boardItem(boardItem)
+				.writer(writer)
+				.content(CoreUtils.stripHtmlTag(content))
+				.build();
 
 		try {
-			JestResult jestResult = jestClient.execute(index);
-			if (!jestResult.isSucceeded()) {
-				log.error(jestResult.getErrorMessage());
-			}
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchIndexComment)
+					.setType(CoreConst.ES_TYPE_COMMENT)
+					.setId(id)
+					.setSource(ObjectMapperUtils.writeValueAsString(esComment))
+					.get();
+
 		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
+	}
+
+	// TODO : 구현 해야 함
+	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
 	}
 
 	public SearchResult searchDocumentJakduComment(String q, int from, int size) {
@@ -249,7 +289,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(query)
 				.addIndex(elasticsearchIndexName)
-				.addType(CommonConst.ELASTICSEARCH_TYPE_JAKDU_COMMENT)
+				.addType(CoreConst.ES_TYPE_JAKDU_COMMENT)
 				.build();
 
 		try {
@@ -282,7 +322,7 @@ public class SearchService {
 
 		Search search = new Search.Builder(new Gson().toJson(query))
 			.addIndex(elasticsearchIndexName)
-			.addType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
+			.addType(CoreConst.ES_TYPE_GALLERY)
 			.build();
 		
 		try {
@@ -294,284 +334,452 @@ public class SearchService {
 	}
 
 	@Async
-	public void createDocumentGallery(Gallery gallery) {
-
-        if (elasticsearchEnable) {
-            GalleryOnES galleryOnES = new GalleryOnES(gallery);
-
-            Index index = new Index.Builder(galleryOnES)
-                    .index(elasticsearchIndexName)
-                    .type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
-                    .build();
-
-            try {
-                jestClient.execute(index);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-	}
-
-	@Async
-	public void deleteDocumentGallery(String id) {
+	public void indexGallery(String id, CommonWriter writer, String name) {
 
 		if (! elasticsearchEnable)
 			return;
 
+		ESGallery esGallery = ESGallery.builder()
+				.id(id)
+				.writer(writer)
+				.name(name)
+				.build();
+
 		try {
-			JestResult jestResult = jestClient.execute(new Delete.Builder(id)
-					.index(elasticsearchIndexName)
-					.type(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
-					.build());
-
-			if (jestResult.getValue("found") != null && jestResult.getValue("found").toString().equals("false"))
-				log.debug("gallery id " + id + " is not found. so can't delete it!");
-
-			if (! jestResult.isSucceeded())
-				log.error(jestResult.getErrorMessage());
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchIndexGallery)
+					.setType(CoreConst.ES_TYPE_GALLERY)
+					.setId(id)
+					.setSource(ObjectMapperUtils.writeValueAsString(esGallery))
+					.get();
 
 		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
-	/**
-	 * 엘라스틱서치 인덱스 초기화.
-	 * @return
-	 */
-	public HashMap<String, Object> initSearchIndex() {
+	@Async
+	public void deleteGallery(String id) {
 
-		HashMap<String, Object> result = new HashMap<>();
+		if (! elasticsearchEnable)
+			return;
 
-		Settings.Builder builder = Settings.builder();
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchIndexName)
+				.setType(CoreConst.ES_TYPE_GALLERY)
+				.setId(id)
+				.get();
+
+		if (! response.isFound())
+			log.info("gallery id " + id + " is not found. so can't delete it!");
+	}
+
+	private Settings.Builder getIndexSettings() {
+
 		//settingsBuilder.put("number_of_shards", 5);
 		//settingsBuilder.put("number_of_replicas", 1);
-		builder.put("index.analysis.analyzer.korean.type", "custom");
-		builder.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer");
-		builder.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
 
-		try {
-			JestResult jestResult = jestClient.execute(
-					new CreateIndex.Builder(elasticsearchIndexName)
-							.settings(builder.build().getAsMap())
-							.build()
-			);
+		return Settings.builder()
+				.put("index.analysis.analyzer.korean.type", "custom")
+				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
+	}
 
-			if (! jestResult.isSucceeded()) {
-				log.debug(jestResult.getErrorMessage());
+	public void createIndexBoard() throws IOException {
+
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode subjectNode = objectMapper.createObjectNode();
+		subjectNode.put("type", "string");
+		subjectNode.put("analyzer", "korean");
+
+		ObjectNode contentNode = objectMapper.createObjectNode();
+		contentNode.put("type", "string");
+		contentNode.put("analyzer", "korean");
+
+		ObjectNode seqNode = objectMapper.createObjectNode();
+		seqNode.put("type", "integer");
+		seqNode.put("index", "no");
+
+		ObjectNode categoryNode = objectMapper.createObjectNode();
+		categoryNode.put("type", "string");
+		categoryNode.put("index", "not_analyzed");
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("subject", subjectNode);
+		propertiesNode.set("content", contentNode);
+		propertiesNode.set("seq", seqNode);
+		propertiesNode.set("writer", writerNode);
+		propertiesNode.set("category", categoryNode);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
+		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
+				.setSettings(getIndexSettings())
+				.addMapping(CoreConst.ES_TYPE_BOARD, objectMapper.writeValueAsString(mappings))
+				.get();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexBoard + " created");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created");
+		}
+	}
+
+	public void createIndexComment() throws JsonProcessingException {
+
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode contentNode = objectMapper.createObjectNode();
+		contentNode.put("type", "string");
+		contentNode.put("analyzer", "korean");
+
+		// boardItem
+		ObjectNode boardItemIdNode = objectMapper.createObjectNode();
+		boardItemIdNode.put("type", "string");
+		boardItemIdNode.put("index", "no");
+
+		ObjectNode boardItemSeqNode = objectMapper.createObjectNode();
+		boardItemSeqNode.put("type", "integer");
+		boardItemSeqNode.put("index", "no");
+
+		ObjectNode boardItemPropertiesNode = objectMapper.createObjectNode();
+		boardItemPropertiesNode.set("id", boardItemIdNode);
+		boardItemPropertiesNode.set("seq", boardItemSeqNode);
+
+		ObjectNode boardItemNode = objectMapper.createObjectNode();
+		boardItemNode.set("properties", boardItemPropertiesNode);
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("content", contentNode);
+		propertiesNode.set("writer", writerNode);
+		propertiesNode.set("boardItem", boardItemNode);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
+		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexComment)
+				.setSettings(getIndexSettings())
+				.addMapping(CoreConst.ES_TYPE_COMMENT, objectMapper.writeValueAsString(mappings))
+				.get();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexComment + " created");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexComment + " not created");
+		}
+	}
+
+	public void createIndexGallery() throws JsonProcessingException {
+
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode nameNode = objectMapper.createObjectNode();
+		nameNode.put("type", "string");
+		nameNode.put("analyzer", "korean");
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("name", nameNode);
+		propertiesNode.set("writer", writerNode);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
+		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
+				.setSettings(getIndexSettings())
+				.addMapping(CoreConst.ES_TYPE_GALLERY, objectMapper.writeValueAsString(mappings))
+				.get();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexGallery + " created");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created");
+		}
+	}
+
+	public void processBulkInsertBoard() throws InterruptedException {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
+			}
+
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+			}
+
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
+
+		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
+
+		Boolean hasPost = true;
+		ObjectId lastPostId = null;
+
+		do {
+			List<ESBoardFree> posts = boardFreeRepository.findPostsGreaterThanId(lastPostId, CoreConst.ES_BULK_LIMIT);
+
+			if (posts.isEmpty()) {
+				hasPost = false;
 			} else {
-				result.put("result", Boolean.TRUE);
+				ESBoardFree lastPost = posts.get(posts.size() - 1);
+				lastPostId = new ObjectId(lastPost.getId());
 			}
-		} catch (IOException e) {
-			result.put("result", Boolean.FALSE);
-			log.error(e.getMessage(), e);
-		}
 
-		return result;
+			posts.forEach(post -> {
+				IndexRequestBuilder index = client.prepareIndex(
+						elasticsearchIndexBoard,
+						CoreConst.ES_TYPE_BOARD,
+						post.getId()
+				);
+
+				try {
+
+					index.setSource(ObjectMapperUtils.writeValueAsString(post));
+					bulkProcessor.add(index.request());
+
+				} catch (JsonProcessingException e) {
+					log.error(e.getLocalizedMessage());
+				}
+
+			});
+
+		} while (hasPost);
+
+		bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
 	}
 
-	/**
-	 * 엘라스틱서치 매핑 초기화.
-	 * @return
-	 */
-	public HashMap<String, Object> initSearchType() throws JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		Map<String, Object> source = new HashMap<>();
+	public void processBulkInsertComment() throws InterruptedException {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
+			}
 
-		// 게시물 매핑 초기화.
-		Map<String, Object> properties = new HashMap<>();
-		Map<String, Object> subject = new HashMap<>();
-		Map<String, Object> content = new HashMap<>();
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+			}
 
-		subject.put("type", "string");
-		subject.put("analyzer", "korean");
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("subject", subject);
-		properties.put("content", content);
-		source.put("properties", properties);
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
 
-		PutMapping putMapping1 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_BOARD,
-				objectMapper.writeValueAsString(source)
-		).build();
+		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
 
-		// 댓글 매핑 초기화.
-		properties = new HashMap<>();
-		source = new HashMap<>();
-		content = new HashMap<>();
+		Boolean hasComment = true;
+		ObjectId lastCommentId = null;
 
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("content", content);
-		source.put("properties", properties);
+		do {
+			List<ESComment> comments = boardFreeCommentRepository.findCommentsGreaterThanId(lastCommentId, CoreConst.ES_BULK_LIMIT);
 
-		PutMapping putMapping2 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_COMMENT,
-				objectMapper.writeValueAsString(source)
-		).build();
+			if (comments.isEmpty()) {
+				hasComment = false;
+			} else {
+				ESComment lastComment = comments.get(comments.size() - 1);
+				lastCommentId = new ObjectId(lastComment.getId());
+			}
 
-		// 사진첩 매핑 초기화.
-		properties = new HashMap<>();
-		source = new HashMap<>();
-		content = new HashMap<>();
+			comments.forEach(comment -> {
+				IndexRequestBuilder index = client.prepareIndex(
+						elasticsearchIndexComment,
+						CoreConst.ES_TYPE_COMMENT,
+						comment.getId()
+				);
 
-		content.put("type", "string");
-		content.put("analyzer", "korean");
-		properties.put("name", content);
-		source.put("properties", properties);
+				try {
 
-		PutMapping putMapping3 = new PutMapping.Builder(
-				elasticsearchIndexName,
-				CommonConst.ELASTICSEARCH_TYPE_GALLERY,
-				objectMapper.writeValueAsString(source)
-		).build();
+					index.setSource(ObjectMapperUtils.writeValueAsString(comment));
+					bulkProcessor.add(index.request());
 
-		HashMap<String, Object> result = new HashMap<>();
+				} catch (JsonProcessingException e) {
+					log.error(e.getLocalizedMessage());
+				}
 
-		try {
-			JestResult jestResult1 = jestClient.execute(putMapping1);
-			JestResult jestResult2 = jestClient.execute(putMapping2);
-			JestResult jestResult3 = jestClient.execute(putMapping3);
+			});
 
-			if (! jestResult1.isSucceeded())
-				log.debug(jestResult1.getErrorMessage());
+		} while (hasComment);
 
-			if (! jestResult2.isSucceeded())
-				log.debug(jestResult2.getErrorMessage());
-
-			if (! jestResult3.isSucceeded())
-				log.debug(jestResult3.getErrorMessage());
-
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-
-		return result;
+		bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
 	}
 
-	/**
-	 * bulk document 생성.
-	 * @return
-	 */
-	public HashMap<String, Object> initSearchDocuments() {
-
-		HashMap<String, Object> result = new HashMap<>();
-
-		// 게시물을 엘라스틱 서치에 모두 넣기.
-		List<BoardFreeOnES> posts = jakdukDAO.getBoardFreeOnES(null);
-		BoardFreeOnES lastPost = posts.size() > 0 ? posts.get(posts.size() - 1) : null;
-
-		while (posts.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (BoardFreeOnES post : posts) {
-				idxList.add(new Index.Builder(post).build());
+	public void processBulkInsertGallery() throws InterruptedException {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
 			}
 
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_BOARD)
-					.addAction(idxList)
-					.build();
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+			}
 
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (! jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
+
+		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
+
+		Boolean hasGallery = true;
+		ObjectId lastGalleryId = null;
+
+		do {
+			List<ESGallery> comments = galleryRepository.findGalleriesGreaterThanId(lastGalleryId, CoreConst.ES_BULK_LIMIT);
+
+			if (comments.isEmpty()) {
+				hasGallery = false;
+			} else {
+				ESGallery lastGallery = comments.get(comments.size() - 1);
+				lastGalleryId = new ObjectId(lastGallery.getId());
+			}
+
+			comments.forEach(comment -> {
+				IndexRequestBuilder index = client.prepareIndex(
+						elasticsearchIndexGallery,
+						CoreConst.ES_TYPE_GALLERY,
+						comment.getId()
+				);
+
+				try {
+
+					index.setSource(ObjectMapperUtils.writeValueAsString(comment));
+					bulkProcessor.add(index.request());
+
+				} catch (JsonProcessingException e) {
+					log.error(e.getLocalizedMessage());
 				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
 
-			if (Objects.nonNull(lastPost)) {
-				posts = jakdukDAO.getBoardFreeOnES(new ObjectId(lastPost.getId()));
-				if (posts.size() > 0) {
-					lastPost = posts.get(posts.size() - 1);
-				}
-			}
-		}
+			});
 
-		// 게시물을 엘라스틱 서치에 모두 넣기.
-		List<CommentOnES> comments = jakdukDAO.getCommentOnES(null);
-		CommentOnES lastComment = comments.size() > 0 ? comments.get(comments.size() - 1) : null;
+		} while (hasGallery);
 
-		while (comments.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (CommentOnES comment : comments) {
-				idxList.add(new Index.Builder(comment).build());
-			}
-
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_COMMENT)
-					.addAction(idxList)
-					.build();
-
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (! jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
-
-			if (Objects.nonNull(lastComment)) {
-				comments = jakdukDAO.getCommentOnES(new ObjectId(lastComment.getId()));
-				if (comments.size() > 0) {
-					lastComment = comments.get(comments.size() - 1);
-				}
-			}
-		}
-
-		// 사진첩을 엘라스틱 서치에 모두 넣기.
-		List<GalleryOnES> galleries = jakdukDAO.getGalleryOnES(null);
-		GalleryOnES lastGallery = galleries.size() > 0 ? galleries.get(galleries.size() - 1) : null;
-
-		while (galleries.size() > 0) {
-			List<Index> idxList = new ArrayList<>();
-
-			for (GalleryOnES gallery : galleries) {
-				idxList.add(new Index.Builder(gallery).build());
-			}
-
-			Bulk bulk = new Bulk.Builder()
-					.defaultIndex(elasticsearchIndexName)
-					.defaultType(CommonConst.ELASTICSEARCH_TYPE_GALLERY)
-					.addAction(idxList)
-					.build();
-
-			try {
-				JestResult jestResult = jestClient.execute(bulk);
-				if (! jestResult.isSucceeded()) {
-					log.debug(jestResult.getErrorMessage());
-				}
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
-
-			if (Objects.nonNull(lastGallery)) {
-				galleries = jakdukDAO.getGalleryOnES(new ObjectId(lastGallery.getId()));
-				if (galleries.size() > 0) {
-					lastGallery = galleries.get(galleries.size() - 1);
-				}
-			}
-		}
-
-		return result;
+		bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
 	}
 
-	public void deleteIndex() throws UnknownHostException {
+	public void deleteIndexBoard() {
 
 		DeleteIndexResponse response = client.admin().indices()
-				.delete(new DeleteIndexRequest(elasticsearchIndexName))
+				.delete(new DeleteIndexRequest(elasticsearchIndexBoard))
 				.actionGet();
 
-		log.debug(response.toString());
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexBoard + " deleted");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not deleted");
+		}
+	}
 
+	public void deleteIndexComment() {
+
+		DeleteIndexResponse response = client.admin().indices()
+				.delete(new DeleteIndexRequest(elasticsearchIndexComment))
+				.actionGet();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexComment + " deleted");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexComment + " not deleted");
+		}
+	}
+
+	public void deleteIndexGallery() {
+
+		DeleteIndexResponse response = client.admin().indices()
+				.delete(new DeleteIndexRequest(elasticsearchIndexGallery))
+				.actionGet();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + elasticsearchIndexGallery + " deleted");
+		} else {
+			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not deleted");
+		}
 	}
 }

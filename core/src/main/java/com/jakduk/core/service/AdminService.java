@@ -1,19 +1,20 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.JakduScheduleScore;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
 import com.jakduk.core.model.web.AttendanceClubWrite;
-import com.jakduk.core.model.web.board.BoardCategoryWrite;
 import com.jakduk.core.model.web.CompetitionWrite;
 import com.jakduk.core.model.web.ThumbnailSizeWrite;
+import com.jakduk.core.model.web.board.BoardCategoryWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
 import com.jakduk.core.repository.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 import io.searchbox.client.JestClient;
@@ -56,9 +57,6 @@ public class AdminService {
 	
 	@Value("${elasticsearch.index.name}")
 	private String elasticsearchIndexName;
-	
-	@Autowired
-	private JestClient jestClient;
 	
 	@Autowired
 	private JakdukDAO jakdukDAO;
@@ -474,7 +472,7 @@ public class AdminService {
 		jakduScheduleGroup.setState(jakduScheduleGroupWrite.getState());
 
 		if (jakduScheduleGroupWrite.isNextSeq()) {
-			jakduScheduleGroup.setSeq(commonService.getNextSequence(CommonConst.SEQ_JAKDU_SCHEDULE_GROUP));
+			jakduScheduleGroup.setSeq(commonService.getNextSequence(CoreConst.SEQ_JAKDU_SCHEDULE_GROUP));
 		} else {
 			jakduScheduleGroup.setSeq(jakduScheduleGroupWrite.getSeq());
 		}

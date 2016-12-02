@@ -8,16 +8,13 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Stream;
-import javax.servlet.http.HttpServletResponse;
 
 import com.jakduk.core.common.util.CoreUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.AttendanceClub;
 import com.jakduk.core.model.db.AttendanceLeague;
@@ -119,7 +116,7 @@ public class StatsService {
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("average"));
 		List<AttendanceClub> attendances = null;
 
-		if (league.equals(CommonConst.K_LEAGUE_ABBREVIATION)) {
+		if (league.equals(CoreConst.K_LEAGUE_ABBREVIATION)) {
 			attendances = attendanceClubRepository.findBySeason(season, sort);
 		} else {
 			attendances = attendanceClubRepository.findBySeasonAndLeague(season, league, sort);

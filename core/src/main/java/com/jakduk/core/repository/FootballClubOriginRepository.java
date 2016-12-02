@@ -1,6 +1,6 @@
 package com.jakduk.core.repository;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.jakduk.core.model.db.FootballClubOrigin;
@@ -15,5 +15,5 @@ import java.util.List;
  */
 public interface FootballClubOriginRepository extends MongoRepository<FootballClubOrigin, String> {
 	FootballClubOrigin findByName(String name);
-	List<FootballClubOrigin> findByClubType(CommonConst.CLUB_TYPE clubType);
+	List<FootballClubOrigin> findByClubType(CoreConst.CLUB_TYPE clubType);
 }

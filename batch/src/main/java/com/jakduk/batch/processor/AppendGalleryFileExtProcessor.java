@@ -1,6 +1,6 @@
 package com.jakduk.batch.processor;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -45,11 +45,11 @@ public class AppendGalleryFileExtProcessor implements ItemProcessor<Gallery, Gal
             Files.move(moveFromImage, moveFromImage.resolveSibling(item.getId() + "." + formatName), StandardCopyOption.REPLACE_EXISTING);
             Files.move(moveFromThumb, moveFromThumb.resolveSibling(item.getId() + "." + formatName), StandardCopyOption.REPLACE_EXISTING);
 
-            List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
+            List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
                     .orElseGet(ArrayList::new);
 
-            if (batchList.stream().noneMatch(batch -> batch.equals(CommonConst.BATCH_TYPE.APPEND_GALLERY_FILE_EXT_01))) {
-                batchList.add(CommonConst.BATCH_TYPE.APPEND_GALLERY_FILE_EXT_01);
+            if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.APPEND_GALLERY_FILE_EXT_01))) {
+                batchList.add(CoreConst.BATCH_TYPE.APPEND_GALLERY_FILE_EXT_01);
                 item.setBatch(batchList);
             }
 

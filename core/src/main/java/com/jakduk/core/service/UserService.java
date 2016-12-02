@@ -1,9 +1,9 @@
 package com.jakduk.core.service;
 
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
@@ -67,12 +67,12 @@ public class UserService {
 	}
 
 	// SNS 계정으로 가입한 회원 찾기.
-	public UserProfile findUserProfileByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public UserProfile findUserProfileByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userProfileRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
 	// SNS 계정으로 가입한 회원 찾기(로그인).
-	public User findOneByProviderIdAndProviderUserId(CommonConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public User findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
@@ -97,13 +97,13 @@ public class UserService {
 				.email(email.trim())
 				.username(username.trim())
 				.password(password)
-				.providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
+				.providerId(CoreConst.ACCOUNT_TYPE.JAKDUK)
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
 				.build();
 
 		if (StringUtils.isNotEmpty(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+					.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(supportFC);
 		}
@@ -118,7 +118,7 @@ public class UserService {
 		return returnUser;
 	}
 
-	public User addSocialUser(String email, String username, CommonConst.ACCOUNT_TYPE providerId, String providerUserId, String footballClub, String about) {
+	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId, String footballClub, String about) {
 		User user = User.builder()
 				.email(email.trim())
 				.username(username.trim())
@@ -129,7 +129,7 @@ public class UserService {
 
 		if (StringUtils.isNotEmpty(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+					.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(supportFC);
 		}
@@ -148,14 +148,14 @@ public class UserService {
 		Optional<User> oUser = userRepository.findOneByEmail(email);
 
 		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.ALREADY_EXIST_EMAIL);
+			throw new ServiceException(ServiceExceptionCode.ALREADY_EXIST_EMAIL);
 	}
 	
 	public void existUsername(String username) {
 		Optional<User> oUser = userRepository.findOneByUsername(username);
 
 		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.ALREADY_EXIST_USERNAME);
+			throw new ServiceException(ServiceExceptionCode.ALREADY_EXIST_USERNAME);
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class UserService {
 	 * @param newPassword 새 비밀번호
      */
 	public void updateUserPassword(String userId, String newPassword) {
-		User user = userRepository.findOneById(userId).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+		User user = userRepository.findOneById(userId).orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_USER));
 		user.setPassword(newPassword);
 		
 		this.save(user);
@@ -173,7 +173,7 @@ public class UserService {
 	}
 
 	public void userPasswordUpdateByEmail(String email, String password) {
-		User user = userRepository.findOneByEmail(email).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+		User user = userRepository.findOneByEmail(email).orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_USER));
 		user.setPassword(password);
 
 		this.save(user);

@@ -7,10 +7,10 @@ import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
@@ -71,10 +71,10 @@ public class BoardRestController {
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
     public FreePostsOnListResponse getFreePosts(@RequestParam(required = false, defaultValue = "1") Integer page,
                                             @RequestParam(required = false, defaultValue = "20") Integer size,
-                                            @RequestParam(required = false, defaultValue = "ALL") CommonConst.BOARD_CATEGORY_TYPE category) {
+                                            @RequestParam(required = false, defaultValue = "ALL") CoreConst.BOARD_CATEGORY_TYPE category) {
 
         if (Objects.isNull(category))
-            category = CommonConst.BOARD_CATEGORY_TYPE.ALL;
+            category = CoreConst.BOARD_CATEGORY_TYPE.ALL;
 
         Page<BoardFreeOnList> posts = boardFreeService.getFreePosts(category, page, size);
         Page<BoardFreeOnList> notices = boardFreeService.getFreeNotices();
@@ -214,7 +214,7 @@ public class BoardRestController {
 
         BoardFreeDetail boardFreeDetail = boardFreeService.getPost(seq, CoreUtils.getLanguageCode(locale, null), isAddCookie);
 
-        CommonConst.BOARD_CATEGORY_TYPE categoryType = CommonConst.BOARD_CATEGORY_TYPE.valueOf(boardFreeDetail.getCategory().getCode());
+        CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(boardFreeDetail.getCategory().getCode());
 
         BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFreeDetail.getId())
                 , categoryType, Sort.Direction.ASC);
@@ -251,12 +251,12 @@ public class BoardRestController {
                                                Device device) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
 
         if (!boardCategory.isPresent())
-            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+            throw new ServiceException(ServiceExceptionCode.CATEGORY_NOT_FOUND);
 
         List<GalleryOnBoard> galleries = new ArrayList<>();
 
@@ -284,12 +284,12 @@ public class BoardRestController {
                                                 Device device) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
 
         if (!boardCategory.isPresent())
-            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+            throw new ServiceException(ServiceExceptionCode.CATEGORY_NOT_FOUND);
 
         List<GalleryOnBoard> galleries = new ArrayList<>();
 
@@ -315,12 +315,12 @@ public class BoardRestController {
     public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
-		CommonConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(writer, seq);
+		CoreConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(writer, seq);
 
         return FreePostOnDeleteResponse.builder().result(deleteType).build();
     }
@@ -351,21 +351,21 @@ public class BoardRestController {
                                            Device device) {
 
           if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
 
-        return boardFreeService.addFreeComment(writer, commentRequest.getSeq(), commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
+        return boardFreeService.insertFreeComment(commentRequest.getSeq(), writer, commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
     }
 
     @ApiOperation(value = "자유게시판 글 감정 표현")
     @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeFeeling(@PathVariable Integer seq,
-                                              @PathVariable CommonConst.FEELING_TYPE feeling) {
+                                              @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -385,10 +385,10 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 댓글 감정 표현")
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(@PathVariable String commentId,
-                                                     @PathVariable CommonConst.FEELING_TYPE feeling) {
+                                                     @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -410,7 +410,7 @@ public class BoardRestController {
     public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
 
         if (! UserUtils.isAdmin())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -425,7 +425,7 @@ public class BoardRestController {
     public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
 
         if (! UserUtils.isAdmin())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());

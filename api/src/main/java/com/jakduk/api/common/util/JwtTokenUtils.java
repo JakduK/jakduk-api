@@ -2,8 +2,8 @@ package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import io.jsonwebtoken.*;
 import org.springframework.aop.AopInvocationException;
@@ -76,7 +76,7 @@ public class JwtTokenUtils implements Serializable {
 
             if (claims.containsKey("providerId")) {
                 String temp =claims.get("providerId", String.class);
-                attemptSocialUser.setProviderId(CommonConst.ACCOUNT_TYPE.valueOf(temp));
+                attemptSocialUser.setProviderId(CoreConst.ACCOUNT_TYPE.valueOf(temp));
             }
 
             if (claims.containsKey("providerUserId"))
@@ -100,12 +100,12 @@ public class JwtTokenUtils implements Serializable {
         } catch (IllegalArgumentException e) {
             claims = null;
         } catch (ExpiredJwtException e) {
-            throw new ServiceException(ServiceError.EXPIRATION_TOKEN, e);
+            throw new ServiceException(ServiceExceptionCode.EXPIRATION_TOKEN, e);
         } catch (MalformedJwtException e) {
-            throw new ServiceException(ServiceError.INVALID_TOKEN, e);
+            throw new ServiceException(ServiceExceptionCode.INVALID_TOKEN, e);
         }  catch (Exception e) {
             e.printStackTrace();
-            throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, e);
+            throw new ServiceException(ServiceExceptionCode.INTERNAL_SERVER_ERROR, e);
         }
 
         return claims;

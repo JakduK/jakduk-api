@@ -5,9 +5,9 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.vo.JakduScheduleResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.UnauthorizedAccessException;
 import com.jakduk.core.model.db.*;
@@ -76,7 +76,7 @@ public class JakduRestController {
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
 
-        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, CommonConst.NAME_TYPE.fullName);
+        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, CoreConst.NAME_TYPE.fullName);
         List<Competition> competitions = footballService.getCompetitions(new ArrayList<>(competitionIds), language);
 
         Map<String, LocalName> fcNames = footballClubs.stream()
@@ -144,7 +144,7 @@ public class JakduRestController {
             throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         jakduCommentWriteRequest.setDevice(ApiUtils.getDeviceInfo(device));
 
@@ -169,10 +169,10 @@ public class JakduRestController {
     // 작두 댓글 좋아요 싫어요
     @RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
-                                                 @PathVariable CommonConst.FEELING_TYPE feeling) {
+                                                 @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());

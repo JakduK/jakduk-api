@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration.authentication.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +20,7 @@ public class SocialUserDetail implements UserDetails {
     private final String id;
     private final String userId;
     private final String username;
-    private final CommonConst.ACCOUNT_TYPE providerId;
+    private final CoreConst.ACCOUNT_TYPE providerId;
     private final String email;
 
     private final Set<GrantedAuthority> authorities;
@@ -29,7 +29,7 @@ public class SocialUserDetail implements UserDetails {
     private final boolean credentialsNonExpired;
     private final boolean enabled;
 
-    public SocialUserDetail(String id, String userId, String username, CommonConst.ACCOUNT_TYPE providerId, String email, boolean enabled, boolean accountNonExpired,
+    public SocialUserDetail(String id, String userId, String username, CoreConst.ACCOUNT_TYPE providerId, String email, boolean enabled, boolean accountNonExpired,
                             boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
         this.id = id;
@@ -119,7 +119,7 @@ public class SocialUserDetail implements UserDetails {
         return username;
     }
 
-    public CommonConst.ACCOUNT_TYPE getProviderId() {
+    public CoreConst.ACCOUNT_TYPE getProviderId() {
         return providerId;
     }
 

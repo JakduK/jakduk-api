@@ -1,8 +1,7 @@
 package com.jakduk.batch.processor;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFree;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,11 +53,11 @@ public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, Bo
 			String newContent = StringUtils.replace(item.getContent(), beforeImageUrl01, afterImageUrl);
 			item.setContent(newContent);
 
-			List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
+			List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
 					.orElseGet(ArrayList::new);
 
-			if (batchList.stream().noneMatch(batch -> batch.equals(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01))) {
-				batchList.add(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01);
+			if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01))) {
+				batchList.add(CoreConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01);
 				item.setBatch(batchList);
 			}
 
@@ -66,11 +65,11 @@ public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, Bo
 			String newContent = StringUtils.replace(item.getContent(), beforeImageUrl02, afterImageUrl);
 			item.setContent(newContent);
 
-			List<CommonConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
+			List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
 					.orElseGet(ArrayList::new);
 
-			if (batchList.stream().noneMatch(batch -> batch.equals(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01))) {
-				batchList.add(CommonConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01);
+			if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01))) {
+				batchList.add(CoreConst.BATCH_TYPE.CHANGE_BOARD_CONTENT_IMAGE_URL_01);
 				item.setBatch(batchList);
 			}
 		}

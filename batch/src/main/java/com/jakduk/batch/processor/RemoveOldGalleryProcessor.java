@@ -1,7 +1,7 @@
 package com.jakduk.batch.processor;
 
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;

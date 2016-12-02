@@ -2,10 +2,9 @@ package com.jakduk.api;
 
 import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
-import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.util.UrlUtils;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -17,7 +16,7 @@ import org.springframework.security.web.util.UrlUtils;
 public class AdminTest extends AbstractSpringTest {
 	
 	@Autowired
-	private BoardFreeRepositoryRepository boardFreeRepository;
+	private BoardFreeRepository boardFreeRepository;
 	
 	@Autowired
 	BoardCategoryRepository boardCategoryRepository;

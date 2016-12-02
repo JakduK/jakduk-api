@@ -13,7 +13,7 @@ import com.jakduk.core.model.embedded.BoardItem;
  * @date     : 2014. 12. 3.
  * @desc     :
  */
-public interface BoardFreeCommentRepository extends MongoRepository<BoardFreeComment, String>{
+public interface BoardFreeCommentRepository extends MongoRepository<BoardFreeComment, String>, BoardFreeCommentRepositoryCustom {
 
 	Integer countByBoardItem(BoardItem boardItem);
 	BoardFreeComment findById(String id);
