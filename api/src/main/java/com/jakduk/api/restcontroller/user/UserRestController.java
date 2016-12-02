@@ -19,7 +19,7 @@ import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.notification.EmailService;
+import com.jakduk.core.service.EmailService;
 import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;

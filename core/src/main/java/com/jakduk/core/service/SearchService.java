@@ -385,8 +385,7 @@ public class SearchService {
 				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
 	}
 
-	public void createIndexBoard() throws IOException {
-
+	private String getBoardFreeMappings() throws JsonProcessingException {
 		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
 
 		ObjectNode idNode = objectMapper.createObjectNode();
@@ -441,20 +440,10 @@ public class SearchService {
 		ObjectNode mappings = objectMapper.createObjectNode();
 		mappings.set("properties", propertiesNode);
 
-		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
-				.setSettings(getIndexSettings())
-				.addMapping(CoreConst.ES_TYPE_BOARD, objectMapper.writeValueAsString(mappings))
-				.get();
-
-		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexBoard + " created");
-		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created");
-		}
+		return objectMapper.writeValueAsString(mappings);
 	}
 
-	public void createIndexComment() throws JsonProcessingException {
-
+	private String getBoardFreeCommentMappings() throws JsonProcessingException {
 		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
 
 		ObjectNode idNode = objectMapper.createObjectNode();
@@ -511,20 +500,10 @@ public class SearchService {
 		ObjectNode mappings = objectMapper.createObjectNode();
 		mappings.set("properties", propertiesNode);
 
-		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexComment)
-				.setSettings(getIndexSettings())
-				.addMapping(CoreConst.ES_TYPE_COMMENT, objectMapper.writeValueAsString(mappings))
-				.get();
-
-		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexComment + " created");
-		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexComment + " not created");
-		}
+		return objectMapper.writeValueAsString(mappings);
 	}
 
-	public void createIndexGallery() throws JsonProcessingException {
-
+	private String getGalleryMappings() throws JsonProcessingException {
 		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
 
 		ObjectNode idNode = objectMapper.createObjectNode();
@@ -564,15 +543,62 @@ public class SearchService {
 		ObjectNode mappings = objectMapper.createObjectNode();
 		mappings.set("properties", propertiesNode);
 
-		CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
-				.setSettings(getIndexSettings())
-				.addMapping(CoreConst.ES_TYPE_GALLERY, objectMapper.writeValueAsString(mappings))
-				.get();
+		return objectMapper.writeValueAsString(mappings);
+	}
 
-		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexGallery + " created");
-		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created");
+	public void createIndexBoard() {
+
+		try {
+			CreateIndexResponse	response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
+                    .setSettings(getIndexSettings())
+                    .addMapping(CoreConst.ES_TYPE_BOARD, getBoardFreeMappings())
+                    .get();
+
+			if (response.isAcknowledged()) {
+				log.debug("Index " + elasticsearchIndexBoard + " created");
+			} else {
+				throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created");
+			}
+
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created", e.getCause());
+		}
+
+	}
+
+	public void createIndexComment() {
+
+		try {
+			CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexComment)
+                    .setSettings(getIndexSettings())
+                    .addMapping(CoreConst.ES_TYPE_COMMENT, getBoardFreeCommentMappings())
+                    .get();
+
+			if (response.isAcknowledged()) {
+				log.debug("Index " + elasticsearchIndexComment + " created");
+			} else {
+				throw new RuntimeException("Index " + elasticsearchIndexComment + " not created");
+			}
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Index " + elasticsearchIndexComment + " not created", e.getCause());
+		}
+	}
+
+	public void createIndexGallery() {
+
+		try {
+			CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
+                    .setSettings(getIndexSettings())
+                    .addMapping(CoreConst.ES_TYPE_GALLERY, getGalleryMappings())
+                    .get();
+
+			if (response.isAcknowledged()) {
+				log.debug("Index " + elasticsearchIndexGallery + " created");
+			} else {
+				throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created");
+			}
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created", e.getCause());
 		}
 	}
 

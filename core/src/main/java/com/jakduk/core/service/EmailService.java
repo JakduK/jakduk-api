@@ -1,4 +1,4 @@
-package com.jakduk.core.notification;
+package com.jakduk.core.service;
 
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Token;

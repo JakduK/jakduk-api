@@ -1,6 +1,6 @@
 package com.jakduk.core;
 
-import com.jakduk.core.notification.EmailService;
+import com.jakduk.core.service.EmailService;
 import com.jakduk.core.common.util.SlackUtils;
 import com.jakduk.core.util.AbstractSpringTest;
 import org.junit.Ignore;
