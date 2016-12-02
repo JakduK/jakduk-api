@@ -44,9 +44,6 @@ public class JestTest extends AbstractSpringTest {
 	private JestClient jestClient;
 	
 	@Autowired
-	private JakdukDAO jakdukDAO;
-	
-	@Autowired
 	private SearchService sut;
 
 	@Autowired
@@ -262,12 +259,6 @@ public class JestTest extends AbstractSpringTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	@Test
-	public void search04() {
-		System.out.println("result=" + sut.searchDocumentBoard("조니", 0, 10).getJsonString());
-		//System.out.println(sut.searchDocumentComment("댓글", 0, 10));
 	}
 	
 	@Test
