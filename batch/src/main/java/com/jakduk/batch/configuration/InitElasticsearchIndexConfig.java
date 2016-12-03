@@ -58,7 +58,7 @@ public class InitElasticsearchIndexConfig {
                         searchService.deleteIndexGallery();
 
                     } catch (IndexNotFoundException e) {
-                        log.error(e.getLocalizedMessage());
+                        e.printStackTrace();
                     }
 
                     return RepeatStatus.FINISHED;
@@ -72,7 +72,7 @@ public class InitElasticsearchIndexConfig {
                 .tasklet((contribution, chunkContext) -> {
 
                     searchService.createIndexBoard();
-                    searchService.createIndexComment();
+//                    searchService.createIndexComment();
                     searchService.createIndexGallery();
 
                     return RepeatStatus.FINISHED;

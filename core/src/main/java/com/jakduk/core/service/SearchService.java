@@ -497,7 +497,11 @@ public class SearchService {
 		propertiesNode.set("writer", writerNode);
 		propertiesNode.set("boardItem", boardItemNode);
 
+		ObjectNode parentNode = objectMapper.createObjectNode();
+		parentNode.put("type", CoreConst.ES_TYPE_BOARD);
+
 		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("_parent", parentNode);
 		mappings.set("properties", propertiesNode);
 
 		return objectMapper.writeValueAsString(mappings);
@@ -552,6 +556,7 @@ public class SearchService {
 			CreateIndexResponse	response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
                     .setSettings(getIndexSettings())
                     .addMapping(CoreConst.ES_TYPE_BOARD, getBoardFreeMappings())
+					.addMapping(CoreConst.ES_TYPE_COMMENT, getBoardFreeCommentMappings())
                     .get();
 
 			if (response.isAcknowledged()) {
@@ -692,15 +697,14 @@ public class SearchService {
 			}
 
 			comments.forEach(comment -> {
-				IndexRequestBuilder index = client.prepareIndex(
-						elasticsearchIndexComment,
-						CoreConst.ES_TYPE_COMMENT,
-						comment.getId()
-				);
-
 				try {
+					IndexRequestBuilder index = client.prepareIndex()
+							.setIndex(elasticsearchIndexBoard)
+							.setType(CoreConst.ES_TYPE_COMMENT)
+							.setId(comment.getId())
+							.setParent(comment.getBoardItem().getId())
+							.setSource(ObjectMapperUtils.writeValueAsString(comment));
 
-					index.setSource(ObjectMapperUtils.writeValueAsString(comment));
 					bulkProcessor.add(index.request());
 
 				} catch (JsonProcessingException e) {
