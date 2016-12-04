@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ESBoardFree {
+public class ESBoard {
 	
     private String id;
 	

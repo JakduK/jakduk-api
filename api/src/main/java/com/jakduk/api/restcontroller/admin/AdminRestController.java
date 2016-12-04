@@ -616,14 +616,9 @@ public class AdminRestController {
 	@RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
 	public EmptyJsonResponse initSearchIndex() {
 
-		try {
-			searchService.createIndexBoard();
-			searchService.createIndexComment();
-			searchService.createIndexGallery();
-
-		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.INTERNAL_SERVER_ERROR, e.getCause());
-		}
+		searchService.createIndexBoard();
+		searchService.createIndexComment();
+		searchService.createIndexGallery();
 
 		return EmptyJsonResponse.newInstance();
 	}

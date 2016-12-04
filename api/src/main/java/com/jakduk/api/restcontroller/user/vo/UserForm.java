@@ -16,9 +16,9 @@ import javax.validation.constraints.Size;
  * 16. 6. 26 오후 1:12
  */
 
-@Getter
 @ApiModel(description = "이메일 기반 회원 가입 폼")
 @FieldMatch(first = "password", second = "passwordConfirm", message = "{validation.msg.password.mismatch}")
+@Getter
 public class UserForm {
 
     @ApiModelProperty(required = true, example = "example@jakduk.com")

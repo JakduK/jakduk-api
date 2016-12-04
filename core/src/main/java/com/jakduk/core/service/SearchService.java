@@ -12,6 +12,7 @@ import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.vo.SearchCommentResult;
 import com.jakduk.core.model.vo.SearchPostResult;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
@@ -30,6 +31,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
@@ -38,7 +40,9 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.support.QueryInnerHitBuilder;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +112,7 @@ public class SearchService {
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchPostResult searchBoardFree(String q, Integer from, Integer size) {
+	public SearchPostResult searchBoard(String q, Integer from, Integer size) {
 		SearchResponse searchResponse = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
@@ -130,12 +134,12 @@ public class SearchService {
 
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESBoardFreeSource> searchList = Arrays.stream(searchHits.getHits())
+		List<ESBoardSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESBoardFreeSource esBoardFreeSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardFreeSource.class);
-					esBoardFreeSource.setScore(searchHit.getScore());
-					esBoardFreeSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
+					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
+					esBoardSource.setScore(searchHit.getScore());
+					esBoardSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
 
 					Map<String, List<String>> highlight = new HashMap<>();
 
@@ -147,25 +151,26 @@ public class SearchService {
 						highlight.put(highlightField.getKey(), fragments);
 					}
 
-					esBoardFreeSource.setHighlight(highlight);
+					esBoardSource.setHighlight(highlight);
 
-					return esBoardFreeSource;
+					return esBoardSource;
 				})
 				.collect(Collectors.toList());
 
 		return SearchPostResult.builder()
+				.took(searchResponse.getTook().getMillis())
 				.totalCount(searchHits.getTotalHits())
 				.posts(searchList)
 				.build();
 	}
 
 	@Async
-	public void indexBoardFree(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
+	public void indexBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
 
 		if (! elasticsearchEnable)
 			return;
 
-		ESBoardFree esBoardFree = ESBoardFree.builder()
+		ESBoard esBoard = ESBoard.builder()
 				.id(id)
 				.seq(seq)
 				.writer(writer)
@@ -179,7 +184,7 @@ public class SearchService {
 					.setIndex(elasticsearchIndexBoard)
 					.setType(CoreConst.ES_TYPE_BOARD)
 					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esBoardFree))
+					.setSource(ObjectMapperUtils.writeValueAsString(esBoard))
 					.get();
 
 		} catch (IOException e) {
@@ -188,7 +193,7 @@ public class SearchService {
 	}
 
 	@Async
-	public void deleteBoardFree(String id) {
+	public void deleteBoard(String id) {
 
 		if (! elasticsearchEnable)
 			return;
@@ -204,37 +209,68 @@ public class SearchService {
 
 	}
 
-	public SearchResult searchDocumentComment(String q, int from, int size) {
-		Map<String, Object> query = new HashMap<>();
-		Map<String, Object> queryQuery = new HashMap<>();
-		Map<String, Object> queryQueryMatch = new HashMap<>();
-		Map<String, Object> queryHighlight = new HashMap<>();
-		Map<String, Object> queryHighlightFields = new HashMap<>();
+	public SearchCommentResult searchBoardComment(String q, Integer from, Integer size) {
 
-		queryQueryMatch.put("content", q);
-		queryQuery.put("match", queryQueryMatch);
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch();
+		SearchResponse searchResponse = searchRequestBuilder
+				.setIndices(elasticsearchIndexBoard)
+				.setTypes(CoreConst.ES_TYPE_COMMENT)
+				.setQuery(
+						QueryBuilders.boolQuery()
+								.must(QueryBuilders.matchQuery("content", q))
+								.must(
+										QueryBuilders
+												.hasParentQuery(CoreConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
+												.innerHit(new QueryInnerHitBuilder())
+								)
+				)
+				.addHighlightedField("content")
+				.setHighlighterPreTags("<span class=\"color-orange\">")
+				.setHighlighterPostTags("</span>")
+				.setFrom(from)
+				.setSize(size)
+				.execute()
+				.actionGet();
 
-		queryHighlightFields.put("content", new HashMap<>());
-		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
-		queryHighlight.put("post_tags", new Object[]{"</span>"});
-		queryHighlight.put("fields", queryHighlightFields);
+		SearchHits searchHits = searchResponse.getHits();
 
-		query.put("from", from);
-		query.put("size", size);
-		query.put("query", queryQuery);
-		query.put("highlight", queryHighlight);
+		log.debug("searchBoardComment Query:\n" + searchRequestBuilder.internalBuilder());
 
-		Search search = new Search.Builder(new Gson().toJson(query))
-			.addIndex(elasticsearchIndexName)
-			.addType(CoreConst.ES_TYPE_COMMENT)
-			.build();
-		
-		try {
-			return jestClient.execute(search);
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-		return null;
+		List<ESBoardCommentSource> searchList = Arrays.stream(searchHits.getHits())
+				.map(searchHit -> {
+					Map<String, Object> sourceMap = searchHit.getSource();
+					ESBoardCommentSource esBoardCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardCommentSource.class);
+					esBoardCommentSource.setScore(searchHit.getScore());
+
+					if (! searchHit.getInnerHits().isEmpty()) {
+						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(CoreConst.ES_TYPE_BOARD).getHits();
+						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
+						ESParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, ESParentBoard.class);
+
+						esBoardCommentSource.setParentBoard(esParentBoard);
+					}
+
+					Map<String, List<String>> highlight = new HashMap<>();
+
+					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
+						List<String> fragments = new ArrayList<>();
+						for (Text text : highlightField.getValue().fragments()) {
+							fragments.add(text.string());
+						}
+						highlight.put(highlightField.getKey(), fragments);
+					}
+
+					esBoardCommentSource.setHighlight(highlight);
+
+					return esBoardCommentSource;
+				})
+				.collect(Collectors.toList());
+
+		return SearchCommentResult.builder()
+				.took(searchResponse.getTook().getMillis())
+				.totalCount(searchHits.getTotalHits())
+				.comments(searchList)
+				.build();
 	}
 
 	@Async
@@ -631,12 +667,12 @@ public class SearchService {
 		ObjectId lastPostId = null;
 
 		do {
-			List<ESBoardFree> posts = boardFreeRepository.findPostsGreaterThanId(lastPostId, CoreConst.ES_BULK_LIMIT);
+			List<ESBoard> posts = boardFreeRepository.findPostsGreaterThanId(lastPostId, CoreConst.ES_BULK_LIMIT);
 
 			if (posts.isEmpty()) {
 				hasPost = false;
 			} else {
-				ESBoardFree lastPost = posts.get(posts.size() - 1);
+				ESBoard lastPost = posts.get(posts.size() - 1);
 				lastPostId = new ObjectId(lastPost.getId());
 			}
 

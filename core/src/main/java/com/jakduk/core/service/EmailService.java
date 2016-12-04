@@ -3,7 +3,6 @@ package com.jakduk.core.service;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.repository.TokenRepository;
-import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,7 +100,7 @@ public class EmailService {
 	}
 
 	@Async(value = "asyncMailExecutor")
-	public void sendWelcome(final Locale locale, final String username, final String recipientEmail) throws MessagingException {
+	public void sendWelcome(final Locale locale, final String username, final String recipientEmail) {
 
 		if (! emailEnabled) return;
 
@@ -112,15 +111,20 @@ public class EmailService {
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
 		final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, "UTF-8");
-		message.setSubject("K리그 작두왕에 오신것을 환영합니다.");
-		message.setTo(recipientEmail);
 
-		// Create the HTML body using Thymeleaf
-		final String htmlContent = this.htmlTemplateEngine.process("welcome", ctx);
-		message.setText(htmlContent, true /* isHtml */);
+		try {
+			message.setSubject("K리그 작두왕에 오신것을 환영합니다.");
+			message.setTo(recipientEmail);
 
-		// Send email
-		this.mailSender.send(mimeMessage);
+			// Create the HTML body using Thymeleaf
+			final String htmlContent = this.htmlTemplateEngine.process("welcome", ctx);
+			message.setText(htmlContent, true /* isHtml */);
+
+			// Send email
+			this.mailSender.send(mimeMessage);
+		} catch (MessagingException e) {
+			log.error(e.getLocalizedMessage());
+		}
 	}
 
 	/**

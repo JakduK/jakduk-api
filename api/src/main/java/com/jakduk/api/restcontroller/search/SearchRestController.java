@@ -3,10 +3,9 @@ package com.jakduk.api.restcontroller.search;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.restcontroller.search.vo.SearchResultResponse;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceExceptionCode;
-import com.jakduk.core.model.elasticsearch.ESComment;
+import com.jakduk.core.model.vo.SearchCommentResult;
 import com.jakduk.core.model.vo.SearchPostResult;
 import com.jakduk.core.service.SearchService;
 import io.searchbox.core.SearchResult;
@@ -15,7 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -25,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,9 +42,6 @@ public class SearchRestController {
 	@Autowired
 	private SearchService searchService;
 
-	@Autowired
-	private BoardDAO boardDAO;
-
 	@ApiOperation(value = "찾기")
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public SearchResultResponse getSearch(
@@ -66,25 +59,16 @@ public class SearchRestController {
 
 		try {
 			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.PO.name())) {
-				SearchPostResult searchPostResult = searchService.searchBoardFree(q, from, size);
+				SearchPostResult searchPostResult = searchService.searchBoard(q, from, size);
 
 				response.setPostResult(searchPostResult);
 			}
 
 			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.CO.name())) {
-				List<ObjectId> ids = new ArrayList<>();
-				SearchResult result = searchService.searchDocumentComment(q, from, size);
 
-				if (result.isSucceeded()) {
-					List<SearchResult.Hit<ESComment, Void>> hits = result.getHits(ESComment.class);
-					hits.forEach(hit -> {
-						String id = hit.source.getBoardItem().getId();
-						ids.add(new ObjectId(id));
-					});
+				SearchCommentResult searchCommentResult = searchService.searchBoardComment(q, from, size);
 
-					response.setComments(objectMapper.readValue(result.getJsonString(), Map.class));
-					response.setPostsHavingComments(boardDAO.getBoardFreeOnSearchComment(ids));
-				}
+				response.setCommentResult(searchCommentResult);
 			}
 
 			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.GA.name())) {

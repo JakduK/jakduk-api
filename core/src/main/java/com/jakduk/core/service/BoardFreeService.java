@@ -171,7 +171,7 @@ public class BoardFreeService {
 		/**
 		 * 엘라스틱서치 색인 요청
 		 */
-		searchService.indexBoardFree(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		searchService.indexBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name());
 
 		/*
@@ -294,7 +294,7 @@ public class BoardFreeService {
 		/**
 		 * 엘라스틱서치 색인 요청
 		 */
-		searchService.indexBoardFree(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		searchService.indexBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name());
 
 		if (log.isInfoEnabled())
@@ -357,7 +357,7 @@ public class BoardFreeService {
             }
         }
 
-        searchService.deleteBoardFree(boardFree.getId());
+        searchService.deleteBoard(boardFree.getId());
 
         return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
     }

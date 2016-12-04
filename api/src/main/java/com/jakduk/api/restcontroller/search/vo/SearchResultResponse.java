@@ -1,6 +1,7 @@
 package com.jakduk.api.restcontroller.search.vo;
 
 import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.core.model.vo.SearchCommentResult;
 import com.jakduk.core.model.vo.SearchPostResult;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +19,7 @@ public class SearchResultResponse {
 	private SearchPostResult postResult;
 
 	@ApiModelProperty(value = "검색된 댓글")
-	private Map<String, Object> comments;
+	private SearchCommentResult commentResult;
 
 	@ApiModelProperty(value = "검색된 사진첩")
 	private Map<String, Object> galleries;

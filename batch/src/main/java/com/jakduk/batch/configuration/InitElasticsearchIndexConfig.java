@@ -3,8 +3,10 @@ package com.jakduk.batch.configuration;
 import com.jakduk.core.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.IndexNotFoundException;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -54,11 +56,17 @@ public class InitElasticsearchIndexConfig {
 
                     try {
                         searchService.deleteIndexBoard();
-                        searchService.deleteIndexComment();
+//                        searchService.deleteIndexComment();
+
+                    } catch (IndexNotFoundException e) {
+                        log.error(e.getLocalizedMessage());
+                    }
+
+                    try {
                         searchService.deleteIndexGallery();
 
                     } catch (IndexNotFoundException e) {
-                        e.printStackTrace();
+                        log.error(e.getLocalizedMessage());
                     }
 
                     return RepeatStatus.FINISHED;
@@ -71,9 +79,14 @@ public class InitElasticsearchIndexConfig {
         return stepBuilderFactory.get("initSearchIndexStep")
                 .tasklet((contribution, chunkContext) -> {
 
-                    searchService.createIndexBoard();
+                    try {
+                        searchService.createIndexBoard();
 //                    searchService.createIndexComment();
-                    searchService.createIndexGallery();
+                        searchService.createIndexGallery();
+
+                    } catch (IndexAlreadyExistsException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
 
                     return RepeatStatus.FINISHED;
                 })
