@@ -13,7 +13,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class SearchPostResult {
+public class SearchBoardResult {
 
 	private Long took;
 	private Long totalCount;

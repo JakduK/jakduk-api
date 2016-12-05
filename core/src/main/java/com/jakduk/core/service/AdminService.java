@@ -17,7 +17,6 @@ import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
-import io.searchbox.client.JestClient;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +53,6 @@ public class AdminService {
 	
 	@Value("${storage.thumbnail.path}")
 	private String storageThumbnailPath;
-	
-	@Value("${elasticsearch.index.name}")
-	private String elasticsearchIndexName;
 	
 	@Autowired
 	private JakdukDAO jakdukDAO;

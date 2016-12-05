@@ -3,7 +3,6 @@ package com.jakduk.core.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.ObjectMapperUtils;
@@ -13,14 +12,14 @@ import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.vo.SearchCommentResult;
-import com.jakduk.core.model.vo.SearchPostResult;
+import com.jakduk.core.model.vo.SearchGalleryResult;
+import com.jakduk.core.model.vo.SearchBoardResult;
+import com.jakduk.core.model.vo.SearchUnifiedResponse;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -31,6 +30,8 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.MultiSearchRequestBuilder;
+import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -49,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -63,9 +65,6 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 	
-	@Value("${elasticsearch.index.name}")
-	private String elasticsearchIndexName;
-
     @Value("${elasticsearch.enable}")
     private boolean elasticsearchEnable;
 
@@ -91,9 +90,6 @@ public class SearchService {
 	private Integer bulkConcurrentRequests;
 
 	@Autowired
-	private JestClient jestClient;
-
-	@Autowired
 	private Client client;
 
 	@Autowired
@@ -106,14 +102,66 @@ public class SearchService {
 	private GalleryRepository galleryRepository;
 
 	/**
-	 * 게시물 검색
+	 * 통합 검색
 	 * @param q	검색어
 	 * @param from	페이지 시작 위치
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchPostResult searchBoard(String q, Integer from, Integer size) {
-		SearchResponse searchResponse = client.prepareSearch()
+	public SearchUnifiedResponse searchUnified(String q, String include, Integer from, Integer size) {
+
+		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
+		Queue<CoreConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
+		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
+
+		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.PO.name())) {
+			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(q, from, size);
+			multiSearchRequestBuilder.add(postSearchRequestBuilder);
+			searchOrder.offer(CoreConst.SEARCH_TYPE.PO);
+		}
+
+		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.CO.name())) {
+			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(q, from, size);
+			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
+			searchOrder.offer(CoreConst.SEARCH_TYPE.CO);
+		}
+
+		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.GA.name())) {
+			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(q, from, size < 10 ? 4 : size);
+			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
+			searchOrder.offer(CoreConst.SEARCH_TYPE.GA);
+		}
+
+		MultiSearchResponse multiSearchResponse = multiSearchRequestBuilder.execute().actionGet();
+
+		for (MultiSearchResponse.Item item : multiSearchResponse.getResponses()) {
+			SearchResponse searchResponse = item.getResponse();
+			CoreConst.SEARCH_TYPE order = searchOrder.poll();
+
+			if (! ObjectUtils.isEmpty(order)) {
+				switch (order) {
+					case PO:
+						SearchBoardResult searchBoardResult = getBoardSearchResponse(searchResponse);
+						searchUnifiedResponse.setPostResult(searchBoardResult);
+						break;
+					case CO:
+						SearchCommentResult searchCommentResult = getCommentSearchResponse(searchResponse);
+						searchUnifiedResponse.setCommentResult(searchCommentResult);
+						break;
+					case GA:
+						SearchGalleryResult searchGalleryResult = getGallerySearchResponse(searchResponse);
+						searchUnifiedResponse.setGalleryResult(searchGalleryResult);
+						break;
+				}
+			}
+		}
+
+		return searchUnifiedResponse;
+	}
+
+
+	private SearchRequestBuilder getBoardSearchRequestBuilder(String q, Integer from, Integer size) {
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"content"})
@@ -128,10 +176,14 @@ public class SearchService {
 								CoreConst.SEARCH_CONTENT_MAX_LENGTH))
 				)
 				.setFrom(from)
-				.setSize(size)
-				.execute()
-				.actionGet();
+				.setSize(size);
 
+		log.debug("getBoardSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+
+		return searchRequestBuilder;
+	}
+
+	private SearchBoardResult getBoardSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
 		List<ESBoardSource> searchList = Arrays.stream(searchHits.getHits())
@@ -157,7 +209,7 @@ public class SearchService {
 				})
 				.collect(Collectors.toList());
 
-		return SearchPostResult.builder()
+		return SearchBoardResult.builder()
 				.took(searchResponse.getTook().getMillis())
 				.totalCount(searchHits.getTotalHits())
 				.posts(searchList)
@@ -165,7 +217,7 @@ public class SearchService {
 	}
 
 	@Async
-	public void indexBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
+	public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
 
 		if (! elasticsearchEnable)
 			return;
@@ -193,13 +245,13 @@ public class SearchService {
 	}
 
 	@Async
-	public void deleteBoard(String id) {
+	public void deleteDocumentBoard(String id) {
 
 		if (! elasticsearchEnable)
 			return;
 
 		DeleteResponse response = client.prepareDelete()
-				.setIndex(elasticsearchIndexName)
+				.setIndex(elasticsearchIndexBoard)
 				.setType(CoreConst.ES_TYPE_BOARD)
 				.setId(id)
 				.get();
@@ -209,10 +261,8 @@ public class SearchService {
 
 	}
 
-	public SearchCommentResult searchBoardComment(String q, Integer from, Integer size) {
-
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch();
-		SearchResponse searchResponse = searchRequestBuilder
+	private SearchRequestBuilder getCommentSearchRequestBuilder(String q, Integer from, Integer size) {
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
 				.setQuery(
@@ -228,13 +278,15 @@ public class SearchService {
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
 				.setFrom(from)
-				.setSize(size)
-				.execute()
-				.actionGet();
+				.setSize(size);
 
+		log.debug("getBoardCommentSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+
+		return searchRequestBuilder;
+	}
+
+	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
-
-		log.debug("searchBoardComment Query:\n" + searchRequestBuilder.internalBuilder());
 
 		List<ESBoardCommentSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
@@ -274,7 +326,7 @@ public class SearchService {
 	}
 
 	@Async
-	public void indexBoardFreeComment(String id, BoardItem boardItem, CommonWriter writer, String content) {
+	public void indexDocumentBoardComment(String id, BoardItem boardItem, CommonWriter writer, String content) {
 
 		if (! elasticsearchEnable)
 			return;
@@ -300,77 +352,60 @@ public class SearchService {
 	}
 
 	// TODO : 구현 해야 함
-	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {
+	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {}
+
+	private SearchRequestBuilder getGallerySearchRequestBuilder(String q, Integer from, Integer size) {
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
+				.setIndices(elasticsearchIndexGallery)
+				.setTypes(CoreConst.ES_TYPE_GALLERY)
+				.setQuery(
+						QueryBuilders.matchQuery("name", q)
+				)
+				.addHighlightedField("name")
+				.setHighlighterPreTags("<span class=\"color-orange\">")
+				.setHighlighterPostTags("</span>")
+				.setFrom(from)
+				.setSize(size);
+
+		log.debug("getGallerySearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+
+		return searchRequestBuilder;
 	}
 
-	public SearchResult searchDocumentJakduComment(String q, int from, int size) {
+	private SearchGalleryResult getGallerySearchResponse(SearchResponse searchResponse) {
+		SearchHits searchHits = searchResponse.getHits();
 
-		String query = "{\n" +
-				"\"from\" : " + from + "," +
-				"\"size\" : " + size + "," +
-				"\"query\": {" +
-				"\"match\" : {" +
-				"\"content\" : \"" + q + "\"" +
-				"}" +
-				"}, " +
-				"\"highlight\" : {" +
-				"\"pre_tags\" : [\"<span class='color-orange'>\"]," +
-				"\"post_tags\" : [\"</span>\"]," +
-				"\"fields\" : {\"content\" : {}" +
-				"}" +
-				"}" +
-				"}";
+		List<ESGallerySource> searchList = Arrays.stream(searchHits.getHits())
+				.map(searchHit -> {
+					Map<String, Object> sourceMap = searchHit.getSource();
+					ESGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, ESGallerySource.class);
+					esGallerySource.setScore(searchHit.getScore());
 
-//		logger.debug("query=" + query);
+					Map<String, List<String>> highlight = new HashMap<>();
 
-		Search search = new Search.Builder(query)
-				.addIndex(elasticsearchIndexName)
-				.addType(CoreConst.ES_TYPE_JAKDU_COMMENT)
+					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
+						List<String> fragments = new ArrayList<>();
+						for (Text text : highlightField.getValue().fragments()) {
+							fragments.add(text.string());
+						}
+						highlight.put(highlightField.getKey(), fragments);
+					}
+
+					esGallerySource.setHighlight(highlight);
+
+					return esGallerySource;
+				})
+				.collect(Collectors.toList());
+
+		return SearchGalleryResult.builder()
+				.took(searchResponse.getTook().getMillis())
+				.totalCount(searchHits.getTotalHits())
+				.galleries(searchList)
 				.build();
-
-		try {
-			return jestClient.execute(search);
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-		return null;
-	}
-
-	public SearchResult searchDocumentGallery(String q, int from, int size) {
-		Map<String, Object> query = new HashMap<>();
-		Map<String, Object> queryQuery = new HashMap<>();
-		Map<String, Object> queryQueryMatch = new HashMap<>();
-		Map<String, Object> queryHighlight = new HashMap<>();
-		Map<String, Object> queryHighlightFields = new HashMap<>();
-
-		queryQueryMatch.put("name", q);
-		queryQuery.put("match", queryQueryMatch);
-
-		queryHighlightFields.put("name", new HashMap<>());
-		queryHighlight.put("pre_tags", new Object[]{"<span class=\"color-orange\">"});
-		queryHighlight.put("post_tags", new Object[]{"</span>"});
-		queryHighlight.put("fields", queryHighlightFields);
-
-		query.put("from", from);
-		query.put("size", size);
-		query.put("query", queryQuery);
-		query.put("highlight", queryHighlight);
-
-		Search search = new Search.Builder(new Gson().toJson(query))
-			.addIndex(elasticsearchIndexName)
-			.addType(CoreConst.ES_TYPE_GALLERY)
-			.build();
-		
-		try {
-			return jestClient.execute(search);
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		}
-		return null;
 	}
 
 	@Async
-	public void indexGallery(String id, CommonWriter writer, String name) {
+	public void indexDocumentGallery(String id, CommonWriter writer, String name) {
 
 		if (! elasticsearchEnable)
 			return;
@@ -395,13 +430,13 @@ public class SearchService {
 	}
 
 	@Async
-	public void deleteGallery(String id) {
+	public void deleteDocumentGallery(String id) {
 
 		if (! elasticsearchEnable)
 			return;
 
 		DeleteResponse response = client.prepareDelete()
-				.setIndex(elasticsearchIndexName)
+				.setIndex(elasticsearchIndexGallery)
 				.setType(CoreConst.ES_TYPE_GALLERY)
 				.setId(id)
 				.get();
