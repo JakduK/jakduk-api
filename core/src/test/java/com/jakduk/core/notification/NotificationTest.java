@@ -1,4 +1,4 @@
-package com.jakduk.core;
+package com.jakduk.core.notification;
 
 import com.jakduk.core.service.EmailService;
 import com.jakduk.core.common.util.SlackUtils;
