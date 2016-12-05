@@ -15,7 +15,12 @@ public class SearchServiceTest extends AbstractSpringTest {
 	private SearchService sut;
 
 	@Test
-	public void searchBoardFree() {
-		sut.searchBoardFree("string", 0, 10);
+	public void searchBoard() {
+		sut.searchBoard("string", 0, 10);
+	}
+
+	@Test
+	public void searchBoardComment() {
+		sut.searchBoardComment("string", 0, 10);
 	}
 }

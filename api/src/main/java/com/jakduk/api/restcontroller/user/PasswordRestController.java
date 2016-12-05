@@ -6,7 +6,7 @@ import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.notification.EmailService;
+import com.jakduk.core.service.EmailService;
 import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.UserService;

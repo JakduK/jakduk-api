@@ -1,21 +1,11 @@
 package com.jakduk.api.restcontroller.search;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.restcontroller.search.vo.SearchResultResponse;
-import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.ServiceExceptionCode;
-import com.jakduk.core.model.elasticsearch.ESComment;
-import com.jakduk.core.model.vo.SearchPostResult;
+import com.jakduk.core.model.vo.SearchUnifiedResponse;
 import com.jakduk.core.service.SearchService;
-import io.searchbox.core.SearchResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -23,11 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -46,12 +31,9 @@ public class SearchRestController {
 	@Autowired
 	private SearchService searchService;
 
-	@Autowired
-	private BoardDAO boardDAO;
-
 	@ApiOperation(value = "찾기")
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public SearchResultResponse getSearch(
+	public SearchUnifiedResponse searchUnified(
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
 			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
@@ -61,49 +43,6 @@ public class SearchRestController {
 
 		if (size <= 0) size = 10;
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		SearchResultResponse response = new SearchResultResponse();
-
-		try {
-			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.PO.name())) {
-				SearchPostResult searchPostResult = searchService.searchBoardFree(q, from, size);
-
-				response.setPostResult(searchPostResult);
-			}
-
-			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.CO.name())) {
-				List<ObjectId> ids = new ArrayList<>();
-				SearchResult result = searchService.searchDocumentComment(q, from, size);
-
-				if (result.isSucceeded()) {
-					List<SearchResult.Hit<ESComment, Void>> hits = result.getHits(ESComment.class);
-					hits.forEach(hit -> {
-						String id = hit.source.getBoardItem().getId();
-						ids.add(new ObjectId(id));
-					});
-
-					response.setComments(objectMapper.readValue(result.getJsonString(), Map.class));
-					response.setPostsHavingComments(boardDAO.getBoardFreeOnSearchComment(ids));
-				}
-			}
-
-			if (StringUtils.contains(w, CoreConst.SEARCH_TYPE.GA.name())) {
-				int tempSize = size;
-
-				if (size < 10)
-					tempSize = 4;
-
-				SearchResult result = searchService.searchDocumentGallery(q, from, tempSize);
-
-				if (result.isSucceeded())
-					response.setGalleries(objectMapper.readValue(result.getJsonString(), Map.class));
-
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new ServiceException(ServiceExceptionCode.IO_EXCEPTION);
-		}
-
-		return response;
+		return searchService.searchUnified(q, w, from, size);
 	}
 }

@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 @Configuration
 @EnableMongoRepositories(basePackages = {"com.jakduk.core.repository"})
-public class MongoConfig extends AbstractMongoConfiguration {
+public class CoreMongoConfig extends AbstractMongoConfiguration {
 
     @Resource
     private Environment environment;

@@ -13,13 +13,13 @@ import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.DuplicateDataException;
-import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.notification.EmailService;
+import com.jakduk.core.service.EmailService;
 import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
@@ -82,10 +82,7 @@ public class UserRestController {
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout());
 
-        try {
-            emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
-        } catch (MessagingException ignored) {
-        }
+        emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
         JakdukUserDetail userDetails = userUtils.signInJakdukUser(user);
 
@@ -112,11 +109,7 @@ public class UserRestController {
         User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout());
 
-        try {
-            emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+        emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
         String token = jwtTokenUtils.generateToken(new CommonPrincipal(user), device);
 

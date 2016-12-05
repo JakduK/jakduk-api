@@ -16,18 +16,15 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ESBoardFreeSource {
+public class ESBoardCommentSource {
+
 	private String id;
+
+	private ESParentBoard parentBoard;
 
 	private CommonWriter writer;
 
-	private String subject;
-
-	private String contentPreview;
-
-	private Integer seq;
-
-	private String category;
+	private String content;
 
 	private Float score;
 

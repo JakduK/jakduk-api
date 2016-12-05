@@ -1,7 +1,6 @@
 package com.jakduk.core.model.elasticsearch;
 
 import com.jakduk.core.model.embedded.CommonWriter;
-import io.searchbox.annotations.JestId;
 import lombok.Data;
 
 /**
@@ -12,7 +11,6 @@ import lombok.Data;
 @Data
 public class JakduCommentOnES {
 
-    @JestId
     private String id;
     private String jakduScheduleId;
     private CommonWriter writer;
