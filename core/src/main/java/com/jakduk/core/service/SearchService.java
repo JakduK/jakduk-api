@@ -11,9 +11,9 @@ import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.vo.SearchBoardResult;
 import com.jakduk.core.model.vo.SearchCommentResult;
 import com.jakduk.core.model.vo.SearchGalleryResult;
-import com.jakduk.core.model.vo.SearchBoardResult;
 import com.jakduk.core.model.vo.SearchUnifiedResponse;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
@@ -103,31 +103,31 @@ public class SearchService {
 
 	/**
 	 * 통합 검색
-	 * @param q	검색어
+	 * @param keywords	검색어
 	 * @param from	페이지 시작 위치
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchUnifiedResponse searchUnified(String q, String include, Integer from, Integer size) {
+	public SearchUnifiedResponse searchUnified(List<String> keywords, String include, Integer from, Integer size) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
 		Queue<CoreConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.PO.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(q, from, size);
+			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(keywords, from, size);
 			multiSearchRequestBuilder.add(postSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.PO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.CO.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(q, from, size);
+			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(keywords, from, size);
 			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.CO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.GA.name())) {
-			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(q, from, size < 10 ? 4 : size);
+			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(keywords, from, size < 10 ? 4 : size);
 			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.GA);
 		}
@@ -159,13 +159,16 @@ public class SearchService {
 		return searchUnifiedResponse;
 	}
 
-
-	private SearchRequestBuilder getBoardSearchRequestBuilder(String q, Integer from, Integer size) {
+	private SearchRequestBuilder getBoardSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"content"})
-				.setQuery(QueryBuilders.multiMatchQuery(q, "subject", "content"))
+				.setQuery(
+						QueryBuilders.boolQuery()
+								.should(QueryBuilders.termsQuery("subject", keywords).boost(1.2f))
+								.should(QueryBuilders.termsQuery("content", keywords).boost(1.0f))
+				)
 				.addHighlightedField("subject")
 				.addHighlightedField("content")
 				.setHighlighterPreTags("<span class=\"color-orange\">")
@@ -261,13 +264,13 @@ public class SearchService {
 
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(String q, Integer from, Integer size) {
+	private SearchRequestBuilder getCommentSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.must(QueryBuilders.matchQuery("content", q))
+								.must(QueryBuilders.termsQuery("content", keywords))
 								.must(
 										QueryBuilders
 												.hasParentQuery(CoreConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
@@ -354,13 +357,11 @@ public class SearchService {
 	// TODO : 구현 해야 함
 	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {}
 
-	private SearchRequestBuilder getGallerySearchRequestBuilder(String q, Integer from, Integer size) {
+	private SearchRequestBuilder getGallerySearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexGallery)
 				.setTypes(CoreConst.ES_TYPE_GALLERY)
-				.setQuery(
-						QueryBuilders.matchQuery("name", q)
-				)
+				.setQuery(QueryBuilders.termsQuery("name", keywords))
 				.addHighlightedField("name")
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
@@ -453,7 +454,8 @@ public class SearchService {
 		return Settings.builder()
 				.put("index.analysis.analyzer.korean.type", "custom")
 				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
-				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false);
 	}
 
 	private String getBoardFreeMappings() throws JsonProcessingException {
