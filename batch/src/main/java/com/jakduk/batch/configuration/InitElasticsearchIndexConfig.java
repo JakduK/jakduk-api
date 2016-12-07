@@ -56,7 +56,6 @@ public class InitElasticsearchIndexConfig {
 
                     try {
                         searchService.deleteIndexBoard();
-//                        searchService.deleteIndexComment();
 
                     } catch (IndexNotFoundException e) {
                         log.error(e.getLocalizedMessage());
@@ -81,7 +80,6 @@ public class InitElasticsearchIndexConfig {
 
                     try {
                         searchService.createIndexBoard();
-//                    searchService.createIndexComment();
                         searchService.createIndexGallery();
 
                     } catch (IndexAlreadyExistsException e) {

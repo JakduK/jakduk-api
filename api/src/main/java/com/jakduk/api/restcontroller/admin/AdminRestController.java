@@ -617,7 +617,6 @@ public class AdminRestController {
 	public EmptyJsonResponse initSearchIndex() {
 
 		searchService.createIndexBoard();
-		searchService.createIndexComment();
 		searchService.createIndexGallery();
 
 		return EmptyJsonResponse.newInstance();

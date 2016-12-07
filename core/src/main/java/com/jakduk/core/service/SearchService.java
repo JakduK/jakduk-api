@@ -11,9 +11,9 @@ import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.vo.SearchBoardResult;
 import com.jakduk.core.model.vo.SearchCommentResult;
 import com.jakduk.core.model.vo.SearchGalleryResult;
-import com.jakduk.core.model.vo.SearchBoardResult;
 import com.jakduk.core.model.vo.SearchUnifiedResponse;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
@@ -71,9 +71,6 @@ public class SearchService {
 	@Value("${core.elasticsearch.index.board}")
 	private String elasticsearchIndexBoard;
 
-	@Value("${core.elasticsearch.index.comment}")
-	private String elasticsearchIndexComment;
-
 	@Value("${core.elasticsearch.index.gallery}")
 	private String elasticsearchIndexGallery;
 
@@ -103,31 +100,31 @@ public class SearchService {
 
 	/**
 	 * 통합 검색
-	 * @param q	검색어
+	 * @param keywords	검색어
 	 * @param from	페이지 시작 위치
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchUnifiedResponse searchUnified(String q, String include, Integer from, Integer size) {
+	public SearchUnifiedResponse searchUnified(List<String> keywords, String include, Integer from, Integer size) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
 		Queue<CoreConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.PO.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(q, from, size);
+			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(keywords, from, size);
 			multiSearchRequestBuilder.add(postSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.PO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.CO.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(q, from, size);
+			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(keywords, from, size);
 			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.CO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.GA.name())) {
-			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(q, from, size < 10 ? 4 : size);
+			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(keywords, from, size < 10 ? 4 : size);
 			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.GA);
 		}
@@ -157,63 +154,6 @@ public class SearchService {
 		}
 
 		return searchUnifiedResponse;
-	}
-
-
-	private SearchRequestBuilder getBoardSearchRequestBuilder(String q, Integer from, Integer size) {
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexBoard)
-				.setTypes(CoreConst.ES_TYPE_BOARD)
-				.setFetchSource(null, new String[]{"content"})
-				.setQuery(QueryBuilders.multiMatchQuery(q, "subject", "content"))
-				.addHighlightedField("subject")
-				.addHighlightedField("content")
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
-				.addScriptField("content_preview", new Script(
-						String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
-								CoreConst.SEARCH_CONTENT_MAX_LENGTH,
-								CoreConst.SEARCH_CONTENT_MAX_LENGTH))
-				)
-				.setFrom(from)
-				.setSize(size);
-
-		log.debug("getBoardSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
-
-		return searchRequestBuilder;
-	}
-
-	private SearchBoardResult getBoardSearchResponse(SearchResponse searchResponse) {
-		SearchHits searchHits = searchResponse.getHits();
-
-		List<ESBoardSource> searchList = Arrays.stream(searchHits.getHits())
-				.map(searchHit -> {
-					Map<String, Object> sourceMap = searchHit.getSource();
-					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
-					esBoardSource.setScore(searchHit.getScore());
-					esBoardSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
-
-					Map<String, List<String>> highlight = new HashMap<>();
-
-					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
-						List<String> fragments = new ArrayList<>();
-						for (Text text : highlightField.getValue().fragments()) {
-							fragments.add(text.string());
-						}
-						highlight.put(highlightField.getKey(), fragments);
-					}
-
-					esBoardSource.setHighlight(highlight);
-
-					return esBoardSource;
-				})
-				.collect(Collectors.toList());
-
-		return SearchBoardResult.builder()
-				.took(searchResponse.getTook().getMillis())
-				.totalCount(searchHits.getTotalHits())
-				.posts(searchList)
-				.build();
 	}
 
 	@Async
@@ -261,70 +201,6 @@ public class SearchService {
 
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(String q, Integer from, Integer size) {
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexBoard)
-				.setTypes(CoreConst.ES_TYPE_COMMENT)
-				.setQuery(
-						QueryBuilders.boolQuery()
-								.must(QueryBuilders.matchQuery("content", q))
-								.must(
-										QueryBuilders
-												.hasParentQuery(CoreConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
-												.innerHit(new QueryInnerHitBuilder())
-								)
-				)
-				.addHighlightedField("content")
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
-				.setFrom(from)
-				.setSize(size);
-
-		log.debug("getBoardCommentSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
-
-		return searchRequestBuilder;
-	}
-
-	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
-		SearchHits searchHits = searchResponse.getHits();
-
-		List<ESBoardCommentSource> searchList = Arrays.stream(searchHits.getHits())
-				.map(searchHit -> {
-					Map<String, Object> sourceMap = searchHit.getSource();
-					ESBoardCommentSource esBoardCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardCommentSource.class);
-					esBoardCommentSource.setScore(searchHit.getScore());
-
-					if (! searchHit.getInnerHits().isEmpty()) {
-						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(CoreConst.ES_TYPE_BOARD).getHits();
-						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
-						ESParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, ESParentBoard.class);
-
-						esBoardCommentSource.setParentBoard(esParentBoard);
-					}
-
-					Map<String, List<String>> highlight = new HashMap<>();
-
-					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
-						List<String> fragments = new ArrayList<>();
-						for (Text text : highlightField.getValue().fragments()) {
-							fragments.add(text.string());
-						}
-						highlight.put(highlightField.getKey(), fragments);
-					}
-
-					esBoardCommentSource.setHighlight(highlight);
-
-					return esBoardCommentSource;
-				})
-				.collect(Collectors.toList());
-
-		return SearchCommentResult.builder()
-				.took(searchResponse.getTook().getMillis())
-				.totalCount(searchHits.getTotalHits())
-				.comments(searchList)
-				.build();
-	}
-
 	@Async
 	public void indexDocumentBoardComment(String id, BoardItem boardItem, CommonWriter writer, String content) {
 
@@ -340,9 +216,10 @@ public class SearchService {
 
 		try {
 			IndexResponse response = client.prepareIndex()
-					.setIndex(elasticsearchIndexComment)
+					.setIndex(elasticsearchIndexBoard)
 					.setType(CoreConst.ES_TYPE_COMMENT)
 					.setId(id)
+					.setParent(boardItem.getId())
 					.setSource(ObjectMapperUtils.writeValueAsString(esComment))
 					.get();
 
@@ -352,57 +229,7 @@ public class SearchService {
 	}
 
 	// TODO : 구현 해야 함
-	public void createDocumentJakduComment(JakduCommentOnES jakduCommentOnES) {}
-
-	private SearchRequestBuilder getGallerySearchRequestBuilder(String q, Integer from, Integer size) {
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexGallery)
-				.setTypes(CoreConst.ES_TYPE_GALLERY)
-				.setQuery(
-						QueryBuilders.matchQuery("name", q)
-				)
-				.addHighlightedField("name")
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
-				.setFrom(from)
-				.setSize(size);
-
-		log.debug("getGallerySearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
-
-		return searchRequestBuilder;
-	}
-
-	private SearchGalleryResult getGallerySearchResponse(SearchResponse searchResponse) {
-		SearchHits searchHits = searchResponse.getHits();
-
-		List<ESGallerySource> searchList = Arrays.stream(searchHits.getHits())
-				.map(searchHit -> {
-					Map<String, Object> sourceMap = searchHit.getSource();
-					ESGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, ESGallerySource.class);
-					esGallerySource.setScore(searchHit.getScore());
-
-					Map<String, List<String>> highlight = new HashMap<>();
-
-					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
-						List<String> fragments = new ArrayList<>();
-						for (Text text : highlightField.getValue().fragments()) {
-							fragments.add(text.string());
-						}
-						highlight.put(highlightField.getKey(), fragments);
-					}
-
-					esGallerySource.setHighlight(highlight);
-
-					return esGallerySource;
-				})
-				.collect(Collectors.toList());
-
-		return SearchGalleryResult.builder()
-				.took(searchResponse.getTook().getMillis())
-				.totalCount(searchHits.getTotalHits())
-				.galleries(searchList)
-				.build();
-	}
+	public void createDocumentJakduComment(ESJakduComment ESJakduComment) {}
 
 	@Async
 	public void indexDocumentGallery(String id, CommonWriter writer, String name) {
@@ -445,182 +272,6 @@ public class SearchService {
 			log.info("gallery id " + id + " is not found. so can't delete it!");
 	}
 
-	private Settings.Builder getIndexSettings() {
-
-		//settingsBuilder.put("number_of_shards", 5);
-		//settingsBuilder.put("number_of_replicas", 1);
-
-		return Settings.builder()
-				.put("index.analysis.analyzer.korean.type", "custom")
-				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
-				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer");
-	}
-
-	private String getBoardFreeMappings() throws JsonProcessingException {
-		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
-
-		ObjectNode idNode = objectMapper.createObjectNode();
-		idNode.put("type", "string");
-
-		ObjectNode subjectNode = objectMapper.createObjectNode();
-		subjectNode.put("type", "string");
-		subjectNode.put("analyzer", "korean");
-
-		ObjectNode contentNode = objectMapper.createObjectNode();
-		contentNode.put("type", "string");
-		contentNode.put("analyzer", "korean");
-
-		ObjectNode seqNode = objectMapper.createObjectNode();
-		seqNode.put("type", "integer");
-		seqNode.put("index", "no");
-
-		ObjectNode categoryNode = objectMapper.createObjectNode();
-		categoryNode.put("type", "string");
-		categoryNode.put("index", "not_analyzed");
-
-		// writer
-		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
-		writerProviderIdNode.put("type", "string");
-		writerProviderIdNode.put("index", "no");
-
-		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
-		writerUserIdNode.put("type", "string");
-		writerUserIdNode.put("index", "no");
-
-		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
-		writerUsernameNode.put("type", "string");
-		writerUsernameNode.put("index", "no");
-
-		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
-		writerPropertiesNode.set("providerId", writerProviderIdNode);
-		writerPropertiesNode.set("userId", writerUserIdNode);
-		writerPropertiesNode.set("username", writerUsernameNode);
-
-		ObjectNode writerNode = objectMapper.createObjectNode();
-		writerNode.set("properties", writerPropertiesNode);
-
-		// properties
-		ObjectNode propertiesNode = objectMapper.createObjectNode();
-		propertiesNode.set("id", idNode);
-		propertiesNode.set("subject", subjectNode);
-		propertiesNode.set("content", contentNode);
-		propertiesNode.set("seq", seqNode);
-		propertiesNode.set("writer", writerNode);
-		propertiesNode.set("category", categoryNode);
-
-		ObjectNode mappings = objectMapper.createObjectNode();
-		mappings.set("properties", propertiesNode);
-
-		return objectMapper.writeValueAsString(mappings);
-	}
-
-	private String getBoardFreeCommentMappings() throws JsonProcessingException {
-		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
-
-		ObjectNode idNode = objectMapper.createObjectNode();
-		idNode.put("type", "string");
-
-		ObjectNode contentNode = objectMapper.createObjectNode();
-		contentNode.put("type", "string");
-		contentNode.put("analyzer", "korean");
-
-		// boardItem
-		ObjectNode boardItemIdNode = objectMapper.createObjectNode();
-		boardItemIdNode.put("type", "string");
-		boardItemIdNode.put("index", "no");
-
-		ObjectNode boardItemSeqNode = objectMapper.createObjectNode();
-		boardItemSeqNode.put("type", "integer");
-		boardItemSeqNode.put("index", "no");
-
-		ObjectNode boardItemPropertiesNode = objectMapper.createObjectNode();
-		boardItemPropertiesNode.set("id", boardItemIdNode);
-		boardItemPropertiesNode.set("seq", boardItemSeqNode);
-
-		ObjectNode boardItemNode = objectMapper.createObjectNode();
-		boardItemNode.set("properties", boardItemPropertiesNode);
-
-		// writer
-		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
-		writerProviderIdNode.put("type", "string");
-		writerProviderIdNode.put("index", "no");
-
-		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
-		writerUserIdNode.put("type", "string");
-		writerUserIdNode.put("index", "no");
-
-		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
-		writerUsernameNode.put("type", "string");
-		writerUsernameNode.put("index", "no");
-
-		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
-		writerPropertiesNode.set("providerId", writerProviderIdNode);
-		writerPropertiesNode.set("userId", writerUserIdNode);
-		writerPropertiesNode.set("username", writerUsernameNode);
-
-		ObjectNode writerNode = objectMapper.createObjectNode();
-		writerNode.set("properties", writerPropertiesNode);
-
-		// properties
-		ObjectNode propertiesNode = objectMapper.createObjectNode();
-		propertiesNode.set("id", idNode);
-		propertiesNode.set("content", contentNode);
-		propertiesNode.set("writer", writerNode);
-		propertiesNode.set("boardItem", boardItemNode);
-
-		ObjectNode parentNode = objectMapper.createObjectNode();
-		parentNode.put("type", CoreConst.ES_TYPE_BOARD);
-
-		ObjectNode mappings = objectMapper.createObjectNode();
-		mappings.set("_parent", parentNode);
-		mappings.set("properties", propertiesNode);
-
-		return objectMapper.writeValueAsString(mappings);
-	}
-
-	private String getGalleryMappings() throws JsonProcessingException {
-		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
-
-		ObjectNode idNode = objectMapper.createObjectNode();
-		idNode.put("type", "string");
-
-		ObjectNode nameNode = objectMapper.createObjectNode();
-		nameNode.put("type", "string");
-		nameNode.put("analyzer", "korean");
-
-		// writer
-		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
-		writerProviderIdNode.put("type", "string");
-		writerProviderIdNode.put("index", "no");
-
-		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
-		writerUserIdNode.put("type", "string");
-		writerUserIdNode.put("index", "no");
-
-		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
-		writerUsernameNode.put("type", "string");
-		writerUsernameNode.put("index", "no");
-
-		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
-		writerPropertiesNode.set("providerId", writerProviderIdNode);
-		writerPropertiesNode.set("userId", writerUserIdNode);
-		writerPropertiesNode.set("username", writerUsernameNode);
-
-		ObjectNode writerNode = objectMapper.createObjectNode();
-		writerNode.set("properties", writerPropertiesNode);
-
-		// properties
-		ObjectNode propertiesNode = objectMapper.createObjectNode();
-		propertiesNode.set("id", idNode);
-		propertiesNode.set("name", nameNode);
-		propertiesNode.set("writer", writerNode);
-
-		ObjectNode mappings = objectMapper.createObjectNode();
-		mappings.set("properties", propertiesNode);
-
-		return objectMapper.writeValueAsString(mappings);
-	}
-
 	public void createIndexBoard() {
 
 		try {
@@ -640,24 +291,6 @@ public class SearchService {
 			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created", e.getCause());
 		}
 
-	}
-
-	public void createIndexComment() {
-
-		try {
-			CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexComment)
-                    .setSettings(getIndexSettings())
-                    .addMapping(CoreConst.ES_TYPE_COMMENT, getBoardFreeCommentMappings())
-                    .get();
-
-			if (response.isAcknowledged()) {
-				log.debug("Index " + elasticsearchIndexComment + " created");
-			} else {
-				throw new RuntimeException("Index " + elasticsearchIndexComment + " not created");
-			}
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Index " + elasticsearchIndexComment + " not created", e.getCause());
-		}
 	}
 
 	public void createIndexGallery() {
@@ -858,19 +491,6 @@ public class SearchService {
 		}
 	}
 
-	public void deleteIndexComment() {
-
-		DeleteIndexResponse response = client.admin().indices()
-				.delete(new DeleteIndexRequest(elasticsearchIndexComment))
-				.actionGet();
-
-		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexComment + " deleted");
-		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexComment + " not deleted");
-		}
-	}
-
 	public void deleteIndexGallery() {
 
 		DeleteIndexResponse response = client.admin().indices()
@@ -882,5 +502,354 @@ public class SearchService {
 		} else {
 			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not deleted");
 		}
+	}
+
+	private SearchRequestBuilder getBoardSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
+				.setIndices(elasticsearchIndexBoard)
+				.setTypes(CoreConst.ES_TYPE_BOARD)
+				.setFetchSource(null, new String[]{"content"})
+				.setQuery(
+						QueryBuilders.boolQuery()
+								.should(QueryBuilders.termsQuery("subject", keywords).boost(1.2f))
+								.should(QueryBuilders.termsQuery("content", keywords).boost(1.0f))
+				)
+				.addHighlightedField("subject")
+				.addHighlightedField("content")
+				.setHighlighterPreTags("<span class=\"color-orange\">")
+				.setHighlighterPostTags("</span>")
+				.addScriptField("content_preview", new Script(
+						String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
+								CoreConst.SEARCH_CONTENT_MAX_LENGTH,
+								CoreConst.SEARCH_CONTENT_MAX_LENGTH))
+				)
+				.setFrom(from)
+				.setSize(size);
+
+		log.debug("getBoardSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+
+		return searchRequestBuilder;
+	}
+
+	private SearchBoardResult getBoardSearchResponse(SearchResponse searchResponse) {
+		SearchHits searchHits = searchResponse.getHits();
+
+		List<ESBoardSource> searchList = Arrays.stream(searchHits.getHits())
+				.map(searchHit -> {
+					Map<String, Object> sourceMap = searchHit.getSource();
+					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
+					esBoardSource.setScore(searchHit.getScore());
+					esBoardSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
+
+					Map<String, List<String>> highlight = new HashMap<>();
+
+					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
+						List<String> fragments = new ArrayList<>();
+						for (Text text : highlightField.getValue().fragments()) {
+							fragments.add(text.string());
+						}
+						highlight.put(highlightField.getKey(), fragments);
+					}
+
+					esBoardSource.setHighlight(highlight);
+
+					return esBoardSource;
+				})
+				.collect(Collectors.toList());
+
+		return SearchBoardResult.builder()
+				.took(searchResponse.getTook().getMillis())
+				.totalCount(searchHits.getTotalHits())
+				.posts(searchList)
+				.build();
+	}
+
+	private SearchRequestBuilder getCommentSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
+				.setIndices(elasticsearchIndexBoard)
+				.setTypes(CoreConst.ES_TYPE_COMMENT)
+				.setQuery(
+						QueryBuilders.boolQuery()
+								.must(QueryBuilders.termsQuery("content", keywords))
+								.must(
+										QueryBuilders
+												.hasParentQuery(CoreConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
+												.innerHit(new QueryInnerHitBuilder())
+								)
+				)
+				.addHighlightedField("content")
+				.setHighlighterPreTags("<span class=\"color-orange\">")
+				.setHighlighterPostTags("</span>")
+				.setFrom(from)
+				.setSize(size);
+
+		log.debug("getBoardCommentSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+
+		return searchRequestBuilder;
+	}
+
+	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
+		SearchHits searchHits = searchResponse.getHits();
+
+		List<ESBoardCommentSource> searchList = Arrays.stream(searchHits.getHits())
+				.map(searchHit -> {
+					Map<String, Object> sourceMap = searchHit.getSource();
+					ESBoardCommentSource esBoardCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardCommentSource.class);
+					esBoardCommentSource.setScore(searchHit.getScore());
+
+					if (! searchHit.getInnerHits().isEmpty()) {
+						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(CoreConst.ES_TYPE_BOARD).getHits();
+						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
+						ESParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, ESParentBoard.class);
+
+						esBoardCommentSource.setParentBoard(esParentBoard);
+					}
+
+					Map<String, List<String>> highlight = new HashMap<>();
+
+					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
+						List<String> fragments = new ArrayList<>();
+						for (Text text : highlightField.getValue().fragments()) {
+							fragments.add(text.string());
+						}
+						highlight.put(highlightField.getKey(), fragments);
+					}
+
+					esBoardCommentSource.setHighlight(highlight);
+
+					return esBoardCommentSource;
+				})
+				.collect(Collectors.toList());
+
+		return SearchCommentResult.builder()
+				.took(searchResponse.getTook().getMillis())
+				.totalCount(searchHits.getTotalHits())
+				.comments(searchList)
+				.build();
+	}
+
+	private SearchRequestBuilder getGallerySearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
+				.setIndices(elasticsearchIndexGallery)
+				.setTypes(CoreConst.ES_TYPE_GALLERY)
+				.setQuery(QueryBuilders.termsQuery("name", keywords))
+				.addHighlightedField("name")
+				.setHighlighterPreTags("<span class=\"color-orange\">")
+				.setHighlighterPostTags("</span>")
+				.setFrom(from)
+				.setSize(size);
+
+		log.debug("getGallerySearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+
+		return searchRequestBuilder;
+	}
+
+	private SearchGalleryResult getGallerySearchResponse(SearchResponse searchResponse) {
+		SearchHits searchHits = searchResponse.getHits();
+
+		List<ESGallerySource> searchList = Arrays.stream(searchHits.getHits())
+				.map(searchHit -> {
+					Map<String, Object> sourceMap = searchHit.getSource();
+					ESGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, ESGallerySource.class);
+					esGallerySource.setScore(searchHit.getScore());
+
+					Map<String, List<String>> highlight = new HashMap<>();
+
+					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
+						List<String> fragments = new ArrayList<>();
+						for (Text text : highlightField.getValue().fragments()) {
+							fragments.add(text.string());
+						}
+						highlight.put(highlightField.getKey(), fragments);
+					}
+
+					esGallerySource.setHighlight(highlight);
+
+					return esGallerySource;
+				})
+				.collect(Collectors.toList());
+
+		return SearchGalleryResult.builder()
+				.took(searchResponse.getTook().getMillis())
+				.totalCount(searchHits.getTotalHits())
+				.galleries(searchList)
+				.build();
+	}
+
+	private Settings.Builder getIndexSettings() {
+
+		//settingsBuilder.put("number_of_shards", 5);
+		//settingsBuilder.put("number_of_replicas", 1);
+
+		return Settings.builder()
+				.put("index.analysis.analyzer.korean.type", "custom")
+				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false);
+	}
+
+	private String getBoardFreeMappings() throws JsonProcessingException {
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode subjectNode = objectMapper.createObjectNode();
+		subjectNode.put("type", "string");
+		subjectNode.put("analyzer", "korean");
+
+		ObjectNode contentNode = objectMapper.createObjectNode();
+		contentNode.put("type", "string");
+		contentNode.put("analyzer", "korean");
+
+		ObjectNode seqNode = objectMapper.createObjectNode();
+		seqNode.put("type", "integer");
+		seqNode.put("index", "no");
+
+		ObjectNode categoryNode = objectMapper.createObjectNode();
+		categoryNode.put("type", "string");
+		categoryNode.put("index", "not_analyzed");
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("subject", subjectNode);
+		propertiesNode.set("content", contentNode);
+		propertiesNode.set("seq", seqNode);
+		propertiesNode.set("writer", writerNode);
+		propertiesNode.set("category", categoryNode);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
+		return objectMapper.writeValueAsString(mappings);
+	}
+
+	private String getBoardFreeCommentMappings() throws JsonProcessingException {
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode contentNode = objectMapper.createObjectNode();
+		contentNode.put("type", "string");
+		contentNode.put("analyzer", "korean");
+
+		// boardItem
+		ObjectNode boardItemIdNode = objectMapper.createObjectNode();
+		boardItemIdNode.put("type", "string");
+		boardItemIdNode.put("index", "no");
+
+		ObjectNode boardItemSeqNode = objectMapper.createObjectNode();
+		boardItemSeqNode.put("type", "integer");
+		boardItemSeqNode.put("index", "no");
+
+		ObjectNode boardItemPropertiesNode = objectMapper.createObjectNode();
+		boardItemPropertiesNode.set("id", boardItemIdNode);
+		boardItemPropertiesNode.set("seq", boardItemSeqNode);
+
+		ObjectNode boardItemNode = objectMapper.createObjectNode();
+		boardItemNode.set("properties", boardItemPropertiesNode);
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("content", contentNode);
+		propertiesNode.set("writer", writerNode);
+		propertiesNode.set("boardItem", boardItemNode);
+
+		ObjectNode parentNode = objectMapper.createObjectNode();
+		parentNode.put("type", CoreConst.ES_TYPE_BOARD);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("_parent", parentNode);
+		mappings.set("properties", propertiesNode);
+
+		return objectMapper.writeValueAsString(mappings);
+	}
+
+	private String getGalleryMappings() throws JsonProcessingException {
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		ObjectNode idNode = objectMapper.createObjectNode();
+		idNode.put("type", "string");
+
+		ObjectNode nameNode = objectMapper.createObjectNode();
+		nameNode.put("type", "string");
+		nameNode.put("analyzer", "korean");
+
+		// writer
+		ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
+		writerProviderIdNode.put("type", "string");
+		writerProviderIdNode.put("index", "no");
+
+		ObjectNode writerUserIdNode = objectMapper.createObjectNode();
+		writerUserIdNode.put("type", "string");
+		writerUserIdNode.put("index", "no");
+
+		ObjectNode writerUsernameNode = objectMapper.createObjectNode();
+		writerUsernameNode.put("type", "string");
+		writerUsernameNode.put("index", "no");
+
+		ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
+		writerPropertiesNode.set("providerId", writerProviderIdNode);
+		writerPropertiesNode.set("userId", writerUserIdNode);
+		writerPropertiesNode.set("username", writerUsernameNode);
+
+		ObjectNode writerNode = objectMapper.createObjectNode();
+		writerNode.set("properties", writerPropertiesNode);
+
+		// properties
+		ObjectNode propertiesNode = objectMapper.createObjectNode();
+		propertiesNode.set("id", idNode);
+		propertiesNode.set("name", nameNode);
+		propertiesNode.set("writer", writerNode);
+
+		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
+		return objectMapper.writeValueAsString(mappings);
 	}
 }
