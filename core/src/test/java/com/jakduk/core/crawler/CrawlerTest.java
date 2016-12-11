@@ -12,7 +12,7 @@ import org.junit.Test;
 public class CrawlerTest {
 
     @Test
-    public void getKeagueSchedules() throws Exception {
+    public void getKLeagueSchedules() throws Exception {
 
         Document doc = Jsoup.connect("http://www.kleague.com/KOR_2016/record/data_2.asp?year=2016&game=1&game_type=#").get();
 

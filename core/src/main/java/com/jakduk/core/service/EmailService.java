@@ -55,7 +55,7 @@ public class EmailService {
 		// Prepare the evaluation context
 		final Context ctx = new Context(locale);
 		ctx.setVariable("email", recipientEmail);
-		ctx.setVariable("callbackUrl", callbackUrl);
+		ctx.setVariable("host", callbackUrl);
 		ctx.setVariable("linkLabel", bundle.getString("user.password.change"));
 
 		String subject = "jakduk.com-" + bundle.getString("user.password.reset.instructions");
