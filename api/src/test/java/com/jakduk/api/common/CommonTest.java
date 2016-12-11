@@ -4,11 +4,9 @@ import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.service.CommonService;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 

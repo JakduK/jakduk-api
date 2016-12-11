@@ -1,6 +1,6 @@
 package com.jakduk.core.model.db;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -50,7 +50,7 @@ public class BoardFree {
 	/**
 	 * 분류 ID
 	 */
-	private CommonConst.BOARD_CATEGORY_TYPE category;
+	private CoreConst.BOARD_CATEGORY_TYPE category;
 	
 	/**
 	 * 조회
@@ -67,5 +67,5 @@ public class BoardFree {
 	
 	private List<BoardImage> galleries;
 
-	private List<CommonConst.BATCH_TYPE> batch;
+	private List<CoreConst.BATCH_TYPE> batch;
 }

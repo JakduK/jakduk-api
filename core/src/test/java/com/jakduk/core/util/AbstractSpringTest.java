@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles({"core-staging", "core-prod", "core-default"}) // profiles 설정 안하면, core-default 적용
+@ActiveProfiles({"core-staging", "core-production", "core-default"}) // profiles 설정 안하면, core-default 적용
 public class AbstractSpringTest {
 
 }

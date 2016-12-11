@@ -2,7 +2,7 @@ package com.jakduk.api;
 
 import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
-import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AdminTest extends AbstractSpringTest {
 	
 	@Autowired
-	private BoardFreeRepositoryRepository boardFreeRepository;
+	private BoardFreeRepository boardFreeRepository;
 	
 	@Autowired
 	BoardCategoryRepository boardCategoryRepository;
@@ -27,7 +27,7 @@ public class AdminTest extends AbstractSpringTest {
 		long boardCnt = 101;
 		int limit = 100;
 		int totalPage = (int)(boardCnt / limit);
-		
+
 		System.out.println("boardCnt=" + boardCnt);
 		System.out.println("totalPage=" + totalPage);
 	}

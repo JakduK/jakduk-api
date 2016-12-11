@@ -2,7 +2,7 @@ package com.jakduk.api.common;
 
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class JwtTokenUtilsTest {
                 .email("test50@test.com")
                 .username("test01")
                 .id("a1b2c3d4")
-                .providerId(CommonConst.ACCOUNT_TYPE.JAKDUK)
+                .providerId(CoreConst.ACCOUNT_TYPE.JAKDUK)
                 .build();
     }
 

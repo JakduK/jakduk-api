@@ -1,3 +1,5 @@
+// token TTL 설정
+db.token.ensureIndex( { "expireAt": 1 }, { expireAfterSeconds: 0 } )
 
 Version 0.7.0 / 2016-07-27
 

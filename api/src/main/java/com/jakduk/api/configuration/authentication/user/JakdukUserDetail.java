@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration.authentication.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
@@ -20,7 +20,7 @@ public class JakdukUserDetail implements UserDetails, CredentialsContainer {
 	private final String nickname;						// 별명
 	private String password;
 	private String username;							// email
-	private final CommonConst.ACCOUNT_TYPE providerId;
+	private final CoreConst.ACCOUNT_TYPE providerId;
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
 	private final boolean accountNonLocked;
@@ -52,7 +52,7 @@ public class JakdukUserDetail implements UserDetails, CredentialsContainer {
 	 *         either as a parameter or as an element in the
 	 *         <code>GrantedAuthority</code> collection
 	 */
-	public JakdukUserDetail(String username, String id, String password, String nickname, CommonConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
+	public JakdukUserDetail(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
                             boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		if (Objects.isNull(username) || Objects.isNull(password))
@@ -113,7 +113,7 @@ public class JakdukUserDetail implements UserDetails, CredentialsContainer {
 		return username;
 	}
 	
-	public CommonConst.ACCOUNT_TYPE getProviderId() {
+	public CoreConst.ACCOUNT_TYPE getProviderId() {
 		return providerId;
 	}
 

@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.api.common.constraints.FieldMatch;
-import com.jakduk.api.common.constraints.PasswordMatch;
+import com.jakduk.api.common.constraint.FieldMatch;
+import com.jakduk.api.common.constraint.PasswordMatch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -22,18 +22,18 @@ import javax.validation.constraints.Size;
 public class UserPasswordForm {
 
 	@ApiModelProperty(required = true, example = "password01")
-	@NotEmpty
 	@Size(min = 4, max=20)
+	@NotEmpty
 	@PasswordMatch
 	private String password;
 
 	@ApiModelProperty(required = true, example = "password02")
-	@NotEmpty
 	@Size(min = 4, max=20)
+	@NotEmpty
 	private String newPassword;
 
 	@ApiModelProperty(required = true, example = "password02")
-	@NotEmpty
 	@Size(min = 4, max=20)
+	@NotEmpty
 	private String newPasswordConfirm;
 }

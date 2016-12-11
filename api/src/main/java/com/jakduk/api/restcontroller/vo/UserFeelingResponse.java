@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -18,7 +18,7 @@ import lombok.*;
 public class UserFeelingResponse {
 
     @ApiModelProperty(value = "감정 표현 종류")
-    private CommonConst.FEELING_TYPE feeling;
+    private CoreConst.FEELING_TYPE feeling;
 
     @ApiModelProperty(value = "좋아요 수")
     private Integer numberOfLike;

@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.user.vo;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.LocalName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,7 +28,7 @@ public class UserProfileResponse {
 	private String about;
 
 	@ApiModelProperty(value = "provider ID")
-	private CommonConst.ACCOUNT_TYPE providerId;
+	private CoreConst.ACCOUNT_TYPE providerId;
 
 	@ApiModelProperty(value = "지지 축구단")
 	private LocalName footballClubName;

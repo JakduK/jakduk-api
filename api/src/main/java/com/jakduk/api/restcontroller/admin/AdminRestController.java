@@ -1,52 +1,34 @@
 package com.jakduk.api.restcontroller.admin;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.Resource;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.FootballClubRequest;
+import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
+import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.exception.ServiceExceptionCode;
+import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.db.*;
+import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.LocalSimpleName;
+import com.jakduk.core.model.web.AttendanceClubWrite;
+import com.jakduk.core.model.web.CompetitionWrite;
+import com.jakduk.core.model.web.ThumbnailSizeWrite;
+import com.jakduk.core.model.web.board.BoardCategoryWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
 import com.jakduk.core.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.vo.FootballClubRequest;
-import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
-import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.model.db.AttendanceLeague;
-import com.jakduk.core.model.db.BoardCategory;
-import com.jakduk.core.model.db.Competition;
-import com.jakduk.core.model.db.Encyclopedia;
-import com.jakduk.core.model.db.FootballClub;
-import com.jakduk.core.model.db.FootballClubOrigin;
-import com.jakduk.core.model.db.HomeDescription;
-import com.jakduk.core.model.db.JakduSchedule;
-import com.jakduk.core.model.db.JakduScheduleGroup;
-import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.AttendanceClubWrite;
-import com.jakduk.core.model.web.board.BoardCategoryWrite;
-import com.jakduk.core.model.web.CompetitionWrite;
-import com.jakduk.core.model.web.ThumbnailSizeWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author pyohwan
@@ -214,9 +196,9 @@ public class AdminRestController {
 		encyclopedia.setId(null);
 
 		if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_EN));
+			encyclopedia.setSeq(commonService.getNextSequence(CoreConst.ENCYCLOPEDIA_EN));
 		} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(CommonConst.ENCYCLOPEDIA_KO));
+			encyclopedia.setSeq(commonService.getNextSequence(CoreConst.ENCYCLOPEDIA_KO));
 		}
 
 		adminService.saveEncyclopedia(encyclopedia);
@@ -632,28 +614,35 @@ public class AdminRestController {
 
 	@ApiOperation(value = "검색 인덱스 초기화")
 	@RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
-	public Map<String, Object> initSearchIndex() {
-		return searchService.initSearchIndex();
-	}
+	public EmptyJsonResponse initSearchIndex() {
 
-	@ApiOperation(value = "검색 타입 초기화")
-	@RequestMapping(value = "/search/type/init", method = RequestMethod.POST)
-	public Map<String, Object> initSearchType() throws JsonProcessingException {
-		return searchService.initSearchType();
+		searchService.createIndexBoard();
+		searchService.createIndexGallery();
+
+		return EmptyJsonResponse.newInstance();
 	}
 
 	@ApiOperation(value = "검색 데이터 초기화")
 	@RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
-	public Map<String, Object> initSearchData() {
-		return searchService.initSearchDocuments();
+	public EmptyJsonResponse initSearchData() {
+		try {
+			searchService.processBulkInsertBoard();
+			searchService.processBulkInsertComment();
+			searchService.processBulkInsertGallery();
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		return EmptyJsonResponse.newInstance();
 	}
 
 	@RequestMapping(value = "/thumbnail/size", method = RequestMethod.GET)
 	public Map<String, Object> thumbnailSizeWrite() {
 
 		Map<String, Object> data = new HashMap<>();
-		data.put("resWidth", CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
-		data.put("resHeight", CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+		data.put("resWidth", CoreConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
+		data.put("resHeight", CoreConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
 
 		return data;
 	}

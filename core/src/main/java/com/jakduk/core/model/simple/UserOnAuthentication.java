@@ -1,6 +1,6 @@
 package com.jakduk.core.model.simple;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.Data;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class UserOnAuthentication {
 
 	private String password;
 
-	private CommonConst.ACCOUNT_TYPE providerId;
+	private CoreConst.ACCOUNT_TYPE providerId;
 
 	private String providerUserId;
 	

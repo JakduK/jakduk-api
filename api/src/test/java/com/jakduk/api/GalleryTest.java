@@ -5,10 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.util.AbstractSpringTest;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -188,7 +188,7 @@ public class GalleryTest extends AbstractSpringTest {
 		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrTemp));
 		//AggregationOperation group = Aggregation.group("boardItem").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(CommonConst.BOARD_LINE_NUMBER);
+		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, /*group, */ sort /*, limit*/);
 		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
 		
@@ -224,7 +224,7 @@ public class GalleryTest extends AbstractSpringTest {
 	public void imageCapacity01() {
 		
 		long temp = 2548576;
-		double bb = CommonConst.GALLERY_MAXIMUM_CAPACITY / (double) temp;
+		double bb = CoreConst.GALLERY_MAXIMUM_CAPACITY / (double) temp;
 		long width = 100;
 		long height = 90;
 		

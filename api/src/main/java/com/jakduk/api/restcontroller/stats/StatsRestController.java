@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.stats;
 
 import com.jakduk.api.restcontroller.stats.vo.SupportersDataResponse;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.AttendanceClub;
 import com.jakduk.core.model.db.AttendanceLeague;
@@ -82,7 +82,7 @@ public class StatsRestController {
 
     @RequestMapping(value = "/attendance/season/{season}", method = RequestMethod.GET)
     public List<AttendanceClub> dataAttendanceSeason(@PathVariable Integer season,
-                                     @RequestParam(required = false, defaultValue = CommonConst.K_LEAGUE_ABBREVIATION) String league){
+                                     @RequestParam(required = false, defaultValue = CoreConst.K_LEAGUE_ABBREVIATION) String league){
 
         List<AttendanceClub> attendances = statsService.getAttendancesSeason(season, league);
 

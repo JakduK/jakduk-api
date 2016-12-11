@@ -1,6 +1,6 @@
 package com.jakduk.core.model.etc;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class AuthUserProfile {
 
     private String username;
 
-    private CommonConst.ACCOUNT_TYPE providerId;
+    private CoreConst.ACCOUNT_TYPE providerId;
 
     private List<String> roles;
 }
