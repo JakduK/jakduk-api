@@ -1,6 +1,6 @@
 package com.jakduk.api.configuration.authentication.user;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.User;
 import lombok.*;
 
@@ -23,7 +23,7 @@ public class CommonPrincipal {
 	
 	private String username;
 	
-	private CommonConst.ACCOUNT_TYPE providerId;
+	private CoreConst.ACCOUNT_TYPE providerId;
 
 	public CommonPrincipal(JakdukUserDetail jakdukUserDetail) {
 		this.id = jakdukUserDetail.getId();

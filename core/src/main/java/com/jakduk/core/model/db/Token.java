@@ -1,6 +1,6 @@
 package com.jakduk.core.model.db;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,10 +15,9 @@ public class Token {
 
 	@Id
 	private String email;
-
 	private String code;
-	private CommonConst.TOKEN_TYPE tokenType = CommonConst.TOKEN_TYPE.RESET_PASSWORD;
+	private CoreConst.TOKEN_TYPE tokenType = CoreConst.TOKEN_TYPE.RESET_PASSWORD;
 
 	@Temporal(TemporalType.DATE)
-	private Date createdTime;
+	private Date expireAt;
 }

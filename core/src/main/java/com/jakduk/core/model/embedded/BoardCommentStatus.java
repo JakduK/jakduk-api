@@ -1,7 +1,8 @@
 package com.jakduk.core.model.embedded;
 
-import com.jakduk.core.common.CommonConst;
-import lombok.Data;
+import com.jakduk.core.common.CoreConst;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,8 +11,9 @@ import lombok.Data;
  * @desc     :
  */
 
-@Data
+@AllArgsConstructor
+@Getter
 public class BoardCommentStatus {
 	
-	private CommonConst.DEVICE_TYPE device;
+	private CoreConst.DEVICE_TYPE device;
 }

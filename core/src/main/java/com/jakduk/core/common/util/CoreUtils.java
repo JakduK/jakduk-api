@@ -1,10 +1,12 @@
 package com.jakduk.core.common.util;
 
+import com.jakduk.core.common.CoreConst;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -43,6 +45,17 @@ public class CoreUtils {
         Locale locale = LocaleContextHolder.getLocale();
         ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.exception", locale);
         return MessageFormat.format(resourceBundle.getString(getString), params);
+    }
+
+    /**
+     * HTML TAG를 제거한다.
+     */
+    public static String stripHtmlTag(String htmlTag) {
+        String content = Optional.ofNullable(htmlTag).orElse("");
+        content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_TAG, "");
+        content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_WHITESPACE, "");
+
+        return content;
     }
 
 }

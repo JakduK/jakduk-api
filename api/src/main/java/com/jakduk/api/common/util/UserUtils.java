@@ -240,7 +240,7 @@ public class UserUtils {
      * 이메일 기반 회원의 로그인 처리
      * @param user User 객체
      */
-    public void signInJakdukUser(User user) {
+    public JakdukUserDetail signInJakdukUser(User user) {
 
         boolean enabled = true;
         boolean accountNonExpired = true;
@@ -254,6 +254,8 @@ public class UserUtils {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukUserDetail, user.getPassword(), jakdukUserDetail.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(token);
+
+        return jakdukUserDetail;
     }
 
     /**
@@ -270,11 +272,11 @@ public class UserUtils {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
+    public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
         return getGrantedAuthorities(getRoles(roles));
     }
 
-    private List<String> getRoles(List<Integer> roles) {
+    private static List<String> getRoles(List<Integer> roles) {
         List<String> newRoles = new ArrayList<>();
 
         if (roles != null) {

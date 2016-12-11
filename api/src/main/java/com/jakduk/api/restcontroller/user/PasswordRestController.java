@@ -1,31 +1,26 @@
 package com.jakduk.api.restcontroller.user;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.notification.EmailService;
+import com.jakduk.core.service.EmailService;
 import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 @Slf4j
 @Api(tags = "User", description = "회원 API")
@@ -51,15 +46,11 @@ public class PasswordRestController {
 	@Autowired
 	private EmailService emailService;
 
-	@Value("#{tokenTerminationTrigger.span}")
-	private long tokenSpan;
-
 	// jakduk 비밀번호 찾기 처리.
 	@RequestMapping(value = "/find", method = RequestMethod.POST)
 	public Map<String, Object> findPassword(@RequestParam String email,
 	                                        @RequestParam String callbackUrl,
-											final Locale locale) {
-
+											Locale locale) {
 		String message = "";
 
 		UserProfile userProfile = userService.findOneByEmail(email);
@@ -71,16 +62,17 @@ public class PasswordRestController {
 				case JAKDUK:
 					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.sendok");
 					try {
+
 						emailService.sendResetPassword(locale, callbackUrl, email);
 					} catch (MessagingException e) {
-						throw new ServiceException(ServiceError.SEND_EMAIL_FAILED);
+						throw new ServiceException(ServiceExceptionCode.SEND_EMAIL_FAILED);
 					}
 					break;
 				case DAUM:
-					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.DAUM);
+					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CoreConst.ACCOUNT_TYPE.DAUM);
 					break;
 				case FACEBOOK:
-					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CommonConst.ACCOUNT_TYPE.FACEBOOK);
+					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CoreConst.ACCOUNT_TYPE.FACEBOOK);
 					break;
 			}
 		}
@@ -95,21 +87,18 @@ public class PasswordRestController {
 
 	// jakduk 비밀번호 재설정.
 	@RequestMapping(value = "/reset/{code}", method = RequestMethod.GET)
-	public Map<String, Object> resetPassword(@PathVariable String code,
-	                            HttpServletRequest request) {
-
-		Locale locale = localeResolver.resolveLocale(request);
+	public Map<String, Object> resetPassword(@PathVariable String code) {
 
 		if (Objects.isNull(code))
 			throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
 
 		Map<String, Object> response = new HashMap<>();
-		Token token = commonService.getTokenByCode(code);
+		Optional<Token> oToken = commonService.getTokenByCode(code);
 
-		if (Objects.isNull(token) || !token.getCode().equals(code)) {
+		if (! oToken.isPresent() || ! StringUtils.equals(oToken.get().getCode(), code))
 			throw new IllegalArgumentException(CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.invalid"));
-		}
 
+		Token token = oToken.get();
 		response.put("subject", token.getEmail());
 		response.put("code", token.getCode());
 
@@ -122,22 +111,20 @@ public class PasswordRestController {
 			@RequestParam(value = "password") String password,
 			@RequestParam(value = "code") String code) {
 
-		long tokenSpanMillis = TimeUnit.MINUTES.toMillis(tokenSpan);
-		Token token = tokenRepository.findByCode(code);
+		Optional<Token> oToken = commonService.getTokenByCode(code);
 
 		Map<String, Object> response = new HashMap<>();
 		String message;
 
-		if (Objects.isNull(token) || token.getCreatedTime().getTime() + tokenSpanMillis <= System.currentTimeMillis()) {
-			message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.invalid");
-		} else {
+		if (oToken.isPresent()) {
+			Token token = oToken.get();
 			userService.userPasswordUpdateByEmail(token.getEmail(), passwordEncoder.encode(password.trim()));
 			message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.success.change.password");
 			response.put("subject", token.getEmail());
-		}
 
-		if (Objects.nonNull(token)) {
 			tokenRepository.delete(token);
+		} else {
+			message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.invalid");
 		}
 
 		response.put("message", message);

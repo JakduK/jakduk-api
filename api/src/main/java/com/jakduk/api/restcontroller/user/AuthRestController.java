@@ -12,8 +12,8 @@ import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
-import com.jakduk.core.common.CommonConst;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.etc.AuthUserProfile;
@@ -111,7 +111,7 @@ public class AuthRestController {
 
             return EmptyJsonResponse.newInstance();
         } else {
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
         }
     }
 
@@ -122,7 +122,7 @@ public class AuthRestController {
                                              Device device,
                                              HttpServletResponse response) {
 
-        CommonConst.ACCOUNT_TYPE convertProviderId = CommonConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
+        CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
         SocialProfile socialProfile = null;
 
         switch (convertProviderId) {
@@ -162,7 +162,7 @@ public class AuthRestController {
 
         response.setHeader(attemptedTokenHeader, attemptedToken);
 
-        throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
+        throw new ServiceException(ServiceExceptionCode.NOT_REGISTER_WITH_SNS);
     }
 
     @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json", response = AttemptSocialUser.class)
@@ -170,7 +170,7 @@ public class AuthRestController {
     public AttemptSocialUser getSocialAttemptedUser(@RequestHeader(value = "x-attempt-token") String attemptedToken) {
 
         if (! jwtTokenUtils.isValidateToken(attemptedToken))
-            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
+            throw new ServiceException(ServiceExceptionCode.EXPIRATION_TOKEN);
 
         return jwtTokenUtils.getAttemptedFromToken(attemptedToken);
     }
@@ -182,7 +182,7 @@ public class AuthRestController {
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
         if (Objects.isNull(authUserProfile))
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
         return authUserProfile;
     }

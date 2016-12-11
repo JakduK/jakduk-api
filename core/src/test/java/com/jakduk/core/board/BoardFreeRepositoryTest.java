@@ -4,7 +4,7 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.user.UserRepository;
 import com.jakduk.core.util.AbstractSpringTest;
 import org.bson.types.ObjectId;
@@ -23,7 +23,7 @@ import java.util.List;
 public class BoardFreeRepositoryTest extends AbstractSpringTest {
 
     @Autowired
-    private BoardFreeRepositoryRepository sut;
+    private BoardFreeRepository sut;
 
     @Autowired
     private UserRepository userRepository;

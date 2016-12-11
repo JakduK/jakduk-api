@@ -1,7 +1,7 @@
 package com.jakduk.batch.configuration;
 
 import com.jakduk.batch.processor.AppendGalleryFileExtProcessor;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -63,7 +63,7 @@ public class AppendGalleryFileExtConfig {
     public ItemReader<Gallery> appendGalleryFileExtReader() {
 
         String query = String.format("{'status.status':'%s', 'batch':{$nin:['%s']}}",
-                CommonConst.GALLERY_STATUS_TYPE.ENABLE, CommonConst.BATCH_TYPE.APPEND_GALLERY_FILE_EXT_01);
+                CoreConst.GALLERY_STATUS_TYPE.ENABLE, CoreConst.BATCH_TYPE.APPEND_GALLERY_FILE_EXT_01);
 
         MongoItemReader<Gallery> itemReader = new MongoItemReader<>();
         itemReader.setTemplate(mongoOperations);

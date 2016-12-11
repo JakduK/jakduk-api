@@ -1,6 +1,6 @@
 package com.jakduk.core.model.web.jakdu;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.Temporal;
@@ -18,7 +18,7 @@ public class JakduScheduleGroupWrite {
 
     private int seq;
 
-    private CommonConst.JAKDU_GROUP_STATE state;
+    private CoreConst.JAKDU_GROUP_STATE state;
 
     @Temporal(TemporalType.DATE)
     private Date openDate;
@@ -41,11 +41,11 @@ public class JakduScheduleGroupWrite {
         this.seq = seq;
     }
 
-    public CommonConst.JAKDU_GROUP_STATE getState() {
+    public CoreConst.JAKDU_GROUP_STATE getState() {
         return state;
     }
 
-    public void setState(CommonConst.JAKDU_GROUP_STATE state) {
+    public void setState(CoreConst.JAKDU_GROUP_STATE state) {
         this.state = state;
     }
 

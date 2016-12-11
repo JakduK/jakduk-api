@@ -1,6 +1,6 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.db.FootballClub;
@@ -44,7 +44,7 @@ public class FootballService {
      * @param sortNameType 정렬 기준
      * @return
      */
-    public List<FootballClub> getFootballClubs(String language, CommonConst.CLUB_TYPE clubType, CommonConst.NAME_TYPE sortNameType) {
+    public List<FootballClub> getFootballClubs(String language, CoreConst.CLUB_TYPE clubType, CoreConst.NAME_TYPE sortNameType) {
 
         List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(clubType);
         List<ObjectId> ids = new ArrayList<ObjectId>();
@@ -66,7 +66,7 @@ public class FootballService {
      * @param ids footballClub Id 배열
      * @return 축구단 배열
      */
-    public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CommonConst.NAME_TYPE sortNameType ) {
+    public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CoreConst.NAME_TYPE sortNameType ) {
 
         List<FootballClub> footballClubs = jakdukDAO.getFootballClubs(ids, language, sortNameType);
 

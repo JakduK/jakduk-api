@@ -1,7 +1,7 @@
 package com.jakduk.api;
 
 import com.jakduk.api.util.AbstractSpringTest;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
@@ -9,11 +9,10 @@ import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
-import com.jakduk.core.repository.board.free.BoardFreeRepositoryRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
 public class BoardTest extends AbstractSpringTest {
 	
 	@Autowired
-	private BoardFreeRepositoryRepository boardFreeRepository;
+	private BoardFreeRepository boardFreeRepository;
 	
 	@Autowired
     private BoardDAO boardDAO;
@@ -225,7 +224,7 @@ public class BoardTest extends AbstractSpringTest {
 
 		boardFreeList = boardFreeList.stream()
 				.sorted(byCount.thenComparing(byView))
-				.limit(CommonConst.BOARD_TOP_LIMIT)
+				.limit(CoreConst.BOARD_TOP_LIMIT)
 				.collect(Collectors.toList());
 		
 		System.out.println("getBoardFreeCountOfCommentBest01=" + boardFreeList);
@@ -242,7 +241,7 @@ public class BoardTest extends AbstractSpringTest {
 		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);
 
 		Iterator<Map> boardFree = boardFreeC.aggregate("{$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
-				.and("{$limit:#}", CommonConst.BOARD_TOP_LIMIT)
+				.and("{$limit:#}", CoreConst.BOARD_TOP_LIMIT)
                 .as(Map.class);
 
 		while (boardFree.hasNext()) {

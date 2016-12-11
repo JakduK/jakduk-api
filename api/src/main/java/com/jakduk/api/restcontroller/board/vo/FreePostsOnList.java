@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.board.vo;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardStatus;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -35,7 +35,7 @@ public class FreePostsOnList {
     private int seq;
 
     @ApiModelProperty(value = "말머리")
-    private CommonConst.BOARD_CATEGORY_TYPE category;
+    private CoreConst.BOARD_CATEGORY_TYPE category;
 
     @ApiModelProperty(value = "읽음 수")
     private int views;

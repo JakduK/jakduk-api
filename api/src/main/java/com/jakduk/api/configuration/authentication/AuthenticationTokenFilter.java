@@ -3,8 +3,8 @@ package com.jakduk.api.configuration.authentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
-import com.jakduk.api.restcontroller.exception.RestError;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.api.restcontroller.exception.ApiRestErrorResponse;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +57,7 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
                     UserDetails userDetails;
                     String email;
 
-                    if (CommonConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
+                    if (CoreConst.ACCOUNT_TYPE.JAKDUK.toString().equals(providerId)) {
                         userDetails = jakdukDetailsService.loadUserByUsername(username);
                         email = userDetails.getUsername();
                     } else {
@@ -79,10 +79,10 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
 
         } catch (ServiceException e) {
             httpResponse.setContentType("application/json");
-            httpResponse.setStatus(e.getServiceError().getHttpStatus());
+            httpResponse.setStatus(e.getServiceExceptionCode().getHttpStatus());
             httpResponse.setCharacterEncoding("utf-8");
 
-            RestError error = new RestError(e.getServiceError().getCode(), e.getMessage());
+            ApiRestErrorResponse error = new ApiRestErrorResponse(e.getServiceExceptionCode().getCode(), e.getMessage());
 
             String errorJson = new ObjectMapper().writeValueAsString(error);
 

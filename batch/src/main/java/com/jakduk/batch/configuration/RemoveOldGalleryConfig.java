@@ -1,7 +1,7 @@
 package com.jakduk.batch.configuration;
 
 import com.jakduk.batch.processor.RemoveOldGalleryProcessor;
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -61,7 +61,7 @@ public class RemoveOldGalleryConfig {
     public ItemReader<Gallery> removeOldGalleryReader() {
 
         String query = String.format("{'status.status':'%s'}",
-                CommonConst.GALLERY_STATUS_TYPE.TEMP);
+                CoreConst.GALLERY_STATUS_TYPE.TEMP);
 
         MongoItemReader<Gallery> itemReader = new MongoItemReader<>();
         itemReader.setTemplate(mongoOperations);

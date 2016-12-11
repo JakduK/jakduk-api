@@ -1,6 +1,6 @@
 package com.jakduk.core.model.simple;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.FootballClub;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -25,7 +25,7 @@ public class UserProfile {
 
 	private String username;
 
-	private CommonConst.ACCOUNT_TYPE providerId;	// 제공자
+	private CoreConst.ACCOUNT_TYPE providerId;	// 제공자
 
 	private String providerUserId;					// SNS USER ID
 

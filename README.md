@@ -13,7 +13,7 @@ The word ‘K LEAGUE JAKDU KING’ is formed by combining ‘K LEAGUE’, ‘JAK
 The MIT License (MIT)
 
 ### Slack
-If you join Slack, it's possible to talk.
+If you join Slack, it's possible to talk. Please send email to me(phjang1983@daum.net), then send to an invitation email.
 * https://jakduk.slack.com
 
 ### Finding contributors
@@ -31,26 +31,11 @@ This project is based on IntelliJ IDEA and Eclipse. You can import the project u
 #### Dependency Management
 * Gradle
 
+#### Continuous integration Tool
+* Jenkins
+
 #### Database
 * mongoDB
 
-#### WAS
-* Apache tmocat 8.x
-
-#### Spring Framework 4.x
-* Spring Core
-* Spring Mvc
-* Spring Security
-* Spring Social
-* Spring Data
-
-#### Front end (CSS, Javascript)
-* Bower
-* Bootstrap
-* JQuery
-* AngularJS
-* [Summernote](https://github.com/HackerWins/summernote), [angular-summernote](https://github.com/outsideris/angular-summernote)
-* font-awesome
-* Highcharts
-* Slick
-
+#### Spring Framework
+* Spring Boot

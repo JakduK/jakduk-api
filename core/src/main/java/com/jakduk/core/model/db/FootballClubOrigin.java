@@ -3,7 +3,7 @@ package com.jakduk.core.model.db;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,9 +24,9 @@ public class FootballClubOrigin {
 	
 	private String name;
 
-	private CommonConst.CLUB_TYPE clubType;
+	private CoreConst.CLUB_TYPE clubType;
 
-	private CommonConst.CLUB_AGE age;
+	private CoreConst.CLUB_AGE age;
 
-	private CommonConst.CLUB_SEX sex;
+	private CoreConst.CLUB_SEX sex;
 }

@@ -1,9 +1,9 @@
 package com.jakduk.core.service;
 
-import com.jakduk.core.common.CommonConst;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.UserFeelingException;
 import com.jakduk.core.model.db.Gallery;
@@ -12,7 +12,7 @@ import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
-import com.jakduk.core.repository.GalleryRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -82,7 +82,7 @@ public class GalleryService {
 	}
 
 	public Gallery findOneById(String id) {
-		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY));
 	}
 
     public List<Gallery> findByIds(List<String> ids) {
@@ -100,7 +100,7 @@ public class GalleryService {
 		gallery.setWriter(writer);
 
 		GalleryStatus status = GalleryStatus.builder()
-				.status(CommonConst.GALLERY_STATUS_TYPE.TEMP)
+				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
 				.build();
 
 		gallery.setStatus(status);
@@ -150,8 +150,8 @@ public class GalleryService {
 					Files.write(imageFilePath, bytes);
 				} else {
 
-					double scale = CommonConst.GALLERY_MAXIMUM_CAPACITY < size ?
-							CommonConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
+					double scale = CoreConst.GALLERY_MAXIMUM_CAPACITY < size ?
+							CoreConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
 
                     InputStream originalInputStream = new ByteArrayInputStream(bytes);
 
@@ -172,13 +172,13 @@ public class GalleryService {
 				InputStream thumbInputStream = new ByteArrayInputStream(bytes);
 
 				Thumbnails.of(thumbInputStream)
-						.size(CommonConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CommonConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
+						.size(CoreConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CoreConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
                         .crop(Positions.TOP_CENTER)
 						.toFile(thumbFilePath.toFile());
 			}
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
+			throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR, e);
 		}
 
 		log.debug("gallery=" + gallery);
@@ -188,7 +188,7 @@ public class GalleryService {
 	}
 
 	// 이미지 가져오기.
-	public ByteArrayOutputStream getGalleryOutStream(Gallery gallery, CommonConst.IMAGE_TYPE imageType) {
+	public ByteArrayOutputStream getGalleryOutStream(Gallery gallery, CoreConst.IMAGE_TYPE imageType) {
 
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
@@ -225,10 +225,10 @@ public class GalleryService {
 				return byteStream;
 
 			} catch (IOException e) {
-				throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
+				throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR, e);
 			}
 		} else {
-			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY);
+			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY);
 		}
 	}
 
@@ -237,13 +237,13 @@ public class GalleryService {
 	 */
 	public void removeImage(String userId, String id) {
 		Gallery gallery = galleryRepository.findOneById(id)
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+                .orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY));
 
 		if (ObjectUtils.isEmpty(gallery.getWriter()))
-			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+			throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
 
 		if (! userId.equals(gallery.getWriter().getUserId()))
-            throw new ServiceException(ServiceError.FORBIDDEN);
+            throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
 
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
@@ -265,10 +265,10 @@ public class GalleryService {
 				galleryRepository.delete(gallery);
 
 			} catch (IOException e) {
-				throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
+				throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR);
 			}
 		} else {
-            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
+            throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY_FILE);
         }
 
 		// 엘라스틱 서치 document 삭제.
@@ -313,9 +313,9 @@ public class GalleryService {
 		return data;
 	}
 
-	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CommonConst.FEELING_TYPE feeling) {
+	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CoreConst.FEELING_TYPE feeling) {
 
-		String errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE;
+		String errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
 		String accountId = writer.getUserId();
 		String accountName = writer.getUsername();
@@ -336,29 +336,29 @@ public class GalleryService {
 
 		if (accountId != null && accountName != null) {
 			if (galleryWriter != null && accountId.equals(galleryWriter.getUserId())) {
-				errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
+				errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
 			}
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersLiking.stream();
 				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
 				if (itemCount > 0) {
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+					errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 				}
 			}
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersDisliking.stream();
 				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
 				if (itemCount > 0) {
-					errCode = CommonConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+					errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 				}
 			}
 
-			if (errCode.equals(CommonConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), accountId, accountName);
 
-				if (CommonConst.FEELING_TYPE.LIKE.equals(feeling)) {
+				if (CoreConst.FEELING_TYPE.LIKE.equals(feeling)) {
 					usersLiking.add(feelingUser);
 					gallery.setUsersLiking(usersLiking);
 				} else {
@@ -369,12 +369,12 @@ public class GalleryService {
 				galleryRepository.save(gallery);
 			} else {
 				throw new UserFeelingException(
-					CommonConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
+					CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
 						CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like")
 				);
 			}
 		} else {
-			throw new ServiceException(ServiceError.FORBIDDEN);
+			throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
 		}
 
 		Map<String, Object> data = new HashMap<>();
