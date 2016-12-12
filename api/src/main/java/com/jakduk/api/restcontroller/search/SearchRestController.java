@@ -47,8 +47,6 @@ public class SearchRestController {
 
 		if (size <= 0) size = 10;
 
-		List<String> keywords = Arrays.asList(StringUtils.split(q, " "));
-
-		return searchService.searchUnified(keywords, w, from, size);
+		return searchService.searchUnified(q, w, from, size);
 	}
 }

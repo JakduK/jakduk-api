@@ -1,12 +1,11 @@
 package com.jakduk.core.common.util;
 
-import com.jakduk.core.common.CoreConst;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -51,9 +50,8 @@ public class CoreUtils {
      * HTML TAG를 제거한다.
      */
     public static String stripHtmlTag(String htmlTag) {
-        String content = Optional.ofNullable(htmlTag).orElse("");
-        content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_TAG, "");
-        content = StringUtils.replacePattern(content, CoreConst.REGEX_FIND_HTML_WHITESPACE, "");
+        String content = StringUtils.defaultIfBlank(htmlTag, "");
+        content = Jsoup.parse(content).text();
 
         return content;
     }

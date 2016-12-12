@@ -100,31 +100,31 @@ public class SearchService {
 
 	/**
 	 * 통합 검색
-	 * @param keywords	검색어
+	 * @param query	검색어
 	 * @param from	페이지 시작 위치
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchUnifiedResponse searchUnified(List<String> keywords, String include, Integer from, Integer size) {
+	public SearchUnifiedResponse searchUnified(String query, String include, Integer from, Integer size) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
 		Queue<CoreConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.PO.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(keywords, from, size);
+			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(query, from, size);
 			multiSearchRequestBuilder.add(postSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.PO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.CO.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(keywords, from, size);
+			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size);
 			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.CO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.GA.name())) {
-			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(keywords, from, size < 10 ? 4 : size);
+			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size);
 			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.GA);
 		}
@@ -504,15 +504,14 @@ public class SearchService {
 		}
 	}
 
-	private SearchRequestBuilder getBoardSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.should(QueryBuilders.termsQuery("subject", keywords).boost(1.2f))
-								.should(QueryBuilders.termsQuery("content", keywords).boost(1.0f))
+								.should(QueryBuilders.multiMatchQuery(query, "subject^1.5", "content"))
 				)
 				.addHighlightedField("subject")
 				.addHighlightedField("content")
@@ -564,13 +563,13 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.must(QueryBuilders.termsQuery("content", keywords))
+								.must(QueryBuilders.matchQuery("content", query))
 								.must(
 										QueryBuilders
 												.hasParentQuery(CoreConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
@@ -628,11 +627,11 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getGallerySearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexGallery)
 				.setTypes(CoreConst.ES_TYPE_GALLERY)
-				.setQuery(QueryBuilders.termsQuery("name", keywords))
+				.setQuery(QueryBuilders.matchQuery("name", query))
 				.addHighlightedField("name")
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")

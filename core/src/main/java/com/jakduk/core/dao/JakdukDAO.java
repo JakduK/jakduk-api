@@ -175,20 +175,7 @@ public class JakdukDAO {
 		
 		return users;
 	}
-	
-	public List<BoardFreeOnRSS> getRSS() {
-		AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(CoreConst.BOARD_HISTORY_TYPE.DELETE.name()));
-		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
-		AggregationOperation limit = Aggregation.limit(CoreConst.RSS_SIZE_ITEM);
-		Aggregation aggregation = Aggregation.newAggregation(match, sort, limit);
-		
-		AggregationResults<BoardFreeOnRSS> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnRSS.class);
-		
-		List<BoardFreeOnRSS> posts = results.getMappedResults();
-		
-		return posts;
-	}	
-	
+
 	public List<UserOnHome> getUserOnHome(String language) {
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
 		AggregationOperation limit = Aggregation.limit(CoreConst.HOME_SIZE_LINE_NUMBER);

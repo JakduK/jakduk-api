@@ -3,6 +3,7 @@ package com.jakduk.core.board;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
+import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.user.UserRepository;
@@ -56,5 +57,12 @@ public class BoardFreeRepositoryTest extends AbstractSpringTest {
         BoardFreeOfMinimum boardFreeOnComment = sut.findBoardFreeOfMinimumBySeq(58);
 
         Assert.assertTrue(! ObjectUtils.isEmpty(boardFreeOnComment));
+    }
+
+    @Test
+    public void findPostsWithRss() {
+        List<BoardFreeOnRSS> posts = sut.findPostsWithRss();
+
+        Assert.assertTrue(posts.size() > 0);
     }
 }

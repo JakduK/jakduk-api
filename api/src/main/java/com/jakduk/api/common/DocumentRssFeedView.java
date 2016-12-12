@@ -3,6 +3,7 @@ package com.jakduk.api.common;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Content;
 import com.rometools.rome.feed.rss.Description;
@@ -33,7 +34,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	private MessageSource messageSource;
 
 	@Autowired
-	private JakdukDAO jakdukDAO;
+	private BoardFreeRepository boardFreeRepository;
 
 	private final String link = "https://jakduk.com";
 
@@ -67,32 +68,14 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	@Override protected List<Item> buildFeedItems(Map<String, Object> model, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
-		// updateDate 되는 줄 알고 스트림 API 써가며 만들어 놨더니, XML로 안나오네.
-		/*
-		List<BoardHistory> history = post.getHistory();
-
-		if (history != null) {
-			Stream<BoardHistory> sHistory = history.stream();
-
-			List<BoardHistory> uHistory = sHistory
-					.filter(item -> item.getProviderId().equals(CoreConst.BOARD_HISTORY_TYPE_EDIT) || item.getProviderId().equals(CoreConst.BOARD_HISTORY_TYPE_EDIT))
-					.sorted((h1, h2) -> h1.getId().compareTo(h2.getId()))
-					.limit(1)
-					.collect(Collectors.toList());
-
-			if (!uHistory.isEmpty()) {
-				logger.debug("phjang =" + uHistory);
-				entry.setUpdatedDate(new ObjectId(uHistory.get(0).getId()).getDate());
-			}
-		}
-		*/
-
-		List<BoardFreeOnRSS> posts = jakdukDAO.getRSS();
+		List<BoardFreeOnRSS> posts = boardFreeRepository.findPostsWithRss();
 
 		List<Item> items = posts.stream()
 				.map(post -> {
 					Item item = new Item();
+					item.setAuthor(post.getWriter().getUsername());
 					item.setTitle(post.getSubject());
+					item.setUri(link + "/board/free/" + post.getSeq());
 					item.setLink(link + "/board/free/" + post.getSeq());
 					item.setDescription(createDescription(CoreUtils.stripHtmlTag(post.getContent())));
 					item.setPubDate(new ObjectId(post.getId()).getDate());
