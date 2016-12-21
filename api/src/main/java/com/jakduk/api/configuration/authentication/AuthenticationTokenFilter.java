@@ -66,10 +66,11 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
                     }
 
                     if (jwtTokenUtils.isValidateToken(authToken, email)) {
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
 
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 }

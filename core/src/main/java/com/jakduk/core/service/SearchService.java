@@ -21,6 +21,7 @@ import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
@@ -684,7 +685,10 @@ public class SearchService {
 				.put("index.analysis.analyzer.korean.type", "custom")
 				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
 				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
-				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false);
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false)
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.decompound", true)
+				.putArray("index.analysis.tokenizer.seunjeon_default_tokenizer.index_poses",
+						"N", "SL", "SH", "SN", "XR", "V", "UNK", "I", "M");
 	}
 
 	private String getBoardFreeMappings() throws JsonProcessingException {
