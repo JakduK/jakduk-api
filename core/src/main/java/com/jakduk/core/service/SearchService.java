@@ -681,6 +681,27 @@ public class SearchService {
 		//settingsBuilder.put("number_of_shards", 5);
 		//settingsBuilder.put("number_of_replicas", 1);
 
+		String[] userWords = new String[]{
+				"k리그",
+				"내셔널리그",
+				"k3리그",
+				"k3",
+				"성남fc",
+				"수원fc",
+				"인천utd",
+				"인천유나이티드",
+				"강원fc",
+				"fc서울",
+				"fc안양",
+				"부천fc",
+				"대구fc",
+				"광주fc",
+				"경남fc",
+				"제주utd",
+				"제주유나이티드",
+				"서울e"
+		};
+
 		return Settings.builder()
 				.put("index.analysis.analyzer.korean.type", "custom")
 				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
@@ -689,6 +710,8 @@ public class SearchService {
 				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.decompound", true)
 				.putArray("index.analysis.tokenizer.seunjeon_default_tokenizer.index_poses",
 						"N", "SL", "SH", "SN", "XR", "V", "UNK", "I", "M");
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false)
+				.putArray("index.analysis.tokenizer.seunjeon_default_tokenizer.user_words", userWords);
 	}
 
 	private String getBoardFreeMappings() throws JsonProcessingException {
