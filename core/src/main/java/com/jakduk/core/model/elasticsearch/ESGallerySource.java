@@ -1,5 +1,6 @@
 package com.jakduk.core.model.elasticsearch;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class ESGallerySource {
 
     private String id;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String name;
 
     private CommonWriter writer;
