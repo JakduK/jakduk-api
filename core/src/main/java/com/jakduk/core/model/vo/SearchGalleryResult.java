@@ -1,6 +1,5 @@
 package com.jakduk.core.model.vo;
 
-import com.jakduk.core.model.elasticsearch.ESBoardCommentSource;
 import com.jakduk.core.model.elasticsearch.ESGallerySource;
 import lombok.Builder;
 import lombok.Getter;

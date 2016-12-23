@@ -18,6 +18,6 @@ public class SearchServiceTest extends AbstractSpringTest {
 
 	@Test
 	public void searchUnified() {
-		sut.searchUnified(Arrays.asList("string"), "PO;CO;GA", 0, 10);
+		sut.searchUnified("string", "PO;CO;GA", 0, 10);
 	}
 }

@@ -42,7 +42,6 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.support.QueryInnerHitBuilder;
-import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.highlight.HighlightField;
@@ -100,31 +99,31 @@ public class SearchService {
 
 	/**
 	 * 통합 검색
-	 * @param keywords	검색어
+	 * @param query	검색어
 	 * @param from	페이지 시작 위치
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchUnifiedResponse searchUnified(List<String> keywords, String include, Integer from, Integer size) {
+	public SearchUnifiedResponse searchUnified(String query, String include, Integer from, Integer size) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
 		Queue<CoreConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.PO.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(keywords, from, size);
+			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(query, from, size);
 			multiSearchRequestBuilder.add(postSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.PO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.CO.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(keywords, from, size);
+			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size);
 			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.CO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.GA.name())) {
-			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(keywords, from, size < 10 ? 4 : size);
+			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size);
 			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.GA);
 		}
@@ -134,6 +133,9 @@ public class SearchService {
 		for (MultiSearchResponse.Item item : multiSearchResponse.getResponses()) {
 			SearchResponse searchResponse = item.getResponse();
 			CoreConst.SEARCH_TYPE order = searchOrder.poll();
+
+			if (item.isFailure())
+				continue;
 
 			if (! ObjectUtils.isEmpty(order)) {
 				switch (order) {
@@ -504,25 +506,21 @@ public class SearchService {
 		}
 	}
 
-	private SearchRequestBuilder getBoardSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
-				.setFetchSource(null, new String[]{"content"})
+				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.should(QueryBuilders.termsQuery("subject", keywords).boost(1.2f))
-								.should(QueryBuilders.termsQuery("content", keywords).boost(1.0f))
+								.should(QueryBuilders.multiMatchQuery(query, "subject^1.5", "content"))
 				)
-				.addHighlightedField("subject")
-				.addHighlightedField("content")
+				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
-				.addScriptField("content_preview", new Script(
-						String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
-								CoreConst.SEARCH_CONTENT_MAX_LENGTH,
-								CoreConst.SEARCH_CONTENT_MAX_LENGTH))
-				)
+				.addHighlightedField("subject", CoreConst.SEARCH_FRAGMENT_SIZE, 0)
+				.addHighlightedField("content", CoreConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
@@ -539,7 +537,6 @@ public class SearchService {
 					Map<String, Object> sourceMap = searchHit.getSource();
 					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
 					esBoardSource.setScore(searchHit.getScore());
-					esBoardSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
 
 					Map<String, List<String>> highlight = new HashMap<>();
 
@@ -564,22 +561,25 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
+				.setFetchSource(null, new String[]{"content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.must(QueryBuilders.termsQuery("content", keywords))
+								.must(QueryBuilders.matchQuery("content", query))
 								.must(
 										QueryBuilders
 												.hasParentQuery(CoreConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
 												.innerHit(new QueryInnerHitBuilder())
 								)
 				)
-				.addHighlightedField("content")
+				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
+				.addHighlightedField("content", CoreConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
@@ -591,18 +591,18 @@ public class SearchService {
 	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESBoardCommentSource> searchList = Arrays.stream(searchHits.getHits())
+		List<ESCommentSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESBoardCommentSource esBoardCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardCommentSource.class);
-					esBoardCommentSource.setScore(searchHit.getScore());
+					ESCommentSource esCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESCommentSource.class);
+					esCommentSource.setScore(searchHit.getScore());
 
 					if (! searchHit.getInnerHits().isEmpty()) {
 						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(CoreConst.ES_TYPE_BOARD).getHits();
 						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
 						ESParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, ESParentBoard.class);
 
-						esBoardCommentSource.setParentBoard(esParentBoard);
+						esCommentSource.setParentBoard(esParentBoard);
 					}
 
 					Map<String, List<String>> highlight = new HashMap<>();
@@ -615,9 +615,9 @@ public class SearchService {
 						highlight.put(highlightField.getKey(), fragments);
 					}
 
-					esBoardCommentSource.setHighlight(highlight);
+					esCommentSource.setHighlight(highlight);
 
-					return esBoardCommentSource;
+					return esCommentSource;
 				})
 				.collect(Collectors.toList());
 
@@ -628,14 +628,17 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getGallerySearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexGallery)
 				.setTypes(CoreConst.ES_TYPE_GALLERY)
-				.setQuery(QueryBuilders.termsQuery("name", keywords))
-				.addHighlightedField("name")
+				.setFetchSource(null, new String[]{"name"})
+				.setQuery(QueryBuilders.matchQuery("name", query))
+				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
+				.addHighlightedField("name", CoreConst.SEARCH_FRAGMENT_SIZE, 0)
 				.setFrom(from)
 				.setSize(size);
 
@@ -681,11 +684,36 @@ public class SearchService {
 		//settingsBuilder.put("number_of_shards", 5);
 		//settingsBuilder.put("number_of_replicas", 1);
 
+		String[] userWords = new String[]{
+				"k리그",
+				"내셔널리그",
+				"k3리그",
+				"k3",
+				"성남fc",
+				"수원fc",
+				"인천utd",
+				"인천유나이티드",
+				"강원fc",
+				"fc서울",
+				"fc안양",
+				"부천fc",
+				"대구fc",
+				"광주fc",
+				"경남fc",
+				"제주utd",
+				"제주유나이티드",
+				"서울e"
+		};
+
 		return Settings.builder()
 				.put("index.analysis.analyzer.korean.type", "custom")
 				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+                .putArray("index.analysis.tokenizer.seunjeon_default_tokenizer.user_words", userWords)
 				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
-				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false);
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false)
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.decompound", true)
+				.putArray("index.analysis.tokenizer.seunjeon_default_tokenizer.index_poses",
+						"N", "SL", "SH", "SN", "XR", "V", "UNK", "I", "M");
 	}
 
 	private String getBoardFreeMappings() throws JsonProcessingException {

@@ -126,7 +126,6 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode, fields);
 
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
-
     }
 
     @ExceptionHandler(UserFeelingException.class)
