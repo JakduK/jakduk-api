@@ -7,6 +7,7 @@ import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.model.db.User;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.AuthUserProfile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -234,6 +236,19 @@ public class UserUtils {
         }
 
         return commonPrincipal;
+    }
+
+    /**
+     * CommonWriter를 가져온다.
+     */
+    public static CommonWriter getCommonWriter() {
+        CommonPrincipal commonPrincipal = getCommonPrincipal();
+
+        if (! ObjectUtils.isEmpty(commonPrincipal)) {
+            return new CommonWriter(commonPrincipal.getId(), commonPrincipal.getUsername(), commonPrincipal.getProviderId());
+        } else {
+            return null;
+        }
     }
 
     /**

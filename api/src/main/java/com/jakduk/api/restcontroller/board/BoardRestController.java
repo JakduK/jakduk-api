@@ -10,7 +10,7 @@ import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.exception.ServiceExceptionCode;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
@@ -251,12 +251,12 @@ public class BoardRestController {
                                                Device device) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
 
         if (!boardCategory.isPresent())
-            throw new ServiceException(ServiceExceptionCode.CATEGORY_NOT_FOUND);
+            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
 
         List<GalleryOnBoard> galleries = new ArrayList<>();
 
@@ -284,12 +284,12 @@ public class BoardRestController {
                                                 Device device) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
 
         if (!boardCategory.isPresent())
-            throw new ServiceException(ServiceExceptionCode.CATEGORY_NOT_FOUND);
+            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
 
         List<GalleryOnBoard> galleries = new ArrayList<>();
 
@@ -315,7 +315,7 @@ public class BoardRestController {
     public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -351,7 +351,7 @@ public class BoardRestController {
                                            Device device) {
 
           if (! UserUtils.isUser())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -365,7 +365,7 @@ public class BoardRestController {
                                               @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -388,7 +388,7 @@ public class BoardRestController {
                                                      @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -410,7 +410,7 @@ public class BoardRestController {
     public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
 
         if (! UserUtils.isAdmin())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
@@ -425,7 +425,7 @@ public class BoardRestController {
     public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
 
         if (! UserUtils.isAdmin())
-            throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());

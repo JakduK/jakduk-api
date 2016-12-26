@@ -37,6 +37,12 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RestAccessDeniedHandler restAccessDeniedHandler;
+
+    @Autowired
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resources/**");
@@ -53,8 +59,8 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
-                .authenticationEntryPoint(restAuthenticationEntryPoint())
-                .accessDeniedHandler(restAccessDeniedHandler())
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .accessDeniedHandler(restAccessDeniedHandler)
 
                 //Configures url based authorization
                 .and()
@@ -116,15 +122,4 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationTokenFilter authenticationTokenFilter() throws Exception {
         return new AuthenticationTokenFilter();
     }
-
-    @Bean
-    public RestAccessDeniedHandler restAccessDeniedHandler() {
-        return new RestAccessDeniedHandler();
-    }
-
-    @Bean
-    public RestAuthenticationEntryPoint restAuthenticationEntryPoint() {
-        return new RestAuthenticationEntryPoint();
-    }
-
 }

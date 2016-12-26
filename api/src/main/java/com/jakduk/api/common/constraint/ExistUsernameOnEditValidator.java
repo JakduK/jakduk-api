@@ -2,7 +2,7 @@ package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.core.exception.ServiceExceptionCode;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.UserService;
@@ -35,7 +35,7 @@ public class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUs
         CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 
         if (ObjectUtils.isEmpty(commonPrincipal))
-            throw new ServiceException(ServiceExceptionCode.NEED_TO_LOGIN);
+            throw new ServiceException(ServiceError.NEED_TO_LOGIN);
 
         UserProfile userProfile = userService.findByNEIdAndUsername(commonPrincipal.getId().trim(), value.trim());
 

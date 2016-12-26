@@ -2,19 +2,17 @@ package com.jakduk.core.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.ObjectMapperUtils;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.vo.SearchBoardResult;
-import com.jakduk.core.model.vo.SearchCommentResult;
-import com.jakduk.core.model.vo.SearchGalleryResult;
-import com.jakduk.core.model.vo.SearchUnifiedResponse;
+import com.jakduk.core.model.vo.*;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -44,6 +42,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.support.QueryInnerHitBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +52,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -72,6 +75,9 @@ public class SearchService {
 
 	@Value("${core.elasticsearch.index.gallery}")
 	private String elasticsearchIndexGallery;
+
+	@Value("${core.elasticsearch.index.search.word}")
+	private String elasticsearchIndexSearchWord;
 
 	@Value("${core.elasticsearch.bulk.actions}")
 	private Integer bulkActions;
@@ -182,7 +188,7 @@ public class SearchService {
 					.get();
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
@@ -226,7 +232,7 @@ public class SearchService {
 					.get();
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
@@ -254,7 +260,7 @@ public class SearchService {
 					.get();
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
@@ -274,64 +280,132 @@ public class SearchService {
 			log.info("gallery id " + id + " is not found. so can't delete it!");
 	}
 
-	public void createIndexBoard() {
+	@Async
+	public void indexDocumentSearchWord(String word, CommonWriter writer) {
+
+		if (! elasticsearchEnable)
+			return;
+
+		ESSearchWord esSearchWord = ESSearchWord.builder()
+				.word(word)
+				.writer(writer)
+				.registerDate(LocalDateTime.now())
+				.build();
 
 		try {
-			CreateIndexResponse	response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
+			IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
+
+			IndexResponse response = indexRequestBuilder
+					.setIndex(elasticsearchIndexSearchWord)
+					.setType(CoreConst.ES_TYPE_SEARCH_WORD)
+					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
+					.get();
+
+			log.debug("indexDocumentSearchWord Source:\n" + indexRequestBuilder.request().getDescription());
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+		}
+	}
+
+	public PopularSearchWordResult aggregateSearchWord(Long registerDateFrom, Integer size) {
+
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
+				.setIndices(elasticsearchIndexSearchWord)
+				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
+				.setSize(size)
+				.setQuery(
+						QueryBuilders.rangeQuery("registerDate").gte(registerDateFrom)
+				)
+				.addAggregation(
+						AggregationBuilders
+								.terms("popular_word_aggs")
+								.field("word")
+				);
+
+		log.debug("aggregateSearchWord Query:\n" + searchRequestBuilder.internalBuilder());
+
+		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
+
+		List<ESTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
+				.map(entry -> ESTermsBucket.builder()
+						.key(entry.getKey().toString())
+						.count(entry.getDocCount())
+						.build())
+				.collect(Collectors.toList());
+
+		return PopularSearchWordResult.builder()
+				.took(searchResponse.getTookInMillis())
+				.popularSearchWords(popularWords)
+				.build();
+	}
+
+	public void createIndexBoard() {
+
+		String index = elasticsearchIndexBoard;
+
+		try {
+			CreateIndexResponse	response = client.admin().indices().prepareCreate(index)
                     .setSettings(getIndexSettings())
                     .addMapping(CoreConst.ES_TYPE_BOARD, getBoardFreeMappings())
 					.addMapping(CoreConst.ES_TYPE_COMMENT, getBoardFreeCommentMappings())
                     .get();
 
 			if (response.isAcknowledged()) {
-				log.debug("Index " + elasticsearchIndexBoard + " created");
+				log.debug("Index " + index + " created");
 			} else {
-				throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created");
+				throw new RuntimeException("Index " + index + " not created");
 			}
 
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created", e.getCause());
+			throw new RuntimeException("Index " + index + " not created", e.getCause());
 		}
-
 	}
 
 	public void createIndexGallery() {
 
+		String index = elasticsearchIndexGallery;
+
 		try {
-			CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
+			CreateIndexResponse response = client.admin().indices().prepareCreate(index)
                     .setSettings(getIndexSettings())
                     .addMapping(CoreConst.ES_TYPE_GALLERY, getGalleryMappings())
                     .get();
 
 			if (response.isAcknowledged()) {
-				log.debug("Index " + elasticsearchIndexGallery + " created");
+				log.debug("Index " + index + " created");
 			} else {
-				throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created");
+				throw new RuntimeException("Index " + index + " not created");
 			}
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created", e.getCause());
+			throw new RuntimeException("Index " + index + " not created", e.getCause());
+		}
+	}
+
+	public void createIndexSearchWord() {
+
+		String index = elasticsearchIndexSearchWord;
+
+		try {
+			CreateIndexResponse response = client.admin().indices().prepareCreate(index)
+					.setSettings(getIndexSettings())
+					.addMapping(CoreConst.ES_TYPE_SEARCH_WORD, getSearchWordMappings())
+					.get();
+
+			if (response.isAcknowledged()) {
+				log.debug("Index " + index + " created");
+			} else {
+				throw new RuntimeException("Index " + index + " not created");
+			}
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Index " + index + " not created", e.getCause());
 		}
 	}
 
 	public void processBulkInsertBoard() throws InterruptedException {
-		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
-			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
-			}
 
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-			}
-
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
-				log.error(throwable.getLocalizedMessage());
-			}
-		};
-
-		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
-				.setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
-				.setConcurrentRequests(bulkConcurrentRequests)
-				.build();
+		BulkProcessor bulkProcessor = getBulkProcessor();
 
 		Boolean hasPost = true;
 		ObjectId lastPostId = null;
@@ -354,7 +428,6 @@ public class SearchService {
 				);
 
 				try {
-
 					index.setSource(ObjectMapperUtils.writeValueAsString(post));
 					bulkProcessor.add(index.request());
 
@@ -370,24 +443,8 @@ public class SearchService {
 	}
 
 	public void processBulkInsertComment() throws InterruptedException {
-		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
-			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
-			}
 
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-			}
-
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
-				log.error(throwable.getLocalizedMessage());
-			}
-		};
-
-		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
-				.setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
-				.setConcurrentRequests(bulkConcurrentRequests)
-				.build();
+		BulkProcessor bulkProcessor = getBulkProcessor();
 
 		Boolean hasComment = true;
 		ObjectId lastCommentId = null;
@@ -425,24 +482,8 @@ public class SearchService {
 	}
 
 	public void processBulkInsertGallery() throws InterruptedException {
-		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
-			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
-			}
 
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-			}
-
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
-				log.error(throwable.getLocalizedMessage());
-			}
-		};
-
-		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
-				.setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
-				.setConcurrentRequests(bulkConcurrentRequests)
-				.build();
+		BulkProcessor bulkProcessor = getBulkProcessor();
 
 		Boolean hasGallery = true;
 		ObjectId lastGalleryId = null;
@@ -465,7 +506,6 @@ public class SearchService {
 				);
 
 				try {
-
 					index.setSource(ObjectMapperUtils.writeValueAsString(comment));
 					bulkProcessor.add(index.request());
 
@@ -482,27 +522,46 @@ public class SearchService {
 
 	public void deleteIndexBoard() {
 
+		String index = elasticsearchIndexBoard;
+
 		DeleteIndexResponse response = client.admin().indices()
-				.delete(new DeleteIndexRequest(elasticsearchIndexBoard))
+				.delete(new DeleteIndexRequest(index))
 				.actionGet();
 
 		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexBoard + " deleted");
+			log.debug("Index " + index + " deleted");
 		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not deleted");
+			throw new RuntimeException("Index " + index + " not deleted");
 		}
 	}
 
 	public void deleteIndexGallery() {
 
+		String index = elasticsearchIndexGallery;
+
 		DeleteIndexResponse response = client.admin().indices()
-				.delete(new DeleteIndexRequest(elasticsearchIndexGallery))
+				.delete(new DeleteIndexRequest(index))
 				.actionGet();
 
 		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexGallery + " deleted");
+			log.debug("Index " + index + " deleted");
 		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not deleted");
+			throw new RuntimeException("Index " + index + " not deleted");
+		}
+	}
+
+	public void deleteIndexSearchWord() {
+
+		String index = elasticsearchIndexSearchWord;
+
+		DeleteIndexResponse response = client.admin().indices()
+				.delete(new DeleteIndexRequest(index))
+				.actionGet();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + index + " deleted");
+		} else {
+			throw new RuntimeException("Index " + index + " not deleted");
 		}
 	}
 
@@ -678,6 +737,31 @@ public class SearchService {
 				.galleries(searchList)
 				.build();
 	}
+
+	private BulkProcessor getBulkProcessor() {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
+			}
+
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+				log.debug("bulk took:" + bulkResponse.getTookInMillis());
+				if (bulkResponse.hasFailures())
+					log.error(bulkResponse.buildFailureMessage());
+			}
+
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
+
+		return BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
+	}
+
 
 	private Settings.Builder getIndexSettings() {
 
@@ -876,6 +960,38 @@ public class SearchService {
 		propertiesNode.set("writer", writerNode);
 
 		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
+		return objectMapper.writeValueAsString(mappings);
+	}
+
+	private String getSearchWordMappings() throws JsonProcessingException {
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+
+		ObjectNode propertiesNode = jsonNodeFactory.objectNode();
+		propertiesNode.set("id",
+				jsonNodeFactory.objectNode()
+						.put("type", "string"));
+		propertiesNode.set("word",
+				jsonNodeFactory.objectNode()
+						.put("type", "string")
+						.put("index", "not_analyzed")
+		);
+
+		ObjectNode writerNode = jsonNodeFactory.objectNode();
+		writerNode.set("providerId", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+		writerNode.set("userId", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+		writerNode.set("username", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+		propertiesNode.set("writer", jsonNodeFactory.objectNode().set("properties", writerNode));
+
+		propertiesNode.set("registerDate",
+				jsonNodeFactory.objectNode()
+						.put("type", "date")
+		);
+
+		ObjectNode mappings = jsonNodeFactory.objectNode();
 		mappings.set("properties", propertiesNode);
 
 		return objectMapper.writeValueAsString(mappings);

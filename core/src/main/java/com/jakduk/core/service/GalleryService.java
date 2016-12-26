@@ -1,11 +1,9 @@
 package com.jakduk.core.service;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.UserFeelingException;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -82,7 +80,7 @@ public class GalleryService {
 	}
 
 	public Gallery findOneById(String id) {
-		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY));
+		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 	}
 
     public List<Gallery> findByIds(List<String> ids) {
@@ -178,7 +176,7 @@ public class GalleryService {
 			}
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR, e);
+			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 		}
 
 		log.debug("gallery=" + gallery);
@@ -225,10 +223,10 @@ public class GalleryService {
 				return byteStream;
 
 			} catch (IOException e) {
-				throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR, e);
+				throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 			}
 		} else {
-			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY);
+			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY);
 		}
 	}
 
@@ -237,13 +235,13 @@ public class GalleryService {
 	 */
 	public void removeImage(String userId, String id) {
 		Gallery gallery = galleryRepository.findOneById(id)
-                .orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY));
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 
 		if (ObjectUtils.isEmpty(gallery.getWriter()))
-			throw new ServiceException(ServiceExceptionCode.UNAUTHORIZED_ACCESS);
+			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
 		if (! userId.equals(gallery.getWriter().getUserId()))
-            throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
+            throw new ServiceException(ServiceError.FORBIDDEN);
 
 		ObjectId objId = new ObjectId(gallery.getId());
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
@@ -265,10 +263,10 @@ public class GalleryService {
 				galleryRepository.delete(gallery);
 
 			} catch (IOException e) {
-				throw new ServiceException(ServiceExceptionCode.GALLERY_IO_ERROR);
+				throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
 			}
 		} else {
-            throw new ServiceException(ServiceExceptionCode.NOT_FOUND_GALLERY_FILE);
+            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
         }
 
 		// 엘라스틱 서치 document 삭제.
@@ -368,13 +366,10 @@ public class GalleryService {
 
 				galleryRepository.save(gallery);
 			} else {
-				throw new UserFeelingException(
-					CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString(),
-						CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like")
-				);
+				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
 			}
 		} else {
-			throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
+			throw new ServiceException(ServiceError.FORBIDDEN);
 		}
 
 		Map<String, Object> data = new HashMap<>();
