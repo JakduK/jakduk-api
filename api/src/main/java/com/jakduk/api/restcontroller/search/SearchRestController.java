@@ -1,6 +1,7 @@
 package com.jakduk.api.restcontroller.search;
 
 import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.core.model.vo.PopularSearchWordResult;
 import com.jakduk.core.model.vo.SearchUnifiedResponse;
 import com.jakduk.core.service.SearchService;
 import io.swagger.annotations.Api;
@@ -45,8 +46,17 @@ public class SearchRestController {
 
 		if (size <= 0) size = 10;
 
+		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size);
+
 		searchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
 
-		return searchService.searchUnified(q, w, from, size);
+		return searchUnifiedResponse;
+	}
+
+	@ApiOperation(value = "인기 검색어")
+	@RequestMapping(value = "/popular/search/words", method = RequestMethod.GET)
+	public PopularSearchWordResult searchPopularSearchWords() {
+
+		return searchService.aggregateSearchWord();
 	}
 }

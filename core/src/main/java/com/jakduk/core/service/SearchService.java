@@ -7,15 +7,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.ObjectMapperUtils;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.vo.SearchBoardResult;
-import com.jakduk.core.model.vo.SearchCommentResult;
-import com.jakduk.core.model.vo.SearchGalleryResult;
-import com.jakduk.core.model.vo.SearchUnifiedResponse;
+import com.jakduk.core.model.vo.*;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -45,6 +42,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.support.QueryInnerHitBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +52,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -305,6 +306,39 @@ public class SearchService {
 		} catch (IOException e) {
 			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
+	}
+
+	public PopularSearchWordResult aggregateSearchWord() {
+
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
+				.setIndices(elasticsearchIndexSearchWord)
+				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
+				.setSize(5)
+				.setQuery(
+						QueryBuilders.rangeQuery("registerDate").gte(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli())
+				)
+				.addAggregation(
+						AggregationBuilders
+								.terms("popular_word_aggs")
+								.field("word")
+				);
+
+		log.debug("aggregateSearchWord Query:\n" + searchRequestBuilder.internalBuilder());
+
+		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
+
+		List<ESTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
+				.map(entry -> ESTermsBucket.builder()
+						.key(entry.getKey().toString())
+						.count(entry.getDocCount())
+						.build())
+				.collect(Collectors.toList());
+
+		return PopularSearchWordResult.builder()
+				.took(searchResponse.getTookInMillis())
+				.popularSearchWords(popularWords)
+				.build();
 	}
 
 	public void createIndexBoard() {
