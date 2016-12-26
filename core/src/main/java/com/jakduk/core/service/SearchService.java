@@ -308,14 +308,14 @@ public class SearchService {
 		}
 	}
 
-	public PopularSearchWordResult aggregateSearchWord() {
+	public PopularSearchWordResult aggregateSearchWord(Long registerDateFrom, Integer size) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexSearchWord)
 				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
-				.setSize(5)
+				.setSize(size)
 				.setQuery(
-						QueryBuilders.rangeQuery("registerDate").gte(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli())
+						QueryBuilders.rangeQuery("registerDate").gte(registerDateFrom)
 				)
 				.addAggregation(
 						AggregationBuilders

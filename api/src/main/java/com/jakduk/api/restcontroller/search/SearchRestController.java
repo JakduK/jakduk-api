@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
 * @company  : http://jakduk.com
@@ -55,8 +58,12 @@ public class SearchRestController {
 
 	@ApiOperation(value = "인기 검색어")
 	@RequestMapping(value = "/popular/search/words", method = RequestMethod.GET)
-	public PopularSearchWordResult searchPopularSearchWords() {
+	public PopularSearchWordResult searchPopularSearchWords(
+			@ApiParam(value = "크기") @RequestParam(required = false, defaultValue = "5") Integer size) {
 
-		return searchService.aggregateSearchWord();
+		// 한달전
+		Long registerDateFrom = LocalDate.now().minusMonths(1L).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		return searchService.aggregateSearchWord(registerDateFrom, size);
 	}
 }
