@@ -3,9 +3,8 @@ package com.jakduk.core.service;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
-import com.jakduk.core.exception.ServiceExceptionCode;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.UserFeelingException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
@@ -208,10 +207,10 @@ public class BoardFreeService {
 								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
 		if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
-			throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
+			throw new ServiceException(ServiceError.FORBIDDEN);
 
 		boardFree.setSubject(subject);
 		boardFree.setContent(content);
@@ -311,10 +310,10 @@ public class BoardFreeService {
     public CoreConst.BOARD_DELETE_TYPE deleteFreePost(CommonWriter writer, Integer seq) {
 
         BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
         if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
-            throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
+            throw new ServiceException(ServiceError.FORBIDDEN);
 
         BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
@@ -412,7 +411,7 @@ public class BoardFreeService {
 	public BoardFreeDetail getPost(Integer seq, String language, Boolean isViewsIncreasing) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
 		List<BoardImage> images = boardFree.getGalleries();
 		List<Gallery> galleries = null;
@@ -448,7 +447,7 @@ public class BoardFreeService {
 
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_POST);
+			throw new ServiceException(ServiceError.NOT_FOUND_POST);
 
 		BoardFree getBoardFree = boardFree.get();
 		CommonWriter postWriter = getBoardFree.getWriter();
@@ -460,25 +459,19 @@ public class BoardFreeService {
 		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
 
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
-		if (userId.equals(postWriter.getUserId())) {
-			throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-					, CoreUtils.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
-		}
+		if (userId.equals(postWriter.getUserId()))
+			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
-			}
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
+				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
 		}
 
 		// 해당 회원이 싫어요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersDisliking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
-			}
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
+				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
 		}
 
 		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
@@ -503,7 +496,7 @@ public class BoardFreeService {
 	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String contents, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceExceptionCode.NOT_FOUND_POST));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
 				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
@@ -558,25 +551,19 @@ public class BoardFreeService {
 		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
 
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
-		if (userId.equals(postWriter.getUserId())) {
-			throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-					, CoreUtils.getResourceBundleMessage("messages.exception", "exception.you.are.writer"));
-		}
+		if (userId.equals(postWriter.getUserId()))
+			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersLiking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
-			}
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
+				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
 		}
 
 		// 해당 회원이 싫어요를 이미 했는지 검사
 		for (CommonFeelingUser feelingUser : usersDisliking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-				throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-						, CoreUtils.getResourceBundleMessage("messages.exception", "exception.select.already.like"));
-			}
+			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
+				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
 		}
 
 		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
@@ -607,7 +594,7 @@ public class BoardFreeService {
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 
 		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceExceptionCode.NOT_FOUND_POST);
+			throw new ServiceException(ServiceError.NOT_FOUND_POST);
 
 		BoardFree getBoardFree = boardFree.get();
 		BoardStatus status = getBoardFree.getStatus();
@@ -619,10 +606,10 @@ public class BoardFreeService {
 
 		if (Objects.nonNull(isNotice)) {
 			if (isEnable && isNotice)
-				throw new ServiceException(ServiceExceptionCode.ALREADY_ENABLE);
+				throw new ServiceException(ServiceError.ALREADY_ENABLE);
 
 			if (! isEnable && ! isNotice)
-				throw new ServiceException(ServiceExceptionCode.ALREADY_DISABLE);
+				throw new ServiceException(ServiceError.ALREADY_DISABLE);
 		}
 
 		if (isEnable) {

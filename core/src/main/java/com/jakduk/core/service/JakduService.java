@@ -4,7 +4,8 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.RepositoryExistException;
-import com.jakduk.core.exception.UserFeelingException;
+import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.model.db.Jakdu;
 import com.jakduk.core.model.db.JakduComment;
 import com.jakduk.core.model.db.JakduSchedule;
@@ -176,25 +177,19 @@ public class JakduService {
         if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
 
         // 이 게시물의 작성자라서 감정 표현을 할 수 없음
-        if (userId.equals(jakdukWriter.getUserId())) {
-            throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.WRITER.toString()
-                    , CoreUtils.getExceptionMessage("exception.you.are.writer"));
-        }
+        if (userId.equals(jakdukWriter.getUserId()))
+            throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
         // 해당 회원이 좋아요를 이미 했는지 검사
         for (CommonFeelingUser feelingUser : usersLiking) {
-            if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-                throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-                        , CoreUtils.getExceptionMessage("exception.select.already.like"));
-            }
+            if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
+                throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
         }
 
         // 해당 회원이 싫어요를 이미 했는지 검사
         for (CommonFeelingUser feelingUser : usersDisliking) {
-            if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId())) {
-                throw new UserFeelingException(CoreConst.USER_FEELING_ERROR_CODE.ALREADY.toString()
-                        , CoreUtils.getExceptionMessage("exception.select.already.like"));
-            }
+            if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
+                throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
         }
 
         CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);

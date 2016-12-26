@@ -1,26 +1,28 @@
 package com.jakduk.api.restcontroller.exception;
 
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.ServiceExceptionCode;
-import com.jakduk.core.exception.UserFeelingException;
+import com.jakduk.core.exception.ServiceError;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
+import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
@@ -37,6 +39,8 @@ import java.util.Set;
 @ControllerAdvice(value = "com.jakduk.api.restcontroller")
 public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
+
     /**
      * Hibernate validator Exception
      */
@@ -48,7 +52,7 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         List<FieldError> fieldErrors = result.getFieldErrors();
         List<ObjectError> globalErrors = result.getGlobalErrors();
-        ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
         Map<String, String> fields = new HashMap<>();
 
@@ -60,9 +64,9 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
                 error -> fields.put(error.getField() + "_" + error.getCode(), error.getDefaultMessage())
         );
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode, fields);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, fields);
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -71,39 +75,11 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
-    }
-
-    /**
-     * 쿼리 스트링 검증 실패
-     */
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(
-            MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-        ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
-
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode.getCode(), ex.getLocalizedMessage());
-
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
-    }
-
-    /**
-     * 파라미터 검증 실패.
-     */
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-        ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
-
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode.getCode(),
-                String.format(ex.getMessage(), ex.getRequestPartName()));
-
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -121,33 +97,54 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
             fields.put(field, message);
         });
 
-        ServiceExceptionCode serviceExceptionCode = ServiceExceptionCode.FORM_VALIDATION_FAILED;
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode, fields);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, fields);
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
-    @ExceptionHandler(UserFeelingException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    /**
+     * Spring Security 에서 발생하는 Exception
+     */
+    @ExceptionHandler(AuthenticationException.class)
     @ResponseBody
-    public ApiRestErrorResponse userFeelingException(UserFeelingException e) {
-        return new ApiRestErrorResponse(e.getCode(), e.getMessage());
+    public ResponseEntity<ApiRestErrorResponse> authenticationException(AuthenticationException e) {
+
+        ServiceError serviceError = ServiceError.UNAUTHORIZED_ACCESS;
+
+        if (e.getCause().getClass().isAssignableFrom(ServiceException.class)) {
+            serviceError = ((ServiceException)e.getCause()).getServiceError();
+        }
+
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(
+                serviceError.getCode(), e.getLocalizedMessage(), serviceError.getHttpStatus()
+        );
+
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public ResponseEntity<ApiRestErrorResponse> serviceException(ServiceException ex) {
-        ServiceExceptionCode serviceExceptionCode = ex.getServiceExceptionCode();
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceExceptionCode);
+    public ResponseEntity<ApiRestErrorResponse> serviceException(ServiceException e) {
+        ServiceError serviceError = e.getServiceError();
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceExceptionCode.getHttpStatus()));
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ApiRestErrorResponse runtimeException(RuntimeException e) {
-        return new ApiRestErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), e.getLocalizedMessage());
+    public ResponseEntity<ApiRestErrorResponse> runtimeException(HttpServletRequest request) {
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR);
+        apiRestErrorResponse.setDetail(getErrorAttributes(request, false));
+
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(apiRestErrorResponse.getHttpStatus()));
+    }
+
+    private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
+        RequestAttributes requestAttributes = new ServletRequestAttributes(request);
+
+        return errorAttributes.getErrorAttributes(requestAttributes, includeStackTrace);
     }
 }

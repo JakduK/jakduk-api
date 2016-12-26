@@ -14,7 +14,7 @@ import com.jakduk.api.restcontroller.user.vo.*;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.DuplicateDataException;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.ServiceExceptionCode;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.embedded.LocalName;
@@ -102,7 +102,7 @@ public class UserRestController {
                                            HttpServletResponse response) {
 
         if (! jwtTokenUtils.isValidateToken(attemptedToken))
-            throw new ServiceException(ServiceExceptionCode.EXPIRATION_TOKEN);
+            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
         AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
@@ -260,7 +260,7 @@ public class UserRestController {
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
         if (! UserUtils.isJakdukUser())
-            throw new ServiceException(ServiceExceptionCode.FORBIDDEN);
+            throw new ServiceException(ServiceError.FORBIDDEN);
 
         CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
 

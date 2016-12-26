@@ -72,12 +72,6 @@ public class CoreConst {
 	public final static String BOARD_USERS_FEELINGS_STATUS_WRITER = "writer";
 	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
 
-	public final static String RESPONSE_VOID_OBJECT = "{}";
-	public final static String RESPONSE_ERROR_DEFAULT_CODE = "-";
-
-	public final static String REGEX_FIND_HTML_TAG = "<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>";
-	public final static String REGEX_FIND_HTML_WHITESPACE = "\r|\n|&nbsp;";
-
 	/**
 	 * Social 프로바이더 종류.
 	 */
@@ -91,12 +85,6 @@ public class CoreConst {
 	public enum FEELING_TYPE {
 		LIKE,
 		DISLIKE
-	}
-
-	// 게시물 감정 표현할때의 에러 코드
-	public enum USER_FEELING_ERROR_CODE {
-		ALREADY,		// 이미 감정 표현을 함
-		WRITER			// 이 게시물의 작성자라서 감정 표현을 할 수 없음
 	}
 
 	public final static String PRINCIPAL_ANONYMOUSUSER = "anonymousUser";
@@ -166,8 +154,8 @@ public class CoreConst {
 	public final static Integer ES_AWAIT_CLOSE_TIMEOUT_MINUTES = 2;
 	public final static String ES_TYPE_BOARD = "board";
 	public final static String ES_TYPE_COMMENT = "comment";
-	public final static String ES_TYPE_JAKDU_COMMENT = "jakduComment";
 	public final static String ES_TYPE_GALLERY = "gallery";
+	public final static String ES_TYPE_SEARCH_WORD = "search_word";
 
 
 	// 이름 타입.

@@ -6,6 +6,7 @@ import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
 import com.jakduk.api.restcontroller.exception.ApiRestErrorResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.exception.ServiceError;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,11 +80,13 @@ public class AuthenticationTokenFilter extends GenericFilterBean {
             chain.doFilter(request, response);
 
         } catch (ServiceException e) {
+            ServiceError serviceError = e.getServiceError();
+
             httpResponse.setContentType("application/json");
-            httpResponse.setStatus(e.getServiceExceptionCode().getHttpStatus());
+            httpResponse.setStatus(serviceError.getHttpStatus());
             httpResponse.setCharacterEncoding("utf-8");
 
-            ApiRestErrorResponse error = new ApiRestErrorResponse(e.getServiceExceptionCode().getCode(), e.getMessage());
+            ApiRestErrorResponse error = new ApiRestErrorResponse(serviceError);
 
             String errorJson = new ObjectMapper().writeValueAsString(error);
 

@@ -2,6 +2,9 @@ package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
+import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.UserOnAuthentication;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author pyohwan
@@ -31,10 +35,13 @@ public class SocialDetailService implements UserDetailsService {
         if (Objects.isNull(email)) {
             throw new IllegalArgumentException("email 는 꼭 필요한 값입니다.");
         } else {
-            UserOnAuthentication user = userRepository.findAuthUserByEmail(email);
+			Optional<UserOnAuthentication> oUser = userRepository.findAuthUserByEmail(email);
 
-            if (Objects.isNull(user))
-                throw new UsernameNotFoundException("로그인 할 사용자 데이터가 존재하지 않습니다. email=" + email);
+            if (! oUser.isPresent())
+                throw new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
+                        CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email));
+
+            UserOnAuthentication user = oUser.get();
 
             log.debug("user=" + user);
 
