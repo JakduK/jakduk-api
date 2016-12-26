@@ -5,6 +5,9 @@ import com.jakduk.core.util.AbstractSpringTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 /**
  * @author Jang, Pyohwan(1100273)
  * @since 2016. 12. 2.
@@ -21,6 +24,8 @@ public class SearchServiceTest extends AbstractSpringTest {
 
 	@Test
 	public void aggregateSearchWord() {
-		sut.aggregateSearchWord();
+		// 한달전
+		Long registerDateFrom = LocalDate.now().minusMonths(1L).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		sut.aggregateSearchWord(registerDateFrom, 5);
 	}
 }
