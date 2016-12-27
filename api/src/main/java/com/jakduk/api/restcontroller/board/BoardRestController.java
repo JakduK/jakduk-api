@@ -388,7 +388,7 @@ public class BoardRestController {
                                                      @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, CoreUtils.getExceptionMessage("exception.need.login.to.feel"));
 
         CommonPrincipal principal = UserUtils.getCommonPrincipal();
         CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());

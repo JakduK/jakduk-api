@@ -57,8 +57,8 @@ public class SearchRestController {
 	}
 
 	@ApiOperation(value = "인기 검색어")
-	@RequestMapping(value = "/popular/search/words", method = RequestMethod.GET)
-	public PopularSearchWordResult searchPopularSearchWords(
+	@RequestMapping(value = "/popular/words", method = RequestMethod.GET)
+	public PopularSearchWordResult searchPopularWords(
 			@ApiParam(value = "크기") @RequestParam(required = false, defaultValue = "5") Integer size) {
 
 		// 한달전

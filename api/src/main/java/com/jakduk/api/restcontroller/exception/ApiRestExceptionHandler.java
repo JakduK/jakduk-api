@@ -128,7 +128,7 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<ApiRestErrorResponse> serviceException(ServiceException e) {
         ServiceError serviceError = e.getServiceError();
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, e.getLocalizedMessage());
 
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
