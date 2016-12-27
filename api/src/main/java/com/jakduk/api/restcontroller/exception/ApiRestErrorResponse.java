@@ -46,6 +46,12 @@ public class ApiRestErrorResponse {
         this.httpStatus = serviceError.getHttpStatus();
     }
 
+    public ApiRestErrorResponse(ServiceError serviceError, String message) {
+        this.code = serviceError.getCode();
+        this.message = message;
+        this.httpStatus = serviceError.getHttpStatus();
+    }
+
     public ApiRestErrorResponse(ServiceError serviceError, Map<String, String> fields) {
         this.code = serviceError.getCode();
         this.message = serviceError.getMessage();
