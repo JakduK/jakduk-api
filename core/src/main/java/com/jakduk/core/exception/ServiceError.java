@@ -28,7 +28,6 @@ public enum ServiceError {
     CANNOT_GET_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.sns.profile"),
     ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
     ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
-
     NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.post.not.found"),
     CATEGORY_NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.category.not.found"),
     ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
