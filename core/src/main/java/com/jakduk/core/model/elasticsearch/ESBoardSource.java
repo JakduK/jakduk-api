@@ -1,5 +1,6 @@
 package com.jakduk.core.model.elasticsearch;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
 
@@ -22,9 +23,11 @@ public class ESBoardSource {
 
 	private CommonWriter writer;
 
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String subject;
 
-	private String contentPreview;
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String content;
 
 	private Integer seq;
 

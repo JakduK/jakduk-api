@@ -5,10 +5,11 @@ import com.jakduk.core.util.AbstractSpringTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
 public class SearchServiceTest extends AbstractSpringTest {
@@ -18,6 +19,13 @@ public class SearchServiceTest extends AbstractSpringTest {
 
 	@Test
 	public void searchUnified() {
-		sut.searchUnified(Arrays.asList("string"), "PO;CO;GA", 0, 10);
+		sut.searchUnified("string", "PO;CO;GA", 0, 10);
+	}
+
+	@Test
+	public void aggregateSearchWord() {
+		// 한달전
+		Long registerDateFrom = LocalDate.now().minusMonths(1L).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		sut.aggregateSearchWord(registerDateFrom, 5);
 	}
 }

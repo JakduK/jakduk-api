@@ -2,19 +2,17 @@ package com.jakduk.core.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.ObjectMapperUtils;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.ServiceExceptionCode;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.vo.SearchBoardResult;
-import com.jakduk.core.model.vo.SearchCommentResult;
-import com.jakduk.core.model.vo.SearchGalleryResult;
-import com.jakduk.core.model.vo.SearchUnifiedResponse;
+import com.jakduk.core.model.vo.*;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -42,9 +40,10 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.support.QueryInnerHitBuilder;
-import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +52,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -73,6 +75,9 @@ public class SearchService {
 
 	@Value("${core.elasticsearch.index.gallery}")
 	private String elasticsearchIndexGallery;
+
+	@Value("${core.elasticsearch.index.search.word}")
+	private String elasticsearchIndexSearchWord;
 
 	@Value("${core.elasticsearch.bulk.actions}")
 	private Integer bulkActions;
@@ -100,31 +105,31 @@ public class SearchService {
 
 	/**
 	 * 통합 검색
-	 * @param keywords	검색어
+	 * @param query	검색어
 	 * @param from	페이지 시작 위치
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchUnifiedResponse searchUnified(List<String> keywords, String include, Integer from, Integer size) {
+	public SearchUnifiedResponse searchUnified(String query, String include, Integer from, Integer size) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
 		Queue<CoreConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.PO.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(keywords, from, size);
+			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(query, from, size);
 			multiSearchRequestBuilder.add(postSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.PO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.CO.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(keywords, from, size);
+			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size);
 			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.CO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.GA.name())) {
-			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(keywords, from, size < 10 ? 4 : size);
+			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size);
 			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.GA);
 		}
@@ -134,6 +139,9 @@ public class SearchService {
 		for (MultiSearchResponse.Item item : multiSearchResponse.getResponses()) {
 			SearchResponse searchResponse = item.getResponse();
 			CoreConst.SEARCH_TYPE order = searchOrder.poll();
+
+			if (item.isFailure())
+				continue;
 
 			if (! ObjectUtils.isEmpty(order)) {
 				switch (order) {
@@ -180,7 +188,7 @@ public class SearchService {
 					.get();
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
@@ -224,7 +232,7 @@ public class SearchService {
 					.get();
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
@@ -252,7 +260,7 @@ public class SearchService {
 					.get();
 
 		} catch (IOException e) {
-			throw new ServiceException(ServiceExceptionCode.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
 		}
 	}
 
@@ -272,64 +280,132 @@ public class SearchService {
 			log.info("gallery id " + id + " is not found. so can't delete it!");
 	}
 
-	public void createIndexBoard() {
+	@Async
+	public void indexDocumentSearchWord(String word, CommonWriter writer) {
+
+		if (! elasticsearchEnable)
+			return;
+
+		ESSearchWord esSearchWord = ESSearchWord.builder()
+				.word(word)
+				.writer(writer)
+				.registerDate(LocalDateTime.now())
+				.build();
 
 		try {
-			CreateIndexResponse	response = client.admin().indices().prepareCreate(elasticsearchIndexBoard)
+			IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
+
+			IndexResponse response = indexRequestBuilder
+					.setIndex(elasticsearchIndexSearchWord)
+					.setType(CoreConst.ES_TYPE_SEARCH_WORD)
+					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
+					.get();
+
+			log.debug("indexDocumentSearchWord Source:\n" + indexRequestBuilder.request().getDescription());
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+		}
+	}
+
+	public PopularSearchWordResult aggregateSearchWord(Long registerDateFrom, Integer size) {
+
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
+				.setIndices(elasticsearchIndexSearchWord)
+				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
+				.setSize(size)
+				.setQuery(
+						QueryBuilders.rangeQuery("registerDate").gte(registerDateFrom)
+				)
+				.addAggregation(
+						AggregationBuilders
+								.terms("popular_word_aggs")
+								.field("word")
+				);
+
+		log.debug("aggregateSearchWord Query:\n" + searchRequestBuilder.internalBuilder());
+
+		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
+
+		List<ESTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
+				.map(entry -> ESTermsBucket.builder()
+						.key(entry.getKey().toString())
+						.count(entry.getDocCount())
+						.build())
+				.collect(Collectors.toList());
+
+		return PopularSearchWordResult.builder()
+				.took(searchResponse.getTookInMillis())
+				.popularSearchWords(popularWords)
+				.build();
+	}
+
+	public void createIndexBoard() {
+
+		String index = elasticsearchIndexBoard;
+
+		try {
+			CreateIndexResponse	response = client.admin().indices().prepareCreate(index)
                     .setSettings(getIndexSettings())
                     .addMapping(CoreConst.ES_TYPE_BOARD, getBoardFreeMappings())
 					.addMapping(CoreConst.ES_TYPE_COMMENT, getBoardFreeCommentMappings())
                     .get();
 
 			if (response.isAcknowledged()) {
-				log.debug("Index " + elasticsearchIndexBoard + " created");
+				log.debug("Index " + index + " created");
 			} else {
-				throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created");
+				throw new RuntimeException("Index " + index + " not created");
 			}
 
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not created", e.getCause());
+			throw new RuntimeException("Index " + index + " not created", e.getCause());
 		}
-
 	}
 
 	public void createIndexGallery() {
 
+		String index = elasticsearchIndexGallery;
+
 		try {
-			CreateIndexResponse response = client.admin().indices().prepareCreate(elasticsearchIndexGallery)
+			CreateIndexResponse response = client.admin().indices().prepareCreate(index)
                     .setSettings(getIndexSettings())
                     .addMapping(CoreConst.ES_TYPE_GALLERY, getGalleryMappings())
                     .get();
 
 			if (response.isAcknowledged()) {
-				log.debug("Index " + elasticsearchIndexGallery + " created");
+				log.debug("Index " + index + " created");
 			} else {
-				throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created");
+				throw new RuntimeException("Index " + index + " not created");
 			}
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not created", e.getCause());
+			throw new RuntimeException("Index " + index + " not created", e.getCause());
+		}
+	}
+
+	public void createIndexSearchWord() {
+
+		String index = elasticsearchIndexSearchWord;
+
+		try {
+			CreateIndexResponse response = client.admin().indices().prepareCreate(index)
+					.setSettings(getIndexSettings())
+					.addMapping(CoreConst.ES_TYPE_SEARCH_WORD, getSearchWordMappings())
+					.get();
+
+			if (response.isAcknowledged()) {
+				log.debug("Index " + index + " created");
+			} else {
+				throw new RuntimeException("Index " + index + " not created");
+			}
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Index " + index + " not created", e.getCause());
 		}
 	}
 
 	public void processBulkInsertBoard() throws InterruptedException {
-		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
-			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
-			}
 
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-			}
-
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
-				log.error(throwable.getLocalizedMessage());
-			}
-		};
-
-		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
-				.setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
-				.setConcurrentRequests(bulkConcurrentRequests)
-				.build();
+		BulkProcessor bulkProcessor = getBulkProcessor();
 
 		Boolean hasPost = true;
 		ObjectId lastPostId = null;
@@ -352,7 +428,6 @@ public class SearchService {
 				);
 
 				try {
-
 					index.setSource(ObjectMapperUtils.writeValueAsString(post));
 					bulkProcessor.add(index.request());
 
@@ -368,24 +443,8 @@ public class SearchService {
 	}
 
 	public void processBulkInsertComment() throws InterruptedException {
-		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
-			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
-			}
 
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-			}
-
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
-				log.error(throwable.getLocalizedMessage());
-			}
-		};
-
-		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
-				.setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
-				.setConcurrentRequests(bulkConcurrentRequests)
-				.build();
+		BulkProcessor bulkProcessor = getBulkProcessor();
 
 		Boolean hasComment = true;
 		ObjectId lastCommentId = null;
@@ -423,24 +482,8 @@ public class SearchService {
 	}
 
 	public void processBulkInsertGallery() throws InterruptedException {
-		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
-			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
-			}
 
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-			}
-
-			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
-				log.error(throwable.getLocalizedMessage());
-			}
-		};
-
-		BulkProcessor bulkProcessor = BulkProcessor.builder(client, bulkProcessorListener)
-				.setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
-				.setConcurrentRequests(bulkConcurrentRequests)
-				.build();
+		BulkProcessor bulkProcessor = getBulkProcessor();
 
 		Boolean hasGallery = true;
 		ObjectId lastGalleryId = null;
@@ -463,7 +506,6 @@ public class SearchService {
 				);
 
 				try {
-
 					index.setSource(ObjectMapperUtils.writeValueAsString(comment));
 					bulkProcessor.add(index.request());
 
@@ -480,49 +522,64 @@ public class SearchService {
 
 	public void deleteIndexBoard() {
 
+		String index = elasticsearchIndexBoard;
+
 		DeleteIndexResponse response = client.admin().indices()
-				.delete(new DeleteIndexRequest(elasticsearchIndexBoard))
+				.delete(new DeleteIndexRequest(index))
 				.actionGet();
 
 		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexBoard + " deleted");
+			log.debug("Index " + index + " deleted");
 		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexBoard + " not deleted");
+			throw new RuntimeException("Index " + index + " not deleted");
 		}
 	}
 
 	public void deleteIndexGallery() {
 
+		String index = elasticsearchIndexGallery;
+
 		DeleteIndexResponse response = client.admin().indices()
-				.delete(new DeleteIndexRequest(elasticsearchIndexGallery))
+				.delete(new DeleteIndexRequest(index))
 				.actionGet();
 
 		if (response.isAcknowledged()) {
-			log.debug("Index " + elasticsearchIndexGallery + " deleted");
+			log.debug("Index " + index + " deleted");
 		} else {
-			throw new RuntimeException("Index " + elasticsearchIndexGallery + " not deleted");
+			throw new RuntimeException("Index " + index + " not deleted");
 		}
 	}
 
-	private SearchRequestBuilder getBoardSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	public void deleteIndexSearchWord() {
+
+		String index = elasticsearchIndexSearchWord;
+
+		DeleteIndexResponse response = client.admin().indices()
+				.delete(new DeleteIndexRequest(index))
+				.actionGet();
+
+		if (response.isAcknowledged()) {
+			log.debug("Index " + index + " deleted");
+		} else {
+			throw new RuntimeException("Index " + index + " not deleted");
+		}
+	}
+
+	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
-				.setFetchSource(null, new String[]{"content"})
+				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.should(QueryBuilders.termsQuery("subject", keywords).boost(1.2f))
-								.should(QueryBuilders.termsQuery("content", keywords).boost(1.0f))
+								.should(QueryBuilders.multiMatchQuery(query, "subject^1.5", "content"))
 				)
-				.addHighlightedField("subject")
-				.addHighlightedField("content")
+				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
-				.addScriptField("content_preview", new Script(
-						String.format("_source.content.length() > %d ? _source.content.substring(0, %d) : _source.content",
-								CoreConst.SEARCH_CONTENT_MAX_LENGTH,
-								CoreConst.SEARCH_CONTENT_MAX_LENGTH))
-				)
+				.addHighlightedField("subject", CoreConst.SEARCH_FRAGMENT_SIZE, 0)
+				.addHighlightedField("content", CoreConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
@@ -539,7 +596,6 @@ public class SearchService {
 					Map<String, Object> sourceMap = searchHit.getSource();
 					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
 					esBoardSource.setScore(searchHit.getScore());
-					esBoardSource.setContentPreview(searchHit.getFields().get("content_preview").getValue());
 
 					Map<String, List<String>> highlight = new HashMap<>();
 
@@ -564,22 +620,25 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
+				.setFetchSource(null, new String[]{"content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.must(QueryBuilders.termsQuery("content", keywords))
+								.must(QueryBuilders.matchQuery("content", query))
 								.must(
 										QueryBuilders
 												.hasParentQuery(CoreConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
 												.innerHit(new QueryInnerHitBuilder())
 								)
 				)
-				.addHighlightedField("content")
+				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
+				.addHighlightedField("content", CoreConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
@@ -591,18 +650,18 @@ public class SearchService {
 	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESBoardCommentSource> searchList = Arrays.stream(searchHits.getHits())
+		List<ESCommentSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESBoardCommentSource esBoardCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardCommentSource.class);
-					esBoardCommentSource.setScore(searchHit.getScore());
+					ESCommentSource esCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESCommentSource.class);
+					esCommentSource.setScore(searchHit.getScore());
 
 					if (! searchHit.getInnerHits().isEmpty()) {
 						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(CoreConst.ES_TYPE_BOARD).getHits();
 						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
 						ESParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, ESParentBoard.class);
 
-						esBoardCommentSource.setParentBoard(esParentBoard);
+						esCommentSource.setParentBoard(esParentBoard);
 					}
 
 					Map<String, List<String>> highlight = new HashMap<>();
@@ -615,9 +674,9 @@ public class SearchService {
 						highlight.put(highlightField.getKey(), fragments);
 					}
 
-					esBoardCommentSource.setHighlight(highlight);
+					esCommentSource.setHighlight(highlight);
 
-					return esBoardCommentSource;
+					return esCommentSource;
 				})
 				.collect(Collectors.toList());
 
@@ -628,14 +687,17 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getGallerySearchRequestBuilder(List<String> keywords, Integer from, Integer size) {
+	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexGallery)
 				.setTypes(CoreConst.ES_TYPE_GALLERY)
-				.setQuery(QueryBuilders.termsQuery("name", keywords))
-				.addHighlightedField("name")
+				.setFetchSource(null, new String[]{"name"})
+				.setQuery(QueryBuilders.matchQuery("name", query))
+				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
+				.addHighlightedField("name", CoreConst.SEARCH_FRAGMENT_SIZE, 0)
 				.setFrom(from)
 				.setSize(size);
 
@@ -676,16 +738,66 @@ public class SearchService {
 				.build();
 	}
 
+	private BulkProcessor getBulkProcessor() {
+		BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
+			@Override public void beforeBulk(long l, BulkRequest bulkRequest) {
+			}
+
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+				log.debug("bulk took:" + bulkResponse.getTookInMillis());
+				if (bulkResponse.hasFailures())
+					log.error(bulkResponse.buildFailureMessage());
+			}
+
+			@Override public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+				log.error(throwable.getLocalizedMessage());
+			}
+		};
+
+		return BulkProcessor.builder(client, bulkProcessorListener)
+				.setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
+				.setConcurrentRequests(bulkConcurrentRequests)
+				.build();
+	}
+
+
 	private Settings.Builder getIndexSettings() {
 
 		//settingsBuilder.put("number_of_shards", 5);
 		//settingsBuilder.put("number_of_replicas", 1);
 
+		String[] userWords = new String[]{
+				"k리그",
+				"내셔널리그",
+				"k3리그",
+				"k3",
+				"성남fc",
+				"수원fc",
+				"인천utd",
+				"인천유나이티드",
+				"강원fc",
+				"fc서울",
+				"fc안양",
+				"부천fc",
+				"대구fc",
+				"광주fc",
+				"경남fc",
+				"제주utd",
+				"제주유나이티드",
+				"서울e"
+		};
+
 		return Settings.builder()
 				.put("index.analysis.analyzer.korean.type", "custom")
 				.put("index.analysis.analyzer.korean.tokenizer", "seunjeon_default_tokenizer")
+                .putArray("index.analysis.tokenizer.seunjeon_default_tokenizer.user_words", userWords)
 				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.type", "seunjeon_tokenizer")
-				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false);
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.pos_tagging", false)
+				.put("index.analysis.tokenizer.seunjeon_default_tokenizer.decompound", true)
+				.putArray("index.analysis.tokenizer.seunjeon_default_tokenizer.index_poses",
+						"N", "SL", "SH", "SN", "XR", "V", "UNK", "I", "M");
 	}
 
 	private String getBoardFreeMappings() throws JsonProcessingException {
@@ -848,6 +960,38 @@ public class SearchService {
 		propertiesNode.set("writer", writerNode);
 
 		ObjectNode mappings = objectMapper.createObjectNode();
+		mappings.set("properties", propertiesNode);
+
+		return objectMapper.writeValueAsString(mappings);
+	}
+
+	private String getSearchWordMappings() throws JsonProcessingException {
+		ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
+
+		JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+
+		ObjectNode propertiesNode = jsonNodeFactory.objectNode();
+		propertiesNode.set("id",
+				jsonNodeFactory.objectNode()
+						.put("type", "string"));
+		propertiesNode.set("word",
+				jsonNodeFactory.objectNode()
+						.put("type", "string")
+						.put("index", "not_analyzed")
+		);
+
+		ObjectNode writerNode = jsonNodeFactory.objectNode();
+		writerNode.set("providerId", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+		writerNode.set("userId", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+		writerNode.set("username", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+		propertiesNode.set("writer", jsonNodeFactory.objectNode().set("properties", writerNode));
+
+		propertiesNode.set("registerDate",
+				jsonNodeFactory.objectNode()
+						.put("type", "date")
+		);
+
+		ObjectNode mappings = jsonNodeFactory.objectNode();
 		mappings.set("properties", propertiesNode);
 
 		return objectMapper.writeValueAsString(mappings);

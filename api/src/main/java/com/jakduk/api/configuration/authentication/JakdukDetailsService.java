@@ -5,7 +5,7 @@ import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.exception.ServiceExceptionCode;
+import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.model.simple.UserOnAuthentication;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -29,14 +31,16 @@ public class JakdukDetailsService implements UserDetailsManager {
 		if (ObjectUtils.isEmpty(email)) {
 			throw new IllegalArgumentException("email 은 꼭 필요한 값입니다.");
 		} else {
-			UserOnAuthentication user = userRepository.findAuthUserByEmail(email);
+			Optional<UserOnAuthentication> oUser = userRepository.findAuthUserByEmail(email);
 
-			if (ObjectUtils.isEmpty(user))
-				throw new ServiceException(ServiceExceptionCode.NOT_FOUND_JAKDUK_ACCOUNT,
+			if (! oUser.isPresent())
+				throw new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
 						CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email));
 
+			UserOnAuthentication user = oUser.get();
+
 			if (! user.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK))
-				throw new ServiceException(ServiceExceptionCode.NOT_FOUND_JAKDUK_ACCOUNT,
+				throw new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
 						CoreUtils.getExceptionMessage("exception.not.jakduk.user", email, user.getProviderId()));
 
 			log.debug("Jakduk user=" + user);

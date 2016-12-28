@@ -21,6 +21,6 @@ public class ESComment {
 	private BoardItem boardItem;
 	
 	private CommonWriter writer;
-	
+
 	private String content;
 }

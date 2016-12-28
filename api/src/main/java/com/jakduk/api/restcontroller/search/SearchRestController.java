@@ -1,5 +1,7 @@
 package com.jakduk.api.restcontroller.search;
 
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.core.model.vo.PopularSearchWordResult;
 import com.jakduk.core.model.vo.SearchUnifiedResponse;
 import com.jakduk.core.service.SearchService;
 import io.swagger.annotations.Api;
@@ -15,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -47,8 +49,21 @@ public class SearchRestController {
 
 		if (size <= 0) size = 10;
 
-		List<String> keywords = Arrays.asList(StringUtils.split(q, " "));
+		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size);
 
-		return searchService.searchUnified(keywords, w, from, size);
+		searchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
+
+		return searchUnifiedResponse;
+	}
+
+	@ApiOperation(value = "인기 검색어")
+	@RequestMapping(value = "/popular/words", method = RequestMethod.GET)
+	public PopularSearchWordResult searchPopularWords(
+			@ApiParam(value = "크기") @RequestParam(required = false, defaultValue = "5") Integer size) {
+
+		// 한달전
+		Long registerDateFrom = LocalDate.now().minusMonths(1L).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		return searchService.aggregateSearchWord(registerDateFrom, size);
 	}
 }

@@ -37,6 +37,12 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RestAccessDeniedHandler restAccessDeniedHandler;
+
+    @Autowired
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resources/**");
@@ -53,8 +59,8 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
-                .authenticationEntryPoint(restAuthenticationEntryPoint())
-                .accessDeniedHandler(restAccessDeniedHandler())
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .accessDeniedHandler(restAccessDeniedHandler)
 
                 //Configures url based authorization
                 .and()
@@ -64,6 +70,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/user/exist/email",                // 이메일 중복 검사
                         "/api/user/exist/username"              // 별명 중복 검사
                 ).permitAll()
+
                 .antMatchers(
                         HttpMethod.POST,
                         "/api/user",            // 이메일 기반 회원 가입
@@ -74,10 +81,12 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
                         "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
                 ).anonymous()
+
                 .antMatchers(
 //                      "/swagger-ui.html",     // 스웨거
                         "/rest/**"              // spring-data-rest
                 ).authenticated()
+
                 .antMatchers(
                         HttpMethod.GET,
                         "/api/user/exist/email/edit",       // 회원 프로필 편집 시 Email 중복 검사
@@ -85,14 +94,21 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/user/profile/me"              // 내 프로필 정보 보기
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
                 .antMatchers(
+                        HttpMethod.POST,
+                        "/api/board/free",                  // 자유게시판 글쓰기
+                        "/api/board/free/comment"           // 자유게시판 댓글 달기
+                ).hasAnyRole("USER_01", "USER_02", "USER_03")
+                .antMatchers(
                         HttpMethod.PUT,
                         "/api/user/profile/me",             // 내 프로필 정보 편집
-                        "/api/user/password"                // 이메일 기반 회원의 비밀번호 변경
+                        "/api/user/password"               // 이메일 기반 회원의 비밀번호 변경
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
+
                 .antMatchers(
                         "/admin/**",
                         "/api/admin/**"
                 ).hasRole("ROOT")
+
                 .anyRequest().permitAll()
 
                 // don't create session
@@ -116,15 +132,4 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationTokenFilter authenticationTokenFilter() throws Exception {
         return new AuthenticationTokenFilter();
     }
-
-    @Bean
-    public RestAccessDeniedHandler restAccessDeniedHandler() {
-        return new RestAccessDeniedHandler();
-    }
-
-    @Bean
-    public RestAuthenticationEntryPoint restAuthenticationEntryPoint() {
-        return new RestAuthenticationEntryPoint();
-    }
-
 }

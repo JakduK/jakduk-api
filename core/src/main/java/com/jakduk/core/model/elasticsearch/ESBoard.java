@@ -12,9 +12,9 @@ import lombok.Setter;
 * @desc     :
 */
 
+@Builder
 @Getter
 @Setter
-@Builder
 public class ESBoard {
 	
     private String id;

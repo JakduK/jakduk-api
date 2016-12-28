@@ -6,7 +6,6 @@ import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -58,14 +57,14 @@ public class InitElasticsearchIndexConfig {
                         searchService.deleteIndexBoard();
 
                     } catch (IndexNotFoundException e) {
-                        log.error(e.getLocalizedMessage());
+                        log.warn(e.getDetailedMessage());
                     }
 
                     try {
                         searchService.deleteIndexGallery();
 
                     } catch (IndexNotFoundException e) {
-                        log.error(e.getLocalizedMessage());
+                        log.warn(e.getDetailedMessage());
                     }
 
                     return RepeatStatus.FINISHED;
@@ -78,12 +77,13 @@ public class InitElasticsearchIndexConfig {
         return stepBuilderFactory.get("initSearchIndexStep")
                 .tasklet((contribution, chunkContext) -> {
 
-                    try {
-                        searchService.createIndexBoard();
-                        searchService.createIndexGallery();
+                    searchService.createIndexBoard();
+                    searchService.createIndexGallery();
 
+                    try {
+                        searchService.createIndexSearchWord();
                     } catch (IndexAlreadyExistsException e) {
-                        throw new RuntimeException(e.getCause());
+                        log.warn(e.status().name() + ", Index: " + e.getIndex() + ", " + e.getDetailedMessage());
                     }
 
                     return RepeatStatus.FINISHED;

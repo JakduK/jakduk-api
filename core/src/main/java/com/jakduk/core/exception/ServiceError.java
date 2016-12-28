@@ -13,12 +13,14 @@ import java.util.ResourceBundle;
  */
 
 @Getter
-public enum ServiceExceptionCode {
+public enum ServiceError {
 
     INVALID_PARAMETER(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     FORM_VALIDATION_FAILED(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     EXPIRATION_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.expiration.token"),
     INVALID_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.invalid.token"),
+    FEELING_YOU_ARE_WRITER(HttpStatus.SC_BAD_REQUEST, "exception.you.are.writer"),
+    FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
 
     NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
     NOT_FOUND_USER(HttpStatus.SC_NOT_FOUND, "exception.not.found.user"),
@@ -26,7 +28,6 @@ public enum ServiceExceptionCode {
     CANNOT_GET_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.sns.profile"),
     ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
     ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
-
     NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.post.not.found"),
     CATEGORY_NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.category.not.found"),
     ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
@@ -37,8 +38,9 @@ public enum ServiceExceptionCode {
 
     UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     NEED_TO_LOGIN(HttpStatus.SC_UNAUTHORIZED, "exception.unauthorized"),
-    NOT_FOUND_JAKDUK_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    NOT_FOUND_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     NOT_JAKDUK_USER(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    BAD_CREDENTIALS(HttpStatus.SC_UNAUTHORIZED, "exception.bad.credentials"),
     FORBIDDEN(HttpStatus.SC_FORBIDDEN, "exception.forbidden"),
 
     SEND_EMAIL_FAILED(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.send.email.failed"),
@@ -52,7 +54,7 @@ public enum ServiceExceptionCode {
     private final String code;
     private final String message;
 
-    ServiceExceptionCode(Integer httpStatus, String message) {
+    ServiceError(Integer httpStatus, String message) {
         Locale locale = LocaleContextHolder.getLocale();
         ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.exception", locale);
 

@@ -1,5 +1,6 @@
 package com.jakduk.core.model.elasticsearch;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
 
 @NoArgsConstructor
 @Getter
 @Setter
-public class ESBoardCommentSource {
+public class ESCommentSource {
 
 	private String id;
 
@@ -24,6 +25,7 @@ public class ESBoardCommentSource {
 
 	private CommonWriter writer;
 
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String content;
 
 	private Float score;

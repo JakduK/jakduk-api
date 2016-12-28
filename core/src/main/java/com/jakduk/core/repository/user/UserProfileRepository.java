@@ -5,11 +5,15 @@ import com.jakduk.core.model.simple.UserProfile;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Optional;
+
 /**
  * @author pyohwan
  * 16. 4. 16 오후 10:54
  */
 public interface UserProfileRepository extends MongoRepository<UserProfile, String> {
+
+    Optional<UserProfile> findOneById(String id);
     UserProfile findOneByEmail(String email);
     UserProfile findOneByUsername(String username);
 

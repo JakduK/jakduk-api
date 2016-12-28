@@ -44,7 +44,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 	OAuthProfile userfindByOauthUser(CoreConst.ACCOUNT_TYPE providerId, String oauthId);
 	
 	@Query(value="{'email' : ?0}")
-	UserOnAuthentication findAuthUserByEmail(String email);
+	Optional<UserOnAuthentication> findAuthUserByEmail(String email);
 
 	@Query(value="{'providerUserId' : ?0}")
 	UserOnAuthentication userFindByProviderUserId(String providerUserId);

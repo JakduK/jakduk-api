@@ -1,6 +1,6 @@
 package com.jakduk.core.model.vo;
 
-import com.jakduk.core.model.elasticsearch.ESBoardSource;
+import com.jakduk.core.model.elasticsearch.ESTermsBucket;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,14 +8,12 @@ import java.util.List;
 
 /**
  * @author Jang, Pyohwan
- * @since 2016. 12. 2.
+ * @since 2016. 12. 26.
  */
 
 @Builder
 @Getter
-public class SearchBoardResult {
-
+public class PopularSearchWordResult {
 	private Long took;
-	private Long totalCount;
-	private List<ESBoardSource> posts;
+	private List<ESTermsBucket> popularSearchWords;
 }

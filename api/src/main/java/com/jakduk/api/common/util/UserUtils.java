@@ -7,6 +7,7 @@ import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.model.db.User;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.AuthUserProfile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,11 +19,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author pyohwan
@@ -34,18 +37,6 @@ public class UserUtils {
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.7/me?fields=id,name,email&format=json";
-
-    private JsonNode fetchProfile(String url, String accessToken) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
-
-        return responseEntity.getBody();
-    }
 
     public SocialProfile getDaumProfile(String accessToken) {
 
@@ -74,7 +65,7 @@ public class UserUtils {
     /**
      * 손님인지 검사.
      */
-    public Boolean isAnonymousUser() {
+    public static Boolean isAnonymousUser() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -90,6 +81,7 @@ public class UserUtils {
                 }
             }
         }
+
         return result;
     }
 
@@ -97,8 +89,8 @@ public class UserUtils {
      * 로그인 중인 회원이 관리자인지 검사.
      * @return 관리자 이면 true
      */
-    public static boolean isAdmin() {
-        boolean result = false;
+    public static Boolean isAdmin() {
+        Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
             return false;
@@ -119,8 +111,8 @@ public class UserUtils {
      * 로그인 중인 회원이 USER 권한인지 검사.
      * @return 회원이면 true
      */
-    public static boolean isUser() {
-        boolean result = false;
+    public static Boolean isUser() {
+        Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
             return false;
@@ -142,7 +134,7 @@ public class UserUtils {
      * 로그인 중인 회원이 이메일 기반인지 검사.
      * @return 이메일 기반이면 true, 아니면 false
      */
-    public static boolean isJakdukUser() {
+    public static Boolean isJakdukUser() {
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail;
     }
 
@@ -150,7 +142,7 @@ public class UserUtils {
      * 로그인 중인 회원이 소셜 기반인지 검사.
      * @return 이메일 기반이면 true, 아니면 false
      */
-    public static boolean isSocialUser() {
+    public static Boolean isSocialUser() {
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail;
     }
 
@@ -166,12 +158,10 @@ public class UserUtils {
                 SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
                 Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-                List<String> roles = new ArrayList<>();
 
-                for (GrantedAuthority grantedAuthority : authorities) {
-                    String authority = grantedAuthority.getAuthority();
-                    roles.add(authority);
-                }
+                List<String> roles = authorities.stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
 
                 authUserProfile = AuthUserProfile.builder()
                         .id(userDetail.getId())
@@ -180,16 +170,15 @@ public class UserUtils {
                         .providerId(userDetail.getProviderId())
                         .roles(roles)
                         .build();
+
             } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail) {
                 JakdukUserDetail principal = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
                 Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-                List<String> roles = new ArrayList<>();
 
-                for (GrantedAuthority grantedAuthority : authorities) {
-                    String authority = grantedAuthority.getAuthority();
-                    roles.add(authority);
-                }
+                List<String> roles = authorities.stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
 
                 authUserProfile = AuthUserProfile.builder()
                         .id(principal.getId())
@@ -237,6 +226,19 @@ public class UserUtils {
     }
 
     /**
+     * CommonWriter를 가져온다.
+     */
+    public static CommonWriter getCommonWriter() {
+        CommonPrincipal commonPrincipal = getCommonPrincipal();
+
+        if (! ObjectUtils.isEmpty(commonPrincipal)) {
+            return new CommonWriter(commonPrincipal.getId(), commonPrincipal.getUsername(), commonPrincipal.getProviderId());
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * 이메일 기반 회원의 로그인 처리
      * @param user User 객체
      */
@@ -274,6 +276,23 @@ public class UserUtils {
 
     public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
         return getGrantedAuthorities(getRoles(roles));
+    }
+
+    /**
+     * accessToken에 해당하는 프로필 정보를 가져온다.
+     * @param url 요청할 URL
+     * @param accessToken accessToken
+     */
+    private JsonNode fetchProfile(String url, String accessToken) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
+
+        return responseEntity.getBody();
     }
 
     private static List<String> getRoles(List<Integer> roles) {
