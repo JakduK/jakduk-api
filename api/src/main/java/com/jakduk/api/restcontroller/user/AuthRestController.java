@@ -6,12 +6,12 @@ import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.common.vo.SocialProfile;
 import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
-import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
+import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
+import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -48,8 +48,11 @@ import java.util.Objects;
 @RequestMapping("/api")
 public class AuthRestController {
 
-    @Autowired
-    private UserService userService;
+    @Value("${jwt.token.header}")
+    private String tokenHeader;
+
+    @Value("${jwt.token.attempted.header}")
+    private String attemptedTokenHeader;
 
     @Autowired
     private JwtTokenUtils jwtTokenUtils;
@@ -66,13 +69,10 @@ public class AuthRestController {
     @Autowired
     private SocialDetailService socialDetailService;
 
-    @Value("${jwt.token.header}")
-    private String tokenHeader;
+    @Autowired
+    private UserService userService;
 
-    @Value("${jwt.token.attempted.header}")
-    private String attemptedTokenHeader;
-
-    @ApiOperation(value = "이메일 기반 로그인", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "이메일 기반 로그인")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public EmptyJsonResponse loginSocialUser(@RequestBody LoginEmailUserForm form,
                                              @ApiIgnore Device device,
@@ -98,7 +98,7 @@ public class AuthRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "JWT 토큰 갱신", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "JWT 토큰 갱신")
     @RequestMapping(value = "/auth/refresh", method = RequestMethod.GET)
     public EmptyJsonResponse refreshAndGetAuthenticationToken(HttpServletRequest request,
                                                               HttpServletResponse response) {
@@ -115,7 +115,7 @@ public class AuthRestController {
         }
     }
 
-    @ApiOperation(value = "SNS 기반 로그인", produces = "application/json", response = EmptyJsonResponse.class)
+    @ApiOperation(value = "SNS 기반 로그인")
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
     public EmptyJsonResponse loginSocialUser(@PathVariable String providerId,
                                              @Valid @RequestBody LoginSocialUserForm form,
@@ -165,7 +165,7 @@ public class AuthRestController {
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
-    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보", produces = "application/json", response = AttemptSocialUser.class)
+    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보")
     @RequestMapping(value = "/social/attempt", method = RequestMethod.GET)
     public AttemptSocialUser getSocialAttemptedUser(@RequestHeader(value = "x-attempt-token") String attemptedToken) {
 
@@ -175,7 +175,7 @@ public class AuthRestController {
         return jwtTokenUtils.getAttemptedFromToken(attemptedToken);
     }
 
-    @ApiOperation(value = "JWT 토큰 속 프로필 정보", produces = "application/json", response = AuthUserProfile.class)
+    @ApiOperation(value = "JWT 토큰 속 프로필 정보")
     @RequestMapping(value = "/auth/user", method = RequestMethod.GET)
     public AuthUserProfile getMyProfile() {
 

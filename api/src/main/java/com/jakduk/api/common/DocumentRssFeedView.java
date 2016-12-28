@@ -1,7 +1,6 @@
 package com.jakduk.api.common;
 
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.rometools.rome.feed.rss.Channel;
@@ -23,7 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
 

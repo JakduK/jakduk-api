@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
 public class SearchServiceTest extends AbstractSpringTest {

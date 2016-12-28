@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 26.
  */
 public class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {

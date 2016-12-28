@@ -6,9 +6,9 @@ import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.service.EmailService;
 import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
+import com.jakduk.core.service.EmailService;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import java.util.*;
 
@@ -28,17 +26,14 @@ import java.util.*;
 @RequestMapping("/api/password")
 public class PasswordRestController {
 
-	@Resource
-	LocaleResolver localeResolver;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private TokenRepository tokenRepository;
 
 	@Autowired
 	private CommonService commonService;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private UserService userService;

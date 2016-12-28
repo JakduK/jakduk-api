@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
 
