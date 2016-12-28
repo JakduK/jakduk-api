@@ -34,16 +34,14 @@ public class UserService {
 	@Autowired
 	private UserProfileRepository userProfileRepository;
 
-	public User findById(String id) {
-		return userRepository.findOne(id);
-	}
-
-	public List<User> findAll() {
-		return userRepository.findAll();
+	public User findUserById(String id) {
+		return userRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 
 	public UserProfile findUserProfileById(String id) {
-		return userProfileRepository.findOne(id);
+		return userProfileRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 
 	// email과 일치하는 회원 찾기.
@@ -64,11 +62,6 @@ public class UserService {
 	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
 	public UserProfile findByNEIdAndEmail(String id, String email) {
 		return userProfileRepository.findByNEIdAndEmail(id, email);
-	}
-
-	// SNS 계정으로 가입한 회원 찾기.
-	public UserProfile findUserProfileByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
-		return userProfileRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
 	// SNS 계정으로 가입한 회원 찾기(로그인).

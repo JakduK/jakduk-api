@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * @author Jang, Pyohwan(1100273)
+ * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
 
