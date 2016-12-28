@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.exception;
 
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
 import org.springframework.boot.autoconfigure.web.ErrorAttributes;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,6 +78,20 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
+
+        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+    }
+
+    /**
+     * 파라미터 검증 실패.
+     *
+     * multipart/form-data 에서 key가 file이 아닐때.
+     */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
 
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
