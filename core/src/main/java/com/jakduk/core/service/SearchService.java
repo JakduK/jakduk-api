@@ -52,9 +52,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -313,7 +311,7 @@ public class SearchService {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexSearchWord)
 				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
-				.setSize(size)
+				.setSize(0)
 				.setQuery(
 						QueryBuilders.rangeQuery("registerDate").gte(registerDateFrom)
 				)
@@ -321,6 +319,7 @@ public class SearchService {
 						AggregationBuilders
 								.terms("popular_word_aggs")
 								.field("word")
+								.size(size)
 				);
 
 		log.debug("aggregateSearchWord Query:\n" + searchRequestBuilder.internalBuilder());

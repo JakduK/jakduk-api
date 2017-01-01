@@ -15,9 +15,6 @@ public class CommonTest extends AbstractSpringTest {
 	@Autowired
 	CommonService commonService;
 
-	@Value("${storage.temp.path}")
-	private String storageTempPath;
-
 	@Autowired
 	private Environment environment;
 
@@ -25,7 +22,6 @@ public class CommonTest extends AbstractSpringTest {
 	
 	@Test
 	public void environmentTest() {
-		System.out.println(storageTempPath);
 		System.out.println(environment.getProperty("mongo.db.name"));
 	}
 
