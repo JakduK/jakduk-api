@@ -1,6 +1,10 @@
 K LEAGUE JAKDU KING
 ===================
 
+_This project is friendly supported by [JetBrains](https://jetbrains.com) & [IntelliJ IDEA](https://www.jetbrains.com/idea)!_
+
+---
+
 K LEAGUE JAKDU KING
 
 * https://jakduk.com
