@@ -6,8 +6,6 @@ import com.jakduk.api.restcontroller.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
 import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.exception.ServiceError;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
@@ -27,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -58,6 +55,9 @@ public class AdminRestController {
 
 	@Autowired
 	private SearchService searchService;
+
+	@Autowired
+	private BoardCategoryService boardCategoryService;
 
 	@ApiOperation(value = "알림판 목록")
 	@RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
@@ -608,8 +608,10 @@ public class AdminRestController {
 
 	@ApiOperation(value = "게시판 말머리 초기화")
 	@RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
-	public Map<String, Object> initBoardCategory() {
-		return adminService.initBoardCategory();
+	public EmptyJsonResponse initBoardCategory() {
+		boardCategoryService.initBoardCategory();
+
+		return EmptyJsonResponse.newInstance();
 	}
 
 	@ApiOperation(value = "검색 인덱스 초기화")

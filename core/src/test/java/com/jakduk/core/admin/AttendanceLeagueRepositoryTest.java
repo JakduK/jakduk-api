@@ -2,7 +2,6 @@ package com.jakduk.core.admin;
 
 import com.jakduk.core.repository.AttendanceLeagueRepository;
 import com.jakduk.core.util.AbstractSpringTest;
-import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

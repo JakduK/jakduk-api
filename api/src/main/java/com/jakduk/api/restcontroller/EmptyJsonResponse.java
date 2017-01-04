@@ -1,6 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 import io.swagger.annotations.ApiModel;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author pyohwan
@@ -10,7 +11,13 @@ import io.swagger.annotations.ApiModel;
 @ApiModel(value = "JSON 타입의 빈 객체")
 public class EmptyJsonResponse {
 
+    private static EmptyJsonResponse emptyJsonResponse;
+
     public static EmptyJsonResponse newInstance() {
-        return new EmptyJsonResponse();
+
+        if (ObjectUtils.isEmpty(emptyJsonResponse))
+            emptyJsonResponse = new EmptyJsonResponse();
+
+        return emptyJsonResponse;
     }
 }

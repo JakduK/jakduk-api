@@ -18,6 +18,7 @@ import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -166,58 +167,20 @@ public class AdminService {
 		footballClubRepository.save(footballClub);
 	}
 
-	public HashMap<String, Object> initBoardCategory() {
-
-		HashMap<String, Object> result = new HashMap<>();
-		
-		if (boardCategoryRepository.count() == 0) {
-			BoardCategory boardCategory01 = new BoardCategory();
-			ArrayList<LocalSimpleName> names01 = new ArrayList<>();
-			names01.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), "자유"));
-			names01.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), "FREE"));
-			boardCategory01.setCode("FREE");
-			boardCategory01.setNames(names01);
-			boardCategoryRepository.save(boardCategory01);
-
-			BoardCategory boardCategory02 = new BoardCategory();
-			ArrayList<LocalSimpleName> names02 = new ArrayList<>();
-			names02.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), "축구"));
-			names02.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), "FOOTBALL"));
-			boardCategory02.setCode("FOOTBALL");
-			boardCategory02.setNames(names02);
-			boardCategoryRepository.save(boardCategory02);
-
-			log.debug("input board category.");
-
-			result.put("result", Boolean.TRUE);
-			result.put("message", "success input board category data at DB");
-		} else {
-			result.put("result", Boolean.FALSE);
-			result.put("message", "already exist board category at DB.");
-		}
-		
-		return result;
-	}
-
 	public BoardCategory boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
-		BoardCategory boardCategory = new BoardCategory();
-		
-		if (boardCategoryWrite.getId() != null) {
-			boardCategory.setId(boardCategoryWrite.getId());
-		}
-		
-		boardCategory.setCode(boardCategoryWrite.getCode());
 
 		ArrayList<LocalSimpleName> names = new ArrayList<>();
 		names.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), boardCategoryWrite.getNameKr()));
 		names.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), boardCategoryWrite.getNameEn()));
 
-		boardCategory.setNames(names);
+		BoardCategory boardCategory = BoardCategory.builder()
+				.id(StringUtils.defaultIfBlank(boardCategoryWrite.getId(), null))
+				.code(boardCategoryWrite.getCode())
+				.names(names)
+				.build();
 
-		if (log.isDebugEnabled()) {
-			log.debug("boardCategory=" + boardCategory);
-		}
-		
+		log.debug("boardCategory=" + boardCategory);
+
 		return boardCategoryRepository.save(boardCategory);
 	}
 
