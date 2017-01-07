@@ -52,7 +52,7 @@ public class StatsRestController {
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 
         if (Objects.nonNull(competitionId)) {
-            competition = competitionService.findCompetitionById(competitionId);
+            competition = competitionService.findOneById(competitionId);
         } else if (Objects.nonNull(competitionCode)) {
             competition = competitionService.findCompetitionByCode(competitionCode);
         }

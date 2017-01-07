@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -41,9 +43,6 @@ public class StatsService {
 	private JakdukDAO jakdukDAO;
 
 	@Autowired
-	private CommonService commonService;
-
-	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
@@ -66,12 +65,14 @@ public class StatsService {
 	}
 
 	// 대회별 관중수 하나.
-	public AttendanceLeague findLeagueAttendance(String id) {
-		return attendanceLeagueRepository.findOne(id);
+	public AttendanceLeague findOneById(String id) {
+		return attendanceLeagueRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_LEAGUE));
 	}
 
 	// 새 대회별 관중수 저장.
 	public void saveLeagueAttendance(AttendanceLeague attendanceLeague) {
+
 		attendanceLeagueRepository.save(attendanceLeague);
 	}
 
