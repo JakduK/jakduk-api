@@ -27,13 +27,10 @@ import java.util.*;
  */
 
 @Slf4j
-@Api(tags = "통계", description = "통계 API")
+@Api(tags = "Stats", description = "통계 API")
 @RestController
 @RequestMapping("/api/stats")
 public class StatsRestController {
-
-    @Resource
-    LocaleResolver localeResolver;
 
     @Autowired
     private StatsService statsService;
@@ -66,33 +63,24 @@ public class StatsRestController {
         return leagueAttendances;
     }
 
+    @ApiOperation(value = "구단별 관중수 목록")
     @RequestMapping(value = "/attendance/club/{clubOrigin}", method = RequestMethod.GET)
-    public List<AttendanceClub> getAttendancesClub(@PathVariable String clubOrigin,
-                                                   HttpServletRequest request) {
+    public List<AttendanceClub> getAttendancesClubs(@PathVariable String clubOrigin) {
 
-        Locale locale = localeResolver.resolveLocale(request);
-
-        if (Objects.isNull(clubOrigin) || clubOrigin.isEmpty())
-            throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
-
-        List<AttendanceClub> attendances = statsService.getAttendanceClub(locale, clubOrigin);
-
-        return attendances;
+        return statsService.getAttendanceClub(clubOrigin);
     }
 
+    @ApiOperation(value = "연도별 관중수 목록")
     @RequestMapping(value = "/attendance/season/{season}", method = RequestMethod.GET)
-    public List<AttendanceClub> dataAttendanceSeason(@PathVariable Integer season,
-                                     @RequestParam(required = false, defaultValue = CoreConst.K_LEAGUE_ABBREVIATION) String league){
+    public List<AttendanceClub> getAttendanceSeason(@PathVariable Integer season,
+                                                    @RequestParam(required = false, defaultValue = CoreConst.K_LEAGUE_ABBREVIATION) String league){
 
-        List<AttendanceClub> attendances = statsService.getAttendancesSeason(season, league);
-
-        return attendances;
+        return statsService.getAttendancesSeason(season, league);
     }
 
     @RequestMapping(value = "/supporters", method = RequestMethod.GET)
-    public SupportersDataResponse dataSupporter(HttpServletRequest request) {
+    public SupportersDataResponse dataSupporter(Locale locale) {
 
-        Locale locale = localeResolver.resolveLocale(request);
         String language = CoreUtils.getLanguageCode(locale, null);
         Map<String, Object> data = statsService.getSupportersData(language);
 

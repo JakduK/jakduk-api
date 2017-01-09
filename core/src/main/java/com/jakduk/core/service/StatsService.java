@@ -96,20 +96,14 @@ public class StatsService {
 		return data;
 	}
 
-	public List<AttendanceClub> getAttendanceClub(Locale locale, String clubOrigin) {
+	public List<AttendanceClub> getAttendanceClub(String clubOrigin) {
 
-		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findByName(clubOrigin);
+		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOneByName(clubOrigin)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
 
-		if (Objects.isNull(footballClubOrigin))
-			throw new NoSuchElementException(CoreUtils.getResourceBundleMessage("messages.exception", "stats.msg.not.found.football.origin.exception"));
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("season", "league"));
 
-		AttendanceClubResponse response = new AttendanceClubResponse();
-
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-
-		List<AttendanceClub> attendances = attendanceClubRepository.findByClub(footballClubOrigin, sort);
-
-		return attendances;
+		return attendanceClubRepository.findByClub(footballClubOrigin, sort);
 	}
 
 	public List<AttendanceClub> getAttendancesSeason(Integer season, String league) {

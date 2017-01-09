@@ -39,9 +39,6 @@ import java.util.*;
 @RequestMapping("/api/admin")
 public class AdminRestController {
 
-	@Resource
-	LocaleResolver localeResolver;
-
 	@Autowired
 	private CommonService commonService;
 
