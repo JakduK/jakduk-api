@@ -37,6 +37,7 @@ public enum ServiceError {
     NOT_FOUND_GALLERY_FILE(HttpStatus.SC_NOT_FOUND, "exception.not.found.gallery.file"),
     NOT_FOUND_COMPETITION(HttpStatus.SC_NOT_FOUND, "exception.not.found.competition"),
     NOT_FOUND_ATTENDANCE_LEAGUE(HttpStatus.SC_NOT_FOUND, "exception.not.found.attendance.league"),
+    NOT_FOUND_ATTENDANCE_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.attendance.club"),
     NOT_FOUND_FOOTBALL_CLUB_ORIGIN(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club.origin"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),

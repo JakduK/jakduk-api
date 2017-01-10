@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -15,6 +16,7 @@ import java.util.List;
  */
 public interface AttendanceClubRepository extends MongoRepository<AttendanceClub, String>{
 
+	Optional<AttendanceClub> findOneById(String id);
 	List<AttendanceClub> findByClub(FootballClubOrigin club, Sort sort);
 	List<AttendanceClub> findBySeasonAndLeague(Integer season, String league, Sort sort);
 	List<AttendanceClub> findBySeason(Integer season, Sort sort);

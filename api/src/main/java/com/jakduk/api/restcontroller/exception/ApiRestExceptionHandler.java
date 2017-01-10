@@ -1,5 +1,7 @@
 package com.jakduk.api.restcontroller.exception;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +69,12 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, fields);
 
+        try {
+            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+        } catch (JsonProcessingException ignore) {
+            log.warn(ex.getLocalizedMessage(), ex);
+        }
+
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
@@ -79,6 +87,12 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
+
+        try {
+            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+        } catch (JsonProcessingException ignore) {
+            log.warn(ex.getLocalizedMessage(), ex);
+        }
 
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
@@ -94,6 +108,12 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
 
+        try {
+            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+        } catch (JsonProcessingException ignore) {
+            log.warn(ex.getLocalizedMessage(), ex);
+        }
+
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
@@ -101,10 +121,10 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
      * RequestParam 에서 필드 검증 실패
      */
     @ExceptionHandler(value = { ConstraintViolationException.class })
-    public ResponseEntity<Object> constrainViolationException(ConstraintViolationException e) {
+    public ResponseEntity<Object> constrainViolationException(ConstraintViolationException ex) {
 
         Map<String, String> fields = new HashMap<>();
-        Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+        Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
 
         violations.forEach(violation -> {
             String field = violation.getPropertyPath().toString();
@@ -116,6 +136,12 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, fields);
 
+        try {
+            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+        } catch (JsonProcessingException ignore) {
+            log.warn(ex.getLocalizedMessage(), ex);
+        }
+
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
@@ -124,35 +150,63 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(AuthenticationException.class)
     @ResponseBody
-    public ResponseEntity<ApiRestErrorResponse> authenticationException(AuthenticationException e) {
+    public ResponseEntity<ApiRestErrorResponse> authenticationException(AuthenticationException ex) {
 
         ServiceError serviceError = ServiceError.UNAUTHORIZED_ACCESS;
 
-        if (e.getCause().getClass().isAssignableFrom(ServiceException.class)) {
-            serviceError = ((ServiceException)e.getCause()).getServiceError();
+        if (ex.getCause().getClass().isAssignableFrom(ServiceException.class)) {
+            serviceError = ((ServiceException)ex.getCause()).getServiceError();
         }
 
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(
-                serviceError.getCode(), e.getLocalizedMessage(), serviceError.getHttpStatus()
+                serviceError.getCode(), ex.getLocalizedMessage(), serviceError.getHttpStatus()
         );
+
+        try {
+            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+        } catch (JsonProcessingException ignore) {
+            log.warn(ex.getLocalizedMessage(), ex);
+        }
 
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public ResponseEntity<ApiRestErrorResponse> serviceException(ServiceException e) {
-        ServiceError serviceError = e.getServiceError();
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, e.getLocalizedMessage());
+    public ResponseEntity<ApiRestErrorResponse> serviceException(ServiceException ex) {
+        ServiceError serviceError = ex.getServiceError();
+        HttpStatus httpStatus = HttpStatus.valueOf(serviceError.getHttpStatus());
+
+        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, ex.getLocalizedMessage());
+
+        String logMessage;
+
+        try {
+            logMessage = ObjectMapperUtils.writeValueAsString(apiRestErrorResponse);
+        } catch (JsonProcessingException e) {
+            logMessage = "code : " + ex.getServiceError().getCode() + ", message : " + ex.getLocalizedMessage();
+        }
+
+        if (httpStatus.is4xxClientError()) {
+            log.warn(logMessage, ex);
+        } else if (httpStatus.is5xxServerError()) {
+            log.error(logMessage, ex);
+        }
 
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody
-    public ResponseEntity<ApiRestErrorResponse> runtimeException(HttpServletRequest request) {
+    public ResponseEntity<ApiRestErrorResponse> runtimeException(RuntimeException ex, HttpServletRequest request) {
         ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR);
         apiRestErrorResponse.setDetail(getErrorAttributes(request, false));
+
+        try {
+            log.error(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+        } catch (JsonProcessingException ignore) {
+            log.error(ex.getLocalizedMessage(), ex);
+        }
 
         return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(apiRestErrorResponse.getHttpStatus()));
     }

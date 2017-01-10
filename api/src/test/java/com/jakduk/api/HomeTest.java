@@ -9,7 +9,7 @@ import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.model.simple.UserOnHome;
 import com.jakduk.core.repository.board.free.BoardFreeCommentOnHomeRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnHomeRepository;
-import com.jakduk.core.repository.FootballClubOriginRepository;
+import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.FootballService;
 import com.jakduk.core.service.HomeService;

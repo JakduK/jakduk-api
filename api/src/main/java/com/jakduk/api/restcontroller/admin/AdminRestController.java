@@ -2,6 +2,7 @@ package com.jakduk.api.restcontroller.admin;
 
 
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.admin.vo.AttendanceClubForm;
 import com.jakduk.api.restcontroller.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
 import com.jakduk.api.restcontroller.admin.vo.LeagueAttendanceForm;
@@ -9,7 +10,6 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.AttendanceClubWrite;
 import com.jakduk.core.model.web.CompetitionWrite;
 import com.jakduk.core.model.web.ThumbnailSizeWrite;
 import com.jakduk.core.model.web.board.BoardCategoryWrite;
@@ -19,12 +19,12 @@ import com.jakduk.core.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
 
@@ -553,31 +553,58 @@ public class AdminRestController {
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "클럽 관중")
+	@ApiOperation(value = "클럽 관중수 목록")
 	@RequestMapping(value = "/club/attendances", method = RequestMethod.GET)
 	public Map<String, Object> getAttendanceClubs() {
+
 		Map<String, Object> data = new HashMap<>();
 		data.put("attendanceClubs", adminService.getAttendanceClubList());
+
 		return data;
 	}
 
 	@ApiOperation(value = "클럽 관중수 하나")
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getAttendanceClub(@PathVariable String id) {
-		return adminService.getAttendanceClubWrite(id);
+
+		AttendanceClub attendanceClub =  statsService.findAttendanceClubById(id);
+
+		AttendanceClubForm attendanceClubForm = new AttendanceClubForm();
+		BeanUtils.copyProperties(attendanceClub, attendanceClubForm);
+
+		if (! ObjectUtils.isEmpty(attendanceClub.getClub()))
+			attendanceClubForm.setOrigin(attendanceClub.getClub().getId());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("attendanceClubWrite", attendanceClubForm);
+
+		return response;
 	}
 
 	@ApiOperation(value = "클럽 관중수 변경")
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.PUT)
-	public EmptyJsonResponse attendanceClubWrite(@PathVariable String id, @RequestBody AttendanceClubWrite attendanceClubWrite) {
-		adminService.attendanceClubWrite(id, attendanceClubWrite);
+	public EmptyJsonResponse addAttendanceClub(@PathVariable String id,
+											   @Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
+
+		adminService.saveAttendanceClub(
+				id, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
+				attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
+				attendanceClubWrite.getAverage()
+		);
+
 		return EmptyJsonResponse.newInstance();
 	}
 
 	@ApiOperation(value = "클럽 관중수 추가")
 	@RequestMapping(value = "/club/attendance", method = RequestMethod.POST)
-	public EmptyJsonResponse attendanceClubWrite(@RequestBody AttendanceClubWrite attendanceClubWrite) {
-		adminService.attendanceClubWrite(null, attendanceClubWrite);
+	public EmptyJsonResponse editAttendanceClub(@Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
+
+		adminService.saveAttendanceClub(
+				null, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
+				attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
+				attendanceClubWrite.getAverage()
+		);
+
 		return EmptyJsonResponse.newInstance();
 	}
 

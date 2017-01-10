@@ -3,13 +3,9 @@ package com.jakduk.core.service;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.stream.Stream;
 
-import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +19,9 @@ import com.jakduk.core.model.db.AttendanceLeague;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.db.FootballClubOrigin;
 import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.model.web.stats.AttendanceClubResponse;
 import com.jakduk.core.repository.AttendanceClubRepository;
 import com.jakduk.core.repository.AttendanceLeagueRepository;
-import com.jakduk.core.repository.FootballClubOriginRepository;
+import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.core.repository.user.UserRepository;
 
 /**
@@ -94,6 +89,12 @@ public class StatsService {
 		data.put("supportersTotal", supportersTotal);
 		data.put("usersTotal", usersTotal.intValue());
 		return data;
+	}
+
+	public AttendanceClub findAttendanceClubById(String id) {
+
+		return attendanceClubRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_CLUB));
 	}
 
 	public List<AttendanceClub> getAttendanceClub(String clubOrigin) {
