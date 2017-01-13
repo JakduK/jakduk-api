@@ -13,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -44,13 +45,6 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.mediaType("html", MediaType.TEXT_HTML)
-                .mediaType("json", MediaType.APPLICATION_JSON)
-                .mediaType("atom", MediaType.APPLICATION_ATOM_XML);
-    }
-
-    @Override
     public void addInterceptors(InterceptorRegistry registry) {
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("lang");
@@ -70,12 +64,9 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
                 .allowCredentials(CrossOrigin.DEFAULT_ALLOW_CREDENTIALS);
     }
 */
-
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver resolver = new SessionLocaleResolver();
-        resolver.setDefaultLocale(Locale.KOREA);
-        return resolver;
+        return new CookieLocaleResolver();
     }
 
     @Bean

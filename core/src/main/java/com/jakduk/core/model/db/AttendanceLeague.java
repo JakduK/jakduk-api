@@ -30,7 +30,7 @@ public class AttendanceLeague {
 
 	@DBRef
 	private Competition competition;
-	
+
 	private Integer season;
 	
 	private Integer games;

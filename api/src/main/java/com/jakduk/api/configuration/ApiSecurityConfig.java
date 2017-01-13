@@ -83,11 +83,6 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 ).anonymous()
 
                 .antMatchers(
-//                      "/swagger-ui.html",     // 스웨거
-                        "/rest/**"              // spring-data-rest
-                ).authenticated()
-
-                .antMatchers(
                         HttpMethod.GET,
                         "/api/user/exist/email/edit",       // 회원 프로필 편집 시 Email 중복 검사
                         "/api/user/exist/username/edit",    // 회원 프로필 편집 시 별명 중복 검사
@@ -101,12 +96,11 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         HttpMethod.PUT,
                         "/api/user/profile/me",             // 내 프로필 정보 편집
-                        "/api/user/password"               // 이메일 기반 회원의 비밀번호 변경
+                        "/api/user/password"                // 이메일 기반 회원의 비밀번호 변경
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
 
                 .antMatchers(
-                        "/admin/**",
-                        "/api/admin/**"
+//                        "/rest/**"                          // spring-data-rest
                 ).hasRole("ROOT")
 
                 .anyRequest().permitAll()

@@ -2,19 +2,21 @@ package com.jakduk.core.service;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.FootballClubOrigin;
 import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.repository.FootballClubOriginRepository;
-import com.jakduk.core.repository.FootballClubRepository;
+import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
+import com.jakduk.core.repository.footballclub.FootballClubRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author pyohwan
@@ -34,7 +36,8 @@ public class FootballService {
     private FootballClubOriginRepository footballClubOriginRepository;
 
     public FootballClub findById(String id) {
-        return footballClubRepository.findOne(id);
+        return footballClubRepository.findOneById(id)
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
     }
 
     /**
@@ -42,21 +45,16 @@ public class FootballService {
      * @param language 언어
      * @param clubType 클럽 성격
      * @param sortNameType 정렬 기준
-     * @return
      */
     public List<FootballClub> getFootballClubs(String language, CoreConst.CLUB_TYPE clubType, CoreConst.NAME_TYPE sortNameType) {
 
-        List<FootballClubOrigin> fcos = footballClubOriginRepository.findByClubType(clubType);
-        List<ObjectId> ids = new ArrayList<ObjectId>();
+        List<FootballClubOrigin> footballClubOrigins = footballClubOriginRepository.findByClubType(clubType);
 
-        for (FootballClubOrigin fco : fcos) {
-            String id = fco.getId();
-            ids.add(new ObjectId(id));
-        }
+        List<ObjectId> ids = footballClubOrigins.stream()
+                .map(footballClubOrigin -> new ObjectId(footballClubOrigin.getId()))
+                .collect(Collectors.toList());
 
-        List<FootballClub> footballClubs = jakdukDAO.getFootballClubs(ids, language, sortNameType);
-
-        return footballClubs;
+        return footballClubRepository.findFootballClubs(ids, language, sortNameType);
     }
 
     /**
@@ -68,9 +66,7 @@ public class FootballService {
      */
     public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CoreConst.NAME_TYPE sortNameType ) {
 
-        List<FootballClub> footballClubs = jakdukDAO.getFootballClubs(ids, language, sortNameType);
-
-        return footballClubs;
+        return footballClubRepository.findFootballClubs(ids, language, sortNameType);
     }
 
     /**

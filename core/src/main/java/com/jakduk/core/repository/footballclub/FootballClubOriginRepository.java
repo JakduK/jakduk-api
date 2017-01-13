@@ -1,11 +1,11 @@
-package com.jakduk.core.repository;
+package com.jakduk.core.repository.footballclub;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.db.FootballClubOrigin;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.jakduk.core.model.db.FootballClubOrigin;
-
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -14,6 +14,8 @@ import java.util.List;
  * @desc     :
  */
 public interface FootballClubOriginRepository extends MongoRepository<FootballClubOrigin, String> {
-	FootballClubOrigin findByName(String name);
+
+	Optional<FootballClubOrigin> findOneById(String id);
+	Optional<FootballClubOrigin> findOneByName(String name);
 	List<FootballClubOrigin> findByClubType(CoreConst.CLUB_TYPE clubType);
 }

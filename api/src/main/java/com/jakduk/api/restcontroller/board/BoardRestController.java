@@ -249,10 +249,7 @@ public class BoardRestController {
             @Valid @RequestBody FreePostForm form,
             Device device) {
 
-        Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
-
-        if (!boardCategory.isPresent())
-            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+        boardCategoryService.findOneByCode(form.getCategoryCode().name());
 
         List<GalleryOnBoard> galleries = new ArrayList<>();
 
@@ -282,10 +279,7 @@ public class BoardRestController {
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        Optional<BoardCategory> boardCategory = boardCategoryService.findOneByCode(form.getCategoryCode().name());
-
-        if (!boardCategory.isPresent())
-            throw new ServiceException(ServiceError.CATEGORY_NOT_FOUND);
+        boardCategoryService.findOneByCode(form.getCategoryCode().name());
 
         List<GalleryOnBoard> galleries = new ArrayList<>();
 

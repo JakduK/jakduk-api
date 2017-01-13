@@ -2,16 +2,14 @@ package com.jakduk.api.restcontroller.admin;
 
 
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.admin.vo.AttendanceClubForm;
 import com.jakduk.api.restcontroller.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.vo.HomeDescriptionRequest;
-import com.jakduk.api.restcontroller.vo.LeagueAttendanceForm;
+import com.jakduk.api.restcontroller.admin.vo.LeagueAttendanceForm;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.exception.ServiceError;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.AttendanceClubWrite;
 import com.jakduk.core.model.web.CompetitionWrite;
 import com.jakduk.core.model.web.ThumbnailSizeWrite;
 import com.jakduk.core.model.web.board.BoardCategoryWrite;
@@ -21,13 +19,13 @@ import com.jakduk.core.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
 
-import javax.annotation.Resource;
-import java.io.IOException;
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -36,13 +34,10 @@ import java.util.*;
  */
 
 @Slf4j
-@Api(tags = "관리자", description = "관리자 API")
+@Api(tags = "Admin", description = "관리자 API")
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
-
-	@Resource
-	LocaleResolver localeResolver;
 
 	@Autowired
 	private CommonService commonService;
@@ -58,6 +53,9 @@ public class AdminRestController {
 
 	@Autowired
 	private SearchService searchService;
+
+	@Autowired
+	private BoardCategoryService boardCategoryService;
 
 	@ApiOperation(value = "알림판 목록")
 	@RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
@@ -461,7 +459,7 @@ public class AdminRestController {
 		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
 
 		if (Objects.nonNull(competitionId)) {
-			competition = competitionService.findCompetitionById(competitionId);
+			competition = competitionService.findOneById(competitionId);
 		} else if (Objects.nonNull(competitionCode)) {
 			competition = competitionService.findCompetitionByCode(competitionCode);
 		}
@@ -485,10 +483,7 @@ public class AdminRestController {
 	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getLeagueAttendance(@PathVariable String id) {
 
-		AttendanceLeague attendanceLeague = statsService.findLeagueAttendance(id);
-
-		if (Objects.isNull(attendanceLeague))
-			throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회 관중수가 존재하지 않습니다.");
+		AttendanceLeague attendanceLeague = statsService.findOneById(id);
 
 		List<Competition> competitions = competitionService.findCompetitions();
 
@@ -501,47 +496,35 @@ public class AdminRestController {
 
 	@ApiOperation(value = "새 대회별 관중수 하나 저장")
 	@RequestMapping(value = "/league/attendance", method = RequestMethod.POST)
-	public Map<String, Object> addLeagueAttendance(@RequestBody LeagueAttendanceForm form) {
+	public EmptyJsonResponse addLeagueAttendance(@Valid @RequestBody LeagueAttendanceForm form) {
 
-		// 신규로 만들기때문에 null로 설정.
-		form.setId(null);
-
-		Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
-
-		if (Objects.isNull(competition))
-			throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
+		Competition competition = competitionService.findOneById(form.getCompetitionId());
 
 		AttendanceLeague attendanceLeague = AttendanceLeague.builder()
-			.competition(competition)
-			.season(form.getSeason())
-			.games(form.getGames())
-			.total(form.getTotal())
-			.average(form.getAverage())
-			.numberOfClubs(form.getNumberOfClubs())
-			.build();
+				.id(null)
+				.competition(competition)
+				.season(form.getSeason())
+				.games(form.getGames())
+				.total(form.getTotal())
+				.average(form.getAverage())
+				.numberOfClubs(form.getNumberOfClubs())
+				.build();
 
 		statsService.saveLeagueAttendance(attendanceLeague);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("leagueAttendance", attendanceLeague);
+		return EmptyJsonResponse.newInstance();
 
-		return response;
 	}
 
 	@ApiOperation(value = "대회별 관중수 하나 편집")
 	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.PUT)
-	public Map<String, Object> editLeagueAttendance(@PathVariable String id,
-	                                                @RequestBody LeagueAttendanceForm form) {
+	public EmptyJsonResponse editLeagueAttendance(@PathVariable String id,
+												  @Valid @RequestBody LeagueAttendanceForm form) {
 
-		AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
+		// 존재 확인
+		statsService.findOneById(id);
 
-		if (Objects.isNull(existAttendanceLeague))
-			throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
-
-		Competition competition = competitionService.findCompetitionById(form.getCompetitionId());
-
-		if (Objects.isNull(competition))
-			throw new IllegalArgumentException("id가 " + form.getCompetitionId() + "에 해당하는 대회가 존재하지 않습니다.");
+		Competition competition = competitionService.findOneById(form.getCompetitionId());
 
 		AttendanceLeague attendanceLeague = AttendanceLeague.builder()
 			.id(id)
@@ -555,61 +538,82 @@ public class AdminRestController {
 
 		statsService.saveLeagueAttendance(attendanceLeague);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("leagueAttendance", attendanceLeague);
-
-		return response;
+		return EmptyJsonResponse.newInstance();
 	}
 
 	@ApiOperation(value = "대회별 관중수 하나 지움")
 	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.DELETE)
-	public Map<String, Object> deleteLeagueAttendance(@PathVariable String id) {
+	public EmptyJsonResponse deleteLeagueAttendance(@PathVariable String id) {
 
-		AttendanceLeague existAttendanceLeague = statsService.findLeagueAttendance(id);
-
-		if (Objects.isNull(existAttendanceLeague))
-			throw new IllegalArgumentException("id가 " + id + "에 해당하는 대회별 관중수가 존재하지 않습니다.");
+		// 존재 확인
+		statsService.findOneById(id);
 
 		statsService.deleteLeagueAttendance(id);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("result", true);
-
-		return response;
+		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "클럽 관중")
+	@ApiOperation(value = "클럽 관중수 목록")
 	@RequestMapping(value = "/club/attendances", method = RequestMethod.GET)
 	public Map<String, Object> getAttendanceClubs() {
+
 		Map<String, Object> data = new HashMap<>();
 		data.put("attendanceClubs", adminService.getAttendanceClubList());
+
 		return data;
 	}
 
 	@ApiOperation(value = "클럽 관중수 하나")
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getAttendanceClub(@PathVariable String id) {
-		return adminService.getAttendanceClubWrite(id);
+
+		AttendanceClub attendanceClub =  statsService.findAttendanceClubById(id);
+
+		AttendanceClubForm attendanceClubForm = new AttendanceClubForm();
+		BeanUtils.copyProperties(attendanceClub, attendanceClubForm);
+
+		if (! ObjectUtils.isEmpty(attendanceClub.getClub()))
+			attendanceClubForm.setOrigin(attendanceClub.getClub().getId());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("attendanceClubWrite", attendanceClubForm);
+
+		return response;
 	}
 
 	@ApiOperation(value = "클럽 관중수 변경")
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.PUT)
-	public EmptyJsonResponse attendanceClubWrite(@PathVariable String id, @RequestBody AttendanceClubWrite attendanceClubWrite) {
-		adminService.attendanceClubWrite(id, attendanceClubWrite);
+	public EmptyJsonResponse addAttendanceClub(@PathVariable String id,
+											   @Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
+
+		adminService.saveAttendanceClub(
+				id, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
+				attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
+				attendanceClubWrite.getAverage()
+		);
+
 		return EmptyJsonResponse.newInstance();
 	}
 
 	@ApiOperation(value = "클럽 관중수 추가")
 	@RequestMapping(value = "/club/attendance", method = RequestMethod.POST)
-	public EmptyJsonResponse attendanceClubWrite(@RequestBody AttendanceClubWrite attendanceClubWrite) {
-		adminService.attendanceClubWrite(null, attendanceClubWrite);
+	public EmptyJsonResponse editAttendanceClub(@Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
+
+		adminService.saveAttendanceClub(
+				null, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
+				attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
+				attendanceClubWrite.getAverage()
+		);
+
 		return EmptyJsonResponse.newInstance();
 	}
 
 	@ApiOperation(value = "게시판 말머리 초기화")
 	@RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
-	public Map<String, Object> initBoardCategory() {
-		return adminService.initBoardCategory();
+	public EmptyJsonResponse initBoardCategory() {
+		boardCategoryService.initBoardCategory();
+
+		return EmptyJsonResponse.newInstance();
 	}
 
 	@ApiOperation(value = "검색 인덱스 초기화")

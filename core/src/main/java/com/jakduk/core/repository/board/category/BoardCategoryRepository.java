@@ -12,5 +12,7 @@ import java.util.Optional;
  * @desc     :
  */
 public interface BoardCategoryRepository extends MongoRepository<BoardCategory, String>, BoardCategoryCustom {
+
 	Optional<BoardCategory> findOneByCode(String code);
+
 }
