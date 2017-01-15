@@ -9,7 +9,7 @@ import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.repository.FootballClubRepository;
+import com.jakduk.core.repository.footballclub.FootballClubRepository;
 import com.jakduk.core.repository.user.UserProfileRepository;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j

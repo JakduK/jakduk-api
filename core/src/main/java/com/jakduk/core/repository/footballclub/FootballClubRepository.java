@@ -1,4 +1,4 @@
-package com.jakduk.core.repository;
+package com.jakduk.core.repository.footballclub;
 
 import com.jakduk.core.model.db.FootballClub;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +14,7 @@ import java.util.Optional;
  * @date     : 2014. 9. 17.
  * @desc     :
  */
-public interface FootballClubRepository extends MongoRepository<FootballClub, String> {
+public interface FootballClubRepository extends MongoRepository<FootballClub, String>, FootballClubRepositoryCustom {
 	
 	@Query(value="{'names.language' : ?0}", fields="{'active' : 1, 'origin' : 1, 'names.$' : 1}")
 	List<FootballClub> findByNamesLanguage(String language, Pageable pageable);

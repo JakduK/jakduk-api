@@ -3,13 +3,11 @@ package com.jakduk.core.service;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.stream.Stream;
 
-import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,10 +19,9 @@ import com.jakduk.core.model.db.AttendanceLeague;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.db.FootballClubOrigin;
 import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.model.web.stats.AttendanceClubResponse;
 import com.jakduk.core.repository.AttendanceClubRepository;
 import com.jakduk.core.repository.AttendanceLeagueRepository;
-import com.jakduk.core.repository.FootballClubOriginRepository;
+import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.core.repository.user.UserRepository;
 
 /**
@@ -39,9 +36,6 @@ public class StatsService {
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
-
-	@Autowired
-	private CommonService commonService;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -66,12 +60,14 @@ public class StatsService {
 	}
 
 	// 대회별 관중수 하나.
-	public AttendanceLeague findLeagueAttendance(String id) {
-		return attendanceLeagueRepository.findOne(id);
+	public AttendanceLeague findOneById(String id) {
+		return attendanceLeagueRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_LEAGUE));
 	}
 
 	// 새 대회별 관중수 저장.
 	public void saveLeagueAttendance(AttendanceLeague attendanceLeague) {
+
 		attendanceLeagueRepository.save(attendanceLeague);
 	}
 
@@ -95,20 +91,20 @@ public class StatsService {
 		return data;
 	}
 
-	public List<AttendanceClub> getAttendanceClub(Locale locale, String clubOrigin) {
+	public AttendanceClub findAttendanceClubById(String id) {
 
-		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findByName(clubOrigin);
+		return attendanceClubRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_CLUB));
+	}
 
-		if (Objects.isNull(footballClubOrigin))
-			throw new NoSuchElementException(CoreUtils.getResourceBundleMessage("messages.exception", "stats.msg.not.found.football.origin.exception"));
+	public List<AttendanceClub> getAttendanceClub(String clubOrigin) {
 
-		AttendanceClubResponse response = new AttendanceClubResponse();
+		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOneByName(clubOrigin)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
 
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
+		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("season", "league"));
 
-		List<AttendanceClub> attendances = attendanceClubRepository.findByClub(footballClubOrigin, sort);
-
-		return attendances;
+		return attendanceClubRepository.findByClub(footballClubOrigin, sort);
 	}
 
 	public List<AttendanceClub> getAttendancesSeason(Integer season, String league) {

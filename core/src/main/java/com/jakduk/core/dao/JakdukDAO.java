@@ -41,32 +41,6 @@ public class JakdukDAO {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	
-	/**
-	 * 축구단 목록 정렬해서 가져온다.
-	 * @param language
-	 * @return
-	 */
-	public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CoreConst.NAME_TYPE sortNameType) {
-
-		Query query = new Query();
-		query.addCriteria(Criteria.where("names.language").is(language));
-		query.addCriteria(Criteria.where("origin.$id").in(ids));
-		query.fields().include("active").include("origin").include("names.$");
-		//query.with(new Sort(Sort.Direction.DESC, "names.fullName"));
-		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
-
-		switch (sortNameType) {
-		case fullName:
-			footballClubs.sort((f1, f2) -> f1.getNames().get(0).getFullName().compareTo(f2.getNames().get(0).getFullName()));			
-			break;
-		case shortName:
-			footballClubs.sort((f1, f2) -> f1.getNames().get(0).getShortName().compareTo(f2.getNames().get(0).getShortName()));			
-			break;			
-		}
-
-		return footballClubs;
-	}
 
 	// 사진 목록.
 	public List<GalleryOnList> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {

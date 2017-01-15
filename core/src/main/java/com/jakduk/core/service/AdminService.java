@@ -2,22 +2,29 @@ package com.jakduk.core.service;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.JakduScheduleScore;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.embedded.LocalSimpleName;
-import com.jakduk.core.model.web.AttendanceClubWrite;
 import com.jakduk.core.model.web.CompetitionWrite;
 import com.jakduk.core.model.web.ThumbnailSizeWrite;
 import com.jakduk.core.model.web.board.BoardCategoryWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleGroupWrite;
 import com.jakduk.core.model.web.jakdu.JakduScheduleWrite;
-import com.jakduk.core.repository.*;
+import com.jakduk.core.repository.AttendanceClubRepository;
+import com.jakduk.core.repository.CompetitionRepository;
+import com.jakduk.core.repository.EncyclopediaRepository;
+import com.jakduk.core.repository.HomeDescriptionRepository;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
+import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
+import com.jakduk.core.repository.footballclub.FootballClubRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -166,58 +173,20 @@ public class AdminService {
 		footballClubRepository.save(footballClub);
 	}
 
-	public HashMap<String, Object> initBoardCategory() {
-
-		HashMap<String, Object> result = new HashMap<>();
-		
-		if (boardCategoryRepository.count() == 0) {
-			BoardCategory boardCategory01 = new BoardCategory();
-			ArrayList<LocalSimpleName> names01 = new ArrayList<>();
-			names01.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), "자유"));
-			names01.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), "FREE"));
-			boardCategory01.setCode("FREE");
-			boardCategory01.setNames(names01);
-			boardCategoryRepository.save(boardCategory01);
-
-			BoardCategory boardCategory02 = new BoardCategory();
-			ArrayList<LocalSimpleName> names02 = new ArrayList<>();
-			names02.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), "축구"));
-			names02.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), "FOOTBALL"));
-			boardCategory02.setCode("FOOTBALL");
-			boardCategory02.setNames(names02);
-			boardCategoryRepository.save(boardCategory02);
-
-			log.debug("input board category.");
-
-			result.put("result", Boolean.TRUE);
-			result.put("message", "success input board category data at DB");
-		} else {
-			result.put("result", Boolean.FALSE);
-			result.put("message", "already exist board category at DB.");
-		}
-		
-		return result;
-	}
-
 	public BoardCategory boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
-		BoardCategory boardCategory = new BoardCategory();
-		
-		if (boardCategoryWrite.getId() != null) {
-			boardCategory.setId(boardCategoryWrite.getId());
-		}
-		
-		boardCategory.setCode(boardCategoryWrite.getCode());
 
 		ArrayList<LocalSimpleName> names = new ArrayList<>();
 		names.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), boardCategoryWrite.getNameKr()));
 		names.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), boardCategoryWrite.getNameEn()));
 
-		boardCategory.setNames(names);
+		BoardCategory boardCategory = BoardCategory.builder()
+				.id(StringUtils.defaultIfBlank(boardCategoryWrite.getId(), null))
+				.code(boardCategoryWrite.getCode())
+				.names(names)
+				.build();
 
-		if (log.isDebugEnabled()) {
-			log.debug("boardCategory=" + boardCategory);
-		}
-		
+		log.debug("boardCategory=" + boardCategory);
+
 		return boardCategoryRepository.save(boardCategory);
 	}
 
@@ -314,35 +283,26 @@ public class AdminService {
 		}
 	}
 
-	public Map<String, Object> getAttendanceClubWrite(String id) {
-		Map<String, Object> data = new HashMap<>();
+	public void saveAttendanceClub(String id, String origin, String league, Integer season, Integer games, Integer total, Integer average) {
 
-		AttendanceClub attendanceClub = attendanceClubRepository.findOne(id);
-		log.debug("attendanceClub=" + attendanceClub);
-		
-		AttendanceClubWrite attendanceClubWrite = new AttendanceClubWrite();
-		attendanceClubWrite.setId(attendanceClub.getId());
-		attendanceClubWrite.setOrigin(attendanceClub.getClub().getId());
-		attendanceClubWrite.setLeague(attendanceClub.getLeague());;
-		attendanceClubWrite.setSeason(attendanceClub.getSeason());
-		attendanceClubWrite.setGames(attendanceClub.getGames());
-		attendanceClubWrite.setTotal(attendanceClub.getTotal());
-		attendanceClubWrite.setAverage(attendanceClub.getAverage());
+		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOneById(origin)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
 
-		data.put("attendanceClubWrite", attendanceClubWrite);
-		return data;
-	}	
-	
-	public void attendanceClubWrite(String id, AttendanceClubWrite attendanceClubWrite) {
-		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOne(attendanceClubWrite.getOrigin());
+		AttendanceClub attendanceClub;
 
-		AttendanceClub attendanceClub = Objects.isNull(id) ? new AttendanceClub() : attendanceClubRepository.findOne(id);
+		if (StringUtils.isBlank(id)) {
+			attendanceClub = new AttendanceClub();
+		} else {
+			attendanceClub = attendanceClubRepository.findOneById(id)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+		}
+
 		attendanceClub.setClub(footballClubOrigin);
-		attendanceClub.setSeason(attendanceClubWrite.getSeason());
-		attendanceClub.setLeague(attendanceClubWrite.getLeague());
-		attendanceClub.setGames(attendanceClubWrite.getGames());
-		attendanceClub.setTotal(attendanceClubWrite.getTotal());
-		attendanceClub.setAverage(attendanceClubWrite.getAverage());
+		attendanceClub.setLeague(league);
+		attendanceClub.setSeason(season);
+		attendanceClub.setGames(games);
+		attendanceClub.setTotal(total);
+		attendanceClub.setAverage(average);
 		
 		attendanceClubRepository.save(attendanceClub);
 	}

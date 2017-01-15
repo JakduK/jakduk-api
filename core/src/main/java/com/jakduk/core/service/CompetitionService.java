@@ -1,8 +1,9 @@
 package com.jakduk.core.service;
 
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.repository.CompetitionRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,6 @@ import java.util.List;
  * 16. 6. 6 오후 11:03
  */
 
-@Slf4j
 @Service
 public class CompetitionService {
 
@@ -26,8 +26,9 @@ public class CompetitionService {
     }
 
     // 대회 하나.
-    public Competition findCompetitionById(String id) {
-        return competitionRepository.findOne(id);
+    public Competition findOneById(String id) {
+        return competitionRepository.findOneById(id)
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMPETITION));
     }
 
     // 대회 하나.
