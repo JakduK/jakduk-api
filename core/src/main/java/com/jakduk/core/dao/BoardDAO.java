@@ -46,22 +46,6 @@ public class BoardDAO {
 	@Autowired
 	private Jongo jongo;
 
-	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
-		
-		AggregationOperation match = Aggregation.match(Criteria.where("boardItem.seq").in(arrSeq));
-		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
-		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);
-		Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
-		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
-
-		List<CommonCount> numberOfItems = results.getMappedResults();
-
-		Map<String, Integer> commentCount = numberOfItems.stream().collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
-
-		return commentCount;
-	}
-
 	public Map<String, BoardFeelingCount> getBoardFreeUsersFeelingCount(List<ObjectId> arrId) {
 		MongoCollection boardFreeC = jongo.getCollection("boardFree");
 

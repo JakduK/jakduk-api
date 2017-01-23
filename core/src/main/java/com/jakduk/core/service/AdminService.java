@@ -51,8 +51,8 @@ import java.util.List;
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  */
 
-@Service
 @Slf4j
+@Service
 public class AdminService {
 	
 	@Value("${storage.image.path}")

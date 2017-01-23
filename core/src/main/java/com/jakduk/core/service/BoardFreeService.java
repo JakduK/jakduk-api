@@ -11,16 +11,17 @@ import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
+import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
-import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
@@ -78,6 +79,13 @@ public class BoardFreeService {
 
 	public List<BoardFreeSimple> findByUserId(String id, String userId, Integer limit) {
 		return boardFreeRepository.findByIdAndUserId(new ObjectId(id), userId, limit);
+	}
+
+	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
+		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountBySeqs(arrSeq);
+
+		return numberOfItems.stream()
+				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 	}
 
     /**
@@ -372,6 +380,7 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 글 목록
+	 *
 	 * @param category 말머리
 	 * @param page 페이지
 	 * @param size 크기

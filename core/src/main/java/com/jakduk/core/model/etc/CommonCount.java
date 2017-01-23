@@ -1,7 +1,6 @@
 package com.jakduk.core.model.etc;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
+import lombok.Getter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,7 +9,7 @@ import org.springframework.data.annotation.Id;
  * @desc     :
  */
 
-@Data
+@Getter
 public class CommonCount {
 	private String id;
 	private Integer count;

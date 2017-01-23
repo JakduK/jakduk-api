@@ -93,7 +93,7 @@ public class BoardRestController {
         posts.getContent().forEach(extractIdAndSeq);
         notices.getContent().forEach(extractIdAndSeq);
 
-        Map<String, Integer> commentCounts = boardDAO.getBoardFreeCommentCount(seqs);
+        Map<String, Integer> commentCounts = boardFreeService.getBoardFreeCommentCount(seqs);
         Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
 
         // 댓글수, 감정 표현수 합치기.
@@ -102,31 +102,40 @@ public class BoardRestController {
 
             Integer commentCount = commentCounts.get(tempId);
 
-            if (Objects.nonNull(commentCount))
+            if (! ObjectUtils.isEmpty(commentCount))
                 board.setCommentCount(commentCount);
 
             BoardFeelingCount feelingCount = feelingCounts.get(tempId);
 
-            if (Objects.nonNull(feelingCount)) {
+            if (! ObjectUtils.isEmpty(feelingCount)) {
                 board.setLikingCount(feelingCount.getUsersLikingCount());
                 board.setDislikingCount(feelingCount.getUsersDisLikingCount());
             }
         };
 
+        // 게시물 목록에 댓글 수, 감정표현 수 적용.
         List<FreePostsOnList> freePosts = posts.getContent().stream()
-                .map(FreePostsOnList::new)
+                .map(post -> {
+                    FreePostsOnList freePostsOnList = new FreePostsOnList();
+                    BeanUtils.copyProperties(post, freePostsOnList);
+                    return freePostsOnList;
+                })
                 .collect(Collectors.toList());
-
         freePosts.forEach(applyCounts);
 
+        // 공지게시물 목록에 댓글 수, 감정표현 수 적용.
         List<FreePostsOnList> freeNotices = notices.getContent().stream()
-                .map(FreePostsOnList::new)
+                .map(notice -> {
+                    FreePostsOnList freePostsOnList = new FreePostsOnList();
+                    BeanUtils.copyProperties(notice, freePostsOnList);
+                    return freePostsOnList;
+                })
                 .collect(Collectors.toList());
-
         freeNotices.forEach(applyCounts);
 
         List<BoardCategory> categories = boardFreeService.getFreeCategories();
-        Map<String, String> categoriesMap = categories.stream().collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+        Map<String, String> categoriesMap = categories.stream()
+                .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
         categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
 
         return FreePostsOnListResponse.builder()
