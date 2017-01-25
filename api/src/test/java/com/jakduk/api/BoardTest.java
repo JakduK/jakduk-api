@@ -8,7 +8,6 @@ import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -91,19 +90,6 @@ public class BoardTest extends AbstractSpringTest {
 		System.out.println("date2=" + date2.getTime());
 	}
 
-	@Test
-	public void mongoAggregationTest01() {
-		
-		ArrayList<Integer> arrTemp = new ArrayList<>();
-		arrTemp.add(21);
-		arrTemp.add(22);
-		arrTemp.add(23);
-		
-		Map<String, Integer> map = boardDAO.getBoardFreeCommentCount(arrTemp);
-		
-		System.out.println("mongoAggregationTest01=" + map);
-	}
-	
 	@Test
 	public void mongoAggregationTest02() {
 		
@@ -249,16 +235,4 @@ public class BoardTest extends AbstractSpringTest {
         }
 	}
 
-	@Test
-	public void 자유게시판_댓글목록() {
-		ArrayList<ObjectId> ids = new ArrayList<>();
-		ids.add(new ObjectId("572603fdccbfc31fbbce46a3"));
-		ids.add(new ObjectId("5551d32ee4b01fe0b11da90d"));
-		ids.add(new ObjectId("54de095b8bf814167dbc59b1"));
-
-		Map<String, BoardFreeOnSearchComment> postsHavingComments = boardDAO.getBoardFreeOnSearchComment(ids);
-
-		System.out.println("postsHavingComments=" + postsHavingComments);
-
-	}
 }

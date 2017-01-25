@@ -21,7 +21,7 @@ import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.service.BoardCategoryService;
@@ -133,7 +133,7 @@ public class BoardRestController {
                 .collect(Collectors.toList());
         freeNotices.forEach(applyCounts);
 
-        List<BoardCategory> categories = boardFreeService.getFreeCategories();
+        List<BoardCategory> categories = boardCategoryService.getFreeCategories();
         Map<String, String> categoriesMap = categories.stream()
                 .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
         categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
@@ -182,7 +182,7 @@ public class BoardRestController {
                 .distinct()
                 .collect(Collectors.toList());
 
-        Map<String, BoardFreeOnSearchComment> postsHavingComments = boardDAO.getBoardFreeOnSearchComment(boardIds);
+        Map<String, BoardFreeOnSearch> postsHavingComments = boardFreeService.getBoardFreeOnSearchByIds(boardIds);
 
         List<FreeCommentsOnList> freeComments = comments.getContent().stream()
                 .map(comment -> {
@@ -190,7 +190,7 @@ public class BoardRestController {
                             BeanUtils.copyProperties(comment, newComment);
                             newComment.setBoardItem(
                                     Optional.ofNullable(postsHavingComments.get(comment.getBoardItem().getId()))
-                                            .orElse(new BoardFreeOnSearchComment())
+                                            .orElse(new BoardFreeOnSearch())
                             );
                             return newComment;
                         }
@@ -245,7 +245,7 @@ public class BoardRestController {
     @RequestMapping(value = "/categories", method = RequestMethod.GET)
     public FreeCategoriesResponse getFreeCategories() {
 
-        List<BoardCategory> categories = boardFreeService.getFreeCategories();
+        List<BoardCategory> categories = boardCategoryService.getFreeCategories();
 
         return FreeCategoriesResponse.builder()
                 .categories(categories)

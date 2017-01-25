@@ -1,5 +1,6 @@
 package com.jakduk.core.service;
 
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
@@ -7,6 +8,7 @@ import com.jakduk.core.model.embedded.LocalSimpleName;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,6 +28,14 @@ public class BoardCategoryService {
     public BoardCategory findOneByCode(String code) {
         return boardCategoryRepository.findOneByCode(code)
                 .orElseThrow(() -> new ServiceException(ServiceError.CATEGORY_NOT_FOUND));
+    }
+
+    /**
+     * 자유게시판 말머리 목록
+     * @return 말머리 목록
+     */
+    public List<BoardCategory> getFreeCategories() {
+        return boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
     }
 
     /**

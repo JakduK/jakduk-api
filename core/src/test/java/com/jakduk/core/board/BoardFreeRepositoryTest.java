@@ -61,7 +61,7 @@ public class BoardFreeRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void findPostsWithRss() {
-        List<BoardFreeOnRSS> posts = sut.findPostsWithRss();
+        List<BoardFreeOnRSS> posts = sut.findPostsOnRss();
 
         Assert.assertTrue(posts.size() > 0);
     }
