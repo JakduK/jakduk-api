@@ -24,7 +24,7 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping
-public class BaseController {
+public class DefaultViewController {
 
 	@Autowired
 	private GalleryService galleryService;
