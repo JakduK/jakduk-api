@@ -14,7 +14,7 @@ import java.util.Map;
  */
 
 @Getter
-public class ApiRestErrorResponse {
+public class RestErrorResponse {
 
     private String code;
     private String message;
@@ -29,30 +29,30 @@ public class ApiRestErrorResponse {
     @Setter
     private Map<String, Object> detail;
 
-    public ApiRestErrorResponse(String code, String message) {
+    public RestErrorResponse(String code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public ApiRestErrorResponse(String code, String message, Integer httpStatus) {
+    public RestErrorResponse(String code, String message, Integer httpStatus) {
         this.code = code;
         this.message = message;
         this.httpStatus = httpStatus;
     }
 
-    public ApiRestErrorResponse(ServiceError serviceError) {
+    public RestErrorResponse(ServiceError serviceError) {
         this.code = serviceError.getCode();
         this.message = serviceError.getMessage();
         this.httpStatus = serviceError.getHttpStatus();
     }
 
-    public ApiRestErrorResponse(ServiceError serviceError, String message) {
+    public RestErrorResponse(ServiceError serviceError, String message) {
         this.code = serviceError.getCode();
         this.message = message;
         this.httpStatus = serviceError.getHttpStatus();
     }
 
-    public ApiRestErrorResponse(ServiceError serviceError, Map<String, String> fields) {
+    public RestErrorResponse(ServiceError serviceError, Map<String, String> fields) {
         this.code = serviceError.getCode();
         this.message = serviceError.getMessage();
         this.httpStatus = serviceError.getHttpStatus();
