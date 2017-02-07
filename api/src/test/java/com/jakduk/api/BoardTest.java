@@ -1,6 +1,5 @@
 package com.jakduk.api;
 
-import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.model.db.BoardFree;
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
  * @desc     :
  */
 
-public class BoardTest extends AbstractSpringTest {
+public class BoardTest extends ApiApplicationTests {
 	
 	@Autowired
 	private BoardFreeRepository boardFreeRepository;

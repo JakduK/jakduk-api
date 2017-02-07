@@ -1,6 +1,6 @@
 package com.jakduk.api.user;
 
-import com.jakduk.api.util.AbstractSpringTest;
+import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.dao.JakdukDAO;
@@ -26,7 +26,7 @@ import java.util.Optional;
  * @desc     :
  */
 
-public class UserTest extends AbstractSpringTest {
+public class UserTest extends ApiApplicationTests {
 
 	@Autowired
 	UserRepository userRepository;

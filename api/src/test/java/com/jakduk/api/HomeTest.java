@@ -1,6 +1,5 @@
 package com.jakduk.api;
 
-import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.FootballClub;
@@ -25,7 +24,7 @@ import java.util.List;
  * @desc     :
  */
 
-public class HomeTest extends AbstractSpringTest {
+public class HomeTest extends ApiApplicationTests {
 	
 	@Autowired
     BoardFreeOnHomeRepository boardFreeOnHomeRepository;

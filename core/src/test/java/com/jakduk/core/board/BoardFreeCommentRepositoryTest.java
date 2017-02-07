@@ -1,8 +1,8 @@
 package com.jakduk.core.board;
 
+import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
-import com.jakduk.core.util.AbstractSpringTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by pyohwan on 17. 1. 23.
  */
-public class BoardFreeCommentRepositoryTest extends AbstractSpringTest {
+public class BoardFreeCommentRepositoryTest extends CoreApplicationTests {
 
     @Autowired
     private BoardFreeCommentRepository sut;

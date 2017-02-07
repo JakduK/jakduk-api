@@ -1,4 +1,4 @@
-package com.jakduk.core.util;
+package com.jakduk.core;
 
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
@@ -7,13 +7,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * Created by pyohwan on 16. 9. 11.
+ * @author Jang, Pyohwan(1100273)
+ * @since 2017. 2. 7.
  */
 
 @Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles({"core-staging", "core-production", "core-default"}) // profiles 설정 안하면, core-default 적용
-public class AbstractSpringTest {
-
+@ActiveProfiles(inheritProfiles = false, resolver = CoreTestActiveProfileResolver.class)
+public class CoreApplicationTests {
 }
