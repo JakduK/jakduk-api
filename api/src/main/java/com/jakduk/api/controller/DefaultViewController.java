@@ -65,4 +65,5 @@ public class DefaultViewController {
 			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY, e);
 		}
 	}
+
 }

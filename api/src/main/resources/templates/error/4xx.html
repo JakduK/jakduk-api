@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Page not found</title>
     <style>
         html {
@@ -57,9 +57,9 @@
 <body style="text-align:center;">
 <div class="main">
     <div style="display: table-cell;vertical-align: middle;text-align: center;">
-        <img src="https://jakduk.com/jakduk/img/logo_256.png" alt="Logo">
-        <h1 class="status">404</h1>
-        <h2 class="status_message">Page not found</h2>
+        <img src="https://jakduk.com/jakduk/img/logo_256.png" alt="Logo"/>
+        <h1 class="status" th:text="${status}">404</h1>
+        <h2 class="status_message" th:text="${message}">Page not found</h2>
         <h1 class="jakduk">K LEAGUE JAKDU KING</h1>
     </div>
 </div>

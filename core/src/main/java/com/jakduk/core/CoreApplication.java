@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
@@ -18,7 +17,6 @@ import javax.annotation.Resource;
 
 @SpringBootApplication
 @PropertySource("classpath:/application-core.properties")
-@ComponentScan
 public class CoreApplication {
 
     @Resource
