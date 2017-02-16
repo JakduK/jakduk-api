@@ -7,8 +7,8 @@ import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryOnUploadResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;
-import com.jakduk.api.restcontroller.vo.GalleriesResponse;
-import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
+import com.jakduk.api.restcontroller.gallery.vo.GalleriesResponse;
+import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -48,10 +48,10 @@ public class GalleryRestController {
     @Value("${api.server.url}")
     private String apiServerUrl;
 
-    @Value("${gallery.image.path}")
+    @Value("${core.gallery.image.path}")
     private String imagePath;
 
-    @Value("${gallery.thumbnail.path}")
+    @Value("${core.gallery.thumbnail.path}")
     private String thumbnailPath;
 
     @Autowired
@@ -94,13 +94,12 @@ public class GalleryRestController {
         if (file.isEmpty())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
-        CommonPrincipal principal = UserUtils.getCommonPrincipal();
-        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
 
         Gallery gallery = null;
 
         try {
-            gallery = galleryService.uploadImage(writer, file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
+            gallery = galleryService.uploadImage(commonWriter, file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
         } catch (IOException ignored) {
         }
 

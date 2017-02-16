@@ -34,6 +34,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -249,6 +250,18 @@ public class UserRestController {
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
         userService.updateUserPassword(authUserProfile.getId(), passwordEncoder.encode(form.getNewPassword().trim()));
+
+        return EmptyJsonResponse.newInstance();
+    }
+
+    @ApiOperation(value = "유저 이미지 올리기")
+    @RequestMapping(value = "/image", method = RequestMethod.POST)
+    public EmptyJsonResponse updateUserImage(@RequestParam MultipartFile file) {
+
+        String contentType = file.getContentType();
+
+        if (! StringUtils.startsWithIgnoreCase(contentType, "image/"))
+            throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
         return EmptyJsonResponse.newInstance();
     }

@@ -22,17 +22,20 @@ public enum ServiceError {
     FEELING_YOU_ARE_WRITER(HttpStatus.SC_BAD_REQUEST, "exception.you.are.writer"),
     FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
 
+    // FILE
+    FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED(HttpStatus.SC_BAD_REQUEST, "exception.only.image.type.can.be.uploaded"),
+
     NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
     NOT_FOUND_USER(HttpStatus.SC_NOT_FOUND, "exception.not.found.user"),
     NOT_REGISTER_WITH_SNS(HttpStatus.SC_NOT_FOUND, "exception.not.register.with.sns"),
     CANNOT_GET_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.sns.profile"),
     ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
     ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
-    NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.post.not.found"),
-    CATEGORY_NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.category.not.found"),
+    NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
+    CATEGORY_NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.not.found.category"),
     ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
     ALREADY_DISABLE(HttpStatus.SC_NOT_FOUND, "exception.already.disable"),
-    NOT_FOUND_FOOTBALL_CLUB(HttpStatus.SC_NOT_FOUND, "exception.football.club.not.found"),
+    NOT_FOUND_FOOTBALL_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club"),
     NOT_FOUND_GALLERY(HttpStatus.SC_NOT_FOUND, "exception.not.found.gallery"),
     NOT_FOUND_GALLERY_FILE(HttpStatus.SC_NOT_FOUND, "exception.not.found.gallery.file"),
     NOT_FOUND_COMPETITION(HttpStatus.SC_NOT_FOUND, "exception.not.found.competition"),
