@@ -1,8 +1,8 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.service.GalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +23,19 @@ import java.io.IOException;
  */
 
 @Controller
-@RequestMapping("/gallery")
-public class GalleryController {
+@RequestMapping
+public class DefaultViewController {
 
 	@Autowired
 	private GalleryService galleryService;
 
+	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
+	public String getRss() {
+		return "documentRssFeedView";
+	}
+
 	// 사진 가져오기.
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/gallery/{id}", method = RequestMethod.GET)
 	public void getGallery(@PathVariable String id,	HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
@@ -46,7 +51,7 @@ public class GalleryController {
 	}
 
 	// 사진 썸네일 가져오기.
-	@RequestMapping(value = "/thumbnail/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/gallery/thumbnail/{id}", method = RequestMethod.GET)
 	public void getGalleyThumbnail(@PathVariable String id, HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
@@ -60,4 +65,5 @@ public class GalleryController {
 			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY, e);
 		}
 	}
+
 }

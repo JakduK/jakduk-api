@@ -1,6 +1,6 @@
 package com.jakduk.api.configuration.authentication.handler;
 
-import com.jakduk.api.restcontroller.exception.ApiRestErrorResponse;
+import com.jakduk.api.restcontroller.exception.RestErrorResponse;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.service.CommonService;
@@ -31,20 +31,20 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
         ServiceError serviceError = ServiceError.NEED_TO_LOGIN;
-        ApiRestErrorResponse apiRestErrorResponse;
+        RestErrorResponse restErrorResponse;
 
         if (authException.getClass().isAssignableFrom(BadCredentialsException.class)) {
             serviceError = ServiceError.BAD_CREDENTIALS;
-            apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
+            restErrorResponse = new RestErrorResponse(serviceError);
         } else {
-            apiRestErrorResponse = new ApiRestErrorResponse(serviceError.getCode(), authException.getLocalizedMessage());
+            restErrorResponse = new RestErrorResponse(serviceError.getCode(), authException.getLocalizedMessage());
         }
 
         response.setContentType("application/json");
         response.setStatus(serviceError.getHttpStatus());
         response.setCharacterEncoding("utf-8");
 
-        String errorJson = ObjectMapperUtils.getObjectMapper().writeValueAsString(apiRestErrorResponse);
+        String errorJson = ObjectMapperUtils.getObjectMapper().writeValueAsString(restErrorResponse);
 
         PrintWriter out = response.getWriter();
         out.print(errorJson);

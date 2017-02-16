@@ -10,14 +10,13 @@ import com.rometools.rome.feed.rss.Item;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.feed.AbstractRssFeedView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 @Component("documentRssFeedView")
 public class DocumentRssFeedView extends AbstractRssFeedView {
 
-	@Autowired
+	@Resource
 	private MessageSource messageSource;
 
 	@Autowired
@@ -42,12 +41,10 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	 * <p>By default returns an RSS 2.0 channel, but the subclass can specify any channel.
 	 */
 	@Override protected Channel newFeed() {
-		Locale locale = LocaleContextHolder.getLocale();
-
 		Channel channel = new Channel("rss_2.0");
 		channel.setLink(link + "/rss");
-		channel.setTitle(messageSource.getMessage("common.jakduk", null, locale));
-		channel.setDescription(messageSource.getMessage("common.jakduk.rss.description", null, locale));
+		channel.setTitle(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk"));
+		channel.setDescription(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk.rss.description"));
 		return channel;
 	}
 
@@ -67,7 +64,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	@Override protected List<Item> buildFeedItems(Map<String, Object> model, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
-		List<BoardFreeOnRSS> posts = boardFreeRepository.findPostsWithRss();
+		List<BoardFreeOnRSS> posts = boardFreeRepository.findPostsOnRss();
 
 		List<Item> items = posts.stream()
 				.map(post -> {

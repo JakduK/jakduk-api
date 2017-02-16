@@ -7,7 +7,7 @@ import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import org.apache.commons.collections4.IteratorUtils;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -45,22 +45,6 @@ public class BoardDAO {
 	
 	@Autowired
 	private Jongo jongo;
-
-	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
-		
-		AggregationOperation match = Aggregation.match(Criteria.where("boardItem.seq").in(arrSeq));
-		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
-		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);
-		Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
-		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
-
-		List<CommonCount> numberOfItems = results.getMappedResults();
-
-		Map<String, Integer> commentCount = numberOfItems.stream().collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
-
-		return commentCount;
-	}
 
 	public Map<String, BoardFeelingCount> getBoardFreeUsersFeelingCount(List<ObjectId> arrId) {
 		MongoCollection boardFreeC = jongo.getCollection("boardFree");
@@ -165,17 +149,6 @@ public class BoardDAO {
 		
 		return commentCount;
 	}	
-	
-	public Map<String, BoardFreeOnSearchComment> getBoardFreeOnSearchComment(List<ObjectId> arrId) {
-		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
-		Aggregation aggregation = Aggregation.newAggregation(match1);
-		AggregationResults<BoardFreeOnSearchComment> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnSearchComment.class);
-		
-		List<BoardFreeOnSearchComment> posts = results.getMappedResults();
-
-		return posts.stream()
-				.collect(Collectors.toMap(BoardFreeOnSearchComment::getId, Function.identity()));
-	}
 	
 	/**
 	 * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.

@@ -1,6 +1,5 @@
 package com.jakduk.api;
 
-import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.AttendanceClub;
 import com.jakduk.core.model.etc.SupporterCount;
@@ -20,7 +19,7 @@ import java.util.stream.Stream;
  * @desc     :
  */
 
-public class StatsTest extends AbstractSpringTest {
+public class StatsTest extends ApiApplicationTests {
 	
 	@Autowired
     JakdukDAO jakdukDAO;

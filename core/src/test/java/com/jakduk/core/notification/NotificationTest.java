@@ -1,8 +1,8 @@
 package com.jakduk.core.notification;
 
-import com.jakduk.core.service.EmailService;
+import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.common.util.SlackUtils;
-import com.jakduk.core.util.AbstractSpringTest;
+import com.jakduk.core.service.EmailService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import java.util.Locale;
 /**
  * Created by pyohwan on 16. 9. 11.
  */
-public class NotificationTest extends AbstractSpringTest {
+public class NotificationTest extends CoreApplicationTests {
 
     @Autowired
     private SlackUtils slackUtils;

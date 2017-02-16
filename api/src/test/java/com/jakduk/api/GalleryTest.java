@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.Gallery;
@@ -41,7 +40,7 @@ import java.util.*;
  * @desc     :
  */
 
-public class GalleryTest extends AbstractSpringTest {
+public class GalleryTest extends ApiApplicationTests {
 	
 	@Value("${storage.image.path}")
 	private String storageImagePath;

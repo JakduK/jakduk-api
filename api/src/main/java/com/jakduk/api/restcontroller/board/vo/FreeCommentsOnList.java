@@ -3,7 +3,7 @@ package com.jakduk.api.restcontroller.board.vo;
 import com.jakduk.core.model.embedded.BoardCommentStatus;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.simple.BoardFreeOnSearchComment;
+import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -27,7 +27,7 @@ public class FreeCommentsOnList {
     private String id;
 
     @ApiModelProperty(value = "연동 글")
-    private BoardFreeOnSearchComment boardItem;
+    private BoardFreeOnSearch boardItem;
 
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;

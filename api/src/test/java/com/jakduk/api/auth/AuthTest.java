@@ -2,7 +2,6 @@ package com.jakduk.api.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.util.AbstractSpringTest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
  * @author pyohwan
  *         16. 7. 31 오후 8:29
  */
-public class AuthTest extends AbstractSpringTest {
+public class AuthTest {
 
     @Autowired
     private UserUtils userUtils;
