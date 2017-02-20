@@ -1,6 +1,5 @@
 package com.jakduk.api;
 
-import com.jakduk.api.util.AbstractSpringTest;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.db.JakduComment;
@@ -23,7 +22,7 @@ import java.util.List;
  * 15. 12. 27 오후 11:57
  */
 
-public class JakduTest extends AbstractSpringTest {
+public class JakduTest extends ApiApplicationTests {
 
     @Autowired
     private  JakdukDAO jakdukDAO;

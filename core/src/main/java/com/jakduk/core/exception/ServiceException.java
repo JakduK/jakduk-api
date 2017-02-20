@@ -1,6 +1,7 @@
 package com.jakduk.core.exception;
 
 import lombok.Getter;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * @author pyohwan

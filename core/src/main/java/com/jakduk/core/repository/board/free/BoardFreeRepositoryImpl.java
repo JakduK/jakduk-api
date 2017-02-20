@@ -4,6 +4,7 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.elasticsearch.ESBoard;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
+import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,13 +70,26 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
     }
 
     @Override
-    public List<BoardFreeOnRSS> findPostsWithRss() {
+    public List<BoardFreeOnRSS> findPostsOnRss() {
         AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(true));
         AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "_id");
         AggregationOperation limit = Aggregation.limit(CoreConst.RSS_SIZE_ITEM);
         Aggregation aggregation = Aggregation.newAggregation(match, sort, limit);
 
         AggregationResults<BoardFreeOnRSS> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnRSS.class);
+
+        return results.getMappedResults();
+    }
+
+    /**
+     * id 배열에 해당하는 BoardFree 목록.
+     * @param ids id 배열
+     */
+    @Override
+    public List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids) {
+        AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(ids));
+        Aggregation aggregation = Aggregation.newAggregation(match1);
+        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnSearch.class);
 
         return results.getMappedResults();
     }

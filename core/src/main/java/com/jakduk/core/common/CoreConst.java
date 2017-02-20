@@ -56,13 +56,6 @@ public class CoreConst {
 	}
 
 	/**
-	 * 사용자 쿠키
-	 */
-	public final static String COOKIE_EMAIL = "email";
-	public final static String COOKIE_REMEMBER = "remember";
-	public final static Integer COOKIE_EMAIL_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-
-	/**
 	 * 글의 좋아요 싫어요에 대한 에러 코드
 	 */
 	public final static String BOARD_USERS_FEELINGS_STATUS_NONE = "none";
@@ -87,8 +80,6 @@ public class CoreConst {
 		DISLIKE
 	}
 
-	public final static String PRINCIPAL_ANONYMOUSUSER = "anonymousUser";
-	
 	/**
 	 * 글 지움 종류
 	 */
@@ -128,7 +119,15 @@ public class CoreConst {
 		TEMP,
 		ENABLE,
 	}
-	
+
+	/**
+	 * 유저 이미지의 출처.
+	 */
+	public enum USER_IMAGE_SOURCE_TYPE {
+		EXTERNAL,		// SNS와 같은 외부에서 가져옴.
+		JAKDUK,			// 작두왕에서 직접 등록.
+	}
+
 	/**
 	 * 디바이스 타입
      */

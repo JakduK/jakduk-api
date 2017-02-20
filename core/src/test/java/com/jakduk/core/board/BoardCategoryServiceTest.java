@@ -1,16 +1,15 @@
 package com.jakduk.core.board;
 
+import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.service.BoardCategoryService;
-import com.jakduk.core.util.AbstractSpringTest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 
 /**
  * Created by pyohwan on 17. 1. 4.
  */
-public class BoardCategoryServiceTest extends AbstractSpringTest {
+public class BoardCategoryServiceTest extends CoreApplicationTests {
 
     @Autowired
     private BoardCategoryService sut;
@@ -20,4 +19,5 @@ public class BoardCategoryServiceTest extends AbstractSpringTest {
     public void initBoardCategory() {
         sut.initBoardCategory();
     }
+
 }

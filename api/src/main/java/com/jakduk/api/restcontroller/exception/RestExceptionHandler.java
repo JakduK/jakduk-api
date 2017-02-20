@@ -40,7 +40,7 @@ import java.util.Set;
 
 @Slf4j
 @ControllerAdvice(value = "com.jakduk.api.restcontroller")
-public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
@@ -67,15 +67,15 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
                 error -> fields.put(error.getField() + "_" + error.getCode(), error.getDefaultMessage())
         );
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, fields);
+        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, fields);
 
         try {
-            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
         } catch (JsonProcessingException ignore) {
             log.warn(ex.getLocalizedMessage(), ex);
         }
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -86,15 +86,15 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
+        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError);
 
         try {
-            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
         } catch (JsonProcessingException ignore) {
             log.warn(ex.getLocalizedMessage(), ex);
         }
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -106,15 +106,15 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError);
+        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError);
 
         try {
-            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
         } catch (JsonProcessingException ignore) {
             log.warn(ex.getLocalizedMessage(), ex);
         }
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -134,15 +134,15 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, fields);
+        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, fields);
 
         try {
-            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
         } catch (JsonProcessingException ignore) {
             log.warn(ex.getLocalizedMessage(), ex);
         }
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     /**
@@ -150,7 +150,7 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(AuthenticationException.class)
     @ResponseBody
-    public ResponseEntity<ApiRestErrorResponse> authenticationException(AuthenticationException ex) {
+    public ResponseEntity<RestErrorResponse> authenticationException(AuthenticationException ex) {
 
         ServiceError serviceError = ServiceError.UNAUTHORIZED_ACCESS;
 
@@ -158,31 +158,31 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
             serviceError = ((ServiceException)ex.getCause()).getServiceError();
         }
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(
+        RestErrorResponse restErrorResponse = new RestErrorResponse(
                 serviceError.getCode(), ex.getLocalizedMessage(), serviceError.getHttpStatus()
         );
 
         try {
-            log.warn(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
         } catch (JsonProcessingException ignore) {
             log.warn(ex.getLocalizedMessage(), ex);
         }
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public ResponseEntity<ApiRestErrorResponse> serviceException(ServiceException ex) {
+    public ResponseEntity<RestErrorResponse> serviceException(ServiceException ex) {
         ServiceError serviceError = ex.getServiceError();
         HttpStatus httpStatus = HttpStatus.valueOf(serviceError.getHttpStatus());
 
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(serviceError, ex.getLocalizedMessage());
+        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, ex.getLocalizedMessage());
 
         String logMessage;
 
         try {
-            logMessage = ObjectMapperUtils.writeValueAsString(apiRestErrorResponse);
+            logMessage = ObjectMapperUtils.writeValueAsString(restErrorResponse);
         } catch (JsonProcessingException e) {
             logMessage = "code : " + ex.getServiceError().getCode() + ", message : " + ex.getLocalizedMessage();
         }
@@ -193,22 +193,22 @@ public class ApiRestExceptionHandler extends ResponseEntityExceptionHandler {
             log.error(logMessage, ex);
         }
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody
-    public ResponseEntity<ApiRestErrorResponse> runtimeException(RuntimeException ex, HttpServletRequest request) {
-        ApiRestErrorResponse apiRestErrorResponse = new ApiRestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR);
-        apiRestErrorResponse.setDetail(getErrorAttributes(request, false));
+    public ResponseEntity<RestErrorResponse> runtimeException(RuntimeException ex, HttpServletRequest request) {
+        RestErrorResponse restErrorResponse = new RestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR);
+        restErrorResponse.setDetail(getErrorAttributes(request, false));
 
         try {
-            log.error(ObjectMapperUtils.writeValueAsString(apiRestErrorResponse), ex);
+            log.error(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
         } catch (JsonProcessingException ignore) {
             log.error(ex.getLocalizedMessage(), ex);
         }
 
-        return new ResponseEntity<>(apiRestErrorResponse, HttpStatus.valueOf(apiRestErrorResponse.getHttpStatus()));
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(restErrorResponse.getHttpStatus()));
     }
 
     private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {

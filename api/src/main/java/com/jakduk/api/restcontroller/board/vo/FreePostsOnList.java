@@ -4,10 +4,11 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardStatus;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.simple.BoardFreeOnList;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 
 @ApiModel(value = "자유게시판 게시물")
+@NoArgsConstructor
 @Getter
 @Setter
 public class FreePostsOnList {
@@ -55,14 +57,4 @@ public class FreePostsOnList {
     @ApiModelProperty(value = "싫어요 수")
     private int dislikingCount;
 
-    public FreePostsOnList(BoardFreeOnList posts) {
-        this.id = posts.getId();
-        this.seq = posts.getSeq();
-        this.writer = posts.getWriter();
-        this.status = posts.getStatus();
-        this.subject = posts.getSubject();
-        this.category = posts.getCategory();
-        this.views = posts.getViews();
-        this.galleries = posts.getGalleries();
-    }
 }

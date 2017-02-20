@@ -1,7 +1,6 @@
 package com.jakduk.core.service;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -11,21 +10,22 @@ import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
+import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
+import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
-import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -78,6 +79,13 @@ public class BoardFreeService {
 
 	public List<BoardFreeSimple> findByUserId(String id, String userId, Integer limit) {
 		return boardFreeRepository.findByIdAndUserId(new ObjectId(id), userId, limit);
+	}
+
+	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
+		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountBySeqs(arrSeq);
+
+		return numberOfItems.stream()
+				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 	}
 
     /**
@@ -362,16 +370,8 @@ public class BoardFreeService {
     }
 
 	/**
-	 * 자유게시판 말머리 목록
-	 * @return 말머리 목록
-     */
-	public List<BoardCategory> getFreeCategories() {
-
-		return boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
-	}
-
-	/**
 	 * 자유게시판 글 목록
+	 *
 	 * @param category 말머리
 	 * @param page 페이지
 	 * @param size 크기
@@ -693,9 +693,6 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 댓글 목록
-	 * @param page
-	 * @param size
-     * @return
      */
 	public Page<BoardFreeComment> getBoardFreeComments(int page, int size) {
 
@@ -703,5 +700,16 @@ public class BoardFreeService {
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 
 		return boardFreeCommentRepository.findAll(pageable);
+	}
+
+	/**
+	 * id 배열에 해당하는 BoardFree 목록.
+	 * @param ids id 배열
+	 */
+	public Map<String, BoardFreeOnSearch> getBoardFreeOnSearchByIds(List<ObjectId> ids) {
+		List<BoardFreeOnSearch> posts = boardFreeRepository.findPostsOnSearchByIds(ids);
+
+		return posts.stream()
+				.collect(Collectors.toMap(BoardFreeOnSearch::getId, Function.identity()));
 	}
 }
