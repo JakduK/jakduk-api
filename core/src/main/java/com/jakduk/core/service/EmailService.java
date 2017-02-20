@@ -24,7 +24,7 @@ import java.util.*;
 @Component
 public class EmailService {
 
-	@Value("${email.enable}")
+	@Value("${core.email.enable}")
 	private boolean emailEnabled;
 
 	@Autowired
@@ -69,15 +69,15 @@ public class EmailService {
 		message.setTo(recipientEmail);
 
 		// Create the HTML body using Thymeleaf
-		final String htmlContent = this.htmlTemplateEngine.process("resetPassword", ctx);
+		final String htmlContent = this.htmlTemplateEngine.process("mail/resetPassword", ctx);
 		message.setText(htmlContent, true /* isHtml */);
 
 		String logoPath = "";
 
 		if (language.equals(Locale.KOREAN.getLanguage())) {
-			logoPath = "mail/images/logo_type_A_kr.png";
+			logoPath = "public/images/logo_type_A_kr.png";
 		} else {
-			logoPath = "mail/images/logo_type_A_en.png";
+			logoPath = "public/images/logo_type_A_en.png";
 		}
 
 		message.addInline("logo", new ClassPathResource(logoPath), "image/png");
@@ -117,7 +117,7 @@ public class EmailService {
 			message.setTo(recipientEmail);
 
 			// Create the HTML body using Thymeleaf
-			final String htmlContent = this.htmlTemplateEngine.process("welcome", ctx);
+			final String htmlContent = this.htmlTemplateEngine.process("mail/welcome", ctx);
 			message.setText(htmlContent, true /* isHtml */);
 
 			// Send email
@@ -148,13 +148,13 @@ public class EmailService {
 		message.setTo(recipientEmail);
 
 		// Create the HTML body using Thymeleaf
-		final String htmlContent = this.htmlTemplateEngine.process("email-inlineimage", ctx);
+		final String htmlContent = this.htmlTemplateEngine.process("mail/email-inlineimage", ctx);
 		message.setText(htmlContent, true /* isHtml */);
 
 		// Add the inline image, referenced from the HTML code as "cid:${imageResourceName}"
 //		final InputStreamSource imageSource = new ByteArrayResource(imageBytes);
 //		message.addInline(imageResourceName, imageSource, imageContentType);
-		message.addInline("sample-image", new ClassPathResource("mail/images/logo_type_A_en.png"), "image/png");
+		message.addInline("sample-image", new ClassPathResource("public/images/logo_type_A_en.png"), "image/png");
 
 		// Send mail
 		this.mailSender.send(mimeMessage);

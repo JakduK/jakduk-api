@@ -254,8 +254,8 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "유저 이미지 올리기")
-    @RequestMapping(value = "/image", method = RequestMethod.POST)
+    @ApiOperation(value = "프로필 이미지 올리기")
+    @RequestMapping(value = "/profile/image", method = RequestMethod.POST)
     public EmptyJsonResponse updateUserImage(@RequestParam MultipartFile file) {
 
         String contentType = file.getContentType();

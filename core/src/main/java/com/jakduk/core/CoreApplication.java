@@ -38,12 +38,11 @@ public class CoreApplication {
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames(
-                "classpath:messages/common", "classpath:messages/board", "classpath:messages/user",
-                "classpath:messages/about", "classpath:messages/home", "classpath:messages/gallery",
-                "classpath:messages/search", "classpath:messages/jakdu", "classpath:messages/email",
-                "classpath:messages/exception"
+                "messages/common", "messages/board", "messages/user", "messages/about", "messages/home",
+                "messages/gallery", "messages/search", "messages/jakdu", "messages/email", "messages/exception"
         );
 
         return messageSource;
     }
+
 }

@@ -45,4 +45,14 @@ public class NotificationTest extends CoreApplicationTests {
         emailService.sendWelcome(locale, "이은상", "phjang1983@daum.net");
 
     }
+
+    @Ignore
+    @Test
+    public void 비밀번호_갱신() throws MessagingException {
+
+        Locale locale = Locale.KOREAN;
+
+        emailService.sendResetPassword(locale, "http://localhost:8080", "phjang1983@daum.net");
+
+    }
 }
