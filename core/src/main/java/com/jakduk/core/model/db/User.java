@@ -29,7 +29,7 @@ public class User {
 	
 	private String password;						// 비밀번호
 
-	private CoreConst.ACCOUNT_TYPE providerId;	// 제공자
+	private CoreConst.ACCOUNT_TYPE providerId;		// 제공자
 
 	private String providerUserId;					// SNS USER ID
 

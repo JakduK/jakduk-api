@@ -2,8 +2,8 @@ package com.jakduk.core.service;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -140,7 +140,6 @@ public class GalleryService {
 			// 사진 경로.
 			Path imageFilePath = imageDirPath.resolve(gallery.getId() + "." + formatName);
 			Path thumbFilePath = thumbDirPath.resolve(gallery.getId() + "." + formatName);
-
 
 			// 사진 저장.
 			if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {

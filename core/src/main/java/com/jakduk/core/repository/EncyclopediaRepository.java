@@ -4,6 +4,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.jakduk.core.model.db.Encyclopedia;
 
+import java.util.List;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -14,5 +16,6 @@ public interface EncyclopediaRepository extends MongoRepository<Encyclopedia, St
 	
 	Encyclopedia findOneBySeqAndLanguage(Integer seq, String language);
 	Integer countByLanguage(String language);
+	List<Encyclopedia> findListByLanguage(String language);
 
 }

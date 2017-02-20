@@ -5,7 +5,7 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
-import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
+import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
