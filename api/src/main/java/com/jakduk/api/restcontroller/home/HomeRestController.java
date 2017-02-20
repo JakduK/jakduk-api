@@ -3,8 +3,6 @@ package com.jakduk.api.restcontroller.home;
 import com.jakduk.api.restcontroller.home.vo.GalleryOnHome;
 import com.jakduk.api.restcontroller.home.vo.HomeResponse;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceError;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.service.HomeService;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -45,25 +42,20 @@ public class HomeRestController {
     @Value("${core.gallery.thumbnail.path}")
     private String thumbnailPath;
 
-    @ApiOperation(value = "백과사전 가져오기")
+    @ApiOperation(value = "랜덤하게 백과사전 하나 가져오기")
     @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
-    public Encyclopedia getEncyclopedia(@RequestParam(required = false) String lang,
-                                        Locale locale) {
+    public Encyclopedia getEncyclopediaWithRandom(@RequestParam(required = false) String lang,
+                                                  Locale locale) {
 
         String language = CoreUtils.getLanguageCode(locale, lang);
 
-        Encyclopedia encyclopedia = homeService.getEncyclopedia(language);
-
-        if (Objects.isNull(encyclopedia))
-            throw new ServiceException(ServiceError.NOT_FOUND);
-
-        return encyclopedia;
+        return homeService.getEncyclopediaWithRandom(language);
     }
 
     @ApiOperation(value = "홈에서 보여줄 각종 최근 데이터 가져오기")
     @RequestMapping(value = "/home/latest", method = RequestMethod.GET)
     public HomeResponse getLatest(@RequestParam(required = false) String lang,
-                                   Locale locale) {
+                                  Locale locale) {
 
         String language = CoreUtils.getLanguageCode(locale, lang);
 

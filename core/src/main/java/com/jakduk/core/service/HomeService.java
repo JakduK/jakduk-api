@@ -3,6 +3,8 @@ package com.jakduk.core.service;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.db.HomeDescription;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,14 +49,19 @@ public class HomeService {
 	@Autowired
 	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
 
-	public Encyclopedia getEncyclopedia(String language) {
-		
-		Integer count = encyclopediaRepository.countByLanguage(language);
-		int random = (int)(Math.random() * count) + 1;
-		Encyclopedia encyclopedia = encyclopediaRepository.findOneBySeqAndLanguage(random, language);
+	/**
+	 * 랜덤하게 백과 사전 하나를 가져온다.
+	 */
+	public Encyclopedia getEncyclopediaWithRandom(String language) {
 
-		return encyclopedia;
+		List<Encyclopedia> encyclopedias = encyclopediaRepository.findListByLanguage(language);
 
+		if (ObjectUtils.isEmpty(encyclopedias))
+			throw new ServiceException(ServiceError.NOT_FOUND_ENCYCLOPEDIA);
+
+		int random = (int)(Math.random() * encyclopedias.size());
+
+		return encyclopedias.get(random);
 	}
 
 	/**

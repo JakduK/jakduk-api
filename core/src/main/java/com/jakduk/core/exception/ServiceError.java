@@ -42,6 +42,7 @@ public enum ServiceError {
     NOT_FOUND_ATTENDANCE_LEAGUE(HttpStatus.SC_NOT_FOUND, "exception.not.found.attendance.league"),
     NOT_FOUND_ATTENDANCE_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.attendance.club"),
     NOT_FOUND_FOOTBALL_CLUB_ORIGIN(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club.origin"),
+    NOT_FOUND_ENCYCLOPEDIA(HttpStatus.SC_NOT_FOUND, "exception.not.found.encyclopedia"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     NEED_TO_LOGIN(HttpStatus.SC_UNAUTHORIZED, "exception.unauthorized"),
