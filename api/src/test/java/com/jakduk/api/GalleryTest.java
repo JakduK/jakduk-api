@@ -42,7 +42,7 @@ import java.util.*;
 
 public class GalleryTest extends ApiApplicationTests {
 	
-	@Value("${storage.image.path}")
+	@Value("${core.storage.image.path}")
 	private String storageImagePath;
 	
 	@Autowired

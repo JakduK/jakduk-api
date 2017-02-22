@@ -46,10 +46,10 @@ import java.util.stream.Stream;
 @Service
 public class GalleryService {
 
-	@Value("${storage.image.path}")
+	@Value("${core.storage.image.path}")
 	private String storageImagePath;
 
-	@Value("${storage.thumbnail.path}")
+	@Value("${core.storage.thumbnail.path}")
 	private String storageThumbnailPath;
 
 	@Autowired

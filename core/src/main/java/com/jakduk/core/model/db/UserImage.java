@@ -31,6 +31,8 @@ public class UserImage {
 
     private CoreConst.GALLERY_STATUS_TYPE status;
 
+    private String contentType;
+
     private CoreConst.USER_IMAGE_SOURCE_TYPE sourceType;
 
     private String externalUrl;

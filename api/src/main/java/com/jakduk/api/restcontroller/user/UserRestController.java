@@ -16,6 +16,7 @@ import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.etc.AuthUserProfile;
 import com.jakduk.core.model.simple.UserProfile;
@@ -38,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -255,13 +257,21 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "프로필 이미지 올리기")
-    @RequestMapping(value = "/profile/image", method = RequestMethod.POST)
+    @RequestMapping(value = "/image", method = RequestMethod.POST)
     public EmptyJsonResponse updateUserImage(@RequestParam MultipartFile file) {
 
         String contentType = file.getContentType();
 
         if (! StringUtils.startsWithIgnoreCase(contentType, "image/"))
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
+
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        try {
+            userService.uploadUserImage(commonWriter, contentType, file.getSize(), file.getBytes());
+        } catch (IOException e) {
+            throw new ServiceException(ServiceError.IO_EXCEPTION, e);
+        }
 
         return EmptyJsonResponse.newInstance();
     }

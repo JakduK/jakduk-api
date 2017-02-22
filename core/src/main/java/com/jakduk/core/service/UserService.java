@@ -1,22 +1,31 @@
 package com.jakduk.core.service;
 
 
-import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.util.FileUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
+import com.jakduk.core.model.db.UserImage;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.repository.footballclub.FootballClubRepository;
+import com.jakduk.core.repository.user.UserImageRepository;
 import com.jakduk.core.repository.user.UserProfileRepository;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -32,6 +41,12 @@ public class UserService {
 
 	@Autowired
 	private UserProfileRepository userProfileRepository;
+
+	@Autowired
+	private UserImageRepository userImageRepository;
+
+	@Value("${core.storage.profile.path}")
+	private String storageProfilePath;
 
 	public User findUserById(String id) {
 		return userRepository.findOneById(id)
@@ -171,6 +186,31 @@ public class UserService {
 		this.save(user);
 
 		log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
+	}
+
+	/**
+	 * 프로필 이미지 올리기
+	 */
+	public void uploadUserImage(CommonWriter writer, String contentType, long size, byte[] bytes) {
+
+		UserImage userImage = UserImage.builder()
+				.writer(writer)
+				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+				.contentType(contentType)
+				.sourceType(CoreConst.USER_IMAGE_SOURCE_TYPE.JAKDUK)
+				.build();
+
+		userImageRepository.save(userImage);
+
+		ObjectId objectId = new ObjectId(userImage.getId());
+		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+		try {
+			FileUtils.writeFile(storageProfilePath, localDate, userImage.getId(), contentType, size, bytes);
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
+		}
+
 	}
 
 }
