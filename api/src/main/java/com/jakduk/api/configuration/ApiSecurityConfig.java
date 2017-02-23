@@ -91,8 +91,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         HttpMethod.POST,
                         "/api/board/free",                  // 자유게시판 글쓰기
-                        "/api/board/free/comment",          // 자유게시판 댓글 달기
-                        "/api/user/image"                   // 유저 이미지 올리기
+                        "/api/board/free/comment"          // 자유게시판 댓글 달기
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
                 .antMatchers(
                         HttpMethod.PUT,

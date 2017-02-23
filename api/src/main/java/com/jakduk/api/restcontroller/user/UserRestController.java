@@ -16,7 +16,7 @@ import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
-import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.db.UserImage;
 import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.model.etc.AuthUserProfile;
 import com.jakduk.core.model.simple.UserProfile;
@@ -83,11 +83,18 @@ public class UserRestController {
                                            HttpServletResponse response) {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
-                form.getFootballClub(), form.getAbout());
+                form.getFootballClub(), form.getAbout(), form.getUserImageId());
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
-        JakdukUserDetail userDetails = userUtils.signInJakdukUser(user);
+        String userImageId = null;
+        UserImage userImage = user.getUserImage();
+
+        if (! ObjectUtils.isEmpty(userImage))
+            userImageId = userImage.getId();
+
+        JakdukUserDetail userDetails = userUtils.signInJakdukUser(user.getId(), user.getEmail(), user.getPassword(), user.getUsername(),
+                user.getProviderId(), userUtils.generateUserImageUrl(userImageId), user.getRoles());
 
         String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
@@ -231,12 +238,18 @@ public class UserRestController {
 
         userService.save(user);
 
-        //log.debug("user updated. user=" + user);
+        String userImageId = null;
+        UserImage userImage = user.getUserImage();
+
+        if (! ObjectUtils.isEmpty(userImage))
+            userImageId = userImage.getId();
 
         if (UserUtils.isJakdukUser()) {
-            userUtils.signInJakdukUser(user);
+            userUtils.signInJakdukUser(user.getId(), user.getEmail(), user.getPassword(), user.getUsername(),
+                    user.getProviderId(), userUtils.generateUserImageUrl(userImageId), user.getRoles());
         } else if (UserUtils.isSocialUser()) {
-            userUtils.signInSocialUser(user);
+            userUtils.signInSocialUser(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(),
+                    user.getProviderUserId(), userUtils.generateUserImageUrl(userImageId), user.getRoles());
         }
 
         return EmptyJsonResponse.newInstance();
@@ -256,24 +269,23 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "프로필 이미지 올리기")
-    @RequestMapping(value = "/image", method = RequestMethod.POST)
-    public EmptyJsonResponse updateUserImage(@RequestParam MultipartFile file) {
+    @ApiOperation(value = "프로필 사진 올리기")
+    @RequestMapping(value = "/profile/image", method = RequestMethod.POST)
+    public UserImage updateUserImage(@RequestParam MultipartFile file) {
 
         String contentType = file.getContentType();
 
         if (! StringUtils.startsWithIgnoreCase(contentType, "image/"))
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
-
         try {
-            userService.uploadUserImage(commonWriter, contentType, file.getSize(), file.getBytes());
+            UserImage userImage = userService.uploadUserImage(contentType, file.getSize(), file.getBytes());
+
+            return userImage;
+
         } catch (IOException e) {
             throw new ServiceException(ServiceError.IO_EXCEPTION, e);
         }
-
-        return EmptyJsonResponse.newInstance();
     }
 
 }

@@ -181,7 +181,7 @@ public class AuthRestController {
 
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        if (Objects.isNull(authUserProfile))
+        if (ObjectUtils.isEmpty(authUserProfile))
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         return authUserProfile;

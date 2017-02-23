@@ -49,4 +49,7 @@ public class UserForm {
 
     @ApiModelProperty(example = "안녕하세요.", value = "자기 소개")
     private String about;
+
+    @ApiModelProperty(example = "58ad9b35a0c73a045d45979a", value = "UserImage의 ID")
+    private String userImageId;
 }

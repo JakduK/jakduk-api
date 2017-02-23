@@ -1,23 +1,17 @@
 package com.jakduk.core.common.util;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
-import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * Created by pyohwanjang on 2017. 2. 22..
@@ -65,6 +59,36 @@ public class FileUtils {
                         .scale(scale)
                         .toFile(imageFilePath.toFile());
             }
+        }
+    }
+
+    public static ByteArrayOutputStream readFile(String imagePath, LocalDate localDate, String fileName, String contentType) {
+
+        // 사진 포맷.
+        String formatName = StringUtils.split(contentType, "/")[1];
+
+        Path filePath = Paths.get(imagePath, String.valueOf(localDate.getYear()), String.valueOf(localDate.getMonthValue()),
+                String.valueOf(localDate.getDayOfMonth()), fileName + "." + formatName);
+
+        if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
+            try {
+                BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
+                ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
+
+                int imageByte;
+
+                while ((imageByte = in.read()) != -1){
+                    byteStream.write(imageByte);
+                }
+
+                in.close();
+                return byteStream;
+
+            } catch (IOException e) {
+                throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
+            }
+        } else {
+            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
         }
     }
 }

@@ -4,7 +4,6 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.OAuthProfile;
 import com.jakduk.core.model.simple.SocialUserOnAuthentication;
-import com.jakduk.core.model.simple.UserOnAuthentication;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -17,11 +16,6 @@ public interface UserRepository extends MongoRepository<User, String> {
 	Optional<User> findOneByEmail(String email);
 	Optional<User> findOneByUsername(String username);
 
-	User findByUsername(String username);
-	User findByEmail(String email);
-
-	UserOnAuthentication findOneByEmailAndProviderId(String email, CoreConst.ACCOUNT_TYPE providerId);
-	
 	@Query(value="{'id' : ?0}", fields="{'username' : 1}")
 	User writerFindById(String id);
 
@@ -42,10 +36,5 @@ public interface UserRepository extends MongoRepository<User, String> {
 	
 	@Query(value="{'socialInfo.providerId' : ?0, 'socialInfo.oauthId' : ?1}")
 	OAuthProfile userfindByOauthUser(CoreConst.ACCOUNT_TYPE providerId, String oauthId);
-	
-	@Query(value="{'email' : ?0}")
-	Optional<UserOnAuthentication> findAuthUserByEmail(String email);
 
-	@Query(value="{'providerUserId' : ?0}")
-	UserOnAuthentication userFindByProviderUserId(String providerUserId);
 }

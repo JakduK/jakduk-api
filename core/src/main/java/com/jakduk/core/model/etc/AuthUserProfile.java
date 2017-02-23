@@ -28,4 +28,6 @@ public class AuthUserProfile {
     private CoreConst.ACCOUNT_TYPE providerId;
 
     private List<String> roles;
+
+    private String imageUrl;
 }

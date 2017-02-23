@@ -2,6 +2,7 @@ package com.jakduk.api.configuration.authentication.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.core.common.CoreConst;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,11 +18,12 @@ import java.util.*;
 
 public class SocialUserDetail implements UserDetails {
 
-    private final String id;
-    private final String userId;
     private final String username;
-    private final CoreConst.ACCOUNT_TYPE providerId;
-    private final String email;
+    @Getter private final String id;
+    @Getter private final String userId;
+    @Getter private final CoreConst.ACCOUNT_TYPE providerId;
+    @Getter private final String email;
+    @Getter private final String imageUrl;
 
     private final Set<GrantedAuthority> authorities;
     private final boolean accountNonExpired;
@@ -29,14 +31,16 @@ public class SocialUserDetail implements UserDetails {
     private final boolean credentialsNonExpired;
     private final boolean enabled;
 
-    public SocialUserDetail(String id, String userId, String username, CoreConst.ACCOUNT_TYPE providerId, String email, boolean enabled, boolean accountNonExpired,
-                            boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+    public SocialUserDetail(String id, String userId, String username, CoreConst.ACCOUNT_TYPE providerId, String email, String imageUrl,
+                            boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
+                            Collection<? extends GrantedAuthority> authorities) {
 
         this.id = id;
         this.userId = userId;
         this.username = username;
         this.providerId = providerId;
         this.email = email;
+        this.imageUrl = imageUrl;
         this.enabled = enabled;
         this.accountNonExpired = accountNonExpired;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -76,10 +80,6 @@ public class SocialUserDetail implements UserDetails {
         }
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
@@ -117,18 +117,6 @@ public class SocialUserDetail implements UserDetails {
     @Override
     public String getUsername() {
         return username;
-    }
-
-    public CoreConst.ACCOUNT_TYPE getProviderId() {
-        return providerId;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
 }

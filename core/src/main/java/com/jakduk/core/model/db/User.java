@@ -1,10 +1,7 @@
 package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,10 +10,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import java.util.List;
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Document
 public class User {
 
@@ -36,8 +34,11 @@ public class User {
 	private List<Integer> roles;					// 권한
 
 	private String about;							// 소개
-	
+
 	@DBRef
 	private FootballClub supportFC;					// 지지구단
+
+	@DBRef
+	private UserImage userImage;					// 프로필 이미지
 	
 }

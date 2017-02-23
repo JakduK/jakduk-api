@@ -99,7 +99,8 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public User addJakdukUser(String email, String username, String password, String footballClub, String about) {
+	public User addJakdukUser(String email, String username, String password, String footballClub, String about, String userImageId) {
+
 		User user = User.builder()
 				.email(email.trim())
 				.username(username.trim())
@@ -108,24 +109,32 @@ public class UserService {
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
 				.build();
 
-		if (StringUtils.isNotEmpty(footballClub)) {
+		if (StringUtils.isNotBlank(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(supportFC);
 		}
 
-		if (StringUtils.isNotEmpty(about))
+		if (StringUtils.isNotBlank(userImageId)) {
+			UserImage userImage = userImageRepository.findOneById(userImageId)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
+
+			user.setUserImage(userImage);
+		}
+
+		if (StringUtils.isNotBlank(about))
 			user.setAbout(about.trim());
 
-		User returnUser = userRepository.save(user);
+		userRepository.save(user);
 
-		log.debug("JakduK user created. user=" + returnUser);
+		log.debug("JakduK user created. user=" + user);
 
-		return returnUser;
+		return user;
 	}
 
 	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId, String footballClub, String about) {
+
 		User user = User.builder()
 				.email(email.trim())
 				.username(username.trim())
@@ -134,21 +143,21 @@ public class UserService {
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
 				.build();
 
-		if (StringUtils.isNotEmpty(footballClub)) {
+		if (StringUtils.isNotBlank(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(supportFC);
 		}
 
-		if (StringUtils.isNotEmpty(about))
+		if (StringUtils.isNotBlank(about))
 			user.setAbout(about.trim());
 
-		User returnUser = userRepository.save(user);
+		userRepository.save(user);
 
-		log.debug("social user created. user=" + returnUser);
+		log.debug("social user created. user=" + user);
 
-		return returnUser;
+		return user;
 	}
 
 	public void existEmail(String email) {
@@ -191,10 +200,9 @@ public class UserService {
 	/**
 	 * 프로필 이미지 올리기
 	 */
-	public void uploadUserImage(CommonWriter writer, String contentType, long size, byte[] bytes) {
+	public UserImage uploadUserImage(String contentType, long size, byte[] bytes) {
 
 		UserImage userImage = UserImage.builder()
-				.writer(writer)
 				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
 				.contentType(contentType)
 				.sourceType(CoreConst.USER_IMAGE_SOURCE_TYPE.JAKDUK)
@@ -207,6 +215,9 @@ public class UserService {
 
 		try {
 			FileUtils.writeFile(storageProfilePath, localDate, userImage.getId(), contentType, size, bytes);
+
+			return userImage;
+
 		} catch (IOException e) {
 			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 		}

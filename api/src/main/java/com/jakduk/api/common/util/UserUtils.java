@@ -6,9 +6,11 @@ import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
 import com.jakduk.core.common.CommonRole;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.AuthUserProfile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -34,6 +37,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserUtils {
+
+    @Value("${api.server.url}")
+    private String apiServerUrl;
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.7/me?fields=id,name,email&format=json";
@@ -168,11 +174,12 @@ public class UserUtils {
                         .email(userDetail.getUserId())
                         .username(userDetail.getUsername())
                         .providerId(userDetail.getProviderId())
+                        .imageUrl(userDetail.getImageUrl())
                         .roles(roles)
                         .build();
 
             } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail) {
-                JakdukUserDetail principal = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                JakdukUserDetail userDetail = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
                 Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
@@ -181,10 +188,11 @@ public class UserUtils {
                         .collect(Collectors.toList());
 
                 authUserProfile = AuthUserProfile.builder()
-                        .id(principal.getId())
-                        .email(principal.getUsername())
-                        .username(principal.getNickname())
-                        .providerId(principal.getProviderId())
+                        .id(userDetail.getId())
+                        .email(userDetail.getUsername())
+                        .username(userDetail.getNickname())
+                        .providerId(userDetail.getProviderId())
+                        .imageUrl(userDetail.getImageUrl())
                         .roles(roles)
                         .build();
             }
@@ -240,38 +248,45 @@ public class UserUtils {
 
     /**
      * 이메일 기반 회원의 로그인 처리
-     * @param user User 객체
      */
-    public JakdukUserDetail signInJakdukUser(User user) {
+    public JakdukUserDetail signInJakdukUser(String id, String email, String password, String username,
+                                             CoreConst.ACCOUNT_TYPE providerId, String imageUrl, List<Integer> roles) {
 
-        boolean enabled = true;
-        boolean accountNonExpired = true;
-        boolean credentialsNonExpired = true;
-        boolean accountNonLocked = true;
+        JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(email, id, password, username, providerId, imageUrl,
+                true, true, true, true, getAuthorities(roles));
 
-        JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(user.getEmail(), user.getId(),
-                user.getPassword(), user.getUsername(), user.getProviderId(),
-                enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(jakdukUserDetail, password, jakdukUserDetail.getAuthorities());
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukUserDetail, user.getPassword(), jakdukUserDetail.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return jakdukUserDetail;
     }
 
     /**
      * SNS 기반 회원의 로그인 처리
-     * @param user User 객체
      */
-    public void signInSocialUser(User user) {
+    public void signInSocialUser(String id, String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
+                                 String imageUrl, List<Integer> roles) {
 
-        SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
-                true, true, true, true, getAuthorities(user.getRoles()));
+        SocialUserDetail userDetail = new SocialUserDetail(id, email, username, providerId, providerUserId, imageUrl,
+                true, true, true, true, getAuthorities(roles));
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    /**
+     * 회원 프로필 이미지 URL을 생성한다.
+     *
+     * @param id UserImage의 ID
+     */
+    public String generateUserImageUrl(String id) {
+
+        if (StringUtils.isEmpty(id))
+            return null;
+
+        return String.format("%s/user/image/%s", apiServerUrl, id);
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
