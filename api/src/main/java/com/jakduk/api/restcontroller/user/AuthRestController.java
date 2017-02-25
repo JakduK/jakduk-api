@@ -36,7 +36,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Objects;
 
 /**
  * @author pyohwan
@@ -116,7 +115,7 @@ public class AuthRestController {
         }
     }
 
-    @ApiOperation(value = "SNS 기반 로그인")
+    @ApiOperation(value = "SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
     public EmptyJsonResponse loginSocialUser(@PathVariable String providerId,
                                              @Valid @RequestBody LoginSocialUserForm form,
@@ -136,17 +135,19 @@ public class AuthRestController {
         }
 
         assert socialProfile != null;
-        User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
-        // 로그인 처리.
-        if (! ObjectUtils.isEmpty(existUser)) {
+        try {
+            User user = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
-            SocialUserDetail userDetails = (SocialUserDetail) socialDetailService.loadUserByUsername(existUser.getEmail());
+            // 로그인 처리.
+            SocialUserDetail userDetails = (SocialUserDetail) socialDetailService.loadUserByUsername(user.getEmail());
             String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
             response.setHeader(tokenHeader, token);
 
             return EmptyJsonResponse.newInstance();
+
+        } catch (ServiceException ignored) {
         }
 
         // 신규 가입.

@@ -2,7 +2,6 @@ package com.jakduk.api.restcontroller.user.vo;
 
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistUsername;
-import com.jakduk.core.model.simple.UserProfile;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -35,7 +34,7 @@ public class UserProfileForm {
 	@ExistUsername
 	private String username;
 
-	@ApiModelProperty(value = "축구단(FootballClub) ID")
+	@ApiModelProperty(example = "54e1d2c68bf86df3fe819874", value = "축구단(FootballClub) ID")
 	private String footballClub;
 
 	@ApiModelProperty(example = "안녕하세요.", value = "자기 소개")
@@ -44,6 +43,6 @@ public class UserProfileForm {
 	@ApiModelProperty(example = "58ad9b35a0c73a045d45979a", value = "UserImage의 ID")
 	private String userImageId;
 
-	@ApiModelProperty(value = "SNS의 회원 사진 객체")
-	private UserPicture picture;
+	@ApiModelProperty(value = "SNS 회원의 사진 객체")
+	private UserExternalPicture externalPicture;
 }

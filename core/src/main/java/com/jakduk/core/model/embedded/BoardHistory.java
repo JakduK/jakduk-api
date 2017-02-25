@@ -1,6 +1,7 @@
 package com.jakduk.core.model.embedded;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

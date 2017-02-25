@@ -75,12 +75,18 @@ public class JwtTokenUtils implements Serializable {
                 attemptSocialUser.setUsername(claims.get("username", String.class));
 
             if (claims.containsKey("providerId")) {
-                String temp =claims.get("providerId", String.class);
+                String temp = claims.get("providerId", String.class);
                 attemptSocialUser.setProviderId(CoreConst.ACCOUNT_TYPE.valueOf(temp));
             }
 
             if (claims.containsKey("providerUserId"))
                 attemptSocialUser.setProviderUserId(claims.get("providerUserId", String.class));
+
+            if (claims.containsKey("smallPictureUrl"))
+                attemptSocialUser.setSmallPictureUrl(claims.get("smallPictureUrl", String.class));
+
+            if (claims.containsKey("largePictureUrl"))
+                attemptSocialUser.setLargePictureUrl(claims.get("largePictureUrl", String.class));
 
         } catch (Exception ignored) {
         }
@@ -217,6 +223,12 @@ public class JwtTokenUtils implements Serializable {
 
         if (! ObjectUtils.isEmpty(attemptSocialUser.getProviderUserId()))
             attempted.put("providerUserId", attemptSocialUser.getProviderUserId());
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getSmallPictureUrl()))
+            attempted.put("smallPictureUrl", attemptSocialUser.getSmallPictureUrl());
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getLargePictureUrl()))
+            attempted.put("largePictureUrl", attemptSocialUser.getLargePictureUrl());
 
         return attempted;
     }

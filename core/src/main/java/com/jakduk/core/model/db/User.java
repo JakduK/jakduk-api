@@ -1,6 +1,7 @@
 package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.embedded.ExternalPicture;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -39,6 +40,7 @@ public class User {
 	private FootballClub supportFC;					// 지지구단
 
 	@DBRef
-	private UserImage userImage;					// 프로필 이미지
-	
+	private UserImage userImage;					// 프로필 사진
+
+	private ExternalPicture externalPicture;		// SNS 계정 사진을 담음
 }

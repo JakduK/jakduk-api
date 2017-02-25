@@ -9,7 +9,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserImage;
-import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.embedded.ExternalPicture;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.repository.footballclub.FootballClubRepository;
@@ -22,6 +22,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -58,6 +59,11 @@ public class UserService {
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 
+	public User findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
+		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+	}
+
 	// email과 일치하는 회원 찾기.
 	public UserProfile findOneByEmail(String email) {
 		return userProfileRepository.findOneByEmail(email);
@@ -78,11 +84,6 @@ public class UserService {
 		return userProfileRepository.findByNEIdAndEmail(id, email);
 	}
 
-	// SNS 계정으로 가입한 회원 찾기(로그인).
-	public User findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
-		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
-	}
-
 	/**
 	 * 비밀번호 변경을 위한 이메일 기반 회원 가져오기
 	 *
@@ -101,6 +102,8 @@ public class UserService {
 
 	public User addJakdukUser(String email, String username, String password, String footballClub, String about, String userImageId) {
 
+		UserImage userImage = null;
+
 		User user = User.builder()
 				.email(email.trim())
 				.username(username.trim())
@@ -116,24 +119,33 @@ public class UserService {
 			user.setSupportFC(supportFC);
 		}
 
+		if (StringUtils.isNotBlank(about))
+			user.setAbout(about.trim());
+
 		if (StringUtils.isNotBlank(userImageId)) {
-			UserImage userImage = userImageRepository.findOneById(userImageId)
+			userImage = userImageRepository.findOneById(userImageId)
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserImage(userImage);
 		}
 
-		if (StringUtils.isNotBlank(about))
-			user.setAbout(about.trim());
-
 		userRepository.save(user);
+
+		if (! ObjectUtils.isEmpty(userImage)) {
+			userImage.setUser(user);
+			userImage.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+			userImageRepository.save(userImage);
+		}
 
 		log.debug("JakduK user created. user=" + user);
 
 		return user;
 	}
 
-	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId, String footballClub, String about) {
+	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
+							  String footballClub, String about, String userImageId, String smallPictureUrl, String largePictureUrl) {
+
+		UserImage userImage = null;
 
 		User user = User.builder()
 				.email(email.trim())
@@ -153,7 +165,27 @@ public class UserService {
 		if (StringUtils.isNotBlank(about))
 			user.setAbout(about.trim());
 
+		if (StringUtils.isNotBlank(userImageId)) {
+			userImage = userImageRepository.findOneById(userImageId)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
+
+			user.setUserImage(userImage);
+		} else if (StringUtils.isNotBlank(smallPictureUrl) || StringUtils.isNotBlank(largePictureUrl)) {
+			ExternalPicture externalPicture = ExternalPicture.builder()
+					.smallPictureUrl(smallPictureUrl)
+					.largePictureUrl(largePictureUrl)
+					.build();
+
+			user.setExternalPicture(externalPicture);
+		}
+
 		userRepository.save(user);
+
+		if (! ObjectUtils.isEmpty(userImage)) {
+			userImage.setUser(user);
+			userImage.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+			userImageRepository.save(userImage);
+		}
 
 		log.debug("social user created. user=" + user);
 
@@ -205,7 +237,6 @@ public class UserService {
 		UserImage userImage = UserImage.builder()
 				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
 				.contentType(contentType)
-				.sourceType(CoreConst.USER_IMAGE_SOURCE_TYPE.JAKDUK)
 				.build();
 
 		userImageRepository.save(userImage);

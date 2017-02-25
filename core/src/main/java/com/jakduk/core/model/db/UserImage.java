@@ -1,12 +1,9 @@
 package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
@@ -27,14 +24,12 @@ public class UserImage {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private String id;
 
-    private CommonWriter writer;
+    @DBRef
+    @Setter
+    private User user;
 
-    private CoreConst.GALLERY_STATUS_TYPE status;
+    @Setter private CoreConst.GALLERY_STATUS_TYPE status;
 
     private String contentType;
-
-    private CoreConst.USER_IMAGE_SOURCE_TYPE sourceType;
-
-    private String externalUrl;
 
 }

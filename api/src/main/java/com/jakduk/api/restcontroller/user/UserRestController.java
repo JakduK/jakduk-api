@@ -114,10 +114,19 @@ public class UserRestController {
         if (! jwtTokenUtils.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
+        String smallPictureUrl = null;
+        String largePictureUrl = null;
+
+        if (! ObjectUtils.isEmpty(form.getExternalPicture())) {
+            smallPictureUrl = StringUtils.defaultIfBlank(form.getExternalPicture().getSmallPictureUrl(), null);
+            largePictureUrl = StringUtils.defaultIfBlank(form.getExternalPicture().getLargePictureUrl(), null);
+        }
+
         AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
         User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
-                attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout());
+                attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserImageId(),
+                smallPictureUrl, largePictureUrl);
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 

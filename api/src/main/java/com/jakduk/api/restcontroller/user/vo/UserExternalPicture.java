@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 
 @Getter
-public class UserPicture {
+public class UserExternalPicture {
 
     @ApiModelProperty(example = "https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2FSjuNejHmr8o0&t=1488000722876", value = "회원 작은 사진")
     private String smallPictureUrl;

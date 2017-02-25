@@ -15,15 +15,13 @@ public interface UserRepository extends MongoRepository<User, String> {
 	Optional<User> findOneById(String id);
 	Optional<User> findOneByEmail(String email);
 	Optional<User> findOneByUsername(String username);
+	Optional<User> findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId);
 
 	@Query(value="{'id' : ?0}", fields="{'username' : 1}")
 	User writerFindById(String id);
 
 	@Query(value="{'id' : ?0}")
 	UserOnPasswordUpdate findUserOnPasswordUpdateById(String id);
-
-	// SNS 계정으로 가입한 회원 찾기(로그인).
-	User findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId);
 
 	@Query(value="{'email' : ?0}")
 	SocialUserOnAuthentication findSocialUserByEmail(String email);
