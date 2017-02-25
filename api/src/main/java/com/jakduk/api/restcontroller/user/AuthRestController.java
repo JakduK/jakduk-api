@@ -29,6 +29,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -149,14 +150,21 @@ public class AuthRestController {
         }
 
         // 신규 가입.
-        AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
-        attemptSocialUser.setUsername(socialProfile.getNickname());
-        attemptSocialUser.setProviderId(convertProviderId);
-        attemptSocialUser.setProviderUserId(socialProfile.getId());
+        AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
+                .username(socialProfile.getNickname())
+                .providerId(convertProviderId)
+                .providerUserId(socialProfile.getId())
+                .build();
 
         // Daum은 이메일을 안 알려준다.
         if (! ObjectUtils.isEmpty(socialProfile.getEmail()))
             attemptSocialUser.setEmail(socialProfile.getEmail());
+
+        if (! StringUtils.isEmpty(socialProfile.getLargePictureUrl()))
+            attemptSocialUser.setLargePictureUrl(socialProfile.getLargePictureUrl());
+
+        if (! StringUtils.isEmpty(socialProfile.getSmallPictureUrl()))
+            attemptSocialUser.setSmallPictureUrl(socialProfile.getSmallPictureUrl());
 
         String attemptedToken = jwtTokenUtils.generateAttemptedToken(attemptSocialUser);
 

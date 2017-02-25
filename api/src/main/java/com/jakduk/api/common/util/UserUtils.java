@@ -42,31 +42,8 @@ public class UserUtils {
     private String apiServerUrl;
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
-    private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.7/me?fields=id,name,email&format=json";
-
-    public SocialProfile getDaumProfile(String accessToken) {
-
-        JsonNode jsonNode = fetchProfile(DAUM_PROFILE_API_URL, accessToken);
-
-        JsonNode resultJson = jsonNode.get("result");
-        SocialProfile profile = new SocialProfile();
-        profile.setId(resultJson.get("userid").asText());
-        profile.setNickname(resultJson.get("nickname").asText());
-
-        return profile;
-    }
-
-    public SocialProfile getFacebookProfile(String accessToken) {
-
-        JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
-
-        SocialProfile profile = new SocialProfile();
-        profile.setId(jsonNode.get("id").asText());
-        profile.setNickname(jsonNode.get("name").asText());
-        profile.setEmail(jsonNode.get("email").asText());
-
-        return profile;
-    }
+    private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
+    private final String FACEBOOK_PROFILE_THUMBNAIL_API_URL = "https://graph.facebook.com/v2.8/me?fields=picture.type(small)&format=json";
 
     /**
      * 손님인지 검사.
@@ -246,6 +223,66 @@ public class UserUtils {
         }
     }
 
+    public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
+        return getGrantedAuthorities(getRoles(roles));
+    }
+
+    /**
+     * Daum 프로필 가져오기
+     *
+     * @param accessToken accessToken
+     */
+    public SocialProfile getDaumProfile(String accessToken) {
+
+        JsonNode jsonNode = fetchProfile(DAUM_PROFILE_API_URL, accessToken);
+
+        JsonNode resultNode = jsonNode.get("result");
+
+        SocialProfile profile = SocialProfile.builder()
+                .id(resultNode.get("userid").asText())
+                .nickname(resultNode.get("nickname").asText())
+                .build();
+
+        if (resultNode.has("imagePath")) {
+            String imagePath = resultNode.get("imagePath").asText();
+            profile.setSmallPictureUrl(imagePath);
+        }
+
+        if (resultNode.has("bigImagePath")) {
+            String bigImagePath = resultNode.get("bigImagePath").asText();
+            profile.setLargePictureUrl(bigImagePath);
+        }
+
+        return profile;
+    }
+
+    /**
+     * Facebook 프로필 가져오기
+     *
+     * @param accessToken accessToken
+     */
+    public SocialProfile getFacebookProfile(String accessToken) {
+
+        JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
+
+        SocialProfile profile = SocialProfile.builder()
+                .id(jsonNode.get("id").asText())
+                .nickname(jsonNode.get("name").asText())
+                .email(jsonNode.get("email").asText())
+                .build();
+
+        if (jsonNode.has("picture")) {
+            String largePictureUrl = jsonNode.get("picture").get("data").get("url").asText();
+            profile.setLargePictureUrl(largePictureUrl);
+
+            JsonNode jsonNodeThumbnail = fetchProfile(FACEBOOK_PROFILE_THUMBNAIL_API_URL, accessToken);
+            String smallPictureUrl = jsonNodeThumbnail.get("picture").get("data").get("url").asText();
+            profile.setSmallPictureUrl(smallPictureUrl);
+        }
+
+        return profile;
+    }
+
     /**
      * 이메일 기반 회원의 로그인 처리
      */
@@ -289,27 +326,6 @@ public class UserUtils {
         return String.format("%s/user/image/%s", apiServerUrl, id);
     }
 
-    public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
-        return getGrantedAuthorities(getRoles(roles));
-    }
-
-    /**
-     * accessToken에 해당하는 프로필 정보를 가져온다.
-     * @param url 요청할 URL
-     * @param accessToken accessToken
-     */
-    private JsonNode fetchProfile(String url, String accessToken) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
-
-        return responseEntity.getBody();
-    }
-
     private static List<String> getRoles(List<Integer> roles) {
         List<String> newRoles = new ArrayList<>();
 
@@ -333,6 +349,24 @@ public class UserUtils {
         }
 
         return authorities;
+    }
+
+    /**
+     * accessToken에 해당하는 프로필 정보를 가져온다.
+     *
+     * @param url 요청할 URL
+     * @param accessToken accessToken
+     */
+    private JsonNode fetchProfile(String url, String accessToken) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
+
+        return responseEntity.getBody();
     }
 
 }

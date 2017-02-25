@@ -91,13 +91,13 @@ public class DefaultViewController {
 		ObjectId objectId = new ObjectId(userImage.getId());
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-		ByteArrayOutputStream byteStream = FileUtils.readFile(storageProfilePath, localDate, userImage.getId(), userImage.getContentType());
-		response.setContentType(userImage.getContentType());
-
 		try {
+			ByteArrayOutputStream byteStream = FileUtils.readFile(storageProfilePath, localDate, userImage.getId(), userImage.getContentType());
+			response.setContentType(userImage.getContentType());
+
 			byteStream.writeTo(response.getOutputStream());
 		} catch (IOException e) {
-			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY, e);
+			throw new ServiceException(ServiceError.IO_EXCEPTION, e);
 		}
 	}
 

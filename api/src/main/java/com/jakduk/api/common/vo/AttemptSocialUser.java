@@ -8,6 +8,9 @@ import lombok.*;
  *         16. 7. 30 오후 9:54
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class AttemptSocialUser {
@@ -15,4 +18,6 @@ public class AttemptSocialUser {
     private String username;
     private CoreConst.ACCOUNT_TYPE providerId;
     private String providerUserId;
+    private String smallPictureUrl;
+    private String largePictureUrl;
 }

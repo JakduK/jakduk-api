@@ -22,7 +22,7 @@ public class FileUtils {
     /**
      * 파일 저장
      *
-     * @param imagePath     파일 저장 최상위 경로
+     * @param imagePath     파일 최상위 경로
      * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
      * @param fileName      파일 제목 (확장자 제외)
      * @param contentType   콘텐츠 타입
@@ -62,7 +62,16 @@ public class FileUtils {
         }
     }
 
-    public static ByteArrayOutputStream readFile(String imagePath, LocalDate localDate, String fileName, String contentType) {
+    /**
+     * 파일 스트림 읽기
+     *
+     * @param imagePath     파일 최상위 경로
+     * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
+     * @param fileName      파일 제목 (확장자 제외)
+     * @param contentType   콘텐츠 타입
+     * @throws IOException  예외 처리 필요함
+     */
+    public static ByteArrayOutputStream readFile(String imagePath, LocalDate localDate, String fileName, String contentType) throws IOException {
 
         // 사진 포맷.
         String formatName = StringUtils.split(contentType, "/")[1];
@@ -71,22 +80,18 @@ public class FileUtils {
                 String.valueOf(localDate.getDayOfMonth()), fileName + "." + formatName);
 
         if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
-            try {
-                BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
-                ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
+            ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
 
-                int imageByte;
+            int imageByte;
 
-                while ((imageByte = in.read()) != -1){
-                    byteStream.write(imageByte);
-                }
-
-                in.close();
-                return byteStream;
-
-            } catch (IOException e) {
-                throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
+            while ((imageByte = in.read()) != -1){
+                byteStream.write(imageByte);
             }
+
+            in.close();
+            return byteStream;
+
         } else {
             throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
         }
