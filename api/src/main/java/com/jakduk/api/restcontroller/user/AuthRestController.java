@@ -162,10 +162,10 @@ public class AuthRestController {
             attemptSocialUser.setEmail(socialProfile.getEmail());
 
         if (! StringUtils.isEmpty(socialProfile.getLargePictureUrl()))
-            attemptSocialUser.setLargePictureUrl(socialProfile.getLargePictureUrl());
+            attemptSocialUser.setExternalLargePictureUrl(socialProfile.getLargePictureUrl());
 
         if (! StringUtils.isEmpty(socialProfile.getSmallPictureUrl()))
-            attemptSocialUser.setSmallPictureUrl(socialProfile.getSmallPictureUrl());
+            attemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
 
         String attemptedToken = jwtTokenUtils.generateAttemptedToken(attemptSocialUser);
 

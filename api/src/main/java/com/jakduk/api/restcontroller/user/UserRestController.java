@@ -114,19 +114,17 @@ public class UserRestController {
         if (! jwtTokenUtils.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
-        String smallPictureUrl = null;
         String largePictureUrl = null;
 
-        if (! ObjectUtils.isEmpty(form.getExternalPicture())) {
-            smallPictureUrl = StringUtils.defaultIfBlank(form.getExternalPicture().getSmallPictureUrl(), null);
-            largePictureUrl = StringUtils.defaultIfBlank(form.getExternalPicture().getLargePictureUrl(), null);
+        if (! ObjectUtils.isEmpty(form.getExternalLargePictureUrl())) {
+            largePictureUrl = StringUtils.defaultIfBlank(form.getExternalLargePictureUrl(), null);
         }
 
         AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
         User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserImageId(),
-                smallPictureUrl, largePictureUrl);
+                largePictureUrl);
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
@@ -279,7 +277,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "프로필 사진 올리기")
-    @RequestMapping(value = "/profile/image", method = RequestMethod.POST)
+    @RequestMapping(value = "/picture", method = RequestMethod.POST)
     public UserImage updateUserImage(@RequestParam MultipartFile file) {
 
         String contentType = file.getContentType();

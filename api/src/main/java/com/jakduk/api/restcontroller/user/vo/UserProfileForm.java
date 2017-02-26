@@ -43,6 +43,6 @@ public class UserProfileForm {
 	@ApiModelProperty(example = "58ad9b35a0c73a045d45979a", value = "UserImage의 ID")
 	private String userImageId;
 
-	@ApiModelProperty(value = "SNS 회원의 사진 객체")
-	private UserExternalPicture externalPicture;
+	@ApiModelProperty(example = "https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2FSjuNejHmr8o0&t=1488000722876", value = "SNS계정의 회원 큰 사진")
+	private String externalLargePictureUrl;
 }

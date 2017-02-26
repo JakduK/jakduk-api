@@ -9,7 +9,6 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserImage;
-import com.jakduk.core.model.embedded.ExternalPicture;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.repository.footballclub.FootballClubRepository;
@@ -46,8 +45,11 @@ public class UserService {
 	@Autowired
 	private UserImageRepository userImageRepository;
 
-	@Value("${core.storage.profile.path}")
-	private String storageProfilePath;
+	@Value("${core.storage.user.picture.large.path}")
+	private String storageUserPictureLargePath;
+
+	@Value("${core.storage.user.picture.small.path}")
+	private String storageUserPictureSmallPath;
 
 	public User findUserById(String id) {
 		return userRepository.findOneById(id)
@@ -143,7 +145,7 @@ public class UserService {
 	}
 
 	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
-							  String footballClub, String about, String userImageId, String smallPictureUrl, String largePictureUrl) {
+							  String footballClub, String about, String userImageId, String largePictureUrl) {
 
 		UserImage userImage = null;
 
@@ -165,22 +167,48 @@ public class UserService {
 		if (StringUtils.isNotBlank(about))
 			user.setAbout(about.trim());
 
+		// 직접 올린 사진을 User와 연동
 		if (StringUtils.isNotBlank(userImageId)) {
 			userImage = userImageRepository.findOneById(userImageId)
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserImage(userImage);
-		} else if (StringUtils.isNotBlank(smallPictureUrl) || StringUtils.isNotBlank(largePictureUrl)) {
-			ExternalPicture externalPicture = ExternalPicture.builder()
-					.smallPictureUrl(smallPictureUrl)
-					.largePictureUrl(largePictureUrl)
-					.build();
+		}
+		// SNS에서 사용중인 사진을 User와 연동
+		else if (StringUtils.isNotBlank(largePictureUrl)) {
 
-			user.setExternalPicture(externalPicture);
+			try {
+				FileUtils.FileInfo fileInfo = FileUtils.getBytesByUrl(largePictureUrl);
+
+				if (! StringUtils.startsWithIgnoreCase(fileInfo.getContentType(), "image/"))
+					throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
+
+				userImage = UserImage.builder()
+						.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+						.contentType(fileInfo.getContentType())
+						.sourceType(providerId)
+						.build();
+
+				userImageRepository.save(userImage);
+
+				ObjectId objectId = new ObjectId(userImage.getId());
+				LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+				FileUtils.writeImageFile(storageUserPictureLargePath, localDate, userImage.getId(), fileInfo.getContentType(),
+						fileInfo.getContentLength(), fileInfo.getBytes());
+				FileUtils.writeSmallImageFile(storageUserPictureSmallPath, localDate, userImage.getId(), fileInfo.getContentType(),
+						CoreConst.USER_SMALL_PICTURE_SIZE_WIDTH, CoreConst.USER_SMALL_PICTURE_SIZE_HEIGHT, fileInfo.getBytes());
+
+				user.setUserImage(userImage);
+
+			} catch (IOException e) {
+				throw new ServiceException(ServiceError.IO_EXCEPTION, e);
+			}
 		}
 
 		userRepository.save(user);
 
+		// userImage를 user와 연동 및 활성화 처리
 		if (! ObjectUtils.isEmpty(userImage)) {
 			userImage.setUser(user);
 			userImage.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
@@ -237,6 +265,7 @@ public class UserService {
 		UserImage userImage = UserImage.builder()
 				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
 				.contentType(contentType)
+				.sourceType(CoreConst.ACCOUNT_TYPE.JAKDUK)
 				.build();
 
 		userImageRepository.save(userImage);
@@ -245,14 +274,15 @@ public class UserService {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			FileUtils.writeFile(storageProfilePath, localDate, userImage.getId(), contentType, size, bytes);
+			FileUtils.writeImageFile(storageUserPictureLargePath, localDate, userImage.getId(), contentType, size, bytes);
+			FileUtils.writeSmallImageFile(storageUserPictureSmallPath, localDate, userImage.getId(), contentType,
+					CoreConst.USER_SMALL_PICTURE_SIZE_WIDTH, CoreConst.USER_SMALL_PICTURE_SIZE_HEIGHT, bytes);
 
 			return userImage;
 
 		} catch (IOException e) {
 			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 		}
-
 	}
 
 }

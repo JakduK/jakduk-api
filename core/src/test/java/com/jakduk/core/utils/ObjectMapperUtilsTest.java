@@ -17,8 +17,8 @@ public class ObjectMapperUtilsTest {
                 "  \"about\": \"ì\u0095\u0088ë\u0085\u0095í\u0095\u0098ì\u0084¸ì\u009A\u0094.\",\n" +
                 "  \"email\": \"phjang1983@daum.net\",\n" +
                 "  \"externalPicture\": {\n" +
-                "    \"largePictureUrl\": \"aaa\",\n" +
-                "    \"smallPictureUrl\": \"bbb\"\n" +
+                "    \"externalLargePictureUrl\": \"aaa\",\n" +
+                "    \"externalSmallPictureUrl\": \"bbb\"\n" +
                 "  },\n" +
                 "  \"username\": \"Jang,Pyohwan\"\n" +
                 "}";

@@ -39,8 +39,8 @@ public class DefaultViewController {
 	@Autowired
 	private UserImageService userImageService;
 
-	@Value("${core.storage.profile.path}")
-	private String storageProfilePath;
+	@Value("${core.storage.user.picture.large.path}")
+	private String storageUserPictureLargePath;
 
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
 	public String getRss() {
@@ -81,8 +81,8 @@ public class DefaultViewController {
 		}
 	}
 
-	// 회원 프로필 이미지 가져오기.
-	@RequestMapping(value = "/user/image/{id}", method = RequestMethod.GET)
+	// 회원 프로필 사진 가져오기.
+	@RequestMapping(value = "/user/picture/{id}", method = RequestMethod.GET)
 	public void getUserImage(@PathVariable String id,
 							 HttpServletResponse response) {
 
@@ -92,7 +92,7 @@ public class DefaultViewController {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			ByteArrayOutputStream byteStream = FileUtils.readFile(storageProfilePath, localDate, userImage.getId(), userImage.getContentType());
+			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageUserPictureLargePath, localDate, userImage.getId(), userImage.getContentType());
 			response.setContentType(userImage.getContentType());
 
 			byteStream.writeTo(response.getOutputStream());

@@ -32,4 +32,6 @@ public class UserImage {
 
     private String contentType;
 
+    private CoreConst.ACCOUNT_TYPE sourceType;
+
 }

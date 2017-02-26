@@ -18,6 +18,6 @@ public class AttemptSocialUser {
     private String username;
     private CoreConst.ACCOUNT_TYPE providerId;
     private String providerUserId;
-    private String smallPictureUrl;
-    private String largePictureUrl;
+    private String externalSmallPictureUrl;
+    private String externalLargePictureUrl;
 }
