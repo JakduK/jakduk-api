@@ -3,12 +3,13 @@ package com.jakduk.api.restcontroller.user;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
+import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.common.vo.SocialProfile;
 import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
 import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
@@ -16,7 +17,6 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
-import com.jakduk.core.model.etc.AuthUserProfile;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -89,7 +89,7 @@ public class AuthRestController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Reload password post-authentication so we can generate token
-        JakdukUserDetail userDetails = (JakdukUserDetail) jakdukDetailsService.loadUserByUsername(form.getUsername());
+        JakdukUserDetails userDetails = (JakdukUserDetails) jakdukDetailsService.loadUserByUsername(form.getUsername());
 
         String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
@@ -140,7 +140,7 @@ public class AuthRestController {
             User user = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
             // 로그인 처리.
-            SocialUserDetail userDetails = (SocialUserDetail) socialDetailService.loadUserByUsername(user.getEmail());
+            SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
             String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
             response.setHeader(tokenHeader, token);

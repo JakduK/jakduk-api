@@ -44,12 +44,12 @@ public class UserForm {
     @NotEmpty
     private String passwordConfirm;
 
-    @ApiModelProperty(value = "축구단(FootballClub) ID")
+    @ApiModelProperty(example = "54e1d2c68bf86df3fe819874", value = "축구단(FootballClub) ID")
     private String footballClub;
 
     @ApiModelProperty(example = "안녕하세요.", value = "자기 소개")
     private String about;
 
-    @ApiModelProperty(example = "58ad9b35a0c73a045d45979a", value = "UserImage의 ID")
-    private String userImageId;
+    @ApiModelProperty(example = "58ad9b35a0c73a045d45979a", value = "UserPicture의 ID")
+    private String userPictureId;
 }

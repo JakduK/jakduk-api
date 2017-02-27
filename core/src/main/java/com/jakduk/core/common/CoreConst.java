@@ -186,13 +186,6 @@ public class CoreConst {
 		TIMEUP		// 경기 종료
 	}
 
-	// 검증 상태.
-	public enum VALIDATION_TYPE {
-		NONE,
-		INVALID,
-		OK
-	}
-
 	// 토큰 타입
 	public enum TOKEN_TYPE {
 		RESET_PASSWORD
@@ -214,5 +207,10 @@ public class CoreConst {
 		PO,	// 게시물
 		CO,	// 댓글
 		GA	// 사진첩
+	}
+
+	public enum IMAGE_SIZE_TYPE {
+		LARGE,
+		SMALL
 	}
 }

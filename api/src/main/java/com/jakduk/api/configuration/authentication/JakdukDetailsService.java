@@ -1,13 +1,14 @@
 package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
+import com.jakduk.api.configuration.authentication.user.UserDetailsPicture;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
-import com.jakduk.core.model.db.UserImage;
+import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,19 +46,23 @@ public class JakdukDetailsService implements UserDetailsService {
 
 			log.debug("Jakduk user=" + user);
 
-			String userImageId = null;
-			UserImage userImage = user.getUserImage();
+			JakdukUserDetails jakdukUserDetails = new JakdukUserDetails(user.getEmail(), user.getId(),
+					user.getPassword(), user.getUsername(), CoreConst.ACCOUNT_TYPE.JAKDUK,
+					true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
 
-			if (! ObjectUtils.isEmpty(userImage))
-				userImageId = userImage.getId();
+			UserPicture userPicture = user.getUserPicture();
 
-			JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(user.getEmail(), user.getId()
-					, user.getPassword(), user.getUsername(), CoreConst.ACCOUNT_TYPE.JAKDUK, userUtils.generateUserImageUrl(userImageId)
-					, true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
+			if (! ObjectUtils.isEmpty(userPicture)) {
+				UserDetailsPicture userDetailsPicture = new UserDetailsPicture(userPicture,
+						userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+						userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
-			log.info("load Jakduk username=" + jakdukUserDetail.getUsername());
+				jakdukUserDetails.setPicture(userDetailsPicture);
+			}
 
-			return jakdukUserDetail;
+			log.info("load Jakduk username=" + jakdukUserDetails.getUsername());
+
+			return jakdukUserDetails;
 		}
 	}
 

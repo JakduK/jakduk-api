@@ -39,6 +39,6 @@ public class User {
 	private FootballClub supportFC;					// 지지구단
 
 	@DBRef
-	private UserImage userImage;					// 프로필 사진
+	private UserPicture userPicture;					// 프로필 사진
 
 }

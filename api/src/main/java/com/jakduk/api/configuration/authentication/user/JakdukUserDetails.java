@@ -3,6 +3,7 @@ package com.jakduk.api.configuration.authentication.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.core.common.CoreConst;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,16 +12,15 @@ import org.springframework.util.Assert;
 import java.io.Serializable;
 import java.util.*;
 
-public class JakdukUserDetail implements UserDetails {
-
-	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+public class JakdukUserDetails implements UserDetails {
 
 	private String password;
 	private String username;									// email
 	@Getter private final String id;
 	@Getter private final String nickname;						// 별명
 	@Getter private final CoreConst.ACCOUNT_TYPE providerId;
-	@Getter private final String imageUrl;
+	@Getter @Setter
+	private UserDetailsPicture picture;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -28,9 +28,9 @@ public class JakdukUserDetail implements UserDetails {
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
 
-	public JakdukUserDetail(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId, String imageUrl,
-							boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
-							Collection<? extends GrantedAuthority> authorities) {
+	public JakdukUserDetails(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId,
+                             boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
+                             Collection<? extends GrantedAuthority> authorities) {
 
 		if (Objects.isNull(username) || Objects.isNull(password))
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
@@ -40,7 +40,6 @@ public class JakdukUserDetail implements UserDetails {
 		this.id = id;
 		this.password = password;
 		this.providerId = providerId;
-		this.imageUrl = imageUrl;
 		this.enabled = enabled;
 		this.accountNonExpired = accountNonExpired;
 		this.credentialsNonExpired = credentialsNonExpired;

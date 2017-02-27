@@ -1,12 +1,14 @@
 package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
+import com.jakduk.api.configuration.authentication.user.UserDetailsPicture;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
-import com.jakduk.core.model.db.UserImage;
+import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,21 +46,24 @@ public class SocialDetailService implements UserDetailsService {
                     .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
                             CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email)));
 
-            log.debug("user=" + user);
+            log.debug("social user=" + user);
 
-            String userImageId = null;
-            UserImage userImage = user.getUserImage();
-
-            if (! ObjectUtils.isEmpty(userImage))
-                userImageId = userImage.getId();
-
-            SocialUserDetail socialUserDetail = new SocialUserDetail(user.getId(), email, user.getUsername(), user.getProviderId(), user.getEmail(),
-                    userUtils.generateUserImageUrl(userImageId),
+            SocialUserDetails socialUserDetails = new SocialUserDetails(user.getId(), email, user.getUsername(), user.getProviderId(), user.getEmail(),
                     true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
 
-            log.info("load Social username=" + socialUserDetail.getUsername());
+            UserPicture userPicture = user.getUserPicture();
 
-            return socialUserDetail;
+            if (! ObjectUtils.isEmpty(userPicture)) {
+                UserDetailsPicture userDetailsPicture = new UserDetailsPicture(userPicture,
+                        userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+                        userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+
+                socialUserDetails.setPicture(userDetailsPicture);
+            }
+
+            log.info("load Social username=" + socialUserDetails.getUsername());
+
+            return socialUserDetails;
         }
     }
 }

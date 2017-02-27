@@ -18,7 +18,7 @@ import javax.persistence.GenerationType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserImage {
+public class UserPicture {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

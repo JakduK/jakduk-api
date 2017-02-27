@@ -5,9 +5,9 @@ import com.jakduk.core.common.util.FileUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.db.UserImage;
+import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.service.GalleryService;
-import com.jakduk.core.service.UserImageService;
+import com.jakduk.core.service.UserPictureService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,10 +37,13 @@ public class DefaultViewController {
 	private GalleryService galleryService;
 
 	@Autowired
-	private UserImageService userImageService;
+	private UserPictureService userPictureService;
 
 	@Value("${core.storage.user.picture.large.path}")
 	private String storageUserPictureLargePath;
+
+	@Value("${core.storage.user.picture.small.path}")
+	private String storageUserPictureSmallPath;
 
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
 	public String getRss() {
@@ -83,17 +86,37 @@ public class DefaultViewController {
 
 	// 회원 프로필 사진 가져오기.
 	@RequestMapping(value = "/user/picture/{id}", method = RequestMethod.GET)
-	public void getUserImage(@PathVariable String id,
+	public void getUserPicture(@PathVariable String id,
 							 HttpServletResponse response) {
 
-		UserImage userImage = userImageService.findOneById(id);
+		UserPicture userPicture = userPictureService.findOneById(id);
 
-		ObjectId objectId = new ObjectId(userImage.getId());
+		ObjectId objectId = new ObjectId(userPicture.getId());
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageUserPictureLargePath, localDate, userImage.getId(), userImage.getContentType());
-			response.setContentType(userImage.getContentType());
+			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageUserPictureLargePath, localDate, userPicture.getId(), userPicture.getContentType());
+			response.setContentType(userPicture.getContentType());
+
+			byteStream.writeTo(response.getOutputStream());
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.IO_EXCEPTION, e);
+		}
+	}
+
+	// 회원 프로필 작은 사진 가져오기.
+	@RequestMapping(value = "/user/picture/small/{id}", method = RequestMethod.GET)
+	public void getUserSmallPicture(@PathVariable String id,
+									HttpServletResponse response) {
+
+		UserPicture userPicture = userPictureService.findOneById(id);
+
+		ObjectId objectId = new ObjectId(userPicture.getId());
+		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+		try {
+			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageUserPictureSmallPath, localDate, userPicture.getId(), userPicture.getContentType());
+			response.setContentType(userPicture.getContentType());
 
 			byteStream.writeTo(response.getOutputStream());
 		} catch (IOException e) {

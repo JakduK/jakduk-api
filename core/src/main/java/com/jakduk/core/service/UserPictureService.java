@@ -2,8 +2,8 @@ package com.jakduk.core.service;
 
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.UserImage;
-import com.jakduk.core.repository.user.UserImageRepository;
+import com.jakduk.core.model.db.UserPicture;
+import com.jakduk.core.repository.user.UserPictureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class UserImageService {
+public class UserPictureService {
 
     @Autowired
-    private UserImageRepository userImageRepository;
+    private UserPictureRepository userPictureRepository;
 
-    public UserImage findOneById(String id) {
-        return userImageRepository.findOneById(id)
+    public UserPicture findOneById(String id) {
+        return userPictureRepository.findOneById(id)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
     }
 }
