@@ -1,7 +1,6 @@
 package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.vo.AttemptSocialUser;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -156,14 +155,23 @@ public class JwtTokenUtils implements Serializable {
         return (AUDIENCE_TABLET.equals(audience) || AUDIENCE_MOBILE.equals(audience));
     }
 
-    public String generateToken(CommonPrincipal userDetails, Device device) {
+    /**
+     * 토큰 생성
+     *
+     * @param device
+     * @param id
+     * @param email
+     * @param username
+     * @param providerId
+     */
+    public String generateToken(Device device, String id, String email, String username, String providerId) {
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put(Claims.ISSUER, userDetails.getEmail());
+        claims.put(Claims.ISSUER, email);
         claims.put(Claims.AUDIENCE, generateAudience(device));
-        claims.put(CLAIM_KEY_USER_ID, userDetails.getId());
-        claims.put(CLAIM_KEY_NAME, userDetails.getUsername());
-        claims.put(CLAIM_KEY_PROVIDER_ID, userDetails.getProviderId());
+        claims.put(CLAIM_KEY_USER_ID, id);
+        claims.put(CLAIM_KEY_NAME, username);
+        claims.put(CLAIM_KEY_PROVIDER_ID, providerId);
 
         return generateToken(claims, generateExpirationDate());
     }

@@ -8,7 +8,6 @@ import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.common.vo.AuthUserProfile;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
 import com.jakduk.core.common.util.CoreUtils;
@@ -86,7 +85,7 @@ public class UserRestController {
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
-        String token = jwtTokenUtils.generateToken(new CommonPrincipal(user), device);
+        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
 
         response.setHeader(tokenHeader, token);
 
@@ -118,7 +117,7 @@ public class UserRestController {
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
-        String token = jwtTokenUtils.generateToken(new CommonPrincipal(user), device);
+        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
 
         response.setHeader(tokenHeader, token);
 

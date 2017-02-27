@@ -3,12 +3,12 @@ package com.jakduk.api.restcontroller.gallery;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
+import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
+import com.jakduk.api.restcontroller.gallery.vo.GalleriesResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryOnUploadResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;
-import com.jakduk.api.restcontroller.gallery.vo.GalleriesResponse;
-import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -118,9 +118,9 @@ public class GalleryRestController {
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        galleryService.removeImage(principal.getId(), id);
+        galleryService.removeImage(authUserProfile.getId(), id);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -151,8 +151,7 @@ public class GalleryRestController {
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal principal = UserUtils.getCommonPrincipal();
-        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+        CommonWriter writer = UserUtils.getCommonWriter();
 
         Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
 
