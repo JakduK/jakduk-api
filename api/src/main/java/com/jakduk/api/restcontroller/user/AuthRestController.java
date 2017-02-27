@@ -3,12 +3,13 @@ package com.jakduk.api.restcontroller.user;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
+import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.common.vo.SocialProfile;
 import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
 import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
@@ -16,7 +17,6 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
-import com.jakduk.core.model.etc.AuthUserProfile;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,13 +29,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Objects;
 
 /**
  * @author pyohwan
@@ -89,7 +89,7 @@ public class AuthRestController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Reload password post-authentication so we can generate token
-        JakdukUserDetail userDetails = (JakdukUserDetail) jakdukDetailsService.loadUserByUsername(form.getUsername());
+        JakdukUserDetails userDetails = (JakdukUserDetails) jakdukDetailsService.loadUserByUsername(form.getUsername());
 
         String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
@@ -115,7 +115,7 @@ public class AuthRestController {
         }
     }
 
-    @ApiOperation(value = "SNS 기반 로그인")
+    @ApiOperation(value = "SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
     @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
     public EmptyJsonResponse loginSocialUser(@PathVariable String providerId,
                                              @Valid @RequestBody LoginSocialUserForm form,
@@ -135,28 +135,37 @@ public class AuthRestController {
         }
 
         assert socialProfile != null;
-        User existUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
-        // 로그인 처리.
-        if (! ObjectUtils.isEmpty(existUser)) {
+        try {
+            User user = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
-            SocialUserDetail userDetails = (SocialUserDetail) socialDetailService.loadUserByUsername(existUser.getEmail());
+            // 로그인 처리.
+            SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
             String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
 
             response.setHeader(tokenHeader, token);
 
             return EmptyJsonResponse.newInstance();
+
+        } catch (ServiceException ignored) {
         }
 
         // 신규 가입.
-        AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
-        attemptSocialUser.setUsername(socialProfile.getNickname());
-        attemptSocialUser.setProviderId(convertProviderId);
-        attemptSocialUser.setProviderUserId(socialProfile.getId());
+        AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
+                .username(socialProfile.getNickname())
+                .providerId(convertProviderId)
+                .providerUserId(socialProfile.getId())
+                .build();
 
         // Daum은 이메일을 안 알려준다.
         if (! ObjectUtils.isEmpty(socialProfile.getEmail()))
             attemptSocialUser.setEmail(socialProfile.getEmail());
+
+        if (! StringUtils.isEmpty(socialProfile.getLargePictureUrl()))
+            attemptSocialUser.setExternalLargePictureUrl(socialProfile.getLargePictureUrl());
+
+        if (! StringUtils.isEmpty(socialProfile.getSmallPictureUrl()))
+            attemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
 
         String attemptedToken = jwtTokenUtils.generateAttemptedToken(attemptSocialUser);
 
@@ -181,7 +190,7 @@ public class AuthRestController {
 
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        if (Objects.isNull(authUserProfile))
+        if (ObjectUtils.isEmpty(authUserProfile))
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         return authUserProfile;

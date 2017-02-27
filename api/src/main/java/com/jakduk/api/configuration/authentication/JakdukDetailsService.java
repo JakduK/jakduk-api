@@ -1,29 +1,34 @@
 package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
+import com.jakduk.api.configuration.authentication.user.UserDetailsPicture;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceError;
-import com.jakduk.core.model.simple.UserOnAuthentication;
+import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.db.User;
+import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Optional;
+import javax.annotation.Resource;
 
 @Slf4j
 @Component
-public class JakdukDetailsService implements UserDetailsManager {
+public class JakdukDetailsService implements UserDetailsService {
 	
 	@Autowired
 	private UserRepository userRepository;
+
+	@Resource
+	private UserUtils userUtils;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -31,13 +36,9 @@ public class JakdukDetailsService implements UserDetailsManager {
 		if (ObjectUtils.isEmpty(email)) {
 			throw new IllegalArgumentException("email 은 꼭 필요한 값입니다.");
 		} else {
-			Optional<UserOnAuthentication> oUser = userRepository.findAuthUserByEmail(email);
-
-			if (! oUser.isPresent())
-				throw new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
-						CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email));
-
-			UserOnAuthentication user = oUser.get();
+			User user = userRepository.findOneByEmail(email)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
+							CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email)));
 
 			if (! user.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK))
 				throw new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
@@ -45,42 +46,24 @@ public class JakdukDetailsService implements UserDetailsManager {
 
 			log.debug("Jakduk user=" + user);
 
-			boolean enabled = true;
-			boolean accountNonExpired = true;
-			boolean credentialsNonExpired = true;
-			boolean accountNonLocked = true;
+			JakdukUserDetails jakdukUserDetails = new JakdukUserDetails(user.getEmail(), user.getId(),
+					user.getPassword(), user.getUsername(), CoreConst.ACCOUNT_TYPE.JAKDUK,
+					true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
 
-			JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(user.getEmail(), user.getId()
-					, user.getPassword(), user.getUsername(), CoreConst.ACCOUNT_TYPE.JAKDUK
-					, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, UserUtils.getAuthorities(user.getRoles()));
+			UserPicture userPicture = user.getUserPicture();
 
-			if (log.isInfoEnabled()) {
-				log.info("load Jakduk username=" + jakdukUserDetail.getUsername());
+			if (! ObjectUtils.isEmpty(userPicture)) {
+				UserDetailsPicture userDetailsPicture = new UserDetailsPicture(userPicture,
+						userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+						userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+
+				jakdukUserDetails.setPicture(userDetailsPicture);
 			}
 
-			return jakdukUserDetail;
+			log.info("load Jakduk username=" + jakdukUserDetails.getUsername());
+
+			return jakdukUserDetails;
 		}
-	}
-
-	@Override
-	public void createUser(UserDetails user) {
-	}
-
-	@Override
-	public void updateUser(UserDetails user) {
-	}
-
-	@Override
-	public void deleteUser(String username) {
-	}
-
-	@Override
-	public void changePassword(String oldPassword, String newPassword) {
-	}
-
-	@Override
-	public boolean userExists(String username) {
-		return false;
 	}
 
 }

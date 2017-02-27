@@ -1,7 +1,7 @@
 package com.jakduk.api.user;
 
 import com.jakduk.api.restcontroller.user.UserRestController;
-import com.jakduk.api.restcontroller.user.vo.UserProfileForm;
+import com.jakduk.api.restcontroller.user.vo.SocialUserForm;
 import com.jakduk.api.util.AbstractMvcTest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -35,7 +35,7 @@ public class UserControllerTest extends AbstractMvcTest<UserRestController> {
     @Ignore
     @Test
     public void 소셜기반회원가입() throws Exception {
-        UserProfileForm form = new UserProfileForm();
+        SocialUserForm form = new SocialUserForm();
 
         mockMvc.perform(post("/api/user/facebook")
                 .contentType(MediaType.APPLICATION_JSON)

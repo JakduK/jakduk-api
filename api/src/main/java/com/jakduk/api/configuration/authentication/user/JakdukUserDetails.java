@@ -2,7 +2,8 @@ package com.jakduk.api.configuration.authentication.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.core.common.CoreConst;
-import org.springframework.security.core.CredentialsContainer;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,49 +12,25 @@ import org.springframework.util.Assert;
 import java.io.Serializable;
 import java.util.*;
 
-public class JakdukUserDetail implements UserDetails, CredentialsContainer {
+public class JakdukUserDetails implements UserDetails {
 
-	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
-
-	//~ Instance fields ================================================================================================
-	private final String id;
-	private final String nickname;						// 별명
 	private String password;
-	private String username;							// email
-	private final CoreConst.ACCOUNT_TYPE providerId;
+	private String username;									// email
+	@Getter private final String id;
+	@Getter private final String nickname;						// 별명
+	@Getter private final CoreConst.ACCOUNT_TYPE providerId;
+	@Getter @Setter
+	private UserDetailsPicture picture;
+
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
 	private final boolean accountNonLocked;
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
 
-	//~ Constructors ===================================================================================================
-
-	/**
-	 * Construct the <code>User</code> with the details required by
-	 * {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}.
-	 *
-	 * @param username the username presented to the
-	 *        <code>DaoAuthenticationProvider</code>
-	 * @param password the password that should be presented to the
-	 *        <code>DaoAuthenticationProvider</code>
-	 * @param enabled set to <code>true</code> if the user is enabled
-	 * @param accountNonExpired set to <code>true</code> if the account has not
-	 *        expired
-	 * @param credentialsNonExpired set to <code>true</code> if the credentials
-	 *        have not expired
-	 * @param accountNonLocked set to <code>true</code> if the account is not
-	 *        locked
-	 * @param authorities the authorities that should be granted to the caller
-	 *        if they presented the correct username and password and the user
-	 *        is enabled. Not null.
-	 *
-	 * @throws IllegalArgumentException if a <code>null</code> value was passed
-	 *         either as a parameter or as an element in the
-	 *         <code>GrantedAuthority</code> collection
-	 */
-	public JakdukUserDetail(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired,
-                            boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+	public JakdukUserDetails(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId,
+                             boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
+                             Collection<? extends GrantedAuthority> authorities) {
 
 		if (Objects.isNull(username) || Objects.isNull(password))
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
@@ -71,8 +48,8 @@ public class JakdukUserDetail implements UserDetails, CredentialsContainer {
 	}
 
 	@Override
-	public void eraseCredentials() {
-		this.password = "";
+	public String getUsername() {
+		return username;
 	}
 
 	@JsonIgnore
@@ -107,26 +84,6 @@ public class JakdukUserDetail implements UserDetails, CredentialsContainer {
 	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
 		return authorities;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-	
-	public CoreConst.ACCOUNT_TYPE getProviderId() {
-		return providerId;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public String getNickname() {
-		return nickname;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	private static SortedSet<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {

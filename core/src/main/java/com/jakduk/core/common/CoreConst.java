@@ -107,10 +107,12 @@ public class CoreConst {
     }
 
 	/**
-	 * 사진 썸네일 크기.
+	 * 사진 가로, 세로 길이
 	 */
 	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 360;
 	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 230;
+	public final static Integer USER_SMALL_PICTURE_SIZE_WIDTH = 50;
+	public final static Integer USER_SMALL_PICTURE_SIZE_HEIGHT = 50;
 
 	/**
 	 * 사진 상태값.
@@ -118,14 +120,6 @@ public class CoreConst {
 	public enum GALLERY_STATUS_TYPE {
 		TEMP,
 		ENABLE,
-	}
-
-	/**
-	 * 유저 이미지의 출처.
-	 */
-	public enum USER_IMAGE_SOURCE_TYPE {
-		EXTERNAL,		// SNS와 같은 외부에서 가져옴.
-		JAKDUK,			// 작두왕에서 직접 등록.
 	}
 
 	/**
@@ -192,13 +186,6 @@ public class CoreConst {
 		TIMEUP		// 경기 종료
 	}
 
-	// 검증 상태.
-	public enum VALIDATION_TYPE {
-		NONE,
-		INVALID,
-		OK
-	}
-
 	// 토큰 타입
 	public enum TOKEN_TYPE {
 		RESET_PASSWORD
@@ -220,5 +207,10 @@ public class CoreConst {
 		PO,	// 게시물
 		CO,	// 댓글
 		GA	// 사진첩
+	}
+
+	public enum IMAGE_SIZE_TYPE {
+		LARGE,
+		SMALL
 	}
 }

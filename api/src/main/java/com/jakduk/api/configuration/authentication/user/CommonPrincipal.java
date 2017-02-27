@@ -25,18 +25,18 @@ public class CommonPrincipal {
 	
 	private CoreConst.ACCOUNT_TYPE providerId;
 
-	public CommonPrincipal(JakdukUserDetail jakdukUserDetail) {
-		this.id = jakdukUserDetail.getId();
-		this.email = jakdukUserDetail.getUsername();
-		this.username = jakdukUserDetail.getNickname();
-		this.providerId = jakdukUserDetail.getProviderId();
+	public CommonPrincipal(JakdukUserDetails jakdukUserDetails) {
+		this.id = jakdukUserDetails.getId();
+		this.email = jakdukUserDetails.getUsername();
+		this.username = jakdukUserDetails.getNickname();
+		this.providerId = jakdukUserDetails.getProviderId();
 	}
 
-	public CommonPrincipal(SocialUserDetail socialUserDetail) {
-		this.id = socialUserDetail.getId();
-		this.email = socialUserDetail.getUserId();
-		this.username = socialUserDetail.getUsername();
-		this.providerId = socialUserDetail.getProviderId();
+	public CommonPrincipal(SocialUserDetails socialUserDetails) {
+		this.id = socialUserDetails.getId();
+		this.email = socialUserDetails.getUserId();
+		this.username = socialUserDetails.getUsername();
+		this.providerId = socialUserDetails.getProviderId();
 	}
 
 	public CommonPrincipal(User user) {

@@ -38,20 +38,6 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
         Assert.assertTrue(! ObjectUtils.isEmpty(boardFree));
     }
 
-    /**
-     * PRD 테스트 안됨
-     */
-    @Ignore
-    @Test
-    public void findByIdAndUserId() {
-
-        User user = userRepository.findByEmail("test05@test.com");
-
-        List<BoardFreeSimple> boardFrees = sut.findByIdAndUserId(new ObjectId("54c4df933d96600d7f55a04b"), user.getId(), 3);
-
-        Assert.assertTrue(boardFrees.size() > 0);
-    }
-
     @Test
     public void findBoardFreeOfMinimumBySeq() {
         BoardFreeOfMinimum boardFreeOnComment = sut.findBoardFreeOfMinimumBySeq(58);

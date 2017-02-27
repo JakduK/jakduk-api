@@ -20,10 +20,10 @@ import java.util.Optional;
  */
 public class AppendGalleryFileExtProcessor implements ItemProcessor<Gallery, Gallery> {
 
-    @Value("${storage.image.path}")
+    @Value("${core.storage.image.path}")
     private String storageImagePath;
 
-    @Value("${storage.thumbnail.path}")
+    @Value("${core.storage.thumbnail.path}")
     private String storageThumbnailPath;
 
     @Override

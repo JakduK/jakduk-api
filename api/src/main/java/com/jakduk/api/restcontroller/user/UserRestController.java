@@ -7,8 +7,8 @@ import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
+import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
 import com.jakduk.core.common.util.CoreUtils;
@@ -16,8 +16,8 @@ import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
+import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.etc.AuthUserProfile;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.EmailService;
 import com.jakduk.core.service.FootballService;
@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -81,13 +82,11 @@ public class UserRestController {
                                            HttpServletResponse response) {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
-                form.getFootballClub(), form.getAbout());
+                form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
-        JakdukUserDetail userDetails = userUtils.signInJakdukUser(user);
-
-        String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
+        String token = jwtTokenUtils.generateToken(new CommonPrincipal(user), device);
 
         response.setHeader(tokenHeader, token);
 
@@ -97,7 +96,7 @@ public class UserRestController {
     @ApiOperation(value = "SNS 기반 회원 가입")
     @RequestMapping(value = "/social", method = RequestMethod.POST)
     public EmptyJsonResponse addSocialUser(@RequestHeader(value = "x-attempt-token") String attemptedToken,
-                                           @Valid @RequestBody UserProfileForm form,
+                                           @Valid @RequestBody SocialUserForm form,
                                            Device device,
                                            Locale locale,
                                            HttpServletResponse response) {
@@ -105,10 +104,17 @@ public class UserRestController {
         if (! jwtTokenUtils.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
+        String largePictureUrl = null;
+
+        if (! ObjectUtils.isEmpty(form.getExternalLargePictureUrl())) {
+            largePictureUrl = StringUtils.defaultIfBlank(form.getExternalLargePictureUrl(), null);
+        }
+
         AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
         User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
-                attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout());
+                attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
+                largePictureUrl);
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
@@ -229,14 +235,6 @@ public class UserRestController {
 
         userService.save(user);
 
-        //log.debug("user updated. user=" + user);
-
-        if (UserUtils.isJakdukUser()) {
-            userUtils.signInJakdukUser(user);
-        } else if (UserUtils.isSocialUser()) {
-            userUtils.signInSocialUser(user);
-        }
-
         return EmptyJsonResponse.newInstance();
     }
 
@@ -254,16 +252,23 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "프로필 이미지 올리기")
-    @RequestMapping(value = "/profile/image", method = RequestMethod.POST)
-    public EmptyJsonResponse updateUserImage(@RequestParam MultipartFile file) {
+    @ApiOperation(value = "프로필 사진 올리기")
+    @RequestMapping(value = "/picture", method = RequestMethod.POST)
+    public UserPicture uploadUserPicture(@RequestParam MultipartFile file) {
 
         String contentType = file.getContentType();
 
         if (! StringUtils.startsWithIgnoreCase(contentType, "image/"))
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
-        return EmptyJsonResponse.newInstance();
+        try {
+            UserPicture userPicture = userService.uploadUserPicture(contentType, file.getSize(), file.getBytes());
+
+            return userPicture;
+
+        } catch (IOException e) {
+            throw new ServiceException(ServiceError.IO_EXCEPTION, e);
+        }
     }
 
 }

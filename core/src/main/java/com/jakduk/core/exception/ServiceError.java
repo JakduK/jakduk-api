@@ -15,22 +15,27 @@ import java.util.ResourceBundle;
 @Getter
 public enum ServiceError {
 
+    // COMMON
     INVALID_PARAMETER(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     FORM_VALIDATION_FAILED(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     EXPIRATION_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.expiration.token"),
     INVALID_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.invalid.token"),
     FEELING_YOU_ARE_WRITER(HttpStatus.SC_BAD_REQUEST, "exception.you.are.writer"),
     FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
+    NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
+    FORBIDDEN(HttpStatus.SC_FORBIDDEN, "exception.forbidden"),
 
     // FILE
     FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED(HttpStatus.SC_BAD_REQUEST, "exception.only.image.type.can.be.uploaded"),
 
-    NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
+    // USER
     NOT_FOUND_USER(HttpStatus.SC_NOT_FOUND, "exception.not.found.user"),
+    NOT_FOUND_USER_IMAGE(HttpStatus.SC_NOT_FOUND, "exception.not.found.user.image"),
     NOT_REGISTER_WITH_SNS(HttpStatus.SC_NOT_FOUND, "exception.not.register.with.sns"),
     CANNOT_GET_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.sns.profile"),
     ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
     ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
+
     NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
     CATEGORY_NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.not.found.category"),
     ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
@@ -49,7 +54,6 @@ public enum ServiceError {
     NOT_FOUND_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     NOT_JAKDUK_USER(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     BAD_CREDENTIALS(HttpStatus.SC_UNAUTHORIZED, "exception.bad.credentials"),
-    FORBIDDEN(HttpStatus.SC_FORBIDDEN, "exception.forbidden"),
 
     SEND_EMAIL_FAILED(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.send.email.failed"),
     GALLERY_IO_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.gallery.io"),
