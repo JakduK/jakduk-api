@@ -81,8 +81,8 @@ public class BoardFreeService {
 		return boardFreeRepository.findByIdAndUserId(new ObjectId(id), userId, limit);
 	}
 
-	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
-		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountBySeqs(arrSeq);
+	public Map<String, Integer> getBoardFreeCommentCount(List<ObjectId> ids) {
+		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountByIds(ids);
 
 		return numberOfItems.stream()
 				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
@@ -400,12 +400,11 @@ public class BoardFreeService {
 	 * 자유 게시판 공지글 목록
      * @return 공지글 목록
      */
-	public Page<BoardFreeOnList> getFreeNotices() {
+	public List<BoardFreeOnList> getFreeNotices() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-		Pageable noticePageable = new PageRequest(0, 10, sort);
 
-		return boardFreeRepository.findByNotice(noticePageable);
+		return boardFreeRepository.findNotices(sort);
 	}
 
 	public BoardFreeDetail getPost(Integer seq, String language, Boolean isViewsIncreasing) {

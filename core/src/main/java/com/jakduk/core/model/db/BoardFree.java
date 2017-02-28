@@ -20,9 +20,6 @@ import java.util.List;
 @Document
 public class BoardFree {
 
-	/**
-	 * ID
-	 */
 	@Id  @GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 

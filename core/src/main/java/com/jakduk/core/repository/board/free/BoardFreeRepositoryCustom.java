@@ -1,10 +1,12 @@
 package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.model.elasticsearch.ESBoard;
+import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -26,4 +28,10 @@ public interface BoardFreeRepositoryCustom {
      * @param ids id 배열
      */
     List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids);
+
+    /**
+     * 공지 글 목록
+     */
+    List<BoardFreeOnList> findNotices(Sort sort);
+
 }

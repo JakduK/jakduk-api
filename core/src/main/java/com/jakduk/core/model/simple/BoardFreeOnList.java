@@ -4,7 +4,7 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardStatus;
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,13 +17,10 @@ import java.util.List;
  * @desc     :
  */
 
-@Data
+@Getter
 @Document(collection = "boardFree")
 public class BoardFreeOnList {
 	
-	/**
-	 * ID
-	 */
 	@Id
 	private String id;
 

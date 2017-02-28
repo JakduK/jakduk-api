@@ -5,7 +5,6 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
-import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
@@ -28,6 +27,7 @@ import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.bson.types.ObjectId;
@@ -69,43 +69,38 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글 목록")
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
     public FreePostsOnListResponse getFreePosts(
-            @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "20") Integer size,
-            @RequestParam(required = false, defaultValue = "ALL") CoreConst.BOARD_CATEGORY_TYPE category) {
+            @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
+            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
+            @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") CoreConst.BOARD_CATEGORY_TYPE category) {
 
         Page<BoardFreeOnList> posts = boardFreeService.getFreePosts(category, page, size);
-        Page<BoardFreeOnList> notices = boardFreeService.getFreeNotices();
+        List<BoardFreeOnList> notices = boardFreeService.getFreeNotices();
 
-        ArrayList<Integer> seqs = new ArrayList<>();
         ArrayList<ObjectId> ids = new ArrayList<>();
 
-        // id와 seq 뽑아내기.
-        Consumer<BoardFreeOnList> extractIdAndSeq = board -> {
-            String tempId = board.getId();
-            Integer tempSeq = board.getSeq();
+        // Board ID 뽑아내기.
+        Consumer<BoardFreeOnList> extractIds = board -> {
+            String boardId = board.getId();
+            ObjectId objId = new ObjectId(boardId);
 
-            ObjectId objId = new ObjectId(tempId);
-
-            seqs.add(tempSeq);
             ids.add(objId);
         };
 
-        posts.getContent().forEach(extractIdAndSeq);
-        notices.getContent().forEach(extractIdAndSeq);
+        posts.getContent().forEach(extractIds);
+        notices.forEach(extractIds);
 
-        Map<String, Integer> commentCounts = boardFreeService.getBoardFreeCommentCount(seqs);
+        Map<String, Integer> commentCounts = boardFreeService.getBoardFreeCommentCount(ids);
         Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
 
         // 댓글수, 감정 표현수 합치기.
         Consumer<FreePostsOnList> applyCounts = board -> {
-            String tempId = board.getId();
-
-            Integer commentCount = commentCounts.get(tempId);
+            String boardId = board.getId();
+            Integer commentCount = commentCounts.get(boardId);
 
             if (! ObjectUtils.isEmpty(commentCount))
                 board.setCommentCount(commentCount);
 
-            BoardFeelingCount feelingCount = feelingCounts.get(tempId);
+            BoardFeelingCount feelingCount = feelingCounts.get(boardId);
 
             if (! ObjectUtils.isEmpty(feelingCount)) {
                 board.setLikingCount(feelingCount.getUsersLikingCount());
@@ -118,24 +113,29 @@ public class BoardRestController {
                 .map(post -> {
                     FreePostsOnList freePostsOnList = new FreePostsOnList();
                     BeanUtils.copyProperties(post, freePostsOnList);
+
                     return freePostsOnList;
                 })
                 .collect(Collectors.toList());
+
         freePosts.forEach(applyCounts);
 
         // 공지게시물 목록에 댓글 수, 감정표현 수 적용.
-        List<FreePostsOnList> freeNotices = notices.getContent().stream()
+        List<FreePostsOnList> freeNotices = notices.stream()
                 .map(notice -> {
                     FreePostsOnList freePostsOnList = new FreePostsOnList();
                     BeanUtils.copyProperties(notice, freePostsOnList);
                     return freePostsOnList;
                 })
                 .collect(Collectors.toList());
+
         freeNotices.forEach(applyCounts);
 
         List<BoardCategory> categories = boardCategoryService.getFreeCategories();
+
         Map<String, String> categoriesMap = categories.stream()
                 .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+
         categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
 
         return FreePostsOnListResponse.builder()
