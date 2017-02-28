@@ -2,6 +2,7 @@ package com.jakduk.api.configuration.authentication.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +21,7 @@ public class JakdukUserDetails implements UserDetails {
 	@Getter private final String nickname;						// 별명
 	@Getter private final CoreConst.ACCOUNT_TYPE providerId;
 	@Getter @Setter
-	private UserDetailsPicture picture;
+	private UserPictureInfo picture;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;

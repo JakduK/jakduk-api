@@ -1,7 +1,6 @@
 package com.jakduk.core.model.embedded;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +22,8 @@ public class BoardHistory {
 	private String id;
 	
 	private CoreConst.BOARD_HISTORY_TYPE type;
-	
+
+	// TODO : @DBRef User 객체로 변환하자
 	private CommonWriter writer;
 	
 }

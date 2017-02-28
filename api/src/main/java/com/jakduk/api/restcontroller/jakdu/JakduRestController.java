@@ -2,9 +2,9 @@ package com.jakduk.api.restcontroller.jakdu;
 
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.api.restcontroller.jakdu.vo.JakduScheduleResponse;
+import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
+import com.jakduk.api.restcontroller.jakdu.vo.JakduScheduleResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
@@ -105,10 +105,10 @@ public class JakduRestController {
         JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
         result.put("jakduSchedule", jakduSchedule);
 
-        CommonPrincipal principal = UserUtils.getCommonPrincipal();
+        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
         if (UserUtils.isUser()) {
-            result.put("myJakdu", jakduService.getMyJakdu(principal.getId(), id));
+            result.put("myJakdu", jakduService.getMyJakdu(authUserProfile.getId(), id));
         }
 
         return result;
@@ -127,10 +127,9 @@ public class JakduRestController {
             throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
         }
 
-        CommonPrincipal principal = UserUtils.getCommonPrincipal();
-        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        Jakdu jakdu = jakduService.setMyJakdu(writer, myJakdu);
+        Jakdu jakdu = jakduService.setMyJakdu(commonWriter, myJakdu);
 
         return jakdu;
     }
@@ -148,10 +147,9 @@ public class JakduRestController {
 
         jakduCommentWriteRequest.setDevice(ApiUtils.getDeviceInfo(device));
 
-        CommonPrincipal principal = UserUtils.getCommonPrincipal();
-        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        JakduComment jakduComment = jakduService.setComment(writer, jakduCommentWriteRequest);
+        JakduComment jakduComment = jakduService.setComment(commonWriter, jakduCommentWriteRequest);
 
         return jakduComment;
     }
@@ -174,10 +172,9 @@ public class JakduRestController {
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonPrincipal principal = UserUtils.getCommonPrincipal();
-        CommonWriter writer = new CommonWriter(principal.getId(), principal.getUsername(), principal.getProviderId());
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        JakduComment jakduComment = jakduService.setJakduCommentFeeling(writer, commentId, feeling);
+        JakduComment jakduComment = jakduService.setJakduCommentFeeling(commonWriter, commentId, feeling);
 
         Integer numberOfLike = Objects.nonNull(jakduComment.getUsersLiking()) ? jakduComment.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;

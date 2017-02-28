@@ -7,7 +7,6 @@ import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.common.vo.SocialProfile;
 import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
@@ -91,7 +90,8 @@ public class AuthRestController {
         // Reload password post-authentication so we can generate token
         JakdukUserDetails userDetails = (JakdukUserDetails) jakdukDetailsService.loadUserByUsername(form.getUsername());
 
-        String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
+        String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getUsername(), userDetails.getNickname(),
+                userDetails.getProviderId().name());
 
         response.setHeader(tokenHeader, token);
 
@@ -139,9 +139,11 @@ public class AuthRestController {
         try {
             User user = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
-            // 로그인 처리.
+            // 토큰 생성
             SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
-            String token = jwtTokenUtils.generateToken(new CommonPrincipal(userDetails), device);
+
+            String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
+                    userDetails.getProviderId().name());
 
             response.setHeader(tokenHeader, token);
 

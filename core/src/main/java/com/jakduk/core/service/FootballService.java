@@ -35,13 +35,14 @@ public class FootballService {
     @Autowired
     private FootballClubOriginRepository footballClubOriginRepository;
 
-    public FootballClub findById(String id) {
+    public FootballClub findOneById(String id) {
         return footballClubRepository.findOneById(id)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
     }
 
     /**
      * 조건에 맞는 축구단 목록을 가져온다.
+     *
      * @param language 언어
      * @param clubType 클럽 성격
      * @param sortNameType 정렬 기준
@@ -59,6 +60,7 @@ public class FootballService {
 
     /**
      * 조건에 맞는 축구단 목록을 가져온다.
+     *
      * @param language 언어
      * @param sortNameType 정렬 기준
      * @param ids footballClub Id 배열
@@ -71,6 +73,7 @@ public class FootballService {
 
     /**
      * 해당 언어에 맞는 축구단 이름 가져오기.
+     *
      * @param footballClub 축구단 객체
      * @param language 언어
      * @return LocalName 객체

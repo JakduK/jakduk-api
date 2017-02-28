@@ -1,6 +1,6 @@
 package com.jakduk.api.common.vo;
 
-import com.jakduk.api.configuration.authentication.user.UserDetailsPicture;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.common.CoreConst;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +27,6 @@ public class AuthUserProfile {
     private String username;
     private CoreConst.ACCOUNT_TYPE providerId;
     private List<String> roles;
-    private UserDetailsPicture picture;
+    private UserPictureInfo picture;
 
 }

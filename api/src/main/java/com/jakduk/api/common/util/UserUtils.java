@@ -3,7 +3,6 @@ package com.jakduk.api.common.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.common.vo.SocialProfile;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.core.common.CommonRole;
@@ -126,6 +125,7 @@ public class UserUtils {
 
     /**
      * 로그인 중인 회원이 소셜 기반인지 검사.
+     *
      * @return 이메일 기반이면 true, 아니면 false
      */
     public static Boolean isSocialUser() {
@@ -134,7 +134,6 @@ public class UserUtils {
 
     /**
      * 로그인 중인 회원 정보를 가져온다.
-     * @return 회원 객체
      */
     public static AuthUserProfile getAuthUserProfile() {
         AuthUserProfile authUserProfile = null;
@@ -182,45 +181,20 @@ public class UserUtils {
     }
 
     /**
-     * 로그인 중인 회원의 정보를 가져온다.
-     * @return 로그인 회원 객체.
-     */
-    public static CommonPrincipal getCommonPrincipal() {
-        CommonPrincipal commonPrincipal = null;
-
-        if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetails) {
-                SocialUserDetails userDetail = (SocialUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-                commonPrincipal = CommonPrincipal.builder()
-                        .id(userDetail.getId())
-                        .email(userDetail.getUserId())
-                        .username(userDetail.getUsername())
-                        .providerId(userDetail.getProviderId())
-                        .build();
-            } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetails) {
-                JakdukUserDetails principal = (JakdukUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-                commonPrincipal = CommonPrincipal.builder()
-                        .id(principal.getId())
-                        .email(principal.getUsername())
-                        .username(principal.getNickname())
-                        .providerId(principal.getProviderId())
-                        .build();
-            }
-        }
-
-        return commonPrincipal;
-    }
-
-    /**
      * CommonWriter를 가져온다.
      */
     public static CommonWriter getCommonWriter() {
-        CommonPrincipal commonPrincipal = getCommonPrincipal();
+        AuthUserProfile authUserProfile = getAuthUserProfile();
 
-        if (! ObjectUtils.isEmpty(commonPrincipal)) {
-            return new CommonWriter(commonPrincipal.getId(), commonPrincipal.getUsername(), commonPrincipal.getProviderId());
+        if (! ObjectUtils.isEmpty(authUserProfile)) {
+            CommonWriter commonWriter = CommonWriter.builder()
+                    .userId(authUserProfile.getId())
+                    .username(authUserProfile.getUsername())
+                    .providerId(authUserProfile.getProviderId())
+                    .picture(authUserProfile.getPicture())
+                    .build();
+
+            return commonWriter;
         } else {
             return null;
         }

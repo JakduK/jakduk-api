@@ -8,9 +8,9 @@ import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.common.vo.AuthUserProfile;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.*;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -18,6 +18,7 @@ import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.EmailService;
 import com.jakduk.core.service.FootballService;
@@ -36,6 +37,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -60,9 +62,6 @@ public class UserRestController {
     private JwtTokenUtils jwtTokenUtils;
 
     @Autowired
-    private UserUtils userUtils;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -73,6 +72,9 @@ public class UserRestController {
 
     @Autowired
     private EmailService emailService;
+
+    @Resource
+    private UserUtils userUtils;
 
     @ApiOperation(value = "이메일 기반 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -86,7 +88,7 @@ public class UserRestController {
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
-        String token = jwtTokenUtils.generateToken(new CommonPrincipal(user), device);
+        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
 
         response.setHeader(tokenHeader, token);
 
@@ -118,7 +120,7 @@ public class UserRestController {
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
-        String token = jwtTokenUtils.generateToken(new CommonPrincipal(user), device);
+        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
 
         response.setHeader(tokenHeader, token);
 
@@ -196,44 +198,41 @@ public class UserRestController {
 
         UserProfile user = userService.findUserProfileById(authUserProfile.getId());
 
-        UserProfileResponse response = new UserProfileResponse();
-        response.setEmail(user.getEmail());
-        response.setUsername(user.getUsername());
-        response.setAbout(user.getAbout());
-        response.setProviderId(user.getProviderId());
+        UserProfileResponse response = UserProfileResponse.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .about(user.getAbout())
+                .providerId(user.getProviderId())
+                .build();
 
         FootballClub footballClub = user.getSupportFC();
+        UserPicture userPicture = user.getUserPicture();
 
-        LocalName localName = footballService.getLocalNameOfFootballClub(footballClub, language);
+        if (Objects.nonNull(footballClub)) {
+            LocalName localName = footballService.getLocalNameOfFootballClub(footballClub, language);
 
-        if (Objects.nonNull(localName)) response.setFootballClubName(localName);
+            response.setFootballClubName(localName);
+        }
+
+        if (Objects.nonNull(userPicture)) {
+            UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
+                    userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+                    userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+
+            response.setPicture(userPictureInfo);
+        }
 
         return response;
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")
     @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
-    public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileOnEditForm form) {
+    public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileEditForm form) {
 
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        User user = userService.findUserById(authUserProfile.getId());
-
-        if (StringUtils.isNotBlank(form.getEmail()))
-            user.setEmail(StringUtils.trim(form.getEmail()));
-
-        if (StringUtils.isNotBlank(form.getUsername()))
-            user.setUsername(StringUtils.trim(form.getUsername()));
-
-        if (StringUtils.isNotBlank(form.getFootballClub())) {
-            FootballClub supportFC = footballService.findById(StringUtils.trim(form.getFootballClub()));
-            user.setSupportFC(supportFC);
-        }
-
-        if (StringUtils.isNotBlank(form.getAbout()))
-            user.setAbout(StringUtils.trim(form.getAbout()));
-
-        userService.save(user);
+        userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
+                form.getAbout(), form.getUserPictureId());
 
         return EmptyJsonResponse.newInstance();
     }

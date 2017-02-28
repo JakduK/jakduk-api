@@ -2,7 +2,7 @@ package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
-import com.jakduk.api.configuration.authentication.user.UserDetailsPicture;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
@@ -54,11 +54,11 @@ public class SocialDetailService implements UserDetailsService {
             UserPicture userPicture = user.getUserPicture();
 
             if (! ObjectUtils.isEmpty(userPicture)) {
-                UserDetailsPicture userDetailsPicture = new UserDetailsPicture(userPicture,
+                UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
                         userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
                         userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
-                socialUserDetails.setPicture(userDetailsPicture);
+                socialUserDetails.setPicture(userPictureInfo);
             }
 
             log.info("load Social username=" + socialUserDetails.getUsername());
