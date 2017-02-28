@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -51,7 +52,7 @@ public class UserService {
 	@Value("${core.storage.user.picture.small.path}")
 	private String storageUserPictureSmallPath;
 
-	public User findUserById(String id) {
+	public User findOneById(String id) {
 		return userRepository.findOneById(id)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
@@ -102,7 +103,7 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public User addJakdukUser(String email, String username, String password, String footballClub, String about, String userImageId) {
+	public User addJakdukUser(String email, String username, String password, String footballClub, String about, String userPictureId) {
 
 		UserPicture userPicture = null;
 
@@ -124,8 +125,8 @@ public class UserService {
 		if (StringUtils.isNotBlank(about))
 			user.setAbout(about.trim());
 
-		if (StringUtils.isNotBlank(userImageId)) {
-			userPicture = userPictureRepository.findOneById(userImageId)
+		if (StringUtils.isNotBlank(userPictureId)) {
+			userPicture = userPictureRepository.findOneById(userPictureId)
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
@@ -145,7 +146,7 @@ public class UserService {
 	}
 
 	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
-							  String footballClub, String about, String userImageId, String largePictureUrl) {
+							  String footballClub, String about, String userPictureId, String largePictureUrl) {
 
 		UserPicture userPicture = null;
 
@@ -168,8 +169,8 @@ public class UserService {
 			user.setAbout(about.trim());
 
 		// 직접 올린 사진을 User와 연동
-		if (StringUtils.isNotBlank(userImageId)) {
-			userPicture = userPictureRepository.findOneById(userImageId)
+		if (StringUtils.isNotBlank(userPictureId)) {
+			userPicture = userPictureRepository.findOneById(userPictureId)
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
@@ -218,6 +219,49 @@ public class UserService {
 		log.debug("social user created. user=" + user);
 
 		return user;
+	}
+
+	public void editUserProfile(String userId, String email, String username, String footballClubId, String about,
+								String userPictureId) {
+
+		UserPicture userPicture = null;
+
+		User user = userRepository.findOneById(userId)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+
+		if (StringUtils.isNotBlank(email))
+			user.setEmail(StringUtils.trim(email));
+
+		if (StringUtils.isNotBlank(username))
+			user.setUsername(StringUtils.trim(username));
+
+		if (StringUtils.isNotBlank(footballClubId)) {
+
+			FootballClub footballClub = footballClubRepository.findOneById(footballClubId)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+
+			user.setSupportFC(footballClub);
+		}
+
+		if (StringUtils.isNotBlank(about))
+			user.setAbout(StringUtils.trim(about));
+
+		if (StringUtils.isNotBlank(userPictureId)) {
+			userPicture = userPictureRepository.findOneById(userPictureId)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
+
+			user.setUserPicture(userPicture);
+		}
+
+		userRepository.save(user);
+
+		if (Objects.nonNull(userPicture)) {
+			userPicture.setUser(user);
+			userPicture.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+			userPictureRepository.save(userPicture);
+		}
+
+		log.debug("User edited. user=" + user);
 	}
 
 	public void existEmail(String email) {
