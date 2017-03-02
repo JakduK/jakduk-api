@@ -2,7 +2,7 @@ package com.jakduk.core.model.simple;
 
 import com.jakduk.core.model.embedded.BoardStatus;
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@Data
+@Getter
 @Document(collection = "boardFree")
 public class BoardFreeOnHome {
 	
@@ -38,5 +38,7 @@ public class BoardFreeOnHome {
 	private BoardStatus status;
 	
 	private int views;
+
+	private String shortContent;
 	
 }

@@ -4,10 +4,7 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.elasticsearch.ESBoard;
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeSimple;
+import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -108,5 +105,17 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         query.limit(10);
 
         return mongoTemplate.find(query, BoardFreeOnList.class);
+    }
+
+    /**
+     * 홈에서 보여지는 최근글 목록
+     */
+    @Override
+    public List<BoardFreeOnHome> findLatest(Sort sort, Integer limit) {
+        Query query = new Query();
+        query.with(sort);
+        query.limit(limit);
+
+        return mongoTemplate.find(query, BoardFreeOnHome.class);
     }
 }

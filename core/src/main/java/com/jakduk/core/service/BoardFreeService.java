@@ -13,10 +13,7 @@ import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.GalleryOnBoard;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeSimple;
+import com.jakduk.core.model.simple.*;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
@@ -419,13 +416,22 @@ public class BoardFreeService {
 
 	/**
 	 * 자유 게시판 공지글 목록
-     * @return 공지글 목록
      */
 	public List<BoardFreeOnList> getFreeNotices() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
 		return boardFreeRepository.findNotices(sort);
+	}
+
+	/**
+	 * 최근 글 가져오기
+	 */
+	public List<BoardFreeOnHome> getFreeLatest() {
+
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+
+		return boardFreeRepository.findLatest(sort, CoreConst.HOME_SIZE_POST);
 	}
 
 	public BoardFreeDetail getPost(Integer seq, String language, Boolean isViewsIncreasing) {

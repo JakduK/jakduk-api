@@ -5,6 +5,7 @@ import com.jakduk.api.restcontroller.home.vo.HomeResponse;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.service.BoardFreeService;
 import com.jakduk.core.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +32,9 @@ public class HomeRestController {
 
     @Autowired
     private HomeService homeService;
+
+    @Autowired
+    private BoardFreeService boardFreeService;
 
     @Value("${api.server.url}")
     private String apiServerUrl;
@@ -61,22 +64,23 @@ public class HomeRestController {
 
         HomeResponse response = new HomeResponse();
         response.setHomeDescription(homeService.getHomeDescription());
-        response.setPosts(homeService.getBoardLatest());
+        response.setPosts(boardFreeService.getFreeLatest());
         response.setUsers(homeService.getUsersLatest(language));
         response.setComments(homeService.getBoardCommentsLatest());
 
         List<GalleryOnList> galleries =  homeService.getGalleriesLatest();
 
         // 사진 경로 붙히기.
-        Consumer<GalleryOnHome> applyImageUrl = gallery -> {
-            gallery.setImageUrl(apiServerUrl + imagePath + gallery.getId());
-            gallery.setThumbnailUrl(apiServerUrl + thumbnailPath + gallery.getId());
-        };
+        List<GalleryOnHome> galleriesOfHome = galleries.stream()
+                .map(GalleryOnHome::new)
+                .map(gallery -> {
+                    gallery.setImageUrl(apiServerUrl + imagePath + gallery.getId());
+                    gallery.setThumbnailUrl(apiServerUrl + thumbnailPath + gallery.getId());
+                    return gallery;
+                })
+                .collect(Collectors.toList());
 
-        List<GalleryOnHome> cvtGalleries = galleries.stream().map(GalleryOnHome::new).collect(Collectors.toList());
-        cvtGalleries.forEach(applyImageUrl);
-
-        response.setGalleries(cvtGalleries);
+        response.setGalleries(galleriesOfHome);
 
         return response;
     }

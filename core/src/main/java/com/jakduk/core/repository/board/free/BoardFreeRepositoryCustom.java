@@ -1,10 +1,7 @@
 package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.model.elasticsearch.ESBoard;
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeSimple;
+import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 
@@ -33,5 +30,10 @@ public interface BoardFreeRepositoryCustom {
      * 공지 글 목록
      */
     List<BoardFreeOnList> findNotices(Sort sort);
+
+    /**
+     * 홈에서 보여지는 최근글 목록
+     */
+    List<BoardFreeOnHome> findLatest(Sort sort, Integer limit);
 
 }
