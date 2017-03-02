@@ -46,6 +46,8 @@ public class CoreConst {
 	public final static String BOARD_CATEGORY_DEVELOP = "develop";
 	public final static String BOARD_CATEGORY_ALL = "all";
 
+	public final static Integer BOARD_SHORT_CONTENT_LENGTH = 100;
+
 	/**
 	 * 게시판 말머리 종류.
 	 */
@@ -200,7 +202,8 @@ public class CoreConst {
 	// 배치 타입
 	public enum BATCH_TYPE {
 		CHANGE_BOARD_CONTENT_IMAGE_URL_01,
-		APPEND_GALLERY_FILE_EXT_01
+		APPEND_GALLERY_FILE_EXT_01,
+		ADD_SHORT_CONTENT_01				// 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
 	}
 
 	public enum SEARCH_TYPE {

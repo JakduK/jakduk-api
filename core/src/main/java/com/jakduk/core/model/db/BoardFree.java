@@ -2,7 +2,8 @@ package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,7 +17,8 @@ import java.util.List;
  *
  */
 
-@Data
+@Getter
+@Setter
 @Document
 public class BoardFree {
 
@@ -65,4 +67,6 @@ public class BoardFree {
 	private List<BoardImage> galleries;
 
 	private List<CoreConst.BATCH_TYPE> batch;
+
+	private String shortContent;
 }
