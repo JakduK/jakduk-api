@@ -2,8 +2,7 @@ package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +16,9 @@ import java.util.List;
  *
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 @Document

@@ -21,14 +21,16 @@ public class AddShortContentProcessor implements ItemProcessor<BoardFree, BoardF
         String stripHtmlContent = StringUtils.defaultIfBlank(CoreUtils.stripHtmlTag(item.getContent()), StringUtils.EMPTY);
         stripHtmlContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
 
-        item.setShortContent(stripHtmlContent);
+        if (StringUtils.isNotBlank(stripHtmlContent)) {
+            item.setShortContent(stripHtmlContent);
 
-        List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
-                .orElseGet(ArrayList::new);
+            List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
+                    .orElseGet(ArrayList::new);
 
-        if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.ADD_SHORT_CONTENT_01))) {
-            batchList.add(CoreConst.BATCH_TYPE.ADD_SHORT_CONTENT_01);
-            item.setBatch(batchList);
+            if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.ADD_SHORT_CONTENT_01))) {
+                batchList.add(CoreConst.BATCH_TYPE.ADD_SHORT_CONTENT_01);
+                item.setBatch(batchList);
+            }
         }
 
         return item;

@@ -1,9 +1,7 @@
 package com.jakduk.core.model.embedded;
 
 import com.jakduk.core.common.CoreConst;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -13,8 +11,10 @@ import lombok.Setter;
  */
 
 @NoArgsConstructor
-@Setter
+@AllArgsConstructor
+@Builder
 @Getter
+@Setter
 public class BoardStatus {
 	
 	private Boolean notice;

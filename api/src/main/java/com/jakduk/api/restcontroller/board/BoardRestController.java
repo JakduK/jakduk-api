@@ -17,7 +17,6 @@ import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
-import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
@@ -258,20 +257,10 @@ public class BoardRestController {
             @Valid @RequestBody FreePostForm form,
             Device device) {
 
-        boardCategoryService.findOneByCode(form.getCategoryCode().name());
-
-        List<GalleryOnBoard> galleries = new ArrayList<>();
-
-        if (Objects.nonNull(form.getGalleries())) {
-            galleries = form.getGalleries().stream()
-                    .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
-                    .collect(Collectors.toList());
-        }
-
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
         Integer boardSeq = boardFreeService.insertFreePost(commonWriter, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
+                form.getCategoryCode(), form.getGalleries(), ApiUtils.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
                 .seq(boardSeq)
@@ -285,23 +274,10 @@ public class BoardRestController {
             @Valid @RequestBody FreePostForm form,
             Device device) {
 
-        if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
-        boardCategoryService.findOneByCode(form.getCategoryCode().name());
-
-        List<GalleryOnBoard> galleries = new ArrayList<>();
-
-        if (Objects.nonNull(form.getGalleries())) {
-            galleries = form.getGalleries().stream()
-                    .map(gallery -> new GalleryOnBoard(gallery.getId(), gallery.getName(), gallery.getFileName(), gallery.getSize()))
-                    .collect(Collectors.toList());
-        }
-
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
         Integer boardSeq = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
+                form.getCategoryCode(), form.getGalleries(), ApiUtils.getDeviceInfo(device));
 
         return FreePostOnWriteResponse.builder()
                 .seq(boardSeq)
@@ -312,9 +288,6 @@ public class BoardRestController {
     @RequestMapping(value = "/{seq}", method = RequestMethod.DELETE)
     public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
 
-        if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
 		CoreConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(commonWriter, seq);
@@ -323,7 +296,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
-    @RequestMapping(value = "/comments/{seq}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{seq}/comments", method = RequestMethod.GET)
     public BoardCommentsResponse getFreeComments(
             @PathVariable Integer seq,
             @RequestParam(required = false) String commentId) {
