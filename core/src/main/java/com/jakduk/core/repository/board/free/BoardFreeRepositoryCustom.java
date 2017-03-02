@@ -34,6 +34,6 @@ public interface BoardFreeRepositoryCustom {
     /**
      * 홈에서 보여지는 최근글 목록
      */
-    List<BoardFreeOnHome> findLatest(Sort sort, Integer limit);
+    List<BoardFreeOnList> findLatest(Sort sort, Integer limit);
 
 }

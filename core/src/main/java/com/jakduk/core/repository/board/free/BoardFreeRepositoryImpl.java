@@ -111,11 +111,11 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
      * 홈에서 보여지는 최근글 목록
      */
     @Override
-    public List<BoardFreeOnHome> findLatest(Sort sort, Integer limit) {
+    public List<BoardFreeOnList> findLatest(Sort sort, Integer limit) {
         Query query = new Query();
         query.with(sort);
         query.limit(limit);
 
-        return mongoTemplate.find(query, BoardFreeOnHome.class);
+        return mongoTemplate.find(query, BoardFreeOnList.class);
     }
 }

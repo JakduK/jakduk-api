@@ -13,6 +13,7 @@ import com.jakduk.core.model.simple.UserOnHome;
 import com.jakduk.core.repository.EncyclopediaRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentOnHomeRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -86,7 +87,7 @@ public class HomeService {
 		for (BoardFreeCommentOnHome comment : comments) {
 			String content = CoreUtils.stripHtmlTag(comment.getContent());
 
-			if (Objects.nonNull(content)) {
+			if (StringUtils.isNotBlank(content)) {
 				Integer contentLength = content.length() + comment.getWriter().getUsername().length();
 
 				if (contentLength > CoreConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {

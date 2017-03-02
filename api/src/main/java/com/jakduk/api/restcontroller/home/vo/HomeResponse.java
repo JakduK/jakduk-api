@@ -1,12 +1,14 @@
 package com.jakduk.api.restcontroller.home.vo;
 
-import com.jakduk.core.model.simple.BoardFreeOnHome;
+import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.UserOnHome;
 import com.jakduk.core.model.db.HomeDescription;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -15,12 +17,13 @@ import java.util.List;
  * 16. 5. 7 오후 10:01
  */
 
-@Data
-@ApiModel(value = "홈에서 보여질 데이터 들")
+@ApiModel(description = "홈에서 보여질 데이터 들")
+@Getter
+@Setter
 public class HomeResponse {
 
     @ApiModelProperty(value = "최근 글")
-    private List<BoardFreeOnHome> posts;
+    private List<BoardFreeOnList> posts;
 
     @ApiModelProperty(value = "최근 가입 회원")
     private List<UserOnHome> users;
@@ -33,4 +36,5 @@ public class HomeResponse {
 
     @ApiModelProperty(value = "상단 글")
     private HomeDescription homeDescription;
+
 }

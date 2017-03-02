@@ -8,6 +8,7 @@ import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.CommonWriter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +19,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -268,7 +268,7 @@ public class UserUtils {
      */
     public String generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE sizeType, String id) {
 
-        if (StringUtils.isEmpty(id))
+        if (StringUtils.isBlank(id))
             return null;
 
         String pictureUrl = null;

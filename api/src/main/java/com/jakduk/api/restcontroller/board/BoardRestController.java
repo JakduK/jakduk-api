@@ -38,6 +38,7 @@ import org.springframework.mobile.device.Device;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -64,6 +65,9 @@ public class BoardRestController {
 
     @Autowired
     private BoardDAO boardDAO;
+
+    @Resource
+    private ApiUtils apiUtils;
 
     @ApiOperation(value = "자유게시판 글 목록")
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
@@ -298,8 +302,8 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @RequestMapping(value = "/{seq}/comments", method = RequestMethod.GET)
     public BoardCommentsResponse getFreeComments(
-            @PathVariable Integer seq,
-            @RequestParam(required = false) String commentId) {
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
         BoardFreeOfMinimum boardFreeOnComment = boardFreeService.findBoardFreeOfMinimumBySeq(seq);
 

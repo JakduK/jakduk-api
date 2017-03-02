@@ -1,7 +1,9 @@
 package com.jakduk.api.restcontroller.home;
 
+import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.restcontroller.home.vo.GalleryOnHome;
 import com.jakduk.api.restcontroller.home.vo.HomeResponse;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.simple.GalleryOnList;
@@ -10,12 +12,12 @@ import com.jakduk.core.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -36,14 +38,8 @@ public class HomeRestController {
     @Autowired
     private BoardFreeService boardFreeService;
 
-    @Value("${api.server.url}")
-    private String apiServerUrl;
-
-    @Value("${core.gallery.image.path}")
-    private String imagePath;
-
-    @Value("${core.gallery.thumbnail.path}")
-    private String thumbnailPath;
+    @Resource
+    private ApiUtils apiUtils;
 
     @ApiOperation(value = "랜덤하게 백과사전 하나 가져오기")
     @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
@@ -74,8 +70,8 @@ public class HomeRestController {
         List<GalleryOnHome> galleriesOfHome = galleries.stream()
                 .map(GalleryOnHome::new)
                 .map(gallery -> {
-                    gallery.setImageUrl(apiServerUrl + imagePath + gallery.getId());
-                    gallery.setThumbnailUrl(apiServerUrl + thumbnailPath + gallery.getId());
+                    gallery.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+                    gallery.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
                     return gallery;
                 })
                 .collect(Collectors.toList());
