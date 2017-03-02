@@ -6,16 +6,12 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
-import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -113,23 +109,6 @@ public class BoardTest extends ApiApplicationTests {
 		System.out.println("getBoardFreeCountOfLikeBest01=" + posts);
 	}
 
-	/**
-	 * java.lang.IllegalArgumentException: Given DBObject must be a BasicDBObject! Object of class [org.jongo.bson.BsonDBObject] must be an instance of class com.mongodb.BasicDBObject
-	 *
-	 * FIXME 왜 발생하는지 모르겠다. 근데, 얘만 따로 돌려보면 잘 된다.
-	 * 스프링 부트 mongodb 설정을 하면 안된다. MongoConfig로 설정 하면 됨.
-	 */
-	@Test
-	public void getNoticeList01() {
-
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("seq"));
-		Pageable pageable = new PageRequest(0, 10, sort);
-		
-		List<BoardFreeOnList> posts = boardFreeRepository.findByNotice(pageable).getContent();
-		
-		System.out.println("getNticeList01=" + posts);
-	}
-	
 	@Test
 	public void getGalleriesCount01() {
 		ArrayList<Integer> arrTemp = new ArrayList<Integer>();

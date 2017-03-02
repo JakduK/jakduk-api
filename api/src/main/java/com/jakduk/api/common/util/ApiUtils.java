@@ -20,6 +20,7 @@ public class ApiUtils {
 
     /**
      * 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
+     *
      * @param request HttpServletRequest
      * @param response HttpServletResponse
      * @param prefix 쿠키 이름의 Prefix
@@ -48,6 +49,7 @@ public class ApiUtils {
 
     /**
      * URL 생성
+     *
      * @param request HttpServletRequest
      * @param uri URI
      * @return 만들어진 URL
@@ -63,6 +65,7 @@ public class ApiUtils {
 
     /**
      * 모바일 디바이스 정보 가져오기.
+     *
      * @param device Device 객체
      * @return CoreConst.DEVICE_TYPE enum 타입
      */

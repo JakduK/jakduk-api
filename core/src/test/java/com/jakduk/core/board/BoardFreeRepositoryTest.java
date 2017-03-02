@@ -2,19 +2,16 @@ package com.jakduk.core.board;
 
 import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
-import com.jakduk.core.repository.user.UserRepository;
-import org.bson.types.ObjectId;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,9 +22,6 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
 
     @Autowired
     private BoardFreeRepository sut;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Test
     public void findOneById() {
@@ -50,5 +44,12 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
         List<BoardFreeOnRSS> posts = sut.findPostsOnRss();
 
         Assert.assertTrue(posts.size() > 0);
+    }
+
+    @Test
+    public void findNotices() {
+
+        Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+        sut.findNotices(sort);
     }
 }

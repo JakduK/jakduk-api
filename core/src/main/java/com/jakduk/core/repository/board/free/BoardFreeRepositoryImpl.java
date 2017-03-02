@@ -2,10 +2,9 @@ package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.elasticsearch.ESBoard;
-import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeSimple;
+import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -14,6 +13,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
@@ -92,5 +92,30 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnSearch.class);
 
         return results.getMappedResults();
+    }
+
+    /**
+     * 공지 글 목록
+     */
+    @Override
+    public List<BoardFreeOnList> findNotices(Sort sort) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("status.notice").is(true));
+        query.with(sort);
+        query.limit(10);
+
+        return mongoTemplate.find(query, BoardFreeOnList.class);
+    }
+
+    /**
+     * 홈에서 보여지는 최근글 목록
+     */
+    @Override
+    public List<BoardFreeOnHome> findLatest(Sort sort, Integer limit) {
+        Query query = new Query();
+        query.with(sort);
+        query.limit(limit);
+
+        return mongoTemplate.find(query, BoardFreeOnHome.class);
     }
 }

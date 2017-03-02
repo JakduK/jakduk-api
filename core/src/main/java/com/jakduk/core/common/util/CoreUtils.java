@@ -29,6 +29,7 @@ public class CoreUtils {
 
     /**
      * ResourceBundle에서 메시지 가져오기.
+     *
      * @param bundle 번들 이름 ex) messages.common
      * @param getString 메시지 이름 ex) common.exception.you.are.writer
      * @param params 파라미터가 있을 경우 계속 넣을 수 있음

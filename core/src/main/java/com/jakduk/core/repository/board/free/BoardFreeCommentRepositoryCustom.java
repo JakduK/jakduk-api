@@ -18,7 +18,7 @@ public interface BoardFreeCommentRepositoryCustom {
     List<ESComment> findCommentsGreaterThanId(ObjectId objectId, Integer limit);
 
     /**
-     * 게시물 seq에 해당하는 댓글 수를 가져온다.
+     * 게시물 ID 에 해당하는 댓글 수를 가져온다.
      */
-    List<CommonCount> findCommentsCountBySeqs(List<Integer> arrSeq);
+    List<CommonCount> findCommentsCountByIds(List<ObjectId> ids);
 }

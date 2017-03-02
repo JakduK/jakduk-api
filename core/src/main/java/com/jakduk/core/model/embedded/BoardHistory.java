@@ -23,7 +23,6 @@ public class BoardHistory {
 	
 	private CoreConst.BOARD_HISTORY_TYPE type;
 
-	// TODO : @DBRef User 객체로 변환하자
 	private CommonWriter writer;
 	
 }
