@@ -32,6 +32,7 @@ public class BoardCategoryService {
 
     /**
      * 자유게시판 말머리 목록
+     *
      * @return 말머리 목록
      */
     public List<BoardCategory> getFreeCategories() {

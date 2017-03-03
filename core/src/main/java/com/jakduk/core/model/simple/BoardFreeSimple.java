@@ -19,9 +19,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "boardFree")
 public class BoardFreeSimple {
 	
-	/**
-	 * ID
-	 */
 	@Id
 	private String id;
 

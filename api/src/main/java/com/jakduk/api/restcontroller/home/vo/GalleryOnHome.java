@@ -12,9 +12,9 @@ import lombok.Setter;
  *         16. 7. 21 오후 9:47
  */
 
+@ApiModel(description = "최근 사진")
 @Getter
 @Setter
-@ApiModel(value = "최근 사진")
 public class GalleryOnHome {
 
     @ApiModelProperty(value = "사진 ID")

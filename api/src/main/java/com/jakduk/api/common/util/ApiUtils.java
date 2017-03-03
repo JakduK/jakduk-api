@@ -2,8 +2,11 @@ package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.core.common.CoreConst;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.web.util.UrlUtils;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +19,18 @@ import java.util.stream.Stream;
  * @author pyohwan
  *         16. 7. 17 오후 8:16
  */
+
+@Component
 public class ApiUtils {
+
+    @Value("${api.server.url}")
+    private String apiServerUrl;
+
+    @Value("${api.gallery.image.url.path}")
+    private String apiGalleryFullUrlPath;
+
+    @Value("${api.gallery.thumbnail.url.path}")
+    private String apiGalleryThumbnailUrlPath;
 
     /**
      * 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
@@ -79,5 +93,30 @@ public class ApiUtils {
         } else {
             return CoreConst.DEVICE_TYPE.NORMAL;
         }
+    }
+
+    /**
+     * 사진첩 이미지 URL을 생성한다.
+     *
+     * @param sizeType size 타입
+     * @param id Gallery ID
+     */
+    public String generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE sizeType, String id) {
+
+        if (StringUtils.isBlank(id))
+            return null;
+
+        String pictureUrl = null;
+
+        switch (sizeType) {
+            case LARGE:
+                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiGalleryFullUrlPath, id);
+                break;
+            case SMALL:
+                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiGalleryThumbnailUrlPath, id);
+                break;
+        }
+
+        return pictureUrl;
     }
 }

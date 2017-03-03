@@ -14,7 +14,7 @@ import java.util.List;
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
  * @date     : 2014. 7. 13.
- * @desc     :
+ * @desc     : 각종 목록에서 쓰임
  */
 
 @Getter
@@ -52,4 +52,6 @@ public class BoardFreeOnList {
 	private BoardStatus status;
 	
 	private List<BoardImage> galleries;
+
+	private String shortContent;
 }

@@ -17,9 +17,9 @@ public class BoardFreeOnSearch {
 	
 	private String id;
 
-	private String subject;
-	
 	private Integer seq;
+
+	private String subject;
 
 	private BoardStatus status;
 }

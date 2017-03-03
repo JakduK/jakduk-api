@@ -5,6 +5,8 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
+import com.jakduk.api.restcontroller.vo.BoardGallery;
+import com.jakduk.api.restcontroller.board.vo.FreePost;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
@@ -13,6 +15,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
+import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFeelingCount;
@@ -38,6 +41,7 @@ import org.springframework.mobile.device.Device;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -65,6 +69,9 @@ public class BoardRestController {
     @Autowired
     private BoardDAO boardDAO;
 
+    @Resource
+    private ApiUtils apiUtils;
+
     @ApiOperation(value = "자유게시판 글 목록")
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
     public FreePostsOnListResponse getFreePosts(
@@ -72,27 +79,73 @@ public class BoardRestController {
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
             @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") CoreConst.BOARD_CATEGORY_TYPE category) {
 
-        Page<BoardFreeOnList> posts = boardFreeService.getFreePosts(category, page, size);
+        Page<BoardFreeOnList> postPage = boardFreeService.getFreePosts(category, page, size);
         List<BoardFreeOnList> notices = boardFreeService.getFreeNotices();
 
-        ArrayList<ObjectId> ids = new ArrayList<>();
+        // 게시물 VO 변환 및 썸네일 URL 추가
+        List<FreePost> freePosts = postPage.getContent().stream()
+                .map(post -> {
+                    FreePost freePostList = new FreePost();
+                    BeanUtils.copyProperties(post, freePostList);
+
+                    if (! ObjectUtils.isEmpty(post.getGalleries())) {
+                        List<BoardGallery> boardGalleries = post.getGalleries().stream()
+                                .sorted(Comparator.comparing(BoardImage::getId))
+                                .limit(1)
+                                .map(gallery -> BoardGallery.builder()
+                                        .id(gallery.getId())
+                                        .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+                                        .build())
+                                .collect(Collectors.toList());
+
+                        freePostList.setGalleries(boardGalleries);
+                    }
+
+                    return freePostList;
+                })
+                .collect(Collectors.toList());
+
+        // 공지게시물 VO 변환 및 썸네일 URL 추가
+        List<FreePost> freeNotices = notices.stream()
+                .map(post -> {
+                    FreePost freePostList = new FreePost();
+                    BeanUtils.copyProperties(post, freePostList);
+
+                    if (! ObjectUtils.isEmpty(post.getGalleries())) {
+                        List<BoardGallery> boardGalleries = post.getGalleries().stream()
+                                .sorted(Comparator.comparing(BoardImage::getId))
+                                .limit(1)
+                                .map(gallery -> BoardGallery.builder()
+                                        .id(gallery.getId())
+                                        .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+                                        .build())
+                                .collect(Collectors.toList());
+
+                        freePostList.setGalleries(boardGalleries);
+                    }
+
+                    return freePostList;
+                })
+                .collect(Collectors.toList());
 
         // Board ID 뽑아내기.
-        Consumer<BoardFreeOnList> extractIds = board -> {
+        ArrayList<ObjectId> ids = new ArrayList<>();
+
+        Consumer<FreePost> extractIds = board -> {
             String boardId = board.getId();
             ObjectId objId = new ObjectId(boardId);
 
             ids.add(objId);
         };
 
-        posts.getContent().forEach(extractIds);
-        notices.forEach(extractIds);
+        freePosts.forEach(extractIds);
+        freeNotices.forEach(extractIds);
 
         Map<String, Integer> commentCounts = boardFreeService.getBoardFreeCommentCount(ids);
         Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
 
         // 댓글수, 감정 표현수 합치기.
-        Consumer<FreePostsOnList> applyCounts = board -> {
+        Consumer<FreePost> applyCounts = board -> {
             String boardId = board.getId();
             Integer commentCount = commentCounts.get(boardId);
 
@@ -101,33 +154,13 @@ public class BoardRestController {
 
             BoardFeelingCount feelingCount = feelingCounts.get(boardId);
 
-            if (! ObjectUtils.isEmpty(feelingCount)) {
+            if (Objects.nonNull(feelingCount)) {
                 board.setLikingCount(feelingCount.getUsersLikingCount());
                 board.setDislikingCount(feelingCount.getUsersDisLikingCount());
             }
         };
 
-        // 게시물 목록에 댓글 수, 감정표현 수 적용.
-        List<FreePostsOnList> freePosts = posts.getContent().stream()
-                .map(post -> {
-                    FreePostsOnList freePostsOnList = new FreePostsOnList();
-                    BeanUtils.copyProperties(post, freePostsOnList);
-
-                    return freePostsOnList;
-                })
-                .collect(Collectors.toList());
-
         freePosts.forEach(applyCounts);
-
-        // 공지게시물 목록에 댓글 수, 감정표현 수 적용.
-        List<FreePostsOnList> freeNotices = notices.stream()
-                .map(notice -> {
-                    FreePostsOnList freePostsOnList = new FreePostsOnList();
-                    BeanUtils.copyProperties(notice, freePostsOnList);
-                    return freePostsOnList;
-                })
-                .collect(Collectors.toList());
-
         freeNotices.forEach(applyCounts);
 
         List<BoardCategory> categories = boardCategoryService.getFreeCategories();
@@ -141,13 +174,13 @@ public class BoardRestController {
                 .categories(categoriesMap)
                 .posts(freePosts)
                 .notices(freeNotices)
-                .first(posts.isFirst())
-                .last(posts.isLast())
-                .totalPages(posts.getTotalPages())
-                .totalElements(posts.getTotalElements())
-                .numberOfElements(posts.getNumberOfElements())
-                .size(posts.getSize())
-                .number(posts.getNumber())
+                .first(postPage.isFirst())
+                .last(postPage.isLast())
+                .totalPages(postPage.getTotalPages())
+                .totalElements(postPage.getTotalElements())
+                .numberOfElements(postPage.getNumberOfElements())
+                .size(postPage.getSize())
+                .number(postPage.getNumber())
                 .build();
     }
 
@@ -298,8 +331,8 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @RequestMapping(value = "/{seq}/comments", method = RequestMethod.GET)
     public BoardCommentsResponse getFreeComments(
-            @PathVariable Integer seq,
-            @RequestParam(required = false) String commentId) {
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
         BoardFreeOfMinimum boardFreeOnComment = boardFreeService.findBoardFreeOfMinimumBySeq(seq);
 

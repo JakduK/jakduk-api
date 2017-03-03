@@ -48,10 +48,10 @@ public class GalleryRestController {
     @Value("${api.server.url}")
     private String apiServerUrl;
 
-    @Value("${core.gallery.image.path}")
+    @Value("${api.gallery.image.url.path}")
     private String imagePath;
 
-    @Value("${core.gallery.thumbnail.path}")
+    @Value("${api.gallery.thumbnail.url.path}")
     private String thumbnailPath;
 
     @Autowired

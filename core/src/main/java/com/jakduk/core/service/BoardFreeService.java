@@ -427,7 +427,7 @@ public class BoardFreeService {
 	/**
 	 * 최근 글 가져오기
 	 */
-	public List<BoardFreeOnHome> getFreeLatest() {
+	public List<BoardFreeOnList> getFreeLatest() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 

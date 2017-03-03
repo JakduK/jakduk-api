@@ -23,10 +23,10 @@ public class FreePostsOnListResponse {
     Map<String, String> categories;
 
     @ApiModelProperty(value = "글 목록")
-    List<FreePostsOnList> posts;
+    List<FreePost> posts;
 
     @ApiModelProperty(value = "공지글 목록")
-    List<FreePostsOnList> notices;
+    List<FreePost> notices;
 
     @ApiModelProperty(value = "마지막 페이지 여부")
     boolean last;
