@@ -1,12 +1,10 @@
 package com.jakduk.api.restcontroller.home.vo;
 
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.UserOnHome;
 import com.jakduk.core.model.db.HomeDescription;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
+import com.jakduk.core.model.simple.UserOnHome;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +21,7 @@ import java.util.List;
 public class HomeResponse {
 
     @ApiModelProperty(value = "최근 글")
-    private List<BoardFreeOnList> posts;
+    private List<LatestPost> posts;
 
     @ApiModelProperty(value = "최근 가입 회원")
     private List<UserOnHome> users;
