@@ -5,7 +5,6 @@ import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
@@ -17,7 +16,6 @@ import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
@@ -26,7 +24,6 @@ import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,6 +67,11 @@ public class BoardFreeService {
 
 	@Autowired
 	private SearchService searchService;
+
+	public BoardFree findOneBySeq(Integer seq) {
+        return boardFreeRepository.findOneBySeq(seq)
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+    }
 
 	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
 		return boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
@@ -439,44 +441,14 @@ public class BoardFreeService {
 		return boardFreeRepository.findLatest(sort, CoreConst.HOME_SIZE_POST);
 	}
 
-	/**
-	 * 글 상세
-	 *
-	 * @param seq 글 seq
-	 * @param language 언어
-	 * @param isViewsIncreasing 읽음 수 증가 여부
-	 */
-	public BoardFreeDetail getPost(Integer seq, String language, Boolean isViewsIncreasing) {
-
-		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
-
-		List<BoardImage> images = boardFree.getGalleries();
-		List<Gallery> galleries = null;
-
-		if (Objects.nonNull(images)) {
-			List<String> ids =  images.stream()
-					.map(BoardImage::getId)
-					.collect(Collectors.toList());
-
-			galleries = galleryRepository.findByIdIn(ids);
-		}
-
-		BoardCategory boardCategory = boardDAO.getBoardCategory(boardFree.getCategory().name(), language);
-
-		BoardFreeDetail post = new BoardFreeDetail();
-		BeanUtils.copyProperties(boardFree, post);
-		post.setCategory(boardCategory);
-		post.setGalleries(galleries);
-
-		if (isViewsIncreasing) {
-			int views = boardFree.getViews();
-			boardFree.setViews(++views);
-			boardFreeRepository.save(boardFree);
-		}
-
-		return post;
-	}
+    /**
+     * 읽음수 1 증가
+     */
+	public void increaseViews(BoardFree boardFree) {
+        int views = boardFree.getViews();
+        boardFree.setViews(++views);
+        boardFreeRepository.save(boardFree);
+    }
 
     /**
      * 글 감정 표현.

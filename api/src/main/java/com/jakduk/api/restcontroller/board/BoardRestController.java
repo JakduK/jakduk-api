@@ -14,6 +14,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -23,13 +24,12 @@ import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
+import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
@@ -53,7 +53,6 @@ import java.util.stream.Collectors;
  * 16. 3. 26 오후 11:05
  */
 
-@Slf4j
 @Api(tags = "BoardFree", description = "자유게시판 API")
 @RestController
 @RequestMapping("/api/board/free")
@@ -64,6 +63,9 @@ public class BoardRestController {
 
     @Autowired
     private BoardCategoryService boardCategoryService;
+
+    @Autowired
+    private GalleryService galleryService;
 
     @Autowired
     private BoardDAO boardDAO;
@@ -242,30 +244,76 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 상세")
     @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
-    public FreePostOnDetailResponse getFreePost(
+    public FreePostDetailResponse getFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            Locale locale,
             HttpServletRequest request,
             HttpServletResponse response) {
 
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
-        BoardFreeDetail boardFreeDetail = boardFreeService.getPost(seq, CoreUtils.getLanguageCode(locale, null), isAddCookie);
+        BoardFree boardFree = boardFreeService.findOneBySeq(seq);
 
-        CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(boardFreeDetail.getCategory().getCode());
+        if (isAddCookie)
+            boardFreeService.increaseViews(boardFree);
 
-        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFreeDetail.getId())
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        /*
+        글 상세
+         */
+        FreePostDetail freePostDetail = new FreePostDetail();
+        BeanUtils.copyProperties(boardFree, freePostDetail);
+        freePostDetail.setCategory(boardCategoryService.getFreeCategory(boardFree.getCategory().name()));
+
+        if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
+            List<String> ids =  boardFree.getGalleries().stream()
+                    .map(BoardImage::getId)
+                    .collect(Collectors.toList());
+
+            List<Gallery> galleries = galleryService.findByIds(ids);
+
+            List<FreePostDetailGallery> postDetailGalleries = galleries.stream()
+                    .map(gallery -> FreePostDetailGallery.builder()
+                            .id(gallery.getId())
+                            .name(gallery.getName())
+                            .imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                            .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                            .build())
+                    .collect(Collectors.toList());
+
+            freePostDetail.setGalleries(postDetailGalleries);
+        }
+
+        if (Objects.nonNull(commonWriter)) {
+            if (boardFree.getUsersLiking().stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                freePostDetail.setMyFeeling(CoreConst.FEELING_TYPE.LIKE);
+            } else if (boardFree.getUsersDisliking().stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                freePostDetail.setMyFeeling(CoreConst.FEELING_TYPE.DISLIKE);
+            }
+        }
+
+        /*
+        앞, 뒤 글
+         */
+        CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
+
+        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(freePostDetail.getId())
                 , categoryType, Sort.Direction.ASC);
-        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFreeDetail.getId())
+        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(freePostDetail.getId())
                 , categoryType, Sort.Direction.DESC);
 
+        /*
+        글쓴이의 최근 글
+         */
         List<BoardFreeSimple> latestPostsByWriter = null;
 
-        if (ObjectUtils.isEmpty(boardFreeDetail.getStatus()) || BooleanUtils.isNotTrue(boardFreeDetail.getStatus().getDelete()))
-            latestPostsByWriter = boardFreeService.findByUserId(boardFreeDetail.getId(), boardFreeDetail.getWriter().getUserId(), 3);
+        if (ObjectUtils.isEmpty(freePostDetail.getStatus()) || BooleanUtils.isNotTrue(freePostDetail.getStatus().getDelete()))
+            latestPostsByWriter = boardFreeService.findByUserId(freePostDetail.getId(), freePostDetail.getWriter().getUserId(), 3);
 
-        return FreePostOnDetailResponse.builder()
-                .post(boardFreeDetail)
+        return FreePostDetailResponse.builder()
+                .post(freePostDetail)
                 .prevPost(prevPost)
                 .nextPost(nextPost)
                 .latestPostsByWriter(latestPostsByWriter)

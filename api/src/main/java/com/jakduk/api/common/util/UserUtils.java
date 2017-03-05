@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -186,15 +187,13 @@ public class UserUtils {
     public static CommonWriter getCommonWriter() {
         AuthUserProfile authUserProfile = getAuthUserProfile();
 
-        if (! ObjectUtils.isEmpty(authUserProfile)) {
-            CommonWriter commonWriter = CommonWriter.builder()
+        if (Objects.nonNull(authUserProfile)) {
+            return CommonWriter.builder()
                     .userId(authUserProfile.getId())
                     .username(authUserProfile.getUsername())
                     .providerId(authUserProfile.getProviderId())
                     .picture(authUserProfile.getPicture())
                     .build();
-
-            return commonWriter;
         } else {
             return null;
         }

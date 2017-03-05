@@ -1,8 +1,6 @@
 package com.jakduk.core.service;
 
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceError;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.embedded.LocalSimpleName;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
@@ -11,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author pyohwan
@@ -25,11 +25,6 @@ public class BoardCategoryService {
     @Autowired
     private BoardCategoryRepository boardCategoryRepository;
 
-    public BoardCategory findOneByCode(String code) {
-        return boardCategoryRepository.findOneByCode(code)
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
-    }
-
     /**
      * 자유게시판 말머리 목록
      *
@@ -37,6 +32,13 @@ public class BoardCategoryService {
      */
     public List<BoardCategory> getFreeCategories() {
         return boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
+    }
+
+    /**
+     * 자유게시판 말머리 가져오기
+     */
+    public BoardCategory getFreeCategory(String code) {
+        return boardCategoryRepository.findByCodeAndLanguage(code, CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
     }
 
     /**
