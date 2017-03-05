@@ -242,8 +242,8 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 상세")
     @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
-    public FreePostOnDetailResponse getFreeView(
-            @PathVariable Integer seq,
+    public FreePostOnDetailResponse getFreePost(
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             Locale locale,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -392,8 +392,8 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글 감정 표현")
     @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeFeeling(
-            @PathVariable Integer seq,
-            @PathVariable CoreConst.FEELING_TYPE feeling) {
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "감정", required = true) @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -402,8 +402,8 @@ public class BoardRestController {
 
         BoardFree boardFree = boardFreeService.setFreeFeelings(commonWriter, seq, feeling);
 
-        Integer numberOfLike = Objects.nonNull(boardFree.getUsersLiking()) ? boardFree.getUsersLiking().size() : 0;
-        Integer numberOfDisLike = Objects.nonNull(boardFree.getUsersDisliking()) ? boardFree.getUsersDisliking().size() : 0;
+        Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
+        Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
 
         return UserFeelingResponse.builder()
                 .feeling(feeling)
