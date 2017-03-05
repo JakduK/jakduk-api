@@ -13,7 +13,10 @@ import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.GalleryOnBoard;
-import com.jakduk.core.model.simple.*;
+import com.jakduk.core.model.simple.BoardFreeOfMinimum;
+import com.jakduk.core.model.simple.BoardFreeOnList;
+import com.jakduk.core.model.simple.BoardFreeOnSearch;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
@@ -101,7 +104,7 @@ public class BoardFreeService {
 								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
 
 		boardCategoryRepository.findOneByCode(categoryCode.name())
-				.orElseThrow(() -> new ServiceException(ServiceError.CATEGORY_NOT_FOUND));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
 
 		String stripHtmlContent = StringUtils.defaultIfBlank(CoreUtils.stripHtmlTag(content), StringUtils.EMPTY);
 		stripHtmlContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
@@ -330,6 +333,7 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 글 지움
+	 *
 	 * @param seq 글 seq
 	 * @return CoreConst.BOARD_DELETE_TYPE
      */
@@ -382,6 +386,7 @@ public class BoardFreeService {
             }
         }
 
+		// 색인 지움
         searchService.deleteDocumentBoard(boardFree.getId());
 
         return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
@@ -518,8 +523,10 @@ public class BoardFreeService {
 		return getBoardFree;
 	}
 
-	// 게시판 댓글 추가.
-	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String contents, CoreConst.DEVICE_TYPE device) {
+	/**
+	 * 게시판 댓글 달기
+	 */
+	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String content, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -527,19 +534,73 @@ public class BoardFreeService {
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
 				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
 				.writer(writer)
-				.content(contents)
+				.content(content)
 				.status(new BoardCommentStatus(device))
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
-		/**
-		 * 엘라스틱서치 색인 요청
+		/*
+		  엘라스틱서치 색인 요청
 		 */
 		searchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
 				boardFreeComment.getContent());
 
 		return boardFreeComment;
+	}
+
+	/**
+	 * 게시판 댓글 고치기
+	 */
+	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, CoreConst.DEVICE_TYPE device) {
+
+		boardFreeRepository.findOneBySeq(seq)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+
+		BoardFreeComment boardFreeComment = boardFreeCommentRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+
+		if (! boardFreeComment.getWriter().getUserId().equals(writer.getUserId()))
+			throw new ServiceException(ServiceError.FORBIDDEN);
+
+		boardFreeComment.setWriter(writer);
+		boardFreeComment.setContent(StringUtils.trim(content));
+		BoardCommentStatus boardCommentStatus = boardFreeComment.getStatus();
+
+		if (Objects.isNull(boardCommentStatus)) {
+			boardCommentStatus = new BoardCommentStatus(device);
+		} else {
+			boardCommentStatus.setDevice(device);
+		}
+
+		boardFreeComment.setStatus(boardCommentStatus);
+
+		boardFreeCommentRepository.save(boardFreeComment);
+
+		/*
+		  엘라스틱서치 색인 요청
+		 */
+		searchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+				boardFreeComment.getContent());
+
+		return boardFreeComment;
+	}
+
+	/**
+	 * 게시판 댓글 지움
+	 */
+	public void deleteFreeComment(String id, CommonWriter writer) {
+
+		BoardFreeComment boardFreeComment = boardFreeCommentRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+
+		if (! boardFreeComment.getWriter().getUserId().equals(writer.getUserId()))
+			throw new ServiceException(ServiceError.FORBIDDEN);
+
+		boardFreeCommentRepository.delete(id);
+
+		// 색인 지움
+		searchService.deleteDocumentBoardComment(id);
 	}
 
 	// 게시판 댓글 목록
@@ -558,6 +619,7 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 댓글 감정 표현.
+	 *
 	 * @param commentId 댓글 ID
 	 * @param feeling 감정표현 종류
      * @return 자유게시판 댓글 객체
@@ -567,7 +629,9 @@ public class BoardFreeService {
 		String userId = writer.getUserId();
 		String username = writer.getUsername();
 
-		BoardFreeComment boardComment = boardFreeCommentRepository.findById(commentId);
+		BoardFreeComment boardComment = boardFreeCommentRepository.findOneById(commentId)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+
 		CommonWriter postWriter = boardComment.getWriter();
 
 		List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();

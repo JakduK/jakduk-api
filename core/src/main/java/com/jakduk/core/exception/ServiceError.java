@@ -37,9 +37,8 @@ public enum ServiceError {
     ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
 
     NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
-    CATEGORY_NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.not.found.category"),
-    ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
-    ALREADY_DISABLE(HttpStatus.SC_NOT_FOUND, "exception.already.disable"),
+    NOT_FOUND_COMMENT(HttpStatus.SC_NOT_FOUND, "exception.not.found.comment"),
+    NOT_FOUND_CATEGORY(HttpStatus.SC_NOT_FOUND, "exception.not.found.category"),
     NOT_FOUND_FOOTBALL_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club"),
     NOT_FOUND_GALLERY(HttpStatus.SC_NOT_FOUND, "exception.not.found.gallery"),
     NOT_FOUND_GALLERY_FILE(HttpStatus.SC_NOT_FOUND, "exception.not.found.gallery.file"),
@@ -48,6 +47,8 @@ public enum ServiceError {
     NOT_FOUND_ATTENDANCE_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.attendance.club"),
     NOT_FOUND_FOOTBALL_CLUB_ORIGIN(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club.origin"),
     NOT_FOUND_ENCYCLOPEDIA(HttpStatus.SC_NOT_FOUND, "exception.not.found.encyclopedia"),
+    ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
+    ALREADY_DISABLE(HttpStatus.SC_NOT_FOUND, "exception.already.disable"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     NEED_TO_LOGIN(HttpStatus.SC_UNAUTHORIZED, "exception.unauthorized"),

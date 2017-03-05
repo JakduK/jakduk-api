@@ -6,7 +6,6 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
 import com.jakduk.api.restcontroller.vo.BoardGallery;
-import com.jakduk.api.restcontroller.board.vo.FreePost;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
@@ -358,6 +357,36 @@ public class BoardRestController {
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
         return boardFreeService.insertFreeComment(commentRequest.getSeq(), commonWriter, commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
+    }
+
+    @ApiOperation(value = "자유게시판 글의 댓글 고치기")
+    @RequestMapping(value ="/comment/{id}", method = RequestMethod.PUT)
+    public BoardFreeComment editFreeComment(
+            @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
+            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm commentRequest,
+            Device device) {
+
+        if (! UserUtils.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        return boardFreeService.updateFreeComment(id, commentRequest.getSeq(), commonWriter, commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
+    }
+
+    @ApiOperation(value = "자유게시판 글의 댓글 지우기")
+    @RequestMapping(value = "/comment/{id}", method = RequestMethod.DELETE)
+    public EmptyJsonResponse deleteFreeComment(
+            @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
+
+        if (! UserUtils.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        boardFreeService.deleteFreeComment(id, commonWriter);
+
+        return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "자유게시판 글 감정 표현")

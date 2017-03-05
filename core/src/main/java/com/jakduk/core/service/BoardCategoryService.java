@@ -27,7 +27,7 @@ public class BoardCategoryService {
 
     public BoardCategory findOneByCode(String code) {
         return boardCategoryRepository.findOneByCode(code)
-                .orElseThrow(() -> new ServiceException(ServiceError.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
     }
 
     /**

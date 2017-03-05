@@ -5,7 +5,6 @@ import com.jakduk.api.restcontroller.home.vo.GalleryOnHome;
 import com.jakduk.api.restcontroller.home.vo.HomeResponse;
 import com.jakduk.api.restcontroller.home.vo.LatestPost;
 import com.jakduk.api.restcontroller.vo.BoardGallery;
-import com.jakduk.api.restcontroller.board.vo.FreePost;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Encyclopedia;
@@ -71,8 +70,8 @@ public class HomeRestController {
         response.setUsers(homeService.getUsersLatest(language));
         response.setComments(homeService.getBoardCommentsLatest());
 
-        /**
-         * 최근 게시물
+        /*
+        최근 게시물
          */
         List<BoardFreeOnList> posts = boardFreeService.getFreeLatest();
 
@@ -101,8 +100,8 @@ public class HomeRestController {
 
         response.setPosts(latestPosts);
 
-        /**
-         * 최근 사진
+        /*
+        최근 사진
          */
         List<GalleryOnList> galleries =  homeService.getGalleriesLatest();
 
