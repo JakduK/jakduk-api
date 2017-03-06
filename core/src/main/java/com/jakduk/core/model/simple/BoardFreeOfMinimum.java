@@ -1,6 +1,6 @@
 package com.jakduk.core.model.simple;
 
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@Data
+@Getter
 @Document(collection = "boardFree")
 public class BoardFreeOfMinimum {
 	

@@ -637,11 +637,11 @@ public class BoardFreeService {
      */
 	public BoardFreeComment setFreeCommentFeeling(CommonWriter writer, String commentId, CoreConst.FEELING_TYPE feeling) {
 
-		String userId = writer.getUserId();
-		String username = writer.getUsername();
-
 		BoardFreeComment boardComment = boardFreeCommentRepository.findOneById(commentId)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+
+		String userId = writer.getUserId();
+		String username = writer.getUsername();
 
 		CommonWriter postWriter = boardComment.getWriter();
 
@@ -656,27 +656,58 @@ public class BoardFreeService {
 			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
-		for (CommonFeelingUser feelingUser : usersLiking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
-				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
-		}
+		Optional<CommonFeelingUser> alreadyLike = usersLiking.stream()
+				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+				.findFirst();
 
 		// 해당 회원이 싫어요를 이미 했는지 검사
-		for (CommonFeelingUser feelingUser : usersDisliking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
-				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
-		}
+		Optional<CommonFeelingUser> alreadyDislike = usersDisliking.stream()
+				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+				.findFirst();
 
 		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
 
 		switch (feeling) {
 			case LIKE:
-				usersLiking.add(feelingUser);
+				// 이미 좋아요를 했을 때, 좋아요를 취소
+				if (alreadyLike.isPresent()) {
+					usersLiking.remove(alreadyLike.get());
+				}
+				// 이미 싫어요를 했을 때, 싫어요를 없애고 좋아요로 바꿈
+				else if (alreadyDislike.isPresent()) {
+					usersDisliking.remove(alreadyDislike.get());
+					usersLiking.add(feelingUser);
+
+					boardComment.setUsersDisliking(usersDisliking);
+				}
+				// 아직 감정 표현을 하지 않아 좋아요로 등록
+				else {
+					usersLiking.add(feelingUser);
+				}
+
 				boardComment.setUsersLiking(usersLiking);
+
 				break;
+
 			case DISLIKE:
-				usersDisliking.add(feelingUser);
+				// 이미 싫어요를 했을 때, 싫어요를 취소
+				if (alreadyDislike.isPresent()) {
+					usersDisliking.remove(alreadyDislike.get());
+				}
+				// 이미 좋아요를 했을 때, 좋아요를 없애고 싫어요로 바꿈
+				else if (alreadyLike.isPresent()) {
+					usersLiking.remove(alreadyLike.get());
+					usersDisliking.add(feelingUser);
+
+					boardComment.setUsersLiking(usersLiking);
+				}
+				// 아직 감정 표현을 하지 않아 싫어요로 등록
+				else {
+					usersDisliking.add(feelingUser);
+				}
+
 				boardComment.setUsersDisliking(usersDisliking);
+
 				break;
 		}
 

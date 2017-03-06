@@ -10,19 +10,20 @@ import lombok.*;
  * 16. 3. 26 오후 11:57
  */
 
-@ApiModel(value = "감정표현")
+@ApiModel(description = "감정표현")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class UserFeelingResponse {
 
-    @ApiModelProperty(value = "감정 표현 종류")
-    private CoreConst.FEELING_TYPE feeling;
+    @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
+    @Setter
+    private CoreConst.FEELING_TYPE myFeeling;
 
-    @ApiModelProperty(value = "좋아요 수")
+    @ApiModelProperty(example = "5", value = "좋아요 수")
     private Integer numberOfLike;
 
-    @ApiModelProperty(value = "싫어요 수")
+    @ApiModelProperty(example = "5", value = "싫어요 수")
     private Integer numberOfDislike;
 }

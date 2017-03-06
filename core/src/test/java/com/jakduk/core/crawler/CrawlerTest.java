@@ -1,9 +1,9 @@
 package com.jakduk.core.crawler;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -11,6 +11,8 @@ import org.junit.Test;
  */
 public class CrawlerTest {
 
+    // K리그 홈페이지 개편되며 사라졌음
+    @Ignore
     @Test
     public void getKLeagueSchedules() throws Exception {
 

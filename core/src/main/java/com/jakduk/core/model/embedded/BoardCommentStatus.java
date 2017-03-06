@@ -18,4 +18,5 @@ import lombok.Setter;
 public class BoardCommentStatus {
 	
 	private CoreConst.DEVICE_TYPE device;
+
 }

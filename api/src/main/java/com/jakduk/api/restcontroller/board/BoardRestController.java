@@ -17,6 +17,7 @@ import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
+import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
@@ -75,7 +76,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 목록")
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
-    public FreePostsOnListResponse getFreePosts(
+    public FreePostsResponse getFreePosts(
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
             @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") CoreConst.BOARD_CATEGORY_TYPE category) {
@@ -171,7 +172,7 @@ public class BoardRestController {
 
         categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
 
-        return FreePostsOnListResponse.builder()
+        return FreePostsResponse.builder()
                 .categories(categoriesMap)
                 .posts(freePosts)
                 .notices(freeNotices)
@@ -284,15 +285,8 @@ public class BoardRestController {
             freePostDetail.setGalleries(postDetailGalleries);
         }
 
-        if (Objects.nonNull(commonWriter)) {
-            if (boardFree.getUsersLiking().stream()
-                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
-                freePostDetail.setMyFeeling(CoreConst.FEELING_TYPE.LIKE);
-            } else if (boardFree.getUsersDisliking().stream()
-                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
-                freePostDetail.setMyFeeling(CoreConst.FEELING_TYPE.DISLIKE);
-            }
-        }
+        if (Objects.nonNull(commonWriter))
+            freePostDetail.setMyFeeling(this.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
 
         /*
         앞, 뒤 글
@@ -377,23 +371,37 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @RequestMapping(value = "/{seq}/comments", method = RequestMethod.GET)
-    public BoardCommentsResponse getFreeComments(
+    public FreePostCommentsResponse getFreePostComments(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
         BoardFreeOfMinimum boardFreeOnComment = boardFreeService.findBoardFreeOfMinimumBySeq(seq);
 
-        List<BoardFreeComment> comments = boardFreeService.getFreeComments(seq, commentId);
+        List<BoardFreeComment> boardComments = boardFreeService.getFreeComments(seq, commentId);
 
         BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
 
         Integer count = boardFreeService.countCommentsByBoardItem(boardItem);
 
-        BoardCommentsResponse response = new BoardCommentsResponse();
-        response.setComments(comments);
-        response.setCount(count);
+        List<FreePostComment> postComments = boardComments.stream()
+                .map(boardFreeComment -> {
+                    FreePostComment freePostComment = new FreePostComment();
+                    BeanUtils.copyProperties(boardFreeComment, freePostComment);
 
-        return response;
+                    if (Objects.nonNull(commonWriter))
+                        freePostComment.setMyFeeling(this.getMyFeeling(commonWriter, freePostComment.getUsersLiking(),
+                                freePostComment.getUsersDisliking()));
+
+                    return freePostComment;
+                })
+                .collect(Collectors.toList());
+
+        return FreePostCommentsResponse.builder()
+                .comments(postComments)
+                .count(count)
+                .build();
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 달기")
@@ -444,7 +452,7 @@ public class BoardRestController {
             @ApiParam(value = "감정", required = true) @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, CoreUtils.getExceptionMessage("exception.need.login.to.feel"));
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
@@ -453,34 +461,42 @@ public class BoardRestController {
         Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
         Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
 
-        return UserFeelingResponse.builder()
-                .feeling(feeling)
+        UserFeelingResponse response = UserFeelingResponse.builder()
                 .numberOfLike(numberOfLike)
                 .numberOfDislike(numberOfDisLike)
                 .build();
+
+        if (Objects.nonNull(commonWriter))
+            response.setMyFeeling(this.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+
+        return response;
     }
 
     @ApiOperation(value = "자유게시판 댓글 감정 표현")
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(
-            @PathVariable String commentId,
-            @PathVariable CoreConst.FEELING_TYPE feeling) {
+            @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
+            @ApiParam(value = "감정", required = true) @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, CoreUtils.getExceptionMessage("exception.need.login.to.feel"));
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        BoardFreeComment boardFreeComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
+        BoardFreeComment boardComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
 
-        Integer numberOfLike = Objects.nonNull(boardFreeComment.getUsersLiking()) ? boardFreeComment.getUsersLiking().size() : 0;
-        Integer numberOfDisLike = Objects.nonNull(boardFreeComment.getUsersDisliking()) ? boardFreeComment.getUsersDisliking().size() : 0;
+        Integer numberOfLike = ObjectUtils.isEmpty(boardComment.getUsersLiking()) ? 0 : boardComment.getUsersLiking().size();
+        Integer numberOfDisLike = ObjectUtils.isEmpty(boardComment.getUsersDisliking()) ? 0 : boardComment.getUsersDisliking().size();
 
-        return UserFeelingResponse.builder()
-                .feeling(feeling)
+        UserFeelingResponse response = UserFeelingResponse.builder()
                 .numberOfLike(numberOfLike)
                 .numberOfDislike(numberOfDisLike)
                 .build();
+
+        if (Objects.nonNull(commonWriter))
+            response.setMyFeeling(this.getMyFeeling(commonWriter, boardComment.getUsersLiking(), boardComment.getUsersDisliking()));
+
+        return response;
     }
 
     @ApiOperation(value = "자유게시판 글의 공지 활성화")
@@ -509,5 +525,27 @@ public class BoardRestController {
         boardFreeService.setFreeNotice(commonWriter, seq, false);
 
         return EmptyJsonResponse.newInstance();
+    }
+
+    /**
+     * 좋아요, 싫어요 목록에서 나도 참여 하였는지 검사
+     *
+     * @param commonWriter 나
+     * @param usersLiking 좋아요 목록
+     * @param usersDisliking 싫어요 목록
+     * @return 감정 표현
+     */
+    private CoreConst.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
+        if (Objects.nonNull(commonWriter)) {
+            if (usersLiking.stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                return CoreConst.FEELING_TYPE.LIKE;
+            } else if (usersDisliking.stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                return CoreConst.FEELING_TYPE.DISLIKE;
+            }
+        }
+
+        return null;
     }
 }

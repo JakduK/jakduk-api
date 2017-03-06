@@ -180,7 +180,7 @@ public class JakduRestController {
         Integer numberOfDisLike = Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;
 
         return UserFeelingResponse.builder()
-                .feeling(feeling)
+                .myFeeling(feeling)
                 .numberOfLike(numberOfLike)
                 .numberOfDislike(numberOfDisLike)
                 .build();
