@@ -156,7 +156,7 @@ public class GalleryRestController {
         Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
 
         return UserFeelingResponse.builder()
-          .feeling((CoreConst.FEELING_TYPE) data.get("feeling"))
+          .myFeeling((CoreConst.FEELING_TYPE) data.get("feeling"))
           .numberOfLike((Integer) data.get("numberOfLike"))
           .numberOfDislike((Integer) data.get("numberOfDislike"))
           .build();

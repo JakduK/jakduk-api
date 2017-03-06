@@ -30,7 +30,6 @@ import java.time.ZoneId;
  */
 
 @Controller
-@RequestMapping
 public class DefaultViewController {
 
 	@Autowired

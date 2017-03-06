@@ -1,8 +1,8 @@
 package com.jakduk.api.restcontroller.board.vo;
 
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.web.board.BoardFreeDetail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -17,15 +17,15 @@ import java.util.List;
  *         16. 7. 16 오후 7:28
  */
 
-@ApiModel(value = "자유게시판 글 상세")
+@ApiModel(description = "자유게시판 글 상세")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FreePostOnDetailResponse {
+public class FreePostDetailResponse {
 
     @ApiModelProperty(value = "글 상세")
-    private BoardFreeDetail post;
+    private FreePostDetail post;
 
     @ApiModelProperty(value = "앞 글")
     private BoardFreeOfMinimum prevPost;
@@ -35,4 +35,5 @@ public class FreePostOnDetailResponse {
 
     @ApiModelProperty(value = "작성자의 최근 글")
     private List<BoardFreeSimple> latestPostsByWriter;
+
 }

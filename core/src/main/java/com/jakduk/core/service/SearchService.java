@@ -234,6 +234,23 @@ public class SearchService {
 		}
 	}
 
+	@Async
+	public void deleteDocumentBoardComment(String id) {
+
+		if (! elasticsearchEnable)
+			return;
+
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchIndexBoard)
+				.setType(CoreConst.ES_TYPE_COMMENT)
+				.setId(id)
+				.get();
+
+		if (! response.isFound())
+			log.info("comment id " + id + " is not found. so can't delete it!");
+
+	}
+
 	// TODO : 구현 해야 함
 	public void createDocumentJakduComment(ESJakduComment ESJakduComment) {}
 

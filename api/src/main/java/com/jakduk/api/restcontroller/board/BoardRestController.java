@@ -6,7 +6,6 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
 import com.jakduk.api.restcontroller.vo.BoardGallery;
-import com.jakduk.api.restcontroller.board.vo.FreePost;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
@@ -15,8 +14,10 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
+import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
@@ -24,13 +25,12 @@ import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.web.board.BoardFreeDetail;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
+import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
@@ -54,7 +54,6 @@ import java.util.stream.Collectors;
  * 16. 3. 26 오후 11:05
  */
 
-@Slf4j
 @Api(tags = "BoardFree", description = "자유게시판 API")
 @RestController
 @RequestMapping("/api/board/free")
@@ -67,6 +66,9 @@ public class BoardRestController {
     private BoardCategoryService boardCategoryService;
 
     @Autowired
+    private GalleryService galleryService;
+
+    @Autowired
     private BoardDAO boardDAO;
 
     @Resource
@@ -74,7 +76,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 목록")
     @RequestMapping(value = "/posts", method = RequestMethod.GET)
-    public FreePostsOnListResponse getFreePosts(
+    public FreePostsResponse getFreePosts(
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
             @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") CoreConst.BOARD_CATEGORY_TYPE category) {
@@ -170,7 +172,7 @@ public class BoardRestController {
 
         categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
 
-        return FreePostsOnListResponse.builder()
+        return FreePostsResponse.builder()
                 .categories(categoriesMap)
                 .posts(freePosts)
                 .notices(freeNotices)
@@ -243,30 +245,69 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 상세")
     @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
-    public FreePostOnDetailResponse getFreeView(
-            @PathVariable Integer seq,
-            Locale locale,
+    public FreePostDetailResponse getFreePost(
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             HttpServletRequest request,
             HttpServletResponse response) {
 
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
-        BoardFreeDetail boardFreeDetail = boardFreeService.getPost(seq, CoreUtils.getLanguageCode(locale, null), isAddCookie);
+        BoardFree boardFree = boardFreeService.findOneBySeq(seq);
 
-        CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(boardFreeDetail.getCategory().getCode());
+        if (isAddCookie)
+            boardFreeService.increaseViews(boardFree);
 
-        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(boardFreeDetail.getId())
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        /*
+        글 상세
+         */
+        FreePostDetail freePostDetail = new FreePostDetail();
+        BeanUtils.copyProperties(boardFree, freePostDetail);
+        freePostDetail.setCategory(boardCategoryService.getFreeCategory(boardFree.getCategory().name()));
+
+        if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
+            List<String> ids =  boardFree.getGalleries().stream()
+                    .map(BoardImage::getId)
+                    .collect(Collectors.toList());
+
+            List<Gallery> galleries = galleryService.findByIds(ids);
+
+            List<FreePostDetailGallery> postDetailGalleries = galleries.stream()
+                    .map(gallery -> FreePostDetailGallery.builder()
+                            .id(gallery.getId())
+                            .name(gallery.getName())
+                            .imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                            .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                            .build())
+                    .collect(Collectors.toList());
+
+            freePostDetail.setGalleries(postDetailGalleries);
+        }
+
+        if (Objects.nonNull(commonWriter))
+            freePostDetail.setMyFeeling(this.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+
+        /*
+        앞, 뒤 글
+         */
+        CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
+
+        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(freePostDetail.getId())
                 , categoryType, Sort.Direction.ASC);
-        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(boardFreeDetail.getId())
+        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(freePostDetail.getId())
                 , categoryType, Sort.Direction.DESC);
 
+        /*
+        글쓴이의 최근 글
+         */
         List<BoardFreeSimple> latestPostsByWriter = null;
 
-        if (ObjectUtils.isEmpty(boardFreeDetail.getStatus()) || BooleanUtils.isNotTrue(boardFreeDetail.getStatus().getDelete()))
-            latestPostsByWriter = boardFreeService.findByUserId(boardFreeDetail.getId(), boardFreeDetail.getWriter().getUserId(), 3);
+        if (ObjectUtils.isEmpty(freePostDetail.getStatus()) || BooleanUtils.isNotTrue(freePostDetail.getStatus().getDelete()))
+            latestPostsByWriter = boardFreeService.findByUserId(freePostDetail.getId(), freePostDetail.getWriter().getUserId(), 3);
 
-        return FreePostOnDetailResponse.builder()
-                .post(boardFreeDetail)
+        return FreePostDetailResponse.builder()
+                .post(freePostDetail)
                 .prevPost(prevPost)
                 .nextPost(nextPost)
                 .latestPostsByWriter(latestPostsByWriter)
@@ -330,23 +371,37 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @RequestMapping(value = "/{seq}/comments", method = RequestMethod.GET)
-    public BoardCommentsResponse getFreeComments(
+    public FreePostCommentsResponse getFreePostComments(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
         BoardFreeOfMinimum boardFreeOnComment = boardFreeService.findBoardFreeOfMinimumBySeq(seq);
 
-        List<BoardFreeComment> comments = boardFreeService.getFreeComments(seq, commentId);
+        List<BoardFreeComment> boardComments = boardFreeService.getFreeComments(seq, commentId);
 
         BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
 
         Integer count = boardFreeService.countCommentsByBoardItem(boardItem);
 
-        BoardCommentsResponse response = new BoardCommentsResponse();
-        response.setComments(comments);
-        response.setCount(count);
+        List<FreePostComment> postComments = boardComments.stream()
+                .map(boardFreeComment -> {
+                    FreePostComment freePostComment = new FreePostComment();
+                    BeanUtils.copyProperties(boardFreeComment, freePostComment);
 
-        return response;
+                    if (Objects.nonNull(commonWriter))
+                        freePostComment.setMyFeeling(this.getMyFeeling(commonWriter, freePostComment.getUsersLiking(),
+                                freePostComment.getUsersDisliking()));
+
+                    return freePostComment;
+                })
+                .collect(Collectors.toList());
+
+        return FreePostCommentsResponse.builder()
+                .comments(postComments)
+                .count(count)
+                .build();
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 달기")
@@ -360,50 +415,88 @@ public class BoardRestController {
         return boardFreeService.insertFreeComment(commentRequest.getSeq(), commonWriter, commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
     }
 
-    @ApiOperation(value = "자유게시판 글 감정 표현")
-    @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse addFreeFeeling(
-            @PathVariable Integer seq,
-            @PathVariable CoreConst.FEELING_TYPE feeling) {
+    @ApiOperation(value = "자유게시판 글의 댓글 고치기")
+    @RequestMapping(value ="/comment/{id}", method = RequestMethod.PUT)
+    public BoardFreeComment editFreeComment(
+            @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
+            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm commentRequest,
+            Device device) {
 
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        BoardFree boardFree = boardFreeService.setFreeFeelings(commonWriter, seq, feeling);
-
-        Integer numberOfLike = Objects.nonNull(boardFree.getUsersLiking()) ? boardFree.getUsersLiking().size() : 0;
-        Integer numberOfDisLike = Objects.nonNull(boardFree.getUsersDisliking()) ? boardFree.getUsersDisliking().size() : 0;
-
-        return UserFeelingResponse.builder()
-                .feeling(feeling)
-                .numberOfLike(numberOfLike)
-                .numberOfDislike(numberOfDisLike)
-                .build();
+        return boardFreeService.updateFreeComment(id, commentRequest.getSeq(), commonWriter, commentRequest.getContent().trim(), ApiUtils.getDeviceInfo(device));
     }
 
-    @ApiOperation(value = "자유게시판 댓글 감정 표현")
-    @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse addFreeCommentFeeling(
-            @PathVariable String commentId,
-            @PathVariable CoreConst.FEELING_TYPE feeling) {
+    @ApiOperation(value = "자유게시판 글의 댓글 지우기")
+    @RequestMapping(value = "/comment/{id}", method = RequestMethod.DELETE)
+    public EmptyJsonResponse deleteFreeComment(
+            @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
+
+        if (! UserUtils.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        boardFreeService.deleteFreeComment(id, commonWriter);
+
+        return EmptyJsonResponse.newInstance();
+    }
+
+    @ApiOperation(value = "자유게시판 글 감정 표현")
+    @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
+    public UserFeelingResponse addFreeFeeling(
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "감정", required = true) @PathVariable CoreConst.FEELING_TYPE feeling) {
 
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, CoreUtils.getExceptionMessage("exception.need.login.to.feel"));
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        BoardFreeComment boardFreeComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
+        BoardFree boardFree = boardFreeService.setFreeFeelings(commonWriter, seq, feeling);
 
-        Integer numberOfLike = Objects.nonNull(boardFreeComment.getUsersLiking()) ? boardFreeComment.getUsersLiking().size() : 0;
-        Integer numberOfDisLike = Objects.nonNull(boardFreeComment.getUsersDisliking()) ? boardFreeComment.getUsersDisliking().size() : 0;
+        Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
+        Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
 
-        return UserFeelingResponse.builder()
-                .feeling(feeling)
+        UserFeelingResponse response = UserFeelingResponse.builder()
                 .numberOfLike(numberOfLike)
                 .numberOfDislike(numberOfDisLike)
                 .build();
+
+        if (Objects.nonNull(commonWriter))
+            response.setMyFeeling(this.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+
+        return response;
+    }
+
+    @ApiOperation(value = "자유게시판 댓글 감정 표현")
+    @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
+    public UserFeelingResponse addFreeCommentFeeling(
+            @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
+            @ApiParam(value = "감정", required = true) @PathVariable CoreConst.FEELING_TYPE feeling) {
+
+        if (! UserUtils.isUser())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, CoreUtils.getExceptionMessage("exception.need.login.to.feel"));
+
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        BoardFreeComment boardComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
+
+        Integer numberOfLike = ObjectUtils.isEmpty(boardComment.getUsersLiking()) ? 0 : boardComment.getUsersLiking().size();
+        Integer numberOfDisLike = ObjectUtils.isEmpty(boardComment.getUsersDisliking()) ? 0 : boardComment.getUsersDisliking().size();
+
+        UserFeelingResponse response = UserFeelingResponse.builder()
+                .numberOfLike(numberOfLike)
+                .numberOfDislike(numberOfDisLike)
+                .build();
+
+        if (Objects.nonNull(commonWriter))
+            response.setMyFeeling(this.getMyFeeling(commonWriter, boardComment.getUsersLiking(), boardComment.getUsersDisliking()));
+
+        return response;
     }
 
     @ApiOperation(value = "자유게시판 글의 공지 활성화")
@@ -432,5 +525,27 @@ public class BoardRestController {
         boardFreeService.setFreeNotice(commonWriter, seq, false);
 
         return EmptyJsonResponse.newInstance();
+    }
+
+    /**
+     * 좋아요, 싫어요 목록에서 나도 참여 하였는지 검사
+     *
+     * @param commonWriter 나
+     * @param usersLiking 좋아요 목록
+     * @param usersDisliking 싫어요 목록
+     * @return 감정 표현
+     */
+    private CoreConst.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
+        if (Objects.nonNull(commonWriter)) {
+            if (usersLiking.stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                return CoreConst.FEELING_TYPE.LIKE;
+            } else if (usersDisliking.stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                return CoreConst.FEELING_TYPE.DISLIKE;
+            }
+        }
+
+        return null;
     }
 }

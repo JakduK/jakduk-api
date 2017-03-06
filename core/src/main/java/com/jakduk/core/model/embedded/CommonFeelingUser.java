@@ -1,7 +1,7 @@
 package com.jakduk.core.model.embedded;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,7 +15,7 @@ import javax.persistence.GenerationType;
  * @desc     : 게시판의 좋아요, 싫어요 등을 사용하는 사용자
  */
 
-@Data
+@Getter
 @AllArgsConstructor
 @Document
 public class CommonFeelingUser {

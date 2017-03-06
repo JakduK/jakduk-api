@@ -14,7 +14,7 @@ import java.util.List;
  *         16. 7. 13 오후 11:18
  */
 
-@ApiModel(value = "자유게시판 댓글 목록")
+@ApiModel(description = "자유게시판 댓글 목록")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

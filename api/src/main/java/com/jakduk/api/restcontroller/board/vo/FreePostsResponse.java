@@ -2,7 +2,10 @@ package com.jakduk.api.restcontroller.board.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -12,12 +15,12 @@ import java.util.Map;
  *         16. 7. 10 오후 11:52
  */
 
-@ApiModel(value = "자유게시판 글 목록")
+@ApiModel(description = "자유게시판 글 목록")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FreePostsOnListResponse {
+public class FreePostsResponse {
 
     @ApiModelProperty(value = "말머리 맵")
     Map<String, String> categories;

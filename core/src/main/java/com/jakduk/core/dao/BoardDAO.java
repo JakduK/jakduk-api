@@ -1,13 +1,11 @@
 package com.jakduk.core.dao;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import org.apache.commons.collections4.IteratorUtils;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -27,8 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -177,21 +173,5 @@ public class BoardDAO {
 
 		return mongoTemplate.findOne(query, BoardFreeOfMinimum.class);
 	}
-
-    /**
-     * 해당 언어에 맞는 게시판 말머리를 가져온다.
-     * @param code 말머리 code
-     * @param language 언어
-     * @return 말머리 객체
-     */
-    public BoardCategory getBoardCategory(String code, String language) {
-
-        Query query = new Query();
-        query.addCriteria(Criteria.where("code").is(code));
-        query.addCriteria(Criteria.where("names.language").is(language));
-        query.fields().include("code").include("names.$");
-
-        return mongoTemplate.findOne(query, BoardCategory.class);
-    }
 
 }
