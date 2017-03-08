@@ -12,10 +12,10 @@ import lombok.Setter;
  *         16. 7. 18 오후 9:31
  */
 
-@ApiModel(value = "사진 올리기 응답 객체")
+@ApiModel(description = "사진 올리기 응답 객체")
 @Setter
 @Getter
-public class GalleryOnUploadResponse {
+public class GalleryUploadResponse {
 
     @ApiModelProperty(value = "사진 ID")
     private String id;

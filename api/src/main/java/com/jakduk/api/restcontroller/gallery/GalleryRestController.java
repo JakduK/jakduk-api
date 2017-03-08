@@ -7,7 +7,7 @@ import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleriesResponse;
-import com.jakduk.api.restcontroller.gallery.vo.GalleryOnUploadResponse;
+import com.jakduk.api.restcontroller.gallery.vo.GalleryUploadResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
@@ -27,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -57,6 +58,9 @@ public class GalleryRestController {
     @Autowired
     private GalleryService galleryService;
 
+    @Resource
+    private ApiUtils apiUtils;
+
     @ApiOperation(value = "사진 목록", response = GalleriesResponse.class)
     @RequestMapping(value = "/galleries", method = RequestMethod.GET)
     public GalleriesResponse getGalleries(@RequestParam(required = false) String id,
@@ -84,12 +88,9 @@ public class GalleryRestController {
         return response;
     }
 
-    @ApiOperation(value = "사진 올리기", response = GalleryOnUploadResponse.class)
+    @ApiOperation(value = "사진 올리기")
     @RequestMapping(value = "/gallery", method = RequestMethod.POST)
-    public GalleryOnUploadResponse uploadImage(@RequestParam MultipartFile file) {
-
-        if (! UserUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+    public GalleryUploadResponse uploadImage(@RequestParam MultipartFile file) {
 
         if (file.isEmpty())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
@@ -103,10 +104,12 @@ public class GalleryRestController {
         } catch (IOException ignored) {
         }
 
-        GalleryOnUploadResponse response = new GalleryOnUploadResponse();
+        GalleryUploadResponse response = new GalleryUploadResponse();
+
+        assert gallery != null;
         BeanUtils.copyProperties(gallery, response);
-        response.setImageUrl(apiServerUrl + imagePath + gallery.getId());
-        response.setThumbnailUrl(apiServerUrl + thumbnailPath + gallery.getId());
+        response.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+        response.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
         return response;
     }

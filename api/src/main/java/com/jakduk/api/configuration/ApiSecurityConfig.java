@@ -74,7 +74,8 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         HttpMethod.POST,
                         "/api/user",                            // 이메일 기반 회원 가입
-                        "/api/user/social"                      // SNS 기반 회원 가입
+                        "/api/user/social",                     // SNS 기반 회원 가입
+                        "/api/gallery"                          // 사진 올리기
                 ).anonymous()
                 .antMatchers(
                         HttpMethod.GET,
