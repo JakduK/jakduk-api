@@ -3,7 +3,6 @@ package com.jakduk.core.model.simple;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+// BoardFreeOnList와 통합 시키자.
+@Deprecated
 @NoArgsConstructor
 @Getter
 @Document(collection = "boardFree")

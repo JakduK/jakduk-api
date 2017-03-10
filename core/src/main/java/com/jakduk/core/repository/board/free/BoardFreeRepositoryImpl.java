@@ -2,9 +2,10 @@ package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.elasticsearch.ESBoard;
-import com.jakduk.core.model.simple.*;
+import com.jakduk.core.model.simple.BoardFreeOnList;
+import com.jakduk.core.model.simple.BoardFreeOnRSS;
+import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -30,13 +31,13 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<BoardFreeSimple> findByIdAndUserId(ObjectId id, String userId, Integer limit) {
+    public List<BoardFreeOnList> findByIdAndUserId(ObjectId id, String userId, Integer limit) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("writer.userId").is(userId));
         AggregationOperation match2 = Aggregation.match(Criteria.where("_id").ne(id));
         AggregationOperation sort1 = Aggregation.sort(Sort.Direction.DESC, "_id");
         AggregationOperation limit1 = Aggregation.limit(limit);
         Aggregation aggregation = Aggregation.newAggregation(match1, match2, sort1, limit1);
-        AggregationResults<BoardFreeSimple> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeSimple.class);
+        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnList.class);
 
         return results.getMappedResults();
     }
