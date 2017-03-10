@@ -24,7 +24,6 @@ import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
 import com.jakduk.core.service.GalleryService;
@@ -247,10 +246,10 @@ public class BoardRestController {
     @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
     public FreePostDetailResponse getFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest servletRequest,
+            HttpServletResponse servletResponse) {
 
-        Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
+        Boolean isAddCookie = ApiUtils.addViewsCookie(servletRequest, servletResponse, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
         BoardFree boardFree = boardFreeService.findOneBySeq(seq);
 
@@ -301,16 +300,41 @@ public class BoardRestController {
         /*
         글쓴이의 최근 글
          */
-        List<BoardFreeSimple> latestPostsByWriter = null;
+        List<LatestFreePost> latestFreePosts = null;
 
-        if (ObjectUtils.isEmpty(freePostDetail.getStatus()) || BooleanUtils.isNotTrue(freePostDetail.getStatus().getDelete()))
-            latestPostsByWriter = boardFreeService.findByUserId(freePostDetail.getId(), freePostDetail.getWriter().getUserId(), 3);
+        if (ObjectUtils.isEmpty(freePostDetail.getStatus()) || BooleanUtils.isNotTrue(freePostDetail.getStatus().getDelete())) {
+
+            List<BoardFreeOnList> latestPostsByWriter = boardFreeService.findByIdAndUserId(freePostDetail.getId(), freePostDetail.getWriter().getUserId(), 3);
+
+            // 게시물 VO 변환 및 썸네일 URL 추가
+            latestFreePosts = latestPostsByWriter.stream()
+                    .map(post -> {
+                        LatestFreePost latestFreePost = new LatestFreePost();
+                        BeanUtils.copyProperties(post, latestFreePost);
+
+                        if (! ObjectUtils.isEmpty(post.getGalleries())) {
+                            List<BoardGallery> boardGalleries = post.getGalleries().stream()
+                                    .sorted(Comparator.comparing(BoardImage::getId))
+                                    .limit(1)
+                                    .map(gallery -> BoardGallery.builder()
+                                            .id(gallery.getId())
+                                            .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+                                            .build())
+                                    .collect(Collectors.toList());
+
+                            latestFreePost.setGalleries(boardGalleries);
+                        }
+
+                        return latestFreePost;
+                    })
+                    .collect(Collectors.toList());
+        }
 
         return FreePostDetailResponse.builder()
                 .post(freePostDetail)
                 .prevPost(prevPost)
                 .nextPost(nextPost)
-                .latestPostsByWriter(latestPostsByWriter)
+                .latestPostsByWriter(ObjectUtils.isEmpty(latestFreePosts) ? null : latestFreePosts)
                 .build();
     }
 

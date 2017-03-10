@@ -19,4 +19,5 @@ public class BoardFreeOfMinimum {
 	private String id;
 	
 	private int seq;
+
 }

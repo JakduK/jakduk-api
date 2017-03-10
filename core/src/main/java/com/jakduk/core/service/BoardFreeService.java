@@ -15,7 +15,6 @@ import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
@@ -81,7 +80,7 @@ public class BoardFreeService {
 		return boardFreeCommentRepository.countByBoardItem(boardItem);
 	}
 
-	public List<BoardFreeSimple> findByUserId(String id, String userId, Integer limit) {
+	public List<BoardFreeOnList> findByIdAndUserId(String id, String userId, Integer limit) {
 		return boardFreeRepository.findByIdAndUserId(new ObjectId(id), userId, limit);
 	}
 
