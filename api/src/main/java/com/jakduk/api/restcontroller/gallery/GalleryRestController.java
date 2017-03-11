@@ -5,7 +5,7 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.board.vo.UserFeelingResponse;
+import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleriesResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryUploadResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;

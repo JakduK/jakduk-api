@@ -36,11 +36,11 @@ public class FreePostComment {
     @ApiModelProperty(example = "댓글입니다.", value = "댓글 내용")
     private String content;
 
-    @ApiModelProperty(value = "좋아요 회원 목록")
-    private List<CommonFeelingUser> usersLiking;
+    @ApiModelProperty(example = "5", value = "좋아요 수")
+    private Integer numberOfLike;
 
-    @ApiModelProperty(value = "싫어요 회원 목록")
-    private List<CommonFeelingUser> usersDisliking;
+    @ApiModelProperty(example = "5", value = "싫어요 수")
+    private Integer numberOfDislike;
 
     @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
     private CoreConst.FEELING_TYPE myFeeling;
