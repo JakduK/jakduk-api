@@ -6,6 +6,7 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
 import com.jakduk.api.restcontroller.vo.BoardGallery;
+import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
@@ -263,7 +264,13 @@ public class BoardRestController {
          */
         FreePostDetail freePostDetail = new FreePostDetail();
         BeanUtils.copyProperties(boardFree, freePostDetail);
+
+        Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
+        Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
+
         freePostDetail.setCategory(boardCategoryService.getFreeCategory(boardFree.getCategory().name()));
+        freePostDetail.setNumberOfLike(numberOfLike);
+        freePostDetail.setNumberOfDislike(numberOfDisLike);
 
         if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
             List<String> ids =  boardFree.getGalleries().stream()
@@ -414,9 +421,15 @@ public class BoardRestController {
                     FreePostComment freePostComment = new FreePostComment();
                     BeanUtils.copyProperties(boardFreeComment, freePostComment);
 
+                    Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
+                    Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
+
+                    freePostComment.setNumberOfLike(numberOfLike);
+                    freePostComment.setNumberOfDislike(numberOfDisLike);
+
                     if (Objects.nonNull(commonWriter))
-                        freePostComment.setMyFeeling(this.getMyFeeling(commonWriter, freePostComment.getUsersLiking(),
-                                freePostComment.getUsersDisliking()));
+                        freePostComment.setMyFeeling(this.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
+                                boardFreeComment.getUsersDisliking()));
 
                     return freePostComment;
                 })
@@ -496,6 +509,20 @@ public class BoardRestController {
         return response;
     }
 
+    @ApiOperation(value = "자유게시판 글의 감정 표현 회원 목록")
+    @RequestMapping(value = "/{seq}/feeling/users", method = RequestMethod.GET)
+    public FreePostFeelingsResponse getFreeFeelings (
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
+
+        BoardFree boardFree = boardFreeService.findOneBySeq(seq);
+
+        return FreePostFeelingsResponse.builder()
+                .seq(seq)
+                .usersLiking(boardFree.getUsersLiking())
+                .usersDisliking(boardFree.getUsersDisliking())
+                .build();
+    }
+
     @ApiOperation(value = "자유게시판 댓글 감정 표현")
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(
@@ -561,10 +588,10 @@ public class BoardRestController {
      */
     private CoreConst.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
         if (Objects.nonNull(commonWriter)) {
-            if (usersLiking.stream()
+            if (! ObjectUtils.isEmpty(usersLiking) && usersLiking.stream()
                     .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
                 return CoreConst.FEELING_TYPE.LIKE;
-            } else if (usersDisliking.stream()
+            } else if (! ObjectUtils.isEmpty(usersDisliking) && usersDisliking.stream()
                     .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
                 return CoreConst.FEELING_TYPE.DISLIKE;
             }
