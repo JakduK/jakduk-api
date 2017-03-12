@@ -8,6 +8,7 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.service.GalleryService;
 import com.jakduk.core.service.UserPictureService;
+import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -47,6 +49,18 @@ public class DefaultViewController {
 	// RSS
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
 	public String getRss() {
+		return "documentRssFeedView";
+	}
+
+	// RSS
+	@RequestMapping(value = "/sitemap", method = RequestMethod.GET)
+	public String getSitemap() {
+
+		try {
+			WebSitemapGenerator wsg = new WebSitemapGenerator("https://jakduk.com");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 		return "documentRssFeedView";
 	}
 

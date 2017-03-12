@@ -13,6 +13,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 9. 11.
@@ -25,11 +26,18 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
 
     @Test
     public void findOneById() {
-        BoardFree boardFree = sut.findOneById("54c4df933d96600d7f55a04b").orElse(new BoardFree());
+        BoardFree boardFree = sut.findOneById("58c55b770fc0bc04fe5e5db6").orElse(new BoardFree());
         boardFree.setBatch(null);
         //sut.save(boardFree);
 
         Assert.assertTrue(! ObjectUtils.isEmpty(boardFree));
+    }
+
+    @Test
+    public void findOneBySeq() {
+        BoardFree boardFree = sut.findOneBySeq(187).orElse(new BoardFree());
+
+        Assert.assertTrue(Objects.nonNull(boardFree));
     }
 
     @Test
@@ -52,4 +60,5 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
         sut.findNotices(sort);
     }
+
 }
