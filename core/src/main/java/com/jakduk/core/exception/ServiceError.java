@@ -24,6 +24,8 @@ public enum ServiceError {
     FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
     NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
     FORBIDDEN(HttpStatus.SC_FORBIDDEN, "exception.forbidden"),
+    IO_EXCEPTION(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.io"),
+    INTERNAL_SERVER_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.internal.server.error"),
 
     // FILE
     FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED(HttpStatus.SC_BAD_REQUEST, "exception.only.image.type.can.be.uploaded"),
@@ -59,9 +61,7 @@ public enum ServiceError {
     SEND_EMAIL_FAILED(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.send.email.failed"),
     GALLERY_IO_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.gallery.io"),
     ELASTICSEARCH_NOT_FOUND_INDEX(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.elasticsearch.not.found.index"),
-    ELASTICSEARCH_INDEX_FAILED(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.elasticsearch.index.failed"),
-    IO_EXCEPTION(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.io"),
-    INTERNAL_SERVER_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.internal.server.error");
+    ELASTICSEARCH_INDEX_FAILED(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.elasticsearch.index.failed");
 
     private final Integer httpStatus;
     private final String code;

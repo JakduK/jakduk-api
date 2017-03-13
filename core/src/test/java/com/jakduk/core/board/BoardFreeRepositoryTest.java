@@ -4,7 +4,9 @@ import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
+import com.jakduk.core.model.simple.BoardFreeOnSitemap;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,15 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
 
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
         sut.findNotices(sort);
+    }
+
+    @Test
+    public void findPostsOnSitemap() {
+
+        List<BoardFreeOnSitemap> posts = sut.findPostsOnSitemap(new ObjectId("58c0189e807d711ab5e1a72d"),
+                new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
+
+        Assert.assertTrue(! ObjectUtils.isEmpty(posts));
     }
 
 }

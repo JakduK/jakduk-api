@@ -6,6 +6,7 @@ import com.jakduk.core.model.elasticsearch.ESBoard;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
+import com.jakduk.core.model.simple.BoardFreeOnSitemap;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -18,7 +19,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 10. 9.
@@ -42,7 +45,9 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         return results.getMappedResults();
     }
 
-    // 기준 BoardFree ID 이상의 BoardFree 목록을 가져온다.
+    /**
+     * 기준 BoardFree ID 이상의 BoardFree 목록을 가져온다.
+     */
     @Override
     public List<ESBoard> findPostsGreaterThanId(ObjectId objectId, Integer limit) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(true));
@@ -70,6 +75,9 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         return posts;
     }
 
+    /**
+     * RSS 용 게시물 목록
+     */
     @Override
     public List<BoardFreeOnRSS> findPostsOnRss() {
         AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(true));
@@ -118,5 +126,26 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         query.limit(limit);
 
         return mongoTemplate.find(query, BoardFreeOnList.class);
+    }
+
+    /**
+     * 사이트맵 용 게시물 목록
+     *
+     * @param objectId 해당 ID 이하의 조건 추가 (null 이면 검사 안함)
+     * @param sort sort
+     * @param limit limit
+     */
+    @Override
+    public List<BoardFreeOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("status.delete").ne(true));
+
+        if (Objects.nonNull(objectId))
+            query.addCriteria(Criteria.where("_id").lt(objectId));
+
+        query.with(sort);
+        query.limit(limit);
+
+        return mongoTemplate.find(query, BoardFreeOnSitemap.class);
     }
 }

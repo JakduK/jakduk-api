@@ -1,18 +1,26 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.util.DateUtils;
 import com.jakduk.core.common.util.FileUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.db.UserPicture;
+import com.jakduk.core.model.simple.BoardFreeOnSitemap;
+import com.jakduk.core.service.BoardFreeService;
 import com.jakduk.core.service.GalleryService;
 import com.jakduk.core.service.UserPictureService;
+import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
+import com.redfin.sitemapgenerator.WebSitemapUrl;
+import org.apache.commons.lang3.CharEncoding;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +31,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -40,11 +50,20 @@ public class DefaultViewController {
 	@Autowired
 	private UserPictureService userPictureService;
 
+	@Autowired
+	private BoardFreeService boardFreeService;
+
 	@Value("${core.storage.user.picture.large.path}")
 	private String storageUserPictureLargePath;
 
 	@Value("${core.storage.user.picture.small.path}")
 	private String storageUserPictureSmallPath;
+
+	@Value("${web.server.url}")
+	private String webServerUrl;
+
+	@Value("${web.board.free.path}")
+	private String webBoardFreePath;
 
 	// RSS
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
@@ -52,16 +71,56 @@ public class DefaultViewController {
 		return "documentRssFeedView";
 	}
 
-	// RSS
-	@RequestMapping(value = "/sitemap", method = RequestMethod.GET)
-	public String getSitemap() {
+	// sitemap
+	@RequestMapping(value = "/sitemap", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+	public void getSitemap(HttpServletResponse servletResponse) {
 
 		try {
-			WebSitemapGenerator wsg = new WebSitemapGenerator("https://jakduk.com");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			WebSitemapGenerator wsg = new WebSitemapGenerator(webServerUrl);
+
+			ObjectId postId = null;
+			Boolean existPosts = true;
+
+			do {
+				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, 10);
+
+				if (ObjectUtils.isEmpty(posts)) {
+					existPosts = false;
+				} else {
+					BoardFreeOnSitemap post = posts.stream()
+							.sorted(Comparator.comparing(BoardFreeOnSitemap::getId).reversed())
+							.findFirst()
+							.orElseThrow(() -> new ServiceException(ServiceError.INTERNAL_SERVER_ERROR));
+
+					postId = new ObjectId(post.getId());
+				}
+
+				if (existPosts) {
+					posts.forEach(post-> {
+						try {
+							WebSitemapUrl url = new WebSitemapUrl
+									.Options(String.format("%s/%s/%d", webServerUrl, webBoardFreePath, post.getSeq()))
+									.lastMod(DateUtils.LocalDateTimeToDate(post.getLastUpdated()))
+									.priority(1.0)
+									.changeFreq(ChangeFreq.DAILY)
+									.build();
+
+							wsg.addUrl(url);
+						} catch (MalformedURLException e) {
+							throw new ServiceException(ServiceError.IO_EXCEPTION, e);
+						}
+					});
+				}
+			} while (existPosts);
+
+			servletResponse.setContentType(MediaType.APPLICATION_XML_VALUE);
+			servletResponse.setCharacterEncoding(CharEncoding.UTF_8);
+			servletResponse.getWriter().println(wsg.writeAsStrings().get(0));
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.IO_EXCEPTION, e);
 		}
-		return "documentRssFeedView";
+
 	}
 
 	// 사진 가져오기.

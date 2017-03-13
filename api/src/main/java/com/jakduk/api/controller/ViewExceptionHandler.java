@@ -63,8 +63,8 @@ public class ViewExceptionHandler {
         return modelAndView;
     }
 
-    protected Map<String, Object> getErrorAttributes(HttpServletRequest request,
-                                                     boolean includeStackTrace) {
+    private Map<String, Object> getErrorAttributes(HttpServletRequest request,
+                                                   boolean includeStackTrace) {
         RequestAttributes requestAttributes = new ServletRequestAttributes(request);
         return this.errorAttributes.getErrorAttributes(requestAttributes,
                 includeStackTrace);
