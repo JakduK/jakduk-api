@@ -3,9 +3,11 @@ package com.jakduk.api.common;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.util.ObjectUtils;
 
 import java.net.MalformedURLException;
 import java.util.Date;
@@ -25,7 +27,8 @@ public class SitemapTest {
                     .lastMod(new Date()).priority(1.0).changeFreq(ChangeFreq.DAILY).build();
 
             wsg.addUrl(url);
-            System.out.println("phjang=" + wsg.writeAsStrings());
+
+            Assert.assertTrue(! ObjectUtils.isEmpty(wsg.writeAsStrings()));
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
