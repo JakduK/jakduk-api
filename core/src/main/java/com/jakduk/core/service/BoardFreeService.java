@@ -12,10 +12,7 @@ import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.GalleryOnBoard;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeOnSitemap;
+import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
@@ -858,6 +855,16 @@ public class BoardFreeService {
 
 		return posts.stream()
 				.collect(Collectors.toMap(BoardFreeOnSearch::getId, Function.identity()));
+	}
+
+	/**
+	 * RSS 용 게시물 목록
+	 */
+	public List<BoardFreeOnRSS> getBoardFreeOnRss(ObjectId objectId, Integer limit) {
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+
+		return boardFreeRepository.findPostsOnRss(objectId, sort, limit);
+
 	}
 
 	/**

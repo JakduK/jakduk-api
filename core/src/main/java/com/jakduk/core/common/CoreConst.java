@@ -29,7 +29,6 @@ public class CoreConst {
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
 	public final static Integer HOME_SIZE_POST = 7;
 	public final static Integer HOME_SIZE_GALLERY = 10;
-	public final static Integer RSS_SIZE_ITEM = 800;
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 110;
 	public final static Integer SEARCH_NO_MATCH_SIZE = 200;
 	public final static Integer SEARCH_FRAGMENT_SIZE = 200;

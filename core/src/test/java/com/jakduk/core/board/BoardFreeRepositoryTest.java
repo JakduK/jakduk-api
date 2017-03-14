@@ -50,10 +50,11 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
     }
 
     @Test
-    public void findPostsWithRss() {
-        List<BoardFreeOnRSS> posts = sut.findPostsOnRss();
+    public void findPostsOnRss() {
+        List<BoardFreeOnRSS> posts = sut.findPostsOnRss(null,
+                new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
 
-        Assert.assertTrue(posts.size() > 0);
+        Assert.assertTrue(! ObjectUtils.isEmpty(posts));
     }
 
     @Test

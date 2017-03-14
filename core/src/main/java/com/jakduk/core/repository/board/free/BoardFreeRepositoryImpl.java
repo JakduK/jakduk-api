@@ -77,17 +77,24 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
 
     /**
      * RSS 용 게시물 목록
+     *
+     * @param objectId 해당 ID 이하의 조건 추가 (null 이면 검사 안함)
+     * @param sort sort
+     * @param limit limit
      */
     @Override
-    public List<BoardFreeOnRSS> findPostsOnRss() {
-        AggregationOperation match = Aggregation.match(Criteria.where("status.delete").ne(true));
-        AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "_id");
-        AggregationOperation limit = Aggregation.limit(CoreConst.RSS_SIZE_ITEM);
-        Aggregation aggregation = Aggregation.newAggregation(match, sort, limit);
+    public List<BoardFreeOnRSS> findPostsOnRss(ObjectId objectId, Sort sort, Integer limit) {
 
-        AggregationResults<BoardFreeOnRSS> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnRSS.class);
+        Query query = new Query();
+        query.addCriteria(Criteria.where("status.delete").ne(true));
 
-        return results.getMappedResults();
+        if (Objects.nonNull(objectId))
+            query.addCriteria(Criteria.where("_id").lt(objectId));
+
+        query.with(sort);
+        query.limit(limit);
+
+        return mongoTemplate.find(query, BoardFreeOnRSS.class);
     }
 
     /**

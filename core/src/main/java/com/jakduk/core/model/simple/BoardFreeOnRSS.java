@@ -2,6 +2,7 @@ package com.jakduk.core.model.simple;
 
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -11,6 +12,7 @@ import lombok.Getter;
  */
 
 @Getter
+@Document(collection = "boardFree")
 public class BoardFreeOnRSS {
 
 	private String id;
@@ -22,4 +24,5 @@ public class BoardFreeOnRSS {
 	private String subject;
 	
 	private String content;
+
 }

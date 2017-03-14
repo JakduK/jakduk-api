@@ -1,5 +1,6 @@
 package com.jakduk.api.controller;
 
+import com.jakduk.api.common.ApiConst;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.DateUtils;
 import com.jakduk.core.common.util.FileUtils;
@@ -71,7 +72,7 @@ public class DefaultViewController {
 		return "documentRssFeedView";
 	}
 
-	// sitemap
+	// Sitemap
 	@RequestMapping(value = "/sitemap", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
 	public void getSitemap(HttpServletResponse servletResponse) {
 
@@ -82,13 +83,13 @@ public class DefaultViewController {
 			Boolean existPosts = true;
 
 			do {
-				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, 10);
+				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, ApiConst.NUMBER_OF_ITEMS_EACH_PAGES);
 
 				if (ObjectUtils.isEmpty(posts)) {
 					existPosts = false;
 				} else {
 					BoardFreeOnSitemap post = posts.stream()
-							.sorted(Comparator.comparing(BoardFreeOnSitemap::getId).reversed())
+							.sorted(Comparator.comparing(BoardFreeOnSitemap::getId))
 							.findFirst()
 							.orElseThrow(() -> new ServiceException(ServiceError.INTERNAL_SERVER_ERROR));
 
@@ -101,7 +102,7 @@ public class DefaultViewController {
 							WebSitemapUrl url = new WebSitemapUrl
 									.Options(String.format("%s/%s/%d", webServerUrl, webBoardFreePath, post.getSeq()))
 									.lastMod(DateUtils.LocalDateTimeToDate(post.getLastUpdated()))
-									.priority(1.0)
+									.priority(0.5)
 									.changeFreq(ChangeFreq.DAILY)
 									.build();
 
