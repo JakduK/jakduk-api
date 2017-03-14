@@ -12,9 +12,7 @@ import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.GalleryOnBoard;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
+import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
@@ -33,6 +31,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
@@ -134,14 +133,20 @@ public class BoardFreeService {
 
 		boardFree.setStatus(boardStatus);
 
+		// boardHistory
 		List<BoardHistory> histories = new ArrayList<>();
-		BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.CREATE, writer);
+		ObjectId boardHistoryId = new ObjectId();
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.CREATE, writer);
 		histories.add(history);
 		boardFree.setHistory(histories);
 
+		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+
 		boardFreeRepository.save(boardFree);
 
-		// 글과 연동 된 사진 처리
+		/*
+		글과 연동 된 사진 처리
+		 */
 		if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
 			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
@@ -183,16 +188,16 @@ public class BoardFreeService {
 					updateGallery.setStatus(status);
 					galleryRepository.save(updateGallery);
 
-					/**
-					 * 엘라스틱서치 색인 요청
+					/*
+					  엘라스틱서치 색인 요청
 					 */
 					searchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 				}
 			}
 		}
 
-		/**
-		 * 엘라스틱서치 색인 요청
+		/*
+		  엘라스틱서치 색인 요청
 		 */
 		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name());
@@ -262,16 +267,22 @@ public class BoardFreeService {
 
 		List<BoardHistory> histories = boardFree.getHistory();
 
-		if (Objects.isNull(histories))
+		if (ObjectUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
-		BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.EDIT, writer);
+		// boardHistory
+		ObjectId boardHistoryId = new ObjectId();
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.EDIT, writer);
 		histories.add(history);
 		boardFree.setHistory(histories);
 
+		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+
 		boardFreeRepository.save(boardFree);
 
-		// 글과 연동 된 사진 처리
+		/*
+		글과 연동 된 사진 처리
+		 */
 		if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
 			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
@@ -313,16 +324,16 @@ public class BoardFreeService {
 					updateGallery.setStatus(status);
 					galleryRepository.save(updateGallery);
 
-					/**
-					 * 엘라스틱서치 색인 요청
+					/*
+					  엘라스틱서치 색인 요청
 					 */
 					searchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 				}
 			}
 		}
 
-		/**
-		 * 엘라스틱서치 색인 요청
+		/*
+		  엘라스틱서치 색인 요청
 		 */
 		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name());
@@ -350,8 +361,10 @@ public class BoardFreeService {
 
         Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 
-        // 글이 지워질 때, 연동된 사진도 끊어주어야 한다.
-        // 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
+        /*
+        글이 지워질 때, 연동된 사진도 끊어주어야 한다.
+        TODO : 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
+         */
         if (count > 0) {
 			boardFree.setContent(null);
 			boardFree.setSubject(null);
@@ -842,5 +855,25 @@ public class BoardFreeService {
 
 		return posts.stream()
 				.collect(Collectors.toMap(BoardFreeOnSearch::getId, Function.identity()));
+	}
+
+	/**
+	 * RSS 용 게시물 목록
+	 */
+	public List<BoardFreeOnRSS> getBoardFreeOnRss(ObjectId objectId, Integer limit) {
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+
+		return boardFreeRepository.findPostsOnRss(objectId, sort, limit);
+
+	}
+
+	/**
+	 * 사이트맵 용 게시물 목록
+	 */
+	public List<BoardFreeOnSitemap> getBoardFreeOnSitemap(ObjectId objectId, Integer limit) {
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+
+		return boardFreeRepository.findPostsOnSitemap(objectId, sort, limit);
+
 	}
 }

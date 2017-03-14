@@ -51,7 +51,7 @@ public class CoreUtils {
      * HTML TAG를 제거한다.
      */
     public static String stripHtmlTag(String htmlTag) {
-        String content = StringUtils.defaultIfBlank(htmlTag, "");
+        String content = StringUtils.defaultIfBlank(htmlTag, StringUtils.EMPTY);
         content = Jsoup.parse(content).text();
 
         return content;

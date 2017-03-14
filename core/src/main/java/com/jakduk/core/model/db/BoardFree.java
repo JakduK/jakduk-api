@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,7 +31,6 @@ public class BoardFree {
 	/**
 	 * 작성자
 	 */
-	
 	private CommonWriter writer;
 	
 	/**
@@ -71,4 +71,7 @@ public class BoardFree {
 	private List<CoreConst.BATCH_TYPE> batch;
 
 	private String shortContent;
+
+	private LocalDateTime lastUpdated;
+
 }

@@ -29,7 +29,6 @@ public class CoreConst {
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
 	public final static Integer HOME_SIZE_POST = 7;
 	public final static Integer HOME_SIZE_GALLERY = 10;
-	public final static Integer RSS_SIZE_ITEM = 800;
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 110;
 	public final static Integer SEARCH_NO_MATCH_SIZE = 200;
 	public final static Integer SEARCH_FRAGMENT_SIZE = 200;
@@ -203,7 +202,8 @@ public class CoreConst {
 	public enum BATCH_TYPE {
 		CHANGE_BOARD_CONTENT_IMAGE_URL_01,
 		APPEND_GALLERY_FILE_EXT_01,
-		ADD_SHORT_CONTENT_01				// 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
+		ADD_SHORT_CONTENT_01,				// 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
+		ADD_LAST_UPDATED_TO_BOARDFREE_01	// BoardFree에 lastUpdated 필드를 추가한다.
 	}
 
 	public enum SEARCH_TYPE {
