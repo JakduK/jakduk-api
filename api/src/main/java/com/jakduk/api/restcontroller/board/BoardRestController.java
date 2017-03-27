@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -85,49 +86,32 @@ public class BoardRestController {
         List<BoardFreeOnList> notices = boardFreeService.getFreeNotices();
 
         // 게시물 VO 변환 및 썸네일 URL 추가
+        Function<BoardFreeOnList, FreePost> convertToFreePost = post -> {
+            FreePost freePostList = new FreePost();
+            BeanUtils.copyProperties(post, freePostList);
+
+            if (! ObjectUtils.isEmpty(post.getGalleries())) {
+                List<BoardGallery> boardGalleries = post.getGalleries().stream()
+                        .sorted(Comparator.comparing(BoardImage::getId))
+                        .limit(1)
+                        .map(gallery -> BoardGallery.builder()
+                                .id(gallery.getId())
+                                .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+                                .build())
+                        .collect(Collectors.toList());
+
+                freePostList.setGalleries(boardGalleries);
+            }
+
+            return freePostList;
+        };
+
         List<FreePost> freePosts = postPage.getContent().stream()
-                .map(post -> {
-                    FreePost freePostList = new FreePost();
-                    BeanUtils.copyProperties(post, freePostList);
-
-                    if (! ObjectUtils.isEmpty(post.getGalleries())) {
-                        List<BoardGallery> boardGalleries = post.getGalleries().stream()
-                                .sorted(Comparator.comparing(BoardImage::getId))
-                                .limit(1)
-                                .map(gallery -> BoardGallery.builder()
-                                        .id(gallery.getId())
-                                        .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-                                        .build())
-                                .collect(Collectors.toList());
-
-                        freePostList.setGalleries(boardGalleries);
-                    }
-
-                    return freePostList;
-                })
+                .map(convertToFreePost)
                 .collect(Collectors.toList());
 
-        // 공지게시물 VO 변환 및 썸네일 URL 추가
         List<FreePost> freeNotices = notices.stream()
-                .map(post -> {
-                    FreePost freePostList = new FreePost();
-                    BeanUtils.copyProperties(post, freePostList);
-
-                    if (! ObjectUtils.isEmpty(post.getGalleries())) {
-                        List<BoardGallery> boardGalleries = post.getGalleries().stream()
-                                .sorted(Comparator.comparing(BoardImage::getId))
-                                .limit(1)
-                                .map(gallery -> BoardGallery.builder()
-                                        .id(gallery.getId())
-                                        .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-                                        .build())
-                                .collect(Collectors.toList());
-
-                        freePostList.setGalleries(boardGalleries);
-                    }
-
-                    return freePostList;
-                })
+                .map(convertToFreePost)
                 .collect(Collectors.toList());
 
         // Board ID 뽑아내기.
