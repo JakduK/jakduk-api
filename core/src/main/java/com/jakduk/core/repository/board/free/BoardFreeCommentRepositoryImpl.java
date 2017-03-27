@@ -60,7 +60,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
      */
     @Override
     public List<CommonCount> findCommentsCountByIds(List<ObjectId> ids) {
-        AggregationOperation match = Aggregation.match(Criteria.where("boardItem.id").in(ids));
+        AggregationOperation match = Aggregation.match(Criteria.where("boardItem._id").in(ids));
         AggregationOperation group = Aggregation.group("boardItem").count().as("count");
         //AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
         //AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);
