@@ -378,4 +378,13 @@ public class GalleryService {
 		return data;
 	}
 
+	/**
+	 * 읽음수 1 증가
+	 */
+	public void increaseViews(Gallery gallery) {
+		int views = gallery.getViews();
+		gallery.setViews(++views);
+		galleryRepository.save(gallery);
+	}
+
 }

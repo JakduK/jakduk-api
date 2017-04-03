@@ -15,10 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ApiModel(value = "사진 정보 응답 객체")
+@ApiModel(description = "사진 정보 응답 객체")
 public class GalleryResponse {
+
 	@ApiModelProperty(value = "사진 정보")
-	private Gallery gallery;
+	private GalleryDetail gallery;
 
 	@ApiModelProperty(value = "이전 사진")
 	private Gallery prev;

@@ -5,20 +5,21 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleriesResponse;
-import com.jakduk.api.restcontroller.gallery.vo.GalleryUploadResponse;
+import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;
+import com.jakduk.api.restcontroller.gallery.vo.GalleryUploadResponse;
+import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,22 +129,44 @@ public class GalleryRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "사진 정보")
+    @ApiOperation(value = "사진 상세")
     @RequestMapping(value = "/gallery/{id}", method = RequestMethod.GET)
-    public GalleryResponse view(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
+    public GalleryResponse view(
+            @ApiParam(value = "Gallery ID", required = true) @PathVariable String id,
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
-        Map<String, Object> gallery = galleryService.getGallery(id, isAddCookie);
 
-        if (Objects.isNull(gallery)) {
-            throw new ServiceException(ServiceError.NOT_FOUND);
-        }
+        Gallery gallery = galleryService.findOneById(id);
+
+        if (isAddCookie)
+            galleryService.increaseViews(gallery);
+
+        CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        /*
+        글 상세
+         */
+        GalleryDetail galleryDetail = new GalleryDetail();
+        BeanUtils.copyProperties(gallery, galleryDetail);
+
+        Integer numberOfLike = ObjectUtils.isEmpty(gallery.getUsersLiking()) ? 0 : gallery.getUsersLiking().size();
+        Integer numberOfDisLike = ObjectUtils.isEmpty(gallery.getUsersDisliking()) ? 0 : gallery.getUsersDisliking().size();
+
+        galleryDetail.setNumberOfLike(numberOfLike);
+        galleryDetail.setNumberOfDislike(numberOfDisLike);
+        galleryDetail.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+        galleryDetail.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+
+        if (Objects.nonNull(commonWriter))
+            galleryDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
 
         return GalleryResponse.builder()
-          .gallery((Gallery) gallery.get("gallery"))
-          .next((Gallery) gallery.get("next"))
-          .prev((Gallery) gallery.get("prev"))
-          .linkedPosts((List<BoardFreeSimple>) gallery.get("linkedPosts"))
+          .gallery(galleryDetail)
+//          .next((Gallery) gallery.get("next"))
+//          .prev((Gallery) gallery.get("prev"))
+//          .linkedPosts((List<BoardFreeSimple>) gallery.get("linkedPosts"))
           .build();
     }
 
