@@ -10,7 +10,7 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.BoardFreeOnSitemap;
 import com.jakduk.core.service.BoardFreeService;
-import com.jakduk.core.service.GalleryService;
+import com.jakduk.api.service.gallery.GalleryService;
 import com.jakduk.core.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;

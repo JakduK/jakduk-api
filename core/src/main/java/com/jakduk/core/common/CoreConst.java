@@ -216,4 +216,12 @@ public class CoreConst {
 		LARGE,
 		SMALL
 	}
+
+	/**
+	 * 몽고DB Criteria Operator
+	 */
+	public enum CRITERIA_OPERATOR {
+		GT,
+		LT
+	}
 }

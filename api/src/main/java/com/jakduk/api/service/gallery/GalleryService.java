@@ -1,5 +1,12 @@
-package com.jakduk.core.service;
+package com.jakduk.api.service.gallery;
 
+import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.restcontroller.board.vo.FreePost;
+import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
+import com.jakduk.api.service.gallery.vo.GalleryResponse;
+import com.jakduk.api.service.gallery.vo.SurroundingsGallery;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
@@ -11,11 +18,13 @@ import com.jakduk.core.model.embedded.GalleryStatus;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.repository.gallery.GalleryRepository;
+import com.jakduk.core.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -23,6 +32,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -33,6 +43,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -61,6 +73,9 @@ public class GalleryService {
 	@Autowired
 	private SearchService searchService;
 
+	@Resource
+	private ApiUtils apiUtils;
+
 	// 사진 목록.
 	public List<GalleryOnList> getGalleriesById(String id, Integer size) {
 		if (Objects.nonNull(id))
@@ -86,6 +101,98 @@ public class GalleryService {
     public List<Gallery> findByIds(List<String> ids) {
         return galleryRepository.findByIdIn(ids);
     }
+
+    public GalleryResponse getGalleryDetail(String id, Boolean isAddCookie) {
+
+		Gallery gallery = galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+
+		if (isAddCookie)
+			this.increaseViews(gallery);
+
+		CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        /*
+        글 상세
+         */
+		GalleryDetail galleryDetail = new GalleryDetail();
+		BeanUtils.copyProperties(gallery, galleryDetail);
+
+		Integer numberOfLike = ObjectUtils.isEmpty(gallery.getUsersLiking()) ? 0 : gallery.getUsersLiking().size();
+		Integer numberOfDisLike = ObjectUtils.isEmpty(gallery.getUsersDisliking()) ? 0 : gallery.getUsersDisliking().size();
+
+		galleryDetail.setNumberOfLike(numberOfLike);
+		galleryDetail.setNumberOfDislike(numberOfDisLike);
+		galleryDetail.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+		galleryDetail.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+
+		if (Objects.nonNull(commonWriter))
+			galleryDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
+
+		/*
+		사진첩 보기의 앞, 뒤 사진을 가져온다.
+		 */
+		List<GalleryOnList> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.GT,
+				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
+		List<GalleryOnList> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.LT,
+				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
+
+		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
+		List<SurroundingsGallery> surroundingsGalleries = new ArrayList<>();
+
+		// GalleryOnLost -> SurroundingsGallery
+		Consumer<GalleryOnList> extractSurroundingsGalleries = surroundingsPrevGallery -> {
+			SurroundingsGallery surroundingsGallery = new SurroundingsGallery();
+			BeanUtils.copyProperties(surroundingsPrevGallery, surroundingsGallery);
+
+			surroundingsGallery.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, surroundingsPrevGallery.getId()));
+			surroundingsGallery.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, surroundingsPrevGallery.getId()));
+
+			surroundingsGalleries.add(surroundingsGallery);
+		};
+
+		// 앞 사진 목록과 뒷 사진 목록이 모두 5개 이상일때
+		if (surroundingsPrevGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
+				&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
+
+			surroundingsPrevGalleries.stream()
+					.limit(HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY)
+					.forEach(extractSurroundingsGalleries);
+
+			surroundingsNextGalleries.stream()
+					.limit(HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY)
+					.forEach(extractSurroundingsGalleries);
+		}
+		// 뒷 사진 목록이 5개 미만일때
+		else if (surroundingsPrevGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
+				&& surroundingsNextGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
+
+			surroundingsPrevGalleries.stream()
+					.limit(ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsNextGalleries.size())
+					.forEach(extractSurroundingsGalleries);
+
+			surroundingsNextGalleries
+					.forEach(extractSurroundingsGalleries);
+
+		}
+		// 앞 사진 목록이 5개 미만일때
+		else if (surroundingsPrevGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
+				&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
+
+			surroundingsPrevGalleries
+					.forEach(extractSurroundingsGalleries);
+
+			surroundingsNextGalleries.stream()
+					.limit(ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsPrevGalleries.size())
+					.forEach(extractSurroundingsGalleries);
+		}
+
+
+		return GalleryResponse.builder()
+				.gallery(galleryDetail)
+				.surroundingsGalleries(surroundingsGalleries)
+//          .linkedPosts((List<BoardFreeSimple>) gallery.get("linkedPosts"))
+				.build();
+	}
 
 	/**
 	 * 사진 올리기.

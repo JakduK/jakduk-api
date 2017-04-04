@@ -1,5 +1,6 @@
 package com.jakduk.core.repository.gallery;
 
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.elasticsearch.ESGallery;
 import com.jakduk.core.model.simple.GalleryOnList;
 import org.bson.types.ObjectId;
@@ -18,5 +19,5 @@ public interface GalleryRepositoryCustom {
     /**
      * 사진첩 보기의 앞, 뒤 사진을 가져온다.
      */
-    List<GalleryOnList> findGalleriesById(ObjectId id, Sort.Direction direction, Integer limit);
+    List<GalleryOnList> findGalleriesById(ObjectId id, CoreConst.CRITERIA_OPERATOR operator, Integer limit);
 }

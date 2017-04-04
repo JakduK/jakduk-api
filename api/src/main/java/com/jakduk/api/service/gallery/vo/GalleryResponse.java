@@ -1,5 +1,6 @@
-package com.jakduk.api.restcontroller.gallery.vo;
+package com.jakduk.api.service.gallery.vo;
 
+import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import io.swagger.annotations.ApiModel;
@@ -21,11 +22,8 @@ public class GalleryResponse {
 	@ApiModelProperty(value = "사진 정보")
 	private GalleryDetail gallery;
 
-	@ApiModelProperty(value = "이전 사진")
-	private Gallery prev;
-
-	@ApiModelProperty(value = "다음 사진")
-	private Gallery next;
+	@ApiModelProperty(value = "해당 사진의 앞, 뒤 사진 목록")
+	private List<SurroundingsGallery> surroundingsGalleries;
 
 	@ApiModelProperty(value = "관련 게시물")
 	private List<BoardFreeSimple> linkedPosts;

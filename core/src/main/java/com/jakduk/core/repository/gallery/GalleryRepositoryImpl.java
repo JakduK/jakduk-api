@@ -50,19 +50,23 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
      * 사진첩 보기의 앞, 뒤 사진을 가져온다.
      */
     @Override
-    public List<GalleryOnList> findGalleriesById(ObjectId id, Sort.Direction direction, Integer limit) {
+    public List<GalleryOnList> findGalleriesById(ObjectId id, CoreConst.CRITERIA_OPERATOR operator, Integer limit) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
         query.limit(limit);
 
-        if (direction.equals(Sort.Direction.ASC)) {
-            query.addCriteria(Criteria.where("_id").gt(id));
-        } else if (direction.equals(Sort.Direction.DESC)) {
-            query.addCriteria(Criteria.where("_id").lt(id));
+        switch (operator) {
+            case GT:
+                query.addCriteria(Criteria.where("_id").gt(id));
+                break;
+            case LT:
+                query.addCriteria(Criteria.where("_id").lt(id));
+                break;
         }
 
-        query.with(new Sort(direction, "_id"));
+        query.with(new Sort(Sort.Direction.DESC, "_id"));
 
         return mongoTemplate.find(query, GalleryOnList.class);
     }
+
 }

@@ -6,17 +6,16 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleriesResponse;
-import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
-import com.jakduk.api.restcontroller.gallery.vo.GalleryResponse;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryUploadResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
+import com.jakduk.api.service.gallery.GalleryService;
+import com.jakduk.api.service.gallery.vo.GalleryResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.simple.GalleryOnList;
-import com.jakduk.core.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -138,36 +136,8 @@ public class GalleryRestController {
 
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
 
-        Gallery gallery = galleryService.findOneById(id);
+        return galleryService.getGalleryDetail(id, isAddCookie);
 
-        if (isAddCookie)
-            galleryService.increaseViews(gallery);
-
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
-
-        /*
-        글 상세
-         */
-        GalleryDetail galleryDetail = new GalleryDetail();
-        BeanUtils.copyProperties(gallery, galleryDetail);
-
-        Integer numberOfLike = ObjectUtils.isEmpty(gallery.getUsersLiking()) ? 0 : gallery.getUsersLiking().size();
-        Integer numberOfDisLike = ObjectUtils.isEmpty(gallery.getUsersDisliking()) ? 0 : gallery.getUsersDisliking().size();
-
-        galleryDetail.setNumberOfLike(numberOfLike);
-        galleryDetail.setNumberOfDislike(numberOfDisLike);
-        galleryDetail.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-        galleryDetail.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-
-        if (Objects.nonNull(commonWriter))
-            galleryDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
-
-        return GalleryResponse.builder()
-          .gallery(galleryDetail)
-//          .next((Gallery) gallery.get("next"))
-//          .prev((Gallery) gallery.get("prev"))
-//          .linkedPosts((List<BoardFreeSimple>) gallery.get("linkedPosts"))
-          .build();
     }
 
     @ApiOperation(value = "사진 좋아요 싫어요")

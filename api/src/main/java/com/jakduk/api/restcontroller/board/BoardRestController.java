@@ -26,7 +26,7 @@ import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
-import com.jakduk.core.service.GalleryService;
+import com.jakduk.api.service.gallery.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
