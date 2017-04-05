@@ -216,4 +216,18 @@ public class CoreConst {
 		LARGE,
 		SMALL
 	}
+
+	/**
+	 * 몽고DB Criteria Operator
+	 */
+	public enum CRITERIA_OPERATOR {
+		GT,
+		LT
+	}
+
+	/**
+	 * mongoDB collection 이름
+	 */
+	public final static String COLLECTION_BOARD_FREE = "boardFree";
+
 }

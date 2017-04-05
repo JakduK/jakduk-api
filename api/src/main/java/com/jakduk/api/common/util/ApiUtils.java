@@ -2,15 +2,19 @@ package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.embedded.CommonFeelingUser;
+import com.jakduk.core.model.embedded.CommonWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -118,5 +122,27 @@ public class ApiUtils {
         }
 
         return pictureUrl;
+    }
+
+    /**
+     * 좋아요, 싫어요 목록에서 나도 참여 하였는지 검사
+     *
+     * @param commonWriter 나
+     * @param usersLiking 좋아요 목록
+     * @param usersDisliking 싫어요 목록
+     * @return 감정 표현
+     */
+    public static CoreConst.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
+        if (Objects.nonNull(commonWriter)) {
+            if (! ObjectUtils.isEmpty(usersLiking) && usersLiking.stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                return CoreConst.FEELING_TYPE.LIKE;
+            } else if (! ObjectUtils.isEmpty(usersDisliking) && usersDisliking.stream()
+                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
+                return CoreConst.FEELING_TYPE.DISLIKE;
+            }
+        }
+
+        return null;
     }
 }

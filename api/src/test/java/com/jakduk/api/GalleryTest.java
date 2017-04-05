@@ -201,13 +201,7 @@ public class GalleryTest extends ApiApplicationTests {
 		System.out.println(result[0]);
 		System.out.println(result[1]);
 	}
-	
-	@Test
-	public void getGalleryList() {
-		
-		System.out.println("findGalleriesById=" + jakdukDAO.getBoardFreeOnGallery(new ObjectId("54d8b3848bf8c15adcfce070")));
-	}
-	
+
 	@Test
 	public void streamAPITest01() {
 		/*

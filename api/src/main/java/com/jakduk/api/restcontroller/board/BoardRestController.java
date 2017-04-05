@@ -18,7 +18,6 @@ import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
-import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
@@ -27,7 +26,7 @@ import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.service.BoardCategoryService;
 import com.jakduk.core.service.BoardFreeService;
-import com.jakduk.core.service.GalleryService;
+import com.jakduk.api.service.gallery.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -276,7 +275,7 @@ public class BoardRestController {
         }
 
         if (Objects.nonNull(commonWriter))
-            freePostDetail.setMyFeeling(this.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+            freePostDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
 
         /*
         앞, 뒤 글
@@ -412,7 +411,7 @@ public class BoardRestController {
                     freePostComment.setNumberOfDislike(numberOfDisLike);
 
                     if (Objects.nonNull(commonWriter))
-                        freePostComment.setMyFeeling(this.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
+                        freePostComment.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
                                 boardFreeComment.getUsersDisliking()));
 
                     return freePostComment;
@@ -488,7 +487,7 @@ public class BoardRestController {
                 .build();
 
         if (Objects.nonNull(commonWriter))
-            response.setMyFeeling(this.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+            response.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
 
         return response;
     }
@@ -529,7 +528,7 @@ public class BoardRestController {
                 .build();
 
         if (Objects.nonNull(commonWriter))
-            response.setMyFeeling(this.getMyFeeling(commonWriter, boardComment.getUsersLiking(), boardComment.getUsersDisliking()));
+            response.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardComment.getUsersLiking(), boardComment.getUsersDisliking()));
 
         return response;
     }
@@ -562,25 +561,4 @@ public class BoardRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    /**
-     * 좋아요, 싫어요 목록에서 나도 참여 하였는지 검사
-     *
-     * @param commonWriter 나
-     * @param usersLiking 좋아요 목록
-     * @param usersDisliking 싫어요 목록
-     * @return 감정 표현
-     */
-    private CoreConst.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
-        if (Objects.nonNull(commonWriter)) {
-            if (! ObjectUtils.isEmpty(usersLiking) && usersLiking.stream()
-                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
-                return CoreConst.FEELING_TYPE.LIKE;
-            } else if (! ObjectUtils.isEmpty(usersDisliking) && usersDisliking.stream()
-                    .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
-                return CoreConst.FEELING_TYPE.DISLIKE;
-            }
-        }
-
-        return null;
-    }
 }

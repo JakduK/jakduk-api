@@ -1,6 +1,8 @@
 package com.jakduk.core.repository.gallery;
 
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.elasticsearch.ESGallery;
+import com.jakduk.core.model.simple.GalleryOnList;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -9,6 +11,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
@@ -42,4 +45,28 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
 
         return results.getMappedResults();
     }
+
+    /**
+     * 사진첩 보기의 앞, 뒤 사진을 가져온다.
+     */
+    @Override
+    public List<GalleryOnList> findGalleriesById(ObjectId id, CoreConst.CRITERIA_OPERATOR operator, Integer limit) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+        query.limit(limit);
+
+        switch (operator) {
+            case GT:
+                query.addCriteria(Criteria.where("_id").gt(id));
+                break;
+            case LT:
+                query.addCriteria(Criteria.where("_id").lt(id));
+                break;
+        }
+
+        query.with(new Sort(Sort.Direction.DESC, "_id"));
+
+        return mongoTemplate.find(query, GalleryOnList.class);
+    }
+
 }

@@ -17,6 +17,12 @@ public class ApiConst {
     public final static Integer NUMBER_OF_ITEMS_EACH_PAGES = 1000;
 
     /**
+     * 사진 상세에서 해당 사진의 앞뒤 사진의 갯수
+     */
+    public final static Integer NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY=10;
+
+
+    /**
      * 읽음 중복 방지를 위한 쿠키
      */
     public enum VIEWS_COOKIE_TYPE {

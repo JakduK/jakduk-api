@@ -53,4 +53,9 @@ public interface BoardFreeRepositoryCustom {
      */
     List<BoardFreeOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit);
 
+    /**
+     * Gallery ID 에 해당하는 BoardFree를 가져온다.
+     */
+    List<BoardFreeSimple> findByGalleryId(ObjectId galleryId);
+
 }

@@ -1,5 +1,6 @@
-package com.jakduk.api.restcontroller.gallery.vo;
+package com.jakduk.api.service.gallery.vo;
 
+import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import io.swagger.annotations.ApiModel;
@@ -15,17 +16,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ApiModel(value = "사진 정보 응답 객체")
+@ApiModel(description = "사진 정보 응답 객체")
 public class GalleryResponse {
+
 	@ApiModelProperty(value = "사진 정보")
-	private Gallery gallery;
+	private GalleryDetail gallery;
 
-	@ApiModelProperty(value = "이전 사진")
-	private Gallery prev;
+	@ApiModelProperty(value = "해당 사진의 앞, 뒤 사진 목록")
+	private List<SurroundingsGallery> surroundingsGalleries;
 
-	@ApiModelProperty(value = "다음 사진")
-	private Gallery next;
-
-	@ApiModelProperty(value = "관련 게시물")
+	@ApiModelProperty(value = "이 사진을 사용하는 게시물 목록")
 	private List<BoardFreeSimple> linkedPosts;
 }
