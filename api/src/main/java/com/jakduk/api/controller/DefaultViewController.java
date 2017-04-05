@@ -1,6 +1,8 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.service.gallery.GalleryService;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.DateUtils;
 import com.jakduk.core.common.util.FileUtils;
@@ -10,7 +12,6 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.BoardFreeOnSitemap;
 import com.jakduk.core.service.BoardFreeService;
-import com.jakduk.api.service.gallery.GalleryService;
 import com.jakduk.core.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -127,9 +129,15 @@ public class DefaultViewController {
 	// 사진 가져오기.
 	@RequestMapping(value = "/${api.gallery.image.url.path}/{id}", method = RequestMethod.GET)
 	public void getGallery(@PathVariable String id,
+						   HttpServletRequest request,
 						   HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
+
+		Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
+
+		if (isAddCookie)
+			galleryService.increaseViews(gallery);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CoreConst.IMAGE_TYPE.FULL);
 		response.setContentType(gallery.getContentType());

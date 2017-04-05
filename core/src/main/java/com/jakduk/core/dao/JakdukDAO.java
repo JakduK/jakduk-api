@@ -1,16 +1,14 @@
 package com.jakduk.core.dao;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.db.*;
-import com.jakduk.core.model.elasticsearch.ESComment;
-import com.jakduk.core.model.elasticsearch.ESGallery;
+import com.jakduk.core.model.db.Competition;
+import com.jakduk.core.model.db.HomeDescription;
+import com.jakduk.core.model.db.JakduComment;
+import com.jakduk.core.model.db.JakduScheduleGroup;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.model.simple.UserOnHome;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -60,40 +57,6 @@ public class JakdukDAO {
 		AggregationResults<GalleryOnList> results = mongoTemplate.aggregate(aggregation, "gallery", GalleryOnList.class);
 		
 		return results.getMappedResults();
-	}
-
-	/**
-	 * galleryId에 해당하는 boardFree 가져오기.
-	 */
-	public List<BoardFreeSimple> getBoardFreeOnGallery(ObjectId galleryId) {
-		AggregationOperation unwind = Aggregation.unwind("galleries");
-		AggregationOperation match = Aggregation.match(Criteria.where("galleries._id").is(galleryId));
-		Aggregation aggregation = Aggregation.newAggregation(unwind, match);
-		AggregationResults<BoardFreeSimple> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeSimple.class);
-
-		return results.getMappedResults();
-	}
-
-	/**
-	 * 사진첩 보기의 앞, 뒤 사진을 가져온다.
-	 * @param id
-	 * @param direction
-	 * @return
-	 */
-	public Gallery getGalleryById(ObjectId id, Direction direction) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
-		
-		if (direction.equals(Sort.Direction.ASC)) {
-			query.addCriteria(Criteria.where("_id").gt(id));
-		} else if (direction.equals(Sort.Direction.DESC)) {
-			query.addCriteria(Criteria.where("_id").lt(id));
-		}
-		
-		query.with(new Sort(direction, "_id"));
-		Gallery gallery = mongoTemplate.findOne(query, Gallery.class);
-		
-		return gallery;
 	}
 
 	// 사진의 좋아요 개수 가져오기.

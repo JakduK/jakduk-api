@@ -25,6 +25,6 @@ public class GalleryResponse {
 	@ApiModelProperty(value = "해당 사진의 앞, 뒤 사진 목록")
 	private List<SurroundingsGallery> surroundingsGalleries;
 
-	@ApiModelProperty(value = "관련 게시물")
+	@ApiModelProperty(value = "이 사진을 사용하는 게시물 목록")
 	private List<BoardFreeSimple> linkedPosts;
 }

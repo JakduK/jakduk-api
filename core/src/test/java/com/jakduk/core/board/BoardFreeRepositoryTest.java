@@ -5,6 +5,7 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.BoardFreeOnSitemap;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
@@ -69,6 +70,13 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
 
         List<BoardFreeOnSitemap> posts = sut.findPostsOnSitemap(new ObjectId("58c0189e807d711ab5e1a72d"),
                 new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
+
+        Assert.assertTrue(! ObjectUtils.isEmpty(posts));
+    }
+
+    @Test
+    public void findByGalleryId() {
+        List<BoardFreeSimple> posts = sut.findByGalleryId(new ObjectId("58d6088c807d714ce356758a"));
 
         Assert.assertTrue(! ObjectUtils.isEmpty(posts));
     }

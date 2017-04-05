@@ -3,10 +3,7 @@ package com.jakduk.core.repository.board.free;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.elasticsearch.ESBoard;
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeOnSitemap;
+import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -40,7 +37,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         AggregationOperation sort1 = Aggregation.sort(Sort.Direction.DESC, "_id");
         AggregationOperation limit1 = Aggregation.limit(limit);
         Aggregation aggregation = Aggregation.newAggregation(match1, match2, sort1, limit1);
-        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnList.class);
+        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, BoardFreeOnList.class);
 
         return results.getMappedResults();
     }
@@ -63,7 +60,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
             aggregation = Aggregation.newAggregation(match1, sort, limit1);
         }
 
-        AggregationResults<ESBoard> results = mongoTemplate.aggregate(aggregation, "boardFree", ESBoard.class);
+        AggregationResults<ESBoard> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, ESBoard.class);
 
         List<ESBoard> posts = results.getMappedResults();
 
@@ -105,7 +102,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
     public List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(ids));
         Aggregation aggregation = Aggregation.newAggregation(match1);
-        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnSearch.class);
+        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, BoardFreeOnSearch.class);
 
         return results.getMappedResults();
     }
@@ -154,5 +151,18 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         query.limit(limit);
 
         return mongoTemplate.find(query, BoardFreeOnSitemap.class);
+    }
+
+    /**
+     * Gallery ID 에 해당하는 BoardFree를 가져온다.
+     */
+    @Override
+    public List<BoardFreeSimple> findByGalleryId(ObjectId galleryId) {
+        AggregationOperation unwind = Aggregation.unwind("galleries");
+        AggregationOperation match = Aggregation.match(Criteria.where("galleries._id").is(galleryId));
+        Aggregation aggregation = Aggregation.newAggregation(unwind, match);
+        AggregationResults<BoardFreeSimple> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, BoardFreeSimple.class);
+
+        return results.getMappedResults();
     }
 }

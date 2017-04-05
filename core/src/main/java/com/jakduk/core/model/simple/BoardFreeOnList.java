@@ -24,29 +24,14 @@ public class BoardFreeOnList {
 	@Id
 	private String id;
 
-	/**
-	 * 작성자
-	 */
 	private CommonWriter writer;
 	
-	/**
-	 * 글 제목
-	 */
 	private String subject;
 	
-	/**
-	 * 글 번호
-	 */
 	private int seq;
 	
-	/**
-	 * 분류 ID
-	 */
 	private CoreConst.BOARD_CATEGORY_TYPE category;
 	
-	/**
-	 * 조회
-	 */
 	private int views = 0;
 	
 	private BoardStatus status;

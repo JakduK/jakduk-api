@@ -224,4 +224,10 @@ public class CoreConst {
 		GT,
 		LT
 	}
+
+	/**
+	 * mongoDB collection 이름
+	 */
+	public final static String COLLECTION_BOARD_FREE = "boardFree";
+
 }

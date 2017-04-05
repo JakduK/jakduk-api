@@ -3,7 +3,6 @@ package com.jakduk.api.service.gallery;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.restcontroller.board.vo.FreePost;
 import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
 import com.jakduk.api.service.gallery.vo.GalleryResponse;
 import com.jakduk.api.service.gallery.vo.SurroundingsGallery;
@@ -17,6 +16,7 @@ import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -44,7 +43,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -66,6 +64,9 @@ public class GalleryService {
 
 	@Autowired
 	private GalleryRepository galleryRepository;
+
+	@Autowired
+	private BoardFreeRepository boardFreeRepository;
 
 	@Autowired
 	private JakdukDAO jakdukDAO;
@@ -137,6 +138,8 @@ public class GalleryService {
 				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
 
 		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
+		Integer prevGalleriesLimit = 0;
+		Integer nextGalleriesLimit = 0;
 		List<SurroundingsGallery> surroundingsGalleries = new ArrayList<>();
 
 		// GalleryOnLost -> SurroundingsGallery
@@ -154,43 +157,50 @@ public class GalleryService {
 		if (surroundingsPrevGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
 				&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
-			surroundingsPrevGalleries.stream()
-					.limit(HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY)
-					.forEach(extractSurroundingsGalleries);
-
-			surroundingsNextGalleries.stream()
-					.limit(HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY)
-					.forEach(extractSurroundingsGalleries);
+			prevGalleriesLimit = HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY;
+			nextGalleriesLimit = HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY;
 		}
 		// 뒷 사진 목록이 5개 미만일때
 		else if (surroundingsPrevGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
 				&& surroundingsNextGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
-			surroundingsPrevGalleries.stream()
-					.limit(ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsNextGalleries.size())
-					.forEach(extractSurroundingsGalleries);
-
-			surroundingsNextGalleries
-					.forEach(extractSurroundingsGalleries);
-
+			prevGalleriesLimit = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsNextGalleries.size();
+			nextGalleriesLimit = surroundingsNextGalleries.size();
 		}
 		// 앞 사진 목록이 5개 미만일때
 		else if (surroundingsPrevGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
 				&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
-			surroundingsPrevGalleries
-					.forEach(extractSurroundingsGalleries);
-
-			surroundingsNextGalleries.stream()
-					.limit(ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsPrevGalleries.size())
-					.forEach(extractSurroundingsGalleries);
+			prevGalleriesLimit = surroundingsPrevGalleries.size();
+			nextGalleriesLimit = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsPrevGalleries.size();
 		}
 
+		// 현재 보는 사진 포함 11장을 조합한다.
+		surroundingsPrevGalleries.stream()
+				.limit(prevGalleriesLimit)
+				.forEach(extractSurroundingsGalleries);
+
+		SurroundingsGallery surroundingsViewingGallery = new SurroundingsGallery();
+		BeanUtils.copyProperties(gallery, surroundingsViewingGallery);
+
+		surroundingsViewingGallery.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, surroundingsViewingGallery.getId()));
+		surroundingsViewingGallery.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, surroundingsViewingGallery.getId()));
+
+		surroundingsGalleries.add(surroundingsViewingGallery);
+
+		surroundingsNextGalleries.stream()
+				.limit(nextGalleriesLimit)
+				.forEach(extractSurroundingsGalleries);
+
+		/*
+		이 사진을 사용하는 게시물 목록
+		 */
+		List<BoardFreeSimple> linkedPosts = boardFreeRepository.findByGalleryId(new ObjectId(id));
 
 		return GalleryResponse.builder()
 				.gallery(galleryDetail)
 				.surroundingsGalleries(surroundingsGalleries)
-//          .linkedPosts((List<BoardFreeSimple>) gallery.get("linkedPosts"))
+          		.linkedPosts(linkedPosts)
 				.build();
 	}
 
@@ -377,44 +387,6 @@ public class GalleryService {
 
 		// 엘라스틱 서치 document 삭제.
 		searchService.deleteDocumentGallery(gallery.getId());
-	}
-
-	public Map<String, Object> getGallery(String id, Boolean isAddCookie) {
-
-		Gallery gallery = galleryRepository.findOne(id);
-
-		if (gallery == null) {
-			return null;
-		}
-
-		if (isAddCookie) {
-			int views = gallery.getViews();
-			gallery.setViews(++views);
-			galleryRepository.save(gallery);
-		}
-
-		Map<String, Date> createDate = new HashMap<>();
-
-		Gallery prevGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.ASC);
-		Gallery nextGall = jakdukDAO.getGalleryById(new ObjectId(id), Sort.Direction.DESC);
-		List<BoardFreeSimple> posts = jakdukDAO.getBoardFreeOnGallery(new ObjectId(id));
-
-		ObjectId objId = new ObjectId(id);
-		createDate.put(id, objId.getDate());
-
-		for (BoardFreeSimple post : posts) {
-			objId = new ObjectId(post.getId());
-			createDate.put(post.getId(), objId.getDate());
-		}
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("gallery", gallery);
-		data.put("prev", prevGall);
-		data.put("next", nextGall);
-		data.put("linkedPosts", posts);
-		data.put("createDate", createDate);
-
-		return data;
 	}
 
 	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CoreConst.FEELING_TYPE feeling) {
