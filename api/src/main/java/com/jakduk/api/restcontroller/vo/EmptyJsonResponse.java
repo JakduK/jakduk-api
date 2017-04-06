@@ -1,7 +1,8 @@
-package com.jakduk.api.restcontroller;
+package com.jakduk.api.restcontroller.vo;
 
 import io.swagger.annotations.ApiModel;
-import org.springframework.util.ObjectUtils;
+
+import java.util.Objects;
 
 /**
  * @author pyohwan
@@ -15,7 +16,7 @@ public class EmptyJsonResponse {
 
     public static EmptyJsonResponse newInstance() {
 
-        if (ObjectUtils.isEmpty(emptyJsonResponse))
+        if (Objects.isNull(emptyJsonResponse))
             emptyJsonResponse = new EmptyJsonResponse();
 
         return emptyJsonResponse;

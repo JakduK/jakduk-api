@@ -3,7 +3,7 @@ package com.jakduk.api.configuration.authentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
-import com.jakduk.api.restcontroller.exception.RestErrorResponse;
+import com.jakduk.api.restcontroller.vo.RestErrorResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceError;

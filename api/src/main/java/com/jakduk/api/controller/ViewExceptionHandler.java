@@ -1,7 +1,7 @@
 package com.jakduk.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jakduk.api.restcontroller.exception.RestErrorResponse;
+import com.jakduk.api.restcontroller.vo.RestErrorResponse;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -22,7 +22,7 @@ import java.util.Map;
  * Created by pyohwan on 17. 2. 6.
  */
 
-@ControllerAdvice(value = "com.jakduk.api.controller")
+@ControllerAdvice
 @Slf4j
 public class ViewExceptionHandler {
 

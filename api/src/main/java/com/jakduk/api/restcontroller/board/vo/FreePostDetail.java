@@ -2,10 +2,8 @@ package com.jakduk.api.restcontroller.board.vo;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardCategory;
-import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardHistory;
 import com.jakduk.core.model.embedded.BoardStatus;
-import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

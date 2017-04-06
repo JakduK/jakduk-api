@@ -1,6 +1,7 @@
-package com.jakduk.api.restcontroller.gallery.vo;
+package com.jakduk.api.service.gallery.vo;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -16,6 +17,9 @@ public class GalleryDetail {
 
     @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "사진 ID")
     private String id;
+
+    @ApiModelProperty(value = "글쓴이")
+    private CommonWriter writer;
 
     @ApiModelProperty(example = "성남FC 시즌권 사진", value = "사진 이름")
     private String name;

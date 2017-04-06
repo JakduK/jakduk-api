@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.admin;
 
 
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.admin.vo.AttendanceClubForm;
 import com.jakduk.api.restcontroller.admin.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.admin.vo.HomeDescriptionRequest;

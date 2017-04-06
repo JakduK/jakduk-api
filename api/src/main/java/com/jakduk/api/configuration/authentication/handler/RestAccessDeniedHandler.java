@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration.authentication.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.restcontroller.exception.RestErrorResponse;
+import com.jakduk.api.restcontroller.vo.RestErrorResponse;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
