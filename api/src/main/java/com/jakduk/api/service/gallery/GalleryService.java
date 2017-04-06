@@ -18,7 +18,7 @@ import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
-import com.jakduk.core.service.SearchService;
+import com.jakduk.api.service.search.SearchService;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;

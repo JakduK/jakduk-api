@@ -3,7 +3,7 @@ package com.jakduk.api.restcontroller.search;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.core.model.vo.PopularSearchWordResult;
 import com.jakduk.core.model.vo.SearchUnifiedResponse;
-import com.jakduk.core.service.SearchService;
+import com.jakduk.api.service.search.SearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
