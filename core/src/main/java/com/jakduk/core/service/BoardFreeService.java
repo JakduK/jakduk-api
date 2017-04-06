@@ -64,7 +64,7 @@ public class BoardFreeService {
 	private CommonService commonService;
 
 	@Autowired
-	private SearchService searchService;
+	private CommonSearchService commonSearchService;
 
 	public BoardFree findOneBySeq(Integer seq) {
         return boardFreeRepository.findOneBySeq(seq)
@@ -191,7 +191,7 @@ public class BoardFreeService {
 					/*
 					  엘라스틱서치 색인 요청
 					 */
-					searchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
+					commonSearchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 				}
 			}
 		}
@@ -199,7 +199,7 @@ public class BoardFreeService {
 		/*
 		  엘라스틱서치 색인 요청
 		 */
-		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name());
 
 		/*
@@ -327,7 +327,7 @@ public class BoardFreeService {
 					/*
 					  엘라스틱서치 색인 요청
 					 */
-					searchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
+					commonSearchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 				}
 			}
 		}
@@ -335,7 +335,7 @@ public class BoardFreeService {
 		/*
 		  엘라스틱서치 색인 요청
 		 */
-		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name());
 
 		log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
@@ -401,7 +401,7 @@ public class BoardFreeService {
         }
 
 		// 색인 지움
-        searchService.deleteDocumentBoard(boardFree.getId());
+        commonSearchService.deleteDocumentBoard(boardFree.getId());
 
         return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
     }
@@ -566,7 +566,7 @@ public class BoardFreeService {
 		/*
 		  엘라스틱서치 색인 요청
 		 */
-		searchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
 				boardFreeComment.getContent());
 
 		return boardFreeComment;
@@ -603,7 +603,7 @@ public class BoardFreeService {
 		/*
 		  엘라스틱서치 색인 요청
 		 */
-		searchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
 				boardFreeComment.getContent());
 
 		return boardFreeComment;
@@ -623,7 +623,7 @@ public class BoardFreeService {
 		boardFreeCommentRepository.delete(id);
 
 		// 색인 지움
-		searchService.deleteDocumentBoardComment(id);
+		commonSearchService.deleteDocumentBoardComment(id);
 	}
 
 	// 게시판 댓글 목록

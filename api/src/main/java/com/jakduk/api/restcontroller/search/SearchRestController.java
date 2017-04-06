@@ -1,9 +1,10 @@
 package com.jakduk.api.restcontroller.search;
 
 import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.service.search.SearchService;
 import com.jakduk.core.model.vo.PopularSearchWordResult;
 import com.jakduk.core.model.vo.SearchUnifiedResponse;
-import com.jakduk.api.service.search.SearchService;
+import com.jakduk.core.service.CommonSearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -35,6 +36,9 @@ import java.time.ZoneId;
 public class SearchRestController {
 	
 	@Autowired
+	private CommonSearchService commonSearchService;
+
+	@Autowired
 	private SearchService searchService;
 
 	@ApiOperation(value = "찾기")
@@ -51,7 +55,7 @@ public class SearchRestController {
 
 		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size);
 
-		searchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
+		commonSearchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
 
 		return searchUnifiedResponse;
 	}

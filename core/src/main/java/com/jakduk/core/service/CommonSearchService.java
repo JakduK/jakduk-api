@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.ObjectMapperUtils;
-import com.jakduk.core.model.elasticsearch.ESBoard;
-import com.jakduk.core.model.elasticsearch.ESComment;
-import com.jakduk.core.model.elasticsearch.ESGallery;
+import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.elasticsearch.*;
+import com.jakduk.core.model.embedded.BoardItem;
+import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -18,7 +21,9 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
@@ -26,8 +31,11 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +46,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class CommonSearchService {
+
+    @Value("${elasticsearch.enable}")
+    private boolean elasticsearchEnable;
 
     @Value("${core.elasticsearch.index.board}")
     private String elasticsearchIndexBoard;
@@ -251,13 +262,175 @@ public class CommonSearchService {
         bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
     }
 
+    @Async
+    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
+
+        if (! elasticsearchEnable)
+            return;
+
+        ESBoard esBoard = ESBoard.builder()
+                .id(id)
+                .seq(seq)
+                .writer(writer)
+                .subject(CoreUtils.stripHtmlTag(subject))
+                .content(CoreUtils.stripHtmlTag(content))
+                .category(category)
+                .build();
+
+        try {
+            IndexResponse response = client.prepareIndex()
+                    .setIndex(elasticsearchIndexBoard)
+                    .setType(CoreConst.ES_TYPE_BOARD)
+                    .setId(id)
+                    .setSource(ObjectMapperUtils.writeValueAsString(esBoard))
+                    .get();
+
+        } catch (IOException e) {
+            throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+        }
+    }
+
+    @Async
+    public void deleteDocumentBoard(String id) {
+
+        if (! elasticsearchEnable)
+            return;
+
+        DeleteResponse response = client.prepareDelete()
+                .setIndex(elasticsearchIndexBoard)
+                .setType(CoreConst.ES_TYPE_BOARD)
+                .setId(id)
+                .get();
+
+        if (! response.isFound())
+            log.info("board id {} is not found. so can't delete it!", id);
+
+    }
+
+    @Async
+    public void indexDocumentBoardComment(String id, BoardItem boardItem, CommonWriter writer, String content) {
+
+        if (! elasticsearchEnable)
+            return;
+
+        ESComment esComment = ESComment.builder()
+                .id(id)
+                .boardItem(boardItem)
+                .writer(writer)
+                .content(CoreUtils.stripHtmlTag(content))
+                .build();
+
+        try {
+            IndexResponse response = client.prepareIndex()
+                    .setIndex(elasticsearchIndexBoard)
+                    .setType(CoreConst.ES_TYPE_COMMENT)
+                    .setId(id)
+                    .setParent(boardItem.getId())
+                    .setSource(ObjectMapperUtils.writeValueAsString(esComment))
+                    .get();
+
+        } catch (IOException e) {
+            throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+        }
+    }
+
+    @Async
+    public void deleteDocumentBoardComment(String id) {
+
+        if (! elasticsearchEnable)
+            return;
+
+        DeleteResponse response = client.prepareDelete()
+                .setIndex(elasticsearchIndexBoard)
+                .setType(CoreConst.ES_TYPE_COMMENT)
+                .setId(id)
+                .get();
+
+        if (! response.isFound())
+            log.info("comment id {} is not found. so can't delete it!", id);
+
+    }
+
+    // TODO : 구현 해야 함
+    public void createDocumentJakduComment(ESJakduComment ESJakduComment) {}
+
+    @Async
+    public void indexDocumentGallery(String id, CommonWriter writer, String name) {
+
+        if (! elasticsearchEnable)
+            return;
+
+        ESGallery esGallery = ESGallery.builder()
+                .id(id)
+                .writer(writer)
+                .name(name)
+                .build();
+
+        try {
+            IndexResponse response = client.prepareIndex()
+                    .setIndex(elasticsearchIndexGallery)
+                    .setType(CoreConst.ES_TYPE_GALLERY)
+                    .setId(id)
+                    .setSource(ObjectMapperUtils.writeValueAsString(esGallery))
+                    .get();
+
+        } catch (IOException e) {
+            throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+        }
+    }
+
+    @Async
+    public void deleteDocumentGallery(String id) {
+
+        if (! elasticsearchEnable)
+            return;
+
+        DeleteResponse response = client.prepareDelete()
+                .setIndex(elasticsearchIndexGallery)
+                .setType(CoreConst.ES_TYPE_GALLERY)
+                .setId(id)
+                .get();
+
+        if (! response.isFound())
+            log.info("gallery id {} is not found. so can't delete it!", id);
+    }
+
+    @Async
+    public void indexDocumentSearchWord(String word, CommonWriter writer) {
+
+        if (! elasticsearchEnable)
+            return;
+
+        ESSearchWord esSearchWord = ESSearchWord.builder()
+                .word(word)
+                .writer(writer)
+                .registerDate(LocalDateTime.now())
+                .build();
+
+        try {
+            IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
+
+            IndexResponse response = indexRequestBuilder
+                    .setIndex(elasticsearchIndexSearchWord)
+                    .setType(CoreConst.ES_TYPE_SEARCH_WORD)
+                    .setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
+                    .get();
+
+            log.debug("indexDocumentSearchWord Source:\n {}", indexRequestBuilder.request().getDescription());
+
+        } catch (IOException e) {
+            throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+        }
+    }
+
     private BulkProcessor getBulkProcessor() {
         BulkProcessor.Listener bulkProcessorListener = new BulkProcessor.Listener() {
             @Override public void beforeBulk(long l, BulkRequest bulkRequest) {
             }
 
             @Override public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-                log.debug("bulk took:" + bulkResponse.getTookInMillis());
+                log.debug("bulk took: {}", bulkResponse.getTookInMillis());
+
                 if (bulkResponse.hasFailures())
                     log.error(bulkResponse.buildFailureMessage());
             }
