@@ -106,7 +106,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
 
                 .antMatchers(
-//                        "/rest/**"                          // spring-data-rest
+//                        "/restcontroller/**"                          // spring-data-restcontroller
                 ).hasRole("ROOT")
 
                 .anyRequest().permitAll()

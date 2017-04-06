@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.gallery.vo;
+package com.jakduk.api.service.gallery.vo;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.CommonWriter;

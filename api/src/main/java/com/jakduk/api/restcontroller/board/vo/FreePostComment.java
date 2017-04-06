@@ -3,14 +3,11 @@ package com.jakduk.api.restcontroller.board.vo;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.BoardCommentStatus;
 import com.jakduk.core.model.embedded.BoardItem;
-import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 /**
  * Created by pyohwanjang on 2017. 3. 6..

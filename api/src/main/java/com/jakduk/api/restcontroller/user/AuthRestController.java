@@ -9,7 +9,7 @@ import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
 import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
 import com.jakduk.core.common.CoreConst;

@@ -3,7 +3,7 @@ package com.jakduk.api.restcontroller.board;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.board.vo.*;
 import com.jakduk.api.restcontroller.vo.BoardGallery;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;

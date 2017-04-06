@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.exception;
+package com.jakduk.api.restcontroller.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

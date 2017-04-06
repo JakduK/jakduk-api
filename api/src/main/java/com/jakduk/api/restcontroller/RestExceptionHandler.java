@@ -1,6 +1,7 @@
-package com.jakduk.api.restcontroller.exception;
+package com.jakduk.api.restcontroller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jakduk.api.restcontroller.vo.RestErrorResponse;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -39,7 +40,7 @@ import java.util.Set;
  */
 
 @Slf4j
-@ControllerAdvice(value = "com.jakduk.api.restcontroller")
+@ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();

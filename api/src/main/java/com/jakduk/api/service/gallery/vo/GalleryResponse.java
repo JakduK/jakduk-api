@@ -1,7 +1,5 @@
 package com.jakduk.api.service.gallery.vo;
 
-import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
-import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

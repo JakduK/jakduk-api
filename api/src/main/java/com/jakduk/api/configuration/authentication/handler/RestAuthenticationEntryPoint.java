@@ -1,6 +1,6 @@
 package com.jakduk.api.configuration.authentication.handler;
 
-import com.jakduk.api.restcontroller.exception.RestErrorResponse;
+import com.jakduk.api.restcontroller.vo.RestErrorResponse;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.service.CommonService;

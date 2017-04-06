@@ -3,7 +3,7 @@ package com.jakduk.api.service.gallery;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.restcontroller.gallery.vo.GalleryDetail;
+import com.jakduk.api.service.gallery.vo.GalleryDetail;
 import com.jakduk.api.service.gallery.vo.GalleryResponse;
 import com.jakduk.api.service.gallery.vo.SurroundingsGallery;
 import com.jakduk.core.common.CoreConst;
