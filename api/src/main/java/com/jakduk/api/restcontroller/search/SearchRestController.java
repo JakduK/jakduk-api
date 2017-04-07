@@ -49,7 +49,7 @@ public class SearchRestController {
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
 			@ApiParam(value = "페이지 크기")@RequestParam(required = false, defaultValue = "10") Integer size) {
 
-		log.debug("q=" + q + ", w=" + w + ", from=" + from + ", size=" + size);
+		log.debug("q={}, w={}, from={}, size={}", q, w, from, size);
 
 		if (size <= 0) size = 10;
 
