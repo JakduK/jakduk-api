@@ -9,6 +9,7 @@ import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
@@ -30,15 +31,20 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Created by pyohwanjang on 2017. 4. 7..
@@ -154,16 +160,40 @@ public class CommonSearchService {
         ObjectId lastPostId = null;
 
         do {
-            List<ESBoard> posts = boardFreeRepository.findPostsGreaterThanId(lastPostId, CoreConst.ES_BULK_LIMIT);
+            List<BoardFree> posts = boardFreeRepository.findPostsGreaterThanId(lastPostId, CoreConst.ES_BULK_LIMIT);
 
-            if (posts.isEmpty()) {
+            List<ESBoard> esBoards = posts.stream()
+                    .filter(Objects::nonNull)
+                    .map(post -> {
+                        List<String> galleryIds = null;
+
+                        if (Objects.nonNull(post.getGalleries())) {
+                            galleryIds = post.getGalleries().stream()
+                                    .filter(Objects::nonNull)
+                                    .map(BoardImage::getId)
+                                    .collect(Collectors.toList());
+                        }
+
+                        return ESBoard.builder()
+                                .id(post.getId())
+                                .seq(post.getSeq())
+                                .writer(post.getWriter())
+                                .subject(CoreUtils.stripHtmlTag(post.getSubject()))
+                                .content(CoreUtils.stripHtmlTag(post.getContent()))
+                                .category(Objects.nonNull(post.getCategory()) ? post.getCategory().name() : null)
+                                .galleries(galleryIds)
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
+            if (esBoards.isEmpty()) {
                 hasPost = false;
             } else {
-                ESBoard lastPost = posts.get(posts.size() - 1);
+                ESBoard lastPost = esBoards.get(esBoards.size() - 1);
                 lastPostId = new ObjectId(lastPost.getId());
             }
 
-            posts.forEach(post -> {
+            esBoards.forEach(post -> {
                 IndexRequestBuilder index = client.prepareIndex(
                         elasticsearchIndexBoard,
                         CoreConst.ES_TYPE_BOARD,
@@ -265,7 +295,7 @@ public class CommonSearchService {
 
     @Async
     public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category,
-                                   List<BoardImage> galleries) {
+                                   List<String> galleryIds) {
 
         if (! elasticsearchEnable)
             return;
@@ -277,7 +307,7 @@ public class CommonSearchService {
                 .subject(CoreUtils.stripHtmlTag(subject))
                 .content(CoreUtils.stripHtmlTag(content))
                 .category(category)
-                .galleries(galleries)
+                .galleries(galleryIds)
                 .build();
 
         try {

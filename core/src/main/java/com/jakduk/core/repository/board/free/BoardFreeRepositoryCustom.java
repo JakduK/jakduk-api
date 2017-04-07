@@ -1,5 +1,6 @@
 package com.jakduk.core.repository.board.free;
 
+import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.elasticsearch.ESBoard;
 import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
@@ -17,7 +18,7 @@ public interface BoardFreeRepositoryCustom {
     /**
      * 기준 BoardFree ID 이상의 BoardFree 목록을 가져온다.
      */
-    List<ESBoard> findPostsGreaterThanId(ObjectId objectId, Integer limit);
+    List<BoardFree> findPostsGreaterThanId(ObjectId objectId, Integer limit);
 
     /**
      * RSS 용 게시물 목록

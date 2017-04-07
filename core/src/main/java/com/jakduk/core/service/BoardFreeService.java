@@ -199,8 +199,17 @@ public class BoardFreeService {
 		/*
 		  엘라스틱서치 색인 요청
 		 */
+		List<String> galleryIds = null;
+
+		if (Objects.nonNull(boardFree.getGalleries())) {
+			galleryIds = boardFree.getGalleries().stream()
+					.filter(Objects::nonNull)
+					.map(BoardImage::getId)
+					.collect(Collectors.toList());
+		}
+
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name(), boardFree.getGalleries());
+				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		/*
 		// 슬랙 알림
@@ -335,10 +344,19 @@ public class BoardFreeService {
 		/*
 		  엘라스틱서치 색인 요청
 		 */
-		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name(), boardFree.getGalleries());
+		List<String> galleryIds = null;
 
-		log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+		if (Objects.nonNull(boardFree.getGalleries())) {
+			galleryIds = boardFree.getGalleries().stream()
+					.filter(Objects::nonNull)
+					.map(BoardImage::getId)
+					.collect(Collectors.toList());
+		}
+
+		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
+
+		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
 
 		return boardFree.getSeq();
 	}
