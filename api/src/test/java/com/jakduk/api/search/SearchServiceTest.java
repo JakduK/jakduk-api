@@ -1,7 +1,7 @@
-package com.jakduk.core.search;
+package com.jakduk.api.search;
 
-import com.jakduk.core.CoreApplicationTests;
-import com.jakduk.core.service.SearchService;
+import com.jakduk.api.ApiApplicationTests;
+import com.jakduk.api.service.search.SearchService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +12,7 @@ import java.time.ZoneId;
  * @author Jang, Pyohwan
  * @since 2016. 12. 2.
  */
-public class SearchServiceTest extends CoreApplicationTests {
+public class SearchServiceTest extends ApiApplicationTests {
 
 	@Autowired
 	private SearchService sut;

@@ -1,6 +1,7 @@
 package com.jakduk.batch.configuration;
 
-import com.jakduk.core.service.SearchService;
+import com.jakduk.batch.service.search.SearchService;
+import com.jakduk.core.service.CommonSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
@@ -31,6 +32,9 @@ public class InitElasticsearchIndexConfig {
 
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private CommonSearchService commonSearchService;
 
     @Autowired
     private SearchService searchService;
@@ -77,13 +81,13 @@ public class InitElasticsearchIndexConfig {
         return stepBuilderFactory.get("initSearchIndexStep")
                 .tasklet((contribution, chunkContext) -> {
 
-                    searchService.createIndexBoard();
-                    searchService.createIndexGallery();
+                    commonSearchService.createIndexBoard();
+                    commonSearchService.createIndexGallery();
 
                     try {
-                        searchService.createIndexSearchWord();
+                        commonSearchService.createIndexSearchWord();
                     } catch (IndexAlreadyExistsException e) {
-                        log.warn(e.status().name() + ", Index: " + e.getIndex() + ", " + e.getDetailedMessage());
+                        log.warn("Index: {}, {}, {}", e.status().name(), e.getIndex(), e.getDetailedMessage());
                     }
 
                     return RepeatStatus.FINISHED;
@@ -96,9 +100,9 @@ public class InitElasticsearchIndexConfig {
         return stepBuilderFactory.get("initSearchDocumentsStep")
                 .tasklet((contribution, chunkContext) -> {
 
-                    searchService.processBulkInsertBoard();
-                    searchService.processBulkInsertComment();
-                    searchService.processBulkInsertGallery();
+                    commonSearchService.processBulkInsertBoard();
+                    commonSearchService.processBulkInsertComment();
+                    commonSearchService.processBulkInsertGallery();
 
                     return RepeatStatus.FINISHED;
                 })

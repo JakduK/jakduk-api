@@ -4,8 +4,8 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.RepositoryExistException;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.exception.ServiceError;
+import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Jakdu;
 import com.jakduk.core.model.db.JakduComment;
 import com.jakduk.core.model.db.JakduSchedule;
@@ -45,7 +45,7 @@ public class JakduService {
     private JakdukDAO jakdukDAO;
 
     @Autowired
-    private SearchService searchService;
+    private CommonSearchService commonSearchService;
 
     @Autowired
     private JakduRepository jakduRepository;
@@ -129,7 +129,7 @@ public class JakduService {
                 .replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
                 .replaceAll("\r|\n|&nbsp;",""));
 
-        searchService.createDocumentJakduComment(ESJakduComment);
+        commonSearchService.createDocumentJakduComment(ESJakduComment);
 
         return jakduComment;
     }

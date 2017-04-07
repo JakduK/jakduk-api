@@ -18,7 +18,7 @@ import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
-import com.jakduk.core.service.SearchService;
+import com.jakduk.core.service.CommonSearchService;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -72,7 +72,7 @@ public class GalleryService {
 	private JakdukDAO jakdukDAO;
 
 	@Autowired
-	private SearchService searchService;
+	private CommonSearchService commonSearchService;
 
 	@Resource
 	private ApiUtils apiUtils;
@@ -386,7 +386,7 @@ public class GalleryService {
         }
 
 		// 엘라스틱 서치 document 삭제.
-		searchService.deleteDocumentGallery(gallery.getId());
+		commonSearchService.deleteDocumentGallery(gallery.getId());
 	}
 
 	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CoreConst.FEELING_TYPE feeling) {

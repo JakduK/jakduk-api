@@ -1,9 +1,12 @@
 package com.jakduk.core.model.elasticsearch;
 
+import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -28,4 +31,6 @@ public class ESBoard {
 	private Integer seq;
 	
 	private String category;
+
+	private List<BoardImage> galleries;
 }

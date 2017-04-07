@@ -1,9 +1,10 @@
 package com.jakduk.api.restcontroller.search;
 
 import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.service.search.SearchService;
 import com.jakduk.core.model.vo.PopularSearchWordResult;
 import com.jakduk.core.model.vo.SearchUnifiedResponse;
-import com.jakduk.core.service.SearchService;
+import com.jakduk.core.service.CommonSearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -12,8 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,10 +36,13 @@ import java.time.ZoneId;
 public class SearchRestController {
 	
 	@Autowired
+	private CommonSearchService commonSearchService;
+
+	@Autowired
 	private SearchService searchService;
 
 	@ApiOperation(value = "찾기")
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@GetMapping(path = "")
 	public SearchUnifiedResponse searchUnified(
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
 			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
@@ -51,13 +55,13 @@ public class SearchRestController {
 
 		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size);
 
-		searchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
+		commonSearchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
 
 		return searchUnifiedResponse;
 	}
 
 	@ApiOperation(value = "인기 검색어")
-	@RequestMapping(value = "/popular/words", method = RequestMethod.GET)
+	@GetMapping(path = "/popular/words")
 	public PopularSearchWordResult searchPopularWords(
 			@ApiParam(value = "크기") @RequestParam(required = false, defaultValue = "5") Integer size) {
 
