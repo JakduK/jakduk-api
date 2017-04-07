@@ -200,7 +200,7 @@ public class BoardFreeService {
 		  엘라스틱서치 색인 요청
 		 */
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name());
+				boardFree.getContent(), boardFree.getCategory().name(), boardFree.getGalleries());
 
 		/*
 		// 슬랙 알림
@@ -336,7 +336,7 @@ public class BoardFreeService {
 		  엘라스틱서치 색인 요청
 		 */
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name());
+				boardFree.getContent(), boardFree.getCategory().name(), boardFree.getGalleries());
 
 		log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
 

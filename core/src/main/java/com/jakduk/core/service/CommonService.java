@@ -37,6 +37,7 @@ public class CommonService {
 
 	/**
 	 * 차기 SEQUENCE를 가져온다.
+	 *
 	 * @param name 게시판 ID
 	 * @return 다음 글번호
 	 */

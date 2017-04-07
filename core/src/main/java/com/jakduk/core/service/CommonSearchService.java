@@ -10,6 +10,7 @@ import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.*;
+import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
@@ -47,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CommonSearchService {
 
-    @Value("${elasticsearch.enable}")
+    @Value("${core.elasticsearch.enable}")
     private boolean elasticsearchEnable;
 
     @Value("${core.elasticsearch.index.board}")
@@ -263,7 +264,8 @@ public class CommonSearchService {
     }
 
     @Async
-    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category) {
+    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category,
+                                   List<BoardImage> galleries) {
 
         if (! elasticsearchEnable)
             return;
@@ -275,6 +277,7 @@ public class CommonSearchService {
                 .subject(CoreUtils.stripHtmlTag(subject))
                 .content(CoreUtils.stripHtmlTag(content))
                 .category(category)
+                .galleries(galleries)
                 .build();
 
         try {
@@ -487,58 +490,59 @@ public class CommonSearchService {
     }
 
     private String getBoardFreeMappings() throws JsonProcessingException {
+
         ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
 
-        ObjectNode idNode = objectMapper.createObjectNode();
-        idNode.put("type", "string");
+        JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
 
-        ObjectNode subjectNode = objectMapper.createObjectNode();
-        subjectNode.put("type", "string");
-        subjectNode.put("analyzer", "korean");
+        ObjectNode propertiesNode = jsonNodeFactory.objectNode();
 
-        ObjectNode contentNode = objectMapper.createObjectNode();
-        contentNode.put("type", "string");
-        contentNode.put("analyzer", "korean");
+        propertiesNode.set("id",
+                jsonNodeFactory.objectNode()
+                        .put("type", "string"));
 
-        ObjectNode seqNode = objectMapper.createObjectNode();
-        seqNode.put("type", "integer");
-        seqNode.put("index", "no");
+        propertiesNode.set("subject",
+                jsonNodeFactory.objectNode()
+                        .put("type", "string")
+                        .put("analyzer", "korean")
+        );
 
-        ObjectNode categoryNode = objectMapper.createObjectNode();
-        categoryNode.put("type", "string");
-        categoryNode.put("index", "not_analyzed");
+        propertiesNode.set("content",
+                jsonNodeFactory.objectNode()
+                        .put("type", "string")
+                        .put("analyzer", "korean")
+        );
 
-        // writer
-        ObjectNode writerProviderIdNode = objectMapper.createObjectNode();
-        writerProviderIdNode.put("type", "string");
-        writerProviderIdNode.put("index", "no");
+        propertiesNode.set("seq",
+                jsonNodeFactory.objectNode()
+                        .put("type", "integer")
+                        .put("index", "no")
+        );
 
-        ObjectNode writerUserIdNode = objectMapper.createObjectNode();
-        writerUserIdNode.put("type", "string");
-        writerUserIdNode.put("index", "no");
+        propertiesNode.set("category",
+                jsonNodeFactory.objectNode()
+                        .put("type", "string")
+                        .put("index", "not_analyzed")
+        );
 
-        ObjectNode writerUsernameNode = objectMapper.createObjectNode();
-        writerUsernameNode.put("type", "string");
-        writerUsernameNode.put("index", "no");
+        propertiesNode.set("galleries",
+                jsonNodeFactory.objectNode()
+                        .put("type", "string")
+                        .put("index", "no")
+        );
 
-        ObjectNode writerPropertiesNode = objectMapper.createObjectNode();
-        writerPropertiesNode.set("providerId", writerProviderIdNode);
-        writerPropertiesNode.set("userId", writerUserIdNode);
-        writerPropertiesNode.set("username", writerUsernameNode);
+        ObjectNode writerNode = jsonNodeFactory.objectNode();
+        writerNode.set("providerId", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+        writerNode.set("userId", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+        writerNode.set("username", jsonNodeFactory.objectNode().put("type", "string").put("index", "no"));
+        propertiesNode.set("writer", jsonNodeFactory.objectNode().set("properties", writerNode));
 
-        ObjectNode writerNode = objectMapper.createObjectNode();
-        writerNode.set("properties", writerPropertiesNode);
+        propertiesNode.set("registerDate",
+                jsonNodeFactory.objectNode()
+                        .put("type", "date")
+        );
 
-        // properties
-        ObjectNode propertiesNode = objectMapper.createObjectNode();
-        propertiesNode.set("id", idNode);
-        propertiesNode.set("subject", subjectNode);
-        propertiesNode.set("content", contentNode);
-        propertiesNode.set("seq", seqNode);
-        propertiesNode.set("writer", writerNode);
-        propertiesNode.set("category", categoryNode);
-
-        ObjectNode mappings = objectMapper.createObjectNode();
+        ObjectNode mappings = jsonNodeFactory.objectNode();
         mappings.set("properties", propertiesNode);
 
         return objectMapper.writeValueAsString(mappings);
@@ -657,9 +661,11 @@ public class CommonSearchService {
         JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
 
         ObjectNode propertiesNode = jsonNodeFactory.objectNode();
+
         propertiesNode.set("id",
                 jsonNodeFactory.objectNode()
                         .put("type", "string"));
+
         propertiesNode.set("word",
                 jsonNodeFactory.objectNode()
                         .put("type", "string")
