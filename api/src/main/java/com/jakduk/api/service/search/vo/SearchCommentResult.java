@@ -1,6 +1,6 @@
-package com.jakduk.core.model.vo;
+package com.jakduk.api.service.search.vo;
 
-import com.jakduk.core.model.elasticsearch.ESBoardSource;
+import com.jakduk.core.model.elasticsearch.ESCommentSource;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,9 +13,9 @@ import java.util.List;
 
 @Builder
 @Getter
-public class SearchBoardResult {
+public class SearchCommentResult {
 
 	private Long took;
 	private Long totalCount;
-	private List<ESBoardSource> posts;
+	private List<ESCommentSource> comments;
 }

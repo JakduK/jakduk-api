@@ -1,10 +1,7 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -15,9 +12,10 @@ import java.util.List;
 * @desc     :
 */
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
-@Setter
 public class ESBoard {
 	
     private String id;
@@ -32,5 +30,6 @@ public class ESBoard {
 	
 	private String category;
 
-	private List<BoardImage> galleries;
+	private List<String> galleries;
+
 }

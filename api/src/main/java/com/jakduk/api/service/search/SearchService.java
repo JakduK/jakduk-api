@@ -1,9 +1,11 @@
 package com.jakduk.api.service.search;
 
+import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.restcontroller.vo.BoardGallery;
+import com.jakduk.api.service.search.vo.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.model.elasticsearch.*;
-import com.jakduk.core.model.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequestBuilder;
@@ -19,11 +21,13 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.highlight.HighlightField;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,6 +50,9 @@ public class SearchService {
 
 	@Autowired
 	private Client client;
+
+	@Resource
+	private ApiUtils apiUtils;
 
 	/**
 	 * 통합 검색
@@ -125,7 +132,7 @@ public class SearchService {
 								.size(size)
 				);
 
-		log.debug("aggregateSearchWord Query:\n" + searchRequestBuilder.internalBuilder());
+		log.debug("aggregateSearchWord Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
 		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
@@ -161,7 +168,7 @@ public class SearchService {
 				.setFrom(from)
 				.setSize(size);
 
-		log.debug("getBoardSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+		log.debug("getBoardSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		return searchRequestBuilder;
 	}
@@ -169,25 +176,35 @@ public class SearchService {
 	private SearchBoardResult getBoardSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESBoardSource> searchList = Arrays.stream(searchHits.getHits())
+		List<BoardSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
 					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
 					esBoardSource.setScore(searchHit.getScore());
 
-					Map<String, List<String>> highlight = new HashMap<>();
-
-					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
-						List<String> fragments = new ArrayList<>();
-						for (Text text : highlightField.getValue().fragments()) {
-							fragments.add(text.string());
-						}
-						highlight.put(highlightField.getKey(), fragments);
-					}
-
+					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
 					esBoardSource.setHighlight(highlight);
 
 					return esBoardSource;
+				})
+				.map(esBoardSource -> {
+					BoardSource boardSource = new BoardSource();
+					BeanUtils.copyProperties(esBoardSource, boardSource);
+
+					if (! ObjectUtils.isEmpty(esBoardSource.getGalleries())) {
+						List<BoardGallery> boardGalleries = esBoardSource.getGalleries().stream()
+								.sorted(Comparator.comparing(String::toString))
+								.limit(1)
+								.map(galleryId -> BoardGallery.builder()
+										.id(galleryId)
+										.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, galleryId))
+										.build())
+								.collect(Collectors.toList());
+
+						boardSource.setGalleries(boardGalleries);
+					}
+
+					return boardSource;
 				})
 				.collect(Collectors.toList());
 
@@ -220,7 +237,7 @@ public class SearchService {
 				.setFrom(from)
 				.setSize(size);
 
-		log.debug("getBoardCommentSearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+		log.debug("getBoardCommentSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		return searchRequestBuilder;
 	}
@@ -242,16 +259,7 @@ public class SearchService {
 						esCommentSource.setParentBoard(esParentBoard);
 					}
 
-					Map<String, List<String>> highlight = new HashMap<>();
-
-					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
-						List<String> fragments = new ArrayList<>();
-						for (Text text : highlightField.getValue().fragments()) {
-							fragments.add(text.string());
-						}
-						highlight.put(highlightField.getKey(), fragments);
-					}
-
+					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
 					esCommentSource.setHighlight(highlight);
 
 					return esCommentSource;
@@ -279,7 +287,7 @@ public class SearchService {
 				.setFrom(from)
 				.setSize(size);
 
-		log.debug("getGallerySearchRequestBuilder Query:\n" + searchRequestBuilder.internalBuilder());
+		log.debug("getGallerySearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		return searchRequestBuilder;
 	}
@@ -293,16 +301,7 @@ public class SearchService {
 					ESGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, ESGallerySource.class);
 					esGallerySource.setScore(searchHit.getScore());
 
-					Map<String, List<String>> highlight = new HashMap<>();
-
-					for (Map.Entry<String, HighlightField> highlightField : searchHit.getHighlightFields().entrySet()) {
-						List<String> fragments = new ArrayList<>();
-						for (Text text : highlightField.getValue().fragments()) {
-							fragments.add(text.string());
-						}
-						highlight.put(highlightField.getKey(), fragments);
-					}
-
+					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
 					esGallerySource.setHighlight(highlight);
 
 					return esGallerySource;
@@ -314,6 +313,20 @@ public class SearchService {
 				.totalCount(searchHits.getTotalHits())
 				.galleries(searchList)
 				.build();
+	}
+
+	private Map<String, List<String>> getHighlight(Set<Map.Entry<String, HighlightField>> entrySet) {
+		Map<String, List<String>> highlight = new HashMap<>();
+
+		for (Map.Entry<String, HighlightField> highlightField : entrySet) {
+			List<String> fragments = new ArrayList<>();
+			for (Text text : highlightField.getValue().fragments()) {
+				fragments.add(text.string());
+			}
+			highlight.put(highlightField.getKey(), fragments);
+		}
+
+		return highlight;
 	}
 
 }

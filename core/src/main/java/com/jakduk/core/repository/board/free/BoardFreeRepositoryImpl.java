@@ -2,6 +2,7 @@ package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.elasticsearch.ESBoard;
 import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
@@ -46,7 +47,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
      * 기준 BoardFree ID 이상의 BoardFree 목록을 가져온다.
      */
     @Override
-    public List<ESBoard> findPostsGreaterThanId(ObjectId objectId, Integer limit) {
+    public List<BoardFree> findPostsGreaterThanId(ObjectId objectId, Integer limit) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(true));
         AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(objectId));
         AggregationOperation sort = Aggregation.sort(Sort.Direction.ASC, "_id");
@@ -60,16 +61,10 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
             aggregation = Aggregation.newAggregation(match1, sort, limit1);
         }
 
-        AggregationResults<ESBoard> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, ESBoard.class);
+        AggregationResults<BoardFree> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, BoardFree.class);
 
-        List<ESBoard> posts = results.getMappedResults();
+        return results.getMappedResults();
 
-        posts.forEach(post -> {
-            post.setSubject(CoreUtils.stripHtmlTag(post.getSubject()));
-            post.setContent(CoreUtils.stripHtmlTag(post.getContent()));
-        });
-
-        return posts;
     }
 
     /**

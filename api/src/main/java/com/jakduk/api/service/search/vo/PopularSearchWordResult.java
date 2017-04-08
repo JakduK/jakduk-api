@@ -1,4 +1,4 @@
-package com.jakduk.core.model.vo;
+package com.jakduk.api.service.search.vo;
 
 import com.jakduk.core.model.elasticsearch.ESTermsBucket;
 import lombok.Builder;

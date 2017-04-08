@@ -6,6 +6,8 @@ import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,7 +22,8 @@ import java.util.List;
  * @desc     :
  */
 
-@Data
+@Getter
+@Setter
 @Document
 public class Gallery {
 	
@@ -50,4 +53,5 @@ public class Gallery {
 	private List<CommonFeelingUser> usersDisliking;
 
 	private List<CoreConst.BATCH_TYPE> batch;
+
 }
