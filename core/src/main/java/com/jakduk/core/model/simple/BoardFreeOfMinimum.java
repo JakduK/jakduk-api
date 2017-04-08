@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+// BoardFreeSimple 로 대체하자.
+@Deprecated
 @Getter
 @Document(collection = "boardFree")
 public class BoardFreeOfMinimum {

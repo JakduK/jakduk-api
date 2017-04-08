@@ -2,8 +2,8 @@ package com.jakduk.api.restcontroller.search;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.service.search.SearchService;
-import com.jakduk.core.model.vo.PopularSearchWordResult;
-import com.jakduk.core.model.vo.SearchUnifiedResponse;
+import com.jakduk.api.service.search.vo.PopularSearchWordResult;
+import com.jakduk.api.service.search.vo.SearchUnifiedResponse;
 import com.jakduk.core.service.CommonSearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +41,7 @@ public class SearchRestController {
 	@Autowired
 	private SearchService searchService;
 
-	@ApiOperation(value = "찾기")
+	@ApiOperation(value = "통합 찾기")
 	@GetMapping(path = "")
 	public SearchUnifiedResponse searchUnified(
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
@@ -49,7 +49,7 @@ public class SearchRestController {
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
 			@ApiParam(value = "페이지 크기")@RequestParam(required = false, defaultValue = "10") Integer size) {
 
-		log.debug("q={}, w={}, from={}, size={}", q, w, from, size);
+		log.debug("unified search request q={}, w={}, from={}, size={}", q, w, from, size);
 
 		if (size <= 0) size = 10;
 

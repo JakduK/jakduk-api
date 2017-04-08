@@ -31,4 +31,5 @@ public class ESBoard {
 	private String category;
 
 	private List<String> galleries;
+
 }

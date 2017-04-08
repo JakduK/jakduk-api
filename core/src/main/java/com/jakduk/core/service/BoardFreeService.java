@@ -225,7 +225,7 @@ public class BoardFreeService {
 		);
 		*/
 
-		log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+		log.info("new post created. post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
 
 		return boardFree.getSeq();
 	}
