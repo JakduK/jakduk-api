@@ -48,12 +48,25 @@ public class SearchRestController {
 			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
 			@ApiParam(value = "페이지 크기") @RequestParam(required = false, defaultValue = "10") Integer size,
-			@ApiParam(value = "하이라이트 문구 앞 태그") @RequestParam(required = false) String preTags,
-			@ApiParam(value = "하이라이트 문구 뒤 태그") @RequestParam(required = false) String postTags) {
+			@ApiParam(value = "하이라이트의 태그") @RequestParam(required = false) String tag,
+			@ApiParam(value = "하이라이트의 태그 클래스") @RequestParam(required = false) String styleClass) {
 
-		log.debug("unified search request q={}, w={}, from={}, size={}, preTags={}, postTags={}", q, w, from, size, preTags, postTags);
+		log.debug("unified search request q={}, w={}, from={}, size={}, tag={}, styleClass={}", q, w, from, size, tag, styleClass);
 
 		if (size <= 0) size = 10;
+
+		String preTags = StringUtils.EMPTY;
+		String postTags = StringUtils.EMPTY;
+
+		if (StringUtils.isNotBlank(tag)) {
+			if (StringUtils.isNotBlank(styleClass)) {
+				preTags = String.format("<%s class=\"%s\">", tag, styleClass);
+			} else {
+				preTags = String.format("<%s>", tag);
+			}
+
+			postTags = String.format("</%s>", tag);
+		}
 
 		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size, preTags, postTags);
 
