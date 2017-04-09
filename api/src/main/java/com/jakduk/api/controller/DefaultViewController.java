@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -127,19 +128,14 @@ public class DefaultViewController {
 	}
 
 	// 사진 가져오기.
-	@RequestMapping(value = "/${api.gallery.image.url.path}/{id}", method = RequestMethod.GET)
+	@GetMapping("/${api.gallery.image.url.path}/{id}")
 	public void getGallery(@PathVariable String id,
-						   HttpServletRequest request,
 						   HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
 
-		Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
-
-		if (isAddCookie)
-			galleryService.increaseViews(gallery);
-
-		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CoreConst.IMAGE_TYPE.FULL);
+		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
+				CoreConst.IMAGE_TYPE.FULL);
 		response.setContentType(gallery.getContentType());
 
 		try {
@@ -150,13 +146,14 @@ public class DefaultViewController {
 	}
 
 	// 사진 썸네일 가져오기.
-	@RequestMapping(value = "/${api.gallery.thumbnail.url.path}/{id}", method = RequestMethod.GET)
+	@GetMapping("/${api.gallery.thumbnail.url.path}/{id}")
 	public void getGalleyThumbnail(@PathVariable String id,
 								   HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
 
-		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery, CoreConst.IMAGE_TYPE.THUMBNAIL);
+		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
+				CoreConst.IMAGE_TYPE.THUMBNAIL);
 		response.setContentType(gallery.getContentType());
 
 		try {
