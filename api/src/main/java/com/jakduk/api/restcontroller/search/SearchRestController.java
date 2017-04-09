@@ -47,13 +47,15 @@ public class SearchRestController {
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
 			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
-			@ApiParam(value = "페이지 크기")@RequestParam(required = false, defaultValue = "10") Integer size) {
+			@ApiParam(value = "페이지 크기") @RequestParam(required = false, defaultValue = "10") Integer size,
+			@ApiParam(value = "하이라이트 문구 앞 태그") @RequestParam(required = false) String preTags,
+			@ApiParam(value = "하이라이트 문구 뒤 태그") @RequestParam(required = false) String postTags) {
 
-		log.debug("unified search request q={}, w={}, from={}, size={}", q, w, from, size);
+		log.debug("unified search request q={}, w={}, from={}, size={}, preTags={}, postTags={}", q, w, from, size, preTags, postTags);
 
 		if (size <= 0) size = 10;
 
-		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size);
+		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size, preTags, postTags);
 
 		commonSearchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
 
