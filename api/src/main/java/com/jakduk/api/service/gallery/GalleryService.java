@@ -302,9 +302,9 @@ public class GalleryService {
 	}
 
 	// 이미지 가져오기.
-	public ByteArrayOutputStream getGalleryOutStream(Gallery gallery, CoreConst.IMAGE_TYPE imageType) {
+	public ByteArrayOutputStream getGalleryOutStream(String id, String contentType, CoreConst.IMAGE_TYPE imageType) {
 
-		ObjectId objId = new ObjectId(gallery.getId());
+		ObjectId objId = new ObjectId(id);
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
@@ -319,10 +319,10 @@ public class GalleryService {
 				break;
 		}
 
-		String formatName = StringUtils.split(gallery.getContentType(), "/")[1];
+		String formatName = StringUtils.split(contentType, "/")[1];
 
 		Path filePath = Paths.get(imagePath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
-				String.valueOf(timePoint.getDayOfMonth()), gallery.getId() + "." + formatName);
+				String.valueOf(timePoint.getDayOfMonth()), id + "." + formatName);
 
 		if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
 			try {
