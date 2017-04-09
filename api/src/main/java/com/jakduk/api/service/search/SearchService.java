@@ -62,20 +62,21 @@ public class SearchService {
 	 * @param size	페이지 크기
 	 * @return	검색 결과
 	 */
-	public SearchUnifiedResponse searchUnified(String query, String include, Integer from, Integer size) {
+	public SearchUnifiedResponse searchUnified(String query, String include, Integer from, Integer size, String preTags,
+											   String postTags) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
 		Queue<CoreConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.PO.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(query, from, size);
+			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(query, from, size, preTags, postTags);
 			multiSearchRequestBuilder.add(postSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.PO);
 		}
 
 		if (StringUtils.contains(include, CoreConst.SEARCH_TYPE.CO.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size);
+			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
 			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
 			searchOrder.offer(CoreConst.SEARCH_TYPE.CO);
 		}
@@ -150,7 +151,9 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size) {
+	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+															  String postTags) {
+
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_BOARD)
@@ -161,12 +164,16 @@ public class SearchService {
 				)
 				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
 				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
 				.addHighlightedField("subject", CoreConst.SEARCH_FRAGMENT_SIZE, 0)
 				.addHighlightedField("content", CoreConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
+
+		if (StringUtils.isNotBlank(preTags))
+			searchRequestBuilder.setHighlighterPreTags(preTags);
+
+		if (StringUtils.isNotBlank(postTags))
+			searchRequestBuilder.setHighlighterPostTags(postTags);
 
 		log.debug("getBoardSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 
@@ -215,7 +222,9 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size) {
+	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+																String postTags) {
+
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchIndexBoard)
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
@@ -231,11 +240,15 @@ public class SearchService {
 				)
 				.setHighlighterNoMatchSize(CoreConst.SEARCH_NO_MATCH_SIZE)
 				.setHighlighterFragmentSize(CoreConst.SEARCH_FRAGMENT_SIZE)
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
 				.addHighlightedField("content", CoreConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
+
+		if (StringUtils.isNotBlank(preTags))
+			searchRequestBuilder.setHighlighterPreTags(preTags);
+
+		if (StringUtils.isNotBlank(postTags))
+			searchRequestBuilder.setHighlighterPostTags(postTags);
 
 		log.debug("getBoardCommentSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 

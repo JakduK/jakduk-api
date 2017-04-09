@@ -19,7 +19,7 @@ public class SearchServiceTest extends ApiApplicationTests {
 
 	@Test
 	public void searchUnified() {
-		sut.searchUnified("string", "PO;CO;GA", 0, 10);
+		sut.searchUnified("string", "PO;CO;GA", 0, 10, null, null);
 	}
 
 	@Test
