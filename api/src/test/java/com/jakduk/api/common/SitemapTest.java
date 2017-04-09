@@ -20,7 +20,7 @@ import java.util.Date;
 public class SitemapTest {
 
     @Test
-    public void test01() {
+    public void generateSitemap() {
         try {
             WebSitemapGenerator wsg = new WebSitemapGenerator("https://jakduk.com");
             WebSitemapUrl url = new WebSitemapUrl.Options("https://jakduk.com/board/free/1")
@@ -34,4 +34,5 @@ public class SitemapTest {
             e.printStackTrace();
         }
     }
+
 }
