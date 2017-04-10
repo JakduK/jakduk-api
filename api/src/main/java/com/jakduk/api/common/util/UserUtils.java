@@ -243,8 +243,10 @@ public class UserUtils {
         SocialProfile profile = SocialProfile.builder()
                 .id(jsonNode.get("id").asText())
                 .nickname(jsonNode.get("name").asText())
-                .email(jsonNode.get("email").asText())
                 .build();
+
+        if (Objects.nonNull(jsonNode.get("email")))
+            profile.setEmail(jsonNode.get("email").asText());
 
         if (jsonNode.has("picture")) {
             String largePictureUrl = jsonNode.get("picture").get("data").get("url").asText();

@@ -17,7 +17,7 @@ public class SocialProfile {
 
     private String id;
     private String nickname;
-    private String email;
+    @Setter private String email;
     @Setter private String smallPictureUrl;
     @Setter private String largePictureUrl;
 
