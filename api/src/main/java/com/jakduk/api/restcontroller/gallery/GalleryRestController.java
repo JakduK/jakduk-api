@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +32,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,24 +91,19 @@ public class GalleryRestController {
     }
 
     @ApiOperation(value = "사진 올리기")
-    @RequestMapping(value = "/gallery", method = RequestMethod.POST)
-    public GalleryUploadResponse uploadImage(@RequestParam MultipartFile file) {
+    @PostMapping("/gallery")
+    public GalleryUploadResponse uploadImage(@RequestParam MultipartFile file) throws IOException {
 
         if (file.isEmpty())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        Gallery gallery = null;
-
-        try {
-            gallery = galleryService.uploadImage(commonWriter, file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
-        } catch (IOException ignored) {
-        }
+        Gallery gallery = galleryService.uploadImage(commonWriter, file.getOriginalFilename(), file.getSize(),
+                file.getContentType(), file.getBytes());
 
         GalleryUploadResponse response = new GalleryUploadResponse();
 
-        assert gallery != null;
         BeanUtils.copyProperties(gallery, response);
         response.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
         response.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));

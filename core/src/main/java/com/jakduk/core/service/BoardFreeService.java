@@ -161,23 +161,18 @@ public class BoardFreeService {
 					List<BoardItem> posts = updateGallery.getPosts();
 
 					if (Objects.isNull(posts))
-						posts = new ArrayList<>();
+						posts = Collections.emptyList();
 
 					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-					long itemCount = 0;
+					Boolean isItemPresent = posts.stream()
+							.anyMatch(item -> item.getId().equals(boardItem.getId()));
 
-					if (!posts.isEmpty()) {
-						itemCount = posts.stream()
-								.filter(item -> item.getId().equals(boardItem.getId()))
-								.count();
-					}
-
-					if (itemCount == 0) {
+					if (! isItemPresent) {
 						posts.add(boardItem);
 						updateGallery.setPosts(posts);
 					}
 
-					if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
+					if (StringUtils.isNotBlank(galleryOnBoard.getName())) {
 						updateGallery.setName(galleryOnBoard.getName());
 					} else {
 						updateGallery.setName(boardFree.getSubject());

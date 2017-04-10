@@ -160,13 +160,11 @@ public class FileUtils {
         BufferedInputStream in = new BufferedInputStream(url.openStream());
         byte[] bytes = IOUtils.toByteArray(in);
 
-        FileInfo fileInfo = FileInfo.builder()
+        return FileInfo.builder()
                 .contentType(contentType)
                 .contentLength(contentLength)
                 .bytes(bytes)
                 .build();
-
-        return fileInfo;
     }
 
     @Builder

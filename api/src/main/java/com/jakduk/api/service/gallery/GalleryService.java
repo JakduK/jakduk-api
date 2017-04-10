@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
@@ -205,23 +206,27 @@ public class GalleryService {
 	}
 
 	/**
-	 * 사진 올리기.
-	 * @return Gallery 객체
+	 * 사진 올리기
      */
 	public Gallery uploadImage(CommonWriter writer, String originalFileName, long size, String contentType, byte[] bytes) {
+
+		String hash = DigestUtils.md5DigestAsHex(bytes);
+		Optional<Gallery> oGallery = galleryRepository.findOneByHashAndStatusStatus(hash, CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+
+		if (oGallery.isPresent())
+			return oGallery.get();
 
 		Gallery gallery = new Gallery();
 
 		gallery.setWriter(writer);
-
-		GalleryStatus status = GalleryStatus.builder()
-				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
-				.build();
-
-		gallery.setStatus(status);
+		gallery.setStatus(
+				GalleryStatus.builder()
+						.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+						.build());
 		gallery.setFileName(originalFileName);
 		gallery.setFileSize(size);
 		gallery.setSize(size);
+		gallery.setHash(DigestUtils.md5DigestAsHex(bytes));
 
 		// 사진 포맷.
 		String formatName = "jpg";
@@ -295,7 +300,7 @@ public class GalleryService {
 			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 		}
 
-		log.debug("gallery=" + gallery);
+		log.debug("gallery=\n{}", gallery);
 
 		return gallery;
 
