@@ -18,10 +18,10 @@ import java.time.ZoneId;
  */
 public class RemoveOldGalleryProcessor implements ItemProcessor<Gallery, Gallery> {
 
-    @Value("${storage.image.path}")
+    @Value("${core.storage.image.path}")
     private String storageImagePath;
 
-    @Value("${storage.thumbnail.path}")
+    @Value("${core.storage.thumbnail.path}")
     private String storageThumbnailPath;
 
     @Autowired

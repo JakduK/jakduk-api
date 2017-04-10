@@ -3,14 +3,17 @@ package com.jakduk.core.board;
 import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
+import org.bson.types.ObjectId;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Created by pyohwan on 17. 1. 23.
+ * Created by pyohwanjang on 2017. 3. 27..
  */
 public class BoardFreeCommentRepositoryTest extends CoreApplicationTests {
 
@@ -18,11 +21,9 @@ public class BoardFreeCommentRepositoryTest extends CoreApplicationTests {
     private BoardFreeCommentRepository sut;
 
     @Test
-    public void findCommentsCountBySeqs() {
-        ArrayList<Integer> arrTemp = new ArrayList<>();
-        arrTemp.add(178);
-        arrTemp.add(180);
+    public void findCommentsCountByIds() {
+        List<CommonCount> commentCounts = sut.findCommentsCountByIds(Arrays.asList(new ObjectId("58d62a6c807d714ce35a75ba")));
 
-        List<CommonCount> numberOfItems = sut.findCommentsCountBySeqs(arrTemp);
+        Assert.assertTrue(Objects.nonNull(commentCounts));
     }
 }

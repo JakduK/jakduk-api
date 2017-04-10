@@ -1,9 +1,10 @@
 package com.jakduk.api.restcontroller.search;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.core.model.vo.PopularSearchWordResult;
-import com.jakduk.core.model.vo.SearchUnifiedResponse;
-import com.jakduk.core.service.SearchService;
+import com.jakduk.api.service.search.SearchService;
+import com.jakduk.api.service.search.vo.PopularSearchWordResult;
+import com.jakduk.api.service.search.vo.SearchUnifiedResponse;
+import com.jakduk.core.service.CommonSearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -12,8 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,29 +36,47 @@ import java.time.ZoneId;
 public class SearchRestController {
 	
 	@Autowired
+	private CommonSearchService commonSearchService;
+
+	@Autowired
 	private SearchService searchService;
 
-	@ApiOperation(value = "찾기")
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@ApiOperation(value = "통합 찾기")
+	@GetMapping(path = "")
 	public SearchUnifiedResponse searchUnified(
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
 			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
-			@ApiParam(value = "페이지 크기")@RequestParam(required = false, defaultValue = "10") Integer size) {
+			@ApiParam(value = "페이지 크기") @RequestParam(required = false, defaultValue = "10") Integer size,
+			@ApiParam(value = "하이라이트의 태그") @RequestParam(required = false) String tag,
+			@ApiParam(value = "하이라이트의 태그 클래스") @RequestParam(required = false) String styleClass) {
 
-		log.debug("q=" + q + ", w=" + w + ", from=" + from + ", size=" + size);
+		log.debug("unified search request q={}, w={}, from={}, size={}, tag={}, styleClass={}", q, w, from, size, tag, styleClass);
 
 		if (size <= 0) size = 10;
 
-		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size);
+		String preTags = StringUtils.EMPTY;
+		String postTags = StringUtils.EMPTY;
 
-		searchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
+		if (StringUtils.isNotBlank(tag)) {
+			if (StringUtils.isNotBlank(styleClass)) {
+				preTags = String.format("<%s class=\"%s\">", tag, styleClass);
+			} else {
+				preTags = String.format("<%s>", tag);
+			}
+
+			postTags = String.format("</%s>", tag);
+		}
+
+		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size, preTags, postTags);
+
+		commonSearchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
 
 		return searchUnifiedResponse;
 	}
 
 	@ApiOperation(value = "인기 검색어")
-	@RequestMapping(value = "/popular/words", method = RequestMethod.GET)
+	@GetMapping(path = "/popular/words")
 	public PopularSearchWordResult searchPopularWords(
 			@ApiParam(value = "크기") @RequestParam(required = false, defaultValue = "5") Integer size) {
 

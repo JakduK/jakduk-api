@@ -1,15 +1,14 @@
 package com.jakduk.core.repository.gallery;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.jakduk.core.model.db.Gallery;
+import com.jakduk.core.model.simple.GalleryOnList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.simple.GalleryOnList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -28,4 +27,5 @@ public interface GalleryRepository extends MongoRepository<Gallery, String>, Gal
 	List<Gallery> findAll();
 
 	List<Gallery> findByIdIn(List<String> ids);
+
 }

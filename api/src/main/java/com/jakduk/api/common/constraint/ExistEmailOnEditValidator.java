@@ -1,7 +1,7 @@
 package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
+import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -30,12 +30,12 @@ public class ExistEmailOnEditValidator implements ConstraintValidator<ExistEmail
         if (StringUtils.isEmpty(value))
             return false;
 
-        CommonPrincipal commonPrincipal = UserUtils.getCommonPrincipal();
+        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        if (ObjectUtils.isEmpty(commonPrincipal))
+        if (ObjectUtils.isEmpty(authUserProfile))
             return false;
 
-        UserProfile userProfile = userService.findByNEIdAndEmail(commonPrincipal.getId(), value.trim());
+        UserProfile userProfile = userService.findByNEIdAndEmail(authUserProfile.getId(), value.trim());
 
         return ObjectUtils.isEmpty(userProfile);
 

@@ -1,11 +1,12 @@
 package com.jakduk.api.restcontroller.admin;
 
 
-import com.jakduk.api.restcontroller.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.admin.vo.AttendanceClubForm;
 import com.jakduk.api.restcontroller.admin.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.admin.vo.HomeDescriptionRequest;
 import com.jakduk.api.restcontroller.admin.vo.LeagueAttendanceForm;
+import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.api.service.search.SearchService;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.*;
 import com.jakduk.core.model.embedded.LocalName;
@@ -50,6 +51,9 @@ public class AdminRestController {
 
 	@Autowired
 	private CompetitionService competitionService;
+
+	@Autowired
+	private CommonSearchService commonSearchService;
 
 	@Autowired
 	private SearchService searchService;
@@ -620,8 +624,8 @@ public class AdminRestController {
 	@RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
 	public EmptyJsonResponse initSearchIndex() {
 
-		searchService.createIndexBoard();
-		searchService.createIndexGallery();
+		commonSearchService.createIndexBoard();
+		commonSearchService.createIndexGallery();
 
 		return EmptyJsonResponse.newInstance();
 	}
@@ -630,9 +634,9 @@ public class AdminRestController {
 	@RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
 	public EmptyJsonResponse initSearchData() {
 		try {
-			searchService.processBulkInsertBoard();
-			searchService.processBulkInsertComment();
-			searchService.processBulkInsertGallery();
+			commonSearchService.processBulkInsertBoard();
+			commonSearchService.processBulkInsertComment();
+			commonSearchService.processBulkInsertGallery();
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();

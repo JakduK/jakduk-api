@@ -33,7 +33,10 @@ public class ESBoardSource {
 
 	private String category;
 
+	private List<String> galleries;
+
 	private Float score;
 
 	private Map<String, List<String>> highlight;
+
 }

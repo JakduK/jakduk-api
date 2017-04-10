@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
  */
 
 @Getter
-@ApiModel(value = "댓글 달기 폼")
+@ApiModel(value = "댓글 폼")
 public class BoardCommentForm {
 
     @ApiModelProperty(value = "글 seq")

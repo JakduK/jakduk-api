@@ -1,30 +1,29 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.common.vo.SocialProfile;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetail;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetail;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.core.common.CommonRole;
-import com.jakduk.core.model.db.User;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.etc.AuthUserProfile;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -35,32 +34,18 @@ import java.util.stream.Collectors;
 @Component
 public class UserUtils {
 
+    @Value("${api.server.url}")
+    private String apiServerUrl;
+
+    @Value("${api.user.picture.large.url.path}")
+    private String apiUserPictureLargeUrlPath;
+
+    @Value("${api.user.picture.small.url.path}")
+    private String apiUserPictureSmallUrlPath;
+
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
-    private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.7/me?fields=id,name,email&format=json";
-
-    public SocialProfile getDaumProfile(String accessToken) {
-
-        JsonNode jsonNode = fetchProfile(DAUM_PROFILE_API_URL, accessToken);
-
-        JsonNode resultJson = jsonNode.get("result");
-        SocialProfile profile = new SocialProfile();
-        profile.setId(resultJson.get("userid").asText());
-        profile.setNickname(resultJson.get("nickname").asText());
-
-        return profile;
-    }
-
-    public SocialProfile getFacebookProfile(String accessToken) {
-
-        JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
-
-        SocialProfile profile = new SocialProfile();
-        profile.setId(jsonNode.get("id").asText());
-        profile.setNickname(jsonNode.get("name").asText());
-        profile.setEmail(jsonNode.get("email").asText());
-
-        return profile;
-    }
+    private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
+    private final String FACEBOOK_PROFILE_THUMBNAIL_API_URL = "https://graph.facebook.com/v2.8/me?fields=picture.type(small)&format=json";
 
     /**
      * 손님인지 검사.
@@ -135,27 +120,27 @@ public class UserUtils {
      * @return 이메일 기반이면 true, 아니면 false
      */
     public static Boolean isJakdukUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail;
+        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetails;
     }
 
     /**
      * 로그인 중인 회원이 소셜 기반인지 검사.
+     *
      * @return 이메일 기반이면 true, 아니면 false
      */
     public static Boolean isSocialUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail;
+        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetails;
     }
 
     /**
      * 로그인 중인 회원 정보를 가져온다.
-     * @return 회원 객체
      */
     public static AuthUserProfile getAuthUserProfile() {
         AuthUserProfile authUserProfile = null;
 
         if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
-                SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetails) {
+                SocialUserDetails userDetail = (SocialUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
                 Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
@@ -168,11 +153,12 @@ public class UserUtils {
                         .email(userDetail.getUserId())
                         .username(userDetail.getUsername())
                         .providerId(userDetail.getProviderId())
+                        .picture(userDetail.getPicture())
                         .roles(roles)
                         .build();
 
-            } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail) {
-                JakdukUserDetail principal = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetails) {
+                JakdukUserDetails userDetail = (JakdukUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
                 Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
@@ -181,10 +167,11 @@ public class UserUtils {
                         .collect(Collectors.toList());
 
                 authUserProfile = AuthUserProfile.builder()
-                        .id(principal.getId())
-                        .email(principal.getUsername())
-                        .username(principal.getNickname())
-                        .providerId(principal.getProviderId())
+                        .id(userDetail.getId())
+                        .email(userDetail.getUsername())
+                        .username(userDetail.getNickname())
+                        .providerId(userDetail.getProviderId())
+                        .picture(userDetail.getPicture())
                         .roles(roles)
                         .build();
             }
@@ -194,84 +181,21 @@ public class UserUtils {
     }
 
     /**
-     * 로그인 중인 회원의 정보를 가져온다.
-     * @return 로그인 회원 객체.
-     */
-    public static CommonPrincipal getCommonPrincipal() {
-        CommonPrincipal commonPrincipal = null;
-
-        if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetail) {
-                SocialUserDetail userDetail = (SocialUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-                commonPrincipal = CommonPrincipal.builder()
-                        .id(userDetail.getId())
-                        .email(userDetail.getUserId())
-                        .username(userDetail.getUsername())
-                        .providerId(userDetail.getProviderId())
-                        .build();
-            } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetail) {
-                JakdukUserDetail principal = (JakdukUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-                commonPrincipal = CommonPrincipal.builder()
-                        .id(principal.getId())
-                        .email(principal.getUsername())
-                        .username(principal.getNickname())
-                        .providerId(principal.getProviderId())
-                        .build();
-            }
-        }
-
-        return commonPrincipal;
-    }
-
-    /**
      * CommonWriter를 가져온다.
      */
     public static CommonWriter getCommonWriter() {
-        CommonPrincipal commonPrincipal = getCommonPrincipal();
+        AuthUserProfile authUserProfile = getAuthUserProfile();
 
-        if (! ObjectUtils.isEmpty(commonPrincipal)) {
-            return new CommonWriter(commonPrincipal.getId(), commonPrincipal.getUsername(), commonPrincipal.getProviderId());
+        if (Objects.nonNull(authUserProfile)) {
+            return CommonWriter.builder()
+                    .userId(authUserProfile.getId())
+                    .username(authUserProfile.getUsername())
+                    .providerId(authUserProfile.getProviderId())
+                    .picture(authUserProfile.getPicture())
+                    .build();
         } else {
             return null;
         }
-    }
-
-    /**
-     * 이메일 기반 회원의 로그인 처리
-     * @param user User 객체
-     */
-    public JakdukUserDetail signInJakdukUser(User user) {
-
-        boolean enabled = true;
-        boolean accountNonExpired = true;
-        boolean credentialsNonExpired = true;
-        boolean accountNonLocked = true;
-
-        JakdukUserDetail jakdukUserDetail = new JakdukUserDetail(user.getEmail(), user.getId(),
-                user.getPassword(), user.getUsername(), user.getProviderId(),
-                enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities(user.getRoles()));
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(jakdukUserDetail, user.getPassword(), jakdukUserDetail.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(token);
-
-        return jakdukUserDetail;
-    }
-
-    /**
-     * SNS 기반 회원의 로그인 처리
-     * @param user User 객체
-     */
-    public void signInSocialUser(User user) {
-
-        SocialUserDetail userDetail = new SocialUserDetail(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getProviderUserId(),
-                true, true, true, true, getAuthorities(user.getRoles()));
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
@@ -279,20 +203,86 @@ public class UserUtils {
     }
 
     /**
-     * accessToken에 해당하는 프로필 정보를 가져온다.
-     * @param url 요청할 URL
+     * Daum 프로필 가져오기
+     *
      * @param accessToken accessToken
      */
-    private JsonNode fetchProfile(String url, String accessToken) {
+    public SocialProfile getDaumProfile(String accessToken) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        JsonNode jsonNode = fetchProfile(DAUM_PROFILE_API_URL, accessToken);
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
+        JsonNode resultNode = jsonNode.get("result");
 
-        return responseEntity.getBody();
+        SocialProfile profile = SocialProfile.builder()
+                .id(resultNode.get("userid").asText())
+                .nickname(resultNode.get("nickname").asText())
+                .build();
+
+        if (resultNode.has("imagePath")) {
+            String imagePath = resultNode.get("imagePath").asText();
+            profile.setSmallPictureUrl(imagePath);
+        }
+
+        if (resultNode.has("bigImagePath")) {
+            String bigImagePath = resultNode.get("bigImagePath").asText();
+            profile.setLargePictureUrl(bigImagePath);
+        }
+
+        return profile;
+    }
+
+    /**
+     * Facebook 프로필 가져오기
+     *
+     * @param accessToken accessToken
+     */
+    public SocialProfile getFacebookProfile(String accessToken) {
+
+        JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
+
+        SocialProfile profile = SocialProfile.builder()
+                .id(jsonNode.get("id").asText())
+                .nickname(jsonNode.get("name").asText())
+                .build();
+
+        if (Objects.nonNull(jsonNode.get("email")))
+            profile.setEmail(jsonNode.get("email").asText());
+
+        if (jsonNode.has("picture")) {
+            String largePictureUrl = jsonNode.get("picture").get("data").get("url").asText();
+            profile.setLargePictureUrl(largePictureUrl);
+
+            JsonNode jsonNodeThumbnail = fetchProfile(FACEBOOK_PROFILE_THUMBNAIL_API_URL, accessToken);
+            String smallPictureUrl = jsonNodeThumbnail.get("picture").get("data").get("url").asText();
+            profile.setSmallPictureUrl(smallPictureUrl);
+        }
+
+        return profile;
+    }
+
+    /**
+     * 회원 프로필 이미지 URL을 생성한다.
+     *
+     * @param sizeType size 타입
+     * @param id UserImage의 ID
+     */
+    public String generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE sizeType, String id) {
+
+        if (StringUtils.isBlank(id))
+            return null;
+
+        String pictureUrl = null;
+
+        switch (sizeType) {
+            case LARGE:
+                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiUserPictureLargeUrlPath, id);
+                break;
+            case SMALL:
+                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiUserPictureSmallUrlPath, id);
+                break;
+        }
+
+        return pictureUrl;
     }
 
     private static List<String> getRoles(List<Integer> roles) {
@@ -318,6 +308,24 @@ public class UserUtils {
         }
 
         return authorities;
+    }
+
+    /**
+     * accessToken에 해당하는 프로필 정보를 가져온다.
+     *
+     * @param url 요청할 URL
+     * @param accessToken accessToken
+     */
+    private JsonNode fetchProfile(String url, String accessToken) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
+
+        return responseEntity.getBody();
     }
 
 }

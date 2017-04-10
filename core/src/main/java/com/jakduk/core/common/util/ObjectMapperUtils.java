@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -25,6 +26,10 @@ public class ObjectMapperUtils {
 
 	public static String writeValueAsString(Object obj) throws JsonProcessingException {
 		return objectMapper.writeValueAsString(obj);
+	}
+
+	public static <T> T readValue(String content, Class<T> obj) throws IOException {
+		return objectMapper.readValue(content, obj);
 	}
 
 	public static <T> T convertValue(Map map, Class<T> obj) {

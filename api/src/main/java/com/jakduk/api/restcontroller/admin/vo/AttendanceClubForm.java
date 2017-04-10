@@ -1,6 +1,5 @@
 package com.jakduk.api.restcontroller.admin.vo;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

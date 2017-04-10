@@ -8,12 +8,12 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.db.HomeDescription;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
-import com.jakduk.core.model.simple.BoardFreeOnHome;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.model.simple.UserOnHome;
 import com.jakduk.core.repository.EncyclopediaRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentOnHomeRepository;
-import com.jakduk.core.repository.board.free.BoardFreeOnHomeRepository;
+import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,7 +43,7 @@ public class HomeService {
 	private EncyclopediaRepository encyclopediaRepository;
 	
 	@Autowired
-	private BoardFreeOnHomeRepository boardFreeOnHomeRepository;
+	private BoardFreeRepository boardFreeRepository;
 
 	@Autowired
 	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
@@ -62,18 +61,6 @@ public class HomeService {
 		int random = (int)(Math.random() * encyclopedias.size());
 
 		return encyclopedias.get(random);
-	}
-
-	/**
-	 * 최근 글 가져오기
-	 * @return 글 목록
-     */
-	public List<BoardFreeOnHome> getBoardLatest() {
-
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("seq"));
-		Pageable pageable = new PageRequest(0, CoreConst.HOME_SIZE_POST, sort);
-
-		return boardFreeOnHomeRepository.findAll(pageable).getContent();
 	}
 
 	// 최근 가입 회원 가져오기.
@@ -100,7 +87,7 @@ public class HomeService {
 		for (BoardFreeCommentOnHome comment : comments) {
 			String content = CoreUtils.stripHtmlTag(comment.getContent());
 
-			if (Objects.nonNull(content)) {
+			if (StringUtils.isNotBlank(content)) {
 				Integer contentLength = content.length() + comment.getWriter().getUsername().length();
 
 				if (contentLength > CoreConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {

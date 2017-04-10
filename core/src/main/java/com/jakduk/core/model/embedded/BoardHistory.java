@@ -22,7 +22,7 @@ public class BoardHistory {
 	private String id;
 	
 	private CoreConst.BOARD_HISTORY_TYPE type;
-	
+
 	private CommonWriter writer;
 	
 }

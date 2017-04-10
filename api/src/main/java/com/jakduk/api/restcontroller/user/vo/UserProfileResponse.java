@@ -2,6 +2,7 @@ package com.jakduk.api.restcontroller.user.vo;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -14,7 +15,9 @@ import lombok.*;
  */
 
 @ApiModel(description = "회원 프로필 응답 객체")
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 public class UserProfileResponse {
 
@@ -30,6 +33,11 @@ public class UserProfileResponse {
 	@ApiModelProperty(value = "provider ID")
 	private CoreConst.ACCOUNT_TYPE providerId;
 
-	@ApiModelProperty(value = "지지 축구단")
+	@ApiModelProperty(value = "지지 축구단 객체")
+	@Setter
 	private LocalName footballClubName;
+
+	@ApiModelProperty(value = "회원 사진 객체")
+	@Setter
+	private UserPictureInfo picture;
 }

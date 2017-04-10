@@ -2,20 +2,21 @@ package com.jakduk.core.board;
 
 import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
+import com.jakduk.core.model.simple.BoardFreeOnSitemap;
 import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
-import com.jakduk.core.repository.user.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 9. 11.
@@ -26,30 +27,20 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
     @Autowired
     private BoardFreeRepository sut;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @Test
     public void findOneById() {
-        BoardFree boardFree = sut.findOneById("54c4df933d96600d7f55a04b").orElse(new BoardFree());
+        BoardFree boardFree = sut.findOneById("58c55b770fc0bc04fe5e5db6").orElse(new BoardFree());
         boardFree.setBatch(null);
         //sut.save(boardFree);
 
         Assert.assertTrue(! ObjectUtils.isEmpty(boardFree));
     }
 
-    /**
-     * PRD 테스트 안됨
-     */
-    @Ignore
     @Test
-    public void findByIdAndUserId() {
+    public void findOneBySeq() {
+        BoardFree boardFree = sut.findOneBySeq(187).orElse(new BoardFree());
 
-        User user = userRepository.findByEmail("test05@test.com");
-
-        List<BoardFreeSimple> boardFrees = sut.findByIdAndUserId(new ObjectId("54c4df933d96600d7f55a04b"), user.getId(), 3);
-
-        Assert.assertTrue(boardFrees.size() > 0);
+        Assert.assertTrue(Objects.nonNull(boardFree));
     }
 
     @Test
@@ -60,9 +51,34 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
     }
 
     @Test
-    public void findPostsWithRss() {
-        List<BoardFreeOnRSS> posts = sut.findPostsOnRss();
+    public void findPostsOnRss() {
+        List<BoardFreeOnRSS> posts = sut.findPostsOnRss(null,
+                new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
 
-        Assert.assertTrue(posts.size() > 0);
+        Assert.assertTrue(! ObjectUtils.isEmpty(posts));
     }
+
+    @Test
+    public void findNotices() {
+
+        Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+        sut.findNotices(sort);
+    }
+
+    @Test
+    public void findPostsOnSitemap() {
+
+        List<BoardFreeOnSitemap> posts = sut.findPostsOnSitemap(new ObjectId("58c0189e807d711ab5e1a72d"),
+                new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
+
+        Assert.assertTrue(! ObjectUtils.isEmpty(posts));
+    }
+
+    @Test
+    public void findByGalleryId() {
+        List<BoardFreeSimple> posts = sut.findByGalleryId(new ObjectId("58d6088c807d714ce356758a"));
+
+        Assert.assertTrue(! ObjectUtils.isEmpty(posts));
+    }
+
 }

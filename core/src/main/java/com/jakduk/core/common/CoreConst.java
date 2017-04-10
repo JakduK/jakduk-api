@@ -29,7 +29,6 @@ public class CoreConst {
 	public final static Integer HOME_SIZE_LINE_NUMBER = 5;
 	public final static Integer HOME_SIZE_POST = 7;
 	public final static Integer HOME_SIZE_GALLERY = 10;
-	public final static Integer RSS_SIZE_ITEM = 800;
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 110;
 	public final static Integer SEARCH_NO_MATCH_SIZE = 200;
 	public final static Integer SEARCH_FRAGMENT_SIZE = 200;
@@ -45,6 +44,8 @@ public class CoreConst {
 	public final static String BOARD_CATEGORY_FOOTBALL = "football";
 	public final static String BOARD_CATEGORY_DEVELOP = "develop";
 	public final static String BOARD_CATEGORY_ALL = "all";
+
+	public final static Integer BOARD_SHORT_CONTENT_LENGTH = 100;
 
 	/**
 	 * 게시판 말머리 종류.
@@ -107,10 +108,12 @@ public class CoreConst {
     }
 
 	/**
-	 * 사진 썸네일 크기.
+	 * 사진 가로, 세로 길이
 	 */
 	public final static Integer GALLERY_THUMBNAIL_SIZE_WIDTH = 360;
 	public final static Integer GALLERY_THUMBNAIL_SIZE_HEIGHT = 230;
+	public final static Integer USER_SMALL_PICTURE_SIZE_WIDTH = 50;
+	public final static Integer USER_SMALL_PICTURE_SIZE_HEIGHT = 50;
 
 	/**
 	 * 사진 상태값.
@@ -118,14 +121,6 @@ public class CoreConst {
 	public enum GALLERY_STATUS_TYPE {
 		TEMP,
 		ENABLE,
-	}
-
-	/**
-	 * 유저 이미지의 출처.
-	 */
-	public enum USER_IMAGE_SOURCE_TYPE {
-		EXTERNAL,		// SNS와 같은 외부에서 가져옴.
-		JAKDUK,			// 작두왕에서 직접 등록.
 	}
 
 	/**
@@ -192,13 +187,6 @@ public class CoreConst {
 		TIMEUP		// 경기 종료
 	}
 
-	// 검증 상태.
-	public enum VALIDATION_TYPE {
-		NONE,
-		INVALID,
-		OK
-	}
-
 	// 토큰 타입
 	public enum TOKEN_TYPE {
 		RESET_PASSWORD
@@ -213,7 +201,9 @@ public class CoreConst {
 	// 배치 타입
 	public enum BATCH_TYPE {
 		CHANGE_BOARD_CONTENT_IMAGE_URL_01,
-		APPEND_GALLERY_FILE_EXT_01
+		APPEND_GALLERY_FILE_EXT_01,
+		ADD_SHORT_CONTENT_01,				// 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
+		ADD_LAST_UPDATED_TO_BOARDFREE_01	// BoardFree에 lastUpdated 필드를 추가한다.
 	}
 
 	public enum SEARCH_TYPE {
@@ -221,4 +211,23 @@ public class CoreConst {
 		CO,	// 댓글
 		GA	// 사진첩
 	}
+
+	public enum IMAGE_SIZE_TYPE {
+		LARGE,
+		SMALL
+	}
+
+	/**
+	 * 몽고DB Criteria Operator
+	 */
+	public enum CRITERIA_OPERATOR {
+		GT,
+		LT
+	}
+
+	/**
+	 * mongoDB collection 이름
+	 */
+	public final static String COLLECTION_BOARD_FREE = "boardFree";
+
 }

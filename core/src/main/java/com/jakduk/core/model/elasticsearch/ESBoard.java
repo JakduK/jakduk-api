@@ -1,9 +1,9 @@
 package com.jakduk.core.model.elasticsearch;
 
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.List;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -12,9 +12,10 @@ import lombok.Setter;
 * @desc     :
 */
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
-@Setter
 public class ESBoard {
 	
     private String id;
@@ -28,4 +29,7 @@ public class ESBoard {
 	private Integer seq;
 	
 	private String category;
+
+	private List<String> galleries;
+
 }

@@ -1,10 +1,10 @@
 package com.jakduk.core.service;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
@@ -12,19 +12,15 @@ import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.GalleryOnBoard;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnList;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
-import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.web.board.BoardFreeDetail;
+import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +31,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
@@ -67,7 +64,12 @@ public class BoardFreeService {
 	private CommonService commonService;
 
 	@Autowired
-	private SearchService searchService;
+	private CommonSearchService commonSearchService;
+
+	public BoardFree findOneBySeq(Integer seq) {
+        return boardFreeRepository.findOneBySeq(seq)
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+    }
 
 	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
 		return boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
@@ -77,12 +79,12 @@ public class BoardFreeService {
 		return boardFreeCommentRepository.countByBoardItem(boardItem);
 	}
 
-	public List<BoardFreeSimple> findByUserId(String id, String userId, Integer limit) {
+	public List<BoardFreeOnList> findByIdAndUserId(String id, String userId, Integer limit) {
 		return boardFreeRepository.findByIdAndUserId(new ObjectId(id), userId, limit);
 	}
 
-	public Map<String, Integer> getBoardFreeCommentCount(List<Integer> arrSeq) {
-		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountBySeqs(arrSeq);
+	public Map<String, Integer> getBoardFreeCommentCount(List<ObjectId> ids) {
+		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountByIds(ids);
 
 		return numberOfItems.stream()
 				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
@@ -90,6 +92,7 @@ public class BoardFreeService {
 
     /**
      * 자유게시판 글쓰기
+	 *
      * @param subject 글 제목
      * @param content 글 내용
      * @param categoryCode 글 말머리 Code
@@ -100,86 +103,113 @@ public class BoardFreeService {
 	public Integer insertFreePost(CommonWriter writer, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
 								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
 
-		BoardFree boardFree = new BoardFree();
+		boardCategoryRepository.findOneByCode(categoryCode.name())
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
 
-		boardFree.setWriter(writer);
-		boardFree.setCategory(categoryCode);
-		boardFree.setSubject(subject);
-		boardFree.setContent(content);
-		boardFree.setViews(0);
-		boardFree.setSeq(commonService.getNextSequence(CoreConst.BOARD_TYPE.BOARD_FREE.name()));
+		String stripHtmlContent = StringUtils.defaultIfBlank(CoreUtils.stripHtmlTag(content), StringUtils.EMPTY);
+		stripHtmlContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
 
-		List<BoardImage> galleriesOnBoard = new ArrayList<>();
-		galleries.forEach(gallery -> galleriesOnBoard.add(new BoardImage(gallery.getId())));
+		BoardFree boardFree = BoardFree.builder()
+				.writer(writer)
+				.category(categoryCode)
+				.subject(subject)
+				.content(content)
+				.shortContent(stripHtmlContent)
+				.views(0)
+				.seq(commonService.getNextSequence(CoreConst.BOARD_TYPE.BOARD_FREE.name()))
+				.build();
 
-		if (! galleriesOnBoard.isEmpty())
+		if (! ObjectUtils.isEmpty(galleries)) {
+			List<BoardImage> galleriesOnBoard = galleries.stream()
+					.map(gallery -> new BoardImage(gallery.getId()))
+					.collect(Collectors.toList());
+
 			boardFree.setGalleries(galleriesOnBoard);
+		}
 
-		BoardStatus boardStatus = new BoardStatus();
-		boardStatus.setDevice(device);
+		BoardStatus boardStatus = BoardStatus.builder()
+				.device(device)
+				.build();
+
 		boardFree.setStatus(boardStatus);
 
+		// boardHistory
 		List<BoardHistory> histories = new ArrayList<>();
-		BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.CREATE, writer);
+		ObjectId boardHistoryId = new ObjectId();
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.CREATE, writer);
 		histories.add(history);
 		boardFree.setHistory(histories);
 
+		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+
 		boardFreeRepository.save(boardFree);
 
-		// 글과 연동 된 사진 처리
-		BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+		/*
+		글과 연동 된 사진 처리
+		 */
+		if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
+			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
-		for (GalleryOnBoard galleryOnBoard : galleries) {
+			for (GalleryOnBoard galleryOnBoard : galleries) {
 
-			Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
+				Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
 
-			if (getGallery.isPresent()) {
-				Gallery updateGallery = getGallery.get();
+				if (getGallery.isPresent()) {
+					Gallery updateGallery = getGallery.get();
 
-				GalleryStatus status = updateGallery.getStatus();
-				List<BoardItem> posts = updateGallery.getPosts();
+					GalleryStatus status = updateGallery.getStatus();
+					List<BoardItem> posts = updateGallery.getPosts();
 
-				if (Objects.isNull(posts))
-					posts = new ArrayList<>();
+					if (Objects.isNull(posts))
+						posts = new ArrayList<>();
 
-				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-				long itemCount = 0;
+					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
+					long itemCount = 0;
 
-				if (! posts.isEmpty()) {
-					itemCount = posts.stream()
-							.filter(item -> item.getId().equals(boardItem.getId()))
-							.count();
+					if (!posts.isEmpty()) {
+						itemCount = posts.stream()
+								.filter(item -> item.getId().equals(boardItem.getId()))
+								.count();
+					}
+
+					if (itemCount == 0) {
+						posts.add(boardItem);
+						updateGallery.setPosts(posts);
+					}
+
+					if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
+						updateGallery.setName(galleryOnBoard.getName());
+					} else {
+						updateGallery.setName(boardFree.getSubject());
+					}
+
+					status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
+					status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+					updateGallery.setStatus(status);
+					galleryRepository.save(updateGallery);
+
+					/*
+					  엘라스틱서치 색인 요청
+					 */
+					commonSearchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 				}
-
-
-				if (itemCount == 0) {
-					posts.add(boardItem);
-					updateGallery.setPosts(posts);
-				}
-
-				if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
-					updateGallery.setName(galleryOnBoard.getName());
-				} else {
-					updateGallery.setName(boardFree.getSubject());
-				}
-
-				status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
-				status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
-				updateGallery.setStatus(status);
-				galleryRepository.save(updateGallery);
-
-				/**
-				 * 엘라스틱서치 색인 요청
-				 */
-				searchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 			}
 		}
 
-		/**
-		 * 엘라스틱서치 색인 요청
+		/*
+		  엘라스틱서치 색인 요청
 		 */
-		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name());
+		List<String> galleryIds = null;
+
+		if (Objects.nonNull(boardFree.getGalleries())) {
+			galleryIds = boardFree.getGalleries().stream()
+					.filter(Objects::nonNull)
+					.map(BoardImage::getId)
+					.collect(Collectors.toList());
+		}
+
+		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		/*
 		// 슬랙 알림
@@ -195,14 +225,14 @@ public class BoardFreeService {
 		);
 		*/
 
-		if (log.isInfoEnabled())
-			log.info("new post created. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+		log.info("new post created. post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
 
 		return boardFree.getSeq();
 	}
 
 	/**
-	 * 자유게시판 글 편집
+	 * 자유게시판 글 고치기
+	 *
 	 * @param seq 글 seq
 	 * @param subject 글 제목
 	 * @param content 글 내용
@@ -220,15 +250,21 @@ public class BoardFreeService {
 		if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
+		String stripHtmlContent = StringUtils.defaultIfBlank(CoreUtils.stripHtmlTag(content), StringUtils.EMPTY);
+		stripHtmlContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
+
 		boardFree.setSubject(subject);
 		boardFree.setContent(content);
 		boardFree.setCategory(categoryCode);
+		boardFree.setShortContent(stripHtmlContent);
 
-		List<BoardImage> galleriesOnBoard = new ArrayList<>();
-		galleries.forEach(gallery -> galleriesOnBoard.add(new BoardImage(gallery.getId())));
+		if (! ObjectUtils.isEmpty(galleries)) {
+			List<BoardImage> galleriesOnBoard = galleries.stream()
+					.map(gallery -> new BoardImage(gallery.getId()))
+					.collect(Collectors.toList());
 
-		if (! galleriesOnBoard.isEmpty())
 			boardFree.setGalleries(galleriesOnBoard);
+		}
 
 		BoardStatus boardStatus = boardFree.getStatus();
 
@@ -240,78 +276,94 @@ public class BoardFreeService {
 
 		List<BoardHistory> histories = boardFree.getHistory();
 
-		if (Objects.isNull(histories))
+		if (ObjectUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
-		BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.EDIT, writer);
+		// boardHistory
+		ObjectId boardHistoryId = new ObjectId();
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.EDIT, writer);
 		histories.add(history);
 		boardFree.setHistory(histories);
 
+		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+
 		boardFreeRepository.save(boardFree);
 
-		// 글과 연동 된 사진 처리
-		BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+		/*
+		글과 연동 된 사진 처리
+		 */
+		if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
+			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
 
-		for (GalleryOnBoard galleryOnBoard : galleries) {
+			for (GalleryOnBoard galleryOnBoard : galleries) {
 
-			Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
+				Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
 
-			if (getGallery.isPresent()) {
-				Gallery updateGallery = getGallery.get();
+				if (getGallery.isPresent()) {
+					Gallery updateGallery = getGallery.get();
 
-				GalleryStatus status = updateGallery.getStatus();
-				List<BoardItem> posts = updateGallery.getPosts();
+					GalleryStatus status = updateGallery.getStatus();
+					List<BoardItem> posts = updateGallery.getPosts();
 
-				if (Objects.isNull(status))
-					status = new GalleryStatus();
+					if (Objects.isNull(status))
+						status = new GalleryStatus();
 
-				if (Objects.isNull(posts))
-					posts = new ArrayList<>();
+					if (Objects.isNull(posts))
+						posts = new ArrayList<>();
 
-				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-				long itemCount = 0;
+					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
+					long itemCount = 0;
 
-				if (! posts.isEmpty())
-					itemCount = posts.stream().filter(item -> item.getId().equals(boardItem.getId())).count();
+					if (!posts.isEmpty())
+						itemCount = posts.stream().filter(item -> item.getId().equals(boardItem.getId())).count();
 
-				if (itemCount == 0) {
-					posts.add(boardItem);
-					updateGallery.setPosts(posts);
+					if (itemCount == 0) {
+						posts.add(boardItem);
+						updateGallery.setPosts(posts);
+					}
+
+					if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
+						updateGallery.setName(galleryOnBoard.getName());
+					} else {
+						updateGallery.setName(boardFree.getSubject());
+					}
+
+					status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
+					status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+					updateGallery.setStatus(status);
+					galleryRepository.save(updateGallery);
+
+					/*
+					  엘라스틱서치 색인 요청
+					 */
+					commonSearchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 				}
-
-				if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
-					updateGallery.setName(galleryOnBoard.getName());
-				} else {
-					updateGallery.setName(boardFree.getSubject());
-				}
-
-				status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
-				status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
-				updateGallery.setStatus(status);
-				galleryRepository.save(updateGallery);
-
-				/**
-				 * 엘라스틱서치 색인 요청
-				 */
-				searchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
 			}
-
 		}
 
-		/**
-		 * 엘라스틱서치 색인 요청
+		/*
+		  엘라스틱서치 색인 요청
 		 */
-		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name());
+		List<String> galleryIds = null;
 
-		if (log.isInfoEnabled())
-			log.info("post was edited. post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
+		if (Objects.nonNull(boardFree.getGalleries())) {
+			galleryIds = boardFree.getGalleries().stream()
+					.filter(Objects::nonNull)
+					.map(BoardImage::getId)
+					.collect(Collectors.toList());
+		}
+
+		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
+
+		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
 
 		return boardFree.getSeq();
 	}
 
 	/**
 	 * 자유게시판 글 지움
+	 *
 	 * @param seq 글 seq
 	 * @return CoreConst.BOARD_DELETE_TYPE
      */
@@ -327,8 +379,10 @@ public class BoardFreeService {
 
         Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 
-        // 글이 지워질 때, 연동된 사진도 끊어주어야 한다.
-        // 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
+        /*
+        글이 지워질 때, 연동된 사진도 끊어주어야 한다.
+        TODO : 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
+         */
         if (count > 0) {
 			boardFree.setContent(null);
 			boardFree.setSubject(null);
@@ -364,7 +418,8 @@ public class BoardFreeService {
             }
         }
 
-        searchService.deleteDocumentBoard(boardFree.getId());
+		// 색인 지움
+        commonSearchService.deleteDocumentBoard(boardFree.getId());
 
         return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
     }
@@ -398,62 +453,48 @@ public class BoardFreeService {
 
 	/**
 	 * 자유 게시판 공지글 목록
-     * @return 공지글 목록
      */
-	public Page<BoardFreeOnList> getFreeNotices() {
+	public List<BoardFreeOnList> getFreeNotices() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-		Pageable noticePageable = new PageRequest(0, 10, sort);
 
-		return boardFreeRepository.findByNotice(noticePageable);
+		return boardFreeRepository.findNotices(sort);
 	}
 
-	public BoardFreeDetail getPost(Integer seq, String language, Boolean isViewsIncreasing) {
+	/**
+	 * 최근 글 가져오기
+	 */
+	public List<BoardFreeOnList> getFreeLatest() {
+
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+
+		return boardFreeRepository.findLatest(sort, CoreConst.HOME_SIZE_POST);
+	}
+
+    /**
+     * 읽음수 1 증가
+     */
+	public void increaseViews(BoardFree boardFree) {
+        int views = boardFree.getViews();
+        boardFree.setViews(++views);
+        boardFreeRepository.save(boardFree);
+    }
+
+    /**
+     * 글 감정 표현.
+     */
+	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, CoreConst.FEELING_TYPE feeling) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
-		List<BoardImage> images = boardFree.getGalleries();
-		List<Gallery> galleries = null;
+        String userId = writer.getUserId();
+        String username = writer.getUsername();
 
-		if (Objects.nonNull(images)) {
-			List<String> ids =  images.stream()
-					.map(BoardImage::getId)
-					.collect(Collectors.toList());
+		CommonWriter postWriter = boardFree.getWriter();
 
-			galleries = galleryRepository.findByIdIn(ids);
-		}
-
-		BoardCategory boardCategory = boardDAO.getBoardCategory(boardFree.getCategory().name(), language);
-
-		BoardFreeDetail post = new BoardFreeDetail();
-		BeanUtils.copyProperties(boardFree, post);
-		post.setCategory(boardCategory);
-		post.setGalleries(galleries);
-
-		if (isViewsIncreasing) {
-			int views = boardFree.getViews();
-			boardFree.setViews(++views);
-			boardFreeRepository.save(boardFree);
-		}
-
-		return post;
-	}
-
-	// 글 감정 표현.
-	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, CoreConst.FEELING_TYPE feeling) {
-		String userId = writer.getUserId();
-		String username = writer.getUsername();
-
-		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
-		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceError.NOT_FOUND_POST);
-
-		BoardFree getBoardFree = boardFree.get();
-		CommonWriter postWriter = getBoardFree.getWriter();
-
-		List<CommonFeelingUser> usersLiking = getBoardFree.getUsersLiking();
-		List<CommonFeelingUser> usersDisliking = getBoardFree.getUsersDisliking();
+		List<CommonFeelingUser> usersLiking = boardFree.getUsersLiking();
+		List<CommonFeelingUser> usersDisliking = boardFree.getUsersDisliking();
 
 		if (Objects.isNull(usersLiking)) usersLiking = new ArrayList<>();
 		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
@@ -462,38 +503,71 @@ public class BoardFreeService {
 		if (userId.equals(postWriter.getUserId()))
 			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
-		// 해당 회원이 좋아요를 이미 했는지 검사
-		for (CommonFeelingUser feelingUser : usersLiking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
-				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
-		}
+        // 해당 회원이 좋아요를 이미 했는지 검사
+		Optional<CommonFeelingUser> alreadyLike = usersLiking.stream()
+                .filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+                .findFirst();
 
-		// 해당 회원이 싫어요를 이미 했는지 검사
-		for (CommonFeelingUser feelingUser : usersDisliking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
-				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
-		}
+        // 해당 회원이 싫어요를 이미 했는지 검사
+        Optional<CommonFeelingUser> alreadyDislike = usersDisliking.stream()
+                .filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+                .findFirst();
 
 		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
 
 		switch (feeling) {
 			case LIKE:
-				usersLiking.add(feelingUser);
-				getBoardFree.setUsersLiking(usersLiking);
+			    // 이미 좋아요를 했을 때, 좋아요를 취소
+			    if (alreadyLike.isPresent()) {
+			        usersLiking.remove(alreadyLike.get());
+                }
+                // 이미 싫어요를 했을 때, 싫어요를 없애고 좋아요로 바꿈
+                else if (alreadyDislike.isPresent()) {
+			        usersDisliking.remove(alreadyDislike.get());
+			        usersLiking.add(feelingUser);
+
+                    boardFree.setUsersDisliking(usersDisliking);
+                }
+                // 아직 감정 표현을 하지 않아 좋아요로 등록
+                else {
+			    	usersLiking.add(feelingUser);
+				}
+
+				boardFree.setUsersLiking(usersLiking);
+
 				break;
+
 			case DISLIKE:
-				usersDisliking.add(feelingUser);
-				getBoardFree.setUsersDisliking(usersDisliking);
+                // 이미 싫어요를 했을 때, 싫어요를 취소
+                if (alreadyDislike.isPresent()) {
+                    usersDisliking.remove(alreadyDislike.get());
+                }
+                // 이미 좋아요를 했을 때, 좋아요를 없애고 싫어요로 바꿈
+                else if (alreadyLike.isPresent()) {
+                    usersLiking.remove(alreadyLike.get());
+                    usersDisliking.add(feelingUser);
+
+                    boardFree.setUsersLiking(usersLiking);
+                }
+				// 아직 감정 표현을 하지 않아 싫어요로 등록
+                else {
+					usersDisliking.add(feelingUser);
+				}
+
+				boardFree.setUsersDisliking(usersDisliking);
+
 				break;
 		}
 
-		boardFreeRepository.save(getBoardFree);
+		boardFreeRepository.save(boardFree);
 
-		return getBoardFree;
+		return boardFree;
 	}
 
-	// 게시판 댓글 추가.
-	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String contents, CoreConst.DEVICE_TYPE device) {
+	/**
+	 * 게시판 댓글 달기
+	 */
+	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String content, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -501,19 +575,73 @@ public class BoardFreeService {
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
 				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
 				.writer(writer)
-				.content(contents)
+				.content(content)
 				.status(new BoardCommentStatus(device))
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
-		/**
-		 * 엘라스틱서치 색인 요청
+		/*
+		  엘라스틱서치 색인 요청
 		 */
-		searchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
 				boardFreeComment.getContent());
 
 		return boardFreeComment;
+	}
+
+	/**
+	 * 게시판 댓글 고치기
+	 */
+	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, CoreConst.DEVICE_TYPE device) {
+
+		boardFreeRepository.findOneBySeq(seq)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+
+		BoardFreeComment boardFreeComment = boardFreeCommentRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+
+		if (! boardFreeComment.getWriter().getUserId().equals(writer.getUserId()))
+			throw new ServiceException(ServiceError.FORBIDDEN);
+
+		boardFreeComment.setWriter(writer);
+		boardFreeComment.setContent(StringUtils.trim(content));
+		BoardCommentStatus boardCommentStatus = boardFreeComment.getStatus();
+
+		if (Objects.isNull(boardCommentStatus)) {
+			boardCommentStatus = new BoardCommentStatus(device);
+		} else {
+			boardCommentStatus.setDevice(device);
+		}
+
+		boardFreeComment.setStatus(boardCommentStatus);
+
+		boardFreeCommentRepository.save(boardFreeComment);
+
+		/*
+		  엘라스틱서치 색인 요청
+		 */
+		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+				boardFreeComment.getContent());
+
+		return boardFreeComment;
+	}
+
+	/**
+	 * 게시판 댓글 지움
+	 */
+	public void deleteFreeComment(String id, CommonWriter writer) {
+
+		BoardFreeComment boardFreeComment = boardFreeCommentRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+
+		if (! boardFreeComment.getWriter().getUserId().equals(writer.getUserId()))
+			throw new ServiceException(ServiceError.FORBIDDEN);
+
+		boardFreeCommentRepository.delete(id);
+
+		// 색인 지움
+		commonSearchService.deleteDocumentBoardComment(id);
 	}
 
 	// 게시판 댓글 목록
@@ -532,16 +660,19 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 댓글 감정 표현.
+	 *
 	 * @param commentId 댓글 ID
 	 * @param feeling 감정표현 종류
      * @return 자유게시판 댓글 객체
      */
 	public BoardFreeComment setFreeCommentFeeling(CommonWriter writer, String commentId, CoreConst.FEELING_TYPE feeling) {
 
+		BoardFreeComment boardComment = boardFreeCommentRepository.findOneById(commentId)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+
 		String userId = writer.getUserId();
 		String username = writer.getUsername();
 
-		BoardFreeComment boardComment = boardFreeCommentRepository.findById(commentId);
 		CommonWriter postWriter = boardComment.getWriter();
 
 		List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
@@ -555,27 +686,58 @@ public class BoardFreeService {
 			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
-		for (CommonFeelingUser feelingUser : usersLiking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
-				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
-		}
+		Optional<CommonFeelingUser> alreadyLike = usersLiking.stream()
+				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+				.findFirst();
 
 		// 해당 회원이 싫어요를 이미 했는지 검사
-		for (CommonFeelingUser feelingUser : usersDisliking) {
-			if (Objects.nonNull(feelingUser) && userId.equals(feelingUser.getUserId()))
-				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
-		}
+		Optional<CommonFeelingUser> alreadyDislike = usersDisliking.stream()
+				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+				.findFirst();
 
 		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
 
 		switch (feeling) {
 			case LIKE:
-				usersLiking.add(feelingUser);
+				// 이미 좋아요를 했을 때, 좋아요를 취소
+				if (alreadyLike.isPresent()) {
+					usersLiking.remove(alreadyLike.get());
+				}
+				// 이미 싫어요를 했을 때, 싫어요를 없애고 좋아요로 바꿈
+				else if (alreadyDislike.isPresent()) {
+					usersDisliking.remove(alreadyDislike.get());
+					usersLiking.add(feelingUser);
+
+					boardComment.setUsersDisliking(usersDisliking);
+				}
+				// 아직 감정 표현을 하지 않아 좋아요로 등록
+				else {
+					usersLiking.add(feelingUser);
+				}
+
 				boardComment.setUsersLiking(usersLiking);
+
 				break;
+
 			case DISLIKE:
-				usersDisliking.add(feelingUser);
+				// 이미 싫어요를 했을 때, 싫어요를 취소
+				if (alreadyDislike.isPresent()) {
+					usersDisliking.remove(alreadyDislike.get());
+				}
+				// 이미 좋아요를 했을 때, 좋아요를 없애고 싫어요로 바꿈
+				else if (alreadyLike.isPresent()) {
+					usersLiking.remove(alreadyLike.get());
+					usersDisliking.add(feelingUser);
+
+					boardComment.setUsersLiking(usersLiking);
+				}
+				// 아직 감정 표현을 하지 않아 싫어요로 등록
+				else {
+					usersDisliking.add(feelingUser);
+				}
+
 				boardComment.setUsersDisliking(usersDisliking);
+
 				break;
 		}
 
@@ -711,5 +873,25 @@ public class BoardFreeService {
 
 		return posts.stream()
 				.collect(Collectors.toMap(BoardFreeOnSearch::getId, Function.identity()));
+	}
+
+	/**
+	 * RSS 용 게시물 목록
+	 */
+	public List<BoardFreeOnRSS> getBoardFreeOnRss(ObjectId objectId, Integer limit) {
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+
+		return boardFreeRepository.findPostsOnRss(objectId, sort, limit);
+
+	}
+
+	/**
+	 * 사이트맵 용 게시물 목록
+	 */
+	public List<BoardFreeOnSitemap> getBoardFreeOnSitemap(ObjectId objectId, Integer limit) {
+		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+
+		return boardFreeRepository.findPostsOnSitemap(objectId, sort, limit);
+
 	}
 }

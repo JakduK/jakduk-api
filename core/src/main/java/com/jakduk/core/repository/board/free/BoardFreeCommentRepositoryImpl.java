@@ -15,8 +15,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by pyohwan on 16. 11. 30.
@@ -58,11 +56,11 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
     }
 
     /**
-     * 게시물 seq에 해당하는 댓글 수를 가져온다.
+     * 게시물 ID 에 해당하는 댓글 수를 가져온다.
      */
     @Override
-    public List<CommonCount> findCommentsCountBySeqs(List<Integer> arrSeq) {
-        AggregationOperation match = Aggregation.match(Criteria.where("boardItem.seq").in(arrSeq));
+    public List<CommonCount> findCommentsCountByIds(List<ObjectId> ids) {
+        AggregationOperation match = Aggregation.match(Criteria.where("boardItem._id").in(ids));
         AggregationOperation group = Aggregation.group("boardItem").count().as("count");
         //AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
         //AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);

@@ -1,7 +1,6 @@
 package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.vo.AttemptSocialUser;
-import com.jakduk.api.configuration.authentication.user.CommonPrincipal;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -75,12 +74,18 @@ public class JwtTokenUtils implements Serializable {
                 attemptSocialUser.setUsername(claims.get("username", String.class));
 
             if (claims.containsKey("providerId")) {
-                String temp =claims.get("providerId", String.class);
+                String temp = claims.get("providerId", String.class);
                 attemptSocialUser.setProviderId(CoreConst.ACCOUNT_TYPE.valueOf(temp));
             }
 
             if (claims.containsKey("providerUserId"))
                 attemptSocialUser.setProviderUserId(claims.get("providerUserId", String.class));
+
+            if (claims.containsKey("externalSmallPictureUrl"))
+                attemptSocialUser.setExternalSmallPictureUrl(claims.get("externalSmallPictureUrl", String.class));
+
+            if (claims.containsKey("externalLargePictureUrl"))
+                attemptSocialUser.setExternalLargePictureUrl(claims.get("externalLargePictureUrl", String.class));
 
         } catch (Exception ignored) {
         }
@@ -150,14 +155,23 @@ public class JwtTokenUtils implements Serializable {
         return (AUDIENCE_TABLET.equals(audience) || AUDIENCE_MOBILE.equals(audience));
     }
 
-    public String generateToken(CommonPrincipal userDetails, Device device) {
+    /**
+     * 토큰 생성
+     *
+     * @param device
+     * @param id
+     * @param email
+     * @param username
+     * @param providerId
+     */
+    public String generateToken(Device device, String id, String email, String username, String providerId) {
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put(Claims.ISSUER, userDetails.getEmail());
+        claims.put(Claims.ISSUER, email);
         claims.put(Claims.AUDIENCE, generateAudience(device));
-        claims.put(CLAIM_KEY_USER_ID, userDetails.getId());
-        claims.put(CLAIM_KEY_NAME, userDetails.getUsername());
-        claims.put(CLAIM_KEY_PROVIDER_ID, userDetails.getProviderId());
+        claims.put(CLAIM_KEY_USER_ID, id);
+        claims.put(CLAIM_KEY_NAME, username);
+        claims.put(CLAIM_KEY_PROVIDER_ID, providerId);
 
         return generateToken(claims, generateExpirationDate());
     }
@@ -217,6 +231,12 @@ public class JwtTokenUtils implements Serializable {
 
         if (! ObjectUtils.isEmpty(attemptSocialUser.getProviderUserId()))
             attempted.put("providerUserId", attemptSocialUser.getProviderUserId());
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getExternalSmallPictureUrl()))
+            attempted.put("externalSmallPictureUrl", attemptSocialUser.getExternalSmallPictureUrl());
+
+        if (! ObjectUtils.isEmpty(attemptSocialUser.getExternalLargePictureUrl()))
+            attempted.put("externalLargePictureUrl", attemptSocialUser.getExternalLargePictureUrl());
 
         return attempted;
     }

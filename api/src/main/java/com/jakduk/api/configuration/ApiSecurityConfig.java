@@ -92,16 +92,21 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                         HttpMethod.POST,
                         "/api/board/free",                  // 자유게시판 글쓰기
                         "/api/board/free/comment",          // 자유게시판 댓글 달기
-                        "/api/user/image"                   // 유저 이미지 올리기
+                        "/api/gallery"                      // 사진 올리기
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
-                .antMatchers(
+                .regexMatchers(
                         HttpMethod.PUT,
+                        "/api/board/free/(\\d+)",           // 자유게시판 글고치기
                         "/api/user/profile/me",             // 내 프로필 정보 편집
                         "/api/user/password"                // 이메일 기반 회원의 비밀번호 변경
                 ).hasAnyRole("USER_01", "USER_02", "USER_03")
+                .regexMatchers(
+                        HttpMethod.DELETE,
+                        "/api/board/free/(\\d+)"            // 자유게시판 글지우기
+                ).hasAnyRole("USER_01", "USER_02", "USER_03")
 
                 .antMatchers(
-//                        "/rest/**"                          // spring-data-rest
+//                        "/restcontroller/**"                          // spring-data-restcontroller
                 ).hasRole("ROOT")
 
                 .anyRequest().permitAll()
