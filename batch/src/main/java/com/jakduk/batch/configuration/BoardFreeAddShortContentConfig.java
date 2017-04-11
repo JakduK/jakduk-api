@@ -1,8 +1,8 @@
 package com.jakduk.batch.configuration;
 
-import com.jakduk.batch.processor.ChangeGalleryPostsToLinkedItemsProcessor;
+import com.jakduk.batch.processor.BoardFreeAddShortContentProcessor;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.db.Gallery;
+import com.jakduk.core.model.db.BoardFree;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Gallery의 posts를 linkedItems으로 바꾼다. 기존에는 글만 저장했는데 이제는 댓글까지 확장하기 위함이다.
+ * 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
  *
- * Created by pyohwanjang on 2017. 4. 11..
+ * Created by pyohwanjang on 2017. 3. 2..
  */
 
 @Configuration
-public class ChangeGalleryPostsToLinkedItemsConfig {
+public class BoardFreeAddShortContentConfig {
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -41,34 +41,34 @@ public class ChangeGalleryPostsToLinkedItemsConfig {
     private MongoOperations mongoOperations;
 
     @Bean
-    public Job changeGalleryPostsToLinkedItemsJob01(@Qualifier("changeGalleryPostsToLinkedItems01") Step step1) throws Exception {
+    public Job boardFreeAddShortContentJob(@Qualifier("boardFreeAddShortContentStep") Step step) {
 
-        return jobBuilderFactory.get("changeGalleryPostsToLinkedItemsJob01")
+        return jobBuilderFactory.get("boardFreeAddShortContentJob")
                 .incrementer(new RunIdIncrementer())
-                .start(step1)
+                .start(step)
                 .build();
     }
 
     @Bean
-    public Step changeGalleryPostsToLinkedItems01() {
-        return stepBuilderFactory.get("changeGalleryPostsToLinkedItems01")
-                .<Gallery, Gallery>chunk(1000)
-                .reader(changeGalleryPostsToLinkedItemsReader())
-                .processor(changeGalleryPostsToLinkedItemsProcessor())
-                .writer(changeGalleryPostsToLinkedItemsWriter())
+    public Step boardFreeAddShortContentStep() {
+        return stepBuilderFactory.get("boardFreeAddShortContentStep")
+                .<BoardFree, BoardFree>chunk(1000)
+                .reader(boardFreeAddShortContentReader())
+                .processor(boardFreeAddShortContentProcessor())
+                .writer(boardFreeAddShortContentWriter())
                 .build();
     }
 
     @Bean
-    public ItemReader<Gallery> changeGalleryPostsToLinkedItemsReader() {
+    public ItemReader<BoardFree> boardFreeAddShortContentReader() {
 
-        String query = String.format("{'status.status':'%s', 'batch':{$nin:['%s']}}",
-                CoreConst.GALLERY_STATUS_TYPE.ENABLE, CoreConst.BATCH_TYPE.CHANGE_GALLERY_POSTS_TO_LINKED_ITEMS_01);
+        String query = String.format("{'batch':{$nin:['%s']}}",
+                CoreConst.BATCH_TYPE.BOARD_FREE_ADD_SHORT_CONTENT_01);
 
-        MongoItemReader<Gallery> itemReader = new MongoItemReader<>();
+        MongoItemReader<BoardFree> itemReader = new MongoItemReader<>();
         itemReader.setTemplate(mongoOperations);
-        itemReader.setTargetType(Gallery.class);
-        itemReader.setPageSize(100);
+        itemReader.setTargetType(BoardFree.class);
+        itemReader.setPageSize(500);
         itemReader.setQuery(query);
         Map<String, Sort.Direction> sorts = new HashMap<>();
         sorts.put("id", Sort.Direction.ASC);
@@ -78,16 +78,15 @@ public class ChangeGalleryPostsToLinkedItemsConfig {
     }
 
     @Bean
-    public ItemProcessor<Gallery, Gallery> changeGalleryPostsToLinkedItemsProcessor() {
-        return new ChangeGalleryPostsToLinkedItemsProcessor();
+    public ItemProcessor<BoardFree, BoardFree> boardFreeAddShortContentProcessor() {
+        return new BoardFreeAddShortContentProcessor();
     }
 
     @Bean
-    public MongoItemWriter<Gallery> changeGalleryPostsToLinkedItemsWriter() {
-        MongoItemWriter<Gallery> writer = new MongoItemWriter<>();
+    public MongoItemWriter<BoardFree> boardFreeAddShortContentWriter() {
+        MongoItemWriter<BoardFree> writer = new MongoItemWriter<>();
         writer.setTemplate(mongoOperations);
 
         return writer;
     }
-
 }

@@ -6,13 +6,16 @@ import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.LinkedItem;
 import org.springframework.batch.item.ItemProcessor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Created by pyohwanjang on 2017. 4. 11..
  */
-public class ChangeGalleryPostsToLinkedItemsProcessor implements ItemProcessor<Gallery, Gallery> {
+public class GalleryChangePostsToLinkedItemsProcessor implements ItemProcessor<Gallery, Gallery> {
 
     @Override
     public Gallery process(Gallery item) throws Exception {
@@ -31,10 +34,10 @@ public class ChangeGalleryPostsToLinkedItemsProcessor implements ItemProcessor<G
             item.setLinkedItems(linkedItems);
 
             List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
-                    .orElseGet(Collections::emptyList);
+                    .orElseGet(ArrayList::new);
 
-            if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.CHANGE_GALLERY_POSTS_TO_LINKED_ITEMS_01))) {
-                batchList.add(CoreConst.BATCH_TYPE.CHANGE_GALLERY_POSTS_TO_LINKED_ITEMS_01);
+            if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.GALLERY_CHANGE_POSTS_TO_LINKED_ITEMS_01))) {
+                batchList.add(CoreConst.BATCH_TYPE.GALLERY_CHANGE_POSTS_TO_LINKED_ITEMS_01);
                 item.setBatch(batchList);
             }
         }

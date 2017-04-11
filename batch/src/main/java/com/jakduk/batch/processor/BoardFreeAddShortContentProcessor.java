@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * Created by pyohwanjang on 2017. 3. 2..
  */
-public class AddShortContentProcessor implements ItemProcessor<BoardFree, BoardFree> {
+public class BoardFreeAddShortContentProcessor implements ItemProcessor<BoardFree, BoardFree> {
 
     @Override
     public BoardFree process(BoardFree item) throws Exception {
@@ -27,8 +27,8 @@ public class AddShortContentProcessor implements ItemProcessor<BoardFree, BoardF
             List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
                     .orElseGet(ArrayList::new);
 
-            if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.ADD_SHORT_CONTENT_01))) {
-                batchList.add(CoreConst.BATCH_TYPE.ADD_SHORT_CONTENT_01);
+            if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.BOARD_FREE_ADD_SHORT_CONTENT_01))) {
+                batchList.add(CoreConst.BATCH_TYPE.BOARD_FREE_ADD_SHORT_CONTENT_01);
                 item.setBatch(batchList);
             }
         }
