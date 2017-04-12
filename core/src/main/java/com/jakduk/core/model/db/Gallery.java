@@ -1,10 +1,8 @@
 package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.embedded.BoardItem;
-import com.jakduk.core.model.embedded.CommonFeelingUser;
-import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.embedded.GalleryStatus;
+import com.jakduk.core.model.embedded.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +20,7 @@ import java.util.List;
  * @desc     :
  */
 
+@Builder
 @Getter
 @Setter
 @Document
@@ -33,8 +32,12 @@ public class Gallery {
 	private String name;
 	
 	private String fileName;
-	
+
+	// linkedItems으로 대체
+	@Deprecated
 	private List<BoardItem> posts;
+
+	private List<LinkedItem> linkedItems;
 	
 	private CommonWriter writer;
 	
@@ -53,5 +56,7 @@ public class Gallery {
 	private List<CommonFeelingUser> usersDisliking;
 
 	private List<CoreConst.BATCH_TYPE> batch;
+
+	private String hash;
 
 }

@@ -1,8 +1,8 @@
 package com.jakduk.batch.configuration;
 
-import com.jakduk.batch.processor.AddLastUpdatedToBoardFreeProcessor;
+import com.jakduk.batch.processor.GalleryAddHashProcessor;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.db.BoardFree;
+import com.jakduk.core.model.db.Gallery;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * BoardFree에 lastUpdated 필드를 추가한다.
+ * Gallery에 hash 필드 추가. 중복 검사할때 쓰임
  *
- * Created by pyohwanjang on 2017. 3. 12..
+ * Created by pyohwanjang on 2017. 4. 11..
  */
 
 @Configuration
-public class AddLastUpdatedToBoardFreeConfig {
+public class GalleryAddHashConfig {
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -41,33 +41,33 @@ public class AddLastUpdatedToBoardFreeConfig {
     private MongoOperations mongoOperations;
 
     @Bean
-    public Job addLastUpdatedToBoardFree(@Qualifier("addLastUpdatedToBoardFreeStep") Step step) throws Exception {
+    public Job galleryAddHashJob(@Qualifier("galleryAddHashStep") Step step) {
 
-        return jobBuilderFactory.get("addLastUpdatedToBoardFreeJob")
+        return jobBuilderFactory.get("galleryAddHashJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step)
                 .build();
     }
 
     @Bean
-    public Step addLastUpdatedToBoardFreeStep() {
-        return stepBuilderFactory.get("addLastUpdatedToBoardFreeStep")
-                .<BoardFree, BoardFree>chunk(1000)
-                .reader(addLastUpdatedToBoardFreeReader())
-                .processor(addLastUpdatedToBoardFreeProcessor())
-                .writer(addLastUpdatedToBoardFreeWriter())
+    public Step galleryAddHashStep() {
+        return stepBuilderFactory.get("galleryAddHashStep")
+                .<Gallery, Gallery>chunk(1000)
+                .reader(galleryAddHashReader())
+                .processor(galleryAddHashProcessor())
+                .writer(galleryAddHashWriter())
                 .build();
     }
 
     @Bean
-    public ItemReader<BoardFree> addLastUpdatedToBoardFreeReader() {
+    public ItemReader<Gallery> galleryAddHashReader() {
 
-        String query = String.format("{'batch':{$nin:['%s']}}",
-                CoreConst.BATCH_TYPE.ADD_LAST_UPDATED_TO_BOARDFREE_01);
+        String query = String.format("{'status.status':'%s', 'batch':{$nin:['%s']}}",
+                CoreConst.GALLERY_STATUS_TYPE.ENABLE, CoreConst.BATCH_TYPE.GALLERY_ADD_HASH_FIELD_01);
 
-        MongoItemReader<BoardFree> itemReader = new MongoItemReader<>();
+        MongoItemReader<Gallery> itemReader = new MongoItemReader<>();
         itemReader.setTemplate(mongoOperations);
-        itemReader.setTargetType(BoardFree.class);
+        itemReader.setTargetType(Gallery.class);
         itemReader.setPageSize(500);
         itemReader.setQuery(query);
         Map<String, Sort.Direction> sorts = new HashMap<>();
@@ -78,16 +78,15 @@ public class AddLastUpdatedToBoardFreeConfig {
     }
 
     @Bean
-    public ItemProcessor<BoardFree, BoardFree> addLastUpdatedToBoardFreeProcessor() {
-        return new AddLastUpdatedToBoardFreeProcessor();
+    public ItemProcessor<Gallery, Gallery> galleryAddHashProcessor() {
+        return new GalleryAddHashProcessor();
     }
 
     @Bean
-    public MongoItemWriter<BoardFree> addLastUpdatedToBoardFreeWriter() {
-        MongoItemWriter<BoardFree> writer = new MongoItemWriter<>();
+    public MongoItemWriter<Gallery> galleryAddHashWriter() {
+        MongoItemWriter<Gallery> writer = new MongoItemWriter<>();
         writer.setTemplate(mongoOperations);
 
         return writer;
     }
-
 }

@@ -1,6 +1,6 @@
 package com.jakduk.batch.configuration;
 
-import com.jakduk.batch.processor.AddShortContentProcessor;
+import com.jakduk.batch.processor.BoardFreeAddLastUpdatedProcessor;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFree;
 import org.springframework.batch.core.Job;
@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
+ * BoardFree에 lastUpdated 필드를 추가한다.
  *
- * Created by pyohwanjang on 2017. 3. 2..
+ * Created by pyohwanjang on 2017. 3. 12..
  */
 
 @Configuration
-public class AddShortContentConfig {
+public class BoardFreeAddLastUpdatedConfig {
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -41,34 +41,34 @@ public class AddShortContentConfig {
     private MongoOperations mongoOperations;
 
     @Bean
-    public Job addShortContentJob(@Qualifier("addShortContentStep") Step step) throws Exception {
+    public Job boardFreeAddLastUpdatedJob(@Qualifier("boardFreeAddLastUpdatedStep") Step step) {
 
-        return jobBuilderFactory.get("addShortContentJob")
+        return jobBuilderFactory.get("boardFreeAddLastUpdatedJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step)
                 .build();
     }
 
     @Bean
-    public Step addShortContentStep() {
-        return stepBuilderFactory.get("addShortContentStep")
+    public Step boardFreeAddLastUpdatedStep() {
+        return stepBuilderFactory.get("boardFreeAddLastUpdatedStep")
                 .<BoardFree, BoardFree>chunk(1000)
-                .reader(addShortContentReader())
-                .processor(addShortContentProcessor())
-                .writer(addShortContentWriter())
+                .reader(boardFreeAddLastUpdatedReader())
+                .processor(boardFreeAddLastUpdatedProcessor())
+                .writer(boardFreeAddLastUpdatedWriter())
                 .build();
     }
 
     @Bean
-    public ItemReader<BoardFree> addShortContentReader() {
+    public ItemReader<BoardFree> boardFreeAddLastUpdatedReader() {
 
         String query = String.format("{'batch':{$nin:['%s']}}",
-                CoreConst.BATCH_TYPE.ADD_SHORT_CONTENT_01);
+                CoreConst.BATCH_TYPE.BOARD_FREE_ADD_LAST_UPDATED_01);
 
         MongoItemReader<BoardFree> itemReader = new MongoItemReader<>();
         itemReader.setTemplate(mongoOperations);
         itemReader.setTargetType(BoardFree.class);
-        itemReader.setPageSize(500);
+        itemReader.setPageSize(1000);
         itemReader.setQuery(query);
         Map<String, Sort.Direction> sorts = new HashMap<>();
         sorts.put("id", Sort.Direction.ASC);
@@ -78,15 +78,16 @@ public class AddShortContentConfig {
     }
 
     @Bean
-    public ItemProcessor<BoardFree, BoardFree> addShortContentProcessor() {
-        return new AddShortContentProcessor();
+    public ItemProcessor<BoardFree, BoardFree> boardFreeAddLastUpdatedProcessor() {
+        return new BoardFreeAddLastUpdatedProcessor();
     }
 
     @Bean
-    public MongoItemWriter<BoardFree> addShortContentWriter() {
+    public MongoItemWriter<BoardFree> boardFreeAddLastUpdatedWriter() {
         MongoItemWriter<BoardFree> writer = new MongoItemWriter<>();
         writer.setTemplate(mongoOperations);
 
         return writer;
     }
+
 }

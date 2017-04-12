@@ -15,6 +15,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class BoardItem {
+
 	private String id;
 	private Integer seq;
+
 }

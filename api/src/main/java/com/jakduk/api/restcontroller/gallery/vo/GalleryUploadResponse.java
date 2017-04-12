@@ -46,4 +46,5 @@ public class GalleryUploadResponse {
 
     @ApiModelProperty(value = "썸네일 URL")
     private String thumbnailUrl;
+
 }

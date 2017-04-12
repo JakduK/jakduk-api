@@ -104,7 +104,8 @@ public class CoreConst {
      * 사진을 등록한 출처
      */
     public enum GALLERY_FROM_TYPE {
-        BOARD_FREE
+        BOARD_FREE,
+		BOARD_FREE_COMMENT
     }
 
 	/**
@@ -202,8 +203,10 @@ public class CoreConst {
 	public enum BATCH_TYPE {
 		CHANGE_BOARD_CONTENT_IMAGE_URL_01,
 		APPEND_GALLERY_FILE_EXT_01,
-		ADD_SHORT_CONTENT_01,				// 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
-		ADD_LAST_UPDATED_TO_BOARDFREE_01	// BoardFree에 lastUpdated 필드를 추가한다.
+		BOARD_FREE_ADD_SHORT_CONTENT_01,			// 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
+		BOARD_FREE_ADD_LAST_UPDATED_01,				// BoardFree에 lastUpdated 필드를 추가한다.
+		GALLERY_CHANGE_POSTS_TO_LINKED_ITEMS_01,	// Gallery의 posts를 linkedItems으로 바꾼다.
+		GALLERY_ADD_HASH_FIELD_01					// Gallery에 hash 필드 추가.
 	}
 
 	public enum SEARCH_TYPE {

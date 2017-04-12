@@ -7,6 +7,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,26 +20,16 @@ import java.util.stream.Stream;
 
 public class ChangeBoardImageUrlProcessor implements ItemProcessor<BoardFree, BoardFree> {
 
-	private final String PROFILE_STAGING_BEFORE_IMAGE_URL_01 = "src=\"/jakduk/gallery/";
-	private final String PROFILE_STAGING_BEFORE_IMAGE_URL_02 = "src=\"/jakduk-web/gallery/";
-	private final String PROFILE_STAGING_AFTER_IMAGE_URL = "src=\"https://staging.jakduk.com:8080/gallery/";
-	private final String PROFILE_PRODUCTION_BEFORE_IMAGE_URL_01 = "src=\"/gallery/";
-	private final String PROFILE_PRODUCTION_AFTER_IMAGE_URL = "src=\"https://api.jakduk.com/gallery/";
-
-	@Autowired
+	@Resource
 	private Environment environment;
 
-	/**
-	 * Process the provided item, returning a potentially modified or new item for continued
-	 * processing.  If the returned result is null, it is assumed that processing of the item
-	 * should not continue.
-	 *
-	 * @param item to be processed
-	 * @return potentially modified or new item for continued processing, null if processing of the
-	 * provided item should not continue.
-	 * @throws Exception
-	 */
 	@Override public BoardFree process(BoardFree item) throws Exception {
+
+		final String PROFILE_STAGING_BEFORE_IMAGE_URL_01 = "src=\"/jakduk/gallery/";
+		final String PROFILE_STAGING_BEFORE_IMAGE_URL_02 = "src=\"/jakduk-web/gallery/";
+		final String PROFILE_STAGING_AFTER_IMAGE_URL = "src=\"https://staging.jakduk.com:8080/gallery/";
+		final String PROFILE_PRODUCTION_BEFORE_IMAGE_URL_01 = "src=\"/gallery/";
+		final String PROFILE_PRODUCTION_AFTER_IMAGE_URL = "src=\"https://api.jakduk.com/gallery/";
 
 		String beforeImageUrl01 = PROFILE_STAGING_BEFORE_IMAGE_URL_01;
 		String beforeImageUrl02 = PROFILE_STAGING_BEFORE_IMAGE_URL_02;

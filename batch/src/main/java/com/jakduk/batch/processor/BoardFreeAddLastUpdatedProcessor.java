@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Created by pyohwanjang on 2017. 3. 12..
  */
-public class AddLastUpdatedToBoardFreeProcessor implements ItemProcessor<BoardFree, BoardFree> {
+public class BoardFreeAddLastUpdatedProcessor implements ItemProcessor<BoardFree, BoardFree> {
 
     @Override
     public BoardFree process(BoardFree item) throws Exception {
@@ -45,8 +45,8 @@ public class AddLastUpdatedToBoardFreeProcessor implements ItemProcessor<BoardFr
         List<CoreConst.BATCH_TYPE> batchList = Optional.ofNullable(item.getBatch())
                 .orElseGet(ArrayList::new);
 
-        if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.ADD_LAST_UPDATED_TO_BOARDFREE_01))) {
-            batchList.add(CoreConst.BATCH_TYPE.ADD_LAST_UPDATED_TO_BOARDFREE_01);
+        if (batchList.stream().noneMatch(batch -> batch.equals(CoreConst.BATCH_TYPE.BOARD_FREE_ADD_LAST_UPDATED_01))) {
+            batchList.add(CoreConst.BATCH_TYPE.BOARD_FREE_ADD_LAST_UPDATED_01);
             item.setBatch(batchList);
         }
 

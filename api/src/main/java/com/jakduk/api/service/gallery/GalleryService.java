@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
@@ -205,36 +206,35 @@ public class GalleryService {
 	}
 
 	/**
-	 * 사진 올리기.
-	 * @return Gallery 객체
+	 * 사진 올리기
      */
-	public Gallery uploadImage(CommonWriter writer, String originalFileName, long size, String contentType, byte[] bytes) {
+	public Gallery uploadImage(CommonWriter writer, String fileName, long size, String contentType, byte[] bytes) {
 
-		Gallery gallery = new Gallery();
+		// hash를 뽑아 DB에 같은게 있는지 찾아보고, 있으면 찾은걸 응답.
+		String hash = DigestUtils.md5DigestAsHex(bytes);
+		Optional<Gallery> oGallery = galleryRepository.findOneByHashAndStatusStatus(hash, CoreConst.GALLERY_STATUS_TYPE.ENABLE);
 
-		gallery.setWriter(writer);
+		if (oGallery.isPresent())
+			return oGallery.get();
 
-		GalleryStatus status = GalleryStatus.builder()
-				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+		Gallery gallery = Gallery.builder()
+				.contentType(contentType)
+				.writer(writer)
+				.status(
+						GalleryStatus.builder()
+								.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+								.build())
+				.fileName(fileName)
+				.size(size)
+				.fileSize(size)
+				.hash(DigestUtils.md5DigestAsHex(bytes))
 				.build();
 
-		gallery.setStatus(status);
-		gallery.setFileName(originalFileName);
-		gallery.setFileSize(size);
-		gallery.setSize(size);
+		galleryRepository.save(gallery);
 
 		// 사진 포맷.
-		String formatName = "jpg";
 		String splitContentType[] = StringUtils.split(contentType, "/");
-
-		if (! splitContentType[1].equals("octet-stream")) {
-			formatName = splitContentType[1];
-			gallery.setContentType(contentType);
-		} else {
-			gallery.setContentType("image/jpeg");
-		}
-
-		galleryRepository.save(gallery);
+		String formatName = splitContentType[1];
 
 		try {
 			// 폴더 생성.
@@ -295,7 +295,7 @@ public class GalleryService {
 			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 		}
 
-		log.debug("gallery=" + gallery);
+		log.debug("gallery=\n{}", gallery);
 
 		return gallery;
 

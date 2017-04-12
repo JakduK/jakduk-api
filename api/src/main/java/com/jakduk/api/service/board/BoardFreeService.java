@@ -1,5 +1,6 @@
-package com.jakduk.core.service;
+package com.jakduk.api.service.board;
 
+import com.jakduk.api.service.board.vo.GalleryOnBoard;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
@@ -11,13 +12,14 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.*;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
-import com.jakduk.core.model.etc.GalleryOnBoard;
 import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
+import com.jakduk.core.service.CommonSearchService;
+import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -96,118 +98,78 @@ public class BoardFreeService {
      * @param subject 글 제목
      * @param content 글 내용
      * @param categoryCode 글 말머리 Code
-     * @param galleries 글과 연동된 사진들
+     * @param boardGalleries 글과 연동된 사진들
      * @param device 디바이스
      * @return 글 seq
      */
 	public Integer insertFreePost(CommonWriter writer, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
-								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
+								  List<GalleryOnBoard> boardGalleries, CoreConst.DEVICE_TYPE device) {
 
 		boardCategoryRepository.findOneByCode(categoryCode.name())
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
 
+		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(CoreUtils.stripHtmlTag(content), StringUtils.EMPTY);
-		stripHtmlContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
+		String shortContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
 
-		BoardFree boardFree = BoardFree.builder()
-				.writer(writer)
-				.category(categoryCode)
-				.subject(subject)
-				.content(content)
-				.shortContent(stripHtmlContent)
-				.views(0)
-				.seq(commonService.getNextSequence(CoreConst.BOARD_TYPE.BOARD_FREE.name()))
-				.build();
-
-		if (! ObjectUtils.isEmpty(galleries)) {
-			List<BoardImage> galleriesOnBoard = galleries.stream()
-					.map(gallery -> new BoardImage(gallery.getId()))
-					.collect(Collectors.toList());
-
-			boardFree.setGalleries(galleriesOnBoard);
-		}
-
+		// 글 상태
 		BoardStatus boardStatus = BoardStatus.builder()
 				.device(device)
 				.build();
-
-		boardFree.setStatus(boardStatus);
 
 		// boardHistory
 		List<BoardHistory> histories = new ArrayList<>();
 		ObjectId boardHistoryId = new ObjectId();
 		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.CREATE, writer);
 		histories.add(history);
-		boardFree.setHistory(histories);
 
-		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+		// lastUpdated
+		LocalDateTime lastUpdated = LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault());
+
+		// 연관된 사진 id 배열
+		List<String> galleryIds = null;
+
+		if (! ObjectUtils.isEmpty(boardGalleries)) {
+			galleryIds = boardGalleries.stream()
+					.map(GalleryOnBoard::getId)
+					.collect(Collectors.toList());
+		}
+
+		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
+
+		List<BoardImage> linkedGalleries = null;
+
+		if (! ObjectUtils.isEmpty(galleries)) {
+			linkedGalleries = galleries.stream()
+					.map(gallery -> new BoardImage(gallery.getId()))
+					.collect(Collectors.toList());
+		}
+
+		BoardFree boardFree = BoardFree.builder()
+				.writer(writer)
+				.category(categoryCode)
+				.subject(subject)
+				.content(content)
+				.shortContent(shortContent)
+				.views(0)
+				.seq(commonService.getNextSequence(CoreConst.BOARD_TYPE.BOARD_FREE.name()))
+				.status(boardStatus)
+				.history(histories)
+				.lastUpdated(lastUpdated)
+				.galleries(Objects.nonNull(linkedGalleries) ? linkedGalleries : null)
+				.build();
 
 		boardFreeRepository.save(boardFree);
 
 		/*
 		글과 연동 된 사진 처리
 		 */
-		if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
-			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
-
-			for (GalleryOnBoard galleryOnBoard : galleries) {
-
-				Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
-
-				if (getGallery.isPresent()) {
-					Gallery updateGallery = getGallery.get();
-
-					GalleryStatus status = updateGallery.getStatus();
-					List<BoardItem> posts = updateGallery.getPosts();
-
-					if (Objects.isNull(posts))
-						posts = new ArrayList<>();
-
-					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-					long itemCount = 0;
-
-					if (!posts.isEmpty()) {
-						itemCount = posts.stream()
-								.filter(item -> item.getId().equals(boardItem.getId()))
-								.count();
-					}
-
-					if (itemCount == 0) {
-						posts.add(boardItem);
-						updateGallery.setPosts(posts);
-					}
-
-					if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
-						updateGallery.setName(galleryOnBoard.getName());
-					} else {
-						updateGallery.setName(boardFree.getSubject());
-					}
-
-					status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
-					status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
-					updateGallery.setStatus(status);
-					galleryRepository.save(updateGallery);
-
-					/*
-					  엘라스틱서치 색인 요청
-					 */
-					commonSearchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
-				}
-			}
-		}
+		if (Objects.nonNull(galleries))
+			this.processLinkedGalleries(boardFree.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
 		/*
 		  엘라스틱서치 색인 요청
 		 */
-		List<String> galleryIds = null;
-
-		if (Objects.nonNull(boardFree.getGalleries())) {
-			galleryIds = boardFree.getGalleries().stream()
-					.filter(Objects::nonNull)
-					.map(BoardImage::getId)
-					.collect(Collectors.toList());
-		}
-
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
@@ -237,12 +199,12 @@ public class BoardFreeService {
 	 * @param subject 글 제목
 	 * @param content 글 내용
 	 * @param categoryCode 글 말머리 Code
-	 * @param galleries 글과 연동된 사진들
+	 * @param boardGalleries 글과 연동된 사진들
      * @param device 디바이스
      * @return 글 seq
      */
 	public Integer updateFreePost(CommonWriter writer, Integer seq, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
-								  List<GalleryOnBoard> galleries, CoreConst.DEVICE_TYPE device) {
+								  List<GalleryOnBoard> boardGalleries, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -250,13 +212,25 @@ public class BoardFreeService {
 		if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
+		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(CoreUtils.stripHtmlTag(content), StringUtils.EMPTY);
-		stripHtmlContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
+		String shortContent = StringUtils.truncate(stripHtmlContent, CoreConst.BOARD_SHORT_CONTENT_LENGTH);
 
 		boardFree.setSubject(subject);
 		boardFree.setContent(content);
 		boardFree.setCategory(categoryCode);
-		boardFree.setShortContent(stripHtmlContent);
+		boardFree.setShortContent(shortContent);
+
+		// 연관된 사진 id 배열
+		List<String> galleryIds = null;
+
+		if (! ObjectUtils.isEmpty(boardGalleries)) {
+			galleryIds = boardGalleries.stream()
+					.map(GalleryOnBoard::getId)
+					.collect(Collectors.toList());
+		}
+
+		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
 
 		if (! ObjectUtils.isEmpty(galleries)) {
 			List<BoardImage> galleriesOnBoard = galleries.stream()
@@ -266,6 +240,9 @@ public class BoardFreeService {
 			boardFree.setGalleries(galleriesOnBoard);
 		}
 
+		/*
+		글 상태
+		 */
 		BoardStatus boardStatus = boardFree.getStatus();
 
 		if (Objects.isNull(boardStatus))
@@ -274,12 +251,14 @@ public class BoardFreeService {
         boardStatus.setDevice(device);
 		boardFree.setStatus(boardStatus);
 
+		/*
+		boardHistory
+		 */
 		List<BoardHistory> histories = boardFree.getHistory();
 
 		if (ObjectUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
-		// boardHistory
 		ObjectId boardHistoryId = new ObjectId();
 		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.EDIT, writer);
 		histories.add(history);
@@ -292,73 +271,19 @@ public class BoardFreeService {
 		/*
 		글과 연동 된 사진 처리
 		 */
-		if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
-			BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
-
-			for (GalleryOnBoard galleryOnBoard : galleries) {
-
-				Optional<Gallery> getGallery = galleryRepository.findOneById(galleryOnBoard.getId());
-
-				if (getGallery.isPresent()) {
-					Gallery updateGallery = getGallery.get();
-
-					GalleryStatus status = updateGallery.getStatus();
-					List<BoardItem> posts = updateGallery.getPosts();
-
-					if (Objects.isNull(status))
-						status = new GalleryStatus();
-
-					if (Objects.isNull(posts))
-						posts = new ArrayList<>();
-
-					// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-					long itemCount = 0;
-
-					if (!posts.isEmpty())
-						itemCount = posts.stream().filter(item -> item.getId().equals(boardItem.getId())).count();
-
-					if (itemCount == 0) {
-						posts.add(boardItem);
-						updateGallery.setPosts(posts);
-					}
-
-					if (galleryOnBoard.getName() != null && !galleryOnBoard.getName().isEmpty()) {
-						updateGallery.setName(galleryOnBoard.getName());
-					} else {
-						updateGallery.setName(boardFree.getSubject());
-					}
-
-					status.setFrom(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
-					status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
-					updateGallery.setStatus(status);
-					galleryRepository.save(updateGallery);
-
-					/*
-					  엘라스틱서치 색인 요청
-					 */
-					commonSearchService.indexDocumentGallery(updateGallery.getId(), updateGallery.getWriter(), updateGallery.getName());
-				}
-			}
-		}
+		if (Objects.nonNull(galleries))
+			this.processLinkedGalleries(boardFree.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
 		/*
 		  엘라스틱서치 색인 요청
 		 */
-		List<String> galleryIds = null;
-
-		if (Objects.nonNull(boardFree.getGalleries())) {
-			galleryIds = boardFree.getGalleries().stream()
-					.filter(Objects::nonNull)
-					.map(BoardImage::getId)
-					.collect(Collectors.toList());
-		}
-
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
 
 		return boardFree.getSeq();
+
 	}
 
 	/**
@@ -893,5 +818,60 @@ public class BoardFreeService {
 
 		return boardFreeRepository.findPostsOnSitemap(objectId, sort, limit);
 
+	}
+
+	/**
+	 * 글/댓글과 엮인 사진들을 업데이트 한다. 색인도 포함
+	 *
+	 * @param id 글/댓글 ID
+	 * @param boardGalleries 사용자가 입력한 사진 목록
+	 * @param galleries DB에 있는 사진 목록
+	 * @param fromType 출처
+	 */
+	private void processLinkedGalleries(String id, List<GalleryOnBoard> boardGalleries, List<Gallery> galleries,
+										CoreConst.GALLERY_FROM_TYPE fromType) {
+
+		LinkedItem linkedItem = LinkedItem.builder()
+				.id(id)
+				.from(fromType)
+				.build();
+
+		for (Gallery gallery : galleries) {
+
+				List<LinkedItem> linkedItems = gallery.getLinkedItems();
+
+				if (Objects.isNull(linkedItems))
+					linkedItems = new ArrayList<>();
+
+				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
+				Boolean isItemPresent = linkedItems.stream()
+						.anyMatch(item -> item.getId().equals(linkedItem.getId()));
+
+				if (! isItemPresent) {
+					linkedItems.add(linkedItem);
+					gallery.setLinkedItems(linkedItems);
+				}
+
+				Optional<GalleryOnBoard> oGalleryOnBoard = boardGalleries.stream()
+						.filter(galleryOnBoard -> galleryOnBoard.getId().equals(gallery.getId()))
+						.findFirst();
+
+				if (oGalleryOnBoard.isPresent() && StringUtils.isBlank(gallery.getName()))
+					gallery.setName(oGalleryOnBoard.get().getName());
+
+				GalleryStatus status = gallery.getStatus();
+
+				if (! status.getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.ENABLE)) {
+					status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+					gallery.setStatus(status);
+				}
+
+				galleryRepository.save(gallery);
+
+				/*
+				엘라스틱서치 색인 요청
+				 */
+				commonSearchService.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
+		}
 	}
 }

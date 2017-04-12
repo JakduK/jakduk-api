@@ -33,6 +33,7 @@ public class CommonTest extends ApiApplicationTests {
 
 		Assert.assertFalse(passwordEncoder.matches("1112", password));
 		Assert.assertTrue(passwordEncoder.matches("1111", password));
+
 	}
 	
 }
