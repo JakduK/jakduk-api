@@ -340,7 +340,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글쓰기")
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @PostMapping("")
     public FreePostOnWriteResponse addFreePost(
             @Valid @RequestBody FreePostForm form,
             Device device) {
@@ -356,7 +356,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 고치기")
-    @RequestMapping(value = "/{seq}", method = RequestMethod.PUT)
+    @PutMapping("/{seq}")
     public FreePostOnWriteResponse editFreePost(
             @PathVariable Integer seq,
             @Valid @RequestBody FreePostForm form,
