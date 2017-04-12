@@ -19,6 +19,7 @@ import com.jakduk.core.model.simple.GalleryOnList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,10 +98,15 @@ public class GalleryRestController {
         if (file.isEmpty())
             throw new ServiceException(ServiceError.INVALID_PARAMETER);
 
+        String contentType = file.getContentType();
+
+        if (! StringUtils.startsWithIgnoreCase(contentType, "image/"))
+            throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
+
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
         Gallery gallery = galleryService.uploadImage(commonWriter, file.getOriginalFilename(), file.getSize(),
-                file.getContentType(), file.getBytes());
+                contentType, file.getBytes());
 
         GalleryUploadResponse response = new GalleryUploadResponse();
 
@@ -126,7 +132,7 @@ public class GalleryRestController {
     }
 
     @ApiOperation(value = "사진 상세")
-    @RequestMapping(value = "/gallery/{id}", method = RequestMethod.GET)
+    @GetMapping("/gallery/{id}")
     public GalleryResponse view(
             @ApiParam(value = "Gallery ID", required = true) @PathVariable String id,
             HttpServletRequest request,

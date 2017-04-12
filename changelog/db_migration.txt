@@ -1,3 +1,7 @@
+Version 0.7.9 / 2017-
+// 사진 posts -> linkedItems 으로 인한 posts 필드 지움
+db.gallery.update({}, {$unset:{"posts":""}}, {multi:true})
+
 Version 0.7.6 / 2016-12-11
 
 // token TTL 설정

@@ -208,38 +208,33 @@ public class GalleryService {
 	/**
 	 * 사진 올리기
      */
-	public Gallery uploadImage(CommonWriter writer, String originalFileName, long size, String contentType, byte[] bytes) {
+	public Gallery uploadImage(CommonWriter writer, String fileName, long size, String contentType, byte[] bytes) {
 
+		// hash를 뽑아 DB에 같은게 있는지 찾아보고, 있으면 찾은걸 응답.
 		String hash = DigestUtils.md5DigestAsHex(bytes);
 		Optional<Gallery> oGallery = galleryRepository.findOneByHashAndStatusStatus(hash, CoreConst.GALLERY_STATUS_TYPE.ENABLE);
 
 		if (oGallery.isPresent())
 			return oGallery.get();
 
-		Gallery gallery = new Gallery();
-
-		gallery.setWriter(writer);
-		gallery.setStatus(
-				GalleryStatus.builder()
-						.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
-						.build());
-		gallery.setFileName(originalFileName);
-		gallery.setFileSize(size);
-		gallery.setSize(size);
-		gallery.setHash(DigestUtils.md5DigestAsHex(bytes));
-
-		// 사진 포맷.
-		String formatName = "jpg";
-		String splitContentType[] = StringUtils.split(contentType, "/");
-
-		if (! splitContentType[1].equals("octet-stream")) {
-			formatName = splitContentType[1];
-			gallery.setContentType(contentType);
-		} else {
-			gallery.setContentType("image/jpeg");
-		}
+		Gallery gallery = Gallery.builder()
+				.contentType(contentType)
+				.writer(writer)
+				.status(
+						GalleryStatus.builder()
+								.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+								.build())
+				.fileName(fileName)
+				.size(size)
+				.fileSize(size)
+				.hash(DigestUtils.md5DigestAsHex(bytes))
+				.build();
 
 		galleryRepository.save(gallery);
+
+		// 사진 포맷.
+		String splitContentType[] = StringUtils.split(contentType, "/");
+		String formatName = splitContentType[1];
 
 		try {
 			// 폴더 생성.

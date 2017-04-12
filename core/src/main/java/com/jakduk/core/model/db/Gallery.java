@@ -2,6 +2,7 @@ package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.util.List;
  * @desc     :
  */
 
+@Builder
 @Getter
 @Setter
 @Document

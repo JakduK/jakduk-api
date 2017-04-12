@@ -19,5 +19,4 @@ public class GalleryStatus {
 	
 	private CoreConst.GALLERY_STATUS_TYPE status;
 
-	private CoreConst.GALLERY_FROM_TYPE from;
 }
