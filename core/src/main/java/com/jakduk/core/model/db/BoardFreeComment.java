@@ -1,9 +1,6 @@
 package com.jakduk.core.model.db;
 
-import com.jakduk.core.model.embedded.BoardCommentStatus;
-import com.jakduk.core.model.embedded.BoardItem;
-import com.jakduk.core.model.embedded.CommonFeelingUser;
-import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.embedded.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,9 +35,10 @@ public class BoardFreeComment {
 
 	private String content;
 
-	@Setter
 	private List<CommonFeelingUser> usersLiking;
 
-	@Setter
 	private List<CommonFeelingUser> usersDisliking;
+
+	private List<BoardImage> galleries;
+
 }

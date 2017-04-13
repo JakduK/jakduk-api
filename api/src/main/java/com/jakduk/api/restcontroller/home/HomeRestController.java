@@ -11,7 +11,7 @@ import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.GalleryOnList;
-import com.jakduk.api.service.board.BoardFreeService;
+import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.core.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
