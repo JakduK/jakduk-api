@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.board;
 
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -26,10 +26,10 @@ public class FreePostDetailResponse {
     private FreePostDetail post;
 
     @ApiModelProperty(value = "앞 글")
-    private BoardFreeOfMinimum prevPost;
+    private BoardFreeSimple prevPost;
 
     @ApiModelProperty(value = "뒷 글")
-    private BoardFreeOfMinimum nextPost;
+    private BoardFreeSimple nextPost;
 
     @ApiModelProperty(value = "작성자의 최근 글")
     private List<LatestFreePost> latestPostsByWriter;

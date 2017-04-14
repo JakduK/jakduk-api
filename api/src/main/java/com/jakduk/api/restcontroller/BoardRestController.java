@@ -17,7 +17,6 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -30,12 +29,10 @@ import com.jakduk.core.service.BoardCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.BooleanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.mobile.device.Device;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -64,9 +61,6 @@ public class BoardRestController {
 
     @Autowired
     private BoardCategoryService boardCategoryService;
-
-    @Autowired
-    private GalleryService galleryService;
 
     @Autowired
     private BoardDAO boardDAO;
@@ -227,105 +221,15 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 상세")
-    @RequestMapping(value = "/{seq}", method = RequestMethod.GET)
+    @GetMapping("/{seq}")
     public FreePostDetailResponse getFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            HttpServletRequest servletRequest,
-            HttpServletResponse servletResponse) {
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
-        Boolean isAddCookie = ApiUtils.addViewsCookie(servletRequest, servletResponse, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
+        Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
-        BoardFree boardFree = boardFreeService.findOneBySeq(seq);
-
-        if (isAddCookie)
-            boardFreeService.increaseViews(boardFree);
-
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
-
-        /*
-        글 상세
-         */
-        FreePostDetail freePostDetail = new FreePostDetail();
-        BeanUtils.copyProperties(boardFree, freePostDetail);
-
-        Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
-        Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
-
-        freePostDetail.setCategory(boardCategoryService.getFreeCategory(boardFree.getCategory().name()));
-        freePostDetail.setNumberOfLike(numberOfLike);
-        freePostDetail.setNumberOfDislike(numberOfDisLike);
-
-        if (! ObjectUtils.isEmpty(boardFree.getGalleries())) {
-            List<String> ids =  boardFree.getGalleries().stream()
-                    .map(BoardImage::getId)
-                    .collect(Collectors.toList());
-
-            List<Gallery> galleries = galleryService.findByIds(ids);
-
-            List<FreePostDetailGallery> postDetailGalleries = galleries.stream()
-                    .map(gallery -> FreePostDetailGallery.builder()
-                            .id(gallery.getId())
-                            .name(gallery.getName())
-                            .imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
-                            .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
-                            .build())
-                    .collect(Collectors.toList());
-
-            freePostDetail.setGalleries(postDetailGalleries);
-        }
-
-        if (Objects.nonNull(commonWriter))
-            freePostDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
-
-        /*
-        앞, 뒤 글
-         */
-        CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
-
-        BoardFreeOfMinimum prevPost = boardDAO.getBoardFreeById(new ObjectId(freePostDetail.getId())
-                , categoryType, Sort.Direction.ASC);
-        BoardFreeOfMinimum nextPost = boardDAO.getBoardFreeById(new ObjectId(freePostDetail.getId())
-                , categoryType, Sort.Direction.DESC);
-
-        /*
-        글쓴이의 최근 글
-         */
-        List<LatestFreePost> latestFreePosts = null;
-
-        if (ObjectUtils.isEmpty(freePostDetail.getStatus()) || BooleanUtils.isNotTrue(freePostDetail.getStatus().getDelete())) {
-
-            List<BoardFreeOnList> latestPostsByWriter = boardFreeService.findByIdAndUserId(freePostDetail.getId(), freePostDetail.getWriter().getUserId(), 3);
-
-            // 게시물 VO 변환 및 썸네일 URL 추가
-            latestFreePosts = latestPostsByWriter.stream()
-                    .map(post -> {
-                        LatestFreePost latestFreePost = new LatestFreePost();
-                        BeanUtils.copyProperties(post, latestFreePost);
-
-                        if (! ObjectUtils.isEmpty(post.getGalleries())) {
-                            List<BoardGallery> boardGalleries = post.getGalleries().stream()
-                                    .sorted(Comparator.comparing(BoardImage::getId))
-                                    .limit(1)
-                                    .map(gallery -> BoardGallery.builder()
-                                            .id(gallery.getId())
-                                            .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-                                            .build())
-                                    .collect(Collectors.toList());
-
-                            latestFreePost.setGalleries(boardGalleries);
-                        }
-
-                        return latestFreePost;
-                    })
-                    .collect(Collectors.toList());
-        }
-
-        return FreePostDetailResponse.builder()
-                .post(freePostDetail)
-                .prevPost(prevPost)
-                .nextPost(nextPost)
-                .latestPostsByWriter(ObjectUtils.isEmpty(latestFreePosts) ? null : latestFreePosts)
-                .build();
+        return boardFreeService.getBoardFreeDetail(seq, isAddCookie);
     }
 
     @ApiOperation(value = "자유게시판 말머리 목록")
@@ -341,8 +245,8 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글쓰기")
     @PostMapping("")
-    public FreePostOnWriteResponse addFreePost(
-            @Valid @RequestBody FreePostForm form,
+    public FreePostWriteResponse addFreePost(
+            @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
             Device device) {
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
@@ -350,16 +254,16 @@ public class BoardRestController {
         Integer boardSeq = boardFreeService.insertFreePost(commonWriter, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), form.getGalleries(), ApiUtils.getDeviceInfo(device));
 
-        return FreePostOnWriteResponse.builder()
+        return FreePostWriteResponse.builder()
                 .seq(boardSeq)
                 .build();
     }
 
     @ApiOperation(value = "자유게시판 글 고치기")
     @PutMapping("/{seq}")
-    public FreePostOnWriteResponse editFreePost(
-            @PathVariable Integer seq,
-            @Valid @RequestBody FreePostForm form,
+    public FreePostWriteResponse editFreePost(
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody FreePostForm form,
             Device device) {
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
@@ -367,7 +271,7 @@ public class BoardRestController {
         Integer boardSeq = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), form.getGalleries(), ApiUtils.getDeviceInfo(device));
 
-        return FreePostOnWriteResponse.builder()
+        return FreePostWriteResponse.builder()
                 .seq(boardSeq)
                 .build();
     }

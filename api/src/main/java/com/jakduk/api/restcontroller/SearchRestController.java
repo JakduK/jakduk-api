@@ -1,9 +1,9 @@
-package com.jakduk.api.restcontroller.search;
+package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.service.search.SearchService;
-import com.jakduk.api.service.search.vo.PopularSearchWordResult;
-import com.jakduk.api.service.search.vo.SearchUnifiedResponse;
+import com.jakduk.api.service.SearchService;
+import com.jakduk.api.vo.search.PopularSearchWordResult;
+import com.jakduk.api.vo.search.SearchUnifiedResponse;
 import com.jakduk.core.service.CommonSearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

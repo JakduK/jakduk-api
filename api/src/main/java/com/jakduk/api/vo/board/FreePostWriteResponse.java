@@ -17,8 +17,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FreePostOnWriteResponse {
+public class FreePostWriteResponse {
 
-    @ApiModelProperty(value = "글 번호")
+    @ApiModelProperty(example = "2", value = "글번호")
     private Integer seq;
+
 }

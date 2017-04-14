@@ -5,20 +5,17 @@ import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import org.apache.commons.collections4.IteratorUtils;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -146,32 +143,4 @@ public class BoardDAO {
 		return commentCount;
 	}	
 	
-	/**
-	 * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
-	 * @param id 글 ID
-	 * @param category 말머리
-	 * @param direction 앞 or 뒤
-	 * @return 글 객체
-	 */
-	public BoardFreeOfMinimum getBoardFreeById(ObjectId id, CoreConst.BOARD_CATEGORY_TYPE category, Direction direction) {
-		Query query = new Query();
-
-		switch (category) {
-			case FREE:
-			case FOOTBALL:
-				query.addCriteria(Criteria.where("category").is(category));
-				break;
-		}
-		
-		if (direction.equals(Sort.Direction.ASC)) {
-			query.addCriteria(Criteria.where("_id").gt(id));
-		} else if (direction.equals(Sort.Direction.DESC)) {
-			query.addCriteria(Criteria.where("_id").lt(id));
-		}
-		
-		query.with(new Sort(direction, "_id"));
-
-		return mongoTemplate.findOne(query, BoardFreeOfMinimum.class);
-	}
-
 }

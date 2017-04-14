@@ -1,6 +1,7 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.DateUtils;
@@ -10,7 +11,6 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.BoardFreeOnSitemap;
-import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.core.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;

@@ -1,8 +1,8 @@
-package com.jakduk.api.service.search;
+package com.jakduk.api.service;
 
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.restcontroller.vo.BoardGallery;
-import com.jakduk.api.service.search.vo.*;
+import com.jakduk.api.vo.search.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.model.elasticsearch.*;

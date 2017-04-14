@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -175,4 +174,28 @@ public class FileUtils {
         private Long contentLength;
         private byte[] bytes;
     }
+
+    /**
+     * 이미지 파일 지움
+     *
+     * @param imagePath     파일 최상위 경로
+     * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
+     * @param fileName      파일 제목 (확장자 제외)
+     */
+    public static void removeImageFile(String imagePath, LocalDate localDate, String fileName) {
+
+        Path imageFilePath = Paths.get(imagePath, String.valueOf(localDate.getYear()), String.valueOf(localDate.getMonthValue()),
+                String.valueOf(localDate.getDayOfMonth()), fileName);
+
+        if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
+            try {
+                Files.delete(imageFilePath);
+            } catch (IOException e) {
+                throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
+            }
+        } else {
+            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
+        }
+    }
+
 }

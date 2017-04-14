@@ -1,11 +1,15 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.vo.board.GalleryOnBoard;
+import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.restcontroller.vo.BoardGallery;
+import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
@@ -21,9 +25,12 @@ import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.CommonSearchService;
 import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +38,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -67,6 +75,9 @@ public class BoardFreeService {
 
 	@Autowired
 	private CommonSearchService commonSearchService;
+
+	@Resource
+	private ApiUtils apiUtils;
 
 	public BoardFree findOneBySeq(Integer seq) {
         return boardFreeRepository.findOneBySeq(seq)
@@ -126,24 +137,22 @@ public class BoardFreeService {
 		// lastUpdated
 		LocalDateTime lastUpdated = LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault());
 
-		// 연관된 사진 id 배열
-		List<String> galleryIds = null;
+		// 연관된 사진 id 배열 (검증 전)
+		List<String> userGalleryIds = null;
 
 		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			galleryIds = boardGalleries.stream()
+			userGalleryIds = boardGalleries.stream()
 					.map(GalleryOnBoard::getId)
 					.collect(Collectors.toList());
 		}
 
-		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
+		// 연관된 사진이 있는지 여부
+		List<Gallery> galleries = galleryRepository.findByIdIn(userGalleryIds);
 
-		List<BoardImage> linkedGalleries = null;
-
-		if (! ObjectUtils.isEmpty(galleries)) {
-			linkedGalleries = galleries.stream()
-					.map(gallery -> new BoardImage(gallery.getId()))
-					.collect(Collectors.toList());
-		}
+		// 연관된 사진 id 배열 (검증 후)
+		List<String> galleryIds = galleries.stream()
+				.map(Gallery::getId)
+				.collect(Collectors.toList());
 
 		BoardFree boardFree = BoardFree.builder()
 				.writer(writer)
@@ -156,20 +165,17 @@ public class BoardFreeService {
 				.status(boardStatus)
 				.history(histories)
 				.lastUpdated(lastUpdated)
-				.galleries(Objects.nonNull(linkedGalleries) ? linkedGalleries : null)
+				.linkedGallery(! galleries.isEmpty())
 				.build();
 
 		boardFreeRepository.save(boardFree);
 
-		/*
-		글과 연동 된 사진 처리
-		 */
-		if (Objects.nonNull(galleries))
+
+		// 글과 연동 된 사진 처리
+		if (! galleries.isEmpty())
 			this.processLinkedGalleries(boardFree.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
-		/*
-		  엘라스틱서치 색인 요청
-		 */
+	 	// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
@@ -221,28 +227,26 @@ public class BoardFreeService {
 		boardFree.setCategory(categoryCode);
 		boardFree.setShortContent(shortContent);
 
-		// 연관된 사진 id 배열
-		List<String> galleryIds = null;
+		// 연관된 사진 id 배열 (검증 전)
+		List<String> userGalleryIds = null;
 
 		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			galleryIds = boardGalleries.stream()
+			userGalleryIds = boardGalleries.stream()
 					.map(GalleryOnBoard::getId)
 					.collect(Collectors.toList());
 		}
 
-		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
+		// 연관된 사진이 있는지 여부
+		List<Gallery> galleries = galleryRepository.findByIdIn(userGalleryIds);
 
-		if (! ObjectUtils.isEmpty(galleries)) {
-			List<BoardImage> galleriesOnBoard = galleries.stream()
-					.map(gallery -> new BoardImage(gallery.getId()))
-					.collect(Collectors.toList());
+		// 연관된 사진 id 배열 (검증 후)
+		List<String> galleryIds = galleries.stream()
+				.map(Gallery::getId)
+				.collect(Collectors.toList());
 
-			boardFree.setGalleries(galleriesOnBoard);
-		}
+		boardFree.setLinkedGallery(! galleries.isEmpty());
 
-		/*
-		글 상태
-		 */
+		// 글 상태
 		BoardStatus boardStatus = boardFree.getStatus();
 
 		if (Objects.isNull(boardStatus))
@@ -251,9 +255,8 @@ public class BoardFreeService {
         boardStatus.setDevice(device);
 		boardFree.setStatus(boardStatus);
 
-		/*
-		boardHistory
-		 */
+
+		// boardHistory
 		List<BoardHistory> histories = boardFree.getHistory();
 
 		if (ObjectUtils.isEmpty(histories))
@@ -268,15 +271,11 @@ public class BoardFreeService {
 
 		boardFreeRepository.save(boardFree);
 
-		/*
-		글과 연동 된 사진 처리
-		 */
-		if (Objects.nonNull(galleries))
+		// 글과 연동 된 사진 처리
+		if (! galleries.isEmpty())
 			this.processLinkedGalleries(boardFree.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
-		/*
-		  엘라스틱서치 색인 요청
-		 */
+		// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
@@ -863,6 +862,103 @@ public class BoardFreeService {
 
 		return boardFreeRepository.findPostsOnSitemap(objectId, sort, limit);
 
+	}
+
+	/**
+	 * 글 상세 객체 가져오기
+	 */
+	public FreePostDetailResponse getBoardFreeDetail(Integer seq, Boolean isAddCookie) {
+
+		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
+
+		if (isAddCookie)
+			this.increaseViews(boardFree);
+
+		CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+        // 글 상세
+		FreePostDetail freePostDetail = new FreePostDetail();
+		BeanUtils.copyProperties(boardFree, freePostDetail);
+
+		Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
+		Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
+
+		BoardCategory boardCategory = boardCategoryRepository.findByCodeAndLanguage(boardFree.getCategory().name(),
+				CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
+
+		freePostDetail.setCategory(boardCategory);
+		freePostDetail.setNumberOfLike(numberOfLike);
+		freePostDetail.setNumberOfDislike(numberOfDisLike);
+
+		List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+				new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
+
+		if (! ObjectUtils.isEmpty(galleries)) {
+			List<FreePostDetailGallery> postDetailGalleries = galleries.stream()
+					.map(gallery -> FreePostDetailGallery.builder()
+							.id(gallery.getId())
+							.name(gallery.getName())
+							.imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+							.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+							.build())
+					.collect(Collectors.toList());
+
+			freePostDetail.setGalleries(postDetailGalleries);
+		}
+
+		if (Objects.nonNull(commonWriter))
+			freePostDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+
+		// 앞, 뒤 글
+		CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
+
+		BoardFreeSimple prevPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId())
+				, categoryType, CoreConst.CRITERIA_OPERATOR.GT);
+		BoardFreeSimple nextPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId())
+				, categoryType, CoreConst.CRITERIA_OPERATOR.LT);
+
+        // 글쓴이의 최근 글
+		List<LatestFreePost> latestFreePosts = null;
+
+		if (ObjectUtils.isEmpty(freePostDetail.getStatus()) || BooleanUtils.isNotTrue(freePostDetail.getStatus().getDelete())) {
+
+			List<BoardFreeOnList> latestPostsByWriter = boardFreeRepository.findByIdAndUserId(
+					new ObjectId(freePostDetail.getId()), freePostDetail.getWriter().getUserId(), 3);
+
+			// 게시물 VO 변환 및 썸네일 URL 추가
+			latestFreePosts = latestPostsByWriter.stream()
+					.map(post -> {
+						LatestFreePost latestFreePost = new LatestFreePost();
+						BeanUtils.copyProperties(post, latestFreePost);
+
+						if (! post.isLinkedGallery()) {
+							List<Gallery> latestPostGalleries = galleryRepository.findByItemIdAndFromType(new ObjectId(post.getId()),
+									CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
+
+							if (! ObjectUtils.isEmpty(latestPostGalleries)) {
+								List<BoardGallery> boardGalleries = latestPostGalleries.stream()
+										.map(gallery -> BoardGallery.builder()
+												.id(gallery.getId())
+												.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+												.build())
+										.collect(Collectors.toList());
+
+								latestFreePost.setGalleries(boardGalleries);
+							}
+						}
+
+						return latestFreePost;
+					})
+					.collect(Collectors.toList());
+		}
+
+		return FreePostDetailResponse.builder()
+				.post(freePostDetail)
+				.prevPost(prevPost)
+				.nextPost(nextPost)
+				.latestPostsByWriter(ObjectUtils.isEmpty(latestFreePosts) ? null : latestFreePosts)
+				.build();
 	}
 
 	/**

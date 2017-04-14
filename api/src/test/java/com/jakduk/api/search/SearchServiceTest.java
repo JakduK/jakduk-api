@@ -1,7 +1,7 @@
 package com.jakduk.api.search;
 
 import com.jakduk.api.ApiApplicationTests;
-import com.jakduk.api.service.search.SearchService;
+import com.jakduk.api.service.SearchService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -232,5 +232,6 @@ public class CoreConst {
 	 * mongoDB collection 이름
 	 */
 	public final static String COLLECTION_BOARD_FREE = "boardFree";
+	public final static String COLLECTION_GALLERY = "gallery";
 
 }

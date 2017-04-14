@@ -1,4 +1,4 @@
-package com.jakduk.api.service.search.vo;
+package com.jakduk.api.vo.search;
 
 
 import io.swagger.annotations.ApiModelProperty;

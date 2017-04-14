@@ -4,12 +4,13 @@ import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AuthUserProfile;
-import com.jakduk.api.vo.gallery.GalleriesResponse;
-import com.jakduk.api.vo.gallery.GalleryUploadResponse;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.service.GalleryService;
+import com.jakduk.api.vo.gallery.GalleriesResponse;
 import com.jakduk.api.vo.gallery.GalleryResponse;
+import com.jakduk.api.vo.gallery.GalleryUploadResponse;
+import com.jakduk.api.vo.gallery.LinkedItemForm;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -114,16 +115,18 @@ public class GalleryRestController {
         return response;
     }
 
-    @ApiOperation(value = "사진 지움", response = EmptyJsonResponse.class)
-    @RequestMapping(value = "/gallery/{id}", method = RequestMethod.DELETE)
-    public EmptyJsonResponse removeImage(@PathVariable String id) {
+    @ApiOperation(value = "사진 지움")
+    @DeleteMapping("/gallery/{id}")
+    public EmptyJsonResponse removeImage(
+            @ApiParam(value = "사진 ID", required = true) @PathVariable String id,
+            @ApiParam(value = "연관된 아이템 폼") @RequestBody LinkedItemForm form) {
 
         if (! UserUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        galleryService.removeImage(authUserProfile.getId(), id);
+        galleryService.removeImage(id, authUserProfile.getId(), form.getItemId(), form.getFrom());
 
         return EmptyJsonResponse.newInstance();
     }
@@ -158,4 +161,5 @@ public class GalleryRestController {
           .numberOfDislike((Integer) data.get("numberOfDislike"))
           .build();
     }
+
 }
