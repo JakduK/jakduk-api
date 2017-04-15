@@ -4,27 +4,18 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.restcontroller.home.vo.GalleryOnHome;
 import com.jakduk.api.restcontroller.home.vo.HomeResponse;
 import com.jakduk.api.restcontroller.home.vo.LatestPost;
-import com.jakduk.api.restcontroller.vo.BoardGallery;
+import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Encyclopedia;
-import com.jakduk.core.model.embedded.BoardImage;
-import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.GalleryOnList;
-import com.jakduk.api.service.board.BoardFreeService;
 import com.jakduk.core.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -59,9 +50,10 @@ public class HomeRestController {
     }
 
     @ApiOperation(value = "홈에서 보여줄 각종 최근 데이터 가져오기")
-    @RequestMapping(value = "/home/latest", method = RequestMethod.GET)
-    public HomeResponse getLatest(@RequestParam(required = false) String lang,
-                                  Locale locale) {
+    @GetMapping("/home/latest")
+    public HomeResponse getLatest(
+            @RequestParam(required = false) String lang,
+            Locale locale) {
 
         String language = CoreUtils.getLanguageCode(locale, lang);
 
@@ -70,34 +62,8 @@ public class HomeRestController {
         response.setUsers(homeService.getUsersLatest(language));
         response.setComments(homeService.getBoardCommentsLatest());
 
-        /*
-        최근 게시물
-         */
-        List<BoardFreeOnList> posts = boardFreeService.getFreeLatest();
-
-        // 게시물 VO 변환 및 썸네일 URL 추가
-        List<LatestPost> latestPosts = posts.stream()
-                .map(post -> {
-                    LatestPost latestPost = new LatestPost();
-                    BeanUtils.copyProperties(post, latestPost);
-
-                    if (! ObjectUtils.isEmpty(post.getGalleries())) {
-                        List<BoardGallery> boardGalleries = post.getGalleries().stream()
-                                .sorted(Comparator.comparing(BoardImage::getId))
-                                .limit(1)
-                                .map(gallery -> BoardGallery.builder()
-                                        .id(gallery.getId())
-                                        .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-                                        .build())
-                                .collect(Collectors.toList());
-
-                        latestPost.setGalleries(boardGalleries);
-                    }
-
-                    return latestPost;
-                })
-                .collect(Collectors.toList());
-
+        // 최근 게시물
+        List<LatestPost> latestPosts = boardFreeService.getFreeLatest();
         response.setPosts(latestPosts);
 
         /*

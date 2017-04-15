@@ -10,8 +10,8 @@ import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardFree;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.*;
-import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
@@ -31,18 +31,15 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -167,10 +164,13 @@ public class CommonSearchService {
                     .map(post -> {
                         List<String> galleryIds = null;
 
-                        if (Objects.nonNull(post.getGalleries())) {
-                            galleryIds = post.getGalleries().stream()
+                        if (post.isLinkedGallery()) {
+                            List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+                                    new ObjectId(post.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
+
+                            galleryIds = galleries.stream()
                                     .filter(Objects::nonNull)
-                                    .map(BoardImage::getId)
+                                    .map(Gallery::getId)
                                     .collect(Collectors.toList());
                         }
 

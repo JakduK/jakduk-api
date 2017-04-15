@@ -1,6 +1,7 @@
 package com.jakduk.core.repository.gallery;
 
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.ESGallery;
 import com.jakduk.core.model.simple.GalleryOnList;
 import org.bson.types.ObjectId;
@@ -41,7 +42,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
             aggregation = Aggregation.newAggregation(sort, limit1);
         }
 
-        AggregationResults<ESGallery> results = mongoTemplate.aggregate(aggregation, "gallery", ESGallery.class);
+        AggregationResults<ESGallery> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_GALLERY, ESGallery.class);
 
         return results.getMappedResults();
     }
@@ -67,6 +68,22 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
         query.with(new Sort(Sort.Direction.DESC, "_id"));
 
         return mongoTemplate.find(query, GalleryOnList.class);
+    }
+
+    /**
+     * ItemID와 FromType에 해당하는 Gallery 목록을 가져온다.
+     */
+    @Override
+    public List<Gallery> findByItemIdAndFromType(ObjectId itemId, CoreConst.GALLERY_FROM_TYPE fromType, Integer limit) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+        query.addCriteria(Criteria.where("linkedItems._id").is(itemId));
+        query.addCriteria(Criteria.where("linkedItems.from").is(fromType));
+        query.limit(limit);
+
+        query.with(new Sort(Sort.Direction.DESC, "_id"));
+
+        return mongoTemplate.find(query, Gallery.class);
     }
 
 }

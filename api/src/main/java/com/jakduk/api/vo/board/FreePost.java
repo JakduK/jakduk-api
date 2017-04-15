@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.home.vo;
+package com.jakduk.api.vo.board;
 
 import com.jakduk.api.restcontroller.vo.BoardGallery;
 import com.jakduk.core.common.CoreConst;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class LatestPost {
+public class FreePost {
 
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;
@@ -44,5 +44,14 @@ public class LatestPost {
 
     @ApiModelProperty(example = "본문입니다.", value = "본문 100자")
     private String shortContent;
+
+    @ApiModelProperty(example = "5", value = "댓글 수")
+    private int commentCount;
+
+    @ApiModelProperty(example = "5", value = "좋아요 수")
+    private int likingCount;
+
+    @ApiModelProperty(example = "5", value = "싫어요 수")
+    private int dislikingCount;
 
 }

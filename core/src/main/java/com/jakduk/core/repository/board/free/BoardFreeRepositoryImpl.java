@@ -1,9 +1,7 @@
 package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.elasticsearch.ESBoard;
 import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -159,5 +156,33 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         AggregationResults<BoardFreeSimple> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, BoardFreeSimple.class);
 
         return results.getMappedResults();
+    }
+
+    /**
+     * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
+     */
+    @Override
+    public BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, CoreConst.BOARD_CATEGORY_TYPE category, CoreConst.CRITERIA_OPERATOR operator) {
+        Query query = new Query();
+
+        switch (category) {
+            case FREE:
+            case FOOTBALL:
+                query.addCriteria(Criteria.where("category").is(category));
+                break;
+        }
+
+        switch (operator) {
+            case GT:
+                query.addCriteria(Criteria.where("_id").gt(id));
+                query.with(new Sort(Sort.Direction.ASC, "_id"));
+                break;
+            case LT:
+                query.addCriteria(Criteria.where("_id").lt(id));
+                query.with(new Sort(Sort.Direction.DESC, "_id"));
+                break;
+        }
+
+        return mongoTemplate.findOne(query, BoardFreeSimple.class);
     }
 }

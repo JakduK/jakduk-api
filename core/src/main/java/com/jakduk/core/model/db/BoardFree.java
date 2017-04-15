@@ -65,13 +65,16 @@ public class BoardFree {
 	private BoardStatus status;
 	
 	private List<BoardHistory> history;
-	
-	private List<BoardImage> galleries;
 
+	@Deprecated
+	private List<BoardImage> galleries;
+	
 	private List<CoreConst.BATCH_TYPE> batch;
 
 	private String shortContent;
 
 	private LocalDateTime lastUpdated;
+
+	private boolean linkedGallery;
 
 }

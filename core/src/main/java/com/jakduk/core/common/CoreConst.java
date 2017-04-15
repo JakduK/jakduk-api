@@ -205,6 +205,7 @@ public class CoreConst {
 		APPEND_GALLERY_FILE_EXT_01,
 		BOARD_FREE_ADD_SHORT_CONTENT_01,			// 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
 		BOARD_FREE_ADD_LAST_UPDATED_01,				// BoardFree에 lastUpdated 필드를 추가한다.
+		BOARD_FREE_ADD_LINKED_GALLERY_01,			// BoardFree에 linkedGallery 필드를 추가한다.
 		GALLERY_CHANGE_POSTS_TO_LINKED_ITEMS_01,	// Gallery의 posts를 linkedItems으로 바꾼다.
 		GALLERY_ADD_HASH_FIELD_01					// Gallery에 hash 필드 추가.
 	}
@@ -232,5 +233,6 @@ public class CoreConst {
 	 * mongoDB collection 이름
 	 */
 	public final static String COLLECTION_BOARD_FREE = "boardFree";
+	public final static String COLLECTION_GALLERY = "gallery";
 
 }
