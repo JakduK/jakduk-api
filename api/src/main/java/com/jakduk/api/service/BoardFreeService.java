@@ -2,6 +2,7 @@ package com.jakduk.api.service;
 
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.restcontroller.home.vo.LatestPost;
 import com.jakduk.api.restcontroller.vo.BoardGallery;
 import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
@@ -14,6 +15,7 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.*;
+import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.simple.*;
@@ -45,6 +47,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -90,17 +93,6 @@ public class BoardFreeService {
 
 	public Integer countCommentsByBoardItem(BoardItem boardItem) {
 		return boardFreeCommentRepository.countByBoardItem(boardItem);
-	}
-
-	public List<BoardFreeOnList> findByIdAndUserId(String id, String userId, Integer limit) {
-		return boardFreeRepository.findByIdAndUserId(new ObjectId(id), userId, limit);
-	}
-
-	public Map<String, Integer> getBoardFreeCommentCount(List<ObjectId> ids) {
-		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountByIds(ids);
-
-		return numberOfItems.stream()
-				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 	}
 
     /**
@@ -356,43 +348,156 @@ public class BoardFreeService {
 	 * @param size 크기
      * @return 글 목록
      */
-	public Page<BoardFreeOnList> getFreePosts(CoreConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
+	public FreePostsResponse getFreePosts(CoreConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
-		Page<BoardFreeOnList> posts = null;
+		Page<BoardFreeOnList> postsPage = null;
 
 		switch (category) {
 			case ALL:
-				posts = boardFreeOnListRepository.findAll(pageable);
+				postsPage = boardFreeOnListRepository.findAll(pageable);
 				break;
 			case FOOTBALL:
 			case FREE:
-				posts = boardFreeOnListRepository.findByCategory(category, pageable);
+				postsPage = boardFreeOnListRepository.findByCategory(category, pageable);
 				break;
 		}
 
-		return posts;
-	}
+		// 자유 게시판 공지글 목록
+		List<BoardFreeOnList> notices = boardFreeRepository.findNotices(sort);
 
-	/**
-	 * 자유 게시판 공지글 목록
-     */
-	public List<BoardFreeOnList> getFreeNotices() {
+		// 게시물 VO 변환 및 썸네일 URL 추가
+		Function<BoardFreeOnList, FreePost> convertToFreePost = post -> {
+			FreePost freePosts = new FreePost();
+			BeanUtils.copyProperties(post, freePosts);
 
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+			if (post.isLinkedGallery()) {
+				List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+						new ObjectId(post.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
-		return boardFreeRepository.findNotices(sort);
+				if (! ObjectUtils.isEmpty(galleries)) {
+					List<BoardGallery> boardGalleries = galleries.stream()
+							.map(gallery -> BoardGallery.builder()
+									.id(gallery.getId())
+									.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+									.build())
+							.collect(Collectors.toList());
+
+					freePosts.setGalleries(boardGalleries);
+				}
+			}
+
+			return freePosts;
+		};
+
+		List<FreePost> freePosts = postsPage.getContent().stream()
+				.map(convertToFreePost)
+				.collect(Collectors.toList());
+
+		List<FreePost> freeNotices = notices.stream()
+				.map(convertToFreePost)
+				.collect(Collectors.toList());
+
+		// Board ID 뽑아내기.
+		ArrayList<ObjectId> ids = new ArrayList<>();
+
+		Consumer<FreePost> extractIds = board -> {
+			String boardId = board.getId();
+			ObjectId objId = new ObjectId(boardId);
+
+			ids.add(objId);
+		};
+
+		freePosts.forEach(extractIds);
+		freeNotices.forEach(extractIds);
+
+		// 게시물의 댓글수
+		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountByIds(ids);
+
+		Map<String, Integer> commentCounts =  numberOfItems.stream()
+				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+
+		// 게시물의 감정수
+		Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
+
+		// 댓글수, 감정 표현수 합치기.
+		Consumer<FreePost> applyCounts = board -> {
+			String boardId = board.getId();
+			Integer commentCount = commentCounts.get(boardId);
+
+			if (! ObjectUtils.isEmpty(commentCount))
+				board.setCommentCount(commentCount);
+
+			BoardFeelingCount feelingCount = feelingCounts.get(boardId);
+
+			if (Objects.nonNull(feelingCount)) {
+				board.setLikingCount(feelingCount.getUsersLikingCount());
+				board.setDislikingCount(feelingCount.getUsersDisLikingCount());
+			}
+		};
+
+		freePosts.forEach(applyCounts);
+		freeNotices.forEach(applyCounts);
+
+		// 말머리
+		List<BoardCategory> categories = boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
+
+		Map<String, String> categoriesMap = categories.stream()
+				.collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+
+		categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
+
+		return FreePostsResponse.builder()
+				.categories(categoriesMap)
+				.posts(freePosts)
+				.notices(freeNotices)
+				.first(postsPage.isFirst())
+				.last(postsPage.isLast())
+				.totalPages(postsPage.getTotalPages())
+				.totalElements(postsPage.getTotalElements())
+				.numberOfElements(postsPage.getNumberOfElements())
+				.size(postsPage.getSize())
+				.number(postsPage.getNumber())
+				.build();
 	}
 
 	/**
 	 * 최근 글 가져오기
 	 */
-	public List<BoardFreeOnList> getFreeLatest() {
+	public List<LatestPost> getFreeLatest() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
-		return boardFreeRepository.findLatest(sort, CoreConst.HOME_SIZE_POST);
+		List<BoardFreeOnList> posts = boardFreeRepository.findLatest(sort, CoreConst.HOME_SIZE_POST);
+
+		// 게시물 VO 변환 및 썸네일 URL 추가
+		List<LatestPost> latestPosts = posts.stream()
+				.map(post -> {
+					LatestPost latestPost = new LatestPost();
+					BeanUtils.copyProperties(post, latestPost);
+
+					if (post.isLinkedGallery()) {
+						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+								new ObjectId(post.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
+
+						List<BoardGallery> boardGalleries = galleries.stream()
+								.sorted(Comparator.comparing(Gallery::getId))
+								.limit(1)
+								.map(gallery -> BoardGallery.builder()
+										.id(gallery.getId())
+										.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+										.build())
+								.collect(Collectors.toList());
+
+						latestPost.setGalleries(boardGalleries);
+					}
+
+					return latestPost;
+				})
+				.collect(Collectors.toList());
+
+		return latestPosts;
 	}
 
     /**

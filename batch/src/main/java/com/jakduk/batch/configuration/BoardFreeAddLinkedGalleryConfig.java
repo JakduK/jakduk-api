@@ -1,6 +1,6 @@
 package com.jakduk.batch.configuration;
 
-import com.jakduk.batch.processor.BoardFreeAddShortContentProcessor;
+import com.jakduk.batch.processor.BoardFreeAddLinkedGalleryProcessor;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFree;
 import org.springframework.batch.core.Job;
@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 본문 미리보기 용으로, HTML이 제거된 100자 정도의 본문 요약 필드가 필요하다
+ * galleries 필드 대신 linkedGallery 필드를 추가한다.
  *
- * Created by pyohwanjang on 2017. 3. 2..
+ * Created by pyohwanjang on 2017. 4. 15..
  */
 
 @Configuration
-public class BoardFreeAddShortContentConfig {
+public class BoardFreeAddLinkedGalleryConfig {
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -41,29 +41,29 @@ public class BoardFreeAddShortContentConfig {
     private MongoOperations mongoOperations;
 
     @Bean
-    public Job boardFreeAddShortContentJob(@Qualifier("boardFreeAddShortContentStep") Step step) {
+    public Job boardFreeAddLinkedGalleryJob(@Qualifier("boardFreeAddLinkedGalleryStep") Step step) {
 
-        return jobBuilderFactory.get("boardFreeAddShortContentJob")
+        return jobBuilderFactory.get("boardFreeAddLinkedGalleryJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step)
                 .build();
     }
 
     @Bean
-    public Step boardFreeAddShortContentStep() {
-        return stepBuilderFactory.get("boardFreeAddShortContentStep")
+    public Step boardFreeAddLinkedGalleryStep() {
+        return stepBuilderFactory.get("boardFreeAddLinkedGalleryStep")
                 .<BoardFree, BoardFree>chunk(1000)
-                .reader(boardFreeAddShortContentReader())
-                .processor(boardFreeAddShortContentProcessor())
-                .writer(boardFreeAddShortContentWriter())
+                .reader(boardFreeAddLinkedGalleryReader())
+                .processor(boardFreeAddLinkedGalleryProcessor())
+                .writer(boardFreeAddLinkedGalleryWriter())
                 .build();
     }
 
     @Bean
-    public ItemReader<BoardFree> boardFreeAddShortContentReader() {
+    public ItemReader<BoardFree> boardFreeAddLinkedGalleryReader() {
 
         String query = String.format("{'batch':{$nin:['%s']}}",
-                CoreConst.BATCH_TYPE.BOARD_FREE_ADD_SHORT_CONTENT_01);
+                CoreConst.BATCH_TYPE.BOARD_FREE_ADD_LINKED_GALLERY_01);
 
         MongoItemReader<BoardFree> itemReader = new MongoItemReader<>();
         itemReader.setTemplate(mongoOperations);
@@ -78,12 +78,12 @@ public class BoardFreeAddShortContentConfig {
     }
 
     @Bean
-    public ItemProcessor<BoardFree, BoardFree> boardFreeAddShortContentProcessor() {
-        return new BoardFreeAddShortContentProcessor();
+    public ItemProcessor<BoardFree, BoardFree> boardFreeAddLinkedGalleryProcessor() {
+        return new BoardFreeAddLinkedGalleryProcessor();
     }
 
     @Bean
-    public MongoItemWriter<BoardFree> boardFreeAddShortContentWriter() {
+    public MongoItemWriter<BoardFree> boardFreeAddLinkedGalleryWriter() {
         MongoItemWriter<BoardFree> writer = new MongoItemWriter<>();
         writer.setTemplate(mongoOperations);
 

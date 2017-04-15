@@ -1,10 +1,7 @@
 package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.embedded.BoardHistory;
-import com.jakduk.core.model.embedded.BoardStatus;
-import com.jakduk.core.model.embedded.CommonFeelingUser;
-import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.embedded.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -68,6 +65,9 @@ public class BoardFree {
 	private BoardStatus status;
 	
 	private List<BoardHistory> history;
+
+	@Deprecated
+	private List<BoardImage> galleries;
 	
 	private List<CoreConst.BATCH_TYPE> batch;
 

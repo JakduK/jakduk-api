@@ -51,4 +51,5 @@ public class FreePostsResponse {
 
     @ApiModelProperty(value = "전체 글 수")
     long totalElements;
+
 }

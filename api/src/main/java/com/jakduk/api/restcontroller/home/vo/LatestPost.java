@@ -44,4 +44,5 @@ public class LatestPost {
 
     @ApiModelProperty(example = "본문입니다.", value = "본문 100자")
     private String shortContent;
+
 }

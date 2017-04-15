@@ -3,27 +3,21 @@ package com.jakduk.api.restcontroller;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.restcontroller.vo.BoardGallery;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.service.BoardFreeService;
-import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnList;
 import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.service.BoardCategoryService;
 import io.swagger.annotations.Api;
@@ -37,13 +31,13 @@ import org.springframework.mobile.device.Device;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -62,105 +56,14 @@ public class BoardRestController {
     @Autowired
     private BoardCategoryService boardCategoryService;
 
-    @Autowired
-    private BoardDAO boardDAO;
-
-    @Resource
-    private ApiUtils apiUtils;
-
     @ApiOperation(value = "자유게시판 글 목록")
-    @RequestMapping(value = "/posts", method = RequestMethod.GET)
+    @GetMapping("/posts")
     public FreePostsResponse getFreePosts(
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
             @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") CoreConst.BOARD_CATEGORY_TYPE category) {
 
-        Page<BoardFreeOnList> postPage = boardFreeService.getFreePosts(category, page, size);
-        List<BoardFreeOnList> notices = boardFreeService.getFreeNotices();
-
-        // 게시물 VO 변환 및 썸네일 URL 추가
-        Function<BoardFreeOnList, FreePost> convertToFreePost = post -> {
-            FreePost freePostList = new FreePost();
-            BeanUtils.copyProperties(post, freePostList);
-
-            if (! ObjectUtils.isEmpty(post.getGalleries())) {
-                List<BoardGallery> boardGalleries = post.getGalleries().stream()
-                        .sorted(Comparator.comparing(BoardImage::getId))
-                        .limit(1)
-                        .map(gallery -> BoardGallery.builder()
-                                .id(gallery.getId())
-                                .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-                                .build())
-                        .collect(Collectors.toList());
-
-                freePostList.setGalleries(boardGalleries);
-            }
-
-            return freePostList;
-        };
-
-        List<FreePost> freePosts = postPage.getContent().stream()
-                .map(convertToFreePost)
-                .collect(Collectors.toList());
-
-        List<FreePost> freeNotices = notices.stream()
-                .map(convertToFreePost)
-                .collect(Collectors.toList());
-
-        // Board ID 뽑아내기.
-        ArrayList<ObjectId> ids = new ArrayList<>();
-
-        Consumer<FreePost> extractIds = board -> {
-            String boardId = board.getId();
-            ObjectId objId = new ObjectId(boardId);
-
-            ids.add(objId);
-        };
-
-        freePosts.forEach(extractIds);
-        freeNotices.forEach(extractIds);
-
-        Map<String, Integer> commentCounts = boardFreeService.getBoardFreeCommentCount(ids);
-        Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
-
-        // 댓글수, 감정 표현수 합치기.
-        Consumer<FreePost> applyCounts = board -> {
-            String boardId = board.getId();
-            Integer commentCount = commentCounts.get(boardId);
-
-            if (! ObjectUtils.isEmpty(commentCount))
-                board.setCommentCount(commentCount);
-
-            BoardFeelingCount feelingCount = feelingCounts.get(boardId);
-
-            if (Objects.nonNull(feelingCount)) {
-                board.setLikingCount(feelingCount.getUsersLikingCount());
-                board.setDislikingCount(feelingCount.getUsersDisLikingCount());
-            }
-        };
-
-        freePosts.forEach(applyCounts);
-        freeNotices.forEach(applyCounts);
-
-        List<BoardCategory> categories = boardCategoryService.getFreeCategories();
-
-        Map<String, String> categoriesMap = categories.stream()
-                .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
-
-        categoriesMap.put("ALL", CoreUtils.getResourceBundleMessage("messages.board", "board.category.all"));
-
-        return FreePostsResponse.builder()
-                .categories(categoriesMap)
-                .posts(freePosts)
-                .notices(freeNotices)
-                .first(postPage.isFirst())
-                .last(postPage.isLast())
-                .totalPages(postPage.getTotalPages())
-                .totalElements(postPage.getTotalElements())
-                .numberOfElements(postPage.getNumberOfElements())
-                .size(postPage.getSize())
-                .number(postPage.getNumber())
-                .build();
+        return boardFreeService.getFreePosts(category, page, size);
     }
 
     @ApiOperation(value = "자유게시판 주간 선두 글")
