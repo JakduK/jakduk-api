@@ -14,6 +14,7 @@ import org.springframework.util.ObjectUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -145,4 +146,33 @@ public class ApiUtils {
 
         return null;
     }
+
+    /**
+     * 세션에서 해당 아이템의 지워질 사진 ID 목록을 가져온다.
+     *
+     * @param request HttpServletRequest
+     * @param from 출처
+     * @param id Item ID
+     */
+    public static List<String> getSessionOfGalleryIdsForRemoval(HttpServletRequest request, CoreConst.GALLERY_FROM_TYPE from, String id) {
+        String name = from + ":" + id +  ":galleries_for_removal";
+        HttpSession httpSession = request.getSession();
+
+        return  (List<String>) httpSession.getAttribute(name);
+    }
+
+    /**
+     * 해당 아이템의 지워질 사진 ID 목록 세션을 지운다.
+     *
+     * @param request HttpServletRequest
+     * @param from 출처
+     * @param id Item ID
+     */
+    public static void removeSessionOfGalleryIdsForRemoval(HttpServletRequest request, CoreConst.GALLERY_FROM_TYPE from, String id) {
+        String name = from + ":" + id +  ":galleries_for_removal";
+        HttpSession httpSession = request.getSession();
+
+        httpSession.removeAttribute(name);
+    }
+
 }

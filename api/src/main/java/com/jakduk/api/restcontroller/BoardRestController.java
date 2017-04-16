@@ -6,6 +6,7 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
@@ -14,6 +15,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
@@ -55,6 +57,9 @@ public class BoardRestController {
 
     @Autowired
     private BoardCategoryService boardCategoryService;
+
+    @Autowired
+    private GalleryService galleryService;
 
     @ApiOperation(value = "자유게시판 글 목록")
     @GetMapping("/posts")
@@ -154,11 +159,24 @@ public class BoardRestController {
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        Integer boardSeq = boardFreeService.insertFreePost(commonWriter, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), form.getGalleries(), ApiUtils.getDeviceInfo(device));
+        // 연관된 사진 id 배열 (검증 전)
+        List<String> unverifiableGalleryIds = null;
+
+        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+            unverifiableGalleryIds = form.getGalleries().stream()
+                    .map(GalleryOnBoard::getId)
+                    .collect(Collectors.toList());
+        }
+
+        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
+
+        BoardFree boardFree = boardFreeService.insertFreePost(commonWriter, form.getSubject().trim(), form.getContent().trim(),
+                form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
+
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
         return FreePostWriteResponse.builder()
-                .seq(boardSeq)
+                .seq(boardFree.getSeq())
                 .build();
     }
 
@@ -167,15 +185,33 @@ public class BoardRestController {
     public FreePostWriteResponse editFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody FreePostForm form,
+            HttpServletRequest request,
             Device device) {
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        Integer boardSeq = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), form.getGalleries(), ApiUtils.getDeviceInfo(device));
+        // 연관된 사진 id 배열 (검증 전)
+        List<String> unverifiableGalleryIds = null;
+
+        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+            unverifiableGalleryIds = form.getGalleries().stream()
+                    .map(GalleryOnBoard::getId)
+                    .collect(Collectors.toList());
+        }
+
+        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
+
+        BoardFree boardFree = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
+                form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
+
+        List<String> galleryIdsForRemoval = ApiUtils.getSessionOfGalleryIdsForRemoval(request, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+
+        ApiUtils.removeSessionOfGalleryIdsForRemoval(request, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
         return FreePostWriteResponse.builder()
-                .seq(boardSeq)
+                .seq(boardFree.getSeq())
                 .build();
     }
 
