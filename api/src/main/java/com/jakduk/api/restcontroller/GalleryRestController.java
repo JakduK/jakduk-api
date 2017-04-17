@@ -32,9 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -135,21 +133,8 @@ public class GalleryRestController {
 
         // form이 null이 아니면 글, 댓글 편집시 호출 했기 때문에 gallery를 바로 지우면 안된다. 글/댓글 편집 완료 시 실제로 gallery를 지워야 한다.
         // session에 저장해 두자.
-        if (Objects.nonNull(form)) {
-            HttpSession httpSession = request.getSession();
-            String name = form.getFrom() + ":" + form.getItemId() +  ":galleries_for_removal";
-
-            List<String> galleryIds = (List<String>) httpSession.getAttribute(name);
-
-            if (ObjectUtils.isEmpty(galleryIds))
-                galleryIds = new ArrayList<>();
-
-            if (! galleryIds.contains(id))
-                galleryIds.add(id);
-
-            httpSession.setAttribute(name, galleryIds);
-//            httpSession.setMaxInactiveInterval(10);
-        }
+        if (Objects.nonNull(form))
+            ApiUtils.setSessionOfGalleryIdsForRemoval(request, form.getFrom(), form.getItemId(), id);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -160,12 +145,6 @@ public class GalleryRestController {
             @ApiParam(value = "Gallery ID", required = true) @PathVariable String id,
             HttpServletRequest request,
             HttpServletResponse response) {
-
-        HttpSession httpSession = request.getSession();
-        System.out.println("phjang=" + httpSession.getAttribute("aaaa"));
-
-        request.getSession().setAttribute("aaaa", "ddddd");
-        request.getSession().setMaxInactiveInterval(10);
 
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
 

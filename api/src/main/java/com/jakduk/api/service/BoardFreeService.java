@@ -20,9 +20,9 @@ import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
-import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.CommonSearchService;
 import com.jakduk.core.service.CommonService;
@@ -464,15 +464,6 @@ public class BoardFreeService {
 	}
 
     /**
-     * 읽음수 1 증가
-     */
-	public void increaseViews(BoardFree boardFree) {
-        int views = boardFree.getViews();
-        boardFree.setViews(++views);
-        boardFreeRepository.save(boardFree);
-    }
-
-    /**
      * 글 감정 표현.
      */
 	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, CoreConst.FEELING_TYPE feeling) {
@@ -559,44 +550,30 @@ public class BoardFreeService {
 	/**
 	 * 게시판 댓글 달기
 	 */
-	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String content, List<GalleryOnBoard> boardGalleries,
+	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String content, List<Gallery> galleries,
 											  CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
-		// 연관된 사진 id 배열
-		List<String> galleryIds = null;
-
-		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			galleryIds = boardGalleries.stream()
-					.map(GalleryOnBoard::getId)
-					.collect(Collectors.toList());
-		}
-
-		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
-
-		List<BoardImage> linkedGalleries = null;
-
-		if (! ObjectUtils.isEmpty(galleries)) {
-			linkedGalleries = galleries.stream()
-					.map(gallery -> new BoardImage(gallery.getId()))
-					.collect(Collectors.toList());
-		}
+		// 연관된 사진 id 배열 (검증 후)
+		List<String> galleryIds = galleries.stream()
+				.map(Gallery::getId)
+				.collect(Collectors.toList());
 
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
 				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
 				.writer(writer)
 				.content(content)
 				.status(new BoardCommentStatus(device))
-				.galleries(linkedGalleries)
+				.linkedGallery(! galleries.isEmpty())
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
 		// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
-				boardFreeComment.getContent());
+				boardFreeComment.getContent(), galleryIds);
 
 		return boardFreeComment;
 	}
@@ -604,7 +581,7 @@ public class BoardFreeService {
 	/**
 	 * 게시판 댓글 고치기
 	 */
-	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, List<GalleryOnBoard> boardGalleries,
+	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, List<Gallery> galleries,
 											  CoreConst.DEVICE_TYPE device) {
 
 		boardFreeRepository.findOneBySeq(seq)
@@ -628,30 +605,18 @@ public class BoardFreeService {
 
 		boardFreeComment.setStatus(boardCommentStatus);
 
-		// 연관된 사진 id 배열
-		List<String> galleryIds = null;
+		// 연관된 사진 id 배열 (검증 후)
+		List<String> galleryIds = galleries.stream()
+				.map(Gallery::getId)
+				.collect(Collectors.toList());
 
-		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			galleryIds = boardGalleries.stream()
-					.map(GalleryOnBoard::getId)
-					.collect(Collectors.toList());
-		}
-
-		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
-
-		if (! ObjectUtils.isEmpty(galleries)) {
-			List<BoardImage> galleriesOnBoard = galleries.stream()
-					.map(gallery -> new BoardImage(gallery.getId()))
-					.collect(Collectors.toList());
-
-			boardFreeComment.setGalleries(galleriesOnBoard);
-		}
+		boardFreeComment.setLinkedGallery(! galleries.isEmpty());
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
 		// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
-				boardFreeComment.getContent());
+				boardFreeComment.getContent(), galleryIds);
 
 		return boardFreeComment;
 	}
@@ -679,9 +644,9 @@ public class BoardFreeService {
 		List<BoardFreeComment> comments;
 
 		if (! ObjectUtils.isEmpty(commentId)) {
-			comments  = boardDAO.getBoardFreeComment(seq, new ObjectId(commentId));
+			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, new ObjectId(commentId));
 		} else {
-			comments  = boardDAO.getBoardFreeComment(seq, null);
+			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, null);
 		}
 
 		return comments;
@@ -1019,6 +984,15 @@ public class BoardFreeService {
 				.nextPost(nextPost)
 				.latestPostsByWriter(ObjectUtils.isEmpty(latestFreePosts) ? null : latestFreePosts)
 				.build();
+	}
+
+	/**
+	 * 읽음수 1 증가
+	 */
+	private void increaseViews(BoardFree boardFree) {
+		int views = boardFree.getViews();
+		boardFree.setViews(++views);
+		boardFreeRepository.save(boardFree);
 	}
 
 }

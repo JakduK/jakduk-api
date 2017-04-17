@@ -1,7 +1,7 @@
-package com.jakduk.core.repository.board.free;
+package com.jakduk.core.repository.board.free.comment;
 
-import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.model.elasticsearch.ESComment;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.CommonCount;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +11,12 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 11. 30.
@@ -30,7 +32,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
      * 기준 BoardFreeComment ID 이상의 BoardFreeComment 목록을 가져온다.
      */
     @Override
-    public List<ESComment> findCommentsGreaterThanId(ObjectId objectId, Integer limit) {
+    public List<BoardFreeComment> findCommentsGreaterThanId(ObjectId objectId, Integer limit) {
 
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(objectId));
         AggregationOperation sort = Aggregation.sort(Sort.Direction.ASC, "_id");
@@ -44,15 +46,9 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
             aggregation = Aggregation.newAggregation(sort, limit1);
         }
 
-        AggregationResults<ESComment> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", ESComment.class);
+        AggregationResults<BoardFreeComment> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", BoardFreeComment.class);
 
-        List<ESComment> comments = results.getMappedResults();
-
-        comments.forEach(comment -> {
-            comment.setContent(CoreUtils.stripHtmlTag(comment.getContent()));
-        });
-
-        return comments;
+        return results.getMappedResults();
     }
 
     /**
@@ -69,4 +65,25 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
 
         return results.getMappedResults();
     }
+
+    /**
+     * Board Seq와 기준 BoardFreeComment ID(null 가능) 이상의 BoardFreeComment 목록을 가져온다.
+     *
+     * @param boardSeq  게시물 seq
+     * @param commentId 댓글 ID
+     */
+    @Override
+    public List<BoardFreeComment> findByBoardSeqAndGTId(Integer boardSeq, ObjectId commentId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("boardItem.seq").is(boardSeq));
+
+        if (Objects.nonNull(commentId))
+            query.addCriteria(Criteria.where("_id").lt(commentId));
+
+        query.with(new Sort(Sort.Direction.ASC, "_id"));
+        query.limit(CoreConst.COMMENT_MAX_LIMIT);
+
+        return mongoTemplate.find(query, BoardFreeComment.class);
+    }
+
 }

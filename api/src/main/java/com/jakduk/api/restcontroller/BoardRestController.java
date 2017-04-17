@@ -275,8 +275,24 @@ public class BoardRestController {
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        return boardFreeService.insertFreeComment(form.getSeq(), commonWriter, form.getContent().trim(), form.getGalleries(),
-                ApiUtils.getDeviceInfo(device));
+        // 연관된 사진 id 배열 (검증 전)
+        List<String> unverifiableGalleryIds = null;
+
+        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+            unverifiableGalleryIds = form.getGalleries().stream()
+                    .map(GalleryOnBoard::getId)
+                    .collect(Collectors.toList());
+        }
+
+        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
+
+        BoardFreeComment boardFreeComment =  boardFreeService.insertFreeComment(form.getSeq(), commonWriter, form.getContent().trim(),
+                galleries, ApiUtils.getDeviceInfo(device));
+
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null,
+                CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+
+        return boardFreeComment;
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 고치기")
@@ -284,6 +300,7 @@ public class BoardRestController {
     public BoardFreeComment editFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
+            HttpServletRequest request,
             Device device) {
 
         if (! UserUtils.isUser())
@@ -291,8 +308,29 @@ public class BoardRestController {
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        return boardFreeService.updateFreeComment(id, form.getSeq(), commonWriter, form.getContent().trim(), form.getGalleries(),
+        // 연관된 사진 id 배열 (검증 전)
+        List<String> unverifiableGalleryIds = null;
+
+        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+            unverifiableGalleryIds = form.getGalleries().stream()
+                    .map(GalleryOnBoard::getId)
+                    .collect(Collectors.toList());
+        }
+
+        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
+
+        BoardFreeComment boardFreeComment = boardFreeService.updateFreeComment(id, form.getSeq(), commonWriter, form.getContent().trim(), galleries,
                 ApiUtils.getDeviceInfo(device));
+
+        List<String> galleryIdsForRemoval = ApiUtils.getSessionOfGalleryIdsForRemoval(request,
+                CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval,
+                CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+
+        ApiUtils.removeSessionOfGalleryIdsForRemoval(request, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+
+        return boardFreeComment;
 
     }
 

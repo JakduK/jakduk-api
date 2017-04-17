@@ -516,7 +516,6 @@ public class GalleryService {
 					// 모두 지움.
 					if (linkedItems.size() < 1) {
 						this.removeGalleryFiles(gallery.getId(), gallery.getContentType());
-						galleryRepository.delete(gallery.getId());
 					}
 					// 업데이트 처리
 					else {
@@ -547,6 +546,8 @@ public class GalleryService {
 
 		FileUtils.removeImageFile(storageImagePath, localDate, fileName);
 		FileUtils.removeImageFile(storageThumbnailPath, localDate, fileName);
+
+		galleryRepository.delete(id);
 
 		// 엘라스틱 서치 document 삭제.
 		commonSearchService.deleteDocumentGallery(id);

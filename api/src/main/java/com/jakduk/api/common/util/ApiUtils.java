@@ -15,6 +15,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -173,6 +174,34 @@ public class ApiUtils {
         HttpSession httpSession = request.getSession();
 
         httpSession.removeAttribute(name);
+    }
+
+    /**
+     * 글, 댓글 편집시 호출 했기 때문에 gallery를 바로 지우면 안된다. 글/댓글 편집 완료 시 실제로 gallery를 지워야 한다.
+     * session에 저장해 두자.
+     *
+     * @param request HttpServletRequest
+     * @param from 출처
+     * @param itemId Item ID
+     * @param galleryId Gallery ID
+     */
+    public static void setSessionOfGalleryIdsForRemoval(HttpServletRequest request, CoreConst.GALLERY_FROM_TYPE from, String itemId,
+                                                        String galleryId) {
+
+        HttpSession httpSession = request.getSession();
+        String name = from + ":" + itemId +  ":galleries_for_removal";
+
+        List<String> galleryIds = getSessionOfGalleryIdsForRemoval(request, from, itemId);
+
+        if (ObjectUtils.isEmpty(galleryIds))
+            galleryIds = new ArrayList<>();
+
+        if (! galleryIds.contains(galleryId))
+            galleryIds.add(galleryId);
+
+        httpSession.setAttribute(name, galleryIds);
+        httpSession.setMaxInactiveInterval(60*60); // 1 hour
+
     }
 
 }

@@ -171,7 +171,7 @@ public class JakdukDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("jakduScheduleId").is(jakduScheduleId));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CoreConst.COMMENT_MAX_SIZE);
+		AggregationOperation limit = Aggregation.limit(CoreConst.COMMENT_MAX_LIMIT);
 
 		Aggregation aggregation;
 

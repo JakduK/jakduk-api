@@ -1,9 +1,10 @@
 package com.jakduk.core.model.db;
 
-import com.jakduk.core.model.embedded.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.jakduk.core.model.embedded.BoardCommentStatus;
+import com.jakduk.core.model.embedded.BoardItem;
+import com.jakduk.core.model.embedded.CommonFeelingUser;
+import com.jakduk.core.model.embedded.CommonWriter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,6 +19,8 @@ import java.util.List;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
 @Setter
@@ -39,6 +42,6 @@ public class BoardFreeComment {
 
 	private List<CommonFeelingUser> usersDisliking;
 
-	private List<BoardImage> galleries;
+	private boolean linkedGallery;
 
 }

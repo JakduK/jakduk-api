@@ -1,4 +1,4 @@
-package com.jakduk.core.repository.board.free;
+package com.jakduk.core.repository.board.free.comment;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

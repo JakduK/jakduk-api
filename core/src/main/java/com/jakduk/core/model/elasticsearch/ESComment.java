@@ -2,7 +2,10 @@ package com.jakduk.core.model.elasticsearch;
 
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.List;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -13,7 +16,6 @@ import lombok.*;
 
 @Builder
 @Getter
-@Setter
 public class ESComment {
 	
     private String id;
@@ -23,4 +25,7 @@ public class ESComment {
 	private CommonWriter writer;
 
 	private String content;
+
+	private List<String> galleries;
+
 }

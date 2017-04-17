@@ -1,4 +1,4 @@
-package com.jakduk.core.repository.board.free;
+package com.jakduk.core.repository.board.free.comment;
 
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.embedded.BoardItem;
