@@ -20,9 +20,9 @@ import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
-import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.CommonSearchService;
 import com.jakduk.core.service.CommonService;
@@ -101,12 +101,11 @@ public class BoardFreeService {
      * @param subject 글 제목
      * @param content 글 내용
      * @param categoryCode 글 말머리 Code
-     * @param boardGalleries 글과 연동된 사진들
+     * @param galleries 글과 연동된 사진들
      * @param device 디바이스
-     * @return 글 seq
      */
-	public Integer insertFreePost(CommonWriter writer, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
-								  List<GalleryOnBoard> boardGalleries, CoreConst.DEVICE_TYPE device) {
+	public BoardFree insertFreePost(CommonWriter writer, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
+								  List<Gallery> galleries, CoreConst.DEVICE_TYPE device) {
 
 		boardCategoryRepository.findOneByCode(categoryCode.name())
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
@@ -129,18 +128,6 @@ public class BoardFreeService {
 		// lastUpdated
 		LocalDateTime lastUpdated = LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault());
 
-		// 연관된 사진 id 배열 (검증 전)
-		List<String> userGalleryIds = null;
-
-		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			userGalleryIds = boardGalleries.stream()
-					.map(GalleryOnBoard::getId)
-					.collect(Collectors.toList());
-		}
-
-		// 연관된 사진이 있는지 여부
-		List<Gallery> galleries = galleryRepository.findByIdIn(userGalleryIds);
-
 		// 연관된 사진 id 배열 (검증 후)
 		List<String> galleryIds = galleries.stream()
 				.map(Gallery::getId)
@@ -162,11 +149,6 @@ public class BoardFreeService {
 
 		boardFreeRepository.save(boardFree);
 
-
-		// 글과 연동 된 사진 처리
-		if (! galleries.isEmpty())
-			this.processLinkedGalleries(boardFree.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
-
 	 	// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
@@ -187,7 +169,7 @@ public class BoardFreeService {
 
 		log.info("new post created. post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
 
-		return boardFree.getSeq();
+		return boardFree;
 	}
 
 	/**
@@ -197,12 +179,11 @@ public class BoardFreeService {
 	 * @param subject 글 제목
 	 * @param content 글 내용
 	 * @param categoryCode 글 말머리 Code
-	 * @param boardGalleries 글과 연동된 사진들
+	 * @param galleries 글과 연동된 사진들
      * @param device 디바이스
-     * @return 글 seq
      */
-	public Integer updateFreePost(CommonWriter writer, Integer seq, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
-								  List<GalleryOnBoard> boardGalleries, CoreConst.DEVICE_TYPE device) {
+	public BoardFree updateFreePost(CommonWriter writer, Integer seq, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
+								  List<Gallery> galleries, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -218,18 +199,6 @@ public class BoardFreeService {
 		boardFree.setContent(content);
 		boardFree.setCategory(categoryCode);
 		boardFree.setShortContent(shortContent);
-
-		// 연관된 사진 id 배열 (검증 전)
-		List<String> userGalleryIds = null;
-
-		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			userGalleryIds = boardGalleries.stream()
-					.map(GalleryOnBoard::getId)
-					.collect(Collectors.toList());
-		}
-
-		// 연관된 사진이 있는지 여부
-		List<Gallery> galleries = galleryRepository.findByIdIn(userGalleryIds);
 
 		// 연관된 사진 id 배열 (검증 후)
 		List<String> galleryIds = galleries.stream()
@@ -247,7 +216,6 @@ public class BoardFreeService {
         boardStatus.setDevice(device);
 		boardFree.setStatus(boardStatus);
 
-
 		// boardHistory
 		List<BoardHistory> histories = boardFree.getHistory();
 
@@ -263,18 +231,13 @@ public class BoardFreeService {
 
 		boardFreeRepository.save(boardFree);
 
-		// 글과 연동 된 사진 처리
-		if (! galleries.isEmpty())
-			this.processLinkedGalleries(boardFree.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
-
 		// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
 
-		return boardFree.getSeq();
-
+		return boardFree;
 	}
 
 	/**
@@ -501,15 +464,6 @@ public class BoardFreeService {
 	}
 
     /**
-     * 읽음수 1 증가
-     */
-	public void increaseViews(BoardFree boardFree) {
-        int views = boardFree.getViews();
-        boardFree.setViews(++views);
-        boardFreeRepository.save(boardFree);
-    }
-
-    /**
      * 글 감정 표현.
      */
 	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, CoreConst.FEELING_TYPE feeling) {
@@ -596,48 +550,30 @@ public class BoardFreeService {
 	/**
 	 * 게시판 댓글 달기
 	 */
-	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String content, List<GalleryOnBoard> boardGalleries,
+	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String content, List<Gallery> galleries,
 											  CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
 
-		// 연관된 사진 id 배열
-		List<String> galleryIds = null;
-
-		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			galleryIds = boardGalleries.stream()
-					.map(GalleryOnBoard::getId)
-					.collect(Collectors.toList());
-		}
-
-		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
-
-		List<BoardImage> linkedGalleries = null;
-
-		if (! ObjectUtils.isEmpty(galleries)) {
-			linkedGalleries = galleries.stream()
-					.map(gallery -> new BoardImage(gallery.getId()))
-					.collect(Collectors.toList());
-		}
+		// 연관된 사진 id 배열 (검증 후)
+		List<String> galleryIds = galleries.stream()
+				.map(Gallery::getId)
+				.collect(Collectors.toList());
 
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
 				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
 				.writer(writer)
 				.content(content)
 				.status(new BoardCommentStatus(device))
-				.galleries(linkedGalleries)
+				.linkedGallery(! galleries.isEmpty())
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
-		// 댓글과 연동 된 사진 처리
-		if (Objects.nonNull(galleries))
-			this.processLinkedGalleries(boardFreeComment.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
-
 		// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
-				boardFreeComment.getContent());
+				boardFreeComment.getContent(), galleryIds);
 
 		return boardFreeComment;
 	}
@@ -645,7 +581,7 @@ public class BoardFreeService {
 	/**
 	 * 게시판 댓글 고치기
 	 */
-	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, List<GalleryOnBoard> boardGalleries,
+	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, List<Gallery> galleries,
 											  CoreConst.DEVICE_TYPE device) {
 
 		boardFreeRepository.findOneBySeq(seq)
@@ -669,34 +605,18 @@ public class BoardFreeService {
 
 		boardFreeComment.setStatus(boardCommentStatus);
 
-		// 연관된 사진 id 배열
-		List<String> galleryIds = null;
+		// 연관된 사진 id 배열 (검증 후)
+		List<String> galleryIds = galleries.stream()
+				.map(Gallery::getId)
+				.collect(Collectors.toList());
 
-		if (! ObjectUtils.isEmpty(boardGalleries)) {
-			galleryIds = boardGalleries.stream()
-					.map(GalleryOnBoard::getId)
-					.collect(Collectors.toList());
-		}
-
-		List<Gallery> galleries = galleryRepository.findByIdIn(galleryIds);
-
-		if (! ObjectUtils.isEmpty(galleries)) {
-			List<BoardImage> galleriesOnBoard = galleries.stream()
-					.map(gallery -> new BoardImage(gallery.getId()))
-					.collect(Collectors.toList());
-
-			boardFreeComment.setGalleries(galleriesOnBoard);
-		}
+		boardFreeComment.setLinkedGallery(! galleries.isEmpty());
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
-		// 댓글과 연동 된 사진 처리
-		if (Objects.nonNull(galleries))
-			this.processLinkedGalleries(boardFreeComment.getId(), boardGalleries, galleries, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
-
 		// 엘라스틱서치 색인 요청
 		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
-				boardFreeComment.getContent());
+				boardFreeComment.getContent(), galleryIds);
 
 		return boardFreeComment;
 	}
@@ -724,9 +644,9 @@ public class BoardFreeService {
 		List<BoardFreeComment> comments;
 
 		if (! ObjectUtils.isEmpty(commentId)) {
-			comments  = boardDAO.getBoardFreeComment(seq, new ObjectId(commentId));
+			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, new ObjectId(commentId));
 		} else {
-			comments  = boardDAO.getBoardFreeComment(seq, null);
+			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, null);
 		}
 
 		return comments;
@@ -1067,59 +987,12 @@ public class BoardFreeService {
 	}
 
 	/**
-	 * 글/댓글과 엮인 사진들을 업데이트 한다. 색인도 포함
-	 *
-	 * TODO : 업데이트 일 경우, 사라진 사진이 있을때 연결을 끊어줘야 한다.
-	 *
-	 * @param id 글/댓글 ID
-	 * @param boardGalleries 사용자가 입력한 사진 목록
-	 * @param galleries DB에 있는 사진 목록
-	 * @param fromType 출처
+	 * 읽음수 1 증가
 	 */
-	private void processLinkedGalleries(String id, List<GalleryOnBoard> boardGalleries, List<Gallery> galleries,
-										CoreConst.GALLERY_FROM_TYPE fromType) {
-
-		LinkedItem linkedItem = LinkedItem.builder()
-				.id(id)
-				.from(fromType)
-				.build();
-
-		for (Gallery gallery : galleries) {
-
-				List<LinkedItem> linkedItems = gallery.getLinkedItems();
-
-				if (Objects.isNull(linkedItems))
-					linkedItems = new ArrayList<>();
-
-				// 연관된 글이 겹침인지 검사하고, 연관글로 등록한다.
-				Boolean isItemPresent = linkedItems.stream()
-						.anyMatch(item -> item.getId().equals(linkedItem.getId()));
-
-				if (! isItemPresent) {
-					linkedItems.add(linkedItem);
-					gallery.setLinkedItems(linkedItems);
-				}
-
-				Optional<GalleryOnBoard> oGalleryOnBoard = boardGalleries.stream()
-						.filter(galleryOnBoard -> galleryOnBoard.getId().equals(gallery.getId()))
-						.findFirst();
-
-				if (oGalleryOnBoard.isPresent() && StringUtils.isBlank(gallery.getName()))
-					gallery.setName(oGalleryOnBoard.get().getName());
-
-				GalleryStatus status = gallery.getStatus();
-
-				if (! status.getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.ENABLE)) {
-					status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
-					gallery.setStatus(status);
-				}
-
-				galleryRepository.save(gallery);
-
-				/*
-				엘라스틱서치 색인 요청
-				 */
-				commonSearchService.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
-		}
+	private void increaseViews(BoardFree boardFree) {
+		int views = boardFree.getViews();
+		boardFree.setViews(++views);
+		boardFreeRepository.save(boardFree);
 	}
+
 }

@@ -6,7 +6,7 @@ import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.model.simple.UserOnHome;
-import com.jakduk.core.repository.board.free.BoardFreeCommentOnHomeRepository;
+import com.jakduk.core.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
 import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.FootballService;

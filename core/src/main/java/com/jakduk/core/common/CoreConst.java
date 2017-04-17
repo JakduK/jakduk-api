@@ -32,7 +32,7 @@ public class CoreConst {
 	public final static Integer HOME_COMMENT_CONTENT_MAX_LENGTH = 110;
 	public final static Integer SEARCH_NO_MATCH_SIZE = 200;
 	public final static Integer SEARCH_FRAGMENT_SIZE = 200;
-	public final static Integer COMMENT_MAX_SIZE = 30;	
+	public final static Integer COMMENT_MAX_LIMIT = 30;
 	public final static Integer GALLERY_SIZE = 24;
 	public final static Integer BOARD_TOP_LIMIT = 3;
 

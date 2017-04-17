@@ -1,7 +1,6 @@
 package com.jakduk.core.dao;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.etc.BoardFeelingCount;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
@@ -77,27 +76,6 @@ public class BoardDAO {
 		return counts;
 	}	
 	
-	public List<BoardFreeComment> getBoardFreeComment(Integer boardSeq, ObjectId commentId) {
-		AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem.seq").is(boardSeq));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
-		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(CoreConst.COMMENT_MAX_SIZE);
-		
-		Aggregation aggregation;
-		
-		if (commentId != null) {
-			aggregation = Aggregation.newAggregation(match1, match2, sort, limit);
-		} else {
-			aggregation = Aggregation.newAggregation(match1, sort, limit);
-		}
-		
-		AggregationResults<BoardFreeComment> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", BoardFreeComment.class);
-		
-		List<BoardFreeComment> comments = results.getMappedResults();
-		
-		return comments;
-	}
-
 	public List<BoardFreeOnBest> getBoardFreeCountOfLikeBest(ObjectId commentId) {
 
 		MongoCollection boardFreeC = jongo.getCollection("boardFree");
