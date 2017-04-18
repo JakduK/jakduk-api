@@ -8,7 +8,6 @@ import com.jakduk.api.vo.gallery.GalleryDetail;
 import com.jakduk.api.vo.gallery.GalleryResponse;
 import com.jakduk.api.vo.gallery.SurroundingsGallery;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.common.util.FileUtils;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -21,6 +20,7 @@ import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
+import com.jakduk.core.service.CommonGalleryService;
 import com.jakduk.core.service.CommonSearchService;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -43,7 +43,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -78,6 +77,9 @@ public class GalleryService {
 
 	@Autowired
 	private CommonSearchService commonSearchService;
+
+	@Autowired
+	private CommonGalleryService commonGalleryService;
 
 	@Resource
 	private ApiUtils apiUtils;
@@ -353,7 +355,7 @@ public class GalleryService {
 	/**
 	 * 사진 삭제. (TEMP 일 경우에만 바로 지워진다.)
 	 */
-	public void removeImage(String id, String userId, String itemId, CoreConst.GALLERY_FROM_TYPE fromType) {
+	public void deleteGallery(String id, String userId) {
 
 		Gallery gallery = galleryRepository.findOneById(id)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
@@ -361,12 +363,12 @@ public class GalleryService {
 		if (Objects.isNull(gallery.getWriter()))
 			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		if (gallery.getStatus().getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.TEMP) && Objects.isNull(fromType)) {
+		if (gallery.getStatus().getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.TEMP)) {
 
 			if (! userId.equals(gallery.getWriter().getUserId()))
 				throw new ServiceException(ServiceError.FORBIDDEN);
 
-			galleryRepository.delete(id);
+			commonGalleryService.deleteGallery(id, gallery.getContentType());
 		}
 	}
 
@@ -515,7 +517,10 @@ public class GalleryService {
 
 					// 모두 지움.
 					if (linkedItems.size() < 1) {
-						this.removeGalleryFiles(gallery.getId(), gallery.getContentType());
+						commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType());
+
+						// 엘라스틱 서치 document 삭제.
+						commonSearchService.deleteDocumentGallery(gallery.getId());
 					}
 					// 업데이트 처리
 					else {
@@ -533,24 +538,8 @@ public class GalleryService {
 	private void increaseViews(Gallery gallery) {
 		int views = gallery.getViews();
 		gallery.setViews(++views);
+
 		galleryRepository.save(gallery);
-	}
-
-	private void removeGalleryFiles(String id, String contentType) {
-		ObjectId objectId = new ObjectId(id);
-		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-		// 사진 포맷.
-		String formatName = StringUtils.split(contentType, "/")[1];
-		String fileName = id + "." + formatName;
-
-		FileUtils.removeImageFile(storageImagePath, localDate, fileName);
-		FileUtils.removeImageFile(storageThumbnailPath, localDate, fileName);
-
-		galleryRepository.delete(id);
-
-		// 엘라스틱 서치 document 삭제.
-		commonSearchService.deleteDocumentGallery(id);
 	}
 
 }

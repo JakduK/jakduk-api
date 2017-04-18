@@ -24,6 +24,7 @@ import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
+import com.jakduk.core.service.CommonGalleryService;
 import com.jakduk.core.service.CommonSearchService;
 import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +79,9 @@ public class BoardFreeService {
 
 	@Autowired
 	private CommonSearchService commonSearchService;
+
+	@Autowired
+	private CommonGalleryService commonGalleryService;
 
 	@Resource
 	private ApiUtils apiUtils;
@@ -258,10 +262,7 @@ public class BoardFreeService {
 
         Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 
-        /*
-        글이 지워질 때, 연동된 사진도 끊어주어야 한다.
-        TODO : 근데 사진을 지워야 하나 말아야 하는지는 고민해보자. 왜냐하면 연동된 글이 없을수도 있지 않나?
-         */
+        // 댓글이 하나라도 달리면 글을 몽땅 지우지 못한다.
         if (count > 0) {
 			boardFree.setContent(null);
 			boardFree.setSubject(null);
@@ -286,16 +287,37 @@ public class BoardFreeService {
 
             boardFreeRepository.save(boardFree);
 
-            if (log.isInfoEnabled()) {
-                log.info("A post was deleted(post only). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
-            }
-        } else { // 몽땅 지우기.
+			log.info("A post was deleted(post only). post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
+        }
+		// 몽땅 지우기
+        else {
             boardFreeRepository.delete(boardFree);
 
-            if (log.isInfoEnabled()) {
-                log.info("A post was deleted(all). post seq=" + boardFree.getSeq() + ", subject=" + boardFree.getSubject());
-            }
+			log.info("A post was deleted(all). post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
         }
+
+        // 연결된 사진 끊기
+        if (boardFree.isLinkedGallery()) {
+			List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+					new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
+
+			galleries.forEach(gallery -> {
+				List<LinkedItem> linkedItems = gallery.getLinkedItems();
+				Boolean isRemoved = linkedItems.removeIf(
+						linkedItem -> linkedItem.getId().equals(boardFree.getId()) &&
+								linkedItem.getFrom().equals(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE));
+
+				if (isRemoved && linkedItems.size() >= 1) {
+					gallery.setLinkedItems(linkedItems);
+					galleryRepository.save(gallery);
+				} else if (isRemoved && linkedItems.size() < 1) {
+					commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType());
+
+                    // 엘라스틱 서치 document 삭제.
+                    commonSearchService.deleteDocumentGallery(gallery.getId());
+				}
+			});
+		}
 
 		// 색인 지움
         commonSearchService.deleteDocumentBoard(boardFree.getId());
