@@ -148,7 +148,6 @@ public class GalleryRestController {
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
 
         return galleryService.getGalleryDetail(id, isAddCookie);
-
     }
 
     @ApiOperation(value = "사진 좋아요 싫어요")

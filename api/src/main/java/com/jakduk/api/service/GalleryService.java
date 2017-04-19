@@ -11,6 +11,7 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -47,6 +48,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -119,9 +121,6 @@ public class GalleryService {
 
 		CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-        /*
-        글 상세
-         */
 		GalleryDetail galleryDetail = new GalleryDetail();
 		BeanUtils.copyProperties(gallery, galleryDetail);
 
@@ -136,9 +135,7 @@ public class GalleryService {
 		if (Objects.nonNull(commonWriter))
 			galleryDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
 
-		/*
-		사진첩 보기의 앞, 뒤 사진을 가져온다.
-		 */
+		// 사진첩 보기의 앞, 뒤 사진을 가져온다.
 		List<GalleryOnList> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.GT,
 				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
 		List<GalleryOnList> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.LT,
@@ -149,7 +146,7 @@ public class GalleryService {
 		Integer nextGalleriesLimit = 0;
 		List<SurroundingsGallery> surroundingsGalleries = new ArrayList<>();
 
-		// GalleryOnLost -> SurroundingsGallery
+		// GalleryOnList -> SurroundingsGallery
 		Consumer<GalleryOnList> extractSurroundingsGalleries = surroundingsPrevGallery -> {
 			SurroundingsGallery surroundingsGallery = new SurroundingsGallery();
 			BeanUtils.copyProperties(surroundingsPrevGallery, surroundingsGallery);
@@ -199,10 +196,29 @@ public class GalleryService {
 				.limit(nextGalleriesLimit)
 				.forEach(extractSurroundingsGalleries);
 
-		/*
-		이 사진을 사용하는 게시물 목록
-		 */
-		List<BoardFreeSimple> linkedPosts = boardFreeRepository.findByGalleryId(new ObjectId(id));
+		// 이 사진을 사용하는 게시물 목록
+        // TODO 댓글도 보여줘야지?
+        List<BoardFreeSimple> linkedPosts = null;
+
+        List<LinkedItem> linkedItems = gallery.getLinkedItems();
+
+        if (! ObjectUtils.isEmpty(linkedItems)) {
+            List<String> ids = linkedItems.stream()
+                    .filter(linkedItem -> linkedItem.getFrom().equals(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE))
+                    .map(LinkedItem::getId)
+                    .collect(Collectors.toList());
+
+            List<BoardFree> posts = boardFreeRepository.findByIdInAndLinkedGalleryIsTrue(ids);
+
+            linkedPosts = posts.stream()
+                    .map(post -> {
+                        BoardFreeSimple boardFreeSimple = new BoardFreeSimple();
+                        BeanUtils.copyProperties(post, boardFreeSimple);
+
+                        return boardFreeSimple;
+                    })
+                    .collect(Collectors.toList());
+        }
 
 		return GalleryResponse.builder()
 				.gallery(galleryDetail)

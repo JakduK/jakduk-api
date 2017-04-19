@@ -922,22 +922,26 @@ public class BoardFreeService {
 		freePostDetail.setNumberOfLike(numberOfLike);
 		freePostDetail.setNumberOfDislike(numberOfDisLike);
 
-		List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-				new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
+		// 엮인 사진들
+		if (boardFree.isLinkedGallery()) {
+            List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+                    new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
 
-		if (! ObjectUtils.isEmpty(galleries)) {
-			List<FreePostDetailGallery> postDetailGalleries = galleries.stream()
-					.map(gallery -> FreePostDetailGallery.builder()
-							.id(gallery.getId())
-							.name(gallery.getName())
-							.imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
-							.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
-							.build())
-					.collect(Collectors.toList());
+            if (! ObjectUtils.isEmpty(galleries)) {
+                List<FreePostDetailGallery> postDetailGalleries = galleries.stream()
+                        .map(gallery -> FreePostDetailGallery.builder()
+                                .id(gallery.getId())
+                                .name(gallery.getName())
+                                .imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                                .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                                .build())
+                        .collect(Collectors.toList());
 
-			freePostDetail.setGalleries(postDetailGalleries);
-		}
+                freePostDetail.setGalleries(postDetailGalleries);
+            }
+        }
 
+        // 나의 감정 상태
 		if (Objects.nonNull(commonWriter))
 			freePostDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
 

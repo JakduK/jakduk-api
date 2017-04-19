@@ -56,11 +56,6 @@ public interface BoardFreeRepositoryCustom {
     List<BoardFreeOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit);
 
     /**
-     * Gallery ID 에 해당하는 BoardFree를 가져온다.
-     */
-    List<BoardFreeSimple> findByGalleryId(ObjectId galleryId);
-
-    /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
     BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, CoreConst.BOARD_CATEGORY_TYPE category, CoreConst.CRITERIA_OPERATOR operator);
