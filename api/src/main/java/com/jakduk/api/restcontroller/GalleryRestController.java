@@ -128,8 +128,7 @@ public class GalleryRestController {
 
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        galleryService.removeImage(id, authUserProfile.getId(), Objects.nonNull(form) ? form.getItemId() : null,
-                Objects.nonNull(form) ? form.getFrom() : null);
+        galleryService.deleteGallery(id, authUserProfile.getId());
 
         // form이 null이 아니면 글, 댓글 편집시 호출 했기 때문에 gallery를 바로 지우면 안된다. 글/댓글 편집 완료 시 실제로 gallery를 지워야 한다.
         // session에 저장해 두자.
@@ -149,7 +148,6 @@ public class GalleryRestController {
         Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
 
         return galleryService.getGalleryDetail(id, isAddCookie);
-
     }
 
     @ApiOperation(value = "사진 좋아요 싫어요")

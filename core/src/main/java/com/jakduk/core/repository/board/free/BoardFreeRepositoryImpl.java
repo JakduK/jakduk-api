@@ -146,19 +146,6 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
     }
 
     /**
-     * Gallery ID 에 해당하는 BoardFree를 가져온다.
-     */
-    @Override
-    public List<BoardFreeSimple> findByGalleryId(ObjectId galleryId) {
-        AggregationOperation unwind = Aggregation.unwind("galleries");
-        AggregationOperation match = Aggregation.match(Criteria.where("galleries._id").is(galleryId));
-        Aggregation aggregation = Aggregation.newAggregation(unwind, match);
-        AggregationResults<BoardFreeSimple> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_BOARD_FREE, BoardFreeSimple.class);
-
-        return results.getMappedResults();
-    }
-
-    /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
     @Override

@@ -216,14 +216,17 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 지움")
-    @RequestMapping(value = "/{seq}", method = RequestMethod.DELETE)
-    public FreePostOnDeleteResponse deleteFree(@PathVariable Integer seq) {
+    @DeleteMapping("/{seq}")
+    public FreePostDeleteResponse deleteFree(
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
         CommonWriter commonWriter = UserUtils.getCommonWriter();
 
 		CoreConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(commonWriter, seq);
 
-        return FreePostOnDeleteResponse.builder().result(deleteType).build();
+        return FreePostDeleteResponse.builder()
+                .result(deleteType)
+                .build();
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
@@ -334,8 +337,8 @@ public class BoardRestController {
 
     }
 
-    @ApiOperation(value = "자유게시판 글의 댓글 지우기")
-    @RequestMapping(value = "/comment/{id}", method = RequestMethod.DELETE)
+    @ApiOperation("자유게시판 글의 댓글 지우기")
+    @DeleteMapping("/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
 

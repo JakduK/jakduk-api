@@ -38,6 +38,8 @@ public class ApiUtils {
     @Value("${api.gallery.thumbnail.url.path}")
     private String apiGalleryThumbnailUrlPath;
 
+    private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";
+
     /**
      * 쿠키를 저장한다. 이미 있다면 저장하지 않는다.
      *
@@ -156,7 +158,7 @@ public class ApiUtils {
      * @param id Item ID
      */
     public static List<String> getSessionOfGalleryIdsForRemoval(HttpServletRequest request, CoreConst.GALLERY_FROM_TYPE from, String id) {
-        String name = from + ":" + id +  ":galleries_for_removal";
+        String name = from + ":" + id + GALLERIES_FOR_REMOVAL;
         HttpSession httpSession = request.getSession();
 
         return  (List<String>) httpSession.getAttribute(name);
@@ -170,7 +172,7 @@ public class ApiUtils {
      * @param id Item ID
      */
     public static void removeSessionOfGalleryIdsForRemoval(HttpServletRequest request, CoreConst.GALLERY_FROM_TYPE from, String id) {
-        String name = from + ":" + id +  ":galleries_for_removal";
+        String name = from + ":" + id + GALLERIES_FOR_REMOVAL;
         HttpSession httpSession = request.getSession();
 
         httpSession.removeAttribute(name);
@@ -189,7 +191,7 @@ public class ApiUtils {
                                                         String galleryId) {
 
         HttpSession httpSession = request.getSession();
-        String name = from + ":" + itemId +  ":galleries_for_removal";
+        String name = from + ":" + itemId + GALLERIES_FOR_REMOVAL;
 
         List<String> galleryIds = getSessionOfGalleryIdsForRemoval(request, from, itemId);
 
