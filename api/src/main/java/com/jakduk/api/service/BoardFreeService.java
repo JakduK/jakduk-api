@@ -284,6 +284,7 @@ public class BoardFreeService {
 
             boardStatus.setDelete(true);
 			boardFree.setStatus(boardStatus);
+			boardFree.setLinkedGallery(false);
 
             boardFreeRepository.save(boardFree);
 
@@ -297,27 +298,8 @@ public class BoardFreeService {
         }
 
         // 연결된 사진 끊기
-        if (boardFree.isLinkedGallery()) {
-			List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-					new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
-
-			galleries.forEach(gallery -> {
-				List<LinkedItem> linkedItems = gallery.getLinkedItems();
-				Boolean isRemoved = linkedItems.removeIf(
-						linkedItem -> linkedItem.getId().equals(boardFree.getId()) &&
-								linkedItem.getFrom().equals(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE));
-
-				if (isRemoved && linkedItems.size() >= 1) {
-					gallery.setLinkedItems(linkedItems);
-					galleryRepository.save(gallery);
-				} else if (isRemoved && linkedItems.size() < 1) {
-					commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType());
-
-                    // 엘라스틱 서치 document 삭제.
-                    commonSearchService.deleteDocumentGallery(gallery.getId());
-				}
-			});
-		}
+        if (boardFree.isLinkedGallery())
+			commonGalleryService.unlinkGalleries(boardFree.getId(), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
 		// 색인 지움
         commonSearchService.deleteDocumentBoard(boardFree.getId());
@@ -658,6 +640,8 @@ public class BoardFreeService {
 
 		// 색인 지움
 		commonSearchService.deleteDocumentBoardComment(id);
+
+		commonGalleryService.unlinkGalleries(id, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
 	}
 
 	// 게시판 댓글 목록

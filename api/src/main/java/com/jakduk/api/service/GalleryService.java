@@ -368,7 +368,7 @@ public class GalleryService {
 			if (! userId.equals(gallery.getWriter().getUserId()))
 				throw new ServiceException(ServiceError.FORBIDDEN);
 
-			commonGalleryService.deleteGallery(id, gallery.getContentType());
+			commonGalleryService.deleteGallery(id, gallery.getContentType(), false);
 		}
 	}
 
@@ -517,10 +517,7 @@ public class GalleryService {
 
 					// 모두 지움.
 					if (linkedItems.size() < 1) {
-						commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType());
-
-						// 엘라스틱 서치 document 삭제.
-						commonSearchService.deleteDocumentGallery(gallery.getId());
+						commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType(), true);
 					}
 					// 업데이트 처리
 					else {

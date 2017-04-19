@@ -337,8 +337,8 @@ public class BoardRestController {
 
     }
 
-    @ApiOperation(value = "자유게시판 글의 댓글 지우기")
-    @RequestMapping(value = "/comment/{id}", method = RequestMethod.DELETE)
+    @ApiOperation("자유게시판 글의 댓글 지우기")
+    @DeleteMapping("/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
 
