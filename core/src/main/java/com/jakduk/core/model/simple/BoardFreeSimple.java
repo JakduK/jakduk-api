@@ -26,4 +26,5 @@ public class BoardFreeSimple {
 	private CommonWriter writer;
 	
 	private String subject;
+
 }

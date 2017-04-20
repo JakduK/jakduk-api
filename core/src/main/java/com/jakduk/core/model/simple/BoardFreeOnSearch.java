@@ -22,4 +22,5 @@ public class BoardFreeOnSearch {
 	private String subject;
 
 	private BoardStatus status;
+
 }

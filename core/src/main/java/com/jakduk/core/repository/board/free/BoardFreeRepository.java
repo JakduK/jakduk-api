@@ -2,6 +2,7 @@ package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.simple.BoardFreeOfMinimum;
+import com.jakduk.core.model.simple.BoardFreeSimple;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -15,6 +16,6 @@ public interface BoardFreeRepository extends MongoRepository<BoardFree, String>,
 	List<BoardFree> findByIdInAndLinkedGalleryIsTrue(List<String> ids);
 
 	@Query(value="{'seq' : ?0}")
-    BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq);
+	BoardFreeSimple findBoardFreeOfMinimumBySeq(Integer seq);
 
 }

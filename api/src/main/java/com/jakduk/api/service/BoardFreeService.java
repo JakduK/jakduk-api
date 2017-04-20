@@ -91,14 +91,6 @@ public class BoardFreeService {
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
     }
 
-	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
-		return boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
-	}
-
-	public Integer countCommentsByBoardItem(BoardItem boardItem) {
-		return boardFreeCommentRepository.countByBoardItem(boardItem);
-	}
-
     /**
      * 자유게시판 글쓰기
 	 *
@@ -644,8 +636,8 @@ public class BoardFreeService {
 		commonGalleryService.unlinkGalleries(id, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
 	}
 
-	// 게시판 댓글 목록
-	public List<BoardFreeComment> getFreeComments(Integer seq, String commentId) {
+	// 게시물 댓글 목록
+	public FreePostCommentsOfPostResponse getBoardFreeCommentsOfPost(Integer seq, String commentId) {
 
 		List<BoardFreeComment> comments;
 
@@ -655,7 +647,37 @@ public class BoardFreeService {
 			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, null);
 		}
 
-		return comments;
+		CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+		BoardFreeSimple boardFreeSimple = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
+
+		BoardItem boardItem = new BoardItem(boardFreeSimple.getId(), boardFreeSimple.getSeq());
+
+		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
+
+		List<FreePostCommentOfPost> postComments = comments.stream()
+				.map(boardFreeComment -> {
+					FreePostCommentOfPost freePostCommentOfPost = new FreePostCommentOfPost();
+					BeanUtils.copyProperties(boardFreeComment, freePostCommentOfPost);
+
+					Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
+					Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
+
+					freePostCommentOfPost.setNumberOfLike(numberOfLike);
+					freePostCommentOfPost.setNumberOfDislike(numberOfDisLike);
+
+					if (Objects.nonNull(commonWriter))
+						freePostCommentOfPost.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
+								boardFreeComment.getUsersDisliking()));
+
+					return freePostCommentOfPost;
+				})
+				.collect(Collectors.toList());
+
+		return FreePostCommentsOfPostResponse.builder()
+				.comments(postComments)
+				.count(count)
+				.build();
 	}
 
 	/**
@@ -856,23 +878,62 @@ public class BoardFreeService {
 	/**
 	 * 자유게시판 댓글 목록
      */
-	public Page<BoardFreeComment> getBoardFreeComments(int page, int size) {
+	public FreePostCommentsResponse getBoardFreeComments(int page, int size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 
-		return boardFreeCommentRepository.findAll(pageable);
-	}
+		CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-	/**
-	 * id 배열에 해당하는 BoardFree 목록.
-	 * @param ids id 배열
-	 */
-	public Map<String, BoardFreeOnSearch> getBoardFreeOnSearchByIds(List<ObjectId> ids) {
-		List<BoardFreeOnSearch> posts = boardFreeRepository.findPostsOnSearchByIds(ids);
+		Page<BoardFreeComment> commentsPage = boardFreeCommentRepository.findAll(pageable);
 
-		return posts.stream()
+		// board id 뽑아내기.
+		List<ObjectId> boardIds = commentsPage.getContent().stream()
+				.map(comment -> new ObjectId(comment.getBoardItem().getId()))
+				.distinct()
+				.collect(Collectors.toList());
+
+		// 댓글을 가진 글 목록
+		List<BoardFreeOnSearch> posts = boardFreeRepository.findPostsOnSearchByIds(boardIds);
+
+		Map<String, BoardFreeOnSearch> postsHavingComments = posts.stream()
 				.collect(Collectors.toMap(BoardFreeOnSearch::getId, Function.identity()));
+
+		List<FreePostComment> freePostComments = commentsPage.getContent().stream()
+				.map(boardFreeComment -> {
+							FreePostComment comment = new FreePostComment();
+							BeanUtils.copyProperties(boardFreeComment, comment);
+
+							comment.setBoardItem(
+									Optional.ofNullable(postsHavingComments.get(boardFreeComment.getBoardItem().getId()))
+											.orElse(new BoardFreeOnSearch())
+							);
+
+							Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
+							Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
+
+							comment.setNumberOfLike(numberOfLike);
+							comment.setNumberOfDislike(numberOfDisLike);
+
+							if (Objects.nonNull(commonWriter))
+								comment.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
+										boardFreeComment.getUsersDisliking()));
+
+							return comment;
+						}
+				)
+				.collect(Collectors.toList());
+
+		return FreePostCommentsResponse.builder()
+				.comments(freePostComments)
+				.first(commentsPage.isFirst())
+				.last(commentsPage.isLast())
+				.totalPages(commentsPage.getTotalPages())
+				.totalElements(commentsPage.getTotalElements())
+				.numberOfElements(commentsPage.getNumberOfElements())
+				.size(commentsPage.getSize())
+				.number(commentsPage.getNumber())
+				.build();
 	}
 
 	/**

@@ -2,7 +2,6 @@ package com.jakduk.core.board;
 
 import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.BoardFreeOnSitemap;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
@@ -41,13 +40,6 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
         BoardFree boardFree = sut.findOneBySeq(187).orElse(new BoardFree());
 
         Assert.assertTrue(Objects.nonNull(boardFree));
-    }
-
-    @Test
-    public void findBoardFreeOfMinimumBySeq() {
-        BoardFreeOfMinimum boardFreeOnComment = sut.findBoardFreeOfMinimumBySeq(58);
-
-//        Assert.assertTrue(! ObjectUtils.isEmpty(boardFreeOnComment));
     }
 
     @Test

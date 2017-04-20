@@ -16,19 +16,13 @@ import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.etc.BoardFreeOnBest;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import com.jakduk.core.service.BoardCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.bson.types.ObjectId;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.mobile.device.Device;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -85,47 +77,12 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 댓글 목록")
-    @RequestMapping(value = "/comments", method = RequestMethod.GET)
-    public FreeCommentsOnListResponse getFreeComments(
-            @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "20") Integer size) {
+    @GetMapping("/comments")
+    public FreePostCommentsResponse getFreeComments(
+            @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
+            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size) {
 
-        Page<BoardFreeComment> comments = boardFreeService.getBoardFreeComments(page, size);
-
-        // id 뽑아내기.
-        List<ObjectId> boardIds = comments.getContent().stream()
-                .map(comment -> {
-                    String tempId = comment.getBoardItem().getId();
-                    return new ObjectId(tempId);
-                })
-                .distinct()
-                .collect(Collectors.toList());
-
-        Map<String, BoardFreeOnSearch> postsHavingComments = boardFreeService.getBoardFreeOnSearchByIds(boardIds);
-
-        List<FreeCommentsOnList> freeComments = comments.getContent().stream()
-                .map(comment -> {
-                            FreeCommentsOnList newComment = new FreeCommentsOnList();
-                            BeanUtils.copyProperties(comment, newComment);
-                            newComment.setBoardItem(
-                                    Optional.ofNullable(postsHavingComments.get(comment.getBoardItem().getId()))
-                                            .orElse(new BoardFreeOnSearch())
-                            );
-                            return newComment;
-                        }
-                )
-                .collect(Collectors.toList());
-
-        return FreeCommentsOnListResponse.builder()
-                .comments(freeComments)
-                .first(comments.isFirst())
-                .last(comments.isLast())
-                .totalPages(comments.getTotalPages())
-                .totalElements(comments.getTotalElements())
-                .numberOfElements(comments.getNumberOfElements())
-                .size(comments.getSize())
-                .number(comments.getNumber())
-                .build();
+        return boardFreeService.getBoardFreeComments(page, size);
     }
 
     @ApiOperation(value = "자유게시판 글 상세")
@@ -230,44 +187,12 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
-    @RequestMapping(value = "/{seq}/comments", method = RequestMethod.GET)
-    public FreePostCommentsResponse getFreePostComments(
+    @GetMapping("/{seq}/comments")
+    public FreePostCommentsOfPostResponse getFreePostCommentsOfPost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
-
-        BoardFreeOfMinimum boardFreeOnComment = boardFreeService.findBoardFreeOfMinimumBySeq(seq);
-
-        List<BoardFreeComment> boardComments = boardFreeService.getFreeComments(seq, commentId);
-
-        BoardItem boardItem = new BoardItem(boardFreeOnComment.getId(), boardFreeOnComment.getSeq());
-
-        Integer count = boardFreeService.countCommentsByBoardItem(boardItem);
-
-        List<FreePostComment> postComments = boardComments.stream()
-                .map(boardFreeComment -> {
-                    FreePostComment freePostComment = new FreePostComment();
-                    BeanUtils.copyProperties(boardFreeComment, freePostComment);
-
-                    Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
-                    Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
-
-                    freePostComment.setNumberOfLike(numberOfLike);
-                    freePostComment.setNumberOfDislike(numberOfDisLike);
-
-                    if (Objects.nonNull(commonWriter))
-                        freePostComment.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
-                                boardFreeComment.getUsersDisliking()));
-
-                    return freePostComment;
-                })
-                .collect(Collectors.toList());
-
-        return FreePostCommentsResponse.builder()
-                .comments(postComments)
-                .count(count)
-                .build();
+        return boardFreeService.getBoardFreeCommentsOfPost(seq, commentId);
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 달기")

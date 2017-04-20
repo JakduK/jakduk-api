@@ -2,39 +2,36 @@ package com.jakduk.api.vo.board;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.BoardCommentStatus;
+import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.simple.BoardFreeOnSearch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * @author pyohwan
- *         16. 7. 13 오후 11:19
+ * Created by pyohwanjang on 2017. 3. 6..
  */
 
-@ApiModel(value = "자유게시판 댓글")
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@ApiModel(description = "특정 글의 댓글")
 @Getter
 @Setter
-public class FreePostComment {
+public class FreePostCommentOfPost {
 
-    @ApiModelProperty(value = "댓글ID")
+    @ApiModelProperty(example = "58bcfabce1948902af90acc4", value = "댓글 ID")
     private String id;
 
-    @ApiModelProperty(value = "연동 글")
-    private BoardFreeOnSearch boardItem;
+    @ApiModelProperty(value = "댓글 ID")
+    private BoardItem boardItem;
+
+    @ApiModelProperty(value = "댓글 상태")
+    private BoardCommentStatus status;
 
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
 
-    @ApiModelProperty(value = "내용")
+    @ApiModelProperty(example = "댓글입니다.", value = "댓글 내용")
     private String content;
-
-    @ApiModelProperty(value = "댓글상태")
-    private BoardCommentStatus status;
 
     @ApiModelProperty(example = "5", value = "좋아요 수")
     private Integer numberOfLike;
