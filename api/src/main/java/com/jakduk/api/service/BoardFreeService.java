@@ -681,7 +681,7 @@ public class BoardFreeService {
 							List<BoardGallery> postDetailGalleries = galleries.stream()
 									.map(gallery -> BoardGallery.builder()
 											.id(gallery.getId())
-											.name(gallery.getName())
+											.name(StringUtils.isNotBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
 											.imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
 											.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
 											.build())

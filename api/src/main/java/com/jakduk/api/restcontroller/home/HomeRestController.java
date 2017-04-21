@@ -8,7 +8,7 @@ import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Encyclopedia;
-import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -69,7 +69,7 @@ public class HomeRestController {
         /*
         최근 사진
          */
-        List<GalleryOnList> galleries =  homeService.getGalleriesLatest();
+        List<GallerySimple> galleries =  homeService.getGalleriesLatest();
 
         // 사진 경로 붙히기.
         List<GalleryOnHome> galleriesOfHome = galleries.stream()

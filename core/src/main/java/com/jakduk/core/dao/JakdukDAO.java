@@ -7,7 +7,7 @@ import com.jakduk.core.model.db.JakduComment;
 import com.jakduk.core.model.db.JakduScheduleGroup;
 import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.model.simple.UserOnHome;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class JakdukDAO {
 	private MongoTemplate mongoTemplate;
 
 	// 사진 목록.
-	public List<GalleryOnList> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {
+	public List<GallerySimple> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {
 		
 		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").lt(galleryId));
@@ -54,7 +54,7 @@ public class JakdukDAO {
 			aggregation = Aggregation.newAggregation(match1, sort, limit);
 		}
 		
-		AggregationResults<GalleryOnList> results = mongoTemplate.aggregate(aggregation, "gallery", GalleryOnList.class);
+		AggregationResults<GallerySimple> results = mongoTemplate.aggregate(aggregation, "gallery", GallerySimple.class);
 		
 		return results.getMappedResults();
 	}

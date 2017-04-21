@@ -3,10 +3,7 @@ package com.jakduk.core.repository.gallery;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.ESGallery;
-import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.simple.GalleryOnList;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -21,7 +18,7 @@ public interface GalleryRepositoryCustom {
     /**
      * 사진첩 보기의 앞, 뒤 사진을 가져온다.
      */
-    List<GalleryOnList> findGalleriesById(ObjectId id, CoreConst.CRITERIA_OPERATOR operator, Integer limit);
+    List<Gallery> findGalleriesById(ObjectId id, CoreConst.CRITERIA_OPERATOR operator, Integer limit);
 
     /**
      * ItemID와 FromType에 해당하는 Gallery 목록을 가져온다.

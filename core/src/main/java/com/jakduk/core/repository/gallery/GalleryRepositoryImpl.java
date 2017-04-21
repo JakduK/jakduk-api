@@ -3,7 +3,6 @@ package com.jakduk.core.repository.gallery;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.ESGallery;
-import com.jakduk.core.model.simple.GalleryOnList;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -51,7 +50,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
      * 사진첩 보기의 앞, 뒤 사진을 가져온다.
      */
     @Override
-    public List<GalleryOnList> findGalleriesById(ObjectId id, CoreConst.CRITERIA_OPERATOR operator, Integer limit) {
+    public List<Gallery> findGalleriesById(ObjectId id, CoreConst.CRITERIA_OPERATOR operator, Integer limit) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
         query.limit(limit);
@@ -67,7 +66,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
 
         query.with(new Sort(Sort.Direction.DESC, "_id"));
 
-        return mongoTemplate.find(query, GalleryOnList.class);
+        return mongoTemplate.find(query, Gallery.class);
     }
 
     /**

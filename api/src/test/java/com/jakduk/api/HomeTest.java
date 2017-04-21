@@ -4,7 +4,7 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
-import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.model.simple.UserOnHome;
 import com.jakduk.core.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
 import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
@@ -68,7 +68,7 @@ public class HomeTest extends ApiApplicationTests {
 
 	@Test
 	public void 최근사진목록() {
-		List<GalleryOnList> galleries = homeService.getGalleriesLatest();
+		List<GallerySimple> galleries = homeService.getGalleriesLatest();
 
 		System.out.println("galleries=" + galleries);
 	}

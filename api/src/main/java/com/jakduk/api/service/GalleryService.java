@@ -4,6 +4,7 @@ import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.vo.board.GalleryOnBoard;
+import com.jakduk.api.vo.gallery.GalleriesResponse;
 import com.jakduk.api.vo.gallery.GalleryDetail;
 import com.jakduk.api.vo.gallery.GalleryResponse;
 import com.jakduk.api.vo.gallery.SurroundingsGallery;
@@ -18,7 +19,7 @@ import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import com.jakduk.core.model.embedded.LinkedItem;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.CommonGalleryService;
@@ -87,7 +88,7 @@ public class GalleryService {
 	private ApiUtils apiUtils;
 
 	// 사진 목록.
-	public List<GalleryOnList> getGalleriesById(String id, Integer size) {
+	public List<GallerySimple> getGalleriesById(String id, Integer size) {
 		if (Objects.nonNull(id))
 			return jakdukDAO.findGalleriesById(Direction.DESC, size, new ObjectId(id));
 		else
@@ -110,6 +111,26 @@ public class GalleryService {
 
 	public List<Gallery> findByIdIn(List<String> galleryIds) {
 		return galleryRepository.findByIdIn(galleryIds);
+	}
+
+	/**
+	 * 사진 목록
+	 */
+	public GalleriesResponse getGalleries(String id, Integer size) {
+
+		ObjectId objectId = null;
+
+		if (StringUtils.isNotBlank(id))
+			objectId = new ObjectId(id);
+
+		List<Gallery> galleries = galleryRepository.findGalleriesById(objectId, CoreConst.CRITERIA_OPERATOR.GT, size);
+
+		List<GallerySimple>
+
+
+		return GalleriesResponse.builder()
+				.galleries(galleries)
+				.build();
 	}
 
     public GalleryResponse getGalleryDetail(String id, Boolean isAddCookie) {
@@ -136,9 +157,9 @@ public class GalleryService {
 			galleryDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
 
 		// 사진첩 보기의 앞, 뒤 사진을 가져온다.
-		List<GalleryOnList> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.GT,
+		List<GallerySimple> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.GT,
 				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
-		List<GalleryOnList> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.LT,
+		List<GallerySimple> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.LT,
 				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
 
 		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
@@ -146,8 +167,8 @@ public class GalleryService {
 		Integer nextGalleriesLimit = 0;
 		List<SurroundingsGallery> surroundingsGalleries = new ArrayList<>();
 
-		// GalleryOnList -> SurroundingsGallery
-		Consumer<GalleryOnList> extractSurroundingsGalleries = surroundingsPrevGallery -> {
+		// GallerySimple -> SurroundingsGallery
+		Consumer<GallerySimple> extractSurroundingsGalleries = surroundingsPrevGallery -> {
 			SurroundingsGallery surroundingsGallery = new SurroundingsGallery();
 			BeanUtils.copyProperties(surroundingsPrevGallery, surroundingsGallery);
 
