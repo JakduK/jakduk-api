@@ -9,6 +9,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Created by pyohwanjang on 2017. 3. 6..
  */
@@ -16,7 +18,7 @@ import lombok.Setter;
 @ApiModel(description = "특정 글의 댓글")
 @Getter
 @Setter
-public class FreePostCommentOfPost {
+public class FreePostDetailComment {
 
     @ApiModelProperty(example = "58bcfabce1948902af90acc4", value = "댓글 ID")
     private String id;
@@ -41,5 +43,8 @@ public class FreePostCommentOfPost {
 
     @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
     private CoreConst.FEELING_TYPE myFeeling;
+
+    @ApiModelProperty(value = "그림 목록")
+    private List<BoardGallery> galleries;
 
 }

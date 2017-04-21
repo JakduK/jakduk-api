@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.restcontroller.vo.BoardGallery;
+import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.search.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.ObjectMapperUtils;
@@ -199,10 +199,10 @@ public class SearchService {
 					BeanUtils.copyProperties(esBoardSource, boardSource);
 
 					if (! ObjectUtils.isEmpty(esBoardSource.getGalleries())) {
-						List<BoardGallery> boardGalleries = esBoardSource.getGalleries().stream()
+						List<BoardGallerySimple> boardGalleries = esBoardSource.getGalleries().stream()
 								.sorted(Comparator.comparing(String::toString))
 								.limit(1)
-								.map(galleryId -> BoardGallery.builder()
+								.map(galleryId -> BoardGallerySimple.builder()
 										.id(galleryId)
 										.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, galleryId))
 										.build())

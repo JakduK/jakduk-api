@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+import java.util.List;
+
 /**
  * @author pyohwan
  *         16. 7. 13 오후 11:19
@@ -44,5 +46,8 @@ public class FreePostComment {
 
     @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
     private CoreConst.FEELING_TYPE myFeeling;
+
+    @ApiModelProperty(value = "그림 목록")
+    private List<BoardGallerySimple> galleries;
 
 }

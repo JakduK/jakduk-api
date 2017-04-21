@@ -188,11 +188,11 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @GetMapping("/{seq}/comments")
-    public FreePostCommentsOfPostResponse getFreePostCommentsOfPost(
+    public FreePostDetailCommentsResponse getFreePostCommentsOfPost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
-        return boardFreeService.getBoardFreeCommentsOfPost(seq, commentId);
+        return boardFreeService.getBoardFreeDetailComments(seq, commentId);
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 달기")

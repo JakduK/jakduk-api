@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.vo;
+package com.jakduk.api.vo.board;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class BoardGallery {
+public class BoardGallerySimple {
 
     @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "사진 ID")
     private String id;
