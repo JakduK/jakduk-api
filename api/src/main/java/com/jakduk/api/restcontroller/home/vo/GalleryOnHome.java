@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.home.vo;
 
-import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,7 +35,7 @@ public class GalleryOnHome {
     @ApiModelProperty(value = "썸네일 URL")
     private String thumbnailUrl;
 
-    public GalleryOnHome(GalleryOnList gallery) {
+    public GalleryOnHome(GallerySimple gallery) {
         this.id = gallery.getId();
         this.name = gallery.getName();
         this.writer = gallery.getWriter();

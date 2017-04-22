@@ -1,4 +1,4 @@
-package com.jakduk.core.model.etc;
+package com.jakduk.core.model.jongo;
 
 import lombok.Data;
 import org.bson.types.ObjectId;

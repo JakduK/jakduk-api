@@ -1,6 +1,5 @@
 package com.jakduk.api.vo.board;
 
-import com.jakduk.api.restcontroller.vo.BoardGallery;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,6 +30,6 @@ public class LatestFreePost {
     private String subject;
 
     @ApiModelProperty(value = "그림 목록")
-    private List<BoardGallery> galleries;
+    private List<BoardGallerySimple> galleries;
 
 }

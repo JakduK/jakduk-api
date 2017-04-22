@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Document(collection = "gallery")
-public class GalleryOnList {
+public class GallerySimple {
 	
 	@Id 
 	private String id;

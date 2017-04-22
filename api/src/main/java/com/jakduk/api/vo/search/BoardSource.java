@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.search;
 
-import com.jakduk.api.restcontroller.vo.BoardGallery;
+import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -30,7 +30,7 @@ public class BoardSource {
     private String category;
 
     @ApiModelProperty(value = "그림 목록")
-    private List<BoardGallery> galleries;
+    private List<BoardGallerySimple> galleries;
 
     @ApiModelProperty(example = "4.9219737", value = "매칭 점수")
     private Float score;

@@ -3,7 +3,6 @@ package com.jakduk.api.service;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.home.vo.LatestPost;
-import com.jakduk.api.restcontroller.vo.BoardGallery;
 import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
@@ -15,9 +14,9 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.*;
-import com.jakduk.core.model.etc.BoardFeelingCount;
-import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
+import com.jakduk.core.model.jongo.BoardFeelingCount;
+import com.jakduk.core.model.jongo.BoardFreeOnBest;
 import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
@@ -90,14 +89,6 @@ public class BoardFreeService {
         return boardFreeRepository.findOneBySeq(seq)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
     }
-
-	public BoardFreeOfMinimum findBoardFreeOfMinimumBySeq(Integer seq) {
-		return boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
-	}
-
-	public Integer countCommentsByBoardItem(BoardItem boardItem) {
-		return boardFreeCommentRepository.countByBoardItem(boardItem);
-	}
 
     /**
      * 자유게시판 글쓰기
@@ -344,8 +335,8 @@ public class BoardFreeService {
 						new ObjectId(post.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
 				if (! ObjectUtils.isEmpty(galleries)) {
-					List<BoardGallery> boardGalleries = galleries.stream()
-							.map(gallery -> BoardGallery.builder()
+					List<BoardGallerySimple> boardGalleries = galleries.stream()
+							.map(gallery -> BoardGallerySimple.builder()
 									.id(gallery.getId())
 									.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 									.build())
@@ -448,10 +439,10 @@ public class BoardFreeService {
 						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 								new ObjectId(post.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
-						List<BoardGallery> boardGalleries = galleries.stream()
+						List<BoardGallerySimple> boardGalleries = galleries.stream()
 								.sorted(Comparator.comparing(Gallery::getId))
 								.limit(1)
-								.map(gallery -> BoardGallery.builder()
+								.map(gallery -> BoardGallerySimple.builder()
 										.id(gallery.getId())
 										.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 										.build())
@@ -644,8 +635,10 @@ public class BoardFreeService {
 		commonGalleryService.unlinkGalleries(id, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
 	}
 
-	// 게시판 댓글 목록
-	public List<BoardFreeComment> getFreeComments(Integer seq, String commentId) {
+	/**
+	 * 게시물 댓글 목록
+	 */
+	public FreePostDetailCommentsResponse getBoardFreeDetailComments(Integer seq, String commentId) {
 
 		List<BoardFreeComment> comments;
 
@@ -655,7 +648,56 @@ public class BoardFreeService {
 			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, null);
 		}
 
-		return comments;
+		CommonWriter commonWriter = UserUtils.getCommonWriter();
+
+		BoardFreeSimple boardFreeSimple = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
+
+		BoardItem boardItem = new BoardItem(boardFreeSimple.getId(), boardFreeSimple.getSeq());
+
+		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
+
+		List<FreePostDetailComment> postComments = comments.stream()
+				.map(boardFreeComment -> {
+					FreePostDetailComment freePostDetailComment = new FreePostDetailComment();
+					BeanUtils.copyProperties(boardFreeComment, freePostDetailComment);
+
+					Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
+					Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
+
+					freePostDetailComment.setNumberOfLike(numberOfLike);
+					freePostDetailComment.setNumberOfDislike(numberOfDisLike);
+
+					if (Objects.nonNull(commonWriter))
+						freePostDetailComment.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
+								boardFreeComment.getUsersDisliking()));
+
+					// 엮인 사진들
+					if (boardFreeComment.isLinkedGallery()) {
+						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+								new ObjectId(boardFreeComment.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
+
+						if (! ObjectUtils.isEmpty(galleries)) {
+							List<BoardGallery> postDetailGalleries = galleries.stream()
+									.map(gallery -> BoardGallery.builder()
+											.id(gallery.getId())
+											.name(StringUtils.isNotBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
+											.imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+											.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+											.build())
+									.collect(Collectors.toList());
+
+							freePostDetailComment.setGalleries(postDetailGalleries);
+						}
+					}
+
+					return freePostDetailComment;
+				})
+				.collect(Collectors.toList());
+
+		return FreePostDetailCommentsResponse.builder()
+				.comments(postComments)
+				.count(count)
+				.build();
 	}
 
 	/**
@@ -856,23 +898,78 @@ public class BoardFreeService {
 	/**
 	 * 자유게시판 댓글 목록
      */
-	public Page<BoardFreeComment> getBoardFreeComments(int page, int size) {
+	public FreePostCommentsResponse getBoardFreeComments(int page, int size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 
-		return boardFreeCommentRepository.findAll(pageable);
-	}
+		CommonWriter commonWriter = UserUtils.getCommonWriter();
 
-	/**
-	 * id 배열에 해당하는 BoardFree 목록.
-	 * @param ids id 배열
-	 */
-	public Map<String, BoardFreeOnSearch> getBoardFreeOnSearchByIds(List<ObjectId> ids) {
-		List<BoardFreeOnSearch> posts = boardFreeRepository.findPostsOnSearchByIds(ids);
+		Page<BoardFreeComment> commentsPage = boardFreeCommentRepository.findAll(pageable);
 
-		return posts.stream()
+		// board id 뽑아내기.
+		List<ObjectId> boardIds = commentsPage.getContent().stream()
+				.map(comment -> new ObjectId(comment.getBoardItem().getId()))
+				.distinct()
+				.collect(Collectors.toList());
+
+		// 댓글을 가진 글 목록
+		List<BoardFreeOnSearch> posts = boardFreeRepository.findPostsOnSearchByIds(boardIds);
+
+		Map<String, BoardFreeOnSearch> postsHavingComments = posts.stream()
 				.collect(Collectors.toMap(BoardFreeOnSearch::getId, Function.identity()));
+
+		List<FreePostComment> freePostComments = commentsPage.getContent().stream()
+				.map(boardFreeComment -> {
+							FreePostComment comment = new FreePostComment();
+							BeanUtils.copyProperties(boardFreeComment, comment);
+
+							comment.setBoardItem(
+									Optional.ofNullable(postsHavingComments.get(boardFreeComment.getBoardItem().getId()))
+											.orElse(new BoardFreeOnSearch())
+							);
+
+							Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
+							Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
+
+							comment.setNumberOfLike(numberOfLike);
+							comment.setNumberOfDislike(numberOfDisLike);
+
+							if (Objects.nonNull(commonWriter))
+								comment.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
+										boardFreeComment.getUsersDisliking()));
+
+							if (boardFreeComment.isLinkedGallery()) {
+								List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+										new ObjectId(boardFreeComment.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
+
+								if (! ObjectUtils.isEmpty(galleries)) {
+									List<BoardGallerySimple> boardGalleries = galleries.stream()
+											.map(gallery -> BoardGallerySimple.builder()
+													.id(gallery.getId())
+													.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+													.build())
+											.collect(Collectors.toList());
+
+									comment.setGalleries(boardGalleries);
+								}
+							}
+
+							return comment;
+						}
+				)
+				.collect(Collectors.toList());
+
+		return FreePostCommentsResponse.builder()
+				.comments(freePostComments)
+				.first(commentsPage.isFirst())
+				.last(commentsPage.isLast())
+				.totalPages(commentsPage.getTotalPages())
+				.totalElements(commentsPage.getTotalElements())
+				.numberOfElements(commentsPage.getNumberOfElements())
+				.size(commentsPage.getSize())
+				.number(commentsPage.getNumber())
+				.build();
 	}
 
 	/**
@@ -928,10 +1025,10 @@ public class BoardFreeService {
                     new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
 
             if (! ObjectUtils.isEmpty(galleries)) {
-                List<FreePostDetailGallery> postDetailGalleries = galleries.stream()
-                        .map(gallery -> FreePostDetailGallery.builder()
+                List<BoardGallery> postDetailGalleries = galleries.stream()
+                        .map(gallery -> BoardGallery.builder()
                                 .id(gallery.getId())
-                                .name(gallery.getName())
+                                .name(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
                                 .imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
                                 .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
                                 .build())
@@ -972,8 +1069,8 @@ public class BoardFreeService {
 									CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
 							if (! ObjectUtils.isEmpty(latestPostGalleries)) {
-								List<BoardGallery> boardGalleries = latestPostGalleries.stream()
-										.map(gallery -> BoardGallery.builder()
+								List<BoardGallerySimple> boardGalleries = latestPostGalleries.stream()
+										.map(gallery -> BoardGallerySimple.builder()
 												.id(gallery.getId())
 												.thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 												.build())

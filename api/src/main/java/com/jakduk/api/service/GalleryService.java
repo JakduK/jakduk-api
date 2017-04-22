@@ -4,9 +4,7 @@ import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.vo.board.GalleryOnBoard;
-import com.jakduk.api.vo.gallery.GalleryDetail;
-import com.jakduk.api.vo.gallery.GalleryResponse;
-import com.jakduk.api.vo.gallery.SurroundingsGallery;
+import com.jakduk.api.vo.gallery.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.exception.ServiceError;
@@ -17,8 +15,8 @@ import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.GalleryStatus;
 import com.jakduk.core.model.embedded.LinkedItem;
+import com.jakduk.core.model.jongo.GalleryFeelingCount;
 import com.jakduk.core.model.simple.BoardFreeSimple;
-import com.jakduk.core.model.simple.GalleryOnList;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.CommonGalleryService;
@@ -31,7 +29,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
@@ -86,30 +83,59 @@ public class GalleryService {
 	@Resource
 	private ApiUtils apiUtils;
 
-	// 사진 목록.
-	public List<GalleryOnList> getGalleriesById(String id, Integer size) {
-		if (Objects.nonNull(id))
-			return jakdukDAO.findGalleriesById(Direction.DESC, size, new ObjectId(id));
-		else
-			return jakdukDAO.findGalleriesById(Direction.DESC, size, null);
-	}
-
-	// 사진의 좋아요 개수 가져오기.
-	public Map<String, Integer> getGalleryUsersLikingCount(List<ObjectId> ids) {
-		return jakdukDAO.findGalleryUsersLikingCount(ids);
-	}
-
-	// 사진의 싫어요 개수 가져오기.
-	public Map<String, Integer> getGalleryUsersDislikingCount(List<ObjectId> ids) {
-		return jakdukDAO.findGalleryUsersDislikingCount(ids);
-	}
-
 	public Gallery findOneById(String id) {
 		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 	}
 
 	public List<Gallery> findByIdIn(List<String> galleryIds) {
 		return galleryRepository.findByIdIn(galleryIds);
+	}
+
+	/**
+	 * 사진 목록
+	 */
+	public GalleriesResponse getGalleries(String id, Integer size) {
+
+		ObjectId objectId = null;
+
+		if (StringUtils.isNotBlank(id))
+			objectId = new ObjectId(id);
+
+		List<Gallery> galleries = galleryRepository.findGalleriesById(objectId, CoreConst.CRITERIA_OPERATOR.LT, size);
+
+		// Gallery ID 뽑아내기.
+		List<ObjectId> ids = galleries.stream()
+				.map(gallery -> new ObjectId(gallery.getId()))
+				.collect(Collectors.toList());
+
+		// 사진들의 감정수
+		Map<String, GalleryFeelingCount> feelingCounts = jakdukDAO.getGalleryUsersFeelingCount(ids);
+
+		List<GalleryOnList> cvtGalleries = galleries.stream()
+				.map(gallery -> {
+					GalleryOnList galleryOnList = new GalleryOnList();
+					BeanUtils.copyProperties(gallery, galleryOnList);
+
+					galleryOnList.setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
+
+					GalleryFeelingCount galleryFeelingCount = feelingCounts.get(gallery.getId());
+
+					if (Objects.nonNull(galleryFeelingCount)) {
+						galleryOnList.setLikingCount(galleryFeelingCount.getUsersLikingCount());
+						galleryOnList.setDislikingCount(galleryFeelingCount.getUsersDisLikingCount());
+					}
+
+					galleryOnList.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+					galleryOnList.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+
+					return galleryOnList;
+				})
+				.collect(Collectors.toList());
+
+
+		return GalleriesResponse.builder()
+				.galleries(cvtGalleries)
+				.build();
 	}
 
     public GalleryResponse getGalleryDetail(String id, Boolean isAddCookie) {
@@ -124,6 +150,8 @@ public class GalleryService {
 		GalleryDetail galleryDetail = new GalleryDetail();
 		BeanUtils.copyProperties(gallery, galleryDetail);
 
+		galleryDetail.setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
+
 		Integer numberOfLike = ObjectUtils.isEmpty(gallery.getUsersLiking()) ? 0 : gallery.getUsersLiking().size();
 		Integer numberOfDisLike = ObjectUtils.isEmpty(gallery.getUsersDisliking()) ? 0 : gallery.getUsersDisliking().size();
 
@@ -136,9 +164,9 @@ public class GalleryService {
 			galleryDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
 
 		// 사진첩 보기의 앞, 뒤 사진을 가져온다.
-		List<GalleryOnList> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.GT,
+		List<Gallery> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.GT,
 				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
-		List<GalleryOnList> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.LT,
+		List<Gallery> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.LT,
 				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
 
 		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
@@ -146,8 +174,8 @@ public class GalleryService {
 		Integer nextGalleriesLimit = 0;
 		List<SurroundingsGallery> surroundingsGalleries = new ArrayList<>();
 
-		// GalleryOnList -> SurroundingsGallery
-		Consumer<GalleryOnList> extractSurroundingsGalleries = surroundingsPrevGallery -> {
+		// Gallery -> SurroundingsGallery
+		Consumer<Gallery> extractSurroundingsGalleries = surroundingsPrevGallery -> {
 			SurroundingsGallery surroundingsGallery = new SurroundingsGallery();
 			BeanUtils.copyProperties(surroundingsPrevGallery, surroundingsGallery);
 

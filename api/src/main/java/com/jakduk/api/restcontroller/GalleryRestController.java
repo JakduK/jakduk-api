@@ -16,16 +16,13 @@ import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.simple.GalleryOnList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,10 +30,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author pyohwan
@@ -63,31 +58,15 @@ public class GalleryRestController {
     @Resource
     private ApiUtils apiUtils;
 
-    @ApiOperation(value = "사진 목록", response = GalleriesResponse.class)
-    @RequestMapping(value = "/galleries", method = RequestMethod.GET)
-    public GalleriesResponse getGalleries(@RequestParam(required = false) String id,
-                                          @RequestParam(required = false, defaultValue = "0") Integer size) {
+    @ApiOperation(value = "사진 목록")
+    @GetMapping("/galleries")
+    public GalleriesResponse getGalleries(
+            @ApiParam(value = "이 ID 이후부터 목록 가져옴") @RequestParam(required = false) String id,
+            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "0") Integer size) {
 
         if (size < CoreConst.GALLERY_SIZE) size = CoreConst.GALLERY_SIZE;
 
-        List<GalleryOnList> galleries = galleryService.getGalleriesById(id, size);
-
-        if (ObjectUtils.isEmpty(galleries))
-            throw new ServiceException(ServiceError.NOT_FOUND);
-
-        List<ObjectId> ids = galleries.stream()
-                .map(gallery -> new ObjectId(gallery.getId()))
-                .collect(Collectors.toList());
-
-        Map<String, Integer> usersLikingCount = galleryService.getGalleryUsersLikingCount(ids);
-        Map<String, Integer> usersDislikingCount = galleryService.getGalleryUsersDislikingCount(ids);
-
-        GalleriesResponse response = new GalleriesResponse();
-        response.setGalleries(galleries);
-        response.setUsersLikingCount(usersLikingCount);
-        response.setUsersDislikingCount(usersDislikingCount);
-
-        return response;
+        return galleryService.getGalleries(id, size);
     }
 
     @ApiOperation(value = "사진 올리기")
