@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by pyohwan on 16. 11. 30.
@@ -55,13 +56,15 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
         query.addCriteria(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
         query.limit(limit);
 
-        switch (operator) {
-            case GT:
-                query.addCriteria(Criteria.where("_id").gt(id));
-                break;
-            case LT:
-                query.addCriteria(Criteria.where("_id").lt(id));
-                break;
+        if (Objects.nonNull(id)) {
+            switch (operator) {
+                case GT:
+                    query.addCriteria(Criteria.where("_id").gt(id));
+                    break;
+                case LT:
+                    query.addCriteria(Criteria.where("_id").lt(id));
+                    break;
+            }
         }
 
         query.with(new Sort(Sort.Direction.DESC, "_id"));

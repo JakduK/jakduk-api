@@ -5,11 +5,13 @@ import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.db.HomeDescription;
 import com.jakduk.core.model.db.JakduComment;
 import com.jakduk.core.model.db.JakduScheduleGroup;
-import com.jakduk.core.model.etc.CommonCount;
 import com.jakduk.core.model.etc.SupporterCount;
+import com.jakduk.core.model.jongo.GalleryFeelingCount;
 import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.model.simple.UserOnHome;
 import org.bson.types.ObjectId;
+import org.jongo.Jongo;
+import org.jongo.MongoCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -21,10 +23,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -38,6 +37,9 @@ public class JakdukDAO {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
+
+	@Autowired
+	private Jongo jongo;
 
 	// 사진 목록.
 	public List<GallerySimple> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {
@@ -59,57 +61,42 @@ public class JakdukDAO {
 		return results.getMappedResults();
 	}
 
-	// 사진의 좋아요 개수 가져오기.
-	public Map<String, Integer> findGalleryUsersLikingCount(List<ObjectId> arrId) {
-		
-		AggregationOperation unwind = Aggregation.unwind("usersLiking");
-		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
-		AggregationOperation group = Aggregation.group("_id").count().as("count");
-		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
-		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);
-		
-		List<CommonCount> likingCounts = results.getMappedResults();
+	/**
+	 * 사진의 좋아요, 싫어요 갯수 가져오기
+	 */
+	public Map<String, GalleryFeelingCount> getGalleryUsersFeelingCount(List<ObjectId> arrId) {
+		MongoCollection boardFreeC = jongo.getCollection(CoreConst.COLLECTION_GALLERY);
 
-		Map<String, Integer> countMap = likingCounts.stream()
-				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+		Iterator<GalleryFeelingCount> iGalleries = boardFreeC.aggregate("{$match:{_id:{$in:#}}}", arrId)
+				.and("{$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
+				.as(GalleryFeelingCount.class);
 
-		return countMap;
+		HashMap<String, GalleryFeelingCount> feelingCount = new HashMap<String, GalleryFeelingCount>();
+
+		while (iGalleries.hasNext()) {
+			GalleryFeelingCount galleryFeelingCount = iGalleries.next();
+			feelingCount.put(galleryFeelingCount.getId().toString(), galleryFeelingCount);
+
+		}
+
+		return feelingCount;
 	}
 
-	// 사진의 싫어요 개수 가져오기.
-	public Map<String, Integer> findGalleryUsersDislikingCount(List<ObjectId> arrId) {
-		
-		AggregationOperation unwind = Aggregation.unwind("usersDisliking");
-		AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(arrId));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("status.status").is(CoreConst.GALLERY_STATUS_TYPE.ENABLE.name()));
-		AggregationOperation group = Aggregation.group("_id").count().as("count");
-		Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group);
-		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "gallery", CommonCount.class);
-		
-		List<CommonCount> diskingCount = results.getMappedResults();
-
-		Map<String, Integer> countMap = diskingCount.stream()
-				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
-
-		return countMap;
-	}		
-	
 	public List<SupporterCount> getSupportFCCount(String language) {
 		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));
 		AggregationOperation group = Aggregation.group("supportFC").count().as("count");
 		AggregationOperation project = Aggregation.project("count").and("_id").as("supportFC");
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
 		Aggregation aggregation = Aggregation.newAggregation(match, group, project, sort);
-		
+
 		AggregationResults<SupporterCount> results = mongoTemplate.aggregate(aggregation, "user", SupporterCount.class);
-		
+
 		List<SupporterCount> users = results.getMappedResults();
-		
+
 		for (SupporterCount supporterCount : users) {
 			supporterCount.getSupportFC().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
 		}
-		
+
 		return users;
 	}
 

@@ -3,7 +3,6 @@ package com.jakduk.core.gallery;
 import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
@@ -23,7 +22,7 @@ public class GalleryRepositoryTest extends CoreApplicationTests {
 
     @Test
     public void findGalleriesById() {
-        List<GallerySimple> galleries = sut.findGalleriesById(new ObjectId("58d64035807d714ce35675d4"), CoreConst.CRITERIA_OPERATOR.GT, 3);
+        List<Gallery> galleries = sut.findGalleriesById(new ObjectId("58d64035807d714ce35675d4"), CoreConst.CRITERIA_OPERATOR.GT, 3);
 
         Assert.assertTrue(Objects.nonNull(galleries));
     }
@@ -34,4 +33,5 @@ public class GalleryRepositoryTest extends CoreApplicationTests {
 
         Assert.assertTrue(Objects.nonNull(galleries));
     }
+    
 }

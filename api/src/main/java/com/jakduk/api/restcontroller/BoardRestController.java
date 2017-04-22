@@ -17,7 +17,7 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.etc.BoardFreeOnBest;
+import com.jakduk.core.model.jongo.BoardFreeOnBest;
 import com.jakduk.core.service.BoardCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -188,7 +188,7 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글의 댓글 목록")
     @GetMapping("/{seq}/comments")
-    public FreePostDetailCommentsResponse getFreePostCommentsOfPost(
+    public FreePostDetailCommentsResponse getFreePostDetailComments(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 

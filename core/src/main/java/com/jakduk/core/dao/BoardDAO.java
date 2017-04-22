@@ -1,8 +1,8 @@
 package com.jakduk.core.dao;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.etc.BoardFeelingCount;
-import com.jakduk.core.model.etc.BoardFreeOnBest;
+import com.jakduk.core.model.jongo.BoardFeelingCount;
+import com.jakduk.core.model.jongo.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
 import org.apache.commons.collections4.IteratorUtils;
 import org.bson.types.ObjectId;

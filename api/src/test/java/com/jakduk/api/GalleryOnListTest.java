@@ -40,7 +40,7 @@ import java.util.*;
  * @desc     :
  */
 
-public class GalleryTest extends ApiApplicationTests {
+public class GalleryOnListTest extends ApiApplicationTests {
 	
 	@Value("${core.storage.image.path}")
 	private String storageImagePath;

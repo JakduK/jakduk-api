@@ -1,4 +1,4 @@
-package com.jakduk.core.model.etc;
+package com.jakduk.core.model.jongo;
 
 import com.jakduk.core.model.embedded.BoardStatus;
 import lombok.Data;

@@ -3,7 +3,6 @@ package com.jakduk.api.service;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.restcontroller.home.vo.LatestPost;
-import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
@@ -15,9 +14,9 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.embedded.*;
-import com.jakduk.core.model.etc.BoardFeelingCount;
-import com.jakduk.core.model.etc.BoardFreeOnBest;
 import com.jakduk.core.model.etc.CommonCount;
+import com.jakduk.core.model.jongo.BoardFeelingCount;
+import com.jakduk.core.model.jongo.BoardFreeOnBest;
 import com.jakduk.core.model.simple.*;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import com.jakduk.core.repository.board.free.BoardFreeOnListRepository;
@@ -1029,7 +1028,7 @@ public class BoardFreeService {
                 List<BoardGallery> postDetailGalleries = galleries.stream()
                         .map(gallery -> BoardGallery.builder()
                                 .id(gallery.getId())
-                                .name(gallery.getName())
+                                .name(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
                                 .imageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
                                 .thumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
                                 .build())

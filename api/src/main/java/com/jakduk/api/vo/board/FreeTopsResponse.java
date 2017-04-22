@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.board;
 
-import com.jakduk.core.model.etc.BoardFreeOnBest;
+import com.jakduk.core.model.jongo.BoardFreeOnBest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
