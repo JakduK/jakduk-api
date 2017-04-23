@@ -2,6 +2,7 @@ package com.jakduk.batch.processor;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,8 +35,10 @@ public class GalleryAddHashProcessor implements ItemProcessor<Gallery, Gallery> 
         Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
         LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
+        String formatName = StringUtils.split(item.getContentType(), "/")[1];
+
         Path imagePath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
-                String.valueOf(timePoint.getDayOfMonth()), item.getId());
+                String.valueOf(timePoint.getDayOfMonth()), item.getId() + "." + formatName);
 
         if (Files.exists(imagePath, LinkOption.NOFOLLOW_LINKS)) {
             try {
