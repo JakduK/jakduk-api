@@ -3,9 +3,8 @@ package com.jakduk.api;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.etc.BoardFeelingCount;
-import com.jakduk.core.model.etc.BoardFreeOnBest;
+import com.jakduk.core.model.jongo.BoardFeelingCount;
+import com.jakduk.core.model.jongo.BoardFreeOnBest;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -119,19 +118,7 @@ public class BoardTest extends ApiApplicationTests {
 		HashMap<String, Integer> galleriesCount = boardDAO.getBoardFreeGalleriesCount(arrTemp);
 		System.out.println("getGalleriesCount01=" + galleriesCount);
 	}
-	
-	@Test
-	public void getFreeComment() {
-		
-		Integer boardSeq = 13;
-		ObjectId commentId = new ObjectId("54b916d73d965cb1dbdd4af6");
-		
-		List<BoardFreeComment> comments = boardDAO.getBoardFreeComment(boardSeq, null);
-		
-		System.out.println("getFreeComment=" + comments);
-		
-	}
-	
+
 	@Test
 	public void isNumeric() {
 		

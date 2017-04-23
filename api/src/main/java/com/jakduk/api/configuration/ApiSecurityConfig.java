@@ -113,7 +113,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 // don't create session
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
     }
 
     @Override

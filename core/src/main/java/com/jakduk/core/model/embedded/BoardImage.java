@@ -14,5 +14,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class BoardImage {
+
 	private String id;
+
 }

@@ -2,10 +2,8 @@ package com.jakduk.core.board;
 
 import com.jakduk.core.CoreApplicationTests;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.simple.BoardFreeOfMinimum;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
 import com.jakduk.core.model.simple.BoardFreeOnSitemap;
-import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
@@ -14,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -44,13 +43,6 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
     }
 
     @Test
-    public void findBoardFreeOfMinimumBySeq() {
-        BoardFreeOfMinimum boardFreeOnComment = sut.findBoardFreeOfMinimumBySeq(58);
-
-//        Assert.assertTrue(! ObjectUtils.isEmpty(boardFreeOnComment));
-    }
-
-    @Test
     public void findPostsOnRss() {
         List<BoardFreeOnRSS> posts = sut.findPostsOnRss(null,
                 new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
@@ -75,10 +67,10 @@ public class BoardFreeRepositoryTest extends CoreApplicationTests {
     }
 
     @Test
-    public void findByGalleryId() {
-        List<BoardFreeSimple> posts = sut.findByGalleryId(new ObjectId("58d6088c807d714ce356758a"));
+    public void findByIdInAndLinkedGalleryIsTrue() {
+        List<BoardFree> posts = sut.findByIdInAndLinkedGalleryIsTrue(Arrays.asList("54abd4813d96d1c506b4286e", "58f3823adce48604e48e97d4"));
 
-        Assert.assertTrue(! ObjectUtils.isEmpty(posts));
+        Assert.assertTrue(Objects.nonNull(posts));
     }
 
 }

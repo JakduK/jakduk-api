@@ -5,7 +5,7 @@ import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.service.BoardFreeService;
+import com.jakduk.api.service.BoardFreeService;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Content;
 import com.rometools.rome.feed.rss.Description;

@@ -1,14 +1,11 @@
 package com.jakduk.core.model.simple;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardStatus;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -35,8 +32,9 @@ public class BoardFreeOnList {
 	private int views = 0;
 	
 	private BoardStatus status;
-	
-	private List<BoardImage> galleries;
 
 	private String shortContent;
+
+	private boolean linkedGallery;
+
 }

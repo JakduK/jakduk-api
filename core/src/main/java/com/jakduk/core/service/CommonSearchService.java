@@ -10,11 +10,12 @@ import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardFree;
+import com.jakduk.core.model.db.BoardFreeComment;
+import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.*;
-import com.jakduk.core.model.embedded.BoardImage;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.repository.board.free.BoardFreeCommentRepository;
+import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -31,18 +32,15 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -167,10 +165,13 @@ public class CommonSearchService {
                     .map(post -> {
                         List<String> galleryIds = null;
 
-                        if (Objects.nonNull(post.getGalleries())) {
-                            galleryIds = post.getGalleries().stream()
+                        if (post.isLinkedGallery()) {
+                            List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+                                    new ObjectId(post.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
+
+                            galleryIds = galleries.stream()
                                     .filter(Objects::nonNull)
-                                    .map(BoardImage::getId)
+                                    .map(Gallery::getId)
                                     .collect(Collectors.toList());
                         }
 
@@ -223,16 +224,41 @@ public class CommonSearchService {
         ObjectId lastCommentId = null;
 
         do {
-            List<ESComment> comments = boardFreeCommentRepository.findCommentsGreaterThanId(lastCommentId, CoreConst.ES_BULK_LIMIT);
+            List<BoardFreeComment> comments = boardFreeCommentRepository.findCommentsGreaterThanId(lastCommentId, CoreConst.ES_BULK_LIMIT);
 
-            if (comments.isEmpty()) {
+            List<ESComment> esComments = comments.stream()
+                    .filter(Objects::nonNull)
+                    .map(comment -> {
+                        List<String> galleryIds = null;
+
+                        if (comment.isLinkedGallery()) {
+                            List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+                                    new ObjectId(comment.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 1);
+
+                            galleryIds = galleries.stream()
+                                    .filter(Objects::nonNull)
+                                    .map(Gallery::getId)
+                                    .collect(Collectors.toList());
+                        }
+
+                        return ESComment.builder()
+                                .id(comment.getId())
+                                .boardItem(comment.getBoardItem())
+                                .writer(comment.getWriter())
+                                .content(CoreUtils.stripHtmlTag(comment.getContent()))
+                                .galleries(galleryIds)
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
+            if (esComments.isEmpty()) {
                 hasComment = false;
             } else {
-                ESComment lastComment = comments.get(comments.size() - 1);
+                ESComment lastComment = esComments.get(esComments.size() - 1);
                 lastCommentId = new ObjectId(lastComment.getId());
             }
 
-            comments.forEach(comment -> {
+            esComments.forEach(comment -> {
                 try {
                     IndexRequestBuilder index = client.prepareIndex()
                             .setIndex(elasticsearchIndexBoard)
@@ -341,7 +367,7 @@ public class CommonSearchService {
     }
 
     @Async
-    public void indexDocumentBoardComment(String id, BoardItem boardItem, CommonWriter writer, String content) {
+    public void indexDocumentBoardComment(String id, BoardItem boardItem, CommonWriter writer, String content, List<String> galleryIds) {
 
         if (! elasticsearchEnable)
             return;
@@ -351,6 +377,7 @@ public class CommonSearchService {
                 .boardItem(boardItem)
                 .writer(writer)
                 .content(CoreUtils.stripHtmlTag(content))
+                .galleries(galleryIds)
                 .build();
 
         try {

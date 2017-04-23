@@ -8,10 +8,10 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Encyclopedia;
 import com.jakduk.core.model.db.HomeDescription;
 import com.jakduk.core.model.simple.BoardFreeCommentOnHome;
-import com.jakduk.core.model.simple.GalleryOnList;
+import com.jakduk.core.model.simple.GallerySimple;
 import com.jakduk.core.model.simple.UserOnHome;
 import com.jakduk.core.repository.EncyclopediaRepository;
-import com.jakduk.core.repository.board.free.BoardFreeCommentOnHomeRepository;
+import com.jakduk.core.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class HomeService {
 	 * 최근 그림 목록 가져오기
 	 * @return 사진 목록
      */
-	public List<GalleryOnList> getGalleriesLatest() {
+	public List<GallerySimple> getGalleriesLatest() {
 		return jakdukDAO.findGalleriesById(Direction.DESC, CoreConst.HOME_SIZE_GALLERY, null);
 	}
 

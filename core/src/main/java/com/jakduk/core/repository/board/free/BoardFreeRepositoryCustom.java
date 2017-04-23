@@ -1,5 +1,6 @@
 package com.jakduk.core.repository.board.free;
 
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.elasticsearch.ESBoard;
 import com.jakduk.core.model.simple.*;
@@ -55,8 +56,8 @@ public interface BoardFreeRepositoryCustom {
     List<BoardFreeOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit);
 
     /**
-     * Gallery ID 에 해당하는 BoardFree를 가져온다.
+     * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
-    List<BoardFreeSimple> findByGalleryId(ObjectId galleryId);
+    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, CoreConst.BOARD_CATEGORY_TYPE category, CoreConst.CRITERIA_OPERATOR operator);
 
 }

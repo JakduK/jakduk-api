@@ -1,9 +1,7 @@
 package com.jakduk.core.repository.gallery;
 
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.simple.GalleryOnList;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -19,9 +17,7 @@ import java.util.Optional;
 public interface GalleryRepository extends MongoRepository<Gallery, String>, GalleryRepositoryCustom {
 
 	Optional<Gallery> findOneById(String id);
-	
-	@Query(value="{'status.status' : 'use'}")
-	Page<GalleryOnList> findList(Pageable pageable);
+	Optional<Gallery> findOneByHashAndStatusStatus(String hash, CoreConst.GALLERY_STATUS_TYPE status);
 	
 	@Query(value="{'status.status' : 'use'}")
 	List<Gallery> findAll();
