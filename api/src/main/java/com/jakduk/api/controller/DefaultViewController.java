@@ -13,6 +13,7 @@ import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.BoardFreeOnSitemap;
 import com.jakduk.core.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
+import com.redfin.sitemapgenerator.W3CDateFormat;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
 import org.apache.commons.lang3.CharEncoding;
@@ -78,7 +79,9 @@ public class DefaultViewController {
 	public void getSitemap(HttpServletResponse servletResponse) {
 
 		try {
-			WebSitemapGenerator wsg = new WebSitemapGenerator(webServerUrl);
+			WebSitemapGenerator wsg =  WebSitemapGenerator.builder(webServerUrl, null)
+					.dateFormat(new W3CDateFormat(W3CDateFormat.Pattern.SECOND))
+					.build();
 
 			ObjectId postId = null;
 			Boolean existPosts = true;
@@ -102,7 +105,7 @@ public class DefaultViewController {
 						try {
 							WebSitemapUrl url = new WebSitemapUrl
 									.Options(String.format("%s/%s/%d", webServerUrl, webBoardFreePath, post.getSeq()))
-									.lastMod(DateUtils.LocalDateTimeToDate(post.getLastUpdated()))
+									.lastMod(DateUtils.localDateTimeToDate(post.getLastUpdated()))
 									.priority(0.5)
 									.changeFreq(ChangeFreq.DAILY)
 									.build();

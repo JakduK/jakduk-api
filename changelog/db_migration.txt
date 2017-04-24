@@ -1,4 +1,4 @@
-Version 0.7.9 / 2017-
+Version 0.7.9 / 2017-04-23
 // 사진 posts -> linkedItems 으로 인한 posts 필드 지움
 db.gallery.update({}, {$unset:{"posts":""}}, {multi:true})
 db.boardFree.update({}, {$unset:{"galleries":""}}, {multi:true})
