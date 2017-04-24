@@ -122,7 +122,7 @@ public class AuthRestController {
                                              Device device,
                                              HttpServletResponse response) {
 
-        log.info("accessToken=%s", form.getAccessToken());
+        log.info("accessToken={}", form.getAccessToken());
 
         CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
         SocialProfile socialProfile = null;
