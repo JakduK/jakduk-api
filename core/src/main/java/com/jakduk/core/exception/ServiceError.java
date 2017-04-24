@@ -53,6 +53,7 @@ public enum ServiceError {
     ALREADY_DISABLE(HttpStatus.SC_NOT_FOUND, "exception.already.disable"),
 
     UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    ANONYMOUS(HttpStatus.SC_UNAUTHORIZED, "exception.anonymous"),
     NEED_TO_LOGIN(HttpStatus.SC_UNAUTHORIZED, "exception.unauthorized"),
     NOT_FOUND_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
     NOT_JAKDUK_USER(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),

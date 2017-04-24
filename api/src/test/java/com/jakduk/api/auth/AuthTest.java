@@ -51,10 +51,10 @@ public class AuthTest {
     @Test
     public void Facebook_프로필가져오기() {
 
-        String daumApiUrl = "https://graph.facebook.com/v2.7/me?fields=id,name,email&format=json";
+        String daumApiUrl = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer EAALwXK7RDAIBABRLhRHZB8DV9GXKSLfSlvZBGkjXbVziSQRuPTqpc2eAvZBXcd9XM130euKDAF9wiZCCBroeZCT3PUpedn9U8WzZAY5q4rKCyQSRUkcGtON0aS95r46s1a2i4OTYMXDE5F8yEZBiw3X20VWXZBz33VjjMMG3hbNbtguVYjlZBJWXq");
+        headers.set("Authorization", "Bearer EAAKMWimF8eoBAJCQ24S8u6Q2HShWpsWgvDKhNstFDKTIVLCeHgAYtaVKE4KJIFRtpcJWaufZBddZBfbiB1M01WrFQLSsvzjK2tszGmFlr5rHTjxBoVX53oe2XtEqhOb8tlH6XtZB95a0qDLsj7rL2OY9vFF0D0ZD");
         //headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 

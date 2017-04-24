@@ -9,9 +9,9 @@ import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
-import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
 import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
+import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -122,6 +122,8 @@ public class AuthRestController {
                                              Device device,
                                              HttpServletResponse response) {
 
+        log.info("accessToken=%s", form.getAccessToken());
+
         CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
         SocialProfile socialProfile = null;
 
@@ -193,7 +195,7 @@ public class AuthRestController {
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
         if (ObjectUtils.isEmpty(authUserProfile))
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            throw new ServiceException(ServiceError.ANONYMOUS);
 
         return authUserProfile;
     }
