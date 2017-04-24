@@ -40,7 +40,7 @@ import java.util.Set;
  */
 
 @Slf4j
-@ControllerAdvice
+@ControllerAdvice("com.jakduk.api.restcontroller")
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
@@ -188,7 +188,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             logMessage = "code : " + ex.getServiceError().getCode() + ", message : " + ex.getLocalizedMessage();
         }
 
-        if (httpStatus.is4xxClientError()) {
+        if (serviceError.equals(ServiceError.ANONYMOUS)) {
+            log.info(logMessage);
+        } else if (httpStatus.is4xxClientError()) {
             log.warn(logMessage, ex);
         } else if (httpStatus.is5xxServerError()) {
             log.error(logMessage, ex);
