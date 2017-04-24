@@ -14,7 +14,7 @@ public class DateUtils {
         return Objects.isNull(date) ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-    public static Date LocalDateTimeToDate(LocalDateTime localDateTime) {
+    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
         return Objects.isNull(localDateTime) ? null : Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 

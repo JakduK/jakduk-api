@@ -3,11 +3,8 @@ package com.jakduk.core.utils;
 import com.jakduk.core.common.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.util.DigestUtils;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 /**
@@ -21,4 +18,5 @@ public class FileUtilsTest {
 
         Assert.assertTrue(Objects.nonNull(fileInfo));
     }
+
 }

@@ -13,6 +13,6 @@ public class LocalDateTimeToDateConverter implements Converter<LocalDateTime, Da
 
     @Override
     public Date convert(LocalDateTime source) {
-        return DateUtils.LocalDateTimeToDate(source);
+        return DateUtils.localDateTimeToDate(source);
     }
 }
