@@ -22,7 +22,7 @@ import java.util.Map;
  * Created by pyohwan on 17. 2. 6.
  */
 
-@ControllerAdvice
+@ControllerAdvice("com.jakduk.api.controller")
 @Slf4j
 public class ViewExceptionHandler {
 
