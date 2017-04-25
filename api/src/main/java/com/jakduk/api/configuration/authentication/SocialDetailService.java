@@ -37,16 +37,16 @@ public class SocialDetailService implements UserDetailsService {
     private UserUtils userUtils;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
 
-        if (StringUtils.isBlank(email)) {
-            throw new IllegalArgumentException("email 는 꼭 필요한 값입니다.");
+        if (StringUtils.isBlank(userId)) {
+            throw new IllegalArgumentException("userId 는 꼭 필요한 값입니다.");
         } else {
-			User user = userRepository.findOneByEmail(email)
+			User user = userRepository.findOneById(userId)
                     .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
-                            CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email)));
+                            CoreUtils.getExceptionMessage("exception.not.found.user")));
 
-            SocialUserDetails socialUserDetails = new SocialUserDetails(user.getId(), email, user.getUsername(), user.getProviderId(), user.getEmail(),
+            SocialUserDetails socialUserDetails = new SocialUserDetails(user.getId(), user.getEmail(), user.getUsername(), user.getProviderId(), user.getEmail(),
                     true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
 
             UserPicture userPicture = user.getUserPicture();

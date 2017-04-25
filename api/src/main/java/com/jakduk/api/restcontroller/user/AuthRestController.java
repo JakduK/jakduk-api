@@ -136,7 +136,7 @@ public class AuthRestController {
                 break;
         }
 
-        log.info("socialProfile id={}, nickname={}, email={}", socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
+        log.info("socialProfile({}, {}) email({})", socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
 
         try {
             User user = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
@@ -150,7 +150,7 @@ public class AuthRestController {
             }
 
             // 토큰 생성
-            SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
+            SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getId());
 
             String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
                     userDetails.getProviderId().name());
