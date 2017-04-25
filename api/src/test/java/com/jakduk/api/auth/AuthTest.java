@@ -54,7 +54,7 @@ public class AuthTest {
         String daumApiUrl = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer EAAKMWimF8eoBAJCQ24S8u6Q2HShWpsWgvDKhNstFDKTIVLCeHgAYtaVKE4KJIFRtpcJWaufZBddZBfbiB1M01WrFQLSsvzjK2tszGmFlr5rHTjxBoVX53oe2XtEqhOb8tlH6XtZB95a0qDLsj7rL2OY9vFF0D0ZD");
+        headers.set("Authorization", "Bearer EAAKMWimF8eoBAFNJa8iPk8YADlbItfZA24IoWZC54E1tB4YbbtoSyHyqqyGpotLInyhQkACcry4Tf7AxthIfryZBiYFTJ8ZBw3fG7CKElUFn33ybNZAaK6JmeZBbDz2xXHkhEEpGdG6jhGQCaGVmo67plrDqT5gNl7RyAVdCXS4IZCrqHi4V2b8");
         //headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
