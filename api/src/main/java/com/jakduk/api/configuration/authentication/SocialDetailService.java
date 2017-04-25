@@ -2,15 +2,16 @@ package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
-import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * @author pyohwan
@@ -39,14 +39,12 @@ public class SocialDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        if (Objects.isNull(email)) {
+        if (StringUtils.isBlank(email)) {
             throw new IllegalArgumentException("email 는 꼭 필요한 값입니다.");
         } else {
 			User user = userRepository.findOneByEmail(email)
                     .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
                             CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email)));
-
-            log.debug("social user=" + user);
 
             SocialUserDetails socialUserDetails = new SocialUserDetails(user.getId(), email, user.getUsername(), user.getProviderId(), user.getEmail(),
                     true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
