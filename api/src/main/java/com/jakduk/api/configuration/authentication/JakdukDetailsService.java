@@ -2,13 +2,13 @@ package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
-import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,6 @@ public class JakdukDetailsService implements UserDetailsService {
 			if (! user.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK))
 				throw new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
 						CoreUtils.getExceptionMessage("exception.not.jakduk.user", email, user.getProviderId()));
-
-			log.debug("Jakduk user=" + user);
 
 			JakdukUserDetails jakdukUserDetails = new JakdukUserDetails(user.getEmail(), user.getId(),
 					user.getPassword(), user.getUsername(), CoreConst.ACCOUNT_TYPE.JAKDUK,

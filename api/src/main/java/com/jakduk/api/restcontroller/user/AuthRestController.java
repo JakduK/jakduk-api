@@ -20,6 +20,7 @@ import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
@@ -28,7 +29,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -136,10 +136,18 @@ public class AuthRestController {
                 break;
         }
 
-        assert socialProfile != null;
+        log.info("socialProfile id={}, nickname={}, email={}", socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
 
         try {
             User user = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
+
+            // 과거에 SNS 가입 회원들은 email이 없는 경우가 있음. 이메일을 DB에 저장
+            if (StringUtils.isBlank(user.getEmail()) && StringUtils.isNotBlank(socialProfile.getEmail())) {
+                user.setEmail(socialProfile.getEmail());
+                userService.save(user);
+
+                log.info("user({},{}) email({}) has been entered.", user.getId(), user.getUsername(), user.getEmail());
+            }
 
             // 토큰 생성
             SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
@@ -162,13 +170,13 @@ public class AuthRestController {
                 .build();
 
         // Daum은 이메일을 안 알려준다.
-        if (! ObjectUtils.isEmpty(socialProfile.getEmail()))
+        if (StringUtils.isNotBlank(socialProfile.getEmail()))
             attemptSocialUser.setEmail(socialProfile.getEmail());
 
-        if (! StringUtils.isEmpty(socialProfile.getLargePictureUrl()))
+        if (StringUtils.isNotBlank(socialProfile.getLargePictureUrl()))
             attemptSocialUser.setExternalLargePictureUrl(socialProfile.getLargePictureUrl());
 
-        if (! StringUtils.isEmpty(socialProfile.getSmallPictureUrl()))
+        if (StringUtils.isNotBlank(socialProfile.getSmallPictureUrl()))
             attemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
 
         String attemptedToken = jwtTokenUtils.generateAttemptedToken(attemptSocialUser);
@@ -189,7 +197,7 @@ public class AuthRestController {
     }
 
     @ApiOperation(value = "JWT 토큰 속 프로필 정보")
-    @RequestMapping(value = "/auth/user", method = RequestMethod.GET)
+    @GetMapping("/auth/user")
     public AuthUserProfile getMyProfile() {
 
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
