@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.user.vo;
+package com.jakduk.api.vo.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,4 +17,5 @@ public class LoginSocialUserForm {
     @ApiModelProperty(required = true, example = "EAALwXK...", value = "OAuth 인증에서 사용하는 AccessToken")
     @NotEmpty
     private String accessToken;
+
 }

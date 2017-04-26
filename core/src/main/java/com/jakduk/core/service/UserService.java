@@ -145,18 +145,23 @@ public class UserService {
 		return user;
 	}
 
+	/**
+	 * SNS 회원 가입
+	 */
 	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
 							  String footballClub, String about, String userPictureId, String largePictureUrl) {
 
 		UserPicture userPicture = null;
 
-		User user = User.builder()
-				.email(email.trim())
-				.username(username.trim())
-				.providerId(providerId)
-				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
-				.build();
+		User user = userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId)
+				.orElseGet(() -> User.builder()
+                        .email(email.trim())
+                        .providerId(providerId)
+                        .providerUserId(providerUserId)
+                        .roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+                        .build());
+
+		user.setUsername(username);
 
 		if (StringUtils.isNotBlank(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
@@ -210,13 +215,13 @@ public class UserService {
 		userRepository.save(user);
 
 		// userImage를 user와 연동 및 활성화 처리
-		if (! ObjectUtils.isEmpty(userPicture)) {
+		if (Objects.nonNull(userPicture)) {
 			userPicture.setUser(user);
 			userPicture.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
-		log.debug("social user created. user=" + user);
+		log.debug("social user created.\n{}" + user);
 
 		return user;
 	}
