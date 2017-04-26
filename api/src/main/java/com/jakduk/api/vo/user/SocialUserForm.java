@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.user.vo;
+package com.jakduk.api.vo.user;
 
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistUsername;
@@ -20,6 +20,9 @@ import javax.validation.constraints.Size;
 @ApiModel(description = "SNS 기반 회원 가입 폼")
 @Getter
 public class SocialUserForm {
+
+	@ApiModelProperty(example = "58ad9b35a0c73a045d45979a", value = "회원 ID")
+	private String id;
 
 	@ApiModelProperty(required = true, example = "example@jakduk.com")
 	@Size(min = 6, max=30)
@@ -45,4 +48,5 @@ public class SocialUserForm {
 
 	@ApiModelProperty(example = "https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2FSjuNejHmr8o0&t=1488000722876", value = "SNS계정의 회원 큰 사진")
 	private String externalLargePictureUrl;
+
 }

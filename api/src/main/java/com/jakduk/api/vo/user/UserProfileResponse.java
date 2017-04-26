@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.user.vo;
+package com.jakduk.api.vo.user;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.LocalName;

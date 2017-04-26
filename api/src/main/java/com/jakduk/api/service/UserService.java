@@ -1,6 +1,9 @@
-package com.jakduk.core.service;
+package com.jakduk.api.service;
 
 
+import com.jakduk.api.common.util.JwtTokenUtils;
+import com.jakduk.api.configuration.authentication.SocialDetailService;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.FileUtils;
@@ -20,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mobile.device.Device;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -46,6 +50,12 @@ public class UserService {
 	@Autowired
 	private UserPictureRepository userPictureRepository;
 
+	@Autowired
+	private SocialDetailService socialDetailService;
+
+	@Autowired
+	private JwtTokenUtils jwtTokenUtils;
+
 	@Value("${core.storage.user.picture.large.path}")
 	private String storageUserPictureLargePath;
 
@@ -62,9 +72,8 @@ public class UserService {
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 
-	public User findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
-		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+	public Optional<User> findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
+		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
 	// email과 일치하는 회원 찾기.
@@ -96,6 +105,24 @@ public class UserService {
 	public UserOnPasswordUpdate findUserOnPasswordUpdateById(String id){
 
 		return userRepository.findUserOnPasswordUpdateById(id);
+	}
+
+	public String loginSnsUser(Device device, String snsEmail, User user) {
+		// 과거 SNS 가입 회원들은 email이 없는 경우가 있음. 이메일을 DB에 저장
+		if (StringUtils.isBlank(user.getEmail()) && StringUtils.isNotBlank(snsEmail)) {
+			user.setEmail(snsEmail);
+			userRepository.save(user);
+
+			log.info("user({},{}) email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
+		}
+
+		SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
+
+		// 토큰 생성
+		String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
+				userDetails.getProviderId().name());
+
+		return token;
 	}
 
 	// 회원 정보 저장.
@@ -145,18 +172,23 @@ public class UserService {
 		return user;
 	}
 
-	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
+	/**
+	 * SNS 회원 가입
+	 */
+	public User addSocialUser(String id, String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
 							  String footballClub, String about, String userPictureId, String largePictureUrl) {
 
 		UserPicture userPicture = null;
 
-		User user = User.builder()
-				.email(email.trim())
-				.username(username.trim())
-				.providerId(providerId)
-				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
-				.build();
+		User user = userRepository.findOneById(id)
+				.orElseGet(() -> User.builder()
+                        .email(email.trim())
+                        .providerId(providerId)
+                        .providerUserId(providerUserId)
+                        .roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+                        .build());
+
+		user.setUsername(username);
 
 		if (StringUtils.isNotBlank(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
@@ -210,13 +242,13 @@ public class UserService {
 		userRepository.save(user);
 
 		// userImage를 user와 연동 및 활성화 처리
-		if (! ObjectUtils.isEmpty(userPicture)) {
+		if (Objects.nonNull(userPicture)) {
 			userPicture.setUser(user);
 			userPicture.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
-		log.debug("social user created. user=" + user);
+		log.debug("social user created.\n{}" + user);
 
 		return user;
 	}

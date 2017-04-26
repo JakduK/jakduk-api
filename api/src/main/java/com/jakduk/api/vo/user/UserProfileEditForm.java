@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.user.vo;
+package com.jakduk.api.vo.user;
 
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsernameOnEdit;

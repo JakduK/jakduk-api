@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.user;
+package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
@@ -9,7 +9,8 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.user.vo.*;
+import com.jakduk.api.service.UserService;
+import com.jakduk.api.vo.user.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
@@ -22,9 +23,9 @@ import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.EmailService;
 import com.jakduk.core.service.FootballService;
-import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -95,37 +96,45 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "SNS 기반 회원 가입")
-    @RequestMapping(value = "/social", method = RequestMethod.POST)
-    public EmptyJsonResponse addSocialUser(@RequestHeader(value = "x-attempt-token") String attemptedToken,
-                                           @Valid @RequestBody SocialUserForm form,
-                                           Device device,
-                                           Locale locale,
-                                           HttpServletResponse response) {
+    @ApiOperation("SNS 기반 회원 가입")
+    @PostMapping("/social")
+    public EmptyJsonResponse addSocialUser(
+            @ApiParam(value = "임시 회원 정보 토큰", required = true) @RequestHeader(value = "x-attempt-token") String attemptedToken,
+            @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody SocialUserForm form,
+            Device device,
+            Locale locale,
+            HttpServletResponse response) {
 
         if (! jwtTokenUtils.isValidateToken(attemptedToken))
             throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
 
         String largePictureUrl = null;
 
-        if (! ObjectUtils.isEmpty(form.getExternalLargePictureUrl())) {
+        if (StringUtils.isNotBlank(form.getExternalLargePictureUrl()))
             largePictureUrl = StringUtils.defaultIfBlank(form.getExternalLargePictureUrl(), null);
-        }
 
         AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
-        User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
+        User user = userService.addSocialUser(form.getId(), form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
                 largePictureUrl);
 
-        emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
+        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
 
         response.setHeader(tokenHeader, token);
 
         return EmptyJsonResponse.newInstance();
+    }
 
+    @ApiOperation(value = "이메일 중복 검사")
+    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
+    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
+
+        userService.existEmail(StringUtils.trim(email));
+
+        return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사")
@@ -166,15 +175,6 @@ public class UserRestController {
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
                     CoreUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.username.exists"));
-
-        return EmptyJsonResponse.newInstance();
-    }
-
-    @ApiOperation(value = "이메일 중복 검사")
-    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
-
-        userService.existEmail(StringUtils.trim(email));
 
         return EmptyJsonResponse.newInstance();
     }
