@@ -17,6 +17,7 @@ import lombok.*;
 @Setter
 public class AttemptSocialUser {
 
+    private String id;
     private String email;
     private String username;
     private CoreConst.ACCOUNT_TYPE providerId;

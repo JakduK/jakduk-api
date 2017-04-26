@@ -9,6 +9,7 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.common.vo.AttemptSocialUser;
 import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
@@ -22,7 +23,6 @@ import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.EmailService;
 import com.jakduk.core.service.FootballService;
-import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -115,7 +115,7 @@ public class UserRestController {
 
         AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
-        User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
+        User user = userService.addSocialUser(form.getId(), form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
                 largePictureUrl);
 
@@ -124,6 +124,15 @@ public class UserRestController {
         String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
 
         response.setHeader(tokenHeader, token);
+
+        return EmptyJsonResponse.newInstance();
+    }
+
+    @ApiOperation(value = "이메일 중복 검사")
+    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
+    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
+
+        userService.existEmail(StringUtils.trim(email));
 
         return EmptyJsonResponse.newInstance();
     }
@@ -166,15 +175,6 @@ public class UserRestController {
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
                     CoreUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.username.exists"));
-
-        return EmptyJsonResponse.newInstance();
-    }
-
-    @ApiOperation(value = "이메일 중복 검사")
-    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
-
-        userService.existEmail(StringUtils.trim(email));
 
         return EmptyJsonResponse.newInstance();
     }

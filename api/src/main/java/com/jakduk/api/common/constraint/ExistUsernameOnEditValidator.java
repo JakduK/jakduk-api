@@ -5,7 +5,7 @@ import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.service.UserService;
+import com.jakduk.api.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
