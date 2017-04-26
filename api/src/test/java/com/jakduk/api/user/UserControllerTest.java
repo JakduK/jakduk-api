@@ -1,7 +1,7 @@
 package com.jakduk.api.user;
 
-import com.jakduk.api.restcontroller.user.UserRestController;
-import com.jakduk.api.restcontroller.user.vo.SocialUserForm;
+import com.jakduk.api.restcontroller.UserRestController;
+import com.jakduk.api.vo.user.SocialUserForm;
 import com.jakduk.api.util.AbstractMvcTest;
 import org.junit.Before;
 import org.junit.Ignore;

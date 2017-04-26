@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.user;
+package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
@@ -9,8 +9,8 @@ import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
-import com.jakduk.api.restcontroller.user.vo.LoginEmailUserForm;
-import com.jakduk.api.restcontroller.user.vo.LoginSocialUserForm;
+import com.jakduk.api.vo.user.LoginEmailUserForm;
+import com.jakduk.api.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
@@ -19,6 +19,7 @@ import com.jakduk.core.model.db.User;
 import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,12 +116,13 @@ public class AuthRestController {
         }
     }
 
-    @ApiOperation(value = "SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
-    @RequestMapping(value = "/login/social/{providerId}", method = RequestMethod.POST)
-    public EmptyJsonResponse loginSocialUser(@PathVariable String providerId,
-                                             @Valid @RequestBody LoginSocialUserForm form,
-                                             Device device,
-                                             HttpServletResponse response) {
+    @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
+    @PostMapping("/login/social/{providerId}")
+    public EmptyJsonResponse loginSocialUser(
+            @ApiParam(value = "Provider ID", required = true) @PathVariable String providerId,
+            @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody LoginSocialUserForm form,
+            Device device,
+            HttpServletResponse response) {
 
         log.info("accessToken={}", form.getAccessToken());
 
@@ -136,7 +138,8 @@ public class AuthRestController {
                 break;
         }
 
-        log.info("socialProfile({}, {}) email({})", socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
+        log.info("socialProfile providerId:{} providerUserId:{} nickname:{} email:{}",
+                convertProviderId.name(), socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
 
         try {
             User user = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
@@ -146,11 +149,16 @@ public class AuthRestController {
                 user.setEmail(socialProfile.getEmail());
                 userService.save(user);
 
-                log.info("user({},{}) email({}) has been entered.", user.getId(), user.getUsername(), user.getEmail());
+                log.info("user({},{}) email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
+            }
+            // User DB 와 SNS Profile 모두에 email이 없을 경우에는 신규 가입으로 진행한다.
+            // SNS 가입시 이메일 제공 동의를 안해서 그렇다.
+            else if (StringUtils.isBlank(user.getEmail()) && StringUtils.isBlank(socialProfile.getEmail())) {
+                throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
             }
 
             // 토큰 생성
-            SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getId());
+            SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
 
             String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
                     userDetails.getProviderId().name());
@@ -162,14 +170,13 @@ public class AuthRestController {
         } catch (ServiceException ignored) {
         }
 
-        // 신규 가입.
+        // 신규 가입을 위한 토큰 생성
         AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
                 .username(socialProfile.getNickname())
                 .providerId(convertProviderId)
                 .providerUserId(socialProfile.getId())
                 .build();
 
-        // Daum은 이메일을 안 알려준다.
         if (StringUtils.isNotBlank(socialProfile.getEmail()))
             attemptSocialUser.setEmail(socialProfile.getEmail());
 
