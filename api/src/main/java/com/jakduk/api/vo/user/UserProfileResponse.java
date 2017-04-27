@@ -21,13 +21,13 @@ import lombok.*;
 @Getter
 public class UserProfileResponse {
 
-	@ApiModelProperty(value = "이메일")
+	@ApiModelProperty(example = "example@jakduk.com", value = "이메일")
 	private String email;
 
-	@ApiModelProperty(value = "별명")
+	@ApiModelProperty(example = "작두왕", value = "별명")
 	private String username;
 
-	@ApiModelProperty(value = "소개")
+	@ApiModelProperty(example = "나는 작두왕이다.", value = "소개")
 	private String about;
 
 	@ApiModelProperty(value = "provider ID")
@@ -40,4 +40,8 @@ public class UserProfileResponse {
 	@ApiModelProperty(value = "회원 사진 객체")
 	@Setter
 	private UserPictureInfo picture;
+
+	@ApiModelProperty(example="true", value = "임시로 발급한 이메일인지 여부")
+	private Boolean temporaryEmail;
+
 }

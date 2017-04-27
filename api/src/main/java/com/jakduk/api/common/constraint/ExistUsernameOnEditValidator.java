@@ -1,7 +1,7 @@
 package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.common.vo.AuthUserProfile;
+import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.UserProfile;

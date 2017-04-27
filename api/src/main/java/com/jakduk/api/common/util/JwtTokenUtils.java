@@ -1,6 +1,6 @@
 package com.jakduk.api.common.util;
 
-import com.jakduk.api.common.vo.AttemptSocialUser;
+import com.jakduk.api.vo.user.AttemptSocialUser;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -67,9 +67,6 @@ public class JwtTokenUtils implements Serializable {
 
         try {
             final Claims claims = getClaimsFromToken(token);
-
-            if (claims.containsKey("id"))
-                attemptSocialUser.setId(claims.get("id", String.class));
 
             if (claims.containsKey("email"))
                 attemptSocialUser.setEmail(claims.get("email", String.class));
@@ -223,9 +220,6 @@ public class JwtTokenUtils implements Serializable {
 
     private Map<String, Object> convertAttemptedSocialUserToMap(AttemptSocialUser attemptSocialUser) {
         Map<String, Object> attempted = new HashMap<>();
-
-        if (StringUtils.isNotBlank(attemptSocialUser.getId()))
-            attempted.put("id", attemptSocialUser.getId());
 
         if (StringUtils.isNotBlank(attemptSocialUser.getEmail()))
             attempted.put("email", attemptSocialUser.getEmail());

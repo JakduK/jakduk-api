@@ -1,4 +1,4 @@
-package com.jakduk.api.common.vo;
+package com.jakduk.api.vo.user;
 
 import com.jakduk.core.common.CoreConst;
 import lombok.*;
@@ -17,7 +17,6 @@ import lombok.*;
 @Setter
 public class AttemptSocialUser {
 
-    private String id;
     private String email;
     private String username;
     private CoreConst.ACCOUNT_TYPE providerId;

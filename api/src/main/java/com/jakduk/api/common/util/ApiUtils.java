@@ -2,8 +2,11 @@ package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.embedded.LocalName;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
@@ -203,7 +206,43 @@ public class ApiUtils {
 
         httpSession.setAttribute(name, galleryIds);
         httpSession.setMaxInactiveInterval(60*60); // 1 hour
+    }
 
+    /**
+     * 임시 이메일 주소를 생선한다.
+     */
+    public static String generateTemporaryEmail() {
+        return RandomStringUtils.randomAlphanumeric(5) + "@jakduk.com";
+    }
+
+    /**
+     * 임시 이메일 주소인지 확인한다.
+     */
+    public static Boolean isTempararyEmail(String email) {
+        return StringUtils.endsWith(email, "@jakduk.com");
+    }
+
+    /**
+     * 해당 언어에 맞는 축구단 이름 가져오기.
+     *
+     * @param footballClub 축구단 객체
+     * @param language 언어
+     * @return LocalName 객체
+     */
+    public static LocalName getLocalNameOfFootballClub(FootballClub footballClub, String language) {
+        LocalName localName = null;
+
+        if (Objects.nonNull(footballClub)) {
+            List<LocalName> names = footballClub.getNames();
+
+            for (LocalName name : names) {
+                if (name.getLanguage().equals(language)) {
+                    localName = name;
+                }
+            }
+        }
+
+        return localName;
     }
 
 }

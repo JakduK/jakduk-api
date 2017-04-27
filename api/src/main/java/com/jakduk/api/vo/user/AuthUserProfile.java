@@ -1,4 +1,4 @@
-package com.jakduk.api.common.vo;
+package com.jakduk.api.vo.user;
 
 import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.common.CoreConst;
