@@ -3,7 +3,7 @@ package com.jakduk.api.restcontroller;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.common.vo.AuthUserProfile;
+import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.service.GalleryService;

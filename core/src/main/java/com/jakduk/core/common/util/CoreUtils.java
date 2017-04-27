@@ -14,6 +14,12 @@ import java.util.ResourceBundle;
 
 public class CoreUtils {
 
+    /**
+     * Locale에서 언어 코드를 뽑아온다.
+     *
+     * @param locale Locale
+     * @param lang 원하는 language
+     */
     public static String getLanguageCode(Locale locale, String lang) {
 
         String getLanguage = Locale.ENGLISH.getLanguage();

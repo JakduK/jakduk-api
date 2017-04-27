@@ -21,9 +21,6 @@ import javax.validation.constraints.Size;
 @Getter
 public class SocialUserForm {
 
-	@ApiModelProperty(example = "58ad9b35a0c73a045d45979a", value = "회원 ID")
-	private String id;
-
 	@ApiModelProperty(required = true, example = "example@jakduk.com")
 	@Size(min = 6, max=30)
 	@NotEmpty

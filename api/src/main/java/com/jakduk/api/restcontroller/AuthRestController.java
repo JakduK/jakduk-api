@@ -2,16 +2,11 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.common.vo.AttemptSocialUser;
-import com.jakduk.api.common.vo.AuthUserProfile;
-import com.jakduk.api.common.vo.SocialProfile;
 import com.jakduk.api.configuration.authentication.JakdukDetailsService;
-import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
-import com.jakduk.api.vo.user.LoginEmailUserForm;
-import com.jakduk.api.vo.user.LoginSocialUserForm;
+import com.jakduk.api.vo.user.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -141,21 +136,8 @@ public class AuthRestController {
 
         Optional<User> oUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
 
-        // User DB 와 SNS Profile 모두에 email이 없을 경우에는 신규 가입으로 진행한다.
-        // SNS 가입시 이메일 제공 동의를 안해서 그렇다.
-        if (oUser.isPresent() && StringUtils.isBlank(oUser.get().getEmail()) && StringUtils.isBlank(socialProfile.getEmail())) {
-
-            User user = oUser.get();
-
-            attemptSocialUser = AttemptSocialUser.builder()
-                    .id(user.getId())
-                    .username(user.getUsername())
-                    .providerId(convertProviderId)
-                    .providerUserId(socialProfile.getId())
-                    .build();
-        }
         // 가입 회원이라 로그인
-        else if (oUser.isPresent()) {
+        if (oUser.isPresent()) {
             String token = userService.loginSnsUser(device, socialProfile.getEmail(), oUser.get());
 
             response.setHeader(tokenHeader, token);

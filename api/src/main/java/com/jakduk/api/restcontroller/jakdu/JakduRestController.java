@@ -2,7 +2,7 @@ package com.jakduk.api.restcontroller.jakdu;
 
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.common.vo.AuthUserProfile;
+import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.jakdu.vo.JakduScheduleResponse;
 import com.jakduk.core.common.CoreConst;
