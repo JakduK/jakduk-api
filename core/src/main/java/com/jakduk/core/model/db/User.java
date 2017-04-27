@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -40,5 +41,7 @@ public class User {
 
 	@DBRef
 	private UserPicture userPicture;				// 프로필 사진
+
+	private LocalDateTime lastLogged;				// 마지막으로 로그인한 날짜
 
 }

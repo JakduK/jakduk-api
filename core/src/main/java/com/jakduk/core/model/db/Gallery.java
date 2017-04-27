@@ -1,7 +1,10 @@
 package com.jakduk.core.model.db;
 
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.model.embedded.*;
+import com.jakduk.core.model.embedded.CommonFeelingUser;
+import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.embedded.GalleryStatus;
+import com.jakduk.core.model.embedded.LinkedItem;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -31,10 +34,6 @@ public class Gallery {
 	private String name;
 	
 	private String fileName;
-
-	// linkedItems으로 대체
-	@Deprecated
-	private List<BoardItem> posts;
 
 	private List<LinkedItem> linkedItems;
 	

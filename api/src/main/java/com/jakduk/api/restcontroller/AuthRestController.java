@@ -83,6 +83,8 @@ public class AuthRestController {
         // Reload password post-authentication so we can generate token
         JakdukUserDetails userDetails = (JakdukUserDetails) jakdukDetailsService.loadUserByUsername(form.getUsername());
 
+        userService.updateLastLogged(userDetails.getId());
+
         String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getUsername(), userDetails.getNickname(),
                 userDetails.getProviderId().name());
 
@@ -140,21 +142,21 @@ public class AuthRestController {
         if (oUser.isPresent()) {
             String token = userService.loginSnsUser(device, socialProfile.getEmail(), oUser.get());
 
+            userService.updateLastLogged(oUser.get().getId());
+
             response.setHeader(tokenHeader, token);
 
             return EmptyJsonResponse.newInstance();
         }
         // 그냥 신규 가입
-        else {
-            attemptSocialUser = AttemptSocialUser.builder()
-                    .username(socialProfile.getNickname())
-                    .providerId(convertProviderId)
-                    .providerUserId(socialProfile.getId())
-                    .build();
+        attemptSocialUser = AttemptSocialUser.builder()
+                .username(socialProfile.getNickname())
+                .providerId(convertProviderId)
+                .providerUserId(socialProfile.getId())
+                .build();
 
-            if (StringUtils.isNotBlank(socialProfile.getEmail()))
-                attemptSocialUser.setEmail(socialProfile.getEmail());
-        }
+        if (StringUtils.isNotBlank(socialProfile.getEmail()))
+            attemptSocialUser.setEmail(socialProfile.getEmail());
 
         if (StringUtils.isNotBlank(socialProfile.getLargePictureUrl()))
             attemptSocialUser.setExternalLargePictureUrl(socialProfile.getLargePictureUrl());
