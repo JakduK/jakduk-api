@@ -45,4 +45,5 @@ public class SocialUserForm {
 
 	@ApiModelProperty(example = "https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2FSjuNejHmr8o0&t=1488000722876", value = "SNS계정의 회원 큰 사진")
 	private String externalLargePictureUrl;
+
 }

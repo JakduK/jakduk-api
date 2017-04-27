@@ -1,20 +1,21 @@
 package com.jakduk.api.common.util;
 
-import com.jakduk.api.common.vo.AttemptSocialUser;
+import com.jakduk.api.vo.user.AttemptSocialUser;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import io.jsonwebtoken.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 public class JwtTokenUtils implements Serializable {
@@ -220,22 +221,22 @@ public class JwtTokenUtils implements Serializable {
     private Map<String, Object> convertAttemptedSocialUserToMap(AttemptSocialUser attemptSocialUser) {
         Map<String, Object> attempted = new HashMap<>();
 
-        if (! ObjectUtils.isEmpty(attemptSocialUser.getEmail()))
+        if (StringUtils.isNotBlank(attemptSocialUser.getEmail()))
             attempted.put("email", attemptSocialUser.getEmail());
 
-        if (! ObjectUtils.isEmpty(attemptSocialUser.getUsername()))
+        if (StringUtils.isNotBlank(attemptSocialUser.getUsername()))
             attempted.put("username", attemptSocialUser.getUsername());
 
-        if (! ObjectUtils.isEmpty(attemptSocialUser.getProviderId()))
+        if (Objects.nonNull(attemptSocialUser.getProviderId()))
             attempted.put("providerId", attemptSocialUser.getProviderId());
 
-        if (! ObjectUtils.isEmpty(attemptSocialUser.getProviderUserId()))
+        if (StringUtils.isNotBlank(attemptSocialUser.getProviderUserId()))
             attempted.put("providerUserId", attemptSocialUser.getProviderUserId());
 
-        if (! ObjectUtils.isEmpty(attemptSocialUser.getExternalSmallPictureUrl()))
+        if (StringUtils.isNotBlank(attemptSocialUser.getExternalSmallPictureUrl()))
             attempted.put("externalSmallPictureUrl", attemptSocialUser.getExternalSmallPictureUrl());
 
-        if (! ObjectUtils.isEmpty(attemptSocialUser.getExternalLargePictureUrl()))
+        if (StringUtils.isNotBlank(attemptSocialUser.getExternalLargePictureUrl()))
             attempted.put("externalLargePictureUrl", attemptSocialUser.getExternalLargePictureUrl());
 
         return attempted;

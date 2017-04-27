@@ -7,7 +7,6 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Competition;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.FootballClubOrigin;
-import com.jakduk.core.model.embedded.LocalName;
 import com.jakduk.core.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.core.repository.footballclub.FootballClubRepository;
 import org.bson.types.ObjectId;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -69,29 +67,6 @@ public class FootballService {
     public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, CoreConst.NAME_TYPE sortNameType ) {
 
         return footballClubRepository.findFootballClubs(ids, language, sortNameType);
-    }
-
-    /**
-     * 해당 언어에 맞는 축구단 이름 가져오기.
-     *
-     * @param footballClub 축구단 객체
-     * @param language 언어
-     * @return LocalName 객체
-     */
-    public LocalName getLocalNameOfFootballClub(FootballClub footballClub, String language) {
-        LocalName localName = null;
-
-        if (Objects.nonNull(footballClub)) {
-            List<LocalName> names = footballClub.getNames();
-
-            for (LocalName name : names) {
-                if (name.getLanguage().equals(language)) {
-                    localName = name;
-                }
-            }
-        }
-
-        return localName;
     }
 
     // 대회 목록.

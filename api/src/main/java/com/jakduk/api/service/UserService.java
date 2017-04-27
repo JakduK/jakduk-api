@@ -1,6 +1,12 @@
-package com.jakduk.core.service;
+package com.jakduk.api.service;
 
 
+import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.JwtTokenUtils;
+import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.configuration.authentication.SocialDetailService;
+import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
+import com.jakduk.api.vo.user.UserProfileResponse;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.FileUtils;
@@ -9,6 +15,8 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
+import com.jakduk.core.model.embedded.LocalName;
+import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.repository.footballclub.FootballClubRepository;
@@ -20,9 +28,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mobile.device.Device;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -46,6 +56,15 @@ public class UserService {
 	@Autowired
 	private UserPictureRepository userPictureRepository;
 
+	@Autowired
+	private SocialDetailService socialDetailService;
+
+	@Autowired
+	private JwtTokenUtils jwtTokenUtils;
+
+	@Resource
+	private UserUtils userUtils;
+
 	@Value("${core.storage.user.picture.large.path}")
 	private String storageUserPictureLargePath;
 
@@ -62,9 +81,8 @@ public class UserService {
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 
-	public User findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
-		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+	public Optional<User> findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
+		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
 	// email과 일치하는 회원 찾기.
@@ -96,6 +114,38 @@ public class UserService {
 	public UserOnPasswordUpdate findUserOnPasswordUpdateById(String id){
 
 		return userRepository.findUserOnPasswordUpdateById(id);
+	}
+
+	/**
+	 * SNS 가입 회원 로그인
+	 *
+	 * @return 인증 토큰
+	 */
+	public String loginSnsUser(Device device, String snsEmail, User user) {
+
+		// User DB 와 SNS Profile 모두에 email이 없을 경우에는 신규 가입으로 진행한다.
+		// SNS 가입시 이메일 제공 동의를 안해서 그렇다.
+		if (StringUtils.isBlank(user.getEmail()) && StringUtils.isBlank(snsEmail)) {
+			user.setEmail(ApiUtils.generateTemporaryEmail());
+			userRepository.save(user);
+
+			log.info("user({},{}) temporary email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
+		}
+		// 과거 SNS 가입 회원들은 email이 없는 경우가 있음. 이메일을 DB에 저장
+		else if (StringUtils.isBlank(user.getEmail()) && StringUtils.isNotBlank(snsEmail)) {
+			user.setEmail(snsEmail);
+			userRepository.save(user);
+
+			log.info("user({},{}) email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
+		}
+
+		SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
+
+		// 토큰 생성
+		String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
+				userDetails.getProviderId().name());
+
+		return token;
 	}
 
 	// 회원 정보 저장.
@@ -153,15 +203,13 @@ public class UserService {
 
 		UserPicture userPicture = null;
 
-		User user = userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId)
-				.orElseGet(() -> User.builder()
-                        .email(email.trim())
-                        .providerId(providerId)
-                        .providerUserId(providerUserId)
-                        .roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
-                        .build());
-
-		user.setUsername(username);
+		User user = User.builder()
+				.email(email.trim())
+				.username(username)
+				.providerId(providerId)
+				.providerUserId(providerUserId)
+				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.build();
 
 		if (StringUtils.isNotBlank(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
@@ -332,6 +380,39 @@ public class UserService {
 		} catch (IOException e) {
 			throw new ServiceException(ServiceError.GALLERY_IO_ERROR, e);
 		}
+	}
+
+	public UserProfileResponse getProfileMe(String language, String id) {
+
+		UserProfile user = userProfileRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+
+		UserProfileResponse response = UserProfileResponse.builder()
+				.email(user.getEmail())
+				.username(user.getUsername())
+				.about(user.getAbout())
+				.providerId(user.getProviderId())
+				.temporaryEmail(ApiUtils.isTempararyEmail(user.getEmail()))
+				.build();
+
+		FootballClub footballClub = user.getSupportFC();
+		UserPicture userPicture = user.getUserPicture();
+
+		if (Objects.nonNull(footballClub)) {
+			LocalName localName = ApiUtils.getLocalNameOfFootballClub(footballClub, language);
+
+			response.setFootballClubName(localName);
+		}
+
+		if (Objects.nonNull(userPicture)) {
+			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
+					userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+					userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+
+			response.setPicture(userPictureInfo);
+		}
+
+		return response;
 	}
 
 }

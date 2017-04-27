@@ -6,23 +6,16 @@ import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.common.vo.AttemptSocialUser;
-import com.jakduk.api.common.vo.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
-import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
-import com.jakduk.core.model.embedded.LocalName;
-import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.service.EmailService;
-import com.jakduk.core.service.FootballService;
-import com.jakduk.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,12 +31,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * @author pyohawan
@@ -69,13 +60,7 @@ public class UserRestController {
     private UserService userService;
 
     @Autowired
-    private FootballService footballService;
-
-    @Autowired
     private EmailService emailService;
-
-    @Resource
-    private UserUtils userUtils;
 
     @ApiOperation(value = "이메일 기반 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -128,6 +113,15 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
+    @ApiOperation(value = "이메일 중복 검사")
+    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
+    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
+
+        userService.existEmail(StringUtils.trim(email));
+
+        return EmptyJsonResponse.newInstance();
+    }
+
     @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사")
     @RequestMapping(value = "/exist/email/edit", method = RequestMethod.GET)
     public EmptyJsonResponse existEmailOnEdit(@NotEmpty @Email @ExistEmailOnEdit @RequestParam String email) {
@@ -170,15 +164,6 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "이메일 중복 검사")
-    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
-
-        userService.existEmail(StringUtils.trim(email));
-
-        return EmptyJsonResponse.newInstance();
-    }
-
     @ApiOperation(value = "별명 중복 검사")
     @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
     public EmptyJsonResponse existUsername(@NotEmpty @ExistUsername @RequestParam String username) {
@@ -188,41 +173,15 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "내 프로필 정보 보기")
-    @RequestMapping(value = "/profile/me", method = RequestMethod.GET)
+    @ApiOperation("내 프로필 정보 보기")
+    @GetMapping("/profile/me")
     public UserProfileResponse getProfileMe(Locale locale) {
 
         String language = CoreUtils.getLanguageCode(locale, null);
 
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
-        UserProfile user = userService.findUserProfileById(authUserProfile.getId());
-
-        UserProfileResponse response = UserProfileResponse.builder()
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .about(user.getAbout())
-                .providerId(user.getProviderId())
-                .build();
-
-        FootballClub footballClub = user.getSupportFC();
-        UserPicture userPicture = user.getUserPicture();
-
-        if (Objects.nonNull(footballClub)) {
-            LocalName localName = footballService.getLocalNameOfFootballClub(footballClub, language);
-
-            response.setFootballClubName(localName);
-        }
-
-        if (Objects.nonNull(userPicture)) {
-            UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
-                    userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-                    userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
-
-            response.setPicture(userPictureInfo);
-        }
-
-        return response;
+        return userService.getProfileMe(language, authUserProfile.getId());
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")

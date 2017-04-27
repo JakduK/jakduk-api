@@ -1,8 +1,8 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.common.vo.AuthUserProfile;
-import com.jakduk.api.common.vo.SocialProfile;
+import com.jakduk.api.vo.user.AuthUserProfile;
+import com.jakduk.api.vo.user.SocialProfile;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.core.common.CommonRole;

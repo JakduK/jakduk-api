@@ -1,4 +1,4 @@
-package com.jakduk.api.restcontroller.user;
+package com.jakduk.api.restcontroller;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
@@ -9,7 +9,7 @@ import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
 import com.jakduk.core.service.EmailService;
-import com.jakduk.core.service.UserService;
+import com.jakduk.api.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
