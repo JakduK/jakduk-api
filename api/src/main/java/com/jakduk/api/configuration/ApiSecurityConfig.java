@@ -1,6 +1,5 @@
 package com.jakduk.api.configuration;
 
-import com.jakduk.api.configuration.authentication.AuthenticationTokenFilter;
 import com.jakduk.api.configuration.authentication.JakdukDetailsService;
 import com.jakduk.api.configuration.authentication.SocialDetailService;
 import com.jakduk.api.configuration.authentication.handler.RestAccessDeniedHandler;
@@ -15,9 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @author pyohwan
@@ -56,7 +53,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
 
                 // Custom JWT based security filter
-                .addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
@@ -109,17 +106,13 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 //                        "/restcontroller/**"                          // spring-data-restcontroller
                 ).hasRole("ROOT")
 
-                .anyRequest().permitAll()
-
-                // don't create session
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+                .anyRequest().permitAll();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(jakdukDetailsService).passwordEncoder(passwordEncoder);
-        auth.userDetailsService(socialDetailService);
+//        auth.userDetailsService(socialDetailService);
     }
 
     @Bean
@@ -128,8 +121,10 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    /*
     @Bean
     public AuthenticationTokenFilter authenticationTokenFilter() throws Exception {
         return new AuthenticationTokenFilter();
     }
+    */
 }

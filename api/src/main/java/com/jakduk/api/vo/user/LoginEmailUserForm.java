@@ -20,4 +20,5 @@ public class LoginEmailUserForm implements Serializable {
 
     @ApiModelProperty(required = true, example = "1111")
     private String password;
+
 }

@@ -3,7 +3,6 @@ package com.jakduk.api.restcontroller;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.JakdukDetailsService;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
@@ -23,12 +22,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -64,11 +64,11 @@ public class AuthRestController {
     @Autowired
     private UserService userService;
 
-    @ApiOperation(value = "이메일 기반 로그인")
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public EmptyJsonResponse loginSocialUser(@RequestBody LoginEmailUserForm form,
-                                             @ApiIgnore Device device,
-                                             HttpServletResponse response) {
+    @ApiOperation("이메일 기반 로그인")
+    @PostMapping("/auth/login")
+    public EmptyJsonResponse loginJakdukUser(
+            @ApiParam(value = "이메일 회원 폼", required = true) @Valid @RequestBody LoginEmailUserForm form,
+            HttpSession session) {
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(
@@ -80,15 +80,7 @@ public class AuthRestController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Reload password post-authentication so we can generate token
-        JakdukUserDetails userDetails = (JakdukUserDetails) jakdukDetailsService.loadUserByUsername(form.getUsername());
-
-        userService.updateLastLogged(userDetails.getId());
-
-        String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getUsername(), userDetails.getNickname(),
-                userDetails.getProviderId().name());
-
-        response.setHeader(tokenHeader, token);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
         return EmptyJsonResponse.newInstance();
     }
