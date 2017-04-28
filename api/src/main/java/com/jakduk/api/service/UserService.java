@@ -12,6 +12,7 @@ import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.FileUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
+import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
@@ -35,6 +36,7 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Objects;
@@ -70,16 +72,6 @@ public class UserService {
 
 	@Value("${core.storage.user.picture.small.path}")
 	private String storageUserPictureSmallPath;
-
-	public User findOneById(String id) {
-		return userRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-	}
-
-	public UserProfile findUserProfileById(String id) {
-		return userProfileRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-	}
 
 	public Optional<User> findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
@@ -163,6 +155,7 @@ public class UserService {
 				.password(password)
 				.providerId(CoreConst.ACCOUNT_TYPE.JAKDUK)
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.lastLogged(LocalDateTime.now())
 				.build();
 
 		if (StringUtils.isNotBlank(footballClub)) {
@@ -209,6 +202,7 @@ public class UserService {
 				.providerId(providerId)
 				.providerUserId(providerUserId)
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.lastLogged(LocalDateTime.now())
 				.build();
 
 		if (StringUtils.isNotBlank(footballClub)) {
@@ -382,6 +376,9 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * 내 프로필 정보 보기
+	 */
 	public UserProfileResponse getProfileMe(String language, String id) {
 
 		UserProfile user = userProfileRepository.findOneById(id)
@@ -413,6 +410,18 @@ public class UserService {
 		}
 
 		return response;
+	}
+
+	/**
+	 * 마지막 로그인 날짜 갱신
+	 */
+	public void updateLastLogged(String id) {
+
+		User user = userRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+
+		user.setLastLogged(LocalDateTime.now());
+		userRepository.save(user);
 	}
 
 }
