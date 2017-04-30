@@ -1,11 +1,13 @@
 package com.jakduk.api.restcontroller;
 
+import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
-import com.jakduk.api.common.util.JwtTokenUtils;
+import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
@@ -23,15 +25,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mobile.device.Device;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Locale;
@@ -47,11 +50,8 @@ import java.util.Locale;
 @Validated
 public class UserRestController {
 
-    @Value("${jwt.token.header}")
-    private String tokenHeader;
-
     @Autowired
-    private JwtTokenUtils jwtTokenUtils;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -65,18 +65,23 @@ public class UserRestController {
     @ApiOperation(value = "이메일 기반 회원 가입")
     @RequestMapping(value = "", method = RequestMethod.POST)
     public EmptyJsonResponse addJakdukUser(@Valid @RequestBody UserForm form,
-                                           Device device,
                                            Locale locale,
-                                           HttpServletResponse response) {
+                                           HttpSession session) {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
         emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
 
-        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
+        // Perform the authentication
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        form.getUsername(),
+                        form.getPassword()
+                )
+        );
 
-        response.setHeader(tokenHeader, token);
+        ApiUtils.login(session, authentication);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -84,21 +89,16 @@ public class UserRestController {
     @ApiOperation("SNS 기반 회원 가입")
     @PostMapping("/social")
     public EmptyJsonResponse addSocialUser(
-            @ApiParam(value = "임시 회원 정보 토큰", required = true) @RequestHeader(value = "x-attempt-token") String attemptedToken,
             @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody SocialUserForm form,
-            Device device,
             Locale locale,
-            HttpServletResponse response) {
+            HttpSession session) {
 
-        if (! jwtTokenUtils.isValidateToken(attemptedToken))
-            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
+        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         String largePictureUrl = null;
 
         if (StringUtils.isNotBlank(form.getExternalLargePictureUrl()))
             largePictureUrl = StringUtils.defaultIfBlank(form.getExternalLargePictureUrl(), null);
-
-        AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
         User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
@@ -106,9 +106,16 @@ public class UserRestController {
 
         emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
-        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
+        // Perform the authentication
+        Authentication authentication = authenticationManager.authenticate(
+                new SnsAuthenticationToken(
+                        user.getEmail()
+                )
+        );
 
-        response.setHeader(tokenHeader, token);
+        ApiUtils.login(session, authentication);
+
+        session.removeAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         return EmptyJsonResponse.newInstance();
     }

@@ -1,0 +1,23 @@
+spring:
+  http:
+    multipart:
+      max-file-size: 8MB
+  mvc:
+    locale: ko_KR
+    throw-exception-if-no-handler-found: true
+
+api:
+  path:
+    user:
+      picture:
+        url:
+          large: user/picture
+          small: user/picture/small
+    gallery:
+      url:
+         image: gallery
+         thumbnail: gallery/thumbnail
+web:
+  path:
+    board:
+      free: board/free

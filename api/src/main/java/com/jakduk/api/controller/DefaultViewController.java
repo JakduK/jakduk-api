@@ -65,7 +65,7 @@ public class DefaultViewController {
 	@Value("${web.server.url}")
 	private String webServerUrl;
 
-	@Value("${web.board.free.path}")
+	@Value("${web.path.board.free}")
 	private String webBoardFreePath;
 
 	// RSS
@@ -129,7 +129,7 @@ public class DefaultViewController {
 	}
 
 	// 사진 가져오기.
-	@GetMapping("/${api.gallery.image.url.path}/{id}")
+	@GetMapping("/${api.path.gallery.url.image}/{id}")
 	public void getGallery(@PathVariable String id,
 						   HttpServletResponse response) {
 
@@ -147,7 +147,7 @@ public class DefaultViewController {
 	}
 
 	// 사진 썸네일 가져오기.
-	@GetMapping("/${api.gallery.thumbnail.url.path}/{id}")
+	@GetMapping("/${api.path.gallery.url.thumbnail}/{id}")
 	public void getGalleyThumbnail(@PathVariable String id,
 								   HttpServletResponse response) {
 
@@ -165,7 +165,7 @@ public class DefaultViewController {
 	}
 
 	// 회원 프로필 사진 가져오기.
-	@RequestMapping(value = "/${api.user.picture.large.url.path}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/${api.path.user.picture.url.large}/{id}", method = RequestMethod.GET)
 	public void getUserPicture(@PathVariable String id,
 							 HttpServletResponse response) {
 
@@ -185,7 +185,7 @@ public class DefaultViewController {
 	}
 
 	// 회원 프로필 작은 사진 가져오기.
-	@RequestMapping(value = "/${api.user.picture.small.url.path}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/${api.path.user.picture.url.small}/{id}", method = RequestMethod.GET)
 	public void getUserSmallPicture(@PathVariable String id,
 									HttpServletResponse response) {
 

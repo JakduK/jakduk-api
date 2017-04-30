@@ -10,6 +10,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -35,10 +38,10 @@ public class ApiUtils {
     @Value("${api.server.url}")
     private String apiServerUrl;
 
-    @Value("${api.gallery.image.url.path}")
+    @Value("${api.path.gallery.url.image}")
     private String apiGalleryFullUrlPath;
 
-    @Value("${api.gallery.thumbnail.url.path}")
+    @Value("${api.path.gallery.url.thumbnail}")
     private String apiGalleryThumbnailUrlPath;
 
     private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";
@@ -243,6 +246,12 @@ public class ApiUtils {
         }
 
         return localName;
+    }
+
+    public static void login(HttpSession session, Authentication authentication) {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     }
 
 }

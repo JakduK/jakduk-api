@@ -29,4 +29,10 @@ public class ApiConst {
         FREE_BOARD,
         GALLERY
     }
+
+    /**
+     * SNS 가입시 임시로 저장할 프로필를 담을 세션
+     * 참고 {@link org.springframework.social.connect.web.ProviderSignInAttempt#SESSION_ATTRIBUTE}
+     */
+    public final static String PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE = "ProviderSignInAttempt";
 }

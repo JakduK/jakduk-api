@@ -2,6 +2,7 @@ package com.jakduk.api.configuration.authentication.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakduk.api.restcontroller.vo.RestErrorResponse;
+import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,8 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setCharacterEncoding("utf-8");
 
-        RestErrorResponse error = new RestErrorResponse(ServiceError.UNAUTHORIZED_ACCESS);
-        String errorJson = new ObjectMapper().writeValueAsString(error);
+        RestErrorResponse restErrorResponse = new RestErrorResponse(ServiceError.UNAUTHORIZED_ACCESS);
+        String errorJson = ObjectMapperUtils.getObjectMapper().writeValueAsString(restErrorResponse);
 
         PrintWriter out = response.getWriter();
         out.print(errorJson);
