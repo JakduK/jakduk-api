@@ -1,10 +1,8 @@
 package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
@@ -47,7 +45,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
                     .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
                             CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", username)));
 
-            JakdukUserDetails jakdukUserDetails = new JakdukUserDetails(user.getEmail(), user.getId(),
+            UserDetailsImpl userDetailsImpl = new UserDetailsImpl(user.getEmail(), user.getId(),
                     user.getPassword(), user.getUsername(), user.getProviderId(),
                     true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
 
@@ -58,12 +56,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
                         userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
                         userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
-                jakdukUserDetails.setPicture(userPictureInfo);
+                userDetailsImpl.setPicture(userPictureInfo);
             }
 
-            log.info("login user:{}", jakdukUserDetails.getUsername());
+            log.info("login user:{}", userDetailsImpl.getUsername());
 
-            return jakdukUserDetails;
+            return userDetailsImpl;
         }
     }
 }

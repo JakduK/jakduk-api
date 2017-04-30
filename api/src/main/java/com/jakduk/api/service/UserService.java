@@ -2,7 +2,6 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.vo.user.UserProfileResponse;
 import com.jakduk.core.common.CommonRole;
@@ -26,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mobile.device.Device;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -54,9 +52,6 @@ public class UserService {
 
 	@Autowired
 	private UserPictureRepository userPictureRepository;
-
-	@Autowired
-	private JwtTokenUtils jwtTokenUtils;
 
 	@Resource
 	private UserUtils userUtils;
@@ -103,11 +98,12 @@ public class UserService {
 	}
 
 	/**
-	 * SNS 가입 회원 로그인
+	 * SNS 회원의 하위 호환 검사
 	 *
-	 * @return 인증 토큰
+	 * @param snsEmail Provider(페이스북, 다음)에서 가져온 email
+	 * @param user DB에서 가져온 회원
 	 */
-	public String loginSnsUser(Device device, String snsEmail, User user) {
+	public void checkBackwardCompatibilityOfSnsUser(String snsEmail, User user) {
 
 		// User DB 와 SNS Profile 모두에 email이 없을 경우에는 신규 가입으로 진행한다.
 		// SNS 가입시 이메일 제공 동의를 안해서 그렇다.
@@ -124,15 +120,6 @@ public class UserService {
 
 			log.info("user({},{}) email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
 		}
-
-//		SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
-//
-//		// 토큰 생성
-//		String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
-//				userDetails.getProviderId().name());
-//
-//		return token;
-		return null;
 	}
 
 	// 회원 정보 저장.

@@ -1,9 +1,9 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.util.JwtTokenUtils;
+import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
-import com.jakduk.api.configuration.authentication.SnsPrincipal;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
@@ -17,20 +17,14 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mobile.device.Device;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -43,15 +37,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthRestController {
-
-    @Value("${jwt.token.header}")
-    private String tokenHeader;
-
-    @Value("${jwt.token.attempted.header}")
-    private String attemptedTokenHeader;
-
-    @Autowired
-    private JwtTokenUtils jwtTokenUtils;
 
     @Autowired
     private UserUtils userUtils;
@@ -76,9 +61,7 @@ public class AuthRestController {
                 )
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+        ApiUtils.login(session, authentication);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -92,7 +75,6 @@ public class AuthRestController {
 
         CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
         SocialProfile socialProfile = null;
-        AttemptSocialUser attemptSocialUser = null;
 
         switch (convertProviderId) {
             case DAUM:
@@ -110,6 +92,8 @@ public class AuthRestController {
 
         // 가입 회원이라 로그인
         if (oUser.isPresent()) {
+            userService.checkBackwardCompatibilityOfSnsUser(socialProfile.getEmail(), oUser.get());
+
             // Perform the authentication
             Authentication authentication = authenticationManager.authenticate(
                     new SnsAuthenticationToken(
@@ -117,60 +101,13 @@ public class AuthRestController {
                     )
             );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+            ApiUtils.login(session, authentication);
 
             return EmptyJsonResponse.newInstance();
         }
 
-
-//
-//        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
-
-        return EmptyJsonResponse.newInstance();
-    }
-
-    @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
-    @PostMapping("/login/social/{providerId}")
-    public EmptyJsonResponse loginSocialUser(
-            @ApiParam(value = "Provider ID", required = true) @PathVariable String providerId,
-            @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody LoginSocialUserForm form,
-            Device device,
-            HttpServletResponse response) {
-
-        log.info("accessToken={}", form.getAccessToken());
-
-        CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
-        SocialProfile socialProfile = null;
-        AttemptSocialUser attemptSocialUser = null;
-
-        switch (convertProviderId) {
-            case DAUM:
-                socialProfile = userUtils.getDaumProfile(form.getAccessToken());
-                break;
-            case FACEBOOK:
-                socialProfile = userUtils.getFacebookProfile(form.getAccessToken());
-                break;
-        }
-
-        log.info("socialProfile providerId:{} providerUserId:{} nickname:{} email:{}",
-                convertProviderId.name(), socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
-
-        Optional<User> oUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
-
-        // 가입 회원이라 로그인
-        if (oUser.isPresent()) {
-            String token = userService.loginSnsUser(device, socialProfile.getEmail(), oUser.get());
-
-            userService.updateLastLogged(oUser.get().getId());
-
-            response.setHeader(tokenHeader, token);
-
-            return EmptyJsonResponse.newInstance();
-        }
-        // 그냥 신규 가입
-        attemptSocialUser = AttemptSocialUser.builder()
+        // 그냥 신규 가입으로 프로필을 세션에 임시 저장한다.
+        AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
                 .username(socialProfile.getNickname())
                 .providerId(convertProviderId)
                 .providerUserId(socialProfile.getId())
@@ -185,28 +122,22 @@ public class AuthRestController {
         if (StringUtils.isNotBlank(socialProfile.getSmallPictureUrl()))
             attemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
 
-        String attemptedToken = jwtTokenUtils.generateAttemptedToken(attemptSocialUser);
-
-        response.setHeader(attemptedTokenHeader, attemptedToken);
+        session.setAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
 
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
-    @ApiOperation(value = "SNS 기반 회원 가입시 필요한 회원 프로필 정보")
-    @RequestMapping(value = "/social/attempt", method = RequestMethod.GET)
-    public AttemptSocialUser getSocialAttemptedUser(@RequestHeader(value = "x-attempt-token") String attemptedToken) {
+    @ApiOperation("SNS 기반 회원 가입시 필요한 회원 프로필 정보")
+    @GetMapping("/user/attempt")
+    public AttemptSocialUser getSocialAttemptedUser(HttpSession session) {
 
-        if (! jwtTokenUtils.isValidateToken(attemptedToken))
-            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
-
-        return jwtTokenUtils.getAttemptedFromToken(attemptedToken);
+        return (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
     }
 
     @ApiOperation(value = "세션에 있는 나의 프로필 정보")
     @GetMapping("/user")
     public AuthUserProfile getMyProfile() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
         if (ObjectUtils.isEmpty(authUserProfile))

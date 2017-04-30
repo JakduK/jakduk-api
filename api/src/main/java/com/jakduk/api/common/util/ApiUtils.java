@@ -10,6 +10,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -243,6 +246,12 @@ public class ApiUtils {
         }
 
         return localName;
+    }
+
+    public static void login(HttpSession session, Authentication authentication) {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     }
 
 }

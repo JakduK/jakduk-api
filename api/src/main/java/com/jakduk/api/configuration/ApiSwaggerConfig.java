@@ -49,7 +49,7 @@ public class ApiSwaggerConfig {
                 .host(environment.getProperty("swagger.host"))
                 .apiInfo(apiInfo())
                 .useDefaultResponseMessages(false)
-                .securitySchemes(Collections.singletonList(apiKey()))
+//                .securitySchemes(Collections.singletonList(apiKey()))
                 .produces(producesList);
     }
 
@@ -62,7 +62,7 @@ public class ApiSwaggerConfig {
                 "test-app",
                 "",
                 ApiKeyVehicle.HEADER,
-                "",
+                "Cookie",
                 "," /*scope separator*/);
     }
 

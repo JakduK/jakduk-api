@@ -1,8 +1,7 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
+import com.jakduk.api.configuration.authentication.UserDetailsImpl;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.vo.user.SocialProfile;
 import com.jakduk.core.common.CommonRole;
@@ -94,6 +93,7 @@ public class UserUtils {
 
     /**
      * 로그인 중인 회원이 USER 권한인지 검사.
+     *
      * @return 회원이면 true
      */
     public static Boolean isUser() {
@@ -120,16 +120,7 @@ public class UserUtils {
      * @return 이메일 기반이면 true, 아니면 false
      */
     public static Boolean isJakdukUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetails;
-    }
-
-    /**
-     * 로그인 중인 회원이 소셜 기반인지 검사.
-     *
-     * @return 이메일 기반이면 true, 아니면 false
-     */
-    public static Boolean isSocialUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetails;
+        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetailsImpl;
     }
 
     /**
@@ -139,8 +130,8 @@ public class UserUtils {
         AuthUserProfile authUserProfile = null;
 
         if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof JakdukUserDetails) {
-                JakdukUserDetails userDetail = (JakdukUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+            if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof UserDetailsImpl) {
+                UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
                 Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
