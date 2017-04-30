@@ -2,7 +2,7 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
@@ -81,7 +81,7 @@ public class GalleryRestController {
         if (! StringUtils.startsWithIgnoreCase(contentType, "image/"))
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         Gallery gallery = galleryService.uploadImage(commonWriter, file.getOriginalFilename(), file.getSize(),
                 contentType, file.getBytes());
@@ -102,10 +102,10 @@ public class GalleryRestController {
             @ApiParam(value = "연관된 아이템 폼") @RequestBody(required = false) LinkedItemForm form,
             HttpServletRequest request) {
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         galleryService.deleteGallery(id, authUserProfile.getId());
 
@@ -133,10 +133,10 @@ public class GalleryRestController {
     @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CoreConst.FEELING_TYPE feeling) {
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter writer = UserUtils.getCommonWriter();
+        CommonWriter writer = AuthUtils.getCommonWriter();
 
         Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
 

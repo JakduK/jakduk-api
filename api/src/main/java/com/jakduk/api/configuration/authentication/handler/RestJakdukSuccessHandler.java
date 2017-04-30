@@ -4,7 +4,6 @@ import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +15,6 @@ import java.io.PrintWriter;
  * Created by pyohwanjang on 2017. 4. 30..
  */
 
-@Component
 public class RestJakdukSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override

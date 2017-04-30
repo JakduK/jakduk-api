@@ -1,8 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.ApiConst;
-import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
@@ -41,7 +40,7 @@ import java.util.Optional;
 public class AuthRestController {
 
     @Autowired
-    private UserUtils userUtils;
+    private AuthUtils authUtils;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -61,10 +60,10 @@ public class AuthRestController {
 
         switch (convertProviderId) {
             case DAUM:
-                socialProfile = userUtils.getDaumProfile(form.getAccessToken());
+                socialProfile = authUtils.getDaumProfile(form.getAccessToken());
                 break;
             case FACEBOOK:
-                socialProfile = userUtils.getFacebookProfile(form.getAccessToken());
+                socialProfile = authUtils.getFacebookProfile(form.getAccessToken());
                 break;
         }
 
@@ -84,7 +83,7 @@ public class AuthRestController {
                     )
             );
 
-            ApiUtils.login(session, authentication);
+            AuthUtils.login(session, authentication);
 
             return EmptyJsonResponse.newInstance();
         }
@@ -121,7 +120,7 @@ public class AuthRestController {
     @GetMapping("/user")
     public AuthUserProfile getMyProfile() {
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         if (ObjectUtils.isEmpty(authUserProfile))
             throw new ServiceException(ServiceError.ANONYMOUS);

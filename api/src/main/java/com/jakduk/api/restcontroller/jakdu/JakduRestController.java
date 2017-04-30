@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.jakdu;
 
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.jakdu.vo.JakduScheduleResponse;
@@ -105,9 +105,9 @@ public class JakduRestController {
         JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
         result.put("jakduSchedule", jakduSchedule);
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        if (UserUtils.isUser()) {
+        if (AuthUtils.isUser()) {
             result.put("myJakdu", jakduService.getMyJakdu(authUserProfile.getId(), id));
         }
 
@@ -120,14 +120,14 @@ public class JakduRestController {
 
         Locale locale = localeResolver.resolveLocale(request);
 
-        if (!UserUtils.isUser())
+        if (!AuthUtils.isUser())
             throw new UnauthorizedAccessException(CoreUtils.getExceptionMessage("exception.access.denied"));
 
         if (Objects.isNull(myJakdu)) {
             throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
         }
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         Jakdu jakdu = jakduService.setMyJakdu(commonWriter, myJakdu);
 
@@ -142,12 +142,12 @@ public class JakduRestController {
         if (Objects.isNull(jakduCommentWriteRequest))
             throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         jakduCommentWriteRequest.setDevice(ApiUtils.getDeviceInfo(device));
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         JakduComment jakduComment = jakduService.setComment(commonWriter, jakduCommentWriteRequest);
 
@@ -169,10 +169,10 @@ public class JakduRestController {
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
                                                  @PathVariable CoreConst.FEELING_TYPE feeling) {
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         JakduComment jakduComment = jakduService.setJakduCommentFeeling(commonWriter, commentId, feeling);
 

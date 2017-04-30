@@ -2,7 +2,7 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.vo.user.UserProfileResponse;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
@@ -54,7 +54,7 @@ public class UserService {
 	private UserPictureRepository userPictureRepository;
 
 	@Resource
-	private UserUtils userUtils;
+	private AuthUtils authUtils;
 
 	@Value("${core.storage.user.picture.large.path}")
 	private String storageUserPictureLargePath;
@@ -385,8 +385,8 @@ public class UserService {
 
 		if (Objects.nonNull(userPicture)) {
 			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
-					userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-					userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+					authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+					authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
 			response.setPicture(userPictureInfo);
 		}

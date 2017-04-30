@@ -13,12 +13,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +34,7 @@ import java.util.stream.Collectors;
  */
 
 @Component
-public class UserUtils {
+public class AuthUtils {
 
     @Value("${api.server.url}")
     private String apiServerUrl;
@@ -49,7 +52,7 @@ public class UserUtils {
     /**
      * 손님인지 검사.
      */
-    public static Boolean isAnonymousUser() {
+    public static Boolean isAnonymous() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -100,7 +103,7 @@ public class UserUtils {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
-            return false;
+            return result;
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
@@ -120,7 +123,14 @@ public class UserUtils {
      * @return 이메일 기반이면 true, 아니면 false
      */
     public static Boolean isJakdukUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetailsImpl;
+
+        if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getDetails();
+
+            return userDetail.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -129,25 +139,23 @@ public class UserUtils {
     public static AuthUserProfile getAuthUserProfile() {
         AuthUserProfile authUserProfile = null;
 
-        if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof UserDetailsImpl) {
-                UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-                Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+            Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
-                List<String> roles = authorities.stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList());
+            List<String> roles = authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
 
-                authUserProfile = AuthUserProfile.builder()
-                        .id(userDetail.getId())
-                        .email(userDetail.getUsername())
-                        .username(userDetail.getNickname())
-                        .providerId(userDetail.getProviderId())
-                        .picture(userDetail.getPicture())
-                        .roles(roles)
-                        .build();
-            }
+            authUserProfile = AuthUserProfile.builder()
+                    .id(userDetail.getId())
+                    .email(userDetail.getUsername())
+                    .username(userDetail.getNickname())
+                    .providerId(userDetail.getProviderId())
+                    .picture(userDetail.getPicture())
+                    .roles(roles)
+                    .build();
         }
 
         return authUserProfile;
@@ -256,6 +264,15 @@ public class UserUtils {
         }
 
         return pictureUrl;
+    }
+
+    /**
+     * 로그인 처리
+     */
+    public static void login(HttpSession session, Authentication authentication) {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     }
 
     private static List<String> getRoles(List<Integer> roles) {

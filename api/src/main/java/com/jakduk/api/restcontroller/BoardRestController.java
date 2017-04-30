@@ -2,7 +2,7 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.service.BoardFreeService;
@@ -114,7 +114,7 @@ public class BoardRestController {
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
             Device device) {
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -145,7 +145,7 @@ public class BoardRestController {
             HttpServletRequest request,
             Device device) {
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -177,7 +177,7 @@ public class BoardRestController {
     public FreePostDeleteResponse deleteFree(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		CoreConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(commonWriter, seq);
 
@@ -201,7 +201,7 @@ public class BoardRestController {
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             Device device) {
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -231,10 +231,10 @@ public class BoardRestController {
             HttpServletRequest request,
             Device device) {
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -267,10 +267,10 @@ public class BoardRestController {
     public EmptyJsonResponse deleteFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         boardFreeService.deleteFreeComment(id, commonWriter);
 
@@ -283,10 +283,10 @@ public class BoardRestController {
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "감정", required = true) @PathVariable CoreConst.FEELING_TYPE feeling) {
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, CoreUtils.getExceptionMessage("exception.need.login.to.feel"));
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         BoardFree boardFree = boardFreeService.setFreeFeelings(commonWriter, seq, feeling);
 
@@ -324,10 +324,10 @@ public class BoardRestController {
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
             @ApiParam(value = "감정", required = true) @PathVariable CoreConst.FEELING_TYPE feeling) {
 
-        if (! UserUtils.isUser())
+        if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, CoreUtils.getExceptionMessage("exception.need.login.to.feel"));
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         BoardFreeComment boardComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
 
@@ -349,10 +349,10 @@ public class BoardRestController {
     @RequestMapping(value = "/{seq}/notice", method = RequestMethod.POST)
     public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
 
-        if (! UserUtils.isAdmin())
+        if (! AuthUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		boardFreeService.setFreeNotice(commonWriter, seq, true);
 
@@ -363,10 +363,10 @@ public class BoardRestController {
     @RequestMapping(value = "/{seq}/notice", method = RequestMethod.DELETE)
     public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
 
-        if (! UserUtils.isAdmin())
+        if (! AuthUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = UserUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         boardFreeService.setFreeNotice(commonWriter, seq, false);
 

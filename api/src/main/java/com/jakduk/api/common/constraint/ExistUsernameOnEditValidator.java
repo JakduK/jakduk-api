@@ -1,6 +1,6 @@
 package com.jakduk.api.common.constraint;
 
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -32,7 +32,7 @@ public class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUs
         if (StringUtils.isEmpty(value))
             return false;
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         if (ObjectUtils.isEmpty(authUserProfile))
             throw new ServiceException(ServiceError.NEED_TO_LOGIN);

@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.home.vo.LatestPost;
 import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
@@ -648,7 +648,7 @@ public class BoardFreeService {
 			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, null);
 		}
 
-		CommonWriter commonWriter = UserUtils.getCommonWriter();
+		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		BoardFreeSimple boardFreeSimple = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
 
@@ -903,7 +903,7 @@ public class BoardFreeService {
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 
-		CommonWriter commonWriter = UserUtils.getCommonWriter();
+		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		Page<BoardFreeComment> commentsPage = boardFreeCommentRepository.findAll(pageable);
 
@@ -1003,7 +1003,7 @@ public class BoardFreeService {
 		if (isAddCookie)
 			this.increaseViews(boardFree);
 
-		CommonWriter commonWriter = UserUtils.getCommonWriter();
+		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 글 상세
 		FreePostDetail freePostDetail = new FreePostDetail();
