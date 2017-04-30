@@ -6,7 +6,10 @@ import com.jakduk.api.common.util.UserUtils;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
-import com.jakduk.api.vo.user.*;
+import com.jakduk.api.vo.user.AttemptSocialUser;
+import com.jakduk.api.vo.user.AuthUserProfile;
+import com.jakduk.api.vo.user.LoginSocialUserForm;
+import com.jakduk.api.vo.user.SocialProfile;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -18,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -46,25 +48,6 @@ public class AuthRestController {
 
     @Autowired
     private UserService userService;
-
-    @ApiOperation("이메일 기반 로그인")
-    @PostMapping("/login")
-    public EmptyJsonResponse loginJakdukUser(
-            @ApiParam(value = "이메일 회원 폼", required = true) @Valid @RequestBody LoginEmailUserForm form,
-            HttpSession session) {
-
-        // Perform the authentication
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        form.getUsername(),
-                        form.getPassword()
-                )
-        );
-
-        ApiUtils.login(session, authentication);
-
-        return EmptyJsonResponse.newInstance();
-    }
 
     @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
     @PostMapping("/login/{providerId}")

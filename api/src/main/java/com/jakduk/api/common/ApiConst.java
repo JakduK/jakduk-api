@@ -1,8 +1,5 @@
 package com.jakduk.api.common;
 
-import org.springframework.social.connect.ConnectionFactoryLocator;
-import org.springframework.social.connect.UsersConnectionRepository;
-
 /**
  * @author pyohwan
  *         16. 7. 17 오후 8:21
@@ -35,7 +32,7 @@ public class ApiConst {
 
     /**
      * SNS 가입시 임시로 저장할 프로필를 담을 세션
-     * {@link org.springframework.social.connect.web.ProviderSignInAttempt#SESSION_ATTRIBUTE}
+     * 참고 {@link org.springframework.social.connect.web.ProviderSignInAttempt#SESSION_ATTRIBUTE}
      */
     public final static String PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE = "ProviderSignInAttempt";
 }

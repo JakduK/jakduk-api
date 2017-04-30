@@ -1,10 +1,7 @@
 package com.jakduk.api.configuration;
 
-import com.jakduk.api.configuration.authentication.JakdukAuthenticationProvider;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationProvider;
-import com.jakduk.api.configuration.authentication.handler.RestAccessDeniedHandler;
-import com.jakduk.api.configuration.authentication.handler.RestAuthenticationEntryPoint;
-import com.jakduk.api.configuration.authentication.handler.RestLogoutSuccessHandler;
+import com.jakduk.api.configuration.authentication.handler.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +13,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
@@ -38,16 +35,16 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     private RestLogoutSuccessHandler restLogoutSuccessHandler;
 
     @Autowired
+    private RestJakdukSuccessHandler restJakdukSuccessHandler;
+
+    @Autowired
+    private RestJakdukFailureHandler restJakdukFailureHandler;
+
+    @Autowired
     private SnsAuthenticationProvider snsAuthenticationProvider;
 
     @Autowired
-    private JakdukAuthenticationProvider jakdukAuthenticationProvider;
-
-    @Autowired
     private UserDetailsService userDetailsService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -61,21 +58,25 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
 
-                .logout()
+                .formLogin()
+                    .loginProcessingUrl("/api/auth/login")
+                    .successHandler(restJakdukSuccessHandler)
+                    .failureHandler(restJakdukFailureHandler)
+
+                .and().rememberMe()
+
+                .and().logout()
                     .logoutSuccessHandler(restLogoutSuccessHandler)
                     .logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout"))
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
-                .and()
-                    .rememberMe()
-                .and()
-                    .exceptionHandling()
+
+                .and().exceptionHandling()
                     .authenticationEntryPoint(restAuthenticationEntryPoint)
                     .accessDeniedHandler(restAccessDeniedHandler)
 
                 //Configures url based authorization
-                .and()
-                    .authorizeRequests()
+                .and().authorizeRequests()
                     .antMatchers(
                             HttpMethod.GET,
                             "/api/user/exist/email",                // 이메일 중복 검사
@@ -128,15 +129,19 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(jakdukAuthenticationProvider);
         auth.authenticationProvider(snsAuthenticationProvider);
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public StandardPasswordEncoder passwordEncoder() {
+        return new StandardPasswordEncoder();
     }
 
 }

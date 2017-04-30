@@ -10,7 +10,6 @@ dependencies {
   compile('org.springframework.boot:spring-boot-starter-security')
   compile('org.springframework.boot:spring-boot-starter-mobile')
 
-  compile "org.springframework.social:spring-social-web:1.1.4.RELEASE"
   compile 'io.springfox:springfox-swagger2:2.6.1'
   compile 'io.springfox:springfox-swagger-ui:2.6.1'
   compile 'com.github.dfabulich:sitemapgen4j:1.0.6'

@@ -18,8 +18,6 @@ public enum ServiceError {
     // COMMON
     INVALID_PARAMETER(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     FORM_VALIDATION_FAILED(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
-    EXPIRATION_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.expiration.token"),
-    INVALID_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.invalid.token"),
     FEELING_YOU_ARE_WRITER(HttpStatus.SC_BAD_REQUEST, "exception.you.are.writer"),
     FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
     NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
