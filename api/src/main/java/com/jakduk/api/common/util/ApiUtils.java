@@ -35,10 +35,10 @@ public class ApiUtils {
     @Value("${api.server.url}")
     private String apiServerUrl;
 
-    @Value("${api.gallery.image.url.path}")
+    @Value("${api.path.gallery.url.image}")
     private String apiGalleryFullUrlPath;
 
-    @Value("${api.gallery.thumbnail.url.path}")
+    @Value("${api.path.gallery.url.thumbnail}")
     private String apiGalleryThumbnailUrlPath;
 
     private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";

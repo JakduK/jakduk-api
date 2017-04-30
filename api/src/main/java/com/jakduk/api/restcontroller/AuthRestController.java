@@ -2,7 +2,8 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.JakdukDetailsService;
+import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
+import com.jakduk.api.configuration.authentication.SnsPrincipal;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
@@ -26,10 +27,10 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -40,7 +41,7 @@ import java.util.Optional;
 @Slf4j
 @Api(tags = "Authentication", description = "인증 API")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthRestController {
 
     @Value("${jwt.token.header}")
@@ -59,13 +60,10 @@ public class AuthRestController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JakdukDetailsService jakdukDetailsService;
-
-    @Autowired
     private UserService userService;
 
     @ApiOperation("이메일 기반 로그인")
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public EmptyJsonResponse loginJakdukUser(
             @ApiParam(value = "이메일 회원 폼", required = true) @Valid @RequestBody LoginEmailUserForm form,
             HttpSession session) {
@@ -85,21 +83,52 @@ public class AuthRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "JWT 토큰 갱신")
-    @RequestMapping(value = "/auth/refresh", method = RequestMethod.GET)
-    public EmptyJsonResponse refreshAndGetAuthenticationToken(HttpServletRequest request,
-                                                              HttpServletResponse response) {
+    @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
+    @PostMapping("/login/{providerId}")
+    public EmptyJsonResponse loginSNSUser(
+            @ApiParam(value = "Provider ID", required = true) @PathVariable String providerId,
+            @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody LoginSocialUserForm form,
+            HttpSession session) {
 
-        String token = request.getHeader(tokenHeader);
+        CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
+        SocialProfile socialProfile = null;
+        AttemptSocialUser attemptSocialUser = null;
 
-        if (jwtTokenUtils.canTokenBeRefreshed(token)) {
-            String refreshedToken = jwtTokenUtils.refreshToken(token);
-            response.setHeader(tokenHeader, refreshedToken);
+        switch (convertProviderId) {
+            case DAUM:
+                socialProfile = userUtils.getDaumProfile(form.getAccessToken());
+                break;
+            case FACEBOOK:
+                socialProfile = userUtils.getFacebookProfile(form.getAccessToken());
+                break;
+        }
+
+        log.info("socialProfile providerId:{} providerUserId:{} nickname:{} email:{}",
+                convertProviderId.name(), socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
+
+        Optional<User> oUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
+
+        // 가입 회원이라 로그인
+        if (oUser.isPresent()) {
+            // Perform the authentication
+            Authentication authentication = authenticationManager.authenticate(
+                    new SnsAuthenticationToken(
+                            oUser.get().getEmail()
+                    )
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
             return EmptyJsonResponse.newInstance();
-        } else {
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
         }
+
+
+//
+//        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+
+        return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
@@ -173,10 +202,11 @@ public class AuthRestController {
         return jwtTokenUtils.getAttemptedFromToken(attemptedToken);
     }
 
-    @ApiOperation(value = "JWT 토큰 속 프로필 정보")
-    @GetMapping("/auth/user")
+    @ApiOperation(value = "세션에 있는 나의 프로필 정보")
+    @GetMapping("/user")
     public AuthUserProfile getMyProfile() {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
 
         if (ObjectUtils.isEmpty(authUserProfile))

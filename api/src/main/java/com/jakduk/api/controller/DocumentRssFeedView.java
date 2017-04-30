@@ -39,7 +39,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	@Value("${web.server.url}")
 	private String webServerUrl;
 
-	@Value("${web.board.free.path}")
+	@Value("${web.path.board.free}")
 	private String webBoardFreePath;
 
 	/**

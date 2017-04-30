@@ -4,15 +4,12 @@ package com.jakduk.api.service;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.JwtTokenUtils;
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.SocialDetailService;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.api.vo.user.UserProfileResponse;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.FileUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
-import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
@@ -57,9 +54,6 @@ public class UserService {
 
 	@Autowired
 	private UserPictureRepository userPictureRepository;
-
-	@Autowired
-	private SocialDetailService socialDetailService;
 
 	@Autowired
 	private JwtTokenUtils jwtTokenUtils;
@@ -131,13 +125,14 @@ public class UserService {
 			log.info("user({},{}) email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
 		}
 
-		SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
-
-		// 토큰 생성
-		String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
-				userDetails.getProviderId().name());
-
-		return token;
+//		SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
+//
+//		// 토큰 생성
+//		String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
+//				userDetails.getProviderId().name());
+//
+//		return token;
+		return null;
 	}
 
 	// 회원 정보 저장.

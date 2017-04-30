@@ -1,10 +1,10 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.vo.user.AuthUserProfile;
-import com.jakduk.api.vo.user.SocialProfile;
 import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
+import com.jakduk.api.vo.user.AuthUserProfile;
+import com.jakduk.api.vo.user.SocialProfile;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -37,10 +37,10 @@ public class UserUtils {
     @Value("${api.server.url}")
     private String apiServerUrl;
 
-    @Value("${api.user.picture.large.url.path}")
+    @Value("${api.path.user.picture.url.large}")
     private String apiUserPictureLargeUrlPath;
 
-    @Value("${api.user.picture.small.url.path}")
+    @Value("${api.path.user.picture.url.small}")
     private String apiUserPictureSmallUrlPath;
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
@@ -139,26 +139,8 @@ public class UserUtils {
         AuthUserProfile authUserProfile = null;
 
         if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetails) {
-                SocialUserDetails userDetail = (SocialUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-                Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-                List<String> roles = authorities.stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList());
-
-                authUserProfile = AuthUserProfile.builder()
-                        .id(userDetail.getId())
-                        .email(userDetail.getUserId())
-                        .username(userDetail.getUsername())
-                        .providerId(userDetail.getProviderId())
-                        .picture(userDetail.getPicture())
-                        .roles(roles)
-                        .build();
-
-            } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetails) {
-                JakdukUserDetails userDetail = (JakdukUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof JakdukUserDetails) {
+                JakdukUserDetails userDetail = (JakdukUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
                 Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 

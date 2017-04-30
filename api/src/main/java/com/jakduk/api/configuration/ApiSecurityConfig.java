@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration;
 
-import com.jakduk.api.configuration.authentication.JakdukDetailsService;
-import com.jakduk.api.configuration.authentication.SocialDetailService;
+import com.jakduk.api.configuration.authentication.JakdukAuthenticationProvider;
+import com.jakduk.api.configuration.authentication.SnsAuthenticationProvider;
 import com.jakduk.api.configuration.authentication.handler.RestAccessDeniedHandler;
 import com.jakduk.api.configuration.authentication.handler.RestAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -25,14 +26,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JakdukDetailsService jakdukDetailsService;
-
-    @Autowired
-    private SocialDetailService socialDetailService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private JakdukDetailsService jakdukDetailsService;
+//
+//    @Autowired
+//    private SocialDetailService socialDetailService;
 
     @Autowired
     private RestAccessDeniedHandler restAccessDeniedHandler;
@@ -40,10 +38,31 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
+    @Autowired
+    private SnsAuthenticationProvider snsAuthenticationProvider;
+
+    @Autowired
+    private JakdukAuthenticationProvider jakdukAuthenticationProvider;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resources/**");
     }
+
+    /*
+*  Using autowired to assign it to the auth manager
+* */
+//    @Autowired
+//    public void configureGlobal(AuthenticationManagerBuilder auth) {
+//        auth.authenticationProvider(jakdukAuthenticationProvider);
+//        auth.authenticationProvider(facebookAuthenticationProvider);
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -54,6 +73,8 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 // Custom JWT based security filter
 //                .addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+
+//                .addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class)
 
                 .exceptionHandling()
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
@@ -107,12 +128,14 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 ).hasRole("ROOT")
 
                 .anyRequest().permitAll();
+
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(jakdukDetailsService).passwordEncoder(passwordEncoder);
-//        auth.userDetailsService(socialDetailService);
+        auth.authenticationProvider(jakdukAuthenticationProvider);
+        auth.authenticationProvider(snsAuthenticationProvider);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Bean
@@ -121,10 +144,16 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new StandardPasswordEncoder();
+//    }
+
     /*
     @Bean
     public AuthenticationTokenFilter authenticationTokenFilter() throws Exception {
         return new AuthenticationTokenFilter();
     }
     */
+
 }

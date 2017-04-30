@@ -1,35 +1,35 @@
 package com.jakduk.api.configuration.authentication;
 
 import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
+import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.repository.user.UserRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 
 /**
- * @author pyohwan
- * 16. 4. 8 오후 9:53
+ * Created by pyohwanjang on 2017. 4. 30..
  */
 
 @Slf4j
-//@Service
-public class SocialDetailService implements UserDetailsService {
+@AllArgsConstructor
+@Service
+public class UserDetailServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -38,16 +38,17 @@ public class SocialDetailService implements UserDetailsService {
     private UserUtils userUtils;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        if (StringUtils.isBlank(email)) {
-            throw new IllegalArgumentException("email 는 꼭 필요한 값입니다.");
+        if (ObjectUtils.isEmpty(username)) {
+            throw new IllegalArgumentException("email 은 꼭 필요한 값입니다.");
         } else {
-            User user = userRepository.findOneByEmail(email)
+            User user = userRepository.findOneByEmail(username)
                     .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
-                            CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", email)));
+                            CoreUtils.getExceptionMessage("exception.not.found.jakduk.account", username)));
 
-            SocialUserDetails socialUserDetails = new SocialUserDetails(user.getId(), email, user.getUsername(), user.getProviderId(), user.getEmail(),
+            JakdukUserDetails jakdukUserDetails = new JakdukUserDetails(user.getEmail(), user.getId(),
+                    user.getPassword(), user.getUsername(), user.getProviderId(),
                     true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
 
             UserPicture userPicture = user.getUserPicture();
@@ -57,12 +58,12 @@ public class SocialDetailService implements UserDetailsService {
                         userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
                         userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
-                socialUserDetails.setPicture(userPictureInfo);
+                jakdukUserDetails.setPicture(userPictureInfo);
             }
 
-            log.info("load Social username=" + socialUserDetails.getUsername());
+            log.info("login user:{}", jakdukUserDetails.getUsername());
 
-            return socialUserDetails;
+            return jakdukUserDetails;
         }
     }
 }

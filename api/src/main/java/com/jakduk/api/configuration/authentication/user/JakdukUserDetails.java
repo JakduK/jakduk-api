@@ -20,8 +20,7 @@ public class JakdukUserDetails implements UserDetails {
 	@Getter private final String id;
 	@Getter private final String nickname;						// 별명
 	@Getter private final CoreConst.ACCOUNT_TYPE providerId;
-	@Getter @Setter
-	private UserPictureInfo picture;
+	@Getter @Setter	private UserPictureInfo picture;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -32,9 +31,6 @@ public class JakdukUserDetails implements UserDetails {
 	public JakdukUserDetails(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId,
                              boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
                              Collection<? extends GrantedAuthority> authorities) {
-
-		if (Objects.isNull(username) || Objects.isNull(password))
-			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
 
 		this.username = username;
 		this.nickname = nickname;
