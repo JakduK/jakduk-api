@@ -124,8 +124,10 @@ public class AuthUtils {
      */
     public static Boolean isJakdukUser() {
 
-        if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof UserDetailsImpl) {
-            UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
             return userDetail.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK);
         } else {
@@ -139,10 +141,12 @@ public class AuthUtils {
     public static AuthUserProfile getAuthUserProfile() {
         AuthUserProfile authUserProfile = null;
 
-        if (SecurityContextHolder.getContext().getAuthentication().getDetails() instanceof UserDetailsImpl) {
-            UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (authentication.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
+
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
             List<String> roles = authorities.stream()
                     .map(GrantedAuthority::getAuthority)

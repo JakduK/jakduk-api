@@ -9,7 +9,6 @@ import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.repository.user.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +24,6 @@ import javax.annotation.Resource;
  */
 
 @Slf4j
-@AllArgsConstructor
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
 
