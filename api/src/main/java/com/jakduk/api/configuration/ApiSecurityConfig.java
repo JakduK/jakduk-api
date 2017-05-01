@@ -26,21 +26,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private RestAccessDeniedHandler restAccessDeniedHandler;
-
-    @Autowired
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
-    @Autowired
-    private RestLogoutSuccessHandler restLogoutSuccessHandler;
-
-    @Autowired
-    private RestJakdukSuccessHandler restJakdukSuccessHandler;
-
-    @Autowired
-    private RestJakdukFailureHandler restJakdukFailureHandler;
-
-    @Autowired
     private SnsAuthenticationProvider snsAuthenticationProvider;
 
     @Autowired
@@ -60,20 +45,20 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .formLogin()
                     .loginProcessingUrl("/api/auth/login")
-                    .successHandler(restJakdukSuccessHandler)
-                    .failureHandler(restJakdukFailureHandler)
+                    .successHandler(new RestJakdukSuccessHandler())
+                    .failureHandler(new RestJakdukFailureHandler())
 
                 .and().rememberMe()
 
                 .and().logout()
-                    .logoutSuccessHandler(restLogoutSuccessHandler)
+                    .logoutSuccessHandler(new RestLogoutSuccessHandler())
                     .logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout"))
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
 
                 .and().exceptionHandling()
-                    .authenticationEntryPoint(restAuthenticationEntryPoint)
-                    .accessDeniedHandler(restAccessDeniedHandler)
+                    .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                    .accessDeniedHandler(new RestAccessDeniedHandler())
 
                 //Configures url based authorization
                 .and().authorizeRequests()
@@ -86,7 +71,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(
                             HttpMethod.POST,
                             "/api/auth/user",                            // 이메일 기반 회원 가입
-                            "/api/auth/user/*"                      // SNS 기반 회원 가입 및
+                            "/api/auth/user/*"                      // SNS 기반 회원 가입 및 SNS 임시 프로필 조회
                     ).anonymous()
                     .antMatchers(
                             HttpMethod.GET,

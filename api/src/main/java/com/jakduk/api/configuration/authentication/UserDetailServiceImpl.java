@@ -1,6 +1,6 @@
 package com.jakduk.api.configuration.authentication;
 
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
@@ -9,7 +9,6 @@ import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.embedded.UserPictureInfo;
 import com.jakduk.core.repository.user.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +24,6 @@ import javax.annotation.Resource;
  */
 
 @Slf4j
-@AllArgsConstructor
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
 
@@ -33,7 +31,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
 
     @Resource
-    private UserUtils userUtils;
+    private AuthUtils authUtils;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -47,14 +45,14 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
             UserDetailsImpl userDetailsImpl = new UserDetailsImpl(user.getEmail(), user.getId(),
                     user.getPassword(), user.getUsername(), user.getProviderId(),
-                    true, true, true, true, UserUtils.getAuthorities(user.getRoles()));
+                    true, true, true, true, AuthUtils.getAuthorities(user.getRoles()));
 
             UserPicture userPicture = user.getUserPicture();
 
             if (! ObjectUtils.isEmpty(userPicture)) {
                 UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
-                        userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-                        userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+                        authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+                        authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
                 userDetailsImpl.setPicture(userPictureInfo);
             }

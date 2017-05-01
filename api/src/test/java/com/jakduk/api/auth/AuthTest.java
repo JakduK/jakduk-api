@@ -1,7 +1,7 @@
 package com.jakduk.api.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 public class AuthTest {
 
     @Autowired
-    private UserUtils userUtils;
+    private AuthUtils authUtils;
 
     // access_token 만료됨.
     @Ignore
@@ -43,7 +43,7 @@ public class AuthTest {
 
         System.out.println("result=" + responseEntity.getBody().get("result"));
 
-        System.out.println(userUtils.getDaumProfile("261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095"));
+        System.out.println(authUtils.getDaumProfile("261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095"));
 
     }
 

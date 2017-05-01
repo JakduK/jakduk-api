@@ -19,12 +19,11 @@ public class SnsAuthenticationToken extends AbstractAuthenticationToken {
         this.principal = principal;
     }
 
-    public SnsAuthenticationToken(Object principal, Object details, Collection<? extends GrantedAuthority> authorities) {
+    public SnsAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         super.setAuthenticated(true);
 
         this.principal = principal;
-        this.setDetails(details);
     }
 
     @Override

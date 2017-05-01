@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.service.SearchService;
 import com.jakduk.api.vo.search.PopularSearchWordResult;
 import com.jakduk.api.vo.search.SearchUnifiedResponse;
@@ -70,7 +70,7 @@ public class SearchRestController {
 
 		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size, preTags, postTags);
 
-		commonSearchService.indexDocumentSearchWord(StringUtils.lowerCase(q), UserUtils.getCommonWriter());
+		commonSearchService.indexDocumentSearchWord(StringUtils.lowerCase(q), AuthUtils.getCommonWriter());
 
 		return searchUnifiedResponse;
 	}

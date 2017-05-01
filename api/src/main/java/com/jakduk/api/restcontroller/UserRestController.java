@@ -6,7 +6,7 @@ import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
@@ -81,7 +81,7 @@ public class UserRestController {
                 )
         );
 
-        ApiUtils.login(session, authentication);
+        AuthUtils.login(session, authentication);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -113,7 +113,7 @@ public class UserRestController {
                 )
         );
 
-        ApiUtils.login(session, authentication);
+        AuthUtils.login(session, authentication);
 
         session.removeAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
@@ -186,7 +186,7 @@ public class UserRestController {
 
         String language = CoreUtils.getLanguageCode(locale, null);
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         return userService.getProfileMe(language, authUserProfile.getId());
     }
@@ -195,7 +195,7 @@ public class UserRestController {
     @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
     public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileEditForm form) {
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
                 form.getAbout(), form.getUserPictureId());
@@ -207,10 +207,10 @@ public class UserRestController {
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
-        if (! UserUtils.isJakdukUser())
+        if (! AuthUtils.isJakdukUser())
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         userService.updateUserPassword(authUserProfile.getId(), passwordEncoder.encode(form.getNewPassword().trim()));
 

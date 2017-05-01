@@ -25,7 +25,7 @@ public class SnsAuthenticationProvider implements AuthenticationProvider {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        return new SnsAuthenticationToken(email, userDetails, userDetails.getAuthorities());
+        return new SnsAuthenticationToken(userDetails, userDetails.getAuthorities());
     }
 
     @Override

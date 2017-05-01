@@ -1,6 +1,6 @@
 package com.jakduk.api.common.constraint;
 
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.core.model.simple.UserOnPasswordUpdate;
 import com.jakduk.api.service.UserService;
@@ -34,9 +34,9 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
         if (Objects.isNull(value))
             return false;
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        if (! UserUtils.isJakdukUser())
+        if (! AuthUtils.isJakdukUser())
             return true;
 
         UserOnPasswordUpdate user = userService.findUserOnPasswordUpdateById(authUserProfile.getId());

@@ -2,7 +2,7 @@ package com.jakduk.api.service;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.vo.board.GalleryOnBoard;
 import com.jakduk.api.vo.gallery.*;
 import com.jakduk.core.common.CoreConst;
@@ -145,7 +145,7 @@ public class GalleryService {
 		if (isAddCookie)
 			this.increaseViews(gallery);
 
-		CommonWriter commonWriter = UserUtils.getCommonWriter();
+		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		GalleryDetail galleryDetail = new GalleryDetail();
 		BeanUtils.copyProperties(gallery, galleryDetail);
