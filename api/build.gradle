@@ -1,5 +1,7 @@
 description = 'api'
 
+compileJava.dependsOn(processResources)
+
 springBoot {
   executable = true
 }
@@ -14,5 +16,5 @@ dependencies {
   compile 'io.springfox:springfox-swagger-ui:2.6.1'
   compile 'com.github.dfabulich:sitemapgen4j:1.0.6'
 
+  compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 }
-

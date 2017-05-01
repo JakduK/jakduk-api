@@ -271,12 +271,12 @@ public class AuthUtils {
     }
 
     /**
-     * 로그인 처리
+     * 세션에 authentication 객체를 업데이트
      */
-    public static void login(HttpSession session, Authentication authentication) {
+    public static void setAuthentication(Authentication authentication) {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+//        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     }
 
     private static List<String> getRoles(List<Integer> roles) {

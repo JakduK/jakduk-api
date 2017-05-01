@@ -48,11 +48,6 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         return new CookieLocaleResolver();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new StandardPasswordEncoder();
-    }
-
     /**
      * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
      */
@@ -67,5 +62,10 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public LocalValidatorFactoryBean localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
+    }
+
+    @Bean
+    public ApiProperties apiProperties() {
+        return new ApiProperties();
     }
 }

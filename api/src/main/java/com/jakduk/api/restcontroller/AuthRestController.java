@@ -21,11 +21,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -83,7 +83,7 @@ public class AuthRestController {
                     )
             );
 
-            AuthUtils.login(session, authentication);
+            AuthUtils.setAuthentication(authentication);
 
             return EmptyJsonResponse.newInstance();
         }
@@ -111,9 +111,14 @@ public class AuthRestController {
 
     @ApiOperation("SNS 기반 회원 가입시 필요한 회원 프로필 정보")
     @GetMapping("/user/attempt")
-    public AttemptSocialUser getSocialAttemptedUser(HttpSession session) {
+    public AttemptSocialUser getAttemptSocialUser(HttpSession session) {
 
-        return (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+
+        if (Objects.isNull(attemptSocialUser))
+            throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
+
+        return attemptSocialUser;
     }
 
     @ApiOperation(value = "세션에 있는 나의 프로필 정보")
@@ -122,7 +127,7 @@ public class AuthRestController {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        if (ObjectUtils.isEmpty(authUserProfile))
+        if (Objects.isNull(authUserProfile))
             throw new ServiceException(ServiceError.ANONYMOUS);
 
         return authUserProfile;

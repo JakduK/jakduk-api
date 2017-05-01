@@ -165,7 +165,7 @@ public class UserService {
 			userPictureRepository.save(userPicture);
 		}
 
-		log.debug("JakduK user created. user=" + user);
+		log.info("JakduK user created. email:{} username:{}", user.getEmail(), user.getUsername());
 
 		return user;
 	}
@@ -245,7 +245,7 @@ public class UserService {
 			userPictureRepository.save(userPicture);
 		}
 
-		log.debug("social user created.\n{}" + user);
+		log.info("social user created. email:{} username:{}, providerId:{}", user.getEmail(), user.getUsername(), user.getProviderId());
 
 		return user;
 	}

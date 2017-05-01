@@ -3,6 +3,7 @@ package com.jakduk.api.configuration;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationProvider;
 import com.jakduk.api.configuration.authentication.handler.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value("${api.rememberme.expiration}")
+    private Integer remembermeExpriation;
 
     @Autowired
     private SnsAuthenticationProvider snsAuthenticationProvider;
@@ -49,6 +53,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                     .failureHandler(new RestJakdukFailureHandler())
 
                 .and().rememberMe()
+                    .tokenValiditySeconds(remembermeExpriation)
 
                 .and().logout()
                     .logoutSuccessHandler(new RestLogoutSuccessHandler())

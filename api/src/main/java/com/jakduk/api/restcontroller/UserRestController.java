@@ -5,7 +5,6 @@ import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
-import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
@@ -38,6 +37,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author pyohawan
@@ -62,26 +62,26 @@ public class UserRestController {
     @Autowired
     private EmailService emailService;
 
-    @ApiOperation(value = "이메일 기반 회원 가입")
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public EmptyJsonResponse addJakdukUser(@Valid @RequestBody UserForm form,
-                                           Locale locale,
-                                           HttpSession session) {
+    @ApiOperation("이메일 기반 회원 가입")
+    @PostMapping("")
+    public EmptyJsonResponse addJakdukUser(
+            @ApiParam(value = "회원 폼", required = true) @Valid @RequestBody UserForm form,
+            Locale locale) {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
-        emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
+        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        form.getUsername(),
+                        user.getEmail(),
                         form.getPassword()
                 )
         );
 
-        AuthUtils.login(session, authentication);
+        AuthUtils.setAuthentication(authentication);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -94,6 +94,9 @@ public class UserRestController {
             HttpSession session) {
 
         AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+
+        if (Objects.isNull(attemptSocialUser))
+            throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
 
         String largePictureUrl = null;
 
@@ -113,9 +116,9 @@ public class UserRestController {
                 )
         );
 
-        AuthUtils.login(session, authentication);
-
         session.removeAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+
+        AuthUtils.setAuthentication(authentication);
 
         return EmptyJsonResponse.newInstance();
     }
