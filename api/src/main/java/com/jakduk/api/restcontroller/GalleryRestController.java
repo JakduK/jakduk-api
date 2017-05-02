@@ -3,7 +3,6 @@ package com.jakduk.api.restcontroller;
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.AuthUtils;
-import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.service.GalleryService;
@@ -11,6 +10,7 @@ import com.jakduk.api.vo.gallery.GalleriesResponse;
 import com.jakduk.api.vo.gallery.GalleryResponse;
 import com.jakduk.api.vo.gallery.GalleryUploadResponse;
 import com.jakduk.api.vo.gallery.LinkedItemForm;
+import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -22,7 +22,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,20 +42,11 @@ import java.util.Objects;
 @RestController
 public class GalleryRestController {
 
-    @Value("${api.server.url}")
-    private String apiServerUrl;
-
-    @Value("${api.path.gallery.url.image}")
-    private String imagePath;
-
-    @Value("${api.path.gallery.url.thumbnail}")
-    private String thumbnailPath;
+    @Resource
+    private ApiUtils apiUtils;
 
     @Autowired
     private GalleryService galleryService;
-
-    @Resource
-    private ApiUtils apiUtils;
 
     @ApiOperation(value = "사진 목록")
     @GetMapping("/galleries")

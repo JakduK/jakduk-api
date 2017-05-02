@@ -2,8 +2,6 @@ package com.jakduk.api.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.LocaleResolver;
@@ -64,8 +62,4 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         return new LocalValidatorFactoryBean();
     }
 
-    @Bean
-    public ApiProperties apiProperties() {
-        return new ApiProperties();
-    }
 }

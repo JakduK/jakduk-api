@@ -1,6 +1,7 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.jakduk.api.configuration.ApiProperties;
 import com.jakduk.api.configuration.authentication.UserDetailsImpl;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.vo.user.SocialProfile;
@@ -8,7 +9,6 @@ import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.CommonWriter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,11 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpSession;
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,14 +35,8 @@ import java.util.stream.Collectors;
 @Component
 public class AuthUtils {
 
-    @Value("${api.server.url}")
-    private String apiServerUrl;
-
-    @Value("${api.path.user.picture.url.large}")
-    private String apiUserPictureLargeUrlPath;
-
-    @Value("${api.path.user.picture.url.small}")
-    private String apiUserPictureSmallUrlPath;
+    @Resource
+    private ApiProperties apiProperties;
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
@@ -103,7 +96,7 @@ public class AuthUtils {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
-            return result;
+            return false;
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
@@ -260,10 +253,10 @@ public class AuthUtils {
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiUserPictureLargeUrlPath, id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getUserPictureLarge(), id);
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiUserPictureSmallUrlPath, id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getUserPictureSmall(), id);
                 break;
         }
 

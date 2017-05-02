@@ -1,6 +1,7 @@
 package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.configuration.ApiProperties;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.FootballClub;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
@@ -8,12 +9,12 @@ import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.embedded.LocalName;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,14 +33,8 @@ import java.util.stream.Stream;
 @Component
 public class ApiUtils {
 
-    @Value("${api.server.url}")
-    private String apiServerUrl;
-
-    @Value("${api.path.gallery.url.image}")
-    private String apiGalleryFullUrlPath;
-
-    @Value("${api.path.gallery.url.thumbnail}")
-    private String apiGalleryThumbnailUrlPath;
+    @Resource
+    private ApiProperties apiProperties;
 
     private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";
 
@@ -121,10 +116,10 @@ public class ApiUtils {
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiGalleryFullUrlPath, id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getGalleryImage(), id);
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiGalleryThumbnailUrlPath, id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getGalleryThumbnail(), id);
                 break;
         }
 
