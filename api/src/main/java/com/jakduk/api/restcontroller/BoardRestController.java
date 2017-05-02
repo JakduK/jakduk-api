@@ -53,7 +53,7 @@ public class BoardRestController {
     @Autowired
     private GalleryService galleryService;
 
-    @ApiOperation(value = "자유게시판 글 목록")
+    @ApiOperation("자유게시판 글 목록")
     @GetMapping("/posts")
     public FreePostsResponse getFreePosts(
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -76,7 +76,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 댓글 목록")
+    @ApiOperation("자유게시판 댓글 목록")
     @GetMapping("/comments")
     public FreePostCommentsResponse getFreeComments(
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -85,7 +85,7 @@ public class BoardRestController {
         return boardFreeService.getBoardFreeComments(page, size);
     }
 
-    @ApiOperation(value = "자유게시판 글 상세")
+    @ApiOperation("자유게시판 글 상세")
     @GetMapping("/{seq}")
     public FreePostDetailResponse getFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
@@ -108,7 +108,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글쓰기")
+    @ApiOperation("자유게시판 글쓰기")
     @PostMapping("")
     public FreePostWriteResponse addFreePost(
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
@@ -137,7 +137,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글 고치기")
+    @ApiOperation("자유게시판 글 고치기")
     @PutMapping("/{seq}")
     public FreePostWriteResponse editFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,

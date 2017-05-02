@@ -3,30 +3,29 @@ package com.jakduk.api.configuration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Created by pyohwanjang on 2017. 5. 1..
  */
 
+@Getter
+@Setter
+@Configuration
 @ConfigurationProperties(prefix = "api")
 public class ApiProperties {
 
-    private String remembermeExpiration;
-    private String pathUserPictureUrl;
+    private Integer rememberMeExpiration;
+    private String serverUrl;
+    private UrlPath urlPath = new UrlPath();
 
-    public String getRemembermeExpiration() {
-        return remembermeExpiration;
+    @Getter
+    @Setter
+    public static class UrlPath {
+        private String userPictureLarge;
+        private String userPictureSmall;
+        private String galleryImage;
+        private String galleryThumbnail;
     }
 
-    public void setRemembermeExpiration(String remembermeExpiration) {
-        this.remembermeExpiration = remembermeExpiration;
-    }
-
-    public String getPathUserPictureUrl() {
-        return pathUserPictureUrl;
-    }
-
-    public void setPathUserPictureUrl(String pathUserPictureUrl) {
-        this.pathUserPictureUrl = pathUserPictureUrl;
-    }
 }

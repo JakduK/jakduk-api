@@ -17,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.annotation.Resource;
+
 /**
  * @author pyohwan
  * 16. 4. 6 오후 9:51
@@ -26,8 +28,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${api.rememberme.expiration}")
-    private Integer remembermeExpriation;
+    @Resource
+    private ApiProperties apiProperties;
 
     @Autowired
     private SnsAuthenticationProvider snsAuthenticationProvider;
@@ -53,7 +55,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                     .failureHandler(new RestJakdukFailureHandler())
 
                 .and().rememberMe()
-                    .tokenValiditySeconds(remembermeExpriation)
+                    .tokenValiditySeconds(apiProperties.getRememberMeExpiration())
 
                 .and().logout()
                     .logoutSuccessHandler(new RestLogoutSuccessHandler())
