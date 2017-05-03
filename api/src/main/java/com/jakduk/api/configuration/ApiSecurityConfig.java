@@ -108,7 +108,8 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                     ).hasAnyRole("USER_01", "USER_02", "USER_03")
                     .regexMatchers(
                             HttpMethod.DELETE,
-                            "/api/board/free/(\\d+)"            // 자유게시판 글지우기
+                            "/api/board/free/(\\d+)",           // 자유게시판 글지우기
+                            "/api/user"                         // 회원 탈퇴
                     ).hasAnyRole("USER_01", "USER_02", "USER_03")
 
                     .antMatchers(

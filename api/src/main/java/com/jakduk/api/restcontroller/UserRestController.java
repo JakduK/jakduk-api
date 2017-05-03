@@ -27,12 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -237,6 +241,21 @@ public class UserRestController {
         } catch (IOException e) {
             throw new ServiceException(ServiceError.IO_EXCEPTION, e);
         }
+    }
+
+    @ApiOperation("회원 탈퇴")
+    @DeleteMapping("")
+    public EmptyJsonResponse deleteUser(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+
+        userService.deleteUser(authUserProfile.getId());
+
+        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+        return EmptyJsonResponse.newInstance();
     }
 
 }
