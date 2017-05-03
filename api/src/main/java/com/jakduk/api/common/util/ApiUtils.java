@@ -116,10 +116,10 @@ public class ApiUtils {
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getGalleryImage(), id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getGalleryImage(), id);
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getGalleryThumbnail(), id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getGalleryThumbnail(), id);
                 break;
         }
 

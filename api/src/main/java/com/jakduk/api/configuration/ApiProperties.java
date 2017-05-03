@@ -1,5 +1,6 @@
 package com.jakduk.api.configuration;
 
+import ch.qos.logback.classic.Level;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,8 +17,12 @@ import org.springframework.context.annotation.Configuration;
 public class ApiProperties {
 
     private Integer rememberMeExpiration;
-    private String serverUrl;
+    private String apiServerUrl;
+    private String webServerUrl;
+
     private UrlPath urlPath = new UrlPath();
+    private Swagger swagger = new Swagger();
+    private SlackLog slackLog = new SlackLog();
 
     @Getter
     @Setter
@@ -26,6 +31,24 @@ public class ApiProperties {
         private String userPictureSmall;
         private String galleryImage;
         private String galleryThumbnail;
+        private String boardFree;
+    }
+
+    @Getter
+    @Setter
+    public static class Swagger {
+        private String protocol;
+        private String host;
+    }
+
+    @Getter
+    @Setter
+    public static class SlackLog {
+        private Boolean enabled;
+        private Level level;
+        private String webhook;
+        private String channel;
+        private String username;
     }
 
 }

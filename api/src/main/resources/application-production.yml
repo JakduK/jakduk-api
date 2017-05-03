@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    include: core-production
+
+server:
+  session:
+    timeout: 259200 # 3 days
+
+logging:
+  file: /jakduk/api/logs/api.log
+  level:
+    root: WARN
+    org.mongodb.driver.cluster: INFO
+
+api:
+  api-server-url: https://api.jakduk.com
+  web-server-url: https://jakduk.com
+  remember-me-expiration: 2592000 # 1 month
+  swagger: # swagger
+    protocol: https
+    host: api.jakduk.com
+  slackLog: # alert slack
+    enabled: true
+    level: ERROR
+    webhook: https://hooks.slack.com/services/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
+    channel: #jakduk_log
+    username: \uC791\uB450\uD0B9 \uC2EC\uD310

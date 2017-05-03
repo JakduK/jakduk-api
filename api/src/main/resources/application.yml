@@ -12,8 +12,4 @@ api:
     user-picture-small: user/picture/small
     gallery-image: gallery
     gallery-thumbnail: gallery/thumbnail
-
-web:
-  path:
-    board:
-      free: board/free
+    board-free: board/free
