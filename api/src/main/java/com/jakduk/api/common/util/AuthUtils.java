@@ -253,10 +253,10 @@ public class AuthUtils {
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getUserPictureLarge(), id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureLarge(), id);
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getServerUrl(), apiProperties.getUrlPath().getUserPictureSmall(), id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureSmall(), id);
                 break;
         }
 

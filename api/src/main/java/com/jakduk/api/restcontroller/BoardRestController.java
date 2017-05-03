@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 @Api(tags = "BoardFree", description = "자유게시판 API")
 @RestController
-@RequestMapping("/api/board/free")
+@RequestMapping("/api/${api.url-path.board-free}")
 public class BoardRestController {
 
     @Autowired

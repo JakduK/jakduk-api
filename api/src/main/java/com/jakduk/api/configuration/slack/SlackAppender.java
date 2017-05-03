@@ -3,6 +3,7 @@ package com.jakduk.api.configuration.slack;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
+import com.jakduk.api.configuration.ApiProperties;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
@@ -21,17 +22,17 @@ import java.util.List;
 
 public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
-    private LogConfig logConfig;
+    private ApiProperties.SlackLog apiSlackLogProperties;
 
-    public SlackAppender(LogConfig logConfig) {
-        this.logConfig = logConfig;
+    public SlackAppender(ApiProperties.SlackLog apiSlackLogProperties) {
+        this.apiSlackLogProperties = apiSlackLogProperties;
     }
 
     @Override
     protected void append(ILoggingEvent iLoggingEvent) {
 
-        if (logConfig.getEnabled()) {
-            if (iLoggingEvent.getLevel().isGreaterOrEqual(logConfig.getLevel())) {
+        if (apiSlackLogProperties.getEnabled()) {
+            if (iLoggingEvent.getLevel().isGreaterOrEqual(apiSlackLogProperties.getLevel())) {
 
                 List<SlackField> fields = new ArrayList<>();
 
@@ -51,12 +52,12 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                     slackAttachment.setText(getStackTrace(iLoggingEvent.getThrowableProxy().getStackTraceElementProxyArray()));
 
                 SlackMessage slackMessage = new SlackMessage("");
-                slackMessage.setChannel("#" + logConfig.getChannel());
-                slackMessage.setUsername(logConfig.getUsername());
+                slackMessage.setChannel("#" + apiSlackLogProperties.getChannel());
+                slackMessage.setUsername(apiSlackLogProperties.getUsername());
                 slackMessage.setIcon(":exclamation:");
                 slackMessage.setAttachments(Collections.singletonList(slackAttachment));
 
-                SlackApi api = new SlackApi(logConfig.getWebhook());
+                SlackApi api = new SlackApi(apiSlackLogProperties.getWebhook());
                 api.call(slackMessage);
             }
         }
