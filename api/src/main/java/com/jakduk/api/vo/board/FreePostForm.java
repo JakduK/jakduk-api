@@ -19,7 +19,7 @@ import java.util.List;
 public class FreePostForm {
 
     @ApiModelProperty(required = true, value = "글 제목", example = "글 제목입니다.")
-    @Size(min = 3, max=60)
+    @Size(min = 1, max=60)
     @NotEmpty
     private String subject;
 

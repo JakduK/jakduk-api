@@ -1,22 +1,23 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.configuration.ApiProperties;
+import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.api.service.BoardFreeService;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Content;
 import com.rometools.rome.feed.rss.Description;
 import com.rometools.rome.feed.rss.Item;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.view.feed.AbstractRssFeedView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -33,14 +34,11 @@ import java.util.stream.Collectors;
 @Component("documentRssFeedView")
 public class DocumentRssFeedView extends AbstractRssFeedView {
 
+	@Resource
+	private ApiProperties apiProperties;
+
 	@Autowired
 	private BoardFreeService boardFreeService;
-
-	@Value("${web.server.url}")
-	private String webServerUrl;
-
-	@Value("${web.board.free.path}")
-	private String webBoardFreePath;
 
 	/**
 	 * Create a new Channel instance to hold the entries.
@@ -48,7 +46,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	 */
 	@Override protected Channel newFeed() {
 		Channel channel = new Channel("rss_2.0");
-		channel.setLink(String.format("%s/%s", webServerUrl, "/rss"));
+		channel.setLink(String.format("%s/%s", apiProperties.getWebServerUrl(), "/rss"));
 		channel.setTitle(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk"));
 		channel.setDescription(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk.rss.description"));
 
@@ -79,7 +77,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 			if (existPosts) {
 				List<Item> eachPostsOfRss = posts.stream()
 						.map(post -> {
-							String url = String.format("%s/%s/%d", webServerUrl, webBoardFreePath, post.getSeq());
+							String url = String.format("%s/%s/%d", apiProperties.getWebServerUrl(), apiProperties.getUrlPath().getBoardFree(), post.getSeq());
 
 							Item item = new Item();
 							item.setAuthor(post.getWriter().getUsername());

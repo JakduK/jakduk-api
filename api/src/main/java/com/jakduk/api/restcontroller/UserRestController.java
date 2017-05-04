@@ -1,11 +1,12 @@
 package com.jakduk.api.restcontroller;
 
+import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
-import com.jakduk.api.common.util.JwtTokenUtils;
-import com.jakduk.api.common.util.UserUtils;
+import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
@@ -23,18 +24,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mobile.device.Device;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author pyohawan
@@ -47,11 +54,8 @@ import java.util.Locale;
 @Validated
 public class UserRestController {
 
-    @Value("${jwt.token.header}")
-    private String tokenHeader;
-
     @Autowired
-    private JwtTokenUtils jwtTokenUtils;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -62,21 +66,26 @@ public class UserRestController {
     @Autowired
     private EmailService emailService;
 
-    @ApiOperation(value = "이메일 기반 회원 가입")
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public EmptyJsonResponse addJakdukUser(@Valid @RequestBody UserForm form,
-                                           Device device,
-                                           Locale locale,
-                                           HttpServletResponse response) {
+    @ApiOperation("이메일 기반 회원 가입")
+    @PostMapping("")
+    public EmptyJsonResponse addJakdukUser(
+            @ApiParam(value = "회원 폼", required = true) @Valid @RequestBody UserForm form,
+            Locale locale) {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
-        emailService.sendWelcome(locale, form.getUsername().trim(), form.getEmail().trim());
+        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
-        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
+        // Perform the authentication
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        user.getEmail(),
+                        form.getPassword()
+                )
+        );
 
-        response.setHeader(tokenHeader, token);
+        AuthUtils.setAuthentication(authentication);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -84,21 +93,19 @@ public class UserRestController {
     @ApiOperation("SNS 기반 회원 가입")
     @PostMapping("/social")
     public EmptyJsonResponse addSocialUser(
-            @ApiParam(value = "임시 회원 정보 토큰", required = true) @RequestHeader(value = "x-attempt-token") String attemptedToken,
             @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody SocialUserForm form,
-            Device device,
             Locale locale,
-            HttpServletResponse response) {
+            HttpSession session) {
 
-        if (! jwtTokenUtils.isValidateToken(attemptedToken))
-            throw new ServiceException(ServiceError.EXPIRATION_TOKEN);
+        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+
+        if (Objects.isNull(attemptSocialUser))
+            throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
 
         String largePictureUrl = null;
 
         if (StringUtils.isNotBlank(form.getExternalLargePictureUrl()))
             largePictureUrl = StringUtils.defaultIfBlank(form.getExternalLargePictureUrl(), null);
-
-        AttemptSocialUser attemptSocialUser = jwtTokenUtils.getAttemptedFromToken(attemptedToken);
 
         User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
@@ -106,9 +113,16 @@ public class UserRestController {
 
         emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
-        String token = jwtTokenUtils.generateToken(device, user.getId(), user.getEmail(), user.getUsername(), user.getProviderId().name());
+        // Perform the authentication
+        Authentication authentication = authenticationManager.authenticate(
+                new SnsAuthenticationToken(
+                        user.getEmail()
+                )
+        );
 
-        response.setHeader(tokenHeader, token);
+        session.removeAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+
+        AuthUtils.setAuthentication(authentication);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -179,7 +193,7 @@ public class UserRestController {
 
         String language = CoreUtils.getLanguageCode(locale, null);
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         return userService.getProfileMe(language, authUserProfile.getId());
     }
@@ -188,7 +202,7 @@ public class UserRestController {
     @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
     public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileEditForm form) {
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
                 form.getAbout(), form.getUserPictureId());
@@ -200,10 +214,10 @@ public class UserRestController {
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
-        if (! UserUtils.isJakdukUser())
+        if (! AuthUtils.isJakdukUser())
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        AuthUserProfile authUserProfile = UserUtils.getAuthUserProfile();
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         userService.updateUserPassword(authUserProfile.getId(), passwordEncoder.encode(form.getNewPassword().trim()));
 
@@ -227,6 +241,21 @@ public class UserRestController {
         } catch (IOException e) {
             throw new ServiceException(ServiceError.IO_EXCEPTION, e);
         }
+    }
+
+    @ApiOperation("회원 탈퇴")
+    @DeleteMapping("")
+    public EmptyJsonResponse deleteUser(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+
+        userService.deleteUser(authUserProfile.getId());
+
+        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+        return EmptyJsonResponse.newInstance();
     }
 
 }

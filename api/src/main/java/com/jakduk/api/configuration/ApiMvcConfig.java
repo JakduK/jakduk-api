@@ -2,8 +2,6 @@ package com.jakduk.api.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.LocaleResolver;
@@ -48,11 +46,6 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
         return new CookieLocaleResolver();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new StandardPasswordEncoder();
-    }
-
     /**
      * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
      */
@@ -68,4 +61,5 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
     public LocalValidatorFactoryBean localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
     }
+
 }

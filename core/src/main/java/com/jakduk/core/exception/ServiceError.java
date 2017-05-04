@@ -18,8 +18,6 @@ public enum ServiceError {
     // COMMON
     INVALID_PARAMETER(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     FORM_VALIDATION_FAILED(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
-    EXPIRATION_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.expiration.token"),
-    INVALID_TOKEN(HttpStatus.SC_BAD_REQUEST, "exception.invalid.token"),
     FEELING_YOU_ARE_WRITER(HttpStatus.SC_BAD_REQUEST, "exception.you.are.writer"),
     FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
     NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
@@ -34,7 +32,7 @@ public enum ServiceError {
     NOT_FOUND_USER(HttpStatus.SC_NOT_FOUND, "exception.not.found.user"),
     NOT_FOUND_USER_IMAGE(HttpStatus.SC_NOT_FOUND, "exception.not.found.user.image"),
     NOT_REGISTER_WITH_SNS(HttpStatus.SC_NOT_FOUND, "exception.not.register.with.sns"),
-    CANNOT_GET_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.sns.profile"),
+    CANNOT_GET_ATTEMPT_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.attempt.sns.profile"),
     ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
     ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
 

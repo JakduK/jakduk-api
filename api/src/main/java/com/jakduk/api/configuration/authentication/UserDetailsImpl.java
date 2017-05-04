@@ -1,4 +1,4 @@
-package com.jakduk.api.configuration.authentication.user;
+package com.jakduk.api.configuration.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.core.common.CoreConst;
@@ -13,15 +13,14 @@ import org.springframework.util.Assert;
 import java.io.Serializable;
 import java.util.*;
 
-public class JakdukUserDetails implements UserDetails {
+public class UserDetailsImpl implements UserDetails {
 
 	private String password;
 	private String username;									// email
 	@Getter private final String id;
 	@Getter private final String nickname;						// 별명
 	@Getter private final CoreConst.ACCOUNT_TYPE providerId;
-	@Getter @Setter
-	private UserPictureInfo picture;
+	@Getter @Setter	private UserPictureInfo picture;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -29,12 +28,9 @@ public class JakdukUserDetails implements UserDetails {
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
 
-	public JakdukUserDetails(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId,
-                             boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
-                             Collection<? extends GrantedAuthority> authorities) {
-
-		if (Objects.isNull(username) || Objects.isNull(password))
-			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
+	public UserDetailsImpl(String username, String id, String password, String nickname, CoreConst.ACCOUNT_TYPE providerId,
+                           boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
+                           Collection<? extends GrantedAuthority> authorities) {
 
 		this.username = username;
 		this.nickname = nickname;

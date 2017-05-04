@@ -1,25 +1,26 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.jakduk.api.configuration.ApiProperties;
+import com.jakduk.api.configuration.authentication.UserDetailsImpl;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.vo.user.SocialProfile;
-import com.jakduk.api.configuration.authentication.user.JakdukUserDetails;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.CommonWriter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,16 +33,10 @@ import java.util.stream.Collectors;
  */
 
 @Component
-public class UserUtils {
+public class AuthUtils {
 
-    @Value("${api.server.url}")
-    private String apiServerUrl;
-
-    @Value("${api.user.picture.large.url.path}")
-    private String apiUserPictureLargeUrlPath;
-
-    @Value("${api.user.picture.small.url.path}")
-    private String apiUserPictureSmallUrlPath;
+    @Resource
+    private ApiProperties apiProperties;
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
@@ -50,7 +45,7 @@ public class UserUtils {
     /**
      * 손님인지 검사.
      */
-    public static Boolean isAnonymousUser() {
+    public static Boolean isAnonymous() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -94,6 +89,7 @@ public class UserUtils {
 
     /**
      * 로그인 중인 회원이 USER 권한인지 검사.
+     *
      * @return 회원이면 true
      */
     public static Boolean isUser() {
@@ -120,16 +116,16 @@ public class UserUtils {
      * @return 이메일 기반이면 true, 아니면 false
      */
     public static Boolean isJakdukUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetails;
-    }
 
-    /**
-     * 로그인 중인 회원이 소셜 기반인지 검사.
-     *
-     * @return 이메일 기반이면 true, 아니면 false
-     */
-    public static Boolean isSocialUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetails;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
+
+            return userDetail.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -138,43 +134,25 @@ public class UserUtils {
     public static AuthUserProfile getAuthUserProfile() {
         AuthUserProfile authUserProfile = null;
 
-        if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof SocialUserDetails) {
-                SocialUserDetails userDetail = (SocialUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-                Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (authentication.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
-                List<String> roles = authorities.stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList());
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
-                authUserProfile = AuthUserProfile.builder()
-                        .id(userDetail.getId())
-                        .email(userDetail.getUserId())
-                        .username(userDetail.getUsername())
-                        .providerId(userDetail.getProviderId())
-                        .picture(userDetail.getPicture())
-                        .roles(roles)
-                        .build();
+            List<String> roles = authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
 
-            } else if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JakdukUserDetails) {
-                JakdukUserDetails userDetail = (JakdukUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-                Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-                List<String> roles = authorities.stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList());
-
-                authUserProfile = AuthUserProfile.builder()
-                        .id(userDetail.getId())
-                        .email(userDetail.getUsername())
-                        .username(userDetail.getNickname())
-                        .providerId(userDetail.getProviderId())
-                        .picture(userDetail.getPicture())
-                        .roles(roles)
-                        .build();
-            }
+            authUserProfile = AuthUserProfile.builder()
+                    .id(userDetail.getId())
+                    .email(userDetail.getUsername())
+                    .username(userDetail.getNickname())
+                    .providerId(userDetail.getProviderId())
+                    .picture(userDetail.getPicture())
+                    .roles(roles)
+                    .build();
         }
 
         return authUserProfile;
@@ -275,14 +253,23 @@ public class UserUtils {
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiUserPictureLargeUrlPath, id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureLarge(), id);
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiServerUrl, apiUserPictureSmallUrlPath, id);
+                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureSmall(), id);
                 break;
         }
 
         return pictureUrl;
+    }
+
+    /**
+     * 세션에 authentication 객체를 업데이트
+     */
+    public static void setAuthentication(Authentication authentication) {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     }
 
     private static List<String> getRoles(List<Integer> roles) {

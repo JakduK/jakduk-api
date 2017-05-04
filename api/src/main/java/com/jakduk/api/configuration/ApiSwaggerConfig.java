@@ -1,9 +1,7 @@
 package com.jakduk.api.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -15,6 +13,7 @@ import springfox.documentation.swagger.web.ApiKeyVehicle;
 import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,14 +27,14 @@ import java.util.Set;
 @EnableSwagger2
 public class ApiSwaggerConfig {
 
-    @Autowired
-    private Environment environment;
+    @Resource
+    private ApiProperties apiProperties;
 
     @Bean
     public Docket api() {
 
         Set<String> protocols = new HashSet<>();
-        protocols.add(environment.getProperty("swagger.protocol"));
+        protocols.add(apiProperties.getSwagger().getProtocol());
 
         Set<String> producesList = new HashSet<>();
         producesList.add("application/json");
@@ -46,7 +45,7 @@ public class ApiSwaggerConfig {
                     .paths(PathSelectors.ant("/api/**"))
                 .build()
                 .protocols(protocols)
-                .host(environment.getProperty("swagger.host"))
+                .host(apiProperties.getSwagger().getHost())
                 .apiInfo(apiInfo())
                 .useDefaultResponseMessages(false)
                 .securitySchemes(Collections.singletonList(apiKey()))
@@ -62,7 +61,7 @@ public class ApiSwaggerConfig {
                 "test-app",
                 "",
                 ApiKeyVehicle.HEADER,
-                "",
+                "api_key",
                 "," /*scope separator*/);
     }
 
@@ -76,6 +75,6 @@ public class ApiSwaggerConfig {
     }
 
     private ApiKey apiKey() {
-        return new ApiKey("Authorization", "api_key", "header");
+        return new ApiKey("JSESSIONID", "api_key", "cookie");
     }
 }

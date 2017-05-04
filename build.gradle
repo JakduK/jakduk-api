@@ -1,7 +1,7 @@
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE")
@@ -27,7 +27,6 @@ subprojects {
     }
 
     repositories {
-        mavenLocal()
         jcenter()
 
         // 프로젝트에 import한 jar 보관 폴더.

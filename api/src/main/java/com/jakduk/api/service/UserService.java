@@ -2,10 +2,7 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.JwtTokenUtils;
-import com.jakduk.api.common.util.UserUtils;
-import com.jakduk.api.configuration.authentication.SocialDetailService;
-import com.jakduk.api.configuration.authentication.user.SocialUserDetails;
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.vo.user.UserProfileResponse;
 import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
@@ -28,13 +25,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mobile.device.Device;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Objects;
@@ -56,30 +53,14 @@ public class UserService {
 	@Autowired
 	private UserPictureRepository userPictureRepository;
 
-	@Autowired
-	private SocialDetailService socialDetailService;
-
-	@Autowired
-	private JwtTokenUtils jwtTokenUtils;
-
 	@Resource
-	private UserUtils userUtils;
+	private AuthUtils authUtils;
 
 	@Value("${core.storage.user.picture.large.path}")
 	private String storageUserPictureLargePath;
 
 	@Value("${core.storage.user.picture.small.path}")
 	private String storageUserPictureSmallPath;
-
-	public User findOneById(String id) {
-		return userRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-	}
-
-	public UserProfile findUserProfileById(String id) {
-		return userProfileRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-	}
 
 	public Optional<User> findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
@@ -117,11 +98,12 @@ public class UserService {
 	}
 
 	/**
-	 * SNS 가입 회원 로그인
+	 * SNS 회원의 하위 호환 검사
 	 *
-	 * @return 인증 토큰
+	 * @param snsEmail Provider(페이스북, 다음)에서 가져온 email
+	 * @param user DB에서 가져온 회원
 	 */
-	public String loginSnsUser(Device device, String snsEmail, User user) {
+	public void checkBackwardCompatibilityOfSnsUser(String snsEmail, User user) {
 
 		// User DB 와 SNS Profile 모두에 email이 없을 경우에는 신규 가입으로 진행한다.
 		// SNS 가입시 이메일 제공 동의를 안해서 그렇다.
@@ -138,14 +120,6 @@ public class UserService {
 
 			log.info("user({},{}) email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
 		}
-
-		SocialUserDetails userDetails = (SocialUserDetails) socialDetailService.loadUserByUsername(user.getEmail());
-
-		// 토큰 생성
-		String token = jwtTokenUtils.generateToken(device, userDetails.getId(), userDetails.getEmail(), userDetails.getUsername(),
-				userDetails.getProviderId().name());
-
-		return token;
 	}
 
 	// 회원 정보 저장.
@@ -163,6 +137,7 @@ public class UserService {
 				.password(password)
 				.providerId(CoreConst.ACCOUNT_TYPE.JAKDUK)
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.lastLogged(LocalDateTime.now())
 				.build();
 
 		if (StringUtils.isNotBlank(footballClub)) {
@@ -190,7 +165,7 @@ public class UserService {
 			userPictureRepository.save(userPicture);
 		}
 
-		log.debug("JakduK user created. user=" + user);
+		log.info("JakduK user created. email:{} username:{}", user.getEmail(), user.getUsername());
 
 		return user;
 	}
@@ -209,6 +184,7 @@ public class UserService {
 				.providerId(providerId)
 				.providerUserId(providerUserId)
 				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.lastLogged(LocalDateTime.now())
 				.build();
 
 		if (StringUtils.isNotBlank(footballClub)) {
@@ -269,7 +245,7 @@ public class UserService {
 			userPictureRepository.save(userPicture);
 		}
 
-		log.debug("social user created.\n{}" + user);
+		log.info("social user created. email:{} username:{}, providerId:{}", user.getEmail(), user.getUsername(), user.getProviderId());
 
 		return user;
 	}
@@ -382,6 +358,9 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * 내 프로필 정보 보기
+	 */
 	public UserProfileResponse getProfileMe(String language, String id) {
 
 		UserProfile user = userProfileRepository.findOneById(id)
@@ -406,13 +385,29 @@ public class UserService {
 
 		if (Objects.nonNull(userPicture)) {
 			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
-					userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-					userUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+					authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+					authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
 			response.setPicture(userPictureInfo);
 		}
 
 		return response;
+	}
+
+	/**
+	 * 마지막 로그인 날짜 갱신
+	 */
+	public void updateLastLogged(String id) {
+
+		User user = userRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+
+		user.setLastLogged(LocalDateTime.now());
+		userRepository.save(user);
+	}
+
+	public void deleteUser(String id) {
+		userRepository.delete(id);
 	}
 
 }

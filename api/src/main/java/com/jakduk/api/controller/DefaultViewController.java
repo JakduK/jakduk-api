@@ -1,6 +1,7 @@
 package com.jakduk.api.controller;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.configuration.ApiProperties;
 import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.core.common.CoreConst;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,6 +49,9 @@ import java.util.List;
 @Controller
 public class DefaultViewController {
 
+	@Resource
+	private ApiProperties apiProperties;
+
 	@Autowired
 	private GalleryService galleryService;
 
@@ -62,12 +67,6 @@ public class DefaultViewController {
 	@Value("${core.storage.user.picture.small.path}")
 	private String storageUserPictureSmallPath;
 
-	@Value("${web.server.url}")
-	private String webServerUrl;
-
-	@Value("${web.board.free.path}")
-	private String webBoardFreePath;
-
 	// RSS
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
 	public String getRss() {
@@ -79,7 +78,7 @@ public class DefaultViewController {
 	public void getSitemap(HttpServletResponse servletResponse) {
 
 		try {
-			WebSitemapGenerator wsg =  WebSitemapGenerator.builder(webServerUrl, null)
+			WebSitemapGenerator wsg =  WebSitemapGenerator.builder(apiProperties.getWebServerUrl(), null)
 					.dateFormat(new W3CDateFormat(W3CDateFormat.Pattern.SECOND))
 					.build();
 
@@ -104,7 +103,10 @@ public class DefaultViewController {
 					posts.forEach(post-> {
 						try {
 							WebSitemapUrl url = new WebSitemapUrl
-									.Options(String.format("%s/%s/%d", webServerUrl, webBoardFreePath, post.getSeq()))
+									.Options(
+									String.format("%s/%s/%d", apiProperties.getWebServerUrl(),
+											apiProperties.getUrlPath().getBoardFree(), post.getSeq())
+							)
 									.lastMod(DateUtils.localDateTimeToDate(post.getLastUpdated()))
 									.priority(0.5)
 									.changeFreq(ChangeFreq.DAILY)
@@ -129,7 +131,7 @@ public class DefaultViewController {
 	}
 
 	// 사진 가져오기.
-	@GetMapping("/${api.gallery.image.url.path}/{id}")
+	@GetMapping("/${api.url-path.gallery-image}/{id}")
 	public void getGallery(@PathVariable String id,
 						   HttpServletResponse response) {
 
@@ -147,7 +149,7 @@ public class DefaultViewController {
 	}
 
 	// 사진 썸네일 가져오기.
-	@GetMapping("/${api.gallery.thumbnail.url.path}/{id}")
+	@GetMapping("/${api.url-path.gallery-thumbnail}/{id}")
 	public void getGalleyThumbnail(@PathVariable String id,
 								   HttpServletResponse response) {
 
@@ -165,7 +167,7 @@ public class DefaultViewController {
 	}
 
 	// 회원 프로필 사진 가져오기.
-	@RequestMapping(value = "/${api.user.picture.large.url.path}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/${api.url-path.user-picture-large}/{id}", method = RequestMethod.GET)
 	public void getUserPicture(@PathVariable String id,
 							 HttpServletResponse response) {
 
@@ -185,7 +187,7 @@ public class DefaultViewController {
 	}
 
 	// 회원 프로필 작은 사진 가져오기.
-	@RequestMapping(value = "/${api.user.picture.small.url.path}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/${api.url-path.user-picture-small}/{id}", method = RequestMethod.GET)
 	public void getUserSmallPicture(@PathVariable String id,
 									HttpServletResponse response) {
 
