@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -171,6 +172,28 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
     }
+
+    /**
+     * 접근 거부. 로그인 필요
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<RestErrorResponse> accessDeniedException(AccessDeniedException ex) {
+
+        ServiceError serviceError = ServiceError.NEED_TO_LOGIN;
+
+        RestErrorResponse restErrorResponse = new RestErrorResponse(
+                serviceError.getCode(), ex.getLocalizedMessage(), serviceError.getHttpStatus()
+        );
+
+        try {
+            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse));
+        } catch (JsonProcessingException ignore) {
+            log.warn(ex.getLocalizedMessage());
+        }
+
+        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+    }
+
 
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
