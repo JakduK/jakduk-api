@@ -19,6 +19,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -249,18 +251,22 @@ public class AuthUtils {
         if (StringUtils.isBlank(id))
             return null;
 
-        String pictureUrl = null;
+        String urlPathUserPicture = null;
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureLarge(), id);
+                urlPathUserPicture = apiProperties.getUrlPath().getUserPictureLarge();
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureSmall(), id);
+                urlPathUserPicture = apiProperties.getUrlPath().getUserPictureSmall();
                 break;
         }
 
-        return pictureUrl;
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(apiProperties.getApiServerUrl())
+                .path("/{urlPathGallery}/{id}")
+                .buildAndExpand(urlPathUserPicture, id);
+
+        return uriComponents.toUriString();
     }
 
     /**

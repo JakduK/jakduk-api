@@ -13,6 +13,8 @@ import org.springframework.mobile.device.Device;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
@@ -112,18 +114,22 @@ public class ApiUtils {
         if (StringUtils.isBlank(id))
             return null;
 
-        String pictureUrl = null;
+        String urlPathGallery = null;
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getGalleryImage(), id);
+                urlPathGallery = apiProperties.getUrlPath().getGalleryImage();
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getGalleryThumbnail(), id);
+                urlPathGallery = apiProperties.getUrlPath().getGalleryThumbnail();
                 break;
         }
 
-        return pictureUrl;
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(apiProperties.getApiServerUrl())
+                .path("/{urlPathGallery}/{id}")
+                .buildAndExpand(urlPathGallery, id);
+
+        return uriComponents.toUriString();
     }
 
     /**
