@@ -253,6 +253,7 @@ public class UserRestController {
 
         userService.deleteUser(authUserProfile.getId());
 
+        // 참고 @{link http://websystique.com/spring-security/spring-security-4-logout-example/}
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
         return EmptyJsonResponse.newInstance();

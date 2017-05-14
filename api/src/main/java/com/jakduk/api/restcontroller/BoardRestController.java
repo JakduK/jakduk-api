@@ -1,6 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.common.annotation.SecuredRoleUser;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
@@ -109,6 +110,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글쓰기")
+    @SecuredRoleUser
     @PostMapping("")
     public FreePostWriteResponse addFreePost(
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
@@ -138,6 +140,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글 고치기")
+    @SecuredRoleUser
     @PutMapping("/{seq}")
     public FreePostWriteResponse editFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
@@ -173,6 +176,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 지움")
+    @SecuredRoleUser
     @DeleteMapping("/{seq}")
     public FreePostDeleteResponse deleteFree(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
@@ -196,6 +200,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 달기")
+    @SecuredRoleUser
     @PostMapping("/comment")
     public BoardFreeComment addFreeComment(
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
@@ -224,6 +229,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 댓글 고치기")
+    @SecuredRoleUser
     @PutMapping(value ="/comment/{id}")
     public BoardFreeComment editFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
@@ -263,6 +269,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 지우기")
+    @SecuredRoleUser
     @DeleteMapping("/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
@@ -278,6 +285,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 감정 표현")
+    @SecuredRoleUser
     @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeFeeling(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
@@ -319,6 +327,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 댓글 감정 표현")
+    @SecuredRoleUser
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
