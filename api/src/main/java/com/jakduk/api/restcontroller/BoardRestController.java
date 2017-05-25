@@ -190,7 +190,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 글의 댓글 목록")
+    @ApiOperation("자유게시판 글의 댓글 목록")
     @GetMapping("/{seq}/comments")
     public FreePostDetailCommentsResponse getFreePostDetailComments(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,

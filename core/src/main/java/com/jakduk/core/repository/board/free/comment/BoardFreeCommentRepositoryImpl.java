@@ -78,7 +78,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         query.addCriteria(Criteria.where("boardItem.seq").is(boardSeq));
 
         if (Objects.nonNull(commentId))
-            query.addCriteria(Criteria.where("_id").lt(commentId));
+            query.addCriteria(Criteria.where("_id").gt(commentId));
 
         query.with(new Sort(Sort.Direction.ASC, "_id"));
         query.limit(CoreConst.COMMENT_MAX_LIMIT);
