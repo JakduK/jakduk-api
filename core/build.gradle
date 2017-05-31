@@ -1,6 +1,15 @@
 description = 'core'
 
 dependencies {
+    compile('org.springframework.boot:spring-boot-starter-mail')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+    compile('org.springframework.boot:spring-boot-starter-validation')
+    compile("org.springframework.boot:spring-boot-starter-amqp")
+
     compile 'javax.persistence:persistence-api:1.0.2'
     compile 'org.jsoup:jsoup:1.10.1'
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }

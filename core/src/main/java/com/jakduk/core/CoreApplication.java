@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  */
 
 @SpringBootApplication
-@PropertySource("classpath:/application-core.properties")
+@PropertySource("classpath:/application-core.yml")
 public class CoreApplication {
 
     @Resource
