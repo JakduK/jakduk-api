@@ -17,13 +17,11 @@ public class CoreRabbitMQConfig {
         return new Queue("hello");
     }
 
-    @Profile("receiver")
     @Bean
     public Tut1Receiver receiver() {
         return new Tut1Receiver();
     }
 
-    @Profile("sender")
     @Bean
     public Tut1Sender sender() {
         return new Tut1Sender();

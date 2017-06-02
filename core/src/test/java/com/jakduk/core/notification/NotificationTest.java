@@ -5,6 +5,8 @@ import com.jakduk.core.common.util.SlackUtils;
 import com.jakduk.core.service.EmailService;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.mail.MessagingException;
@@ -53,6 +55,21 @@ public class NotificationTest extends CoreApplicationTests {
         Locale locale = Locale.KOREAN;
 
         emailService.sendResetPassword(locale, "http://localhost:8080", "phjang1983@daum.net");
+
+    }
+
+    @Test
+    public void rabbitmq() {
+        CachingConnectionFactory cf = new CachingConnectionFactory("192.168.35.74", 5672);
+        cf.setUsername("admin");
+        cf.setPassword("wkrenakstp@");
+
+        //메시지 보내기
+        RabbitTemplate template = new RabbitTemplate(cf);
+        template.setExchange("amq.direct");
+        template.setQueue("myQueue");
+        template.convertAndSend("foo.bar", "Hello, world!");
+        cf.destroy();
 
     }
 }
