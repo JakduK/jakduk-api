@@ -46,6 +46,7 @@ subprojects {
         compile group: 'net.gpedro.integrations.slack', name: 'slack-webhook', version:'1.2.1'
         compile 'net.coobird:thumbnailator:0.4.8'
 
+        testCompile('org.springframework.boot:spring-boot-starter-test')
         compileOnly 'org.projectlombok:lombok'
     }
 }
