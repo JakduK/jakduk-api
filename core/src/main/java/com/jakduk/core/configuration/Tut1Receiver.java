@@ -11,7 +11,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 public class Tut1Receiver {
 
     @RabbitHandler
-    public void receive(String in) {
+    public void receive(String in) throws InterruptedException {
+        Thread.sleep(1000L);
         System.out.println(" [x] Received '" + in + "'");
     }
 }

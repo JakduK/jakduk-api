@@ -1,9 +1,14 @@
 package com.jakduk.core.configuration;
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by naver on 2017. 6. 2..
@@ -11,6 +16,19 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class CoreRabbitMQConfig {
+
+    @Resource
+    private CoreProperties coreProperties;
+
+    @Bean
+    public TopicExchange topicExchange() {
+        return new TopicExchange(coreProperties.getRabbitmq().getExchangeName());
+    }
+
+//    @Bean
+//    public List<Binding> binding(TopicExchange exchange, Queue queue) {
+//        return BindingBuilder.bind(queue).to(exchange).with("");
+//    }
 
     @Bean
     public Queue hello() {

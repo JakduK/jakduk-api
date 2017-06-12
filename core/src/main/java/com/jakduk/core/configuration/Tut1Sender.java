@@ -5,6 +5,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.util.stream.IntStream;
+
 /**
  * Created by naver on 2017. 6. 2..
  */
@@ -16,10 +18,13 @@ public class Tut1Sender {
     @Autowired
     private Queue queue;
 
-    @Scheduled(fixedDelay = 1000, initialDelay = 500)
+//    @Scheduled(fixedDelay = 1000, initialDelay = 500)
     public void send() {
         String message = "Hello World!";
-        this.template.convertAndSend(queue.getName(), message);
-        System.out.println(" [x] Sent '" + message + "'");
+        IntStream.range(0, 5)
+                .forEach(action -> {
+                    this.template.convertAndSend(queue.getName(), message + action);
+                    System.out.println(" [x] Sent '" + message + action + "'");
+                });
     }
 }

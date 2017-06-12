@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.ObjectMapperUtils;
+import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.BoardFree;
@@ -15,8 +16,8 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -33,10 +34,10 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,29 +53,8 @@ import java.util.stream.Collectors;
 @Service
 public class CommonSearchService {
 
-    @Value("${core.elasticsearch.enable}")
-    private boolean elasticsearchEnable;
-
-    @Value("${core.elasticsearch.index.board}")
-    private String elasticsearchIndexBoard;
-
-    @Value("${core.elasticsearch.index.gallery}")
-    private String elasticsearchIndexGallery;
-
-    @Value("${core.elasticsearch.index.search.word}")
-    private String elasticsearchIndexSearchWord;
-
-    @Value("${core.elasticsearch.bulk.actions}")
-    private Integer bulkActions;
-
-    @Value("${core.elasticsearch.bulk.size.mb}")
-    private Integer bulkMbSize;
-
-    @Value("${core.elasticsearch.bulk.flush.interval.seconds}")
-    private Integer bulkFlushIntervalSeconds;
-
-    @Value("${core.elasticsearch.bulk.concurrent.requests}")
-    private Integer bulkConcurrentRequests;
+    @Resource
+    private CoreProperties coreProperties;
 
     @Autowired
     private Client client;
@@ -90,7 +70,7 @@ public class CommonSearchService {
 
     public void createIndexBoard() {
 
-        String index = elasticsearchIndexBoard;
+        String index = coreProperties.getElasticsearch().getIndexBoard();
 
         try {
             CreateIndexResponse response = client.admin().indices().prepareCreate(index)
@@ -112,7 +92,7 @@ public class CommonSearchService {
 
     public void createIndexGallery() {
 
-        String index = elasticsearchIndexGallery;
+        String index = coreProperties.getElasticsearch().getIndexGallery();
 
         try {
             CreateIndexResponse response = client.admin().indices().prepareCreate(index)
@@ -132,7 +112,7 @@ public class CommonSearchService {
 
     public void createIndexSearchWord() {
 
-        String index = elasticsearchIndexSearchWord;
+        String index = coreProperties.getElasticsearch().getIndexSearchWord();
 
         try {
             CreateIndexResponse response = client.admin().indices().prepareCreate(index)
@@ -196,7 +176,7 @@ public class CommonSearchService {
 
             esBoards.forEach(post -> {
                 IndexRequestBuilder index = client.prepareIndex(
-                        elasticsearchIndexBoard,
+                        coreProperties.getElasticsearch().getIndexBoard(),
                         CoreConst.ES_TYPE_BOARD,
                         post.getId()
                 );
@@ -261,7 +241,7 @@ public class CommonSearchService {
             esComments.forEach(comment -> {
                 try {
                     IndexRequestBuilder index = client.prepareIndex()
-                            .setIndex(elasticsearchIndexBoard)
+                            .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                             .setType(CoreConst.ES_TYPE_COMMENT)
                             .setId(comment.getId())
                             .setParent(comment.getBoardItem().getId())
@@ -299,7 +279,7 @@ public class CommonSearchService {
 
             comments.forEach(comment -> {
                 IndexRequestBuilder index = client.prepareIndex(
-                        elasticsearchIndexGallery,
+                        coreProperties.getElasticsearch().getIndexGallery(),
                         CoreConst.ES_TYPE_GALLERY,
                         comment.getId()
                 );
@@ -323,7 +303,7 @@ public class CommonSearchService {
     public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category,
                                    List<String> galleryIds) {
 
-        if (! elasticsearchEnable)
+        if (! coreProperties.getElasticsearch().getEnable())
             return;
 
         ESBoard esBoard = ESBoard.builder()
@@ -338,7 +318,7 @@ public class CommonSearchService {
 
         try {
             IndexResponse response = client.prepareIndex()
-                    .setIndex(elasticsearchIndexBoard)
+                    .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                     .setType(CoreConst.ES_TYPE_BOARD)
                     .setId(id)
                     .setSource(ObjectMapperUtils.writeValueAsString(esBoard))
@@ -352,11 +332,11 @@ public class CommonSearchService {
     @Async
     public void deleteDocumentBoard(String id) {
 
-        if (! elasticsearchEnable)
+        if (! coreProperties.getElasticsearch().getEnable())
             return;
 
         DeleteResponse response = client.prepareDelete()
-                .setIndex(elasticsearchIndexBoard)
+                .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                 .setType(CoreConst.ES_TYPE_BOARD)
                 .setId(id)
                 .get();
@@ -369,7 +349,7 @@ public class CommonSearchService {
     @Async
     public void indexDocumentBoardComment(String id, BoardItem boardItem, CommonWriter writer, String content, List<String> galleryIds) {
 
-        if (! elasticsearchEnable)
+        if (! coreProperties.getElasticsearch().getEnable())
             return;
 
         ESComment esComment = ESComment.builder()
@@ -382,7 +362,7 @@ public class CommonSearchService {
 
         try {
             IndexResponse response = client.prepareIndex()
-                    .setIndex(elasticsearchIndexBoard)
+                    .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                     .setType(CoreConst.ES_TYPE_COMMENT)
                     .setId(id)
                     .setParent(boardItem.getId())
@@ -397,11 +377,11 @@ public class CommonSearchService {
     @Async
     public void deleteDocumentBoardComment(String id) {
 
-        if (! elasticsearchEnable)
+        if (! coreProperties.getElasticsearch().getEnable())
             return;
 
         DeleteResponse response = client.prepareDelete()
-                .setIndex(elasticsearchIndexBoard)
+                .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                 .setType(CoreConst.ES_TYPE_COMMENT)
                 .setId(id)
                 .get();
@@ -417,7 +397,7 @@ public class CommonSearchService {
     @Async
     public void indexDocumentGallery(String id, CommonWriter writer, String name) {
 
-        if (! elasticsearchEnable)
+        if (! coreProperties.getElasticsearch().getEnable())
             return;
 
         ESGallery esGallery = ESGallery.builder()
@@ -428,7 +408,7 @@ public class CommonSearchService {
 
         try {
             IndexResponse response = client.prepareIndex()
-                    .setIndex(elasticsearchIndexGallery)
+                    .setIndex(coreProperties.getElasticsearch().getIndexGallery())
                     .setType(CoreConst.ES_TYPE_GALLERY)
                     .setId(id)
                     .setSource(ObjectMapperUtils.writeValueAsString(esGallery))
@@ -442,11 +422,11 @@ public class CommonSearchService {
     @Async
     public void deleteDocumentGallery(String id) {
 
-        if (! elasticsearchEnable)
+        if (! coreProperties.getElasticsearch().getEnable())
             return;
 
         DeleteResponse response = client.prepareDelete()
-                .setIndex(elasticsearchIndexGallery)
+                .setIndex(coreProperties.getElasticsearch().getIndexGallery())
                 .setType(CoreConst.ES_TYPE_GALLERY)
                 .setId(id)
                 .get();
@@ -458,7 +438,7 @@ public class CommonSearchService {
     @Async
     public void indexDocumentSearchWord(String word, CommonWriter writer) {
 
-        if (! elasticsearchEnable)
+        if (! coreProperties.getElasticsearch().getEnable())
             return;
 
         ESSearchWord esSearchWord = ESSearchWord.builder()
@@ -471,7 +451,7 @@ public class CommonSearchService {
             IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
 
             IndexResponse response = indexRequestBuilder
-                    .setIndex(elasticsearchIndexSearchWord)
+                    .setIndex(coreProperties.getElasticsearch().getIndexSearchWord())
                     .setType(CoreConst.ES_TYPE_SEARCH_WORD)
                     .setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
                     .get();
@@ -501,10 +481,10 @@ public class CommonSearchService {
         };
 
         return BulkProcessor.builder(client, bulkProcessorListener)
-                .setBulkActions(bulkActions)
-                .setBulkSize(new ByteSizeValue(bulkMbSize, ByteSizeUnit.MB))
-                .setFlushInterval(TimeValue.timeValueSeconds(bulkFlushIntervalSeconds))
-                .setConcurrentRequests(bulkConcurrentRequests)
+                .setBulkActions(coreProperties.getElasticsearch().getBulkActions())
+                .setBulkSize(new ByteSizeValue(coreProperties.getElasticsearch().getBulkSizeMb(), ByteSizeUnit.MB))
+                .setFlushInterval(TimeValue.timeValueSeconds(coreProperties.getElasticsearch().getBulkFlushIntervalSeconds()))
+                .setConcurrentRequests(coreProperties.getElasticsearch().getBulkConcurrentRequests())
                 .build();
     }
 

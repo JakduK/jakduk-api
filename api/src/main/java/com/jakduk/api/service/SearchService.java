@@ -5,6 +5,7 @@ import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.search.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.ObjectMapperUtils;
+import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.model.elasticsearch.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -39,14 +39,8 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 
-	@Value("${core.elasticsearch.index.board}")
-	private String elasticsearchIndexBoard;
-
-	@Value("${core.elasticsearch.index.gallery}")
-	private String elasticsearchIndexGallery;
-
-	@Value("${core.elasticsearch.index.search.word}")
-	private String elasticsearchIndexSearchWord;
+	@Resource
+	private CoreProperties coreProperties;
 
 	@Autowired
 	private Client client;
@@ -120,7 +114,7 @@ public class SearchService {
 	public PopularSearchWordResult aggregateSearchWord(Long registerDateFrom, Integer size) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexSearchWord)
+				.setIndices(coreProperties.getElasticsearch().getIndexSearchWord())
 				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
 				.setSize(0)
 				.setQuery(
@@ -155,7 +149,7 @@ public class SearchService {
 															  String postTags) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexBoard)
+				.setIndices(coreProperties.getElasticsearch().getIndexBoard())
 				.setTypes(CoreConst.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
@@ -226,7 +220,7 @@ public class SearchService {
 																String postTags) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexBoard)
+				.setIndices(coreProperties.getElasticsearch().getIndexBoard())
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
 				.setFetchSource(null, new String[]{"content"})
 				.setQuery(
@@ -288,7 +282,7 @@ public class SearchService {
 
 	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexGallery)
+				.setIndices(coreProperties.getElasticsearch().getIndexGallery())
 				.setTypes(CoreConst.ES_TYPE_GALLERY)
 				.setFetchSource(null, new String[]{"name"})
 				.setQuery(QueryBuilders.matchQuery("name", query))

@@ -1,0 +1,63 @@
+logging:
+  level:
+    root: DEBUG
+    org:
+      mongodb:
+        driver:
+          cluster: INFO
+spring:
+  data:
+    elasticsearch:
+      cluster-name: jakduk-elasticsearch
+      cluster-nodes: 192.168.35.137:9300,192.168.35.181:9300
+      repositories:
+        enabled: false
+  rabbitmq:
+    addresses: 192.168.35.74
+    password: wkrenakstp@
+    username: admin
+
+mongo:
+  db:
+    name: jakduk_test
+  host:
+    name: http://192.168.35.194:27017,http://192.168.35.138:27017
+
+core:
+  elasticsearch:
+    enable: false
+    index-board: jakduk_dev_board
+    index-gallery: jakduk_dev_gallery
+    index-search-word: jakduk_dev_search_word
+    bulk-actions: 10000
+    bulk-concurrent-requests: 2
+    bulk-flush-interval-seconds: 10
+    bulk-size-mb: 50
+  email:
+      enable: false
+  rabbitmq:
+    exchange-name: jakduk-dev
+    queues:
+      -
+        queue-name: dev.email
+        routing-key: dev.email.*
+      -
+  slack:
+    board:
+      channel: '#jakduk_board_noti'
+      enabled: false
+      webhook: https://hooks.slack.com/services/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
+  storage:
+    image:
+      path: /Users/pyohwanjang/storage/image/
+    thumbnail:
+      path: /Users/pyohwanjang/storage/thumbnail/
+    user:
+      picture:
+        large:
+          path: /Users/pyohwanjang/storage/user/picture/large/
+        small:
+          path: /Users/pyohwanjang/storage/user/picture/small/
+
+
+
