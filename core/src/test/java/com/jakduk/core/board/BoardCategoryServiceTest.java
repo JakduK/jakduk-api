@@ -26,9 +26,4 @@ public class BoardCategoryServiceTest extends CoreApplicationTests {
         sut.initBoardCategory();
     }
 
-    @Test
-    public void test() {
-        System.out.println("phjang=" + coreProperties.getRabbitmq().getQueues());
-    }
-
 }

@@ -1,6 +1,5 @@
 package com.jakduk.core.configuration;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,16 +21,11 @@ public class CoreProperties {
     private Rabbitmq rabbitmq = new Rabbitmq();
     private Elasticsearch elasticsearch = new Elasticsearch();
 
-    @Data
-    public static class Rabbitmq {
+    @Getter
+    @Setter
+    public class Rabbitmq {
         private String exchangeName;
-        private List<Queue> queues = new ArrayList<>();
-    }
-
-    @Data
-    public class Queue {
-        private String queueName;
-        private String routingKey;
+        private List<RabbitmqQueue> queues = new ArrayList<>();
     }
 
     @Getter
