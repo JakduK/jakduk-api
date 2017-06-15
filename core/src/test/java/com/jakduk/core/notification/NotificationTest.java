@@ -72,4 +72,5 @@ public class NotificationTest extends CoreApplicationTests {
         cf.destroy();
 
     }
+
 }

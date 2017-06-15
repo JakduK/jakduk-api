@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by naver on 2017. 6. 2..
@@ -25,14 +27,21 @@ public class CoreRabbitMQConfig {
         return new TopicExchange(coreProperties.getRabbitmq().getExchangeName());
     }
 
-//    @Bean
-//    public List<Binding> binding(TopicExchange exchange, Queue queue) {
-//        return BindingBuilder.bind(queue).to(exchange).with("");
-//    }
+    @Bean
+    public List<Binding> binding(TopicExchange exchange, List<Queue> queues) {
+        Map<String, String> queueMap = coreProperties.getRabbitmq().getQueues().stream()
+                .collect(Collectors.toMap(RabbitmqQueue::getQueueName, RabbitmqQueue::getRoutingKey));
+
+        return queues.stream()
+                .map(queue -> BindingBuilder.bind(queue).to(exchange).with(queueMap.get(queue.getName())))
+                .collect(Collectors.toList());
+    }
 
     @Bean
-    public Queue hello() {
-        return new Queue("hello");
+    public List<Queue> queues() {
+        return coreProperties.getRabbitmq().getQueues().stream()
+                .map(queue -> new Queue(queue.getQueueName()))
+                .collect(Collectors.toList());
     }
 
     @Bean
