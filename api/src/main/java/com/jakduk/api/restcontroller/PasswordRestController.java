@@ -1,15 +1,13 @@
 package com.jakduk.api.restcontroller;
 
+import com.jakduk.api.service.EmailService;
+import com.jakduk.api.service.UserService;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
-import com.jakduk.core.exception.ServiceError;
-import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Token;
 import com.jakduk.core.model.simple.UserProfile;
 import com.jakduk.core.repository.TokenRepository;
 import com.jakduk.core.service.CommonService;
-import com.jakduk.core.service.EmailService;
-import com.jakduk.api.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
 import java.util.*;
 
 @Slf4j
@@ -44,7 +41,7 @@ public class PasswordRestController {
 	// jakduk 비밀번호 찾기 처리.
 	@RequestMapping(value = "/find", method = RequestMethod.POST)
 	public Map<String, Object> findPassword(@RequestParam String email,
-	                                        @RequestParam String callbackUrl,
+	                                        @RequestParam(value = "callbackUrl") String host,
 											Locale locale) {
 		String message = "";
 
@@ -56,12 +53,7 @@ public class PasswordRestController {
 			switch (userProfile.getProviderId()) {
 				case JAKDUK:
 					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.sendok");
-					try {
-
-						emailService.sendResetPassword(locale, callbackUrl, email);
-					} catch (MessagingException e) {
-						throw new ServiceException(ServiceError.SEND_EMAIL_FAILED);
-					}
+					emailService.sendResetPassword(locale, host, email);
 					break;
 				case DAUM:
 					message = CoreUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", CoreConst.ACCOUNT_TYPE.DAUM);

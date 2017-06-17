@@ -8,6 +8,7 @@ import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.api.service.EmailService;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
 import com.jakduk.core.common.util.CoreUtils;
@@ -16,7 +17,6 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.service.EmailService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -65,6 +65,7 @@ public class UserRestController {
 
     @Autowired
     private EmailService emailService;
+
 
     @ApiOperation("이메일 기반 회원 가입")
     @PostMapping("")
@@ -234,9 +235,7 @@ public class UserRestController {
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
         try {
-            UserPicture userPicture = userService.uploadUserPicture(contentType, file.getSize(), file.getBytes());
-
-            return userPicture;
+            return userService.uploadUserPicture(contentType, file.getSize(), file.getBytes());
 
         } catch (IOException e) {
             throw new ServiceException(ServiceError.IO_EXCEPTION, e);

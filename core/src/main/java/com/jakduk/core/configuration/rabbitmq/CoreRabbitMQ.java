@@ -1,4 +1,4 @@
-package com.jakduk.core.configuration;
+package com.jakduk.core.configuration.rabbitmq;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +9,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RabbitmqQueue {
+public class CoreRabbitMQ {
+
     private String queueName;
     private String routingKey;
+    private Boolean enabled;
+
 }

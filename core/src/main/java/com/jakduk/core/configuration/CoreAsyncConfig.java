@@ -2,7 +2,6 @@ package com.jakduk.core.configuration;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -34,14 +33,4 @@ public class CoreAsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
-    @Bean(name = "asyncMailExecutor")
-    public Executor getAsyncMailExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(3);
-        executor.setThreadNamePrefix("Mail-Thread-");
-        executor.initialize();
-
-        return executor;
-    }
 }

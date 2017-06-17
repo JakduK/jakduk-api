@@ -2,14 +2,13 @@ package com.jakduk.core.service;
 
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.model.db.Token;
+import com.jakduk.core.model.rabbitmq.EmailPayload;
 import com.jakduk.core.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -22,10 +21,7 @@ import java.util.*;
 
 @Slf4j
 @Component
-public class EmailService {
-
-	@Value("${core.email.enable}")
-	private boolean emailEnabled;
+public class CommonEmailService {
 
 	@Autowired
 	private TokenRepository tokenRepository;
@@ -36,35 +32,26 @@ public class EmailService {
 	@Autowired
 	private TemplateEngine htmlTemplateEngine;
 
-	@Async(value = "asyncMailExecutor")
-	public void sendResetPassword(final Locale locale, final String host, final String recipientEmail)
-			throws MessagingException {
+	public void sendResetPassword(EmailPayload emailPayload) throws MessagingException {
 
-		if (! emailEnabled) return;
-
-		if (log.isDebugEnabled()) {
-			log.debug("send email to reset password. email is " + recipientEmail);
-		}
+		Locale locale = emailPayload.getLocale();
+		String recipientEmail = emailPayload.getRecipientEmail();
 
 		String code = UUID.randomUUID().toString();
-		String callbackUrl = host + "/" + code;
+		String callbackUrl = emailPayload.getExtra().get("host") + "/" + code;
 
-		ResourceBundle bundle = ResourceBundle.getBundle("messages.user", locale);
 		String language = CoreUtils.getLanguageCode(locale, null);
 
 		// Prepare the evaluation context
 		final Context ctx = new Context(locale);
-		ctx.setVariable("email", recipientEmail);
-		ctx.setVariable("host", callbackUrl);
-		ctx.setVariable("linkLabel", bundle.getString("user.password.change"));
-
-		String subject = "jakduk.com-" + bundle.getString("user.password.reset.instructions");
+		ctx.setVariables(emailPayload.getBody());
+		ctx.setVariable("callbackUrl", callbackUrl);
 
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
 		final MimeMessageHelper message
 				= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
-		message.setSubject(subject);
+		message.setSubject(emailPayload.getSubject());
 //		message.setFrom("thymeleaf@example.com");
 		message.setTo(recipientEmail);
 
@@ -85,46 +72,49 @@ public class EmailService {
 		// Send mail
 		this.mailSender.send(mimeMessage);
 
-		Token token = new Token();
-		token.setEmail(recipientEmail);
-		token.setCode(code);
-		token.setExpireAt(
-				Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
-		);
+		Optional<Token> optToken = tokenRepository.findOneByEmail(recipientEmail);
 
-		if (Objects.nonNull(tokenRepository.findOne(recipientEmail))) {
-			tokenRepository.delete(recipientEmail);
+		if (optToken.isPresent()) {
+			optToken.ifPresent(token -> {
+				token.setCode(code);
+				token.setExpireAt(
+						Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
+				);
+
+				tokenRepository.save(token);
+			});
+		} else {
+			Token token = Token.builder()
+					.email(recipientEmail)
+					.code(code)
+					.expireAt(
+							Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
+					)
+					.build();
+
+			tokenRepository.save(token);
 		}
-
-		tokenRepository.insert(token);
 	}
 
-	@Async(value = "asyncMailExecutor")
-	public void sendWelcome(final Locale locale, final String username, final String recipientEmail) {
-
-		if (! emailEnabled) return;
+	public void sendWelcome(EmailPayload emailPayload) throws MessagingException {
 
 		// Prepare the evaluation context
-		final Context ctx = new Context(locale);
-		ctx.setVariable("username", username);
+		final Context ctx = new Context(emailPayload.getLocale());
+		ctx.setVariables(emailPayload.getBody());
 
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
 		final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-		try {
-			message.setSubject("K리그 작두왕에 오신것을 환영합니다.");
-			message.setTo(recipientEmail);
+		message.setSubject(emailPayload.getSubject());
+		message.setTo(emailPayload.getRecipientEmail());
 
-			// Create the HTML body using Thymeleaf
-			final String htmlContent = this.htmlTemplateEngine.process("mail/welcome", ctx);
-			message.setText(htmlContent, true /* isHtml */);
+		// Create the HTML body using Thymeleaf
+		final String htmlContent = this.htmlTemplateEngine.process("mail/welcome", ctx);
+		message.setText(htmlContent, true /* isHtml */);
 
-			// Send email
-			this.mailSender.send(mimeMessage);
-		} catch (MessagingException e) {
-			log.error(e.getLocalizedMessage());
-		}
+		// Send email
+		this.mailSender.send(mimeMessage);
 	}
 
 	/**

@@ -1,15 +1,21 @@
 package com.jakduk.core.notification;
 
 import com.jakduk.core.CoreApplicationTests;
+import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.rabbitmq.RabbitMQPublisher;
+import com.jakduk.core.common.rabbitmq.RabbitMQRoutingKey;
+import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.common.util.SlackUtils;
-import com.jakduk.core.service.EmailService;
+import com.jakduk.core.configuration.CoreProperties;
+import com.jakduk.core.model.rabbitmq.EmailPayload;
+import com.jakduk.core.service.CommonEmailService;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
+import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -17,11 +23,17 @@ import java.util.Locale;
  */
 public class NotificationTest extends CoreApplicationTests {
 
+    @Resource
+    private CoreProperties coreProperties;
+
     @Autowired
     private SlackUtils slackUtils;
 
     @Autowired
-    private EmailService emailService;
+    private CommonEmailService commonEmailService;
+
+    @Autowired
+    private RabbitMQPublisher rabbitMQPublisher;
 
     @Ignore
     @Test
@@ -35,16 +47,27 @@ public class NotificationTest extends CoreApplicationTests {
 
         Locale locale = Locale.KOREAN;
 
-        emailService.sendMailWithInline("Pyohwan", "phjang1983@daum.net", locale);
+        commonEmailService.sendMailWithInline("Pyohwan", "phjang1983@daum.net", locale);
     }
 
     @Ignore
     @Test
     public void 가입메일() throws MessagingException {
 
-        Locale locale = Locale.KOREAN;
+        EmailPayload emailPayload = EmailPayload.builder()
+                .locale(Locale.KOREAN)
+                .type(CoreConst.EMAIL_TYPE.WELCOME)
+                .recipientEmail("phjang1983@daum.net")
+                .body(
+                        new HashMap<String, String>() {
+                            {
+                                put("username", "이은상");
+                            }
+                        }
+                )
+                .build();
 
-        emailService.sendWelcome(locale, "이은상", "phjang1983@daum.net");
+        commonEmailService.sendWelcome(emailPayload);
 
     }
 
@@ -52,25 +75,53 @@ public class NotificationTest extends CoreApplicationTests {
     @Test
     public void 비밀번호_갱신() throws MessagingException {
 
-        Locale locale = Locale.KOREAN;
+        EmailPayload emailPayload = EmailPayload.builder()
+                .locale(Locale.KOREA)
+                .type(CoreConst.EMAIL_TYPE.RESET_PASSWORD)
+                .recipientEmail("phjang1983@daum.net")
+                .subject("jakduk.com-" + CoreUtils.getResourceBundleMessage("messages.user", "user.password.reset.instructions"))
+                .extra(
+                        new HashMap<String, String>() {
+                            {
+                                put("host", "http://localhost:8080");
+                            }
+                        }
+                )
+                .body(
+                        new HashMap<String, String>() {
+                            {
+                                put("email", "phjang1983@daum.net");
+                            }
+                        }
+                )
+                .build();
 
-        emailService.sendResetPassword(locale, "http://localhost:8080", "phjang1983@daum.net");
+        commonEmailService.sendResetPassword(emailPayload);
 
     }
 
+    @Ignore
     @Test
-    public void rabbitmq() {
-        CachingConnectionFactory cf = new CachingConnectionFactory("192.168.35.74", 5672);
-        cf.setUsername("admin");
-        cf.setPassword("wkrenakstp@");
+    public void sendWelcomeWithRabbitMQ() throws InterruptedException {
 
-        //메시지 보내기
-        RabbitTemplate template = new RabbitTemplate(cf);
-        template.setExchange("amq.direct");
-        template.setQueue("myQueue");
-        template.convertAndSend("foo.bar", "Hello, world!");
-        cf.destroy();
+        EmailPayload emailPayload = EmailPayload.builder()
+                .locale(Locale.KOREAN)
+                .type(CoreConst.EMAIL_TYPE.WELCOME)
+                .recipientEmail("phjang1983@daum.net")
+                .body(
+                        new HashMap<String, String>() {
+                            {
+                                put("username", "이은상");
+                            }
+                        }
+                )
+                .build();
 
+        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.EMAIL_WELCOME.getRoutingKey());
+
+        rabbitMQPublisher.emailPublish(routingKey, emailPayload);
+
+        Thread.sleep(1000 * 5);
     }
 
 }

@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
     }
 }
 
@@ -36,10 +36,6 @@ subprojects {
     }
 
     dependencies {
-        compile 'com.rometools:rome:1.7.0'
-        compile group: 'net.gpedro.integrations.slack', name: 'slack-webhook', version:'1.2.1'
-        compile 'net.coobird:thumbnailator:0.4.8'
-
         testCompile('org.springframework.boot:spring-boot-starter-test')
         compileOnly 'org.projectlombok:lombok'
     }

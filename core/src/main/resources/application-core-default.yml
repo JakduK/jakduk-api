@@ -33,15 +33,20 @@ core:
     bulk-concurrent-requests: 2
     bulk-flush-interval-seconds: 10
     bulk-size-mb: 50
-  email:
-    enable: false
   rabbitmq:
     exchange-name: jakduk-dev
     queues:
-      - queue-name: dev.email
+      email:
+        queue-name: dev.email
         routing-key: dev.email.*
-      - queue-name: dev.elasticsearch
+        enabled: true
+      elasticsearch:
+        queue-name: dev.elasticsearch
         routing-key: dev.elasticsearch.*
+        enabled: true
+    routing-keys:
+      email-welcome: dev.email.welcome
+      email-reset-password: dev.email.reset-password
   slack:
     board:
       channel: '#jakduk_board_noti'

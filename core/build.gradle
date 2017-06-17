@@ -13,4 +13,7 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.1'
     compile 'javax.persistence:persistence-api:1.0.2'
     compile 'org.jsoup:jsoup:1.10.1'
+    compile 'com.rometools:rome:1.7.0'
+    compile group: 'net.gpedro.integrations.slack', name: 'slack-webhook', version:'1.2.1'
+    compile 'net.coobird:thumbnailator:0.4.8'
 }

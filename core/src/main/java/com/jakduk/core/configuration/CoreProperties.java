@@ -1,12 +1,13 @@
 package com.jakduk.core.configuration;
 
+import com.jakduk.core.configuration.rabbitmq.CoreRabbitMQ;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Jang,Pyohwan on 2017. 6. 12..
@@ -25,7 +26,8 @@ public class CoreProperties {
     @Setter
     public class Rabbitmq {
         private String exchangeName;
-        private List<RabbitmqQueue> queues = new ArrayList<>();
+        private Map<String, CoreRabbitMQ> queues = new HashMap<>();
+        private Map<String, String> routingKeys = new HashMap<>();
     }
 
     @Getter
