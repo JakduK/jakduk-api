@@ -42,7 +42,7 @@ public class EmailService {
                 .build();
 
         String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.EMAIL_WELCOME.getRoutingKey());
-        rabbitMQPublisher.emailPublish(routingKey, emailPayload);
+        rabbitMQPublisher.publishEmail(routingKey, emailPayload);
     }
 
     public void sendResetPassword(Locale locale, String recipientEmail, String host) {
@@ -69,7 +69,7 @@ public class EmailService {
                 .build();
 
         String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
-        rabbitMQPublisher.emailPublish(routingKey, emailPayload);
+        rabbitMQPublisher.publishEmail(routingKey, emailPayload);
     }
 
 }

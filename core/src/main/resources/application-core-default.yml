@@ -1,10 +1,7 @@
 logging:
   level:
     root: DEBUG
-    org:
-      mongodb:
-        driver:
-          cluster: INFO
+    org.mongodb.driver.cluster: INFO
 spring:
   data:
     elasticsearch:
@@ -16,7 +13,13 @@ spring:
     addresses: 192.168.35.74
     password: wkrenakstp@
     username: admin
-
+    listener:
+      simple:
+        concurrency: 1
+        max-concurrency: 3
+        retry:
+          max-attempts: 3
+          enabled: true
 mongo:
   db:
     name: jakduk_test

@@ -108,6 +108,7 @@ public class NotificationTest extends CoreApplicationTests {
                 .locale(Locale.KOREAN)
                 .type(CoreConst.EMAIL_TYPE.WELCOME)
                 .recipientEmail("phjang1983@daum.net")
+                .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
                         new HashMap<String, String>() {
                             {
@@ -119,7 +120,39 @@ public class NotificationTest extends CoreApplicationTests {
 
         String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.EMAIL_WELCOME.getRoutingKey());
 
-        rabbitMQPublisher.emailPublish(routingKey, emailPayload);
+        rabbitMQPublisher.publishEmail(routingKey, emailPayload);
+
+        Thread.sleep(1000 * 5);
+    }
+
+    @Ignore
+    @Test
+    public void sendResetPasswordWithRabbitMQ() throws InterruptedException {
+
+        EmailPayload emailPayload = EmailPayload.builder()
+                .locale(Locale.KOREA)
+                .type(CoreConst.EMAIL_TYPE.RESET_PASSWORD)
+                .recipientEmail("phjang1983@daum.net")
+                .subject("jakduk.com-" + CoreUtils.getResourceBundleMessage("messages.user", "user.password.reset.instructions"))
+                .extra(
+                        new HashMap<String, String>() {
+                            {
+                                put("host", "http://localhost:8080");
+                            }
+                        }
+                )
+                .body(
+                        new HashMap<String, String>() {
+                            {
+                                put("email", "phjang1983@daum.net");
+                            }
+                        }
+                )
+                .build();
+
+        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
+
+        rabbitMQPublisher.publishEmail(routingKey, emailPayload);
 
         Thread.sleep(1000 * 5);
     }

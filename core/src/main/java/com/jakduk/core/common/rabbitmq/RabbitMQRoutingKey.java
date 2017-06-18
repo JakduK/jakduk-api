@@ -10,7 +10,7 @@ import lombok.Getter;
 public enum RabbitMQRoutingKey {
 
     EMAIL_WELCOME("email-welcome"),
-    EMAIL_RESET_PASSWORD("email-rest-password");
+    EMAIL_RESET_PASSWORD("email-reset-password");
 
     private String routingKey;
 

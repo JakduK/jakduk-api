@@ -25,13 +25,12 @@ public class RabbitMQPublisher {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    public void emailPublish(String routingKey, EmailPayload message) {
+    public void publishEmail(String routingKey, EmailPayload message) {
         if (coreProperties.getRabbitmq().getQueues().get(QUEUE_EMAIL).getEnabled()) {
             rabbitTemplate.convertAndSend(coreProperties.getRabbitmq().getExchangeName(), routingKey, message);
         } else {
             log.info("Can not publish message. {} queue is disabled.", QUEUE_EMAIL);
         }
-
     }
 
 }
