@@ -55,6 +55,9 @@ import java.util.stream.Collectors;
 @Service
 public class BoardFreeService {
 
+	@Resource
+	private ApiUtils apiUtils;
+
 	@Autowired
 	private BoardFreeRepository boardFreeRepository;
 
@@ -82,8 +85,8 @@ public class BoardFreeService {
 	@Autowired
 	private CommonGalleryService commonGalleryService;
 
-	@Resource
-	private ApiUtils apiUtils;
+	@Autowired
+	private SearchService searchService;
 
 	public BoardFree findOneBySeq(Integer seq) {
         return boardFreeRepository.findOneBySeq(seq)
@@ -145,7 +148,7 @@ public class BoardFreeService {
 		boardFreeRepository.save(boardFree);
 
 	 	// 엘라스틱서치 색인 요청
-		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		/*
@@ -227,7 +230,7 @@ public class BoardFreeService {
 		boardFreeRepository.save(boardFree);
 
 		// 엘라스틱서치 색인 요청
-		commonSearchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());

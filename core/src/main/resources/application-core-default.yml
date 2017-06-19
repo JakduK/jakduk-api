@@ -11,15 +11,15 @@ spring:
         enabled: false
   rabbitmq:
     addresses: 192.168.35.74
-    password: wkrenakstp@
     username: admin
+    password: wkrenakstp@
     listener:
       simple:
         concurrency: 1
         max-concurrency: 3
         retry:
-          max-attempts: 3
           enabled: true
+          max-attempts: 3
 mongo:
   db:
     name: jakduk_test
@@ -50,6 +50,8 @@ core:
     routing-keys:
       email-welcome: dev.email.welcome
       email-reset-password: dev.email.reset-password
+      elasticsearch-index-document-board: dev.elasticsearch.index-document-board
+      elasticsearch-delete-document-board: dev.elasticsearch.delete-document-board
   slack:
     board:
       channel: '#jakduk_board_noti'

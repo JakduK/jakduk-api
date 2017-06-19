@@ -1,6 +1,7 @@
 package com.jakduk.core.common.rabbitmq;
 
 import com.jakduk.core.configuration.CoreProperties;
+import com.jakduk.core.model.rabbitmq.ElasticsearchPayload;
 import com.jakduk.core.model.rabbitmq.EmailPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,6 +19,7 @@ import javax.annotation.Resource;
 public class RabbitMQPublisher {
 
     private final String QUEUE_EMAIL = "email";
+    private final String QUEUE_ELASTICSEATCH = "elasticsearch";
 
     @Resource
     private CoreProperties coreProperties;
@@ -30,6 +32,14 @@ public class RabbitMQPublisher {
             rabbitTemplate.convertAndSend(coreProperties.getRabbitmq().getExchangeName(), routingKey, message);
         } else {
             log.info("Can not publish message. {} queue is disabled.", QUEUE_EMAIL);
+        }
+    }
+
+    public void publishElasticsearch(String routingKey, ElasticsearchPayload message) {
+        if (coreProperties.getRabbitmq().getQueues().get(QUEUE_ELASTICSEATCH).getEnabled()) {
+            rabbitTemplate.convertAndSend(coreProperties.getRabbitmq().getExchangeName(), routingKey, message);
+        } else {
+            log.info("Can not publish message. {} queue is disabled.", QUEUE_ELASTICSEATCH);
         }
     }
 

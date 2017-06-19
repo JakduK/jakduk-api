@@ -1,30 +1,39 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.jakduk.core.model.embedded.BoardItem;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.jakduk.core.model.embedded.CommonWriter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
 * @company  : http://jakduk.com
-* @date     : 2015. 8. 23.
+* @date     : 2015. 8. 3.
 * @desc     :
 */
 
+@JsonDeserialize(as = EsDocument.class)
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
-public class ESComment {
+public class EsBoard implements EsDocument {
 	
     private String id;
 	
-	private BoardItem boardItem;
-	
 	private CommonWriter writer;
-
+	
+	private String subject;
+	
 	private String content;
+	
+	private Integer seq;
+	
+	private String category;
 
 	private List<String> galleries;
 

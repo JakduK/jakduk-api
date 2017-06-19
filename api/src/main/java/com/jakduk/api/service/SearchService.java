@@ -4,9 +4,13 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.search.*;
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.rabbitmq.RabbitMQPublisher;
+import com.jakduk.core.common.rabbitmq.RabbitMQRoutingKey;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.model.elasticsearch.*;
+import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.rabbitmq.ElasticsearchPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequestBuilder;
@@ -42,11 +46,15 @@ public class SearchService {
 	@Resource
 	private CoreProperties coreProperties;
 
+	@Resource
+	private ApiUtils apiUtils;
+
 	@Autowired
 	private Client client;
 
-	@Resource
-	private ApiUtils apiUtils;
+	@Autowired
+	private RabbitMQPublisher rabbitMQPublisher;
+
 
 	/**
 	 * 통합 검색
@@ -132,8 +140,8 @@ public class SearchService {
 		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
 		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
 
-		List<ESTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
-				.map(entry -> ESTermsBucket.builder()
+		List<EsTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
+				.map(entry -> EsTermsBucket.builder()
 						.key(entry.getKey().toString())
 						.count(entry.getDocCount())
 						.build())
@@ -143,6 +151,28 @@ public class SearchService {
 				.took(searchResponse.getTookInMillis())
 				.popularSearchWords(popularWords)
 				.build();
+	}
+
+	public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category,
+								   List<String> galleryIds) {
+
+		EsBoard esBoard = EsBoard.builder()
+				.id(id)
+				.seq(seq)
+				.writer(writer)
+				.subject(subject)
+				.content(content)
+				.category(category)
+				.galleries(galleryIds)
+				.build();
+
+		ElasticsearchPayload payload = ElasticsearchPayload.builder()
+				.type(CoreConst.ELASTICSEARCH_TYPE.INDEX_DOCUMENT_BOARD)
+				.document(esBoard)
+				.build();
+
+		String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
+		rabbitMQPublisher.publishElasticsearch(routingKey, payload);
 	}
 
 	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
@@ -180,7 +210,7 @@ public class SearchService {
 		List<BoardSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
+					EsBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, EsBoardSource.class);
 					esBoardSource.setScore(searchHit.getScore());
 
 					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
@@ -252,16 +282,16 @@ public class SearchService {
 	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESCommentSource> searchList = Arrays.stream(searchHits.getHits())
+		List<EsCommentSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESCommentSource esCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESCommentSource.class);
+					EsCommentSource esCommentSource = ObjectMapperUtils.convertValue(sourceMap, EsCommentSource.class);
 					esCommentSource.setScore(searchHit.getScore());
 
 					if (! searchHit.getInnerHits().isEmpty()) {
 						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(CoreConst.ES_TYPE_BOARD).getHits();
 						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
-						ESParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, ESParentBoard.class);
+						EsParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, EsParentBoard.class);
 
 						esCommentSource.setParentBoard(esParentBoard);
 					}
@@ -302,10 +332,10 @@ public class SearchService {
 	private SearchGalleryResult getGallerySearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESGallerySource> searchList = Arrays.stream(searchHits.getHits())
+		List<EsGallerySource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, ESGallerySource.class);
+					EsGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, EsGallerySource.class);
 					esGallerySource.setScore(searchHit.getScore());
 
 					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());

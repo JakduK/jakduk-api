@@ -2,7 +2,7 @@ package com.jakduk.core.repository.gallery;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.model.elasticsearch.ESGallery;
+import com.jakduk.core.model.elasticsearch.EsGallery;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -29,7 +29,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<ESGallery> findGalleriesGreaterThanId(ObjectId objectId, Integer limit) {
+    public List<EsGallery> findGalleriesGreaterThanId(ObjectId objectId, Integer limit) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(objectId));
         AggregationOperation sort = Aggregation.sort(Sort.Direction.ASC, "_id");
         AggregationOperation limit1 = Aggregation.limit(limit);
@@ -42,7 +42,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
             aggregation = Aggregation.newAggregation(sort, limit1);
         }
 
-        AggregationResults<ESGallery> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_GALLERY, ESGallery.class);
+        AggregationResults<EsGallery> results = mongoTemplate.aggregate(aggregation, CoreConst.COLLECTION_GALLERY, EsGallery.class);
 
         return results.getMappedResults();
     }

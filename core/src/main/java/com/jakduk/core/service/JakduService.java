@@ -9,7 +9,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.Jakdu;
 import com.jakduk.core.model.db.JakduComment;
 import com.jakduk.core.model.db.JakduSchedule;
-import com.jakduk.core.model.elasticsearch.ESJakduComment;
+import com.jakduk.core.model.elasticsearch.EsJakduComment;
 import com.jakduk.core.model.embedded.BoardCommentStatus;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
 import com.jakduk.core.model.embedded.CommonWriter;
@@ -121,15 +121,15 @@ public class JakduService {
         jakduCommentRepository.save(jakduComment);
 
         // 엘라스틱 서치 도큐먼트 생성을 위한 객체.
-        ESJakduComment ESJakduComment = new ESJakduComment();
-        ESJakduComment.setId(jakduComment.getId());
-        ESJakduComment.setWriter(jakduComment.getWriter());
-        ESJakduComment.setJakduScheduleId(jakduComment.getJakduScheduleId());
-        ESJakduComment.setContents(jakduComment.getContents()
+        EsJakduComment EsJakduComment = new EsJakduComment();
+        EsJakduComment.setId(jakduComment.getId());
+        EsJakduComment.setWriter(jakduComment.getWriter());
+        EsJakduComment.setJakduScheduleId(jakduComment.getJakduScheduleId());
+        EsJakduComment.setContents(jakduComment.getContents()
                 .replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
                 .replaceAll("\r|\n|&nbsp;",""));
 
-        commonSearchService.createDocumentJakduComment(ESJakduComment);
+        commonSearchService.createDocumentJakduComment(EsJakduComment);
 
         return jakduComment;
     }

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @Setter
-public class ESSearchWord {
+public class EsSearchWord implements EsDocument {
 
 	private String id;
 

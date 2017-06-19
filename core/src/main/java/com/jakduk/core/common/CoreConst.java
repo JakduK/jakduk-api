@@ -241,4 +241,9 @@ public class CoreConst {
 		RESET_PASSWORD
 	}
 
+	public enum ELASTICSEARCH_TYPE {
+		INDEX_DOCUMENT_BOARD,
+		DELETE_DOCUMENT_BOARD
+	}
+
 }

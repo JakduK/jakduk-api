@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 
 /**
  * @author pyohwan
@@ -52,6 +53,11 @@ public class ApiMvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
+    }
+
+    @Bean
+    public BeanValidatorPluginsConfiguration beanValidatorPluginsConfiguration() {
+        return new BeanValidatorPluginsConfiguration();
     }
 
 }

@@ -2,7 +2,6 @@ package com.jakduk.core.repository.board.free;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.elasticsearch.ESBoard;
 import com.jakduk.core.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;

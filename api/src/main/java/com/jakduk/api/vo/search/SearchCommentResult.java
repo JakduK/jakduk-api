@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.search;
 
-import com.jakduk.core.model.elasticsearch.ESCommentSource;
+import com.jakduk.core.model.elasticsearch.EsCommentSource;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,5 +17,5 @@ public class SearchCommentResult {
 
 	private Long took;
 	private Long totalCount;
-	private List<ESCommentSource> comments;
+	private List<EsCommentSource> comments;
 }

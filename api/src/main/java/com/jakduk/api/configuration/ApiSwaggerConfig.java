@@ -59,9 +59,9 @@ public class ApiSwaggerConfig {
                 "test-app-client-secret",
                 "test-app-realm",
                 "test-app",
-                "",
-                ApiKeyVehicle.HEADER,
                 "api_key",
+                ApiKeyVehicle.HEADER,
+                "Cookie",
                 "," /*scope separator*/);
     }
 
@@ -75,6 +75,6 @@ public class ApiSwaggerConfig {
     }
 
     private ApiKey apiKey() {
-        return new ApiKey("JSESSIONID", "api_key", "cookie");
+        return new ApiKey("api_key", "Cookie", "JSESSIONID");
     }
 }

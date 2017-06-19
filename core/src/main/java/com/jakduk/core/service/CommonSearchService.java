@@ -16,6 +16,7 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.core.model.rabbitmq.ElasticsearchPayload;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -140,7 +141,7 @@ public class CommonSearchService {
         do {
             List<BoardFree> posts = boardFreeRepository.findPostsGreaterThanId(lastPostId, CoreConst.ES_BULK_LIMIT);
 
-            List<ESBoard> esBoards = posts.stream()
+            List<EsBoard> esBoards = posts.stream()
                     .filter(Objects::nonNull)
                     .map(post -> {
                         List<String> galleryIds = null;
@@ -155,7 +156,7 @@ public class CommonSearchService {
                                     .collect(Collectors.toList());
                         }
 
-                        return ESBoard.builder()
+                        return EsBoard.builder()
                                 .id(post.getId())
                                 .seq(post.getSeq())
                                 .writer(post.getWriter())
@@ -170,7 +171,7 @@ public class CommonSearchService {
             if (esBoards.isEmpty()) {
                 hasPost = false;
             } else {
-                ESBoard lastPost = esBoards.get(esBoards.size() - 1);
+                EsBoard lastPost = esBoards.get(esBoards.size() - 1);
                 lastPostId = new ObjectId(lastPost.getId());
             }
 
@@ -206,7 +207,7 @@ public class CommonSearchService {
         do {
             List<BoardFreeComment> comments = boardFreeCommentRepository.findCommentsGreaterThanId(lastCommentId, CoreConst.ES_BULK_LIMIT);
 
-            List<ESComment> esComments = comments.stream()
+            List<EsComment> esComments = comments.stream()
                     .filter(Objects::nonNull)
                     .map(comment -> {
                         List<String> galleryIds = null;
@@ -221,7 +222,7 @@ public class CommonSearchService {
                                     .collect(Collectors.toList());
                         }
 
-                        return ESComment.builder()
+                        return EsComment.builder()
                                 .id(comment.getId())
                                 .boardItem(comment.getBoardItem())
                                 .writer(comment.getWriter())
@@ -234,7 +235,7 @@ public class CommonSearchService {
             if (esComments.isEmpty()) {
                 hasComment = false;
             } else {
-                ESComment lastComment = esComments.get(esComments.size() - 1);
+                EsComment lastComment = esComments.get(esComments.size() - 1);
                 lastCommentId = new ObjectId(lastComment.getId());
             }
 
@@ -268,12 +269,12 @@ public class CommonSearchService {
         ObjectId lastGalleryId = null;
 
         do {
-            List<ESGallery> comments = galleryRepository.findGalleriesGreaterThanId(lastGalleryId, CoreConst.ES_BULK_LIMIT);
+            List<EsGallery> comments = galleryRepository.findGalleriesGreaterThanId(lastGalleryId, CoreConst.ES_BULK_LIMIT);
 
             if (comments.isEmpty()) {
                 hasGallery = false;
             } else {
-                ESGallery lastGallery = comments.get(comments.size() - 1);
+                EsGallery lastGallery = comments.get(comments.size() - 1);
                 lastGalleryId = new ObjectId(lastGallery.getId());
             }
 
@@ -299,28 +300,26 @@ public class CommonSearchService {
         bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
     }
 
-    @Async
-    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category,
-                                   List<String> galleryIds) {
+    public void indexDocumentBoard(ElasticsearchPayload payload) {
 
-        if (! coreProperties.getElasticsearch().getEnable())
-            return;
+        EsBoard rawBoard = (EsBoard) payload.getDocument();
+        String esId = rawBoard.getId();
 
-        ESBoard esBoard = ESBoard.builder()
-                .id(id)
-                .seq(seq)
-                .writer(writer)
-                .subject(CoreUtils.stripHtmlTag(subject))
-                .content(CoreUtils.stripHtmlTag(content))
-                .category(category)
-                .galleries(galleryIds)
+        EsBoard esBoard = EsBoard.builder()
+                .id(esId)
+                .seq(rawBoard.getSeq())
+                .writer(rawBoard.getWriter())
+                .subject(CoreUtils.stripHtmlTag(rawBoard.getSubject()))
+                .content(CoreUtils.stripHtmlTag(rawBoard.getContent()))
+                .category(rawBoard.getCategory())
+                .galleries(rawBoard.getGalleries())
                 .build();
 
         try {
             IndexResponse response = client.prepareIndex()
                     .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                     .setType(CoreConst.ES_TYPE_BOARD)
-                    .setId(id)
+                    .setId(esId)
                     .setSource(ObjectMapperUtils.writeValueAsString(esBoard))
                     .get();
 
@@ -352,7 +351,7 @@ public class CommonSearchService {
         if (! coreProperties.getElasticsearch().getEnable())
             return;
 
-        ESComment esComment = ESComment.builder()
+        EsComment esComment = EsComment.builder()
                 .id(id)
                 .boardItem(boardItem)
                 .writer(writer)
@@ -392,7 +391,7 @@ public class CommonSearchService {
     }
 
     // TODO : 구현 해야 함
-    public void createDocumentJakduComment(ESJakduComment ESJakduComment) {}
+    public void createDocumentJakduComment(EsJakduComment EsJakduComment) {}
 
     @Async
     public void indexDocumentGallery(String id, CommonWriter writer, String name) {
@@ -400,7 +399,7 @@ public class CommonSearchService {
         if (! coreProperties.getElasticsearch().getEnable())
             return;
 
-        ESGallery esGallery = ESGallery.builder()
+        EsGallery esGallery = EsGallery.builder()
                 .id(id)
                 .writer(writer)
                 .name(name)
@@ -441,7 +440,7 @@ public class CommonSearchService {
         if (! coreProperties.getElasticsearch().getEnable())
             return;
 
-        ESSearchWord esSearchWord = ESSearchWord.builder()
+        EsSearchWord esSearchWord = EsSearchWord.builder()
                 .word(word)
                 .writer(writer)
                 .registerDate(LocalDateTime.now())
