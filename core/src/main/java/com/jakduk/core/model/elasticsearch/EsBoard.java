@@ -1,6 +1,5 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,12 +15,11 @@ import java.util.List;
 * @desc     :
 */
 
-@JsonDeserialize(as = EsDocument.class)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
-public class EsBoard implements EsDocument {
+public class EsBoard {
 	
     private String id;
 	

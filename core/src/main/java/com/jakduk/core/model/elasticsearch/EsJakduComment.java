@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class EsJakduComment implements EsDocument {
+public class EsJakduComment {
 
     private String id;
     private String jakduScheduleId;

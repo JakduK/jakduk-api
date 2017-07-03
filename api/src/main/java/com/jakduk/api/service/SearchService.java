@@ -4,13 +4,12 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.search.*;
 import com.jakduk.core.common.CoreConst;
+import com.jakduk.core.common.rabbitmq.ElasticsearchRoutingKey;
 import com.jakduk.core.common.rabbitmq.RabbitMQPublisher;
-import com.jakduk.core.common.rabbitmq.RabbitMQRoutingKey;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.rabbitmq.ElasticsearchPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequestBuilder;
@@ -166,13 +165,8 @@ public class SearchService {
 				.galleries(galleryIds)
 				.build();
 
-		ElasticsearchPayload payload = ElasticsearchPayload.builder()
-				.type(CoreConst.ELASTICSEARCH_TYPE.INDEX_DOCUMENT_BOARD)
-				.document(esBoard)
-				.build();
-
-		String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
-		rabbitMQPublisher.publishElasticsearch(routingKey, payload);
+		String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
+		rabbitMQPublisher.publishElasticsearch(routingKey, esBoard);
 	}
 
 	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,

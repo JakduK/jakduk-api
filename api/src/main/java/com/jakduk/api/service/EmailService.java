@@ -2,7 +2,7 @@ package com.jakduk.api.service;
 
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.rabbitmq.RabbitMQPublisher;
-import com.jakduk.core.common.rabbitmq.RabbitMQRoutingKey;
+import com.jakduk.core.common.rabbitmq.EmailRoutingKey;
 import com.jakduk.core.common.util.CoreUtils;
 import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.model.rabbitmq.EmailPayload;
@@ -41,7 +41,7 @@ public class EmailService {
                 )
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.EMAIL_WELCOME.getRoutingKey());
+        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(EmailRoutingKey.EMAIL_WELCOME.getRoutingKey());
         rabbitMQPublisher.publishEmail(routingKey, emailPayload);
     }
 
@@ -68,7 +68,7 @@ public class EmailService {
                 )
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(RabbitMQRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
+        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(EmailRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
         rabbitMQPublisher.publishEmail(routingKey, emailPayload);
     }
 

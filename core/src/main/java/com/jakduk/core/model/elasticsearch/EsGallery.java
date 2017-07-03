@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class EsGallery implements EsDocument {
+public class EsGallery {
 
     private String id;
 	

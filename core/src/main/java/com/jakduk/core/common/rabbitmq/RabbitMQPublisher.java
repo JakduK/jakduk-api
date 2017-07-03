@@ -1,7 +1,6 @@
 package com.jakduk.core.common.rabbitmq;
 
 import com.jakduk.core.configuration.CoreProperties;
-import com.jakduk.core.model.rabbitmq.ElasticsearchPayload;
 import com.jakduk.core.model.rabbitmq.EmailPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -35,7 +34,7 @@ public class RabbitMQPublisher {
         }
     }
 
-    public void publishElasticsearch(String routingKey, ElasticsearchPayload message) {
+    public void publishElasticsearch(String routingKey, Object message) {
         if (coreProperties.getRabbitmq().getQueues().get(QUEUE_ELASTICSEATCH).getEnabled()) {
             rabbitTemplate.convertAndSend(coreProperties.getRabbitmq().getExchangeName(), routingKey, message);
         } else {

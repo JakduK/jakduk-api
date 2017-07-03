@@ -2,6 +2,8 @@ logging:
   level:
     root: DEBUG
     org.mongodb.driver.cluster: INFO
+    org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
+
 spring:
   data:
     elasticsearch:
@@ -40,12 +42,12 @@ core:
     exchange-name: jakduk-dev
     queues:
       email:
-        queue-name: dev.email
-        routing-key: dev.email.*
+        binding-queue-name: dev.email
+        binding-routing-key: dev.email.*
         enabled: true
       elasticsearch:
-        queue-name: dev.elasticsearch
-        routing-key: dev.elasticsearch.*
+        binding-queue-name: dev.elasticsearch
+        binding-routing-key: dev.elasticsearch.*
         enabled: true
     routing-keys:
       email-welcome: dev.email.welcome

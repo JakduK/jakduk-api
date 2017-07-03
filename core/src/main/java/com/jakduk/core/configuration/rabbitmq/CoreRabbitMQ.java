@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 public class CoreRabbitMQ {
 
-    private String queueName;
-    private String routingKey;
+    private String bindingQueueName;
+    private String bindingRoutingKey;
     private Boolean enabled;
 
 }

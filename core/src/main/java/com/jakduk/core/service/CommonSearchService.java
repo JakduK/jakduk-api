@@ -16,7 +16,6 @@ import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.*;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import com.jakduk.core.model.rabbitmq.ElasticsearchPayload;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -300,9 +299,8 @@ public class CommonSearchService {
         bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
     }
 
-    public void indexDocumentBoard(ElasticsearchPayload payload) {
+    public void indexDocumentBoard(EsBoard rawBoard) {
 
-        EsBoard rawBoard = (EsBoard) payload.getDocument();
         String esId = rawBoard.getId();
 
         EsBoard esBoard = EsBoard.builder()

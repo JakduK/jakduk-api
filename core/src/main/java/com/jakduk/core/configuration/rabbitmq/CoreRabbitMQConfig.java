@@ -44,7 +44,7 @@ public class CoreRabbitMQConfig {
     public List<Binding> binding(TopicExchange exchange, List<Queue> queues) {
         Map<String, String> queueMap = coreProperties.getRabbitmq().getQueues().entrySet().stream()
                 .map(Map.Entry::getValue)
-                .collect(Collectors.toMap(CoreRabbitMQ::getQueueName, CoreRabbitMQ::getRoutingKey));
+                .collect(Collectors.toMap(CoreRabbitMQ::getBindingQueueName, CoreRabbitMQ::getBindingRoutingKey));
 
         return queues.stream()
                 .map(queue -> BindingBuilder.bind(queue).to(exchange).with(queueMap.get(queue.getName())))
@@ -57,7 +57,7 @@ public class CoreRabbitMQConfig {
         return coreProperties.getRabbitmq().getQueues().entrySet().stream()
                 .map(queue -> {
                     CoreRabbitMQ coreRabbitMQ = queue.getValue();
-                    return new Queue(coreRabbitMQ.getQueueName());
+                    return new Queue(coreRabbitMQ.getBindingQueueName());
                 })
                 .collect(Collectors.toList());
     }

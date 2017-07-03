@@ -16,7 +16,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class EsComment implements EsDocument {
+public class EsComment {
 	
     private String id;
 	
