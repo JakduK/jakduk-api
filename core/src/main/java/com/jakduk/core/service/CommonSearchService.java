@@ -326,12 +326,7 @@ public class CommonSearchService {
         }
     }
 
-    @Async
     public void deleteDocumentBoard(String id) {
-
-        if (! coreProperties.getElasticsearch().getEnable())
-            return;
-
         DeleteResponse response = client.prepareDelete()
                 .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                 .setType(CoreConst.ES_TYPE_BOARD)
@@ -340,7 +335,6 @@ public class CommonSearchService {
 
         if (! response.isFound())
             log.info("board id {} is not found. so can't delete it!", id);
-
     }
 
     @Async

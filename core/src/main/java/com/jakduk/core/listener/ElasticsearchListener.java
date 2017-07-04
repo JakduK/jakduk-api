@@ -49,6 +49,10 @@ public class ElasticsearchListener {
                 EsBoard esBoard = ObjectMapperUtils.readValue(message.getBody(), EsBoard.class);
                 commonSearchService.indexDocumentBoard(esBoard);
                 break;
+            case ELASTICSEARCH_DELETE_DOCUMENT_BOARD:
+                String id = ObjectMapperUtils.readValue(message.getBody(), String.class);
+                commonSearchService.deleteDocumentBoard(id);
+                break;
 
         }
     }

@@ -169,6 +169,11 @@ public class SearchService {
 		rabbitMQPublisher.publishElasticsearch(routingKey, esBoard);
 	}
 
+	public void deleteDocumentBoard(String id) {
+		String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
+		rabbitMQPublisher.publishElasticsearch(routingKey, id);
+	}
+
 	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
 															  String postTags) {
 

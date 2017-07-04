@@ -229,11 +229,11 @@ public class BoardFreeService {
 
 		boardFreeRepository.save(boardFree);
 
+		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
+
 		// 엘라스틱서치 색인 요청
 		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
-
-		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
 
 		return boardFree;
 	}
@@ -296,7 +296,7 @@ public class BoardFreeService {
 			commonGalleryService.unlinkGalleries(boardFree.getId(), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
 		// 색인 지움
-        commonSearchService.deleteDocumentBoard(boardFree.getId());
+		searchService.deleteDocumentBoard(boardFree.getId());
 
         return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
     }

@@ -28,4 +28,5 @@ public class SearchServiceTest extends ApiApplicationTests {
 		Long registerDateFrom = LocalDate.now().minusMonths(1L).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		sut.aggregateSearchWord(registerDateFrom, 5);
 	}
+
 }
