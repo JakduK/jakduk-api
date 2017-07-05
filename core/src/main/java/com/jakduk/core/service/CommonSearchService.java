@@ -14,7 +14,6 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.*;
-import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
@@ -299,25 +298,15 @@ public class CommonSearchService {
         bulkProcessor.awaitClose(CoreConst.ES_AWAIT_CLOSE_TIMEOUT_MINUTES, TimeUnit.MINUTES);
     }
 
-    public void indexDocumentBoard(EsBoard rawBoard) {
+    public void indexDocumentBoard(EsBoard esBoard) {
 
-        String esId = rawBoard.getId();
-
-        EsBoard esBoard = EsBoard.builder()
-                .id(esId)
-                .seq(rawBoard.getSeq())
-                .writer(rawBoard.getWriter())
-                .subject(CoreUtils.stripHtmlTag(rawBoard.getSubject()))
-                .content(CoreUtils.stripHtmlTag(rawBoard.getContent()))
-                .category(rawBoard.getCategory())
-                .galleries(rawBoard.getGalleries())
-                .build();
+        String id = esBoard.getId();
 
         try {
             IndexResponse response = client.prepareIndex()
                     .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                     .setType(CoreConst.ES_TYPE_BOARD)
-                    .setId(esId)
+                    .setId(id)
                     .setSource(ObjectMapperUtils.writeValueAsString(esBoard))
                     .get();
 
@@ -337,26 +326,17 @@ public class CommonSearchService {
             log.info("board id {} is not found. so can't delete it!", id);
     }
 
-    @Async
-    public void indexDocumentBoardComment(String id, BoardItem boardItem, CommonWriter writer, String content, List<String> galleryIds) {
+    public void indexDocumentBoardComment(EsComment esComment) {
 
-        if (! coreProperties.getElasticsearch().getEnable())
-            return;
-
-        EsComment esComment = EsComment.builder()
-                .id(id)
-                .boardItem(boardItem)
-                .writer(writer)
-                .content(CoreUtils.stripHtmlTag(content))
-                .galleries(galleryIds)
-                .build();
+        String id = esComment.getId();
+        String parentBoardId = esComment.getBoardItem().getId();
 
         try {
             IndexResponse response = client.prepareIndex()
                     .setIndex(coreProperties.getElasticsearch().getIndexBoard())
                     .setType(CoreConst.ES_TYPE_COMMENT)
                     .setId(id)
-                    .setParent(boardItem.getId())
+                    .setParent(parentBoardId)
                     .setSource(ObjectMapperUtils.writeValueAsString(esComment))
                     .get();
 
@@ -365,11 +345,7 @@ public class CommonSearchService {
         }
     }
 
-    @Async
     public void deleteDocumentBoardComment(String id) {
-
-        if (! coreProperties.getElasticsearch().getEnable())
-            return;
 
         DeleteResponse response = client.prepareDelete()
                 .setIndex(coreProperties.getElasticsearch().getIndexBoard())
@@ -379,23 +355,14 @@ public class CommonSearchService {
 
         if (! response.isFound())
             log.info("comment id {} is not found. so can't delete it!", id);
-
     }
 
     // TODO : 구현 해야 함
     public void createDocumentJakduComment(EsJakduComment EsJakduComment) {}
 
-    @Async
-    public void indexDocumentGallery(String id, CommonWriter writer, String name) {
+    public void indexDocumentGallery(EsGallery esGallery) {
 
-        if (! coreProperties.getElasticsearch().getEnable())
-            return;
-
-        EsGallery esGallery = EsGallery.builder()
-                .id(id)
-                .writer(writer)
-                .name(name)
-                .build();
+        String id = esGallery.getId();
 
         try {
             IndexResponse response = client.prepareIndex()
@@ -410,11 +377,7 @@ public class CommonSearchService {
         }
     }
 
-    @Async
     public void deleteDocumentGallery(String id) {
-
-        if (! coreProperties.getElasticsearch().getEnable())
-            return;
 
         DeleteResponse response = client.prepareDelete()
                 .setIndex(coreProperties.getElasticsearch().getIndexGallery())

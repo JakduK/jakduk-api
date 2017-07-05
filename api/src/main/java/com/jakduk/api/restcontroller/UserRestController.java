@@ -8,7 +8,6 @@ import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.api.service.EmailService;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
 import com.jakduk.core.common.util.CoreUtils;
@@ -17,6 +16,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.UserProfile;
+import com.jakduk.core.service.CommonMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -64,7 +64,7 @@ public class UserRestController {
     private UserService userService;
 
     @Autowired
-    private EmailService emailService;
+    private CommonMessageService commonMessageService;
 
 
     @ApiOperation("이메일 기반 회원 가입")
@@ -76,7 +76,7 @@ public class UserRestController {
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
-        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(
@@ -112,7 +112,7 @@ public class UserRestController {
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
                 largePictureUrl);
 
-        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(

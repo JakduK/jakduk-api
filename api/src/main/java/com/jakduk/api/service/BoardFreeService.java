@@ -24,7 +24,7 @@ import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.CommonGalleryService;
-import com.jakduk.core.service.CommonSearchService;
+import com.jakduk.core.service.CommonMessageService;
 import com.jakduk.core.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -80,13 +80,10 @@ public class BoardFreeService {
 	private CommonService commonService;
 
 	@Autowired
-	private CommonSearchService commonSearchService;
-
-	@Autowired
 	private CommonGalleryService commonGalleryService;
 
 	@Autowired
-	private SearchService searchService;
+	private CommonMessageService commonMessageService;
 
 	public BoardFree findOneBySeq(Integer seq) {
         return boardFreeRepository.findOneBySeq(seq)
@@ -148,7 +145,7 @@ public class BoardFreeService {
 		boardFreeRepository.save(boardFree);
 
 	 	// 엘라스틱서치 색인 요청
-		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		commonMessageService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		/*
@@ -232,7 +229,7 @@ public class BoardFreeService {
 		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
 
 		// 엘라스틱서치 색인 요청
-		searchService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
+		commonMessageService.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
 				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
 
 		return boardFree;
@@ -296,7 +293,7 @@ public class BoardFreeService {
 			commonGalleryService.unlinkGalleries(boardFree.getId(), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
 		// 색인 지움
-		searchService.deleteDocumentBoard(boardFree.getId());
+		commonMessageService.deleteDocumentBoard(boardFree.getId());
 
         return count > 0 ? CoreConst.BOARD_DELETE_TYPE.CONTENT : CoreConst.BOARD_DELETE_TYPE.ALL;
     }
@@ -570,7 +567,7 @@ public class BoardFreeService {
 		boardFreeCommentRepository.save(boardFreeComment);
 
 		// 엘라스틱서치 색인 요청
-		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+		commonMessageService.indexDocumentComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
 				boardFreeComment.getContent(), galleryIds);
 
 		return boardFreeComment;
@@ -613,7 +610,7 @@ public class BoardFreeService {
 		boardFreeCommentRepository.save(boardFreeComment);
 
 		// 엘라스틱서치 색인 요청
-		commonSearchService.indexDocumentBoardComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
+		commonMessageService.indexDocumentComment(boardFreeComment.getId(), boardFreeComment.getBoardItem(), boardFreeComment.getWriter(),
 				boardFreeComment.getContent(), galleryIds);
 
 		return boardFreeComment;
@@ -633,7 +630,7 @@ public class BoardFreeService {
 		boardFreeCommentRepository.delete(id);
 
 		// 색인 지움
-		commonSearchService.deleteDocumentBoardComment(id);
+		commonMessageService.deleteDocumentComment(id);
 
 		commonGalleryService.unlinkGalleries(id, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
 	}

@@ -4,12 +4,9 @@ import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.search.*;
 import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.common.rabbitmq.ElasticsearchRoutingKey;
-import com.jakduk.core.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.core.common.util.ObjectMapperUtils;
 import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.model.elasticsearch.*;
-import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequestBuilder;
@@ -50,10 +47,6 @@ public class SearchService {
 
 	@Autowired
 	private Client client;
-
-	@Autowired
-	private RabbitMQPublisher rabbitMQPublisher;
-
 
 	/**
 	 * 통합 검색
@@ -150,28 +143,6 @@ public class SearchService {
 				.took(searchResponse.getTookInMillis())
 				.popularSearchWords(popularWords)
 				.build();
-	}
-
-	public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category,
-								   List<String> galleryIds) {
-
-		EsBoard esBoard = EsBoard.builder()
-				.id(id)
-				.seq(seq)
-				.writer(writer)
-				.subject(subject)
-				.content(content)
-				.category(category)
-				.galleries(galleryIds)
-				.build();
-
-		String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
-		rabbitMQPublisher.publishElasticsearch(routingKey, esBoard);
-	}
-
-	public void deleteDocumentBoard(String id) {
-		String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
-		rabbitMQPublisher.publishElasticsearch(routingKey, id);
 	}
 
 	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,

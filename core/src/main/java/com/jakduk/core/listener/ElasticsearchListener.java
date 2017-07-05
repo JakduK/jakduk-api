@@ -6,6 +6,8 @@ import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.EsBoard;
+import com.jakduk.core.model.elasticsearch.EsComment;
+import com.jakduk.core.model.elasticsearch.EsGallery;
 import com.jakduk.core.service.CommonSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -49,9 +51,30 @@ public class ElasticsearchListener {
                 EsBoard esBoard = ObjectMapperUtils.readValue(message.getBody(), EsBoard.class);
                 commonSearchService.indexDocumentBoard(esBoard);
                 break;
-            case ELASTICSEARCH_DELETE_DOCUMENT_BOARD:
-                String id = ObjectMapperUtils.readValue(message.getBody(), String.class);
-                commonSearchService.deleteDocumentBoard(id);
+
+                case ELASTICSEARCH_DELETE_DOCUMENT_BOARD:
+                String boardId = ObjectMapperUtils.readValue(message.getBody(), String.class);
+                commonSearchService.deleteDocumentBoard(boardId);
+                break;
+
+            case ELASTICSEARCH_INDEX_DOCUMENT_COMMENT:
+                EsComment esComment = ObjectMapperUtils.readValue(message.getBody(), EsComment.class);
+                commonSearchService.indexDocumentBoardComment(esComment);
+                break;
+
+            case ELASTICSEARCH_DELETE_DOCUMENT_COMMENT:
+                String commentId = ObjectMapperUtils.readValue(message.getBody(), String.class);
+                commonSearchService.deleteDocumentBoardComment(commentId);
+                break;
+
+            case ELASTICSEARCH_INDEX_DOCUMENT_GALLERY:
+                EsGallery esGallery = ObjectMapperUtils.readValue(message.getBody(), EsGallery.class);
+                commonSearchService.indexDocumentGallery(esGallery);
+                break;
+
+            case ELASTICSEARCH_DELETE_DOCUMENT_GALLERY:
+                String galleryId = ObjectMapperUtils.readValue(message.getBody(), String.class);
+                commonSearchService.deleteDocumentGallery(galleryId);
                 break;
 
         }
