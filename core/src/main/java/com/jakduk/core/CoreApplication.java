@@ -1,16 +1,13 @@
 package com.jakduk.core;
 
 import net.gpedro.integrations.slack.SlackApi;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.Resource;
 
@@ -20,13 +17,13 @@ import javax.annotation.Resource;
 
 @SpringBootApplication
 @PropertySource("classpath:/application-core.properties")
-@EnableScheduling
 public class CoreApplication {
 
     @Resource
     private Environment environment;
 
     public static void main(String[] args) {
+
         new SpringApplicationBuilder(CoreApplication.class)
                 .web(false)
                 .profiles("core-default")
@@ -48,6 +45,5 @@ public class CoreApplication {
 
         return messageSource;
     }
-
 
 }

@@ -1,9 +1,3 @@
-logging:
-  level:
-    root: DEBUG
-    org.mongodb.driver.cluster: INFO
-    org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
-
 spring:
   data:
     elasticsearch:
@@ -61,12 +55,12 @@ core:
       webhook: https://hooks.slack.com/services/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
   storage:
     image:
-      path: /Users/pyohwanjang/storage/image/
+      path: /jakduk/storage/image/
     thumbnail:
-      path: /Users/pyohwanjang/storage/thumbnail/
+      path: /jakduk/storage/thumbnail/
     user:
       picture:
         large:
-          path: /Users/pyohwanjang/storage/user/picture/large/
+          path: /jakduk/storage/user/picture/large/
         small:
-          path: /Users/pyohwanjang/storage/user/picture/small/
+          path: /jakduk/storage/user/picture/small/
