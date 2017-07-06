@@ -273,6 +273,10 @@ public class AuthUtils {
         return uriComponents.toUriString();
     }
 
+    public static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
     /**
      * 세션에 authentication 객체를 업데이트
      */

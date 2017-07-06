@@ -28,6 +28,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.ObjectUtils;
@@ -66,6 +68,9 @@ public class UserRestController {
     @Autowired
     private CommonMessageService commonMessageService;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
 
     @ApiOperation("이메일 기반 회원 가입")
     @PostMapping("")
@@ -79,7 +84,7 @@ public class UserRestController {
         commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
-        Authentication authentication = authenticationManager.authenticate(
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(),
                         form.getPassword()
@@ -205,8 +210,18 @@ public class UserRestController {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
+        User user = userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
                 form.getAbout(), form.getUserPictureId());
+
+
+        Authentication authentication = AuthUtils.getAuthentication();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+
+        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(
+                userDetails, authentication.getCredentials(), authentication.getAuthorities()
+        );
+
+        AuthUtils.setAuthentication(newAuthentication);
 
         return EmptyJsonResponse.newInstance();
     }
