@@ -205,7 +205,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")
-    @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
+    @PutMapping("/profile/me")
     public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileEditForm form) {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
