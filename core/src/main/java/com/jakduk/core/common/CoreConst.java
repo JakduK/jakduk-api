@@ -236,4 +236,9 @@ public class CoreConst {
 	public final static String COLLECTION_BOARD_FREE = "boardFree";
 	public final static String COLLECTION_GALLERY = "gallery";
 
+	public enum EMAIL_TYPE {
+		WELCOME,
+		RESET_PASSWORD
+	}
+
 }

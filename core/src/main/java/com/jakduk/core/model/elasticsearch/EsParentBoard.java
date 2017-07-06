@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 
 @Getter
-public class ESParentBoard {
+public class EsParentBoard {
     private String id;
     private Integer seq;
     private String subject;

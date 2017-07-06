@@ -5,6 +5,7 @@ import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.search.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.ObjectMapperUtils;
+import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.model.elasticsearch.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -39,20 +39,14 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 
-	@Value("${core.elasticsearch.index.board}")
-	private String elasticsearchIndexBoard;
-
-	@Value("${core.elasticsearch.index.gallery}")
-	private String elasticsearchIndexGallery;
-
-	@Value("${core.elasticsearch.index.search.word}")
-	private String elasticsearchIndexSearchWord;
-
-	@Autowired
-	private Client client;
+	@Resource
+	private CoreProperties coreProperties;
 
 	@Resource
 	private ApiUtils apiUtils;
+
+	@Autowired
+	private Client client;
 
 	/**
 	 * 통합 검색
@@ -120,7 +114,7 @@ public class SearchService {
 	public PopularSearchWordResult aggregateSearchWord(Long registerDateFrom, Integer size) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexSearchWord)
+				.setIndices(coreProperties.getElasticsearch().getIndexSearchWord())
 				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
 				.setSize(0)
 				.setQuery(
@@ -138,8 +132,8 @@ public class SearchService {
 		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
 		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
 
-		List<ESTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
-				.map(entry -> ESTermsBucket.builder()
+		List<EsTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
+				.map(entry -> EsTermsBucket.builder()
 						.key(entry.getKey().toString())
 						.count(entry.getDocCount())
 						.build())
@@ -155,7 +149,7 @@ public class SearchService {
 															  String postTags) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexBoard)
+				.setIndices(coreProperties.getElasticsearch().getIndexBoard())
 				.setTypes(CoreConst.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
@@ -186,7 +180,7 @@ public class SearchService {
 		List<BoardSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, ESBoardSource.class);
+					EsBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, EsBoardSource.class);
 					esBoardSource.setScore(searchHit.getScore());
 
 					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
@@ -226,7 +220,7 @@ public class SearchService {
 																String postTags) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexBoard)
+				.setIndices(coreProperties.getElasticsearch().getIndexBoard())
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
 				.setFetchSource(null, new String[]{"content"})
 				.setQuery(
@@ -258,16 +252,16 @@ public class SearchService {
 	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESCommentSource> searchList = Arrays.stream(searchHits.getHits())
+		List<EsCommentSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESCommentSource esCommentSource = ObjectMapperUtils.convertValue(sourceMap, ESCommentSource.class);
+					EsCommentSource esCommentSource = ObjectMapperUtils.convertValue(sourceMap, EsCommentSource.class);
 					esCommentSource.setScore(searchHit.getScore());
 
 					if (! searchHit.getInnerHits().isEmpty()) {
 						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(CoreConst.ES_TYPE_BOARD).getHits();
 						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
-						ESParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, ESParentBoard.class);
+						EsParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, EsParentBoard.class);
 
 						esCommentSource.setParentBoard(esParentBoard);
 					}
@@ -288,7 +282,7 @@ public class SearchService {
 
 	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchIndexGallery)
+				.setIndices(coreProperties.getElasticsearch().getIndexGallery())
 				.setTypes(CoreConst.ES_TYPE_GALLERY)
 				.setFetchSource(null, new String[]{"name"})
 				.setQuery(QueryBuilders.matchQuery("name", query))
@@ -308,10 +302,10 @@ public class SearchService {
 	private SearchGalleryResult getGallerySearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<ESGallerySource> searchList = Arrays.stream(searchHits.getHits())
+		List<EsGallerySource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					ESGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, ESGallerySource.class);
+					EsGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, EsGallerySource.class);
 					esGallerySource.setScore(searchHit.getScore());
 
 					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());

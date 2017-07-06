@@ -1,13 +1,12 @@
 package com.jakduk.api.user;
 
 import com.jakduk.api.ApiApplicationTests;
-import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.CommonRole;
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.dao.JakdukDAO;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.etc.SupporterCount;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.repository.footballclub.FootballClubRepository;
 import com.jakduk.core.repository.user.UserProfileRepository;
 import com.jakduk.core.repository.user.UserRepository;
 import org.junit.Before;
@@ -34,9 +33,6 @@ public class UserTest extends ApiApplicationTests {
 	@Autowired
 	UserProfileRepository userProfileRepository;
 	
-	@Autowired
-	FootballClubRepository footballClubRepository;
-
 	@Autowired
 	private JakdukDAO jakdukDAO;
 

@@ -1,12 +1,14 @@
 package com.jakduk.batch.service.search;
 
+import com.jakduk.core.configuration.CoreProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * Created by pyohwanjang on 2017. 4. 7..
@@ -16,21 +18,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class SearchService {
 
-    @Value("${core.elasticsearch.index.board}")
-    private String elasticsearchIndexBoard;
-
-    @Value("${core.elasticsearch.index.gallery}")
-    private String elasticsearchIndexGallery;
-
-    @Value("${core.elasticsearch.index.search.word}")
-    private String elasticsearchIndexSearchWord;
+    @Resource
+    private CoreProperties coreProperties;
 
     @Autowired
     private Client client;
 
     public void deleteIndexBoard() {
 
-        String index = elasticsearchIndexBoard;
+        String index = coreProperties.getElasticsearch().getIndexBoard();
 
         DeleteIndexResponse response = client.admin().indices()
                 .delete(new DeleteIndexRequest(index))
@@ -45,7 +41,7 @@ public class SearchService {
 
     public void deleteIndexGallery() {
 
-        String index = elasticsearchIndexGallery;
+        String index = coreProperties.getElasticsearch().getIndexGallery();
 
         DeleteIndexResponse response = client.admin().indices()
                 .delete(new DeleteIndexRequest(index))
@@ -60,7 +56,7 @@ public class SearchService {
 
     public void deleteIndexSearchWord() {
 
-        String index = elasticsearchIndexSearchWord;
+        String index = coreProperties.getElasticsearch().getIndexSearchWord();
 
         DeleteIndexResponse response = client.admin().indices()
                 .delete(new DeleteIndexRequest(index))

@@ -32,7 +32,7 @@ public class CommonGalleryService {
     private GalleryRepository galleryRepository;
 
     @Autowired
-    private CommonSearchService commonSearchService;
+    private CommonMessageService commonMessageService;
 
     /**
      * Gallery와 사진 파일 지움
@@ -40,7 +40,7 @@ public class CommonGalleryService {
      * @param id Gallery ID
      * @param contentType contentType
      */
-    public void deleteGallery(String id, String contentType, Boolean deleteSearchDocument) {
+    public void deleteGallery(String id, String contentType) {
         ObjectId objectId = new ObjectId(id);
         LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
@@ -52,10 +52,6 @@ public class CommonGalleryService {
         FileUtils.removeImageFile(storageThumbnailPath, localDate, fileName);
 
         galleryRepository.delete(id);
-
-        // 엘라스틱 서치 document 삭제.
-        if (deleteSearchDocument)
-            commonSearchService.deleteDocumentGallery(id);
     }
 
     /**
@@ -65,8 +61,7 @@ public class CommonGalleryService {
      * @param fromType 출처
      */
     public void unlinkGalleries(String itemId, CoreConst.GALLERY_FROM_TYPE fromType) {
-        List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-                new ObjectId(itemId), fromType, 100);
+        List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(new ObjectId(itemId), fromType, 100);
 
         galleries.forEach(gallery -> {
             List<LinkedItem> linkedItems = gallery.getLinkedItems();
@@ -77,7 +72,8 @@ public class CommonGalleryService {
                 gallery.setLinkedItems(linkedItems);
                 galleryRepository.save(gallery);
             } else if (removed && linkedItems.size() < 1) {
-                this.deleteGallery(gallery.getId(), gallery.getContentType(), true);
+                this.deleteGallery(gallery.getId(), gallery.getContentType());
+                commonMessageService.deleteDocumentGallery(gallery.getId());
             }
         });
     }

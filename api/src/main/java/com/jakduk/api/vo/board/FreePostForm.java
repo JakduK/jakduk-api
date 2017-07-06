@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class FreePostForm {
     private String content;
 
     @ApiModelProperty(required = true, value = "말머리 코드", example = "FREE")
+    @NotNull
     private CoreConst.BOARD_CATEGORY_TYPE categoryCode;
 
     @ApiModelProperty(value = "사진 목록")

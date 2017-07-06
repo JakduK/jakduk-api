@@ -17,11 +17,11 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ESCommentSource {
+public class EsCommentSource {
 
 	private String id;
 
-	private ESParentBoard parentBoard;
+	private EsParentBoard parentBoard;
 
 	private CommonWriter writer;
 

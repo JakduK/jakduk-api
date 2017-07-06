@@ -1,0 +1,70 @@
+logging:
+  level:
+    root: WARN
+
+spring:
+  data:
+    elasticsearch:
+      cluster-name: jakduk-elasticsearch
+      cluster-nodes: 192.168.35.137:9300,192.168.35.181:9300
+      repositories:
+        enabled: false
+  rabbitmq:
+    addresses: 192.168.35.74
+    username: admin
+    password: wkrenakstp@
+    listener:
+      simple:
+        concurrency: 1
+        max-concurrency: 3
+        retry:
+          enabled: true
+          max-attempts: 3
+
+mongo:
+  db:
+    name: jakduk_sample
+  host:
+    name: http://192.168.35.194:27017,http://192.168.35.138:27017
+
+core:
+  elasticsearch:
+    index-board: jakduk_prd_board
+    index-gallery: jakduk_prd_gallery
+    index-search-word: jakduk_prd_search_word
+    bulk-actions: 10000
+    bulk-concurrent-requests: 2
+    bulk-flush-interval-seconds: 10
+    bulk-size-mb: 50
+  rabbitmq:
+    exchange-name: jakduk-prd
+    queues:
+      email:
+        binding-queue-name: prd.email
+        binding-routing-key: prd.email.*
+        enabled: true
+      elasticsearch:
+        binding-queue-name: prd.elasticsearch
+        binding-routing-key: prd.elasticsearch.*
+        enabled: true
+    routing-keys:
+      email-welcome: prd.email.welcome
+      email-reset-password: prd.email.reset-password
+      elasticsearch-index-document-board: prd.elasticsearch.index-document-board
+      elasticsearch-delete-document-board: prd.elasticsearch.delete-document-board
+  slack:
+    board:
+      channel: '#jakduk_board_noti'
+      enabled: true
+      webhook: https://hooks.slack.com/services/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
+  storage:
+    image:
+      path: /jakduk/storage/image/
+    thumbnail:
+      path: /jakduk/storage/thumbnail/
+    user:
+      picture:
+        large:
+          path: /jakduk/storage/user/picture/large/
+        small:
+          path: /jakduk/storage/user/picture/small/

@@ -16,7 +16,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.service.EmailService;
+import com.jakduk.core.service.CommonMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -64,7 +64,8 @@ public class UserRestController {
     private UserService userService;
 
     @Autowired
-    private EmailService emailService;
+    private CommonMessageService commonMessageService;
+
 
     @ApiOperation("이메일 기반 회원 가입")
     @PostMapping("")
@@ -75,7 +76,7 @@ public class UserRestController {
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
-        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(
@@ -111,7 +112,7 @@ public class UserRestController {
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
                 largePictureUrl);
 
-        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(
@@ -234,9 +235,7 @@ public class UserRestController {
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
         try {
-            UserPicture userPicture = userService.uploadUserPicture(contentType, file.getSize(), file.getBytes());
-
-            return userPicture;
+            return userService.uploadUserPicture(contentType, file.getSize(), file.getBytes());
 
         } catch (IOException e) {
             throw new ServiceException(ServiceError.IO_EXCEPTION, e);

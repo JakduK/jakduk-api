@@ -20,6 +20,7 @@ public enum ServiceError {
     FORM_VALIDATION_FAILED(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     FEELING_YOU_ARE_WRITER(HttpStatus.SC_BAD_REQUEST, "exception.you.are.writer"),
     FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
+    ILLEGAL_ARGUMENT(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.illegal.argument"),
     NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
     FORBIDDEN(HttpStatus.SC_FORBIDDEN, "exception.forbidden"),
     IO_EXCEPTION(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.io"),

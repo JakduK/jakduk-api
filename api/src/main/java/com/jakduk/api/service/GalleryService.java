@@ -20,7 +20,7 @@ import com.jakduk.core.model.simple.BoardFreeSimple;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
 import com.jakduk.core.service.CommonGalleryService;
-import com.jakduk.core.service.CommonSearchService;
+import com.jakduk.core.service.CommonMessageService;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -65,6 +65,9 @@ public class GalleryService {
 	@Value("${core.storage.thumbnail.path}")
 	private String storageThumbnailPath;
 
+	@Resource
+	private ApiUtils apiUtils;
+
 	@Autowired
 	private GalleryRepository galleryRepository;
 
@@ -75,13 +78,10 @@ public class GalleryService {
 	private JakdukDAO jakdukDAO;
 
 	@Autowired
-	private CommonSearchService commonSearchService;
-
-	@Autowired
 	private CommonGalleryService commonGalleryService;
 
-	@Resource
-	private ApiUtils apiUtils;
+	@Autowired
+	private CommonMessageService commonMessageService;
 
 	public Gallery findOneById(String id) {
 		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
@@ -412,7 +412,7 @@ public class GalleryService {
 			if (! userId.equals(gallery.getWriter().getUserId()))
 				throw new ServiceException(ServiceError.FORBIDDEN);
 
-			commonGalleryService.deleteGallery(id, gallery.getContentType(), false);
+			commonGalleryService.deleteGallery(id, gallery.getContentType());
 		}
 	}
 
@@ -536,7 +536,7 @@ public class GalleryService {
 			galleryRepository.save(gallery);
 
 			// 엘라스틱서치 색인 요청
-			commonSearchService.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
+			commonMessageService.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
 
 			if (! ObjectUtils.isEmpty(galleryIdsForRemoval)) {
 				if (galleryIdsForRemoval.contains(gallery.getId()))
@@ -561,7 +561,9 @@ public class GalleryService {
 
 					// 모두 지움.
 					if (linkedItems.size() < 1) {
-						commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType(), true);
+						commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType());
+						// 엘라스틱 서치 document 삭제.
+						commonMessageService.deleteDocumentGallery(gallery.getId());
 					}
 					// 업데이트 처리
 					else {

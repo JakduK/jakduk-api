@@ -23,6 +23,7 @@ public class CoreApplication {
     private Environment environment;
 
     public static void main(String[] args) {
+
         new SpringApplicationBuilder(CoreApplication.class)
                 .web(false)
                 .profiles("core-default")
