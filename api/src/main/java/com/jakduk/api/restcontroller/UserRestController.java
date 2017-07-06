@@ -84,7 +84,7 @@ public class UserRestController {
         commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
-        authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(),
                         form.getPassword()
