@@ -14,7 +14,6 @@ import com.jakduk.core.model.db.BoardFree;
 import com.jakduk.core.model.db.BoardFreeComment;
 import com.jakduk.core.model.db.Gallery;
 import com.jakduk.core.model.elasticsearch.*;
-import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.repository.board.free.BoardFreeRepository;
 import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.core.repository.gallery.GalleryRepository;
@@ -33,12 +32,10 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -389,17 +386,7 @@ public class CommonSearchService {
             log.info("gallery id {} is not found. so can't delete it!", id);
     }
 
-    @Async
-    public void indexDocumentSearchWord(String word, CommonWriter writer) {
-
-        if (! coreProperties.getElasticsearch().getEnable())
-            return;
-
-        EsSearchWord esSearchWord = EsSearchWord.builder()
-                .word(word)
-                .writer(writer)
-                .registerDate(LocalDateTime.now())
-                .build();
+    public void indexDocumentSearchWord(EsSearchWord esSearchWord) {
 
         try {
             IndexRequestBuilder indexRequestBuilder = client.prepareIndex();

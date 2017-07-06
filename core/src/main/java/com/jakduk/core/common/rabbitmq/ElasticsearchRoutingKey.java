@@ -18,7 +18,8 @@ public enum ElasticsearchRoutingKey  {
     ELASTICSEARCH_INDEX_DOCUMENT_COMMENT("elasticsearch-index-document-comment"),
     ELASTICSEARCH_DELETE_DOCUMENT_COMMENT("elasticsearch-delete-document-comment"),
     ELASTICSEARCH_INDEX_DOCUMENT_GALLERY("elasticsearch-index-document-gallery"),
-    ELASTICSEARCH_DELETE_DOCUMENT_GALLERY("elasticsearch-delete-document-gallery");
+    ELASTICSEARCH_DELETE_DOCUMENT_GALLERY("elasticsearch-delete-document-gallery"),
+    ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD("elasticsearch-delete-document-search-word");
 
     String routingKey;
 

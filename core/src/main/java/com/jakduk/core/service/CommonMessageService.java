@@ -9,6 +9,7 @@ import com.jakduk.core.configuration.CoreProperties;
 import com.jakduk.core.model.elasticsearch.EsBoard;
 import com.jakduk.core.model.elasticsearch.EsComment;
 import com.jakduk.core.model.elasticsearch.EsGallery;
+import com.jakduk.core.model.elasticsearch.EsSearchWord;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
 import com.jakduk.core.model.rabbitmq.EmailPayload;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -135,4 +137,16 @@ public class CommonMessageService {
         String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_GALLERY.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, id);
     }
+
+    public void indexDocumentSearchWord(String word, CommonWriter writer) {
+        EsSearchWord esSearchWord = EsSearchWord.builder()
+                .word(word)
+                .writer(writer)
+                .registerDate(LocalDateTime.now())
+                .build();
+
+        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD.getRoutingKey());
+        rabbitMQPublisher.publishElasticsearch(routingKey, esSearchWord);
+    }
+
 }

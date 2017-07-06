@@ -8,6 +8,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.elasticsearch.EsBoard;
 import com.jakduk.core.model.elasticsearch.EsComment;
 import com.jakduk.core.model.elasticsearch.EsGallery;
+import com.jakduk.core.model.elasticsearch.EsSearchWord;
 import com.jakduk.core.service.CommonSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -75,6 +76,11 @@ public class ElasticsearchListener {
             case ELASTICSEARCH_DELETE_DOCUMENT_GALLERY:
                 String galleryId = ObjectMapperUtils.readValue(message.getBody(), String.class);
                 commonSearchService.deleteDocumentGallery(galleryId);
+                break;
+
+            case ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD:
+                EsSearchWord esSearchWord = ObjectMapperUtils.readValue(message.getBody(), EsSearchWord.class);
+                commonSearchService.indexDocumentSearchWord(esSearchWord);
                 break;
 
         }
