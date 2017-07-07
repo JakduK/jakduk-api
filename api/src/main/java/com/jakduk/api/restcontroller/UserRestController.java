@@ -206,7 +206,10 @@ public class UserRestController {
 
     @ApiOperation(value = "내 프로필 정보 편집")
     @PutMapping("/profile/me")
-    public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileEditForm form) {
+    public EmptyJsonResponse editProfileMe(
+            @Valid @RequestBody UserProfileEditForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
@@ -217,11 +220,21 @@ public class UserRestController {
         Authentication authentication = AuthUtils.getAuthentication();
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 
-        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(
-                userDetails, authentication.getCredentials(), authentication.getAuthorities()
-        );
+        if (AuthUtils.isJakdukUser()) {
+            Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, authentication.getCredentials(), authentication.getAuthorities()
+            );
 
-        AuthUtils.setAuthentication(newAuthentication);
+            AuthUtils.setAuthentication(newAuthentication);
+        } else if (AuthUtils.isSnsUser()) {
+            Authentication newAuthentication = new SnsAuthenticationToken(userDetails);
+            AuthUtils.setAuthentication(newAuthentication);
+        } else {
+            // 참고 @{link http://websystique.com/spring-security/spring-security-4-logout-example/}
+            new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+            throw new ServiceException(ServiceError.INVALID_ACCOUNT);
+        }
 
         return EmptyJsonResponse.newInstance();
     }

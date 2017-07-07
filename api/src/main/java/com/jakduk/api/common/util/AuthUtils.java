@@ -134,6 +134,22 @@ public class AuthUtils {
         }
     }
 
+    public static Boolean isSnsUser() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
+
+            CoreConst.ACCOUNT_TYPE providerId = userDetail.getProviderId();
+
+            return providerId.equals(CoreConst.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(CoreConst.ACCOUNT_TYPE.DAUM);
+        } else {
+            return false;
+        }
+
+    }
+
     /**
      * 로그인 중인 회원 정보를 가져온다.
      */
