@@ -250,7 +250,7 @@ public class UserService {
 		return user;
 	}
 
-	public void editUserProfile(String userId, String email, String username, String footballClubId, String about,
+	public User editUserProfile(String userId, String email, String username, String footballClubId, String about,
 								String userPictureId) {
 
 		UserPicture userPicture = null;
@@ -290,7 +290,9 @@ public class UserService {
 			userPictureRepository.save(userPicture);
 		}
 
-		log.debug("User edited. user=" + user);
+		log.debug("User edited. user={}", user);
+
+		return user;
 	}
 
 	public void existEmail(String email) {

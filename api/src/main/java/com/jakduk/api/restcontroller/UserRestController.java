@@ -28,6 +28,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.ObjectUtils;
@@ -65,6 +67,9 @@ public class UserRestController {
 
     @Autowired
     private CommonMessageService commonMessageService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
 
     @ApiOperation("이메일 기반 회원 가입")
@@ -200,13 +205,23 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")
-    @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
+    @PutMapping("/profile/me")
     public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileEditForm form) {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
+        User user = userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
                 form.getAbout(), form.getUserPictureId());
+
+
+        Authentication authentication = AuthUtils.getAuthentication();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+
+        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(
+                userDetails, authentication.getCredentials(), authentication.getAuthorities()
+        );
+
+        AuthUtils.setAuthentication(newAuthentication);
 
         return EmptyJsonResponse.newInstance();
     }
