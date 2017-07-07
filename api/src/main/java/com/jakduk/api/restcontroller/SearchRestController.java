@@ -4,7 +4,7 @@ import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.service.SearchService;
 import com.jakduk.api.vo.search.PopularSearchWordResult;
 import com.jakduk.api.vo.search.SearchUnifiedResponse;
-import com.jakduk.core.service.CommonSearchService;
+import com.jakduk.core.service.CommonMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -36,7 +36,7 @@ import java.time.ZoneId;
 public class SearchRestController {
 	
 	@Autowired
-	private CommonSearchService commonSearchService;
+	private CommonMessageService commonMessageService;
 
 	@Autowired
 	private SearchService searchService;
@@ -70,7 +70,7 @@ public class SearchRestController {
 
 		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size, preTags, postTags);
 
-		commonSearchService.indexDocumentSearchWord(StringUtils.lowerCase(q), AuthUtils.getCommonWriter());
+		commonMessageService.indexDocumentSearchWord(StringUtils.lowerCase(q), AuthUtils.getCommonWriter());
 
 		return searchUnifiedResponse;
 	}
@@ -85,4 +85,5 @@ public class SearchRestController {
 
 		return searchService.aggregateSearchWord(registerDateFrom, size);
 	}
+
 }

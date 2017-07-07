@@ -32,6 +32,10 @@ public class ObjectMapperUtils {
 		return objectMapper.readValue(content, obj);
 	}
 
+	public static <T> T readValue(byte[] src, Class<T> obj) throws IOException {
+		return objectMapper.readValue(src, obj);
+	}
+
 	public static <T> T convertValue(Map map, Class<T> obj) {
 		return objectMapper.convertValue(map, obj);
 	}

@@ -16,7 +16,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ESGallerySource {
+public class EsGallerySource {
 
     private String id;
 

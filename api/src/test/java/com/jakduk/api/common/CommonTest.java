@@ -1,7 +1,6 @@
 package com.jakduk.api.common;
 
 import com.jakduk.api.ApiApplicationTests;
-import com.jakduk.core.service.CommonService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,6 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 public class CommonTest extends ApiApplicationTests {
 	
-	@Autowired
-	CommonService commonService;
-
 	@Autowired
 	private Environment environment;
 
@@ -33,7 +29,6 @@ public class CommonTest extends ApiApplicationTests {
 
 		Assert.assertFalse(passwordEncoder.matches("1112", password));
 		Assert.assertTrue(passwordEncoder.matches("1111", password));
-
 	}
-	
+
 }

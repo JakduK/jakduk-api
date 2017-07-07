@@ -20,10 +20,20 @@ public enum ServiceError {
     FORM_VALIDATION_FAILED(HttpStatus.SC_BAD_REQUEST, "exception.invalid.parameter"),
     FEELING_YOU_ARE_WRITER(HttpStatus.SC_BAD_REQUEST, "exception.you.are.writer"),
     FEELING_SELECT_ALREADY_LIKE(HttpStatus.SC_BAD_REQUEST, "exception.select.already.like"),
+    ILLEGAL_ARGUMENT(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.illegal.argument"),
     NOT_FOUND(HttpStatus.SC_NOT_FOUND, "exception.no.such.element"),
     FORBIDDEN(HttpStatus.SC_FORBIDDEN, "exception.forbidden"),
     IO_EXCEPTION(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.io"),
     INTERNAL_SERVER_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.internal.server.error"),
+
+    // AUTHENTICATE
+    UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    ANONYMOUS(HttpStatus.SC_UNAUTHORIZED, "exception.anonymous"),
+    NEED_TO_LOGIN(HttpStatus.SC_UNAUTHORIZED, "exception.unauthorized"),
+    NOT_FOUND_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    NOT_JAKDUK_USER(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
+    BAD_CREDENTIALS(HttpStatus.SC_UNAUTHORIZED, "exception.bad.credentials"),
+    INVALID_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.invalid.account"),
 
     // FILE
     FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED(HttpStatus.SC_BAD_REQUEST, "exception.only.image.type.can.be.uploaded"),
@@ -49,13 +59,6 @@ public enum ServiceError {
     NOT_FOUND_ENCYCLOPEDIA(HttpStatus.SC_NOT_FOUND, "exception.not.found.encyclopedia"),
     ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
     ALREADY_DISABLE(HttpStatus.SC_NOT_FOUND, "exception.already.disable"),
-
-    UNAUTHORIZED_ACCESS(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
-    ANONYMOUS(HttpStatus.SC_UNAUTHORIZED, "exception.anonymous"),
-    NEED_TO_LOGIN(HttpStatus.SC_UNAUTHORIZED, "exception.unauthorized"),
-    NOT_FOUND_ACCOUNT(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
-    NOT_JAKDUK_USER(HttpStatus.SC_UNAUTHORIZED, "exception.access.denied"),
-    BAD_CREDENTIALS(HttpStatus.SC_UNAUTHORIZED, "exception.bad.credentials"),
 
     SEND_EMAIL_FAILED(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.send.email.failed"),
     GALLERY_IO_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "exception.gallery.io"),

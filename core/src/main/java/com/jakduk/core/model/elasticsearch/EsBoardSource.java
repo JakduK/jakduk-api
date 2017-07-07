@@ -17,7 +17,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ESBoardSource {
+public class EsBoardSource {
 
 	private String id;
 

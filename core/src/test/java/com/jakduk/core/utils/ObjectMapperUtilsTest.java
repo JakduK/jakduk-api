@@ -25,4 +25,5 @@ public class ObjectMapperUtilsTest {
 
         ObjectMapperUtils.readValue(json, Map.class);
     }
+
 }

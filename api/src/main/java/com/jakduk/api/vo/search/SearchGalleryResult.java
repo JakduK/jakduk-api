@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.search;
 
-import com.jakduk.core.model.elasticsearch.ESGallerySource;
+import com.jakduk.core.model.elasticsearch.EsGallerySource;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,5 +16,5 @@ public class SearchGalleryResult {
 
     private Long took;
     private Long totalCount;
-    private List<ESGallerySource> galleries;
+    private List<EsGallerySource> galleries;
 }

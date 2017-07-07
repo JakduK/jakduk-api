@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,6 +27,7 @@ import javax.annotation.Resource;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
@@ -96,19 +98,16 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                     ).hasAnyRole("USER_01", "USER_02", "USER_03")
                     .antMatchers(
                             HttpMethod.POST,
-                            "/api/board/free",                  // 자유게시판 글쓰기
                             "/api/board/free/comment",          // 자유게시판 댓글 달기
                             "/api/gallery"                      // 사진 올리기
                     ).hasAnyRole("USER_01", "USER_02", "USER_03")
                     .regexMatchers(
                             HttpMethod.PUT,
-                            "/api/board/free/(\\d+)",           // 자유게시판 글고치기
                             "/api/user/profile/me",             // 내 프로필 정보 편집
                             "/api/user/password"                // 이메일 기반 회원의 비밀번호 변경
                     ).hasAnyRole("USER_01", "USER_02", "USER_03")
                     .regexMatchers(
                             HttpMethod.DELETE,
-                            "/api/board/free/(\\d+)",           // 자유게시판 글지우기
                             "/api/user"                         // 회원 탈퇴
                     ).hasAnyRole("USER_01", "USER_02", "USER_03")
 

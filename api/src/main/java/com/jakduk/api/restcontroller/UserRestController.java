@@ -16,7 +16,7 @@ import com.jakduk.core.exception.ServiceException;
 import com.jakduk.core.model.db.User;
 import com.jakduk.core.model.db.UserPicture;
 import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.service.EmailService;
+import com.jakduk.core.service.CommonMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,6 +28,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.ObjectUtils;
@@ -64,7 +66,11 @@ public class UserRestController {
     private UserService userService;
 
     @Autowired
-    private EmailService emailService;
+    private CommonMessageService commonMessageService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
 
     @ApiOperation("이메일 기반 회원 가입")
     @PostMapping("")
@@ -75,7 +81,7 @@ public class UserRestController {
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
-        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(
@@ -111,7 +117,7 @@ public class UserRestController {
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
                 largePictureUrl);
 
-        emailService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the authentication
         Authentication authentication = authenticationManager.authenticate(
@@ -199,13 +205,36 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")
-    @RequestMapping(value = "/profile/me", method = RequestMethod.PUT)
-    public EmptyJsonResponse editProfileMe(@Valid @RequestBody UserProfileEditForm form) {
+    @PutMapping("/profile/me")
+    public EmptyJsonResponse editProfileMe(
+            @Valid @RequestBody UserProfileEditForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
+        User user = userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
                 form.getAbout(), form.getUserPictureId());
+
+
+        Authentication authentication = AuthUtils.getAuthentication();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+
+        if (AuthUtils.isJakdukUser()) {
+            Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, authentication.getCredentials(), authentication.getAuthorities()
+            );
+
+            AuthUtils.setAuthentication(newAuthentication);
+        } else if (AuthUtils.isSnsUser()) {
+            Authentication newAuthentication = new SnsAuthenticationToken(userDetails);
+            AuthUtils.setAuthentication(newAuthentication);
+        } else {
+            // 참고 @{link http://websystique.com/spring-security/spring-security-4-logout-example/}
+            new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+            throw new ServiceException(ServiceError.INVALID_ACCOUNT);
+        }
 
         return EmptyJsonResponse.newInstance();
     }
@@ -234,9 +263,7 @@ public class UserRestController {
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
         try {
-            UserPicture userPicture = userService.uploadUserPicture(contentType, file.getSize(), file.getBytes());
-
-            return userPicture;
+            return userService.uploadUserPicture(contentType, file.getSize(), file.getBytes());
 
         } catch (IOException e) {
             throw new ServiceException(ServiceError.IO_EXCEPTION, e);
@@ -253,6 +280,7 @@ public class UserRestController {
 
         userService.deleteUser(authUserProfile.getId());
 
+        // 참고 @{link http://websystique.com/spring-security/spring-security-4-logout-example/}
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
         return EmptyJsonResponse.newInstance();

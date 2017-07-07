@@ -1,31 +1,23 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.Builder;
-import lombok.Getter;
-
-import java.util.List;
+import lombok.*;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
 * @company  : http://jakduk.com
-* @date     : 2015. 8. 23.
+* @date     : 2015. 8. 27.
 * @desc     :
 */
 
 @Builder
 @Getter
-public class ESComment {
-	
+@Setter
+public class EsGallery {
+
     private String id;
 	
-	private BoardItem boardItem;
+	private String name;
 	
 	private CommonWriter writer;
-
-	private String content;
-
-	private List<String> galleries;
-
 }

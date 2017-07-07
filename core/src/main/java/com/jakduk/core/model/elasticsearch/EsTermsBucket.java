@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ESTermsBucket {
+public class EsTermsBucket {
 
 	private String key;
 	private Long count;

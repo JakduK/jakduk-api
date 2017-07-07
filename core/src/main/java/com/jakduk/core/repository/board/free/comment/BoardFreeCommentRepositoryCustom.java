@@ -1,12 +1,10 @@
 package com.jakduk.core.repository.board.free.comment;
 
 import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.elasticsearch.ESComment;
 import com.jakduk.core.model.etc.CommonCount;
 import org.bson.types.ObjectId;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by pyohwan on 16. 11. 30.

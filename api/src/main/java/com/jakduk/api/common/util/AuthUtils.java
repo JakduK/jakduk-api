@@ -9,6 +9,7 @@ import com.jakduk.core.common.CommonRole;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.CommonWriter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,6 +20,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -37,6 +40,9 @@ public class AuthUtils {
 
     @Resource
     private ApiProperties apiProperties;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
@@ -126,6 +132,22 @@ public class AuthUtils {
         } else {
             return false;
         }
+    }
+
+    public static Boolean isSnsUser() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
+
+            CoreConst.ACCOUNT_TYPE providerId = userDetail.getProviderId();
+
+            return providerId.equals(CoreConst.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(CoreConst.ACCOUNT_TYPE.DAUM);
+        } else {
+            return false;
+        }
+
     }
 
     /**
@@ -249,18 +271,26 @@ public class AuthUtils {
         if (StringUtils.isBlank(id))
             return null;
 
-        String pictureUrl = null;
+        String urlPathUserPicture = null;
 
         switch (sizeType) {
             case LARGE:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureLarge(), id);
+                urlPathUserPicture = apiProperties.getUrlPath().getUserPictureLarge();
                 break;
             case SMALL:
-                pictureUrl = String.format("%s/%s/%s", apiProperties.getApiServerUrl(), apiProperties.getUrlPath().getUserPictureSmall(), id);
+                urlPathUserPicture = apiProperties.getUrlPath().getUserPictureSmall();
                 break;
         }
 
-        return pictureUrl;
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(apiProperties.getApiServerUrl())
+                .path("/{urlPathGallery}/{id}")
+                .buildAndExpand(urlPathUserPicture, id);
+
+        return uriComponents.toUriString();
+    }
+
+    public static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     /**
@@ -309,7 +339,6 @@ public class AuthUtils {
         headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
 
         return responseEntity.getBody();

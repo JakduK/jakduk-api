@@ -1,7 +1,10 @@
 package com.jakduk.core.model.elasticsearch;
 
 import com.jakduk.core.model.embedded.CommonWriter;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -16,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ESBoard {
+public class EsBoard {
 	
     private String id;
 	

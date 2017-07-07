@@ -1,6 +1,19 @@
 description = 'core'
 
 dependencies {
+    compile('org.springframework.boot:spring-boot-starter-mail')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+    compile('org.springframework.boot:spring-boot-starter-amqp')
+
+    compile group: 'org.jongo', name: 'jongo', version:'1.3.0'
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'org.apache.commons:commons-io:1.3.2'
+    compile 'org.apache.commons:commons-collections4:4.1'
     compile 'javax.persistence:persistence-api:1.0.2'
     compile 'org.jsoup:jsoup:1.10.1'
+    compile 'com.rometools:rome:1.7.0'
+    compile group: 'net.gpedro.integrations.slack', name: 'slack-webhook', version:'1.2.1'
+    compile 'net.coobird:thumbnailator:0.4.8'
 }

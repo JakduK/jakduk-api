@@ -22,4 +22,5 @@ public class BoardCategoryRepositoryTest extends CoreApplicationTests {
     public void findByLanguage() {
         List<BoardCategory> categories = sut.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
     }
+
 }
