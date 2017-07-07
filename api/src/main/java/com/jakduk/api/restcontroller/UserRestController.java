@@ -227,7 +227,7 @@ public class UserRestController {
 
             AuthUtils.setAuthentication(newAuthentication);
         } else if (AuthUtils.isSnsUser()) {
-            Authentication newAuthentication = new SnsAuthenticationToken(userDetails);
+            Authentication newAuthentication = new SnsAuthenticationToken(userDetails, authentication.getAuthorities());
             AuthUtils.setAuthentication(newAuthentication);
         } else {
             // 참고 @{link http://websystique.com/spring-security/spring-security-4-logout-example/}
