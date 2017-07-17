@@ -30,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -504,31 +505,29 @@ public class GalleryService {
 
 		// Galleries 와 해당 Item을 연결 한다.
 		galleries.forEach(gallery -> {
-			List<LinkedItem> linkedItems = gallery.getLinkedItems();
+			List<LinkedItem> willBeLinkedItems = gallery.getLinkedItems();
 
-			if (Objects.isNull(linkedItems))
-				linkedItems = new ArrayList<>();
+			if (CollectionUtils.isEmpty(willBeLinkedItems))
+				willBeLinkedItems = new ArrayList<>();
 
-			// 중복 검사
-			Boolean isItemPresent = linkedItems.stream()
-					.anyMatch(item -> item.getId().equals(linkedItem.getId()));
-
-			if (! isItemPresent) {
-				linkedItems.add(linkedItem);
-				gallery.setLinkedItems(linkedItems);
+			// 중복 검사 해서 없으면 추가
+			if (willBeLinkedItems.stream().noneMatch(item -> item.getId().equals(linkedItem.getId()))) {
+				willBeLinkedItems.add(linkedItem);
+				gallery.setLinkedItems(willBeLinkedItems);
 			}
 
 			// 사용자가 입력한 이름이 있다면 그걸 입력
-			Optional<GalleryOnBoard> oGalleryOnBoard = galleriesForInsertion.stream()
+			galleriesForInsertion.stream()
 					.filter(galleryOnBoard -> galleryOnBoard.getId().equals(gallery.getId()))
-					.findFirst();
-
-			if (oGalleryOnBoard.isPresent() && StringUtils.isBlank(gallery.getName()))
-				gallery.setName(oGalleryOnBoard.get().getName());
+					.findFirst()
+					.ifPresent(galleryOnBoard -> {
+						if (StringUtils.isNoneBlank(gallery.getName()))
+							gallery.setName(galleryOnBoard.getName());
+					});
 
 			GalleryStatus status = gallery.getStatus();
 
-			if (! status.getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.ENABLE)) {
+			if (status.getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.TEMP)) {
 				status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
 				gallery.setStatus(status);
 			}
@@ -538,26 +537,26 @@ public class GalleryService {
 			// 엘라스틱서치 색인 요청
 			commonMessageService.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
 
-			if (! ObjectUtils.isEmpty(galleryIdsForRemoval)) {
+			if (! CollectionUtils.isEmpty(galleryIdsForRemoval)) {
 				if (galleryIdsForRemoval.contains(gallery.getId()))
 					galleryIdsForRemoval.remove(gallery.getId());
 			}
 		});
 
 		// Galleries 와 해당 Item을 연결 해제한다. Gallery 가 지워질 수도 있음.
-		if (! ObjectUtils.isEmpty(galleryIdsForRemoval)) {
+		if (! CollectionUtils.isEmpty(galleryIdsForRemoval)) {
 			List<Gallery> galleriesForRemoval = galleryRepository.findByIdIn(galleryIdsForRemoval);
 
 			galleriesForRemoval.forEach(gallery -> {
-				if (! ObjectUtils.isEmpty(gallery.getLinkedItems()) && gallery.getStatus().getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.ENABLE)) {
+				List<LinkedItem> linkedItems = gallery.getLinkedItems();
 
-					List<LinkedItem> linkedItems = gallery.getLinkedItems();
+				if (! CollectionUtils.isEmpty(linkedItems) &&
+						gallery.getStatus().getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.ENABLE)) {
 
-					Optional<LinkedItem> oLinkedItem = linkedItems.stream()
+					linkedItems.stream()
 							.filter(item -> item.getId().equals(linkedItem.getId()) && item.getFrom().equals(linkedItem.getFrom()))
-							.findFirst();
-
-					oLinkedItem.ifPresent(linkedItems::remove);
+							.findFirst()
+							.ifPresent(linkedItems::remove);
 
 					// 모두 지움.
 					if (linkedItems.size() < 1) {

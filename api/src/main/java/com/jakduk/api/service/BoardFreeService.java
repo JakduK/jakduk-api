@@ -38,6 +38,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
@@ -174,11 +175,11 @@ public class BoardFreeService {
 	 * @param subject 글 제목
 	 * @param content 글 내용
 	 * @param categoryCode 글 말머리 Code
-	 * @param galleries 글과 연동된 사진들
+	 * @param galleryIds 글과 연동된 사진들
      * @param device 디바이스
      */
 	public BoardFree updateFreePost(CommonWriter writer, Integer seq, String subject, String content, CoreConst.BOARD_CATEGORY_TYPE categoryCode,
-								  List<Gallery> galleries, CoreConst.DEVICE_TYPE device) {
+									List<String> galleryIds, CoreConst.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -194,13 +195,7 @@ public class BoardFreeService {
 		boardFree.setContent(content);
 		boardFree.setCategory(categoryCode);
 		boardFree.setShortContent(shortContent);
-
-		// 연관된 사진 id 배열 (검증 후)
-		List<String> galleryIds = galleries.stream()
-				.map(Gallery::getId)
-				.collect(Collectors.toList());
-
-		boardFree.setLinkedGallery(! galleries.isEmpty());
+		boardFree.setLinkedGallery(! galleryIds.isEmpty());
 
 		// 글 상태
 		BoardStatus boardStatus = boardFree.getStatus();
@@ -214,7 +209,7 @@ public class BoardFreeService {
 		// boardHistory
 		List<BoardHistory> histories = boardFree.getHistory();
 
-		if (ObjectUtils.isEmpty(histories))
+		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
 		ObjectId boardHistoryId = new ObjectId();
@@ -576,7 +571,7 @@ public class BoardFreeService {
 	/**
 	 * 게시판 댓글 고치기
 	 */
-	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, List<Gallery> galleries,
+	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, List<String> galleryIds,
 											  CoreConst.DEVICE_TYPE device) {
 
 		boardFreeRepository.findOneBySeq(seq)
@@ -599,13 +594,7 @@ public class BoardFreeService {
 		}
 
 		boardFreeComment.setStatus(boardCommentStatus);
-
-		// 연관된 사진 id 배열 (검증 후)
-		List<String> galleryIds = galleries.stream()
-				.map(Gallery::getId)
-				.collect(Collectors.toList());
-
-		boardFreeComment.setLinkedGallery(! galleries.isEmpty());
+		boardFreeComment.setLinkedGallery(! galleryIds.isEmpty());
 
 		boardFreeCommentRepository.save(boardFreeComment);
 

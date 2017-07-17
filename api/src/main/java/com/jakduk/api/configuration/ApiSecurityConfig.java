@@ -3,7 +3,6 @@ package com.jakduk.api.configuration;
 import com.jakduk.api.configuration.authentication.SnsAuthenticationProvider;
 import com.jakduk.api.configuration.authentication.handler.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -89,31 +88,6 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                             "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
                             "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
                     ).anonymous()
-
-                    .antMatchers(
-                            HttpMethod.GET,
-                            "/api/user/exist/email/edit",       // 회원 프로필 편집 시 Email 중복 검사
-                            "/api/user/exist/username/edit",    // 회원 프로필 편집 시 별명 중복 검사
-                            "/api/user/profile/me"              // 내 프로필 정보 보기
-                    ).hasAnyRole("USER_01", "USER_02", "USER_03")
-                    .antMatchers(
-                            HttpMethod.POST,
-                            "/api/board/free/comment",          // 자유게시판 댓글 달기
-                            "/api/gallery"                      // 사진 올리기
-                    ).hasAnyRole("USER_01", "USER_02", "USER_03")
-                    .regexMatchers(
-                            HttpMethod.PUT,
-                            "/api/user/profile/me",             // 내 프로필 정보 편집
-                            "/api/user/password"                // 이메일 기반 회원의 비밀번호 변경
-                    ).hasAnyRole("USER_01", "USER_02", "USER_03")
-                    .regexMatchers(
-                            HttpMethod.DELETE,
-                            "/api/user"                         // 회원 탈퇴
-                    ).hasAnyRole("USER_01", "USER_02", "USER_03")
-
-                    .antMatchers(
-    //                        "/restcontroller/**"                          // spring-data-restcontroller
-                    ).hasRole("ROOT")
 
                     .anyRequest().permitAll();
 

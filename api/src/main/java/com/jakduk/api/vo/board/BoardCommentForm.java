@@ -19,7 +19,7 @@ import java.util.List;
 public class BoardCommentForm {
 
     @ApiModelProperty(value = "글 seq")
-    @Min(value = 1)
+    @Min(1)
     @NotNull
     private Integer seq;
 

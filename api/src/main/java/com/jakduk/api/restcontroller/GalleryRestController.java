@@ -1,6 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.common.annotation.SecuredRoleUser;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
@@ -60,6 +61,7 @@ public class GalleryRestController {
     }
 
     @ApiOperation(value = "사진 올리기")
+    @SecuredRoleUser
     @PostMapping("/gallery")
     public GalleryUploadResponse uploadImage(@RequestParam MultipartFile file) throws IOException {
 

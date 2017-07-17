@@ -1,6 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.common.annotation.SecuredRoleUser;
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsername;
@@ -143,6 +144,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사")
+    @SecuredRoleUser
     @RequestMapping(value = "/exist/email/edit", method = RequestMethod.GET)
     public EmptyJsonResponse existEmailOnEdit(@NotEmpty @Email @ExistEmailOnEdit @RequestParam String email) {
 
@@ -164,6 +166,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "회원 프로필 편집 시 별명 중복 검사")
+    @SecuredRoleUser
     @RequestMapping(value = "/exist/username/edit", method = RequestMethod.GET)
     public EmptyJsonResponse existUsernameOnEdit(@NotEmpty @ExistUsernameOnEdit @RequestParam String username) {
 
@@ -194,6 +197,7 @@ public class UserRestController {
     }
 
     @ApiOperation("내 프로필 정보 보기")
+    @SecuredRoleUser
     @GetMapping("/profile/me")
     public UserProfileResponse getProfileMe(Locale locale) {
 
@@ -205,6 +209,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")
+    @SecuredRoleUser
     @PutMapping("/profile/me")
     public EmptyJsonResponse editProfileMe(
             @Valid @RequestBody UserProfileEditForm form,
@@ -240,6 +245,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
+    @SecuredRoleUser
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
@@ -271,6 +277,7 @@ public class UserRestController {
     }
 
     @ApiOperation("회원 탈퇴")
+    @SecuredRoleUser
     @DeleteMapping("")
     public EmptyJsonResponse deleteUser(
             HttpServletRequest request,

@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -153,16 +154,22 @@ public class BoardRestController {
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
 
-        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+        if (! CollectionUtils.isEmpty(form.getGalleries())) {
             unverifiableGalleryIds = form.getGalleries().stream()
                     .map(GalleryOnBoard::getId)
+                    .distinct()
                     .collect(Collectors.toList());
         }
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
+        // 연관된 사진 id 배열 (검증 후)
+        List<String> galleryIds = galleries.stream()
+                .map(Gallery::getId)
+                .collect(Collectors.toList());
+
         BoardFree boardFree = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), galleries, ApiUtils.getDeviceInfo(device));
+                form.getCategoryCode(), galleryIds, ApiUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = ApiUtils.getSessionOfGalleryIdsForRemoval(request, CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
@@ -228,9 +235,9 @@ public class BoardRestController {
         return boardFreeComment;
     }
 
-    @ApiOperation(value = "자유게시판 글의 댓글 고치기")
+    @ApiOperation("자유게시판 글의 댓글 고치기")
     @SecuredRoleUser
-    @PutMapping(value ="/comment/{id}")
+    @PutMapping("/comment/{id}")
     public BoardFreeComment editFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
@@ -245,15 +252,21 @@ public class BoardRestController {
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
 
-        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+        if (! CollectionUtils.isEmpty(form.getGalleries())) {
             unverifiableGalleryIds = form.getGalleries().stream()
                     .map(GalleryOnBoard::getId)
+                    .distinct()
                     .collect(Collectors.toList());
         }
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        BoardFreeComment boardFreeComment = boardFreeService.updateFreeComment(id, form.getSeq(), commonWriter, form.getContent().trim(), galleries,
+        // 연관된 사진 id 배열 (검증 후)
+        List<String> galleryIds = galleries.stream()
+                .map(Gallery::getId)
+                .collect(Collectors.toList());
+
+        BoardFreeComment boardFreeComment = boardFreeService.updateFreeComment(id, form.getSeq(), commonWriter, form.getContent().trim(), galleryIds,
                 ApiUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = ApiUtils.getSessionOfGalleryIdsForRemoval(request,
