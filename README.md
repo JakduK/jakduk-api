@@ -14,10 +14,6 @@ The word ‘K LEAGUE JAKDU KING’ is formed by combining ‘K LEAGUE’, ‘JAK
 ### License
 The MIT License (MIT)
 
-### Gitter
-We can talk at Gitter.
-* https://gitter.im/JakduK/Lobby
-
 ### Finding contributors
 If you want to help to develop this project, anyone who wants to come is welcome.
 
