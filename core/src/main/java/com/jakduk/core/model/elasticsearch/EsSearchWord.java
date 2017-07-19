@@ -1,7 +1,5 @@
 package com.jakduk.core.model.elasticsearch;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.jakduk.core.common.json.LocalDateTimeSerializer;
 import com.jakduk.core.model.embedded.CommonWriter;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +23,6 @@ public class EsSearchWord {
 
 	private CommonWriter writer;
 
-	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	private LocalDateTime registerDate;
+
 }

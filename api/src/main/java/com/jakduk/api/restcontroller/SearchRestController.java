@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -80,10 +79,10 @@ public class SearchRestController {
 	public PopularSearchWordResult searchPopularWords(
 			@ApiParam(value = "크기") @RequestParam(required = false, defaultValue = "5") Integer size) {
 
-		// 한달전
-		Long registerDateFrom = LocalDate.now().minusMonths(1L).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		// 3 주전
+		LocalDate oneMonthAgo = LocalDate.now().minusWeeks(3);
 
-		return searchService.aggregateSearchWord(registerDateFrom, size);
+		return searchService.aggregateSearchWord(oneMonthAgo, size);
 	}
 
 }

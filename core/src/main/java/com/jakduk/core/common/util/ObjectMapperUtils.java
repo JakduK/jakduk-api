@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,9 +17,12 @@ import java.util.Map;
 public class ObjectMapperUtils {
 
 	private static ObjectMapper objectMapper = new ObjectMapper()
+			.registerModule(new JavaTimeModule())
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 			.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+			.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
 
 	public static ObjectMapper getObjectMapper() {
 		return objectMapper;

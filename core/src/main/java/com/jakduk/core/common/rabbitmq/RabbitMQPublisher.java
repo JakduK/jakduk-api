@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 public class RabbitMQPublisher {
 
     private final String QUEUE_EMAIL = "email";
-    private final String QUEUE_ELASTICSEATCH = "elasticsearch";
+    private final String QUEUE_ELASTICSEARCH = "elasticsearch";
 
     @Resource
     private CoreProperties coreProperties;
@@ -35,10 +35,10 @@ public class RabbitMQPublisher {
     }
 
     public void publishElasticsearch(String routingKey, Object message) {
-        if (coreProperties.getRabbitmq().getQueues().get(QUEUE_ELASTICSEATCH).getEnabled()) {
+        if (coreProperties.getRabbitmq().getQueues().get(QUEUE_ELASTICSEARCH).getEnabled()) {
             rabbitTemplate.convertAndSend(coreProperties.getRabbitmq().getExchangeName(), routingKey, message);
         } else {
-            log.info("Can not publish message. {} queue is disabled.", QUEUE_ELASTICSEATCH);
+            log.info("Can not publish message. {} queue is disabled.", QUEUE_ELASTICSEARCH);
         }
     }
 

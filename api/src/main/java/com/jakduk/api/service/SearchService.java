@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,14 +112,14 @@ public class SearchService {
 		return searchUnifiedResponse;
 	}
 
-	public PopularSearchWordResult aggregateSearchWord(Long registerDateFrom, Integer size) {
+	public PopularSearchWordResult aggregateSearchWord(LocalDate gteDate, Integer size) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(coreProperties.getElasticsearch().getIndexSearchWord())
 				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
 				.setSize(0)
 				.setQuery(
-						QueryBuilders.rangeQuery("registerDate").gte(registerDateFrom)
+						QueryBuilders.rangeQuery("registerDate").gte(gteDate)
 				)
 				.addAggregation(
 						AggregationBuilders

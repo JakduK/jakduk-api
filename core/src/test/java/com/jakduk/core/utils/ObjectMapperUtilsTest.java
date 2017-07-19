@@ -1,9 +1,12 @@
 package com.jakduk.core.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jakduk.core.common.util.ObjectMapperUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -24,6 +27,14 @@ public class ObjectMapperUtilsTest {
                 "}";
 
         ObjectMapperUtils.readValue(json, Map.class);
+    }
+
+    @Test
+    public void iso8601Test() throws JsonProcessingException {
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        String expect = "\"" + localDateTime.toString() + "\"";
+        Assert.assertTrue(expect.equals(ObjectMapperUtils.writeValueAsString(localDateTime)));
     }
 
 }

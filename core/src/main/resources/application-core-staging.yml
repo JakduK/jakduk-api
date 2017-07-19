@@ -16,11 +16,12 @@ spring:
     username: admin
     password: wkrenakstp@
     listener:
-      concurrency: 1
-      max-concurrency: 3
-      retry:
-        enabled: true
-        max-attempts: 3
+      simple:
+        concurrency: 1
+        max-concurrency: 3
+        retry:
+          enabled: true
+          max-attempts: 3
 
 mongo:
   db:
