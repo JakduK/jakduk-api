@@ -40,8 +40,8 @@ public class SearchRestController {
 	@Autowired
 	private SearchService searchService;
 
-	@ApiOperation(value = "통합 찾기")
-	@GetMapping(path = "")
+	@ApiOperation("통합 찾기")
+	@GetMapping("")
 	public SearchUnifiedResponse searchUnified(
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
 			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
@@ -74,15 +74,15 @@ public class SearchRestController {
 		return searchUnifiedResponse;
 	}
 
-	@ApiOperation(value = "인기 검색어")
-	@GetMapping(path = "/popular/words")
+	@ApiOperation("인기 검색어")
+	@GetMapping("/popular/words")
 	public PopularSearchWordResult searchPopularWords(
 			@ApiParam(value = "크기") @RequestParam(required = false, defaultValue = "5") Integer size) {
 
 		// 3 주전
-		LocalDate oneMonthAgo = LocalDate.now().minusWeeks(3);
+		LocalDate threeWeeksAgo = LocalDate.now().minusWeeks(3);
 
-		return searchService.aggregateSearchWord(oneMonthAgo, size);
+		return searchService.aggregateSearchWord(threeWeeksAgo, size);
 	}
 
 }
