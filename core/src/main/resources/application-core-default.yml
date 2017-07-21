@@ -58,7 +58,7 @@ core:
       elasticsearch-delete-document-comment: dev.elasticsearch.delete-document-comment
       elasticsearch-index-document-gallery: dev.elasticsearch.index-document-gallery
       elasticsearch-delete-document-gallery: dev.elasticsearch.delete-document-gallery
-      elasticsearch-index-document-search-word: dev.elasticsearch.delete-document-search-word
+      elasticsearch-index-document-search-word: dev.elasticsearch.index-document-search-word
   slack:
     board:
       channel: '#jakduk_board_noti'
