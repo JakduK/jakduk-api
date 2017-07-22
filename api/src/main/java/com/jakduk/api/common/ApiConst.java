@@ -21,7 +21,6 @@ public class ApiConst {
      */
     public final static Integer NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY=10;
 
-
     /**
      * 읽음 중복 방지를 위한 쿠키
      */
@@ -35,4 +34,16 @@ public class ApiConst {
      * 참고 {@link org.springframework.social.connect.web.ProviderSignInAttempt#SESSION_ATTRIBUTE}
      */
     public final static String PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE = "ProviderSignInAttempt";
+
+    /**
+     * 글 히스토리 상태
+     */
+    public enum BOARD_FREE_HISTORY_TYPE {
+        CREATE,
+        EDIT,
+        DELETE,
+        ENABLE_NOTICE,
+        DISABLE_NOTICE
+    }
+
 }

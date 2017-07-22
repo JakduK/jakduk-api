@@ -1,6 +1,5 @@
 package com.jakduk.api.vo.board;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import lombok.Getter;
  * Created by pyohwanjang on 2017. 3. 5..
  */
 
-@ApiModel(value = "게시판에서 쓰이는 사진")
 @Builder
 @Getter
 public class BoardGallery {

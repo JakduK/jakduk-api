@@ -89,17 +89,6 @@ public class CoreConst {
 		ALL			// 모두 지움
 	}
 
-	/**
-	 * 글 히스토리 상태
-	 */
-	public enum BOARD_HISTORY_TYPE {
-		CREATE,
-		EDIT,
-		DELETE,
-		ENABLE_NOTICE,
-		DISABLE_NOTICE
-	}
-
     /**
      * 사진을 등록한 출처
      */

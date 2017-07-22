@@ -1,5 +1,6 @@
 package com.jakduk.api.service;
 
+import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.home.vo.LatestPost;
@@ -117,7 +118,7 @@ public class BoardFreeService {
 		// boardHistory
 		List<BoardHistory> histories = new ArrayList<>();
 		ObjectId boardHistoryId = new ObjectId();
-		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.CREATE, writer);
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), ApiConst.BOARD_FREE_HISTORY_TYPE.CREATE.name(), writer);
 		histories.add(history);
 
 		// lastUpdated
@@ -212,7 +213,7 @@ public class BoardFreeService {
 			histories = new ArrayList<>();
 
 		ObjectId boardHistoryId = new ObjectId();
-		BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.EDIT, writer);
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), ApiConst.BOARD_FREE_HISTORY_TYPE.EDIT.name(), writer);
 		histories.add(history);
 		boardFree.setHistory(histories);
 
@@ -260,7 +261,7 @@ public class BoardFreeService {
                 histories = new ArrayList<>();
 
 			ObjectId boardHistoryId = new ObjectId();
-            BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.DELETE, writer);
+            BoardHistory history = new BoardHistory(boardHistoryId.toString(), ApiConst.BOARD_FREE_HISTORY_TYPE.DELETE.name(), writer);
             histories.add(history);
 			boardFree.setHistory(histories);
 
@@ -789,7 +790,7 @@ public class BoardFreeService {
 	 * @param seq 글 seq
 	 * @param isEnable 활성화/비활성화
      */
-	public void setFreeNotice(CommonWriter writer, int seq, boolean isEnable) {
+	public void setFreeNotice(CommonWriter writer, int seq, Boolean isEnable) {
 
 		Optional<BoardFree> boardFree = boardFreeRepository.findOneBySeq(seq);
 
@@ -822,11 +823,11 @@ public class BoardFreeService {
 
 		List<BoardHistory> histories = getBoardFree.getHistory();
 
-		if (Objects.isNull(histories))
+		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
-		BoardHistory history = new BoardHistory(new ObjectId().toString(),
-				isEnable ? CoreConst.BOARD_HISTORY_TYPE.ENABLE_NOTICE : CoreConst.BOARD_HISTORY_TYPE.DISABLE_NOTICE, writer);
+		String historyType = isEnable ? ApiConst.BOARD_FREE_HISTORY_TYPE.ENABLE_NOTICE.name() : ApiConst.BOARD_FREE_HISTORY_TYPE.DISABLE_NOTICE.name();
+		BoardHistory history = new BoardHistory(new ObjectId().toString(), historyType, writer);
 		histories.add(history);
 
 		getBoardFree.setHistory(histories);

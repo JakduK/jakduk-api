@@ -21,8 +21,7 @@ public class ObjectMapperUtils {
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 			.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
 			.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-			.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public static ObjectMapper getObjectMapper() {
 		return objectMapper;
