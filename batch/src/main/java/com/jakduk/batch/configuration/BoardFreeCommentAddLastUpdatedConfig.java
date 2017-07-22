@@ -41,7 +41,7 @@ public class BoardFreeCommentAddLastUpdatedConfig {
     private MongoOperations mongoOperations;
 
     @Bean
-    public Job boardFreeAddLastUpdatedJob(@Qualifier("boardFreeCommentAddLastUpdatedStep") Step step) {
+    public Job boardFreeCommentAddLastUpdatedJob(@Qualifier("boardFreeCommentAddLastUpdatedStep") Step step) {
 
         return jobBuilderFactory.get("boardFreeCommentAddLastUpdatedJob")
                 .incrementer(new RunIdIncrementer())

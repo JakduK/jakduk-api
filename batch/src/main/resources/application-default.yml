@@ -1,0 +1,14 @@
+logging:
+  level:
+    root: debug
+
+spring:
+  profiles:
+    include: core-default
+  datasource:
+    url: jdbc:mariadb://192.168.35.149:3306/JAKDUK_BATCH_DEV
+    username: root
+    password: jakduk584
+  batch:
+    initializer:
+      enabled: false
