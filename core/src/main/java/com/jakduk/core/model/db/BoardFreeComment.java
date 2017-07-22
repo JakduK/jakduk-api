@@ -1,5 +1,6 @@
 package com.jakduk.core.model.db;
 
+import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.embedded.BoardCommentStatus;
 import com.jakduk.core.model.embedded.BoardItem;
 import com.jakduk.core.model.embedded.CommonFeelingUser;
@@ -46,5 +47,7 @@ public class BoardFreeComment {
 	private LocalDateTime lastUpdated;
 
 	private boolean linkedGallery;
+
+    private List<CoreConst.BATCH_TYPE> batch;
 
 }

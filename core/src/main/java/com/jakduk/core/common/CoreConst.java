@@ -208,7 +208,8 @@ public class CoreConst {
 		BOARD_FREE_ADD_LINKED_GALLERY_01,			// BoardFree에 linkedGallery 필드를 추가한다.
 		GALLERY_CHANGE_POSTS_TO_LINKED_ITEMS_01,	// Gallery의 posts를 linkedItems으로 바꾼다.
 		GALLERY_ADD_HASH_FIELD_01,					// Gallery에 hash 필드 추가.
-		GALLERY_CHECK_NAME_01						// Gallery 의 name이 fileName과 동일하면 ""로 엎어친다.
+		GALLERY_CHECK_NAME_01,						// Gallery 의 name이 fileName과 동일하면 ""로 엎어친다.
+		BOARD_FREE_COMMENT_ADD_LAST_UPDATED_01		// BoardFreeComment에 lastUpdated 필드를 추가한다.
 	}
 
 	public enum SEARCH_TYPE {
