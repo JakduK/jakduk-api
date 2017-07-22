@@ -47,7 +47,7 @@ public class Gallery {
 
 	private GalleryStatus status;
 
-	private int views = 0;
+	private int views;
 
 	private List<CommonFeelingUser> usersLiking;
 

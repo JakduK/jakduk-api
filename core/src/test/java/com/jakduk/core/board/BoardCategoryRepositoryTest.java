@@ -6,7 +6,6 @@ import com.jakduk.core.model.db.BoardCategory;
 import com.jakduk.core.repository.board.category.BoardCategoryRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class BoardCategoryRepositoryTest extends CoreApplicationTests {
 
     @Test
     public void findByLanguage() {
-        List<BoardCategory> categories = sut.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
+        List<BoardCategory> categories = sut.findByLanguage(CoreUtils.getLanguageCode());
     }
 
 }
