@@ -4,10 +4,12 @@ import com.jakduk.api.common.ApiConst;
 import com.jakduk.core.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 public class BoardFreeHistory {
 
     @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "사진 ID")

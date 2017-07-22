@@ -75,6 +75,6 @@ public class BoardFree {
 
 	private LocalDateTime lastUpdated;
 
-	private boolean linkedGallery;
+	private Boolean linkedGallery;
 
 }

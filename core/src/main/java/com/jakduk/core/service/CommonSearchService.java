@@ -141,7 +141,7 @@ public class CommonSearchService {
                     .map(post -> {
                         List<String> galleryIds = null;
 
-                        if (post.isLinkedGallery()) {
+                        if (post.getLinkedGallery()) {
                             List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
                                     new ObjectId(post.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
@@ -207,7 +207,7 @@ public class CommonSearchService {
                     .map(comment -> {
                         List<String> galleryIds = null;
 
-                        if (comment.isLinkedGallery()) {
+                        if (comment.getLinkedGallery()) {
                             List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
                                     new ObjectId(comment.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 1);
 

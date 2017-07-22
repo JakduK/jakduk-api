@@ -7,6 +7,7 @@ import com.jakduk.api.restcontroller.home.vo.LatestPost;
 import com.jakduk.api.vo.board.*;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.common.util.CoreUtils;
+import com.jakduk.core.common.util.DateUtils;
 import com.jakduk.core.dao.BoardDAO;
 import com.jakduk.core.exception.ServiceError;
 import com.jakduk.core.exception.ServiceException;
@@ -290,7 +291,7 @@ public class BoardFreeService {
         }
 
         // 연결된 사진 끊기
-        if (boardFree.isLinkedGallery())
+        if (boardFree.getLinkedGallery())
 			commonGalleryService.unlinkGalleries(boardFree.getId(), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE);
 
 		// 색인 지움
@@ -563,7 +564,6 @@ public class BoardFreeService {
 				.content(content)
 				.status(new BoardCommentStatus(device))
 				.linkedGallery(! galleries.isEmpty())
-				.lastUpdated(LocalDateTime.now())
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
@@ -602,7 +602,6 @@ public class BoardFreeService {
 
 		boardFreeComment.setStatus(boardCommentStatus);
 		boardFreeComment.setLinkedGallery(! galleryIds.isEmpty());
-		boardFreeComment.setLastUpdated(LocalDateTime.now());
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
@@ -669,7 +668,7 @@ public class BoardFreeService {
 								boardFreeComment.getUsersDisliking()));
 
 					// 엮인 사진들
-					if (boardFreeComment.isLinkedGallery()) {
+					if (boardFreeComment.getLinkedGallery()) {
 						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 								new ObjectId(boardFreeComment.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
 
@@ -936,7 +935,7 @@ public class BoardFreeService {
 								comment.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
 										boardFreeComment.getUsersDisliking()));
 
-							if (boardFreeComment.isLinkedGallery()) {
+							if (boardFreeComment.getLinkedGallery()) {
 								List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 										new ObjectId(boardFreeComment.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
 
@@ -1006,6 +1005,21 @@ public class BoardFreeService {
 		FreePostDetail freePostDetail = new FreePostDetail();
 		BeanUtils.copyProperties(boardFree, freePostDetail);
 
+		List<BoardFreeHistory> histories = boardFree.getHistory().stream()
+				.map(boardHistory -> {
+					BoardFreeHistory boardFreeHistory = new BoardFreeHistory();
+					BeanUtils.copyProperties(boardHistory, boardFreeHistory);
+					LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeHistory.getId()).getDate());
+					boardFreeHistory.setType(ApiConst.BOARD_FREE_HISTORY_TYPE.valueOf(boardHistory.getType()));
+					boardFreeHistory.setTimestamp(timestamp);
+
+					return boardFreeHistory;
+				})
+				.sorted(Comparator.comparing(BoardFreeHistory::getId).reversed())
+				.collect(Collectors.toList());
+
+		freePostDetail.setHistory(histories);
+
 		Integer numberOfLike = CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
 		Integer numberOfDisLike = CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
 		BoardCategory boardCategory = boardCategoryRepository.findByCodeAndLanguage(boardFree.getCategory().name(), CoreUtils.getLanguageCode());
@@ -1015,7 +1029,7 @@ public class BoardFreeService {
 		freePostDetail.setNumberOfDislike(numberOfDisLike);
 
 		// 엮인 사진들
-		if (boardFree.isLinkedGallery()) {
+		if (boardFree.getLinkedGallery()) {
             List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
                     new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
 
@@ -1040,10 +1054,10 @@ public class BoardFreeService {
 		// 앞, 뒤 글
 		CoreConst.BOARD_CATEGORY_TYPE categoryType = CoreConst.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
 
-		BoardFreeSimple prevPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId())
-				, categoryType, CoreConst.CRITERIA_OPERATOR.GT);
-		BoardFreeSimple nextPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId())
-				, categoryType, CoreConst.CRITERIA_OPERATOR.LT);
+		BoardFreeSimple prevPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId()),
+				categoryType, CoreConst.CRITERIA_OPERATOR.GT);
+		BoardFreeSimple nextPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId()),
+				categoryType, CoreConst.CRITERIA_OPERATOR.LT);
 
         // 글쓴이의 최근 글
 		List<LatestFreePost> latestFreePosts = null;
