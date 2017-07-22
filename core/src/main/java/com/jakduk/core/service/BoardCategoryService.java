@@ -31,14 +31,7 @@ public class BoardCategoryService {
      * @return 말머리 목록
      */
     public List<BoardCategory> getFreeCategories() {
-        return boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
-    }
-
-    /**
-     * 자유게시판 말머리 가져오기
-     */
-    public BoardCategory getFreeCategory(String code) {
-        return boardCategoryRepository.findByCodeAndLanguage(code, CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
+        return boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode());
     }
 
     /**

@@ -41,10 +41,9 @@ public class HomeRestController {
 
     @ApiOperation(value = "랜덤하게 백과사전 하나 가져오기")
     @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
-    public Encyclopedia getEncyclopediaWithRandom(@RequestParam(required = false) String lang,
-                                                  Locale locale) {
+    public Encyclopedia getEncyclopediaWithRandom(@RequestParam(required = false) String lang) {
 
-        String language = CoreUtils.getLanguageCode(locale, lang);
+        String language = CoreUtils.getLanguageCode(lang);
 
         return homeService.getEncyclopediaWithRandom(language);
     }
@@ -52,10 +51,9 @@ public class HomeRestController {
     @ApiOperation(value = "홈에서 보여줄 각종 최근 데이터 가져오기")
     @GetMapping("/home/latest")
     public HomeResponse getLatest(
-            @RequestParam(required = false) String lang,
-            Locale locale) {
+            @RequestParam(required = false) String lang) {
 
-        String language = CoreUtils.getLanguageCode(locale, lang);
+        String language = CoreUtils.getLanguageCode(lang);
 
         HomeResponse response = new HomeResponse();
         response.setHomeDescription(homeService.getHomeDescription());

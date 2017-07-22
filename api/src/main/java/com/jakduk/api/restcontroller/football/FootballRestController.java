@@ -30,10 +30,9 @@ public class FootballRestController {
 
     @ApiOperation(value = "축구단 목록")
     @RequestMapping(value = "/clubs", method = RequestMethod.GET)
-    public List<FootballClub> getFootballClubs(@RequestParam String lang,
-                                               Locale locale) {
+    public List<FootballClub> getFootballClubs(@RequestParam String lang) {
 
-        String language = CoreUtils.getLanguageCode(locale, lang);
+        String language = CoreUtils.getLanguageCode(lang);
 
         return footballService.getFootballClubs(language, CoreConst.CLUB_TYPE.FOOTBALL_CLUB, CoreConst.NAME_TYPE.fullName);
     }

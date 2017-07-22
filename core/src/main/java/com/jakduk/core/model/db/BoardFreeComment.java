@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,6 +42,8 @@ public class BoardFreeComment {
 	private List<CommonFeelingUser> usersLiking;
 
 	private List<CommonFeelingUser> usersDisliking;
+
+	private LocalDateTime lastUpdated;
 
 	private boolean linkedGallery;
 

@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -217,6 +216,7 @@ public class BoardFreeService {
 		histories.add(history);
 		boardFree.setHistory(histories);
 
+		// lastUpdated
 		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
 
 		boardFreeRepository.save(boardFree);
@@ -259,7 +259,8 @@ public class BoardFreeService {
             if (Objects.isNull(histories))
                 histories = new ArrayList<>();
 
-            BoardHistory history = new BoardHistory(new ObjectId().toString(), CoreConst.BOARD_HISTORY_TYPE.DELETE, writer);
+			ObjectId boardHistoryId = new ObjectId();
+            BoardHistory history = new BoardHistory(boardHistoryId.toString(), CoreConst.BOARD_HISTORY_TYPE.DELETE, writer);
             histories.add(history);
 			boardFree.setHistory(histories);
 
@@ -272,7 +273,11 @@ public class BoardFreeService {
 			boardFree.setStatus(boardStatus);
 			boardFree.setLinkedGallery(false);
 
-            boardFreeRepository.save(boardFree);
+			// lastUpdated
+			boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+
+
+			boardFreeRepository.save(boardFree);
 
 			log.info("A post was deleted(post only). post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
         }
@@ -394,7 +399,7 @@ public class BoardFreeService {
 		freeNotices.forEach(applyCounts);
 
 		// 말머리
-		List<BoardCategory> categories = boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
+		List<BoardCategory> categories = boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode());
 
 		Map<String, String> categoriesMap = categories.stream()
 				.collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
@@ -557,6 +562,7 @@ public class BoardFreeService {
 				.content(content)
 				.status(new BoardCommentStatus(device))
 				.linkedGallery(! galleries.isEmpty())
+				.lastUpdated(LocalDateTime.now())
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
@@ -595,6 +601,7 @@ public class BoardFreeService {
 
 		boardFreeComment.setStatus(boardCommentStatus);
 		boardFreeComment.setLinkedGallery(! galleryIds.isEmpty());
+		boardFreeComment.setLastUpdated(LocalDateTime.now());
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
@@ -998,11 +1005,9 @@ public class BoardFreeService {
 		FreePostDetail freePostDetail = new FreePostDetail();
 		BeanUtils.copyProperties(boardFree, freePostDetail);
 
-		Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
-		Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
-
-		BoardCategory boardCategory = boardCategoryRepository.findByCodeAndLanguage(boardFree.getCategory().name(),
-				CoreUtils.getLanguageCode(LocaleContextHolder.getLocale(), null));
+		Integer numberOfLike = CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
+		Integer numberOfDisLike = CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
+		BoardCategory boardCategory = boardCategoryRepository.findByCodeAndLanguage(boardFree.getCategory().name(), CoreUtils.getLanguageCode());
 
 		freePostDetail.setCategory(boardCategory);
 		freePostDetail.setNumberOfLike(numberOfLike);
@@ -1013,7 +1018,7 @@ public class BoardFreeService {
             List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
                     new ObjectId(boardFree.getId()), CoreConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
 
-            if (! ObjectUtils.isEmpty(galleries)) {
+            if (! CollectionUtils.isEmpty(galleries)) {
                 List<BoardGallery> postDetailGalleries = galleries.stream()
                         .map(gallery -> BoardGallery.builder()
                                 .id(gallery.getId())

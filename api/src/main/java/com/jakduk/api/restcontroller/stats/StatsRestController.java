@@ -76,9 +76,9 @@ public class StatsRestController {
     }
 
     @RequestMapping(value = "/supporters", method = RequestMethod.GET)
-    public SupportersDataResponse dataSupporter(Locale locale) {
+    public SupportersDataResponse dataSupporter() {
 
-        String language = CoreUtils.getLanguageCode(locale, null);
+        String language = CoreUtils.getLanguageCode();
         Map<String, Object> data = statsService.getSupportersData(language);
 
         return SupportersDataResponse.builder()

@@ -15,22 +15,29 @@ import java.util.ResourceBundle;
 public class CoreUtils {
 
     /**
-     * Locale에서 언어 코드를 뽑아온다.
-     *
-     * @param locale Locale
-     * @param lang 원하는 language
+     * 사용 가능한 언어 코드를 클라이언트의 Locale 에서 뽑아온다.
      */
-    public static String getLanguageCode(Locale locale, String lang) {
+    public static String getLanguageCode() {
+        return CoreUtils.getLanguageCode(null);
+    }
 
-        String getLanguage = Locale.ENGLISH.getLanguage();
+    /**
+     * 사용 가능한 언어 코드를 클라이언트의 Locale 에서 뽑아온다.
+     *
+     * @param wantLanguage 원하는 language
+     */
+    public static String getLanguageCode(String wantLanguage) {
 
-        if (StringUtils.isEmpty(lang))
-            lang = locale.getLanguage();
+        Locale locale = LocaleContextHolder.getLocale();
+        String returnLanguage = Locale.ENGLISH.getLanguage();
 
-        if (StringUtils.isNotEmpty(lang) && lang.contains(Locale.KOREAN.getLanguage()))
-            getLanguage = Locale.KOREAN.getLanguage();
+        if (StringUtils.isBlank(wantLanguage))
+            wantLanguage = locale.getLanguage();
 
-        return getLanguage;
+        if (wantLanguage.contains(Locale.KOREAN.getLanguage()))
+            returnLanguage = Locale.KOREAN.getLanguage();
+
+        return returnLanguage;
     }
 
     /**

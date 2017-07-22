@@ -199,9 +199,9 @@ public class UserRestController {
     @ApiOperation("내 프로필 정보 보기")
     @SecuredRoleUser
     @GetMapping("/profile/me")
-    public UserProfileResponse getProfileMe(Locale locale) {
+    public UserProfileResponse getProfileMe() {
 
-        String language = CoreUtils.getLanguageCode(locale, null);
+        String language = CoreUtils.getLanguageCode();
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 

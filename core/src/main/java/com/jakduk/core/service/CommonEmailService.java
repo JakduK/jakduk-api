@@ -40,7 +40,7 @@ public class CommonEmailService {
 		String code = UUID.randomUUID().toString();
 		String callbackUrl = emailPayload.getExtra().get("host") + "/" + code;
 
-		String language = CoreUtils.getLanguageCode(locale, null);
+		String language = CoreUtils.getLanguageCode();
 
 		// Prepare the evaluation context
 		final Context ctx = new Context(locale);

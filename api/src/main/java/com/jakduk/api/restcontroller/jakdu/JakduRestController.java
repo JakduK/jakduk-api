@@ -55,11 +55,9 @@ public class JakduRestController {
     // 작두 일정 목록
     @RequestMapping(value = "/schedule", method = RequestMethod.GET)
     public JakduScheduleResponse dataSchedule(@RequestParam(required = false, defaultValue = "1") int page,
-                                              @RequestParam(required = false, defaultValue = "20") int size,
-                                              HttpServletRequest request) {
+                                              @RequestParam(required = false, defaultValue = "20") int size) {
 
-        Locale locale = localeResolver.resolveLocale(request);
-        String language = CoreUtils.getLanguageCode(locale, null);
+        String language = CoreUtils.getLanguageCode();
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
         Pageable pageable = new PageRequest(page - 1, size, sort);
