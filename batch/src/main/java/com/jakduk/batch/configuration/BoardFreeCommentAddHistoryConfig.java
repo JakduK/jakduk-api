@@ -1,6 +1,6 @@
 package com.jakduk.batch.configuration;
 
-import com.jakduk.batch.processor.BoardFreeCommentAddLastUpdatedProcessor;
+import com.jakduk.batch.processor.BoardFreeCommentAddHistoryProcessor;
 import com.jakduk.core.common.CoreConst;
 import com.jakduk.core.model.db.BoardFreeComment;
 import org.springframework.batch.core.Job;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 
 @Configuration
-public class BoardFreeCommentAddLastUpdatedConfig {
+public class BoardFreeCommentAddHistoryConfig {
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -41,29 +41,27 @@ public class BoardFreeCommentAddLastUpdatedConfig {
     private MongoOperations mongoOperations;
 
     @Bean
-    public Job boardFreeCommentAddLastUpdatedJob(@Qualifier("boardFreeCommentAddLastUpdatedStep") Step step) {
-
-        return jobBuilderFactory.get("boardFreeCommentAddLastUpdatedJob")
+    public Job boardFreeCommentAddHistoryJob(@Qualifier("boardFreeCommentAddHistoryStep") Step step) {
+        return jobBuilderFactory.get("boardFreeCommentAddHistoryJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step)
                 .build();
     }
 
     @Bean
-    public Step boardFreeCommentAddLastUpdatedStep() {
-        return stepBuilderFactory.get("boardFreeCommentAddLastUpdatedStep")
+    public Step boardFreeCommentAddHistoryStep() {
+        return stepBuilderFactory.get("boardFreeCommentAddHistoryStep")
                 .<BoardFreeComment, BoardFreeComment>chunk(1000)
-                .reader(boardFreeCommentAddLastUpdatedReader())
-                .processor(boardFreeCommentAddLastUpdatedProcessor())
-                .writer(boardFreeCommentAddLastUpdatedWriter())
+                .reader(boardFreeCommentAddHistoryReader())
+                .processor(boardFreeCommentAddHistoryProcessor())
+                .writer(boardFreeCommentAddHistoryWriter())
                 .build();
     }
 
     @Bean
-    public ItemReader<BoardFreeComment> boardFreeCommentAddLastUpdatedReader() {
-
+    public ItemReader<BoardFreeComment> boardFreeCommentAddHistoryReader() {
         String query = String.format("{'batch':{$nin:['%s']}}",
-                CoreConst.BATCH_TYPE.BOARD_FREE_COMMENT_ADD_LAST_UPDATED_01);
+                CoreConst.BATCH_TYPE.BOARD_FREE_COMMENT_ADD_HISTORY_01);
 
         MongoItemReader<BoardFreeComment> itemReader = new MongoItemReader<>();
         itemReader.setTemplate(mongoOperations);
@@ -78,12 +76,12 @@ public class BoardFreeCommentAddLastUpdatedConfig {
     }
 
     @Bean
-    public ItemProcessor<BoardFreeComment, BoardFreeComment> boardFreeCommentAddLastUpdatedProcessor() {
-        return new BoardFreeCommentAddLastUpdatedProcessor();
+    public ItemProcessor<BoardFreeComment, BoardFreeComment> boardFreeCommentAddHistoryProcessor() {
+        return new BoardFreeCommentAddHistoryProcessor();
     }
 
     @Bean
-    public MongoItemWriter<BoardFreeComment> boardFreeCommentAddLastUpdatedWriter() {
+    public MongoItemWriter<BoardFreeComment> boardFreeCommentAddHistoryWriter() {
         MongoItemWriter<BoardFreeComment> writer = new MongoItemWriter<>();
         writer.setTemplate(mongoOperations);
 
