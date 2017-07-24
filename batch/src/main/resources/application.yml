@@ -1,5 +1,0 @@
-# 어플리케이션 구동 시 모든 배치 작업을 시작할 지 여부.
-spring:
-  batch:
-    job:
-      enabled: false

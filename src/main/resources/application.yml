@@ -1,0 +1,31 @@
+spring:
+  profiles:
+    active: default
+  http:
+    multipart:
+      max-file-size: 8MB
+  mvc:
+    locale: ko_KR
+    throw-exception-if-no-handler-found: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: jakduknoreply
+    password: 1234qweras
+    test-connection: true
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.trust: smtp.gmail.com
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+api:
+  url-path:
+    user-picture-large: user/picture
+    user-picture-small: user/picture/small
+    gallery-image: gallery
+    gallery-thumbnail: gallery/thumbnail
+    board-free: board/free
