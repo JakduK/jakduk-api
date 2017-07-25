@@ -4,16 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.db.Gallery;
-import com.jakduk.core.repository.gallery.GalleryRepository;
+import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.model.db.Gallery;
+import com.jakduk.api.repository.gallery.GalleryRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -21,6 +20,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
+import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,19 +41,12 @@ import java.util.*;
  */
 
 public class GalleryOnListTest extends ApiApplicationTests {
-	
-	@Value("${core.storage.image.path}")
-	private String storageImagePath;
-	
-	@Autowired
-	private MongoTemplate mongoTemplate;
-	
-	@Autowired
-	private GalleryRepository galleryRepository;
-	
-	@Autowired
-    JakdukDAO jakdukDAO;
-	
+
+	@Resource private JakdukProperties.Storage storageProperties;
+
+	@Autowired private MongoTemplate mongoTemplate;
+	@Autowired private GalleryRepository galleryRepository;
+
 	@Test
 	public void convertDateTime01() {
 		ObjectId objId = new ObjectId("54bd00393d969532bfb7ddc9");
@@ -71,7 +64,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 	@Test
 	public void createDirectory01() {
 		
-		Path newDirectoryPath = Paths.get(storageImagePath, "test");
+		Path newDirectoryPath = Paths.get(storageProperties.getImagePath(), "test");
 		
 		if (Files.notExists(newDirectoryPath, LinkOption.NOFOLLOW_LINKS)) {
 		    try {
@@ -88,7 +81,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 	public void inputOutputFile01() {
 		
 		Path fromPath = Paths.get("/home/Pyohwan/사진", "t1.search.daumcdn.net.jpeg");
-		Path toPath = Paths.get(storageImagePath + "/test", "phjang.jpg");
+		Path toPath = Paths.get(storageProperties.getImagePath() + "/test", "phjang.jpg");
 		
 		if (Files.exists(fromPath)) {
 			try {
@@ -103,7 +96,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 	
 	@Test
 	public void deleteFile01() {
-		Path filePath = Paths.get(storageImagePath + "/test", "phjang.jpg");
+		Path filePath = Paths.get(storageProperties.getImagePath() + "/test", "phjang.jpg");
 		
 		if (Files.exists(filePath)) {
 			try {

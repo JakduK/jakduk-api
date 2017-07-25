@@ -20,7 +20,7 @@ public class EmailListener {
     @Autowired
     private CommonEmailService commonEmailService;
 
-    @RabbitListener(queues = "${core.rabbitmq.queues.email.binding-queue-name}")
+    @RabbitListener(queues = "${jakduk.rabbitmq.queues.email.binding-queue-name}")
     public void receive(EmailPayload emailPayload) throws MessagingException {
 
         switch (emailPayload.getType()) {

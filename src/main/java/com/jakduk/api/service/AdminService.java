@@ -2,6 +2,7 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -28,10 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -55,49 +56,21 @@ import java.util.List;
 @Slf4j
 @Service
 public class AdminService {
-	
-	@Value("${core.storage.image.path}")
-	private String storageImagePath;
-	
-	@Value("${core.storage.thumbnail.path}")
-	private String storageThumbnailPath;
-	
-	@Autowired
-	private JakdukDAO jakdukDAO;
-	
-	@Autowired
-	private CommonService commonService;
 
-	@Autowired
-	private BoardCategoryRepository boardCategoryRepository;
-	
-	@Autowired
-	private EncyclopediaRepository encyclopediaRepository;
-	
-	@Autowired
-	private FootballClubRepository footballClubRepository;
-	
-	@Autowired
-	private FootballClubOriginRepository footballClubOriginRepository;
-	
-	@Autowired
-	private GalleryRepository galleryRepository;
-	
-	@Autowired
-	private HomeDescriptionRepository homeDescriptionReposotiry;
-	
-	@Autowired
-	private AttendanceClubRepository attendanceClubRepository;
+	@Resource private JakdukProperties.Storage storageProperties;
 
-	@Autowired
-	private JakduScheduleRepository jakduScheduleRepository;
-
-	@Autowired
-	private JakduScheduleGroupRepository jakduScheduleGroupRepository;
-
-	// 리팩토링 할때 없애자.
-	@Autowired
-	private CompetitionRepository competitionRepository;
+	@Autowired private JakdukDAO jakdukDAO;
+	@Autowired private CommonService commonService;
+	@Autowired private BoardCategoryRepository boardCategoryRepository;
+	@Autowired private EncyclopediaRepository encyclopediaRepository;
+	@Autowired private FootballClubRepository footballClubRepository;
+	@Autowired private FootballClubOriginRepository footballClubOriginRepository;
+	@Autowired private GalleryRepository galleryRepository;
+	@Autowired private HomeDescriptionRepository homeDescriptionReposotiry;
+	@Autowired private AttendanceClubRepository attendanceClubRepository;
+	@Autowired private JakduScheduleRepository jakduScheduleRepository;
+	@Autowired private JakduScheduleGroupRepository jakduScheduleGroupRepository;
+	@Autowired private CompetitionRepository competitionRepository; // 리팩토링 할때 없애자.
 
 	// 알림판 목록.
 	public List<HomeDescription> findHomeDescriptions() {
@@ -238,10 +211,10 @@ public class AdminService {
 			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 			
-			Path imageDirPath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()), 
+			Path imageDirPath = Paths.get(storageProperties.getImagePath(), String.valueOf(timePoint.getYear()),
 					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
 			
-			Path thumbDirPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()), 
+			Path thumbDirPath = Paths.get(storageProperties.getThumbnailPath(), String.valueOf(timePoint.getYear()),
 					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
 			
 			// 사진 경로.

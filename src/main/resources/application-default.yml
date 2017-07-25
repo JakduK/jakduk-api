@@ -27,27 +27,23 @@ spring:
           enabled: true
           max-attempts: 3
 
-mongo:
-  db:
-    name: jakduk_test
-  host:
-    name: http://192.168.35.194:27017,http://192.168.35.138:27017
-
-api:
+jakduk:
   api-server-url: http://localhost:8080
   web-server-url: http://localhost:3000
   remember-me-expiration: 7200 # 2 hours
+
+  mongodb:
+    database: jakduk_test
+    host: http://192.168.35.194:27017,http://192.168.35.138:27017
   swagger: # swagger
     protocol: http
     host: localhost:8080
-  slackLog: # alert slack
+  slack-log: # alert slack
     enabled: false
     level: DEBUG
     webhook: https://hooks.slack.com/services/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
     channel: #jakduk_staging_log
     username: \uC791\uB450\uD0B9 \uC2EC\uD310
-
-core:
   elasticsearch:
     index-board: jakduk_dev_board
     index-gallery: jakduk_dev_gallery
@@ -77,11 +73,6 @@ core:
       elasticsearch-index-document-gallery: dev.elasticsearch.index-document-gallery
       elasticsearch-delete-document-gallery: dev.elasticsearch.delete-document-gallery
       elasticsearch-index-document-search-word: dev.elasticsearch.index-document-search-word
-  slack:
-    board:
-      channel: '#jakduk_board_noti'
-      enabled: false
-      webhook: https://hooks.slack.com/services/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
   storage:
     image:
       path: /Users/pyohwanjang/storage/image/

@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration.rabbitmq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.configuration.CoreProperties;
+import com.jakduk.api.configuration.JakdukProperties;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -24,11 +24,9 @@ import java.util.stream.Collectors;
 @Configuration
 public class CoreRabbitMQConfig {
 
-    @Resource
-    private CoreProperties coreProperties;
+    @Resource private JakdukProperties.Rabbitmq rabbitmqProperties;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     @Bean
     public MessageConverter messageConverter() {
@@ -37,12 +35,12 @@ public class CoreRabbitMQConfig {
 
     @Bean
     public TopicExchange topicExchange() {
-        return new TopicExchange(coreProperties.getRabbitmq().getExchangeName());
+        return new TopicExchange(rabbitmqProperties.getExchangeName());
     }
 
     @Bean
     public List<Binding> binding(TopicExchange exchange, List<Queue> queues) {
-        Map<String, String> queueMap = coreProperties.getRabbitmq().getQueues().entrySet().stream()
+        Map<String, String> queueMap = rabbitmqProperties.getQueues().entrySet().stream()
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toMap(CoreRabbitMQ::getBindingQueueName, CoreRabbitMQ::getBindingRoutingKey));
 
@@ -54,7 +52,7 @@ public class CoreRabbitMQConfig {
     @Bean
     public List<Queue> queues() {
 
-        return coreProperties.getRabbitmq().getQueues().entrySet().stream()
+        return rabbitmqProperties.getQueues().entrySet().stream()
                 .map(queue -> {
                     CoreRabbitMQ coreRabbitMQ = queue.getValue();
                     return new Queue(coreRabbitMQ.getBindingQueueName());

@@ -22,8 +22,8 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
-api:
-  url-path:
+jakduk:
+  api-url-path:
     user-picture-large: user/picture
     user-picture-small: user/picture/small
     gallery-image: gallery

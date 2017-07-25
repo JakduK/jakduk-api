@@ -4,6 +4,7 @@ import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.CoreConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -19,7 +20,6 @@ import com.jakduk.api.repository.board.free.BoardFreeRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.vo.board.GalleryOnBoard;
 import com.jakduk.api.vo.gallery.*;
-
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
@@ -59,29 +58,14 @@ import java.util.stream.Stream;
 @Service
 public class GalleryService {
 
-	@Value("${core.storage.image.path}")
-	private String storageImagePath;
+	@Resource private JakdukProperties.Storage storageProperties;
+	@Resource private ApiUtils apiUtils;
 
-	@Value("${core.storage.thumbnail.path}")
-	private String storageThumbnailPath;
-
-	@Resource
-	private ApiUtils apiUtils;
-
-	@Autowired
-	private GalleryRepository galleryRepository;
-
-	@Autowired
-	private BoardFreeRepository boardFreeRepository;
-
-	@Autowired
-	private JakdukDAO jakdukDAO;
-
-	@Autowired
-	private CommonGalleryService commonGalleryService;
-
-	@Autowired
-	private CommonMessageService commonMessageService;
+	@Autowired private GalleryRepository galleryRepository;
+	@Autowired private BoardFreeRepository boardFreeRepository;
+	@Autowired private JakdukDAO jakdukDAO;
+	@Autowired private CommonGalleryService commonGalleryService;
+	@Autowired private CommonMessageService commonMessageService;
 
 	public Gallery findOneById(String id) {
 		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
@@ -292,10 +276,10 @@ public class GalleryService {
 			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
-			Path imageDirPath = Paths.get(storageImagePath, String.valueOf(timePoint.getYear()),
+			Path imageDirPath = Paths.get(storageProperties.getImagePath(), String.valueOf(timePoint.getYear()),
 					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
 
-			Path thumbDirPath = Paths.get(storageThumbnailPath, String.valueOf(timePoint.getYear()),
+			Path thumbDirPath = Paths.get(storageProperties.getThumbnailPath(), String.valueOf(timePoint.getYear()),
 					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
 
 			if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS))
@@ -362,10 +346,10 @@ public class GalleryService {
 
 		switch (imageType) {
 			case FULL:
-				imagePath = storageImagePath;
+				imagePath = storageProperties.getImagePath();
 				break;
 			case THUMBNAIL:
-				imagePath = storageThumbnailPath;
+				imagePath = storageProperties.getThumbnailPath();
 				break;
 		}
 

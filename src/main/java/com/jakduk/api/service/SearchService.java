@@ -3,13 +3,17 @@ package com.jakduk.api.service;
 import com.jakduk.api.common.CoreConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
-import com.jakduk.api.configuration.CoreProperties;
+import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.exception.ServiceError;
+import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.elasticsearch.*;
 import com.jakduk.api.vo.board.BoardGallerySimple;
 import com.jakduk.api.vo.search.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.MultiSearchRequestBuilder;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -29,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,14 +46,10 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 
-	@Resource
-	private CoreProperties coreProperties;
+	@Resource private JakdukProperties.Elasticsearch elasticsearchProperties;
+	@Resource private ApiUtils apiUtils;
 
-	@Resource
-	private ApiUtils apiUtils;
-
-	@Autowired
-	private Client client;
+	@Autowired private Client client;
 
 	/**
 	 * 통합 검색
@@ -116,7 +117,7 @@ public class SearchService {
 	public PopularSearchWordResult aggregateSearchWord(LocalDate gteDate, Integer size) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(coreProperties.getElasticsearch().getIndexSearchWord())
+				.setIndices(elasticsearchProperties.getIndexSearchWord())
 				.setTypes(CoreConst.ES_TYPE_SEARCH_WORD)
 				.setSize(0)
 				.setQuery(
@@ -147,11 +148,120 @@ public class SearchService {
 				.build();
 	}
 
+	public void indexDocumentBoard(EsBoard esBoard) {
+
+		String id = esBoard.getId();
+
+		try {
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchProperties.getIndexBoard())
+					.setType(CoreConst.ES_TYPE_BOARD)
+					.setId(id)
+					.setSource(ObjectMapperUtils.writeValueAsString(esBoard))
+					.get();
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+		}
+	}
+
+	public void deleteDocumentBoard(String id) {
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchProperties.getIndexBoard())
+				.setType(CoreConst.ES_TYPE_BOARD)
+				.setId(id)
+				.get();
+
+		if (! response.isFound())
+			log.info("board id {} is not found. so can't delete it!", id);
+	}
+
+	public void indexDocumentBoardComment(EsComment esComment) {
+
+		String id = esComment.getId();
+		String parentBoardId = esComment.getBoardItem().getId();
+
+		try {
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchProperties.getIndexBoard())
+					.setType(CoreConst.ES_TYPE_COMMENT)
+					.setId(id)
+					.setParent(parentBoardId)
+					.setSource(ObjectMapperUtils.writeValueAsString(esComment))
+					.get();
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+		}
+	}
+
+	public void deleteDocumentBoardComment(String id) {
+
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchProperties.getIndexBoard())
+				.setType(CoreConst.ES_TYPE_COMMENT)
+				.setId(id)
+				.get();
+
+		if (! response.isFound())
+			log.info("comment id {} is not found. so can't delete it!", id);
+	}
+
+	// TODO : 구현 해야 함
+	public void createDocumentJakduComment(EsJakduComment EsJakduComment) {}
+
+	public void indexDocumentGallery(EsGallery esGallery) {
+
+		String id = esGallery.getId();
+
+		try {
+			IndexResponse response = client.prepareIndex()
+					.setIndex(elasticsearchProperties.getIndexGallery())
+					.setType(CoreConst.ES_TYPE_GALLERY)
+					.setId(id)
+					.setSource(ObjectMapperUtils.writeValueAsString(esGallery))
+					.get();
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+		}
+	}
+
+	public void deleteDocumentGallery(String id) {
+
+		DeleteResponse response = client.prepareDelete()
+				.setIndex(elasticsearchProperties.getIndexGallery())
+				.setType(CoreConst.ES_TYPE_GALLERY)
+				.setId(id)
+				.get();
+
+		if (! response.isFound())
+			log.info("gallery id {} is not found. so can't delete it!", id);
+	}
+
+	public void indexDocumentSearchWord(EsSearchWord esSearchWord) {
+
+		try {
+			IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
+
+			IndexResponse response = indexRequestBuilder
+					.setIndex(elasticsearchProperties.getIndexSearchWord())
+					.setType(CoreConst.ES_TYPE_SEARCH_WORD)
+					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
+					.get();
+
+			log.debug("indexDocumentSearchWord Source:\n {}", indexRequestBuilder.request().getDescription());
+
+		} catch (IOException e) {
+			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
+		}
+	}
+
 	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
 															  String postTags) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(coreProperties.getElasticsearch().getIndexBoard())
+				.setIndices(elasticsearchProperties.getIndexBoard())
 				.setTypes(CoreConst.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
@@ -222,7 +332,7 @@ public class SearchService {
 																String postTags) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(coreProperties.getElasticsearch().getIndexBoard())
+				.setIndices(elasticsearchProperties.getIndexBoard())
 				.setTypes(CoreConst.ES_TYPE_COMMENT)
 				.setFetchSource(null, new String[]{"content"})
 				.setQuery(
@@ -284,7 +394,7 @@ public class SearchService {
 
 	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(coreProperties.getElasticsearch().getIndexGallery())
+				.setIndices(elasticsearchProperties.getIndexGallery())
 				.setTypes(CoreConst.ES_TYPE_GALLERY)
 				.setFetchSource(null, new String[]{"name"})
 				.setQuery(QueryBuilders.matchQuery("name", query))

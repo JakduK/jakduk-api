@@ -2,7 +2,7 @@ package com.jakduk.api.controller;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.util.CoreUtils;
-import com.jakduk.api.configuration.ApiProperties;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.simple.BoardFreeOnRSS;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class DocumentRssFeedView extends AbstractRssFeedView {
 
 	@Resource
-	private ApiProperties apiProperties;
+	private JakdukProperties jakdukProperties;
 
 	@Autowired
 	private BoardFreeService boardFreeService;
@@ -46,7 +46,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	 */
 	@Override protected Channel newFeed() {
 		Channel channel = new Channel("rss_2.0");
-		channel.setLink(String.format("%s/%s", apiProperties.getWebServerUrl(), "/rss"));
+		channel.setLink(String.format("%s/%s", jakdukProperties.getWebServerUrl(), "/rss"));
 		channel.setTitle(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk"));
 		channel.setDescription(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk.rss.description"));
 
@@ -77,7 +77,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 			if (existPosts) {
 				List<Item> eachPostsOfRss = posts.stream()
 						.map(post -> {
-							String url = String.format("%s/%s/%d", apiProperties.getWebServerUrl(), apiProperties.getUrlPath().getBoardFree(), post.getSeq());
+							String url = String.format("%s/%s/%d", jakdukProperties.getWebServerUrl(), jakdukProperties.getApiUrlPath().getBoardFree(), post.getSeq());
 
 							Item item = new Item();
 							item.setAuthor(post.getWriter().getUsername());

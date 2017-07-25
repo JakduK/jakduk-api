@@ -30,7 +30,7 @@ import javax.annotation.Resource;
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
-    private ApiProperties apiProperties;
+    private JakdukProperties jakdukProperties;
 
     @Autowired
     private SnsAuthenticationProvider snsAuthenticationProvider;
@@ -56,7 +56,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                     .failureHandler(new RestJakdukFailureHandler())
 
                 .and().rememberMe()
-                    .tokenValiditySeconds(apiProperties.getRememberMeExpiration())
+                    .tokenValiditySeconds(jakdukProperties.getRememberMeExpiration())
 
                 .and().logout()
                     .logoutSuccessHandler(new RestLogoutSuccessHandler())

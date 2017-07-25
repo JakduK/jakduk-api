@@ -2,15 +2,16 @@ package com.jakduk.api.service;
 
 import com.jakduk.api.common.CoreConst;
 import com.jakduk.api.common.util.FileUtils;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.LinkedItem;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -22,17 +23,9 @@ import java.util.List;
 @Service
 public class CommonGalleryService {
 
-    @Value("${core.storage.image.path}")
-    private String storageImagePath;
-
-    @Value("${core.storage.thumbnail.path}")
-    private String storageThumbnailPath;
-
-    @Autowired
-    private GalleryRepository galleryRepository;
-
-    @Autowired
-    private CommonMessageService commonMessageService;
+    @Resource private JakdukProperties.Storage storageProperties;
+    @Autowired private GalleryRepository galleryRepository;
+    @Autowired private CommonMessageService commonMessageService;
 
     /**
      * Gallery와 사진 파일 지움
@@ -48,8 +41,8 @@ public class CommonGalleryService {
         String formatName = StringUtils.split(contentType, "/")[1];
         String fileName = id + "." + formatName;
 
-        FileUtils.removeImageFile(storageImagePath, localDate, fileName);
-        FileUtils.removeImageFile(storageThumbnailPath, localDate, fileName);
+        FileUtils.removeImageFile(storageProperties.getImagePath(), localDate, fileName);
+        FileUtils.removeImageFile(storageProperties.getThumbnailPath(), localDate, fileName);
 
         galleryRepository.delete(id);
     }

@@ -29,21 +29,20 @@ import java.util.stream.Stream;
  */
 
 @Configuration
-@EnableMongoRepositories(basePackages = {"com.jakduk.api.repository"})
-public class CoreMongoConfig extends AbstractMongoConfiguration {
+@EnableMongoRepositories("com.jakduk.api.repository")
+public class MongodbConfig extends AbstractMongoConfiguration {
 
-    @Resource
-    private Environment environment;
+    @Resource private JakdukProperties.Mongodb mongodbProperties;
 
     @Override
     protected String getDatabaseName() {
-        return environment.getProperty("mongo.db.name");
+        return mongodbProperties.getDatabase();
     }
 
     @Override
     public Mongo mongo() throws Exception {
 
-        List<ServerAddress> seeds = Stream.of(StringUtils.split(environment.getProperty("mongo.host.name"), ","))
+        List<ServerAddress> seeds = Stream.of(StringUtils.split(mongodbProperties.getHost(), ","))
                 .map(hostName -> {
                     try {
                         URL url = new URL(hostName);

@@ -4,7 +4,7 @@ import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.CoreConst;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.FileUtils;
-import com.jakduk.api.configuration.ApiProperties;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Gallery;
@@ -12,7 +12,6 @@ import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.simple.BoardFreeOnSitemap;
 import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.api.service.GalleryService;
-
 import com.jakduk.api.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.W3CDateFormat;
@@ -21,7 +20,6 @@ import com.redfin.sitemapgenerator.WebSitemapUrl;
 import org.apache.commons.lang3.CharEncoding;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
@@ -50,23 +48,12 @@ import java.util.List;
 @Controller
 public class DefaultViewController {
 
-	@Resource
-	private ApiProperties apiProperties;
+	@Resource private JakdukProperties jakdukProperties;
+	@Resource private JakdukProperties.Storage storageProperties;
 
-	@Autowired
-	private GalleryService galleryService;
-
-	@Autowired
-	private UserPictureService userPictureService;
-
-	@Autowired
-	private BoardFreeService boardFreeService;
-
-	@Value("${core.storage.user.picture.large.path}")
-	private String storageUserPictureLargePath;
-
-	@Value("${core.storage.user.picture.small.path}")
-	private String storageUserPictureSmallPath;
+	@Autowired private GalleryService galleryService;
+	@Autowired private UserPictureService userPictureService;
+	@Autowired private BoardFreeService boardFreeService;
 
 	// RSS
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
@@ -79,7 +66,7 @@ public class DefaultViewController {
 	public void getSitemap(HttpServletResponse servletResponse) {
 
 		try {
-			WebSitemapGenerator wsg =  WebSitemapGenerator.builder(apiProperties.getWebServerUrl(), null)
+			WebSitemapGenerator wsg =  WebSitemapGenerator.builder(jakdukProperties.getWebServerUrl(), null)
 					.dateFormat(new W3CDateFormat(W3CDateFormat.Pattern.SECOND))
 					.build();
 
@@ -105,8 +92,8 @@ public class DefaultViewController {
 						try {
 							WebSitemapUrl url = new WebSitemapUrl
 									.Options(
-									String.format("%s/%s/%d", apiProperties.getWebServerUrl(),
-											apiProperties.getUrlPath().getBoardFree(), post.getSeq())
+									String.format("%s/%s/%d", jakdukProperties.getWebServerUrl(),
+											jakdukProperties.getApiUrlPath().getBoardFree(), post.getSeq())
 							)
 									.lastMod(DateUtils.localDateTimeToDate(post.getLastUpdated()))
 									.priority(0.5)
@@ -132,7 +119,7 @@ public class DefaultViewController {
 	}
 
 	// 사진 가져오기.
-	@GetMapping("/${api.url-path.gallery-image}/{id}")
+	@GetMapping("/${jakduk.api-url-path.gallery-image}/{id}")
 	public void getGallery(@PathVariable String id,
 						   HttpServletResponse response) {
 
@@ -150,7 +137,7 @@ public class DefaultViewController {
 	}
 
 	// 사진 썸네일 가져오기.
-	@GetMapping("/${api.url-path.gallery-thumbnail}/{id}")
+	@GetMapping("/${jakduk.api-url-path.gallery-thumbnail}/{id}")
 	public void getGalleyThumbnail(@PathVariable String id,
 								   HttpServletResponse response) {
 
@@ -168,7 +155,7 @@ public class DefaultViewController {
 	}
 
 	// 회원 프로필 사진 가져오기.
-	@RequestMapping(value = "/${api.url-path.user-picture-large}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/${jakduk.api-url-path.user-picture-large}/{id}", method = RequestMethod.GET)
 	public void getUserPicture(@PathVariable String id,
 							 HttpServletResponse response) {
 
@@ -178,7 +165,7 @@ public class DefaultViewController {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageUserPictureLargePath, localDate, userPicture.getId(), userPicture.getContentType());
+			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), userPicture.getContentType());
 			response.setContentType(userPicture.getContentType());
 
 			byteStream.writeTo(response.getOutputStream());
@@ -188,7 +175,7 @@ public class DefaultViewController {
 	}
 
 	// 회원 프로필 작은 사진 가져오기.
-	@RequestMapping(value = "/${api.url-path.user-picture-small}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/${jakduk.api-url-path.user-picture-small}/{id}", method = RequestMethod.GET)
 	public void getUserSmallPicture(@PathVariable String id,
 									HttpServletResponse response) {
 
@@ -198,7 +185,7 @@ public class DefaultViewController {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageUserPictureSmallPath, localDate, userPicture.getId(), userPicture.getContentType());
+			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), userPicture.getContentType());
 			response.setContentType(userPicture.getContentType());
 
 			byteStream.writeTo(response.getOutputStream());

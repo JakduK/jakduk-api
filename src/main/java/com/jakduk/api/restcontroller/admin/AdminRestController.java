@@ -52,12 +52,6 @@ public class AdminRestController {
 	private CompetitionService competitionService;
 
 	@Autowired
-	private CommonSearchService commonSearchService;
-
-	@Autowired
-	private SearchService searchService;
-
-	@Autowired
 	private BoardCategoryService boardCategoryService;
 
 	@ApiOperation(value = "알림판 목록")
@@ -615,31 +609,6 @@ public class AdminRestController {
 	@RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
 	public EmptyJsonResponse initBoardCategory() {
 		boardCategoryService.initBoardCategory();
-
-		return EmptyJsonResponse.newInstance();
-	}
-
-	@ApiOperation(value = "검색 인덱스 초기화")
-	@RequestMapping(value = "/search/index/init", method = RequestMethod.POST)
-	public EmptyJsonResponse initSearchIndex() {
-
-		commonSearchService.createIndexBoard();
-		commonSearchService.createIndexGallery();
-
-		return EmptyJsonResponse.newInstance();
-	}
-
-	@ApiOperation(value = "검색 데이터 초기화")
-	@RequestMapping(value = "/search/data/init", method = RequestMethod.POST)
-	public EmptyJsonResponse initSearchData() {
-		try {
-			commonSearchService.processBulkInsertBoard();
-			commonSearchService.processBulkInsertComment();
-			commonSearchService.processBulkInsertGallery();
-
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 
 		return EmptyJsonResponse.newInstance();
 	}

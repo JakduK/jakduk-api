@@ -6,6 +6,7 @@ import com.jakduk.api.common.CoreConst;
 import com.jakduk.api.common.util.ApiUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.FileUtils;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.FootballClub;
@@ -20,12 +21,10 @@ import com.jakduk.api.repository.user.UserPictureRepository;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
 import com.jakduk.api.vo.user.UserProfileResponse;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -42,26 +41,13 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-	@Autowired
-	private UserRepository userRepository;
+	@Resource private JakdukProperties.Storage storageProperties;
+	@Resource private AuthUtils authUtils;
 
-	@Autowired
-	private FootballClubRepository footballClubRepository;
-
-	@Autowired
-	private UserProfileRepository userProfileRepository;
-
-	@Autowired
-	private UserPictureRepository userPictureRepository;
-
-	@Resource
-	private AuthUtils authUtils;
-
-	@Value("${core.storage.user.picture.large.path}")
-	private String storageUserPictureLargePath;
-
-	@Value("${core.storage.user.picture.small.path}")
-	private String storageUserPictureSmallPath;
+	@Autowired private UserRepository userRepository;
+	@Autowired private FootballClubRepository footballClubRepository;
+	@Autowired private UserProfileRepository userProfileRepository;
+	@Autowired private UserPictureRepository userPictureRepository;
 
 	public Optional<User> findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
@@ -225,9 +211,9 @@ public class UserService {
 				ObjectId objectId = new ObjectId(userPicture.getId());
 				LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-				FileUtils.writeImageFile(storageUserPictureLargePath, localDate, userPicture.getId(), fileInfo.getContentType(),
+				FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), fileInfo.getContentType(),
 						fileInfo.getContentLength(), fileInfo.getBytes());
-				FileUtils.writeSmallImageFile(storageUserPictureSmallPath, localDate, userPicture.getId(), fileInfo.getContentType(),
+				FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), fileInfo.getContentType(),
 						CoreConst.USER_SMALL_PICTURE_SIZE_WIDTH, CoreConst.USER_SMALL_PICTURE_SIZE_HEIGHT, fileInfo.getBytes());
 
 				user.setUserPicture(userPicture);
@@ -350,8 +336,8 @@ public class UserService {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			FileUtils.writeImageFile(storageUserPictureLargePath, localDate, userPicture.getId(), contentType, size, bytes);
-			FileUtils.writeSmallImageFile(storageUserPictureSmallPath, localDate, userPicture.getId(), contentType,
+			FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), contentType, size, bytes);
+			FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), contentType,
 					CoreConst.USER_SMALL_PICTURE_SIZE_WIDTH, CoreConst.USER_SMALL_PICTURE_SIZE_HEIGHT, bytes);
 
 			return userPicture;

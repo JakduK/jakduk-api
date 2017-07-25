@@ -2,7 +2,7 @@ package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.ApiConst;
 import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.configuration.ApiProperties;
+import com.jakduk.api.configuration.JakdukProperties;
 
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 public class ApiUtils {
 
     @Resource
-    private ApiProperties apiProperties;
+    private JakdukProperties jakdukProperties;
 
     private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";
 
@@ -119,14 +119,14 @@ public class ApiUtils {
 
         switch (sizeType) {
             case LARGE:
-                urlPathGallery = apiProperties.getUrlPath().getGalleryImage();
+                urlPathGallery = jakdukProperties.getApiUrlPath().getGalleryImage();
                 break;
             case SMALL:
-                urlPathGallery = apiProperties.getUrlPath().getGalleryThumbnail();
+                urlPathGallery = jakdukProperties.getApiUrlPath().getGalleryThumbnail();
                 break;
         }
 
-        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(apiProperties.getApiServerUrl())
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(jakdukProperties.getApiServerUrl())
                 .path("/{urlPathGallery}/{id}")
                 .buildAndExpand(urlPathGallery, id);
 

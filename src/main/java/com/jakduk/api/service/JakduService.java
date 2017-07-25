@@ -41,20 +41,11 @@ import java.util.Objects;
 @Slf4j
 public class JakduService {
 
-    @Autowired
-    private JakdukDAO jakdukDAO;
-
-    @Autowired
-    private CommonSearchService commonSearchService;
-
-    @Autowired
-    private JakduRepository jakduRepository;
-
-    @Autowired
-    private JakduScheduleRepository jakduScheduleRepository;
-
-    @Autowired
-    private JakduCommentRepository jakduCommentRepository;
+    @Autowired private JakduRepository jakduRepository;
+    @Autowired private JakduScheduleRepository jakduScheduleRepository;
+    @Autowired private JakduCommentRepository jakduCommentRepository;
+    @Autowired private JakdukDAO jakdukDAO;
+    @Autowired private SearchService searchService;
 
     public JakduSchedule findScheduleById(String id) {
         return jakduScheduleRepository.findOne(id);
@@ -127,7 +118,7 @@ public class JakduService {
                 .replaceAll("<(/)?([a-zA-Z0-9]*)(\\s[a-zA-Z0-9]*=[^>]*)?(\\s)*(/)?>","")
                 .replaceAll("\r|\n|&nbsp;",""));
 
-        commonSearchService.createDocumentJakduComment(EsJakduComment);
+        searchService.createDocumentJakduComment(EsJakduComment);
 
         return jakduComment;
     }

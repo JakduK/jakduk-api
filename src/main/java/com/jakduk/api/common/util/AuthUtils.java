@@ -3,7 +3,7 @@ package com.jakduk.api.common.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jakduk.api.common.CommonRole;
 import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.configuration.ApiProperties;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.authentication.UserDetailsImpl;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.vo.user.AuthUserProfile;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 public class AuthUtils {
 
     @Resource
-    private ApiProperties apiProperties;
+    private JakdukProperties jakdukProperties;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -275,14 +275,14 @@ public class AuthUtils {
 
         switch (sizeType) {
             case LARGE:
-                urlPathUserPicture = apiProperties.getUrlPath().getUserPictureLarge();
+                urlPathUserPicture = jakdukProperties.getApiUrlPath().getUserPictureLarge();
                 break;
             case SMALL:
-                urlPathUserPicture = apiProperties.getUrlPath().getUserPictureSmall();
+                urlPathUserPicture = jakdukProperties.getApiUrlPath().getUserPictureSmall();
                 break;
         }
 
-        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(apiProperties.getApiServerUrl())
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(jakdukProperties.getApiServerUrl())
                 .path("/{urlPathGallery}/{id}")
                 .buildAndExpand(urlPathUserPicture, id);
 

@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Created by pyohwanjang on 2017. 5. 1..
  */
-public class ApiPropertiesTest extends ApiApplicationTests {
+public class JakdukPropertiesTest extends ApiApplicationTests {
 
     @Autowired
-    private ApiProperties sut;
+    private JakdukProperties sut;
 
     @Test
     public void getProperties() {
-        Assert.assertTrue(sut.getUrlPath().getGalleryImage().equals("gallery"));
+        Assert.assertTrue(sut.getApiUrlPath().getGalleryImage().equals("gallery"));
     }
 }

@@ -28,13 +28,13 @@ import java.util.Set;
 public class ApiSwaggerConfig {
 
     @Resource
-    private ApiProperties apiProperties;
+    private JakdukProperties jakdukProperties;
 
     @Bean
     public Docket api() {
 
         Set<String> protocols = new HashSet<>();
-        protocols.add(apiProperties.getSwagger().getProtocol());
+        protocols.add(jakdukProperties.getSwagger().getProtocol());
 
         Set<String> producesList = new HashSet<>();
         producesList.add("application/json");
@@ -45,7 +45,7 @@ public class ApiSwaggerConfig {
                     .paths(PathSelectors.ant("/api/**"))
                 .build()
                 .protocols(protocols)
-                .host(apiProperties.getSwagger().getHost())
+                .host(jakdukProperties.getSwagger().getHost())
                 .apiInfo(apiInfo())
                 .useDefaultResponseMessages(false)
                 .securitySchemes(Collections.singletonList(apiKey()))

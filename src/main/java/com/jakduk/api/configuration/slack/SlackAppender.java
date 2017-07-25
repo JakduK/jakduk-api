@@ -3,7 +3,7 @@ package com.jakduk.api.configuration.slack;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
-import com.jakduk.api.configuration.ApiProperties;
+import com.jakduk.api.configuration.JakdukProperties;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
@@ -22,9 +22,9 @@ import java.util.List;
 
 public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
-    private ApiProperties.SlackLog apiSlackLogProperties;
+    private JakdukProperties.SlackLog apiSlackLogProperties;
 
-    public SlackAppender(ApiProperties.SlackLog apiSlackLogProperties) {
+    public SlackAppender(JakdukProperties.SlackLog apiSlackLogProperties) {
         this.apiSlackLogProperties = apiSlackLogProperties;
     }
 

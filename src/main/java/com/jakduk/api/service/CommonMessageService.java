@@ -6,7 +6,7 @@ import com.jakduk.api.common.rabbitmq.ElasticsearchRoutingKey;
 import com.jakduk.api.common.rabbitmq.EmailRoutingKey;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.CoreUtils;
-import com.jakduk.api.configuration.CoreProperties;
+import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.elasticsearch.EsBoard;
 import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.elasticsearch.EsGallery;
@@ -30,11 +30,9 @@ import java.util.Locale;
 @Service
 public class CommonMessageService {
 
-    @Resource
-    private CoreProperties coreProperties;
+    @Resource private JakdukProperties.Rabbitmq rabbitmqProperties;
 
-    @Autowired
-    private RabbitMQPublisher rabbitMQPublisher;
+    @Autowired private RabbitMQPublisher rabbitMQPublisher;
 
     public void sendWelcome(Locale locale, String recipientEmail, String userName) {
         EmailPayload emailPayload = EmailPayload.builder()
@@ -51,7 +49,7 @@ public class CommonMessageService {
                 )
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(EmailRoutingKey.EMAIL_WELCOME.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(EmailRoutingKey.EMAIL_WELCOME.getRoutingKey());
         rabbitMQPublisher.publishEmail(routingKey, emailPayload);
     }
 
@@ -78,7 +76,7 @@ public class CommonMessageService {
                 )
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(EmailRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(EmailRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
         rabbitMQPublisher.publishEmail(routingKey, emailPayload);
     }
 
@@ -95,12 +93,12 @@ public class CommonMessageService {
                 .galleries(galleryIds)
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, esBoard);
     }
 
     public void deleteDocumentBoard(String id) {
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, id);
     }
 
@@ -114,12 +112,12 @@ public class CommonMessageService {
                 .galleries(galleryIds)
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_COMMENT.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_COMMENT.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, esComment);
     }
 
     public void deleteDocumentComment(String id) {
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_COMMENT.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_COMMENT.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, id);
     }
 
@@ -130,12 +128,12 @@ public class CommonMessageService {
                 .name(name)
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_GALLERY.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_GALLERY.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, esGallery);
     }
 
     public void deleteDocumentGallery(String id) {
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_GALLERY.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_GALLERY.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, id);
     }
 
@@ -146,7 +144,7 @@ public class CommonMessageService {
                 .registerDate(LocalDateTime.now())
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD.getRoutingKey());
         rabbitMQPublisher.publishElasticsearch(routingKey, esSearchWord);
     }
 
