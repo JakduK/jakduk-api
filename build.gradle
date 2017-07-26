@@ -18,6 +18,10 @@ apply plugin: 'org.springframework.boot'
 version = '1.0.0'
 sourceCompatibility = 1.8
 
+springBoot {
+    executable = true
+}
+
 // test task 에서 spring.profiles.active 를 위한 설정.
 test {
     systemProperties = System.properties as Map<String, ?>
