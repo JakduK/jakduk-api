@@ -1,45 +1,67 @@
-
 buildscript {
     ext {
         springBootVersion = '1.5.4.RELEASE'
     }
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
-allprojects  {
-    group = 'com.jakduk'
-    version = '0.7.1-SNAPSHOT'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+version = '1.0.0'
+sourceCompatibility = 1.8
+
+// test task 에서 spring.profiles.active 를 위한 설정.
+test {
+    systemProperties = System.properties as Map<String, ?>
 }
 
-subprojects {
-    apply plugin: 'idea'
-    apply plugin: 'java'
-    apply plugin: 'org.springframework.boot'
+repositories {
+    jcenter()
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
-    // test task 에서 spring.profiles.active 를 위한 설정.
-    test {
-        systemProperties = System.properties as Map<String, ?>
+    // 프로젝트에 import한 jar 보관 폴더.
+    flatDir {
+        dirs getRootDir().path + '/custom-lib'
     }
+}
 
-    repositories {
-        jcenter()
+repositories {
+    mavenCentral()
+}
 
-        // 프로젝트에 import한 jar 보관 폴더.
-        flatDir {
-            dirs getRootDir().path + '/custom-lib'
-        }
-    }
 
-    dependencies {
-        testCompile('org.springframework.boot:spring-boot-starter-test')
-        compileOnly 'org.projectlombok:lombok'
-    }
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-mail')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+    compile('org.springframework.boot:spring-boot-starter-amqp')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.boot:spring-boot-starter-mobile')
+
+    compile 'io.springfox:springfox-swagger2:2.7.0'
+    compile 'io.springfox:springfox-swagger-ui:2.7.0'
+    compile "io.springfox:springfox-bean-validators:2.7.0"
+    compile 'com.github.dfabulich:sitemapgen4j:1.0.6'
+    compile 'commons-beanutils:commons-beanutils:1.9.3'
+    compile 'org.jongo:jongo:1.3.0'
+    compile 'org.apache.commons:commons-lang3:3.6'
+    compile 'org.apache.commons:commons-io:1.3.2'
+    compile 'org.apache.commons:commons-collections4:4.1'
+    compile 'org.jsoup:jsoup:1.10.3'
+    compile 'com.rometools:rome:1.7.0'
+    compile 'net.gpedro.integrations.slack:slack-webhook:1.3.0'
+    compile 'net.coobird:thumbnailator:0.4.8'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.9'
+
+    compileOnly 'org.projectlombok:lombok'
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
