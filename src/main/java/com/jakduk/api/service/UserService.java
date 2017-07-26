@@ -2,8 +2,8 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.CommonRole;
-import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.FileUtils;
 import com.jakduk.api.configuration.JakdukProperties;
@@ -49,7 +49,7 @@ public class UserService {
 	@Autowired private UserProfileRepository userProfileRepository;
 	@Autowired private UserPictureRepository userPictureRepository;
 
-	public Optional<User> findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE providerId, String providerUserId) {
+	public Optional<User> findOneByProviderIdAndProviderUserId(JakdukConst.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
@@ -95,7 +95,7 @@ public class UserService {
 		// User DB 와 SNS Profile 모두에 email이 없을 경우에는 신규 가입으로 진행한다.
 		// SNS 가입시 이메일 제공 동의를 안해서 그렇다.
 		if (StringUtils.isBlank(user.getEmail()) && StringUtils.isBlank(snsEmail)) {
-			user.setEmail(ApiUtils.generateTemporaryEmail());
+			user.setEmail(JakdukUtils.generateTemporaryEmail());
 			userRepository.save(user);
 
 			log.info("user({},{}) temporary email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
@@ -122,8 +122,8 @@ public class UserService {
 				.email(email.trim())
 				.username(username.trim())
 				.password(password)
-				.providerId(CoreConst.ACCOUNT_TYPE.JAKDUK)
-				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.providerId(JakdukConst.ACCOUNT_TYPE.JAKDUK)
+				.roles(Collections.singletonList(CommonRole.ROLE_USER_01.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 
@@ -148,7 +148,7 @@ public class UserService {
 
 		if (! ObjectUtils.isEmpty(userPicture)) {
 			userPicture.setUser(user);
-			userPicture.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+			userPicture.setStatus(JakdukConst.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
@@ -160,8 +160,8 @@ public class UserService {
 	/**
 	 * SNS 회원 가입
 	 */
-	public User addSocialUser(String email, String username, CoreConst.ACCOUNT_TYPE providerId, String providerUserId,
-							  String footballClub, String about, String userPictureId, String largePictureUrl) {
+	public User addSocialUser(String email, String username, JakdukConst.ACCOUNT_TYPE providerId, String providerUserId,
+                              String footballClub, String about, String userPictureId, String largePictureUrl) {
 
 		UserPicture userPicture = null;
 
@@ -170,7 +170,7 @@ public class UserService {
 				.username(username)
 				.providerId(providerId)
 				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(CommonRole.ROLE_NUMBER_USER_01))
+				.roles(Collections.singletonList(CommonRole.ROLE_USER_01.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 
@@ -201,7 +201,7 @@ public class UserService {
 					throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
 				userPicture = UserPicture.builder()
-						.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+						.status(JakdukConst.GALLERY_STATUS_TYPE.TEMP)
 						.contentType(fileInfo.getContentType())
 						.sourceType(providerId)
 						.build();
@@ -214,7 +214,7 @@ public class UserService {
 				FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), fileInfo.getContentType(),
 						fileInfo.getContentLength(), fileInfo.getBytes());
 				FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), fileInfo.getContentType(),
-						CoreConst.USER_SMALL_PICTURE_SIZE_WIDTH, CoreConst.USER_SMALL_PICTURE_SIZE_HEIGHT, fileInfo.getBytes());
+						JakdukConst.USER_SMALL_PICTURE_SIZE_WIDTH, JakdukConst.USER_SMALL_PICTURE_SIZE_HEIGHT, fileInfo.getBytes());
 
 				user.setUserPicture(userPicture);
 
@@ -228,7 +228,7 @@ public class UserService {
 		// userImage를 user와 연동 및 활성화 처리
 		if (Objects.nonNull(userPicture)) {
 			userPicture.setUser(user);
-			userPicture.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+			userPicture.setStatus(JakdukConst.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
@@ -273,7 +273,7 @@ public class UserService {
 
 		if (Objects.nonNull(userPicture)) {
 			userPicture.setUser(user);
-			userPicture.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+			userPicture.setStatus(JakdukConst.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
@@ -325,9 +325,9 @@ public class UserService {
 	public UserPicture uploadUserPicture(String contentType, long size, byte[] bytes) {
 
 		UserPicture userPicture = UserPicture.builder()
-				.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+				.status(JakdukConst.GALLERY_STATUS_TYPE.TEMP)
 				.contentType(contentType)
-				.sourceType(CoreConst.ACCOUNT_TYPE.JAKDUK)
+				.sourceType(JakdukConst.ACCOUNT_TYPE.JAKDUK)
 				.build();
 
 		userPictureRepository.save(userPicture);
@@ -338,7 +338,7 @@ public class UserService {
 		try {
 			FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), contentType, size, bytes);
 			FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), contentType,
-					CoreConst.USER_SMALL_PICTURE_SIZE_WIDTH, CoreConst.USER_SMALL_PICTURE_SIZE_HEIGHT, bytes);
+					JakdukConst.USER_SMALL_PICTURE_SIZE_WIDTH, JakdukConst.USER_SMALL_PICTURE_SIZE_HEIGHT, bytes);
 
 			return userPicture;
 
@@ -360,22 +360,22 @@ public class UserService {
 				.username(user.getUsername())
 				.about(user.getAbout())
 				.providerId(user.getProviderId())
-				.temporaryEmail(ApiUtils.isTempararyEmail(user.getEmail()))
+				.temporaryEmail(JakdukUtils.isTempararyEmail(user.getEmail()))
 				.build();
 
 		FootballClub footballClub = user.getSupportFC();
 		UserPicture userPicture = user.getUserPicture();
 
 		if (Objects.nonNull(footballClub)) {
-			LocalName localName = ApiUtils.getLocalNameOfFootballClub(footballClub, language);
+			LocalName localName = JakdukUtils.getLocalNameOfFootballClub(footballClub, language);
 
 			response.setFootballClubName(localName);
 		}
 
 		if (Objects.nonNull(userPicture)) {
 			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
-					authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-					authUtils.generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+					authUtils.generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+					authUtils.generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
 			response.setPicture(userPictureInfo);
 		}

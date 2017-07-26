@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.board.free;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.simple.*;
 import org.bson.types.ObjectId;
@@ -57,6 +57,6 @@ public interface BoardFreeRepositoryCustom {
     /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
-    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, CoreConst.BOARD_CATEGORY_TYPE category, CoreConst.CRITERIA_OPERATOR operator);
+    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, JakdukConst.BOARD_CATEGORY_TYPE category, JakdukConst.CRITERIA_OPERATOR operator);
 
 }

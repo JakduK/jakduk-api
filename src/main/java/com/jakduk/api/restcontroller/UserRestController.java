@@ -1,21 +1,21 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.ApiConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.annotation.SecuredRoleUser;
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
-import com.jakduk.api.common.util.CoreUtils;
-import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
+import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.configuration.security.SnsAuthenticationToken;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.api.service.CommonMessageService;
 import com.jakduk.api.service.UserService;
 import com.jakduk.api.vo.user.*;
 import io.swagger.annotations.Api;
@@ -57,20 +57,11 @@ import java.util.Objects;
 @Validated
 public class UserRestController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CommonMessageService commonMessageService;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
+    @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private UserService userService;
+    @Autowired private RabbitMQPublisher rabbitMQPublisher;
+    @Autowired private UserDetailsService userDetailsService;
 
 
     @ApiOperation("이메일 기반 회원 가입")
@@ -82,9 +73,9 @@ public class UserRestController {
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
-        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
 
-        // Perform the authentication
+        // Perform the security
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(),
@@ -104,7 +95,7 @@ public class UserRestController {
             Locale locale,
             HttpSession session) {
 
-        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(JakdukConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         if (Objects.isNull(attemptSocialUser))
             throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
@@ -118,16 +109,16 @@ public class UserRestController {
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
                 largePictureUrl);
 
-        commonMessageService.sendWelcome(locale, user.getUsername(), user.getEmail());
+        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
 
-        // Perform the authentication
+        // Perform the security
         Authentication authentication = authenticationManager.authenticate(
                 new SnsAuthenticationToken(
                         user.getEmail()
                 )
         );
 
-        session.removeAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+        session.removeAttribute(JakdukConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         AuthUtils.setAuthentication(authentication);
 
@@ -160,7 +151,7 @@ public class UserRestController {
 
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    CoreUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.email.exists"));
+                    JakdukUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.email.exists"));
 
         return EmptyJsonResponse.newInstance();
     }
@@ -182,7 +173,7 @@ public class UserRestController {
 
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    CoreUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.username.exists"));
+                    JakdukUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.username.exists"));
 
         return EmptyJsonResponse.newInstance();
     }
@@ -201,7 +192,7 @@ public class UserRestController {
     @GetMapping("/profile/me")
     public UserProfileResponse getProfileMe() {
 
-        String language = CoreUtils.getLanguageCode();
+        String language = JakdukUtils.getLanguageCode();
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 

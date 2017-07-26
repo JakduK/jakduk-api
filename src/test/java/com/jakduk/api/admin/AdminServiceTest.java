@@ -1,7 +1,7 @@
 package com.jakduk.api.admin;
 
-import com.jakduk.core.CoreApplicationTests;
-import com.jakduk.core.service.AdminService;
+import com.jakduk.api.ApiApplicationTests;
+import com.jakduk.api.service.AdminService;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 
 @Ignore
-public class AdminServiceTest extends CoreApplicationTests {
+public class AdminServiceTest extends ApiApplicationTests {
 
     @Autowired
     private AdminService sut;

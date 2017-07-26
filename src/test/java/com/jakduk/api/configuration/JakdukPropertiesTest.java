@@ -17,4 +17,10 @@ public class JakdukPropertiesTest extends ApiApplicationTests {
     public void getProperties() {
         Assert.assertTrue(sut.getApiUrlPath().getGalleryImage().equals("gallery"));
     }
+
+    @Test
+    public void rabbitmqTest() {
+        Assert.assertFalse(sut.getRabbitmq().getQueues().isEmpty());
+        Assert.assertFalse(sut.getRabbitmq().getRoutingKeys().isEmpty());
+    }
 }

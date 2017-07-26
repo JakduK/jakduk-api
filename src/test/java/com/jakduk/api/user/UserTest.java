@@ -1,14 +1,15 @@
 package com.jakduk.api.user;
 
 import com.jakduk.api.ApiApplicationTests;
-import com.jakduk.core.common.CommonRole;
-import com.jakduk.core.common.CoreConst;
-import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.db.User;
-import com.jakduk.core.model.etc.SupporterCount;
-import com.jakduk.core.model.simple.UserProfile;
-import com.jakduk.core.repository.user.UserProfileRepository;
-import com.jakduk.core.repository.user.UserRepository;
+
+import com.jakduk.api.common.CommonRole;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.dao.JakdukDAO;
+import com.jakduk.api.model.db.User;
+import com.jakduk.api.model.etc.SupporterCount;
+import com.jakduk.api.model.simple.UserProfile;
+import com.jakduk.api.repository.user.UserProfileRepository;
+import com.jakduk.api.repository.user.UserRepository;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -62,19 +63,11 @@ public class UserTest extends ApiApplicationTests {
 		UserProfile userProfile01 = userProfileRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
 		System.out.println("userProfile01=" + userProfile01);
 
-		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(CoreConst.ACCOUNT_TYPE.DAUM, "1lnkE");
+		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(JakdukConst.ACCOUNT_TYPE.DAUM, "1lnkE");
 		System.out.println("userProfile02=" + userProfile02);
 	}
 	
-	@Test
-	public void roleTest01() {
-		
-		String roleName = CommonRole.getRoleName(10);
-		
-		System.out.println("roleName=" + roleName);
-		System.out.println("roleNumber=" + CommonRole.getRoleNumber(roleName));
-			
-	}
+
 	
 	@Test
 	public void getSupportFCCount() {

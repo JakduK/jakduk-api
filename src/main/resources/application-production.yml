@@ -26,10 +26,14 @@ spring:
           enabled: true
           max-attempts: 3
 
-api:
+jakduk:
   api-server-url: https://api.jakduk.com
   web-server-url: https://jakduk.com
   remember-me-expiration: 2592000 # 1 month
+
+  mongodb:
+    database: jakduk_sample
+    host: http://192.168.35.194:27017,http://192.168.35.138:27017
   swagger: # swagger
     protocol: https
     host: api.jakduk.com
@@ -39,14 +43,6 @@ api:
     webhook: https://hooks.slack.com/services/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
     channel: #jakduk_log
     username: \uC791\uB450\uD0B9 \uC2EC\uD310
-
-mongo:
-  db:
-    name: jakduk_sample
-  host:
-    name: http://192.168.35.194:27017,http://192.168.35.138:27017
-
-core:
   elasticsearch:
     index-board: jakduk_prd_board
     index-gallery: jakduk_prd_gallery
@@ -75,12 +71,7 @@ core:
       elasticsearch-delete-document-comment: prd.elasticsearch.delete-document-comment
       elasticsearch-index-document-gallery: prd.elasticsearch.index-document-gallery
       elasticsearch-delete-document-gallery: prd.elasticsearch.delete-document-gallery
-      elasticsearch-index-document-search-word: prd.elasticsearch.delete-document-search-word
-  slack:
-    board:
-      channel: '#jakduk_board_noti'
-      enabled: true
-      webhook: https://hooks.slack.com/services/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
+      elasticsearch-index-document-search-word: prd.elasticsearch.index-document-search-word
   storage:
     image:
       path: /jakduk/storage/image/

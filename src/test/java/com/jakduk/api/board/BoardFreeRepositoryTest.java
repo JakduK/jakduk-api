@@ -1,10 +1,11 @@
 package com.jakduk.api.board;
 
-import com.jakduk.core.CoreApplicationTests;
-import com.jakduk.core.model.db.BoardFree;
-import com.jakduk.core.model.simple.BoardFreeOnRSS;
-import com.jakduk.core.model.simple.BoardFreeOnSitemap;
-import com.jakduk.core.repository.board.free.BoardFreeRepository;
+import com.jakduk.api.ApiApplicationTests;
+
+import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.simple.BoardFreeOnRSS;
+import com.jakduk.api.model.simple.BoardFreeOnSitemap;
+import com.jakduk.api.repository.board.free.BoardFreeRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,7 +22,7 @@ import java.util.Objects;
  * Created by pyohwan on 16. 9. 11.
  */
 
-public class BoardFreeRepositoryTest extends CoreApplicationTests {
+public class BoardFreeRepositoryTest extends ApiApplicationTests {
 
     @Autowired
     private BoardFreeRepository sut;

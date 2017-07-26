@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.gallery;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.GalleryStatus;
 import io.swagger.annotations.ApiModelProperty;
@@ -43,6 +43,6 @@ public class GalleryDetail {
     private GalleryStatus status;
 
     @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
-    private CoreConst.FEELING_TYPE myFeeling;
+    private JakdukConst.FEELING_TYPE myFeeling;
 
 }

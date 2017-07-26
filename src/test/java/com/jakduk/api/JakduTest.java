@@ -1,11 +1,12 @@
 package com.jakduk.api;
 
-import com.jakduk.core.dao.JakdukDAO;
-import com.jakduk.core.model.db.Competition;
-import com.jakduk.core.model.db.JakduComment;
-import com.jakduk.core.model.db.JakduSchedule;
-import com.jakduk.core.repository.jakdu.JakduRepository;
-import com.jakduk.core.repository.jakdu.JakduScheduleRepository;
+
+import com.jakduk.api.dao.JakdukDAO;
+import com.jakduk.api.model.db.Competition;
+import com.jakduk.api.model.db.JakduComment;
+import com.jakduk.api.model.db.JakduSchedule;
+import com.jakduk.api.repository.jakdu.JakduRepository;
+import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import java.util.List;
 public class JakduTest extends ApiApplicationTests {
 
     @Autowired
-    private  JakdukDAO jakdukDAO;
+    private JakdukDAO jakdukDAO;
 
     @Autowired
     private JakduScheduleRepository jakduScheduleRepository;

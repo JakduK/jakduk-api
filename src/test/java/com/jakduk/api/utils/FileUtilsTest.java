@@ -1,6 +1,6 @@
 package com.jakduk.api.utils;
 
-import com.jakduk.core.common.util.FileUtils;
+import com.jakduk.api.common.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,7 +1,7 @@
 package com.jakduk.api.vo.board;
 
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.embedded.BoardCommentStatus;
 import com.jakduk.api.model.embedded.BoardItem;
 import com.jakduk.api.model.embedded.CommonWriter;
@@ -44,7 +44,7 @@ public class FreePostDetailComment {
     private Integer numberOfDislike;
 
     @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
-    private CoreConst.FEELING_TYPE myFeeling;
+    private JakdukConst.FEELING_TYPE myFeeling;
 
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallery> galleries;

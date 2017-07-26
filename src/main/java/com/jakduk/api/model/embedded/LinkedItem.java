@@ -1,6 +1,6 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,6 +13,6 @@ import lombok.Getter;
 public class LinkedItem {
 
     private String id;
-    private CoreConst.GALLERY_FROM_TYPE from;
+    private JakdukConst.GALLERY_FROM_TYPE from;
 
 }

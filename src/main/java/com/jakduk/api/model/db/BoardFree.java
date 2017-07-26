@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.embedded.BoardHistory;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
@@ -52,7 +52,7 @@ public class BoardFree {
 	/**
 	 * 분류 ID
 	 */
-	private CoreConst.BOARD_CATEGORY_TYPE category;
+	private JakdukConst.BOARD_CATEGORY_TYPE category;
 	
 	/**
 	 * 조회
@@ -67,7 +67,7 @@ public class BoardFree {
 	
 	private List<BoardHistory> history;
 
-	private List<CoreConst.BATCH_TYPE> batch;
+	private List<JakdukConst.BATCH_TYPE> batch;
 
 	private String shortContent;
 

@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.football;
 
-import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.common.util.CoreUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.service.FootballService;
 import io.swagger.annotations.Api;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author pyohwan
@@ -32,8 +31,8 @@ public class FootballRestController {
     @RequestMapping(value = "/clubs", method = RequestMethod.GET)
     public List<FootballClub> getFootballClubs(@RequestParam String lang) {
 
-        String language = CoreUtils.getLanguageCode(lang);
+        String language = JakdukUtils.getLanguageCode(lang);
 
-        return footballService.getFootballClubs(language, CoreConst.CLUB_TYPE.FOOTBALL_CLUB, CoreConst.NAME_TYPE.fullName);
+        return footballService.getFootballClubs(language, JakdukConst.CLUB_TYPE.FOOTBALL_CLUB, JakdukConst.NAME_TYPE.fullName);
     }
 }

@@ -1,6 +1,6 @@
 package com.jakduk.api.common;
 
-import com.jakduk.core.common.rabbitmq.ElasticsearchRoutingKey;
+import com.jakduk.api.common.rabbitmq.ElasticsearchRoutingKey;
 import org.junit.Assert;
 import org.junit.Test;
 

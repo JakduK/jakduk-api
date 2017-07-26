@@ -1,6 +1,6 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import lombok.*;
 
 /**
@@ -17,6 +17,6 @@ import lombok.*;
 @Setter
 public class GalleryStatus {
 	
-	private CoreConst.GALLERY_STATUS_TYPE status;
+	private JakdukConst.GALLERY_STATUS_TYPE status;
 
 }

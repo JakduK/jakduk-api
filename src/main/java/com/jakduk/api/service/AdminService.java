@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
@@ -10,11 +10,11 @@ import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.JakduScheduleScore;
 import com.jakduk.api.model.embedded.LocalName;
 import com.jakduk.api.model.embedded.LocalSimpleName;
-import com.jakduk.api.model.web.CompetitionWrite;
-import com.jakduk.api.model.web.ThumbnailSizeWrite;
-import com.jakduk.api.model.web.board.BoardCategoryWrite;
-import com.jakduk.api.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.api.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.api.restcontroller.admin.vo.CompetitionWrite;
+import com.jakduk.api.restcontroller.admin.vo.ThumbnailSizeWrite;
+import com.jakduk.api.restcontroller.admin.vo.board.BoardCategoryWrite;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduScheduleWrite;
 import com.jakduk.api.repository.AttendanceClubRepository;
 import com.jakduk.api.repository.CompetitionRepository;
 import com.jakduk.api.repository.EncyclopediaRepository;
@@ -402,7 +402,7 @@ public class AdminService {
 		jakduScheduleGroup.setState(jakduScheduleGroupWrite.getState());
 
 		if (jakduScheduleGroupWrite.isNextSeq()) {
-			jakduScheduleGroup.setSeq(commonService.getNextSequence(CoreConst.SEQ_JAKDU_SCHEDULE_GROUP));
+			jakduScheduleGroup.setSeq(commonService.getNextSequence(JakdukConst.SEQ_JAKDU_SCHEDULE_GROUP));
 		} else {
 			jakduScheduleGroup.setSeq(jakduScheduleGroupWrite.getSeq());
 		}

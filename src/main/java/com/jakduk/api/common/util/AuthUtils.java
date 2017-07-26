@@ -2,9 +2,9 @@ package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jakduk.api.common.CommonRole;
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.configuration.authentication.UserDetailsImpl;
+import com.jakduk.api.configuration.security.UserDetailsImpl;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.vo.user.AuthUserProfile;
 import com.jakduk.api.vo.user.SocialProfile;
@@ -128,7 +128,7 @@ public class AuthUtils {
         if (authentication.getPrincipal() instanceof UserDetailsImpl) {
             UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
-            return userDetail.getProviderId().equals(CoreConst.ACCOUNT_TYPE.JAKDUK);
+            return userDetail.getProviderId().equals(JakdukConst.ACCOUNT_TYPE.JAKDUK);
         } else {
             return false;
         }
@@ -141,9 +141,9 @@ public class AuthUtils {
         if (authentication.getPrincipal() instanceof UserDetailsImpl) {
             UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
-            CoreConst.ACCOUNT_TYPE providerId = userDetail.getProviderId();
+            JakdukConst.ACCOUNT_TYPE providerId = userDetail.getProviderId();
 
-            return providerId.equals(CoreConst.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(CoreConst.ACCOUNT_TYPE.DAUM);
+            return providerId.equals(JakdukConst.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(JakdukConst.ACCOUNT_TYPE.DAUM);
         } else {
             return false;
         }
@@ -266,7 +266,7 @@ public class AuthUtils {
      * @param sizeType size 타입
      * @param id UserImage의 ID
      */
-    public String generateUserPictureUrl(CoreConst.IMAGE_SIZE_TYPE sizeType, String id) {
+    public String generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE sizeType, String id) {
 
         if (StringUtils.isBlank(id))
             return null;
@@ -294,7 +294,7 @@ public class AuthUtils {
     }
 
     /**
-     * 세션에 authentication 객체를 업데이트
+     * 세션에 security 객체를 업데이트
      */
     public static void setAuthentication(Authentication authentication) {
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -303,18 +303,10 @@ public class AuthUtils {
     }
 
     private static List<String> getRoles(List<Integer> roles) {
-        List<String> newRoles = new ArrayList<>();
-
-        if (roles != null) {
-            for (Integer roleNumber : roles) {
-                String roleName = CommonRole.getRoleName(roleNumber);
-                if (!roleName.isEmpty()) {
-                    newRoles.add(roleName);
-                }
-            }
-        }
-
-        return newRoles;
+        return roles.stream()
+                .map(CommonRole::findByCode)
+                .map(CommonRole::name)
+                .collect(Collectors.toList());
     }
 
     private static List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {

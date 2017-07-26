@@ -1,15 +1,15 @@
 package com.jakduk.api.restcontroller.admin;
 
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.LocalName;
 import com.jakduk.api.model.embedded.LocalSimpleName;
-import com.jakduk.api.model.web.CompetitionWrite;
-import com.jakduk.api.model.web.ThumbnailSizeWrite;
-import com.jakduk.api.model.web.board.BoardCategoryWrite;
-import com.jakduk.api.model.web.jakdu.JakduScheduleGroupWrite;
-import com.jakduk.api.model.web.jakdu.JakduScheduleWrite;
+import com.jakduk.api.restcontroller.admin.vo.CompetitionWrite;
+import com.jakduk.api.restcontroller.admin.vo.ThumbnailSizeWrite;
+import com.jakduk.api.restcontroller.admin.vo.board.BoardCategoryWrite;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduScheduleGroupWrite;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduScheduleWrite;
 import com.jakduk.api.restcontroller.admin.vo.AttendanceClubForm;
 import com.jakduk.api.restcontroller.admin.vo.FootballClubRequest;
 import com.jakduk.api.restcontroller.admin.vo.HomeDescriptionRequest;
@@ -191,9 +191,9 @@ public class AdminRestController {
 		encyclopedia.setId(null);
 
 		if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(CoreConst.ENCYCLOPEDIA_EN));
+			encyclopedia.setSeq(commonService.getNextSequence(JakdukConst.ENCYCLOPEDIA_EN));
 		} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(CoreConst.ENCYCLOPEDIA_KO));
+			encyclopedia.setSeq(commonService.getNextSequence(JakdukConst.ENCYCLOPEDIA_KO));
 		}
 
 		adminService.saveEncyclopedia(encyclopedia);
@@ -617,8 +617,8 @@ public class AdminRestController {
 	public Map<String, Object> thumbnailSizeWrite() {
 
 		Map<String, Object> data = new HashMap<>();
-		data.put("resWidth", CoreConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
-		data.put("resHeight", CoreConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+		data.put("resWidth", JakdukConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
+		data.put("resHeight", JakdukConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
 
 		return data;
 	}

@@ -1,6 +1,7 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.FileUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.db.Gallery;
@@ -25,7 +26,7 @@ public class CommonGalleryService {
 
     @Resource private JakdukProperties.Storage storageProperties;
     @Autowired private GalleryRepository galleryRepository;
-    @Autowired private CommonMessageService commonMessageService;
+    @Autowired private RabbitMQPublisher rabbitMQPublisher;
 
     /**
      * Gallery와 사진 파일 지움
@@ -53,7 +54,7 @@ public class CommonGalleryService {
      * @param itemId Item ID
      * @param fromType 출처
      */
-    public void unlinkGalleries(String itemId, CoreConst.GALLERY_FROM_TYPE fromType) {
+    public void unlinkGalleries(String itemId, JakdukConst.GALLERY_FROM_TYPE fromType) {
         List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(new ObjectId(itemId), fromType, 100);
 
         galleries.forEach(gallery -> {
@@ -66,7 +67,7 @@ public class CommonGalleryService {
                 galleryRepository.save(gallery);
             } else if (removed && linkedItems.size() < 1) {
                 this.deleteGallery(gallery.getId(), gallery.getContentType());
-                commonMessageService.deleteDocumentGallery(gallery.getId());
+                rabbitMQPublisher.deleteDocumentGallery(gallery.getId());
             }
         });
     }

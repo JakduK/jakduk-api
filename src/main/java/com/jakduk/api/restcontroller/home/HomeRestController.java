@@ -1,8 +1,8 @@
 package com.jakduk.api.restcontroller.home;
 
-import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.common.util.ApiUtils;
-import com.jakduk.api.common.util.CoreUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.restcontroller.home.vo.GalleryOnHome;
@@ -15,9 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -30,20 +28,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class HomeRestController {
 
-    @Autowired
-    private HomeService homeService;
-
-    @Autowired
-    private BoardFreeService boardFreeService;
-
-    @Resource
-    private ApiUtils apiUtils;
+    @Autowired private UrlGenerationUtils urlGenerationUtils;
+    @Autowired private HomeService homeService;
+    @Autowired private BoardFreeService boardFreeService;
 
     @ApiOperation(value = "랜덤하게 백과사전 하나 가져오기")
     @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
     public Encyclopedia getEncyclopediaWithRandom(@RequestParam(required = false) String lang) {
 
-        String language = CoreUtils.getLanguageCode(lang);
+        String language = JakdukUtils.getLanguageCode(lang);
 
         return homeService.getEncyclopediaWithRandom(language);
     }
@@ -53,7 +46,7 @@ public class HomeRestController {
     public HomeResponse getLatest(
             @RequestParam(required = false) String lang) {
 
-        String language = CoreUtils.getLanguageCode(lang);
+        String language = JakdukUtils.getLanguageCode(lang);
 
         HomeResponse response = new HomeResponse();
         response.setHomeDescription(homeService.getHomeDescription());
@@ -72,10 +65,9 @@ public class HomeRestController {
         // 사진 경로 붙히기.
         List<GalleryOnHome> galleriesOfHome = galleries.stream()
                 .map(GalleryOnHome::new)
-                .map(gallery -> {
-                    gallery.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-                    gallery.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-                    return gallery;
+                .peek(gallery -> {
+                    gallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+                    gallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
                 })
                 .collect(Collectors.toList());
 

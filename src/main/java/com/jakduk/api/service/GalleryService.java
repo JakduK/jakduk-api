@@ -1,9 +1,10 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.ApiConst;
-import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
@@ -59,13 +60,13 @@ import java.util.stream.Stream;
 public class GalleryService {
 
 	@Resource private JakdukProperties.Storage storageProperties;
-	@Resource private ApiUtils apiUtils;
 
+	@Autowired private UrlGenerationUtils urlGenerationUtils;
 	@Autowired private GalleryRepository galleryRepository;
 	@Autowired private BoardFreeRepository boardFreeRepository;
 	@Autowired private JakdukDAO jakdukDAO;
 	@Autowired private CommonGalleryService commonGalleryService;
-	@Autowired private CommonMessageService commonMessageService;
+	@Autowired private RabbitMQPublisher rabbitMQPublisher;
 
 	public Gallery findOneById(String id) {
 		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
@@ -85,7 +86,7 @@ public class GalleryService {
 		if (StringUtils.isNotBlank(id))
 			objectId = new ObjectId(id);
 
-		List<Gallery> galleries = galleryRepository.findGalleriesById(objectId, CoreConst.CRITERIA_OPERATOR.LT, size);
+		List<Gallery> galleries = galleryRepository.findGalleriesById(objectId, JakdukConst.CRITERIA_OPERATOR.LT, size);
 
 		// Gallery ID 뽑아내기.
 		List<ObjectId> ids = galleries.stream()
@@ -109,8 +110,8 @@ public class GalleryService {
 						galleryOnList.setDislikingCount(galleryFeelingCount.getUsersDisLikingCount());
 					}
 
-					galleryOnList.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-					galleryOnList.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+					galleryOnList.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+					galleryOnList.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
 					return galleryOnList;
 				})
@@ -141,19 +142,19 @@ public class GalleryService {
 
 		galleryDetail.setNumberOfLike(numberOfLike);
 		galleryDetail.setNumberOfDislike(numberOfDisLike);
-		galleryDetail.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-		galleryDetail.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+		galleryDetail.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+		galleryDetail.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
 		if (Objects.nonNull(commonWriter))
-			galleryDetail.setMyFeeling(ApiUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
+			galleryDetail.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
 
 		// 사진첩 보기의 앞, 뒤 사진을 가져온다.
-		List<Gallery> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.GT,
-				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
-		List<Gallery> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), CoreConst.CRITERIA_OPERATOR.LT,
-				ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
+		List<Gallery> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), JakdukConst.CRITERIA_OPERATOR.GT,
+				JakdukConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
+		List<Gallery> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), JakdukConst.CRITERIA_OPERATOR.LT,
+				JakdukConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
 
-		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
+		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY = JakdukConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
 		Integer prevGalleriesLimit = 0;
 		Integer nextGalleriesLimit = 0;
 		List<SurroundingsGallery> surroundingsGalleries = new ArrayList<>();
@@ -163,8 +164,8 @@ public class GalleryService {
 			SurroundingsGallery surroundingsGallery = new SurroundingsGallery();
 			BeanUtils.copyProperties(surroundingsPrevGallery, surroundingsGallery);
 
-			surroundingsGallery.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, surroundingsPrevGallery.getId()));
-			surroundingsGallery.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, surroundingsPrevGallery.getId()));
+			surroundingsGallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, surroundingsPrevGallery.getId()));
+			surroundingsGallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, surroundingsPrevGallery.getId()));
 
 			surroundingsGalleries.add(surroundingsGallery);
 		};
@@ -180,7 +181,7 @@ public class GalleryService {
 		else if (surroundingsPrevGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
 				&& surroundingsNextGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
-			prevGalleriesLimit = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsNextGalleries.size();
+			prevGalleriesLimit = JakdukConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsNextGalleries.size();
 			nextGalleriesLimit = surroundingsNextGalleries.size();
 		}
 		// 앞 사진 목록이 5개 미만일때
@@ -188,7 +189,7 @@ public class GalleryService {
 				&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
 			prevGalleriesLimit = surroundingsPrevGalleries.size();
-			nextGalleriesLimit = ApiConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsPrevGalleries.size();
+			nextGalleriesLimit = JakdukConst.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsPrevGalleries.size();
 		}
 
 		// 현재 보는 사진 포함 11장을 조합한다.
@@ -199,8 +200,8 @@ public class GalleryService {
 		SurroundingsGallery surroundingsViewingGallery = new SurroundingsGallery();
 		BeanUtils.copyProperties(gallery, surroundingsViewingGallery);
 
-		surroundingsViewingGallery.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, surroundingsViewingGallery.getId()));
-		surroundingsViewingGallery.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, surroundingsViewingGallery.getId()));
+		surroundingsViewingGallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, surroundingsViewingGallery.getId()));
+		surroundingsViewingGallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, surroundingsViewingGallery.getId()));
 
 		surroundingsGalleries.add(surroundingsViewingGallery);
 
@@ -216,7 +217,7 @@ public class GalleryService {
 
         if (! ObjectUtils.isEmpty(linkedItems)) {
             List<String> ids = linkedItems.stream()
-                    .filter(linkedItem -> linkedItem.getFrom().equals(CoreConst.GALLERY_FROM_TYPE.BOARD_FREE))
+                    .filter(linkedItem -> linkedItem.getFrom().equals(JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE))
                     .map(LinkedItem::getId)
                     .collect(Collectors.toList());
 
@@ -246,7 +247,7 @@ public class GalleryService {
 
 		// hash를 뽑아 DB에 같은게 있는지 찾아보고, 있으면 찾은걸 응답.
 		String hash = DigestUtils.md5DigestAsHex(bytes);
-		Optional<Gallery> oGallery = galleryRepository.findOneByHashAndStatusStatus(hash, CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+		Optional<Gallery> oGallery = galleryRepository.findOneByHashAndStatusStatus(hash, JakdukConst.GALLERY_STATUS_TYPE.ENABLE);
 
 		if (oGallery.isPresent())
 			return oGallery.get();
@@ -256,7 +257,7 @@ public class GalleryService {
 				.writer(writer)
 				.status(
 						GalleryStatus.builder()
-								.status(CoreConst.GALLERY_STATUS_TYPE.TEMP)
+								.status(JakdukConst.GALLERY_STATUS_TYPE.TEMP)
 								.build())
 				.fileName(fileName)
 				.size(size)
@@ -298,8 +299,8 @@ public class GalleryService {
 					Files.write(imageFilePath, bytes);
 				} else {
 
-					double scale = CoreConst.GALLERY_MAXIMUM_CAPACITY < size ?
-							CoreConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
+					double scale = JakdukConst.GALLERY_MAXIMUM_CAPACITY < size ?
+							JakdukConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
 
                     InputStream originalInputStream = new ByteArrayInputStream(bytes);
 
@@ -320,7 +321,7 @@ public class GalleryService {
 				InputStream thumbInputStream = new ByteArrayInputStream(bytes);
 
 				Thumbnails.of(thumbInputStream)
-						.size(CoreConst.GALLERY_THUMBNAIL_SIZE_WIDTH, CoreConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
+						.size(JakdukConst.GALLERY_THUMBNAIL_SIZE_WIDTH, JakdukConst.GALLERY_THUMBNAIL_SIZE_HEIGHT)
                         .crop(Positions.TOP_CENTER)
 						.toFile(thumbFilePath.toFile());
 			}
@@ -336,7 +337,7 @@ public class GalleryService {
 	}
 
 	// 이미지 가져오기.
-	public ByteArrayOutputStream getGalleryOutStream(String id, String contentType, CoreConst.IMAGE_TYPE imageType) {
+	public ByteArrayOutputStream getGalleryOutStream(String id, String contentType, JakdukConst.IMAGE_TYPE imageType) {
 
 		ObjectId objId = new ObjectId(id);
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
@@ -391,7 +392,7 @@ public class GalleryService {
 		if (Objects.isNull(gallery.getWriter()))
 			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		if (gallery.getStatus().getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.TEMP)) {
+		if (gallery.getStatus().getStatus().equals(JakdukConst.GALLERY_STATUS_TYPE.TEMP)) {
 
 			if (! userId.equals(gallery.getWriter().getUserId()))
 				throw new ServiceException(ServiceError.FORBIDDEN);
@@ -400,9 +401,9 @@ public class GalleryService {
 		}
 	}
 
-	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, CoreConst.FEELING_TYPE feeling) {
+	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, JakdukConst.FEELING_TYPE feeling) {
 
-		String errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE;
+		String errCode = JakdukConst.BOARD_USERS_FEELINGS_STATUS_NONE;
 
 		String accountId = writer.getUserId();
 		String accountName = writer.getUsername();
@@ -423,29 +424,29 @@ public class GalleryService {
 
 		if (accountId != null && accountName != null) {
 			if (galleryWriter != null && accountId.equals(galleryWriter.getUserId())) {
-				errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
+				errCode = JakdukConst.BOARD_USERS_FEELINGS_STATUS_WRITER;
 			}
 
-			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(JakdukConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersLiking.stream();
 				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
 				if (itemCount > 0) {
-					errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+					errCode = JakdukConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 				}
 			}
 
-			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(JakdukConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				Stream<CommonFeelingUser> users = usersDisliking.stream();
 				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
 				if (itemCount > 0) {
-					errCode = CoreConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
+					errCode = JakdukConst.BOARD_USERS_FEELINGS_STATUS_ALREADY;
 				}
 			}
 
-			if (errCode.equals(CoreConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
+			if (errCode.equals(JakdukConst.BOARD_USERS_FEELINGS_STATUS_NONE)) {
 				CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), accountId, accountName);
 
-				if (CoreConst.FEELING_TYPE.LIKE.equals(feeling)) {
+				if (JakdukConst.FEELING_TYPE.LIKE.equals(feeling)) {
 					usersLiking.add(feelingUser);
 					gallery.setUsersLiking(usersLiking);
 				} else {
@@ -479,7 +480,7 @@ public class GalleryService {
 	 * @param itemId 아이템 ID
 	 */
 	public void processLinkedGalleries(List<Gallery> galleries, List<GalleryOnBoard> galleriesForInsertion, List<String> galleryIdsForRemoval,
-								CoreConst.GALLERY_FROM_TYPE fromType, String itemId) {
+									   JakdukConst.GALLERY_FROM_TYPE fromType, String itemId) {
 
 		LinkedItem linkedItem = LinkedItem.builder()
 				.id(itemId)
@@ -510,15 +511,15 @@ public class GalleryService {
 
 			GalleryStatus status = gallery.getStatus();
 
-			if (status.getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.TEMP)) {
-				status.setStatus(CoreConst.GALLERY_STATUS_TYPE.ENABLE);
+			if (status.getStatus().equals(JakdukConst.GALLERY_STATUS_TYPE.TEMP)) {
+				status.setStatus(JakdukConst.GALLERY_STATUS_TYPE.ENABLE);
 				gallery.setStatus(status);
 			}
 
 			galleryRepository.save(gallery);
 
 			// 엘라스틱서치 색인 요청
-			commonMessageService.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
+			rabbitMQPublisher.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
 
 			if (! CollectionUtils.isEmpty(galleryIdsForRemoval)) {
 				if (galleryIdsForRemoval.contains(gallery.getId()))
@@ -534,7 +535,7 @@ public class GalleryService {
 				List<LinkedItem> linkedItems = gallery.getLinkedItems();
 
 				if (! CollectionUtils.isEmpty(linkedItems) &&
-						gallery.getStatus().getStatus().equals(CoreConst.GALLERY_STATUS_TYPE.ENABLE)) {
+						gallery.getStatus().getStatus().equals(JakdukConst.GALLERY_STATUS_TYPE.ENABLE)) {
 
 					linkedItems.stream()
 							.filter(item -> item.getId().equals(linkedItem.getId()) && item.getFrom().equals(linkedItem.getFrom()))
@@ -545,7 +546,7 @@ public class GalleryService {
 					if (linkedItems.size() < 1) {
 						commonGalleryService.deleteGallery(gallery.getId(), gallery.getContentType());
 						// 엘라스틱 서치 document 삭제.
-						commonMessageService.deleteDocumentGallery(gallery.getId());
+						rabbitMQPublisher.deleteDocumentGallery(gallery.getId());
 					}
 					// 업데이트 처리
 					else {

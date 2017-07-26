@@ -1,9 +1,10 @@
 package com.jakduk.api.board;
 
-import com.jakduk.core.CoreApplicationTests;
-import com.jakduk.core.model.db.BoardFreeComment;
-import com.jakduk.core.model.etc.CommonCount;
-import com.jakduk.core.repository.board.free.comment.BoardFreeCommentRepository;
+
+import com.jakduk.api.ApiApplicationTests;
+import com.jakduk.api.model.db.BoardFreeComment;
+import com.jakduk.api.model.etc.CommonCount;
+import com.jakduk.api.repository.board.free.comment.BoardFreeCommentRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import java.util.Objects;
 /**
  * Created by pyohwanjang on 2017. 3. 27..
  */
-public class BoardFreeCommentRepositoryTest extends CoreApplicationTests {
+public class BoardFreeCommentRepositoryTest extends ApiApplicationTests {
 
     @Autowired
     private BoardFreeCommentRepository sut;

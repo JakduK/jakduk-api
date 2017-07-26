@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration;
 
 import ch.qos.logback.classic.Level;
-import com.jakduk.api.configuration.rabbitmq.CoreRabbitMQ;
+import com.jakduk.api.configuration.rabbitmq.RabbitMQ;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -58,7 +58,7 @@ public class JakdukProperties {
     @ConfigurationProperties("jakduk.rabbitmq")
     public class Rabbitmq {
         private String exchangeName;
-        private Map<String, CoreRabbitMQ> queues = new HashMap<>();
+        private Map<String, RabbitMQ> queues = new HashMap<>();
         private Map<String, String> routingKeys = new HashMap<>();
     }
 

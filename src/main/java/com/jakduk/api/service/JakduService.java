@@ -1,8 +1,8 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.common.util.CoreUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -14,9 +14,9 @@ import com.jakduk.api.model.embedded.BoardCommentStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.JakduOnSchedule;
-import com.jakduk.api.model.web.jakdu.JakduCommentWriteRequest;
-import com.jakduk.api.model.web.jakdu.JakduCommentsResponse;
-import com.jakduk.api.model.web.jakdu.MyJakduRequest;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduCommentWriteRequest;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduCommentsResponse;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.MyJakduRequest;
 import com.jakduk.api.repository.jakdu.JakduCommentRepository;
 import com.jakduk.api.repository.jakdu.JakduRepository;
 import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
@@ -60,12 +60,12 @@ public class JakduService {
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
 
         if (Objects.isNull(jakduSchedule))
-            throw new NoSuchElementException(CoreUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+            throw new NoSuchElementException(JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
 
         JakduOnSchedule existJakdu = jakduRepository.findByUserIdAndWriter(writer.getUserId(), new ObjectId(jakduSchedule.getId()));
 
         if (Objects.nonNull(existJakdu))
-            throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, CoreUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.already.join.jakdu.exception"));
+            throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.already.join.jakdu.exception"));
 
         Jakdu jakdu = new Jakdu();
         jakdu.setSchedule(jakduSchedule);
@@ -83,7 +83,7 @@ public class JakduService {
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(jakdukScheduleId);
 
         if (Objects.isNull(jakduSchedule))
-            throw new NoSuchElementException(CoreUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+            throw new NoSuchElementException(JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
 
         return jakduRepository.findByUserIdAndWriter(userId, new ObjectId(jakduSchedule.getId()));
     }
@@ -95,7 +95,7 @@ public class JakduService {
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(request.getId());
 
         if (Objects.isNull(jakduSchedule)) {
-            throw new NoSuchElementException(CoreUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+            throw new NoSuchElementException(JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
         }
 
         BoardCommentStatus status = new BoardCommentStatus(request.getDevice());
@@ -151,7 +151,7 @@ public class JakduService {
     /**
      * 작두 댓글 감정 표현
      */
-    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, CoreConst.FEELING_TYPE feeling) {
+    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, JakdukConst.FEELING_TYPE feeling) {
 
         String userId = writer.getUserId();
         String username = writer.getUsername();

@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.stats;
 
-import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.common.util.CoreUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.db.AttendanceLeague;
 import com.jakduk.api.model.db.Competition;
@@ -71,7 +71,7 @@ public class StatsRestController {
     @ApiOperation(value = "연도별 관중수 목록")
     @RequestMapping(value = "/attendance/season/{season}", method = RequestMethod.GET)
     public List<AttendanceClub> getAttendanceSeason(@PathVariable Integer season,
-                                                    @RequestParam(required = false, defaultValue = CoreConst.K_LEAGUE_ABBREVIATION) String league){
+                                                    @RequestParam(required = false, defaultValue = JakdukConst.K_LEAGUE_ABBREVIATION) String league){
 
         return statsService.getAttendancesSeason(season, league);
     }
@@ -79,7 +79,7 @@ public class StatsRestController {
     @RequestMapping(value = "/supporters", method = RequestMethod.GET)
     public SupportersDataResponse dataSupporter() {
 
-        String language = CoreUtils.getLanguageCode();
+        String language = JakdukUtils.getLanguageCode();
         Map<String, Object> data = statsService.getSupportersData(language);
 
         return SupportersDataResponse.builder()

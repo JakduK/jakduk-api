@@ -1,7 +1,7 @@
 package com.jakduk.api.listener;
 
 import com.jakduk.api.model.rabbitmq.EmailPayload;
-import com.jakduk.api.service.CommonEmailService;
+import com.jakduk.api.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +18,17 @@ import javax.mail.MessagingException;
 public class EmailListener {
 
     @Autowired
-    private CommonEmailService commonEmailService;
+    private EmailService emailService;
 
     @RabbitListener(queues = "${jakduk.rabbitmq.queues.email.binding-queue-name}")
     public void receive(EmailPayload emailPayload) throws MessagingException {
 
         switch (emailPayload.getType()) {
             case WELCOME:
-                commonEmailService.sendWelcome(emailPayload);
+                emailService.sendWelcome(emailPayload);
                 break;
             case RESET_PASSWORD:
-                commonEmailService.sendResetPassword(emailPayload);
+                emailService.sendResetPassword(emailPayload);
                 break;
         }
     }

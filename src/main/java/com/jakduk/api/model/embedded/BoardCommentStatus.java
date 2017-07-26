@@ -1,6 +1,6 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +17,6 @@ import lombok.Setter;
 @Setter
 public class BoardCommentStatus {
 	
-	private CoreConst.DEVICE_TYPE device;
+	private JakdukConst.DEVICE_TYPE device;
 
 }

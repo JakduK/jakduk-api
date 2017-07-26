@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.board;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -17,6 +17,6 @@ import lombok.Getter;
 public class FreePostDeleteResponse {
 
     @ApiModelProperty(value = "결과")
-    CoreConst.BOARD_DELETE_TYPE result;
+    JakdukConst.BOARD_DELETE_TYPE result;
 
 }

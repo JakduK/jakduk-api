@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.gallery;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -17,6 +17,6 @@ public class LinkedItemForm {
     private String itemId;
 
     @ApiModelProperty(value = "출처")
-    private CoreConst.GALLERY_FROM_TYPE from;
+    private JakdukConst.GALLERY_FROM_TYPE from;
 
 }

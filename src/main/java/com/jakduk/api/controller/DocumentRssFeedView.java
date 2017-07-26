@@ -1,7 +1,7 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.api.common.ApiConst;
-import com.jakduk.api.common.util.CoreUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -34,11 +34,9 @@ import java.util.stream.Collectors;
 @Component("documentRssFeedView")
 public class DocumentRssFeedView extends AbstractRssFeedView {
 
-	@Resource
-	private JakdukProperties jakdukProperties;
+	@Resource private JakdukProperties jakdukProperties;
 
-	@Autowired
-	private BoardFreeService boardFreeService;
+	@Autowired private BoardFreeService boardFreeService;
 
 	/**
 	 * Create a new Channel instance to hold the entries.
@@ -47,8 +45,8 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	@Override protected Channel newFeed() {
 		Channel channel = new Channel("rss_2.0");
 		channel.setLink(String.format("%s/%s", jakdukProperties.getWebServerUrl(), "/rss"));
-		channel.setTitle(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk"));
-		channel.setDescription(CoreUtils.getResourceBundleMessage("messages.common", "common.jakduk.rss.description"));
+		channel.setTitle(JakdukUtils.getResourceBundleMessage("messages.common", "common.jakduk"));
+		channel.setDescription(JakdukUtils.getResourceBundleMessage("messages.common", "common.jakduk.rss.description"));
 
 		return channel;
 	}
@@ -61,7 +59,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 		List<Item> items = new ArrayList<>();
 
 		do {
-			List<BoardFreeOnRSS> posts = boardFreeService.getBoardFreeOnRss(postId, ApiConst.NUMBER_OF_ITEMS_EACH_PAGES);
+			List<BoardFreeOnRSS> posts = boardFreeService.getBoardFreeOnRss(postId, JakdukConst.NUMBER_OF_ITEMS_EACH_PAGES);
 
 			if (ObjectUtils.isEmpty(posts)) {
 				existPosts = false;
@@ -84,7 +82,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 							item.setTitle(post.getSubject());
 							item.setUri(url);
 							item.setLink(url);
-							item.setDescription(createDescription(CoreUtils.stripHtmlTag(post.getContent())));
+							item.setDescription(createDescription(JakdukUtils.stripHtmlTag(post.getContent())));
 							item.setPubDate(new ObjectId(post.getId()).getDate());
 
 							return item;

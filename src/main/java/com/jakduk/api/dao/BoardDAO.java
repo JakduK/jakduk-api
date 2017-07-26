@@ -1,6 +1,6 @@
 package com.jakduk.api.dao;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.etc.CommonCount;
 import com.jakduk.api.model.jongo.BoardFeelingCount;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
@@ -61,7 +61,7 @@ public class BoardDAO {
 		AggregationOperation match = Aggregation.match(Criteria.where("seq").in(arrSeq));
 		AggregationOperation group = Aggregation.group("_id").count().as("count");
 		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_LINE_NUMBER);
+		//AggregationOperation limit = Aggregation.limit(JakdukConst.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(unwind, match, group);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFree", CommonCount.class);
 		
@@ -83,7 +83,7 @@ public class BoardDAO {
 		Iterator<BoardFreeOnBest> iPosts = boardFreeC.aggregate("{$match:{_id:{$gt:#}}}", commentId)
 				.and("{$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}}")
 				.and("{$sort:{count:-1, views:-1}}")
-				.and("{$limit:#}", CoreConst.BOARD_TOP_LIMIT)
+				.and("{$limit:#}", JakdukConst.BOARD_TOP_LIMIT)
 				.as(BoardFreeOnBest.class);
 
 		return IteratorUtils.toList(iPosts);
@@ -106,7 +106,7 @@ public class BoardDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(commentId));
 		AggregationOperation group = Aggregation.group("boardItem").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.DESC, "count");
-		//AggregationOperation limit = Aggregation.limit(CoreConst.BOARD_TOP_LIMIT);
+		//AggregationOperation limit = Aggregation.limit(JakdukConst.BOARD_TOP_LIMIT);
 		Aggregation aggregation = Aggregation.newAggregation(match1, group, sort/*, limit*/);
 		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
 		

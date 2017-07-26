@@ -1,8 +1,8 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.CoreConst;
-import com.jakduk.api.common.util.CoreUtils;
+import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -12,7 +12,6 @@ import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
-import com.jakduk.api.repository.board.free.BoardFreeRepository;
 import com.jakduk.api.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,6 @@ public class HomeService {
 	
 	@Autowired
 	private EncyclopediaRepository encyclopediaRepository;
-	
-	@Autowired
-	private BoardFreeRepository boardFreeRepository;
 
 	@Autowired
 	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
@@ -74,25 +70,25 @@ public class HomeService {
 	 * @return 사진 목록
      */
 	public List<GallerySimple> getGalleriesLatest() {
-		return jakdukDAO.findGalleriesById(Direction.DESC, CoreConst.HOME_SIZE_GALLERY, null);
+		return jakdukDAO.findGalleriesById(Direction.DESC, JakdukConst.HOME_SIZE_GALLERY, null);
 	}
 
 	// 최근 댓글 가져오기.
 	public List<BoardFreeCommentOnHome> getBoardCommentsLatest() {
 		
 		Sort sort = new Sort(Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, CoreConst.HOME_SIZE_LINE_NUMBER, sort);
+		Pageable pageable = new PageRequest(0, JakdukConst.HOME_SIZE_LINE_NUMBER, sort);
 		
 		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
 		
 		for (BoardFreeCommentOnHome comment : comments) {
-			String content = CoreUtils.stripHtmlTag(comment.getContent());
+			String content = JakdukUtils.stripHtmlTag(comment.getContent());
 
 			if (StringUtils.isNotBlank(content)) {
 				Integer contentLength = content.length() + comment.getWriter().getUsername().length();
 
-				if (contentLength > CoreConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
-					content = content.substring(0, CoreConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
+				if (contentLength > JakdukConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+					content = content.substring(0, JakdukConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
 					content = String.format("%s...", content);
 				}
 				comment.setContent(content);

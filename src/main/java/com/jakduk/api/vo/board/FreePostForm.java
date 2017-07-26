@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.board;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class FreePostForm {
 
     @ApiModelProperty(required = true, value = "말머리 코드", example = "FREE")
     @NotNull
-    private CoreConst.BOARD_CATEGORY_TYPE categoryCode;
+    private JakdukConst.BOARD_CATEGORY_TYPE categoryCode;
 
     @ApiModelProperty(value = "사진 목록")
     private List<GalleryOnBoard> galleries;

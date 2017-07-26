@@ -1,9 +1,8 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.ApiConst;
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.util.AuthUtils;
-import com.jakduk.api.configuration.authentication.SnsAuthenticationToken;
+import com.jakduk.api.configuration.security.SnsAuthenticationToken;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
@@ -56,7 +55,7 @@ public class AuthRestController {
             @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody LoginSocialUserForm form,
             HttpSession session) {
 
-        CoreConst.ACCOUNT_TYPE convertProviderId = CoreConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
+        JakdukConst.ACCOUNT_TYPE convertProviderId = JakdukConst.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
         SocialProfile socialProfile = null;
 
         switch (convertProviderId) {
@@ -77,7 +76,7 @@ public class AuthRestController {
         if (oUser.isPresent()) {
             userService.checkBackwardCompatibilityOfSnsUser(socialProfile.getEmail(), oUser.get());
 
-            // Perform the authentication
+            // Perform the security
             Authentication authentication = authenticationManager.authenticate(
                     new SnsAuthenticationToken(
                             oUser.get().getEmail()
@@ -105,7 +104,7 @@ public class AuthRestController {
         if (StringUtils.isNotBlank(socialProfile.getSmallPictureUrl()))
             attemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
 
-        session.setAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
+        session.setAttribute(JakdukConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
 
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
@@ -114,7 +113,7 @@ public class AuthRestController {
     @GetMapping("/user/attempt")
     public AttemptSocialUser getAttemptSocialUser(HttpSession session) {
 
-        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(ApiConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(JakdukConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         if (Objects.isNull(attemptSocialUser))
             throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);

@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.embedded.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -42,6 +42,6 @@ public class BoardFreeComment {
 
 	private List<BoardHistory> history;
 
-    private List<CoreConst.BATCH_TYPE> batch;
+    private List<JakdukConst.BATCH_TYPE> batch;
 
 }

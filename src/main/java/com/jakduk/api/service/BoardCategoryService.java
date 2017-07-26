@@ -1,12 +1,11 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.util.CoreUtils;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.BoardCategory;
 import com.jakduk.api.model.embedded.LocalSimpleName;
 import com.jakduk.api.repository.board.category.BoardCategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class BoardCategoryService {
      * @return 말머리 목록
      */
     public List<BoardCategory> getFreeCategories() {
-        return boardCategoryRepository.findByLanguage(CoreUtils.getLanguageCode());
+        return boardCategoryRepository.findByLanguage(JakdukUtils.getLanguageCode());
     }
 
     /**

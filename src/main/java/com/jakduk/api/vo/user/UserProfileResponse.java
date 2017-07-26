@@ -1,6 +1,6 @@
 package com.jakduk.api.vo.user;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.embedded.LocalName;
 import com.jakduk.api.model.embedded.UserPictureInfo;
 import io.swagger.annotations.ApiModel;
@@ -31,7 +31,7 @@ public class UserProfileResponse {
 	private String about;
 
 	@ApiModelProperty(value = "provider ID")
-	private CoreConst.ACCOUNT_TYPE providerId;
+	private JakdukConst.ACCOUNT_TYPE providerId;
 
 	@ApiModelProperty(value = "지지 축구단 객체")
 	@Setter

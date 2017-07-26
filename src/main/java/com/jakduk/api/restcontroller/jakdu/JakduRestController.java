@@ -1,18 +1,17 @@
 package com.jakduk.api.restcontroller.jakdu;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.annotation.SecuredRoleUser;
-import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
-import com.jakduk.api.common.util.CoreUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalName;
-import com.jakduk.api.model.web.jakdu.JakduCommentWriteRequest;
-import com.jakduk.api.model.web.jakdu.JakduCommentsResponse;
-import com.jakduk.api.model.web.jakdu.MyJakduRequest;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduCommentWriteRequest;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.JakduCommentsResponse;
+import com.jakduk.api.restcontroller.admin.vo.jakdu.MyJakduRequest;
 import com.jakduk.api.service.FootballService;
 import com.jakduk.api.service.JakduService;
 import com.jakduk.api.vo.user.AuthUserProfile;
@@ -57,7 +56,7 @@ public class JakduRestController {
     public JakduScheduleResponse dataSchedule(@RequestParam(required = false, defaultValue = "1") int page,
                                               @RequestParam(required = false, defaultValue = "20") int size) {
 
-        String language = CoreUtils.getLanguageCode();
+        String language = JakdukUtils.getLanguageCode();
 
         Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
         Pageable pageable = new PageRequest(page - 1, size, sort);
@@ -74,7 +73,7 @@ public class JakduRestController {
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
 
-        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, CoreConst.NAME_TYPE.fullName);
+        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, JakdukConst.NAME_TYPE.fullName);
         List<Competition> competitions = footballService.getCompetitions(new ArrayList<>(competitionIds), language);
 
         Map<String, LocalName> fcNames = footballClubs.stream()
@@ -118,7 +117,7 @@ public class JakduRestController {
     public Jakdu myJakduWrite(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
 
         if (Objects.isNull(myJakdu)) {
-            throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
+            throw new IllegalArgumentException(JakdukUtils.getExceptionMessage("exception.invalid.parameter"));
         }
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
@@ -132,12 +131,12 @@ public class JakduRestController {
                                      Device device) {
 
         if (Objects.isNull(jakduCommentWriteRequest))
-            throw new IllegalArgumentException(CoreUtils.getExceptionMessage("exception.invalid.parameter"));
+            throw new IllegalArgumentException(JakdukUtils.getExceptionMessage("exception.invalid.parameter"));
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        jakduCommentWriteRequest.setDevice(ApiUtils.getDeviceInfo(device));
+        jakduCommentWriteRequest.setDevice(JakdukUtils.getDeviceInfo(device));
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
@@ -159,7 +158,7 @@ public class JakduRestController {
     // 작두 댓글 좋아요 싫어요
     @RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
-                                                 @PathVariable CoreConst.FEELING_TYPE feeling) {
+                                                 @PathVariable JakdukConst.FEELING_TYPE feeling) {
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);

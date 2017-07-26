@@ -1,7 +1,7 @@
 package com.jakduk.api.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jakduk.core.common.util.ObjectMapperUtils;
+import com.jakduk.api.common.util.ObjectMapperUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -24,7 +24,7 @@ public class Sequence {
 	
 	/**
 	 * 게시판 ID
-	 * CoreConst 의 게시판 ID 참고
+	 * JakdukConst 의 게시판 ID 참고
 	 */
 	@NotNull
 	private String name;

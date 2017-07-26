@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller;
 
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
-import com.jakduk.api.service.CommonMessageService;
 import com.jakduk.api.service.SearchService;
 import com.jakduk.api.vo.search.PopularSearchWordResult;
 import com.jakduk.api.vo.search.SearchUnifiedResponse;
@@ -34,11 +34,8 @@ import java.time.LocalDate;
 @RestController
 public class SearchRestController {
 	
-	@Autowired
-	private CommonMessageService commonMessageService;
-
-	@Autowired
-	private SearchService searchService;
+	@Autowired private RabbitMQPublisher rabbitMQPublisher;
+	@Autowired private SearchService searchService;
 
 	@ApiOperation("통합 찾기")
 	@GetMapping("")
@@ -69,7 +66,7 @@ public class SearchRestController {
 
 		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size, preTags, postTags);
 
-		commonMessageService.indexDocumentSearchWord(StringUtils.lowerCase(q), AuthUtils.getCommonWriter());
+		rabbitMQPublisher.indexDocumentSearchWord(StringUtils.lowerCase(q), AuthUtils.getCommonWriter());
 
 		return searchUnifiedResponse;
 	}

@@ -1,11 +1,11 @@
 package com.jakduk.api.rabbitmq;
 
-import com.jakduk.core.CoreApplicationTests;
-import com.jakduk.core.common.rabbitmq.ElasticsearchRoutingKey;
-import com.jakduk.core.common.rabbitmq.RabbitMQPublisher;
-import com.jakduk.core.configuration.CoreProperties;
-import com.jakduk.core.model.elasticsearch.EsBoard;
-import com.jakduk.core.model.embedded.CommonWriter;
+import com.jakduk.api.ApiApplicationTests;
+import com.jakduk.api.common.rabbitmq.ElasticsearchRoutingKey;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
+import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.model.elasticsearch.EsBoard;
+import com.jakduk.api.model.embedded.CommonWriter;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import javax.annotation.Resource;
 /**
  * Created by pyohwanjang on 2017. 7. 5..
  */
-public class RabbitMQPublisherTest extends CoreApplicationTests {
+public class RabbitMQPublisherTest extends ApiApplicationTests {
 
     @Resource
-    private CoreProperties coreProperties;
+    private JakdukProperties jakdukProperties;
 
     @Autowired
     private RabbitMQPublisher sut;
@@ -36,7 +36,7 @@ public class RabbitMQPublisherTest extends CoreApplicationTests {
 //                .galleries(Collections.EMPTY_LIST)
                 .build();
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
+        String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
 
         sut.publishElasticsearch(routingKey, esBoard);
     }
@@ -46,7 +46,7 @@ public class RabbitMQPublisherTest extends CoreApplicationTests {
 
         String id = "595bb024290ad3035636f2ba";
 
-        String routingKey = coreProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
+        String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
 
         sut.publishElasticsearch(routingKey, id);
 

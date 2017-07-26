@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,9 +21,9 @@ public class FootballClubOrigin {
 	
 	private String name;
 
-	private CoreConst.CLUB_TYPE clubType;
+	private JakdukConst.CLUB_TYPE clubType;
 
-	private CoreConst.CLUB_AGE age;
+	private JakdukConst.CLUB_AGE age;
 
-	private CoreConst.CLUB_SEX sex;
+	private JakdukConst.CLUB_SEX sex;
 }

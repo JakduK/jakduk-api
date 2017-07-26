@@ -1,10 +1,10 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.ApiConst;
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.annotation.SecuredRoleUser;
-import com.jakduk.api.common.util.ApiUtils;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Gallery;
@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -43,11 +42,8 @@ import java.util.Objects;
 @RestController
 public class GalleryRestController {
 
-    @Resource
-    private ApiUtils apiUtils;
-
-    @Autowired
-    private GalleryService galleryService;
+    @Autowired private UrlGenerationUtils urlGenerationUtils;
+    @Autowired private GalleryService galleryService;
 
     @ApiOperation(value = "사진 목록")
     @GetMapping("/galleries")
@@ -55,7 +51,7 @@ public class GalleryRestController {
             @ApiParam(value = "이 ID 이후부터 목록 가져옴") @RequestParam(required = false) String id,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "0") Integer size) {
 
-        if (size < CoreConst.GALLERY_SIZE) size = CoreConst.GALLERY_SIZE;
+        if (size < JakdukConst.GALLERY_SIZE) size = JakdukConst.GALLERY_SIZE;
 
         return galleryService.getGalleries(id, size);
     }
@@ -81,8 +77,8 @@ public class GalleryRestController {
         GalleryUploadResponse response = new GalleryUploadResponse();
 
         BeanUtils.copyProperties(gallery, response);
-        response.setImageUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-        response.setThumbnailUrl(apiUtils.generateGalleryUrl(CoreConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+        response.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+        response.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
         return response;
     }
@@ -104,7 +100,7 @@ public class GalleryRestController {
         // form이 null이 아니면 글, 댓글 편집시 호출 했기 때문에 gallery를 바로 지우면 안된다. 글/댓글 편집 완료 시 실제로 gallery를 지워야 한다.
         // session에 저장해 두자.
         if (Objects.nonNull(form))
-            ApiUtils.setSessionOfGalleryIdsForRemoval(request, form.getFrom(), form.getItemId(), id);
+            JakdukUtils.setSessionOfGalleryIdsForRemoval(request, form.getFrom(), form.getItemId(), id);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -116,14 +112,14 @@ public class GalleryRestController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        Boolean isAddCookie = ApiUtils.addViewsCookie(request, response, ApiConst.VIEWS_COOKIE_TYPE.GALLERY, id);
+        Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, JakdukConst.VIEWS_COOKIE_TYPE.GALLERY, id);
 
         return galleryService.getGalleryDetail(id, isAddCookie);
     }
 
     @ApiOperation(value = "사진 좋아요 싫어요")
     @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable CoreConst.FEELING_TYPE feeling) {
+    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable JakdukConst.FEELING_TYPE feeling) {
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -133,7 +129,7 @@ public class GalleryRestController {
         Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
 
         return UserFeelingResponse.builder()
-          .myFeeling((CoreConst.FEELING_TYPE) data.get("feeling"))
+          .myFeeling((JakdukConst.FEELING_TYPE) data.get("feeling"))
           .numberOfLike((Integer) data.get("numberOfLike"))
           .numberOfDislike((Integer) data.get("numberOfDislike"))
           .build();

@@ -1,14 +1,14 @@
 package com.jakduk.api.admin;
 
-import com.jakduk.core.CoreApplicationTests;
-import com.jakduk.core.repository.AttendanceLeagueRepository;
+import com.jakduk.api.ApiApplicationTests;
+import com.jakduk.api.repository.AttendanceLeagueRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Created by pyohwan on 17. 1. 3.
  */
-public class AttendanceLeagueRepositoryTest extends CoreApplicationTests {
+public class AttendanceLeagueRepositoryTest extends ApiApplicationTests {
 
     @Autowired
     private AttendanceLeagueRepository sut;

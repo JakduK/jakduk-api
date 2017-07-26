@@ -1,6 +1,6 @@
 package com.jakduk.api.model.simple;
 
-import com.jakduk.api.common.CoreConst;
+import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class BoardFreeOnList {
 	
 	private int seq;
 	
-	private CoreConst.BOARD_CATEGORY_TYPE category;
+	private JakdukConst.BOARD_CATEGORY_TYPE category;
 	
 	private int views = 0;
 	
