@@ -1,9 +1,0 @@
-description = 'batch'
-
-dependencies {
-	compile project(':core')
-
-	compile('org.springframework.boot:spring-boot-starter-batch')
-
-	compile 'org.mariadb.jdbc:mariadb-java-client:1.5.9'
-}
