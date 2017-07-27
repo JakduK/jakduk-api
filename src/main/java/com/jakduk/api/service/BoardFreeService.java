@@ -255,7 +255,6 @@ public class BoardFreeService {
 			// lastUpdated
 			boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
 
-
 			boardFreeRepository.save(boardFree);
 
 			log.info("A post was deleted(post only). post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
@@ -535,12 +534,19 @@ public class BoardFreeService {
 				.map(Gallery::getId)
 				.collect(Collectors.toList());
 
+		// boardHistory
+		List<BoardHistory> histories = new ArrayList<>();
+		ObjectId boardHistoryId = new ObjectId();
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.CREATE.name(), writer);
+		histories.add(history);
+
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
 				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
 				.writer(writer)
 				.content(content)
 				.status(new BoardCommentStatus(device))
 				.linkedGallery(! galleries.isEmpty())
+				.history(histories)
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
@@ -580,6 +586,17 @@ public class BoardFreeService {
 		boardFreeComment.setStatus(boardCommentStatus);
 		boardFreeComment.setLinkedGallery(! galleryIds.isEmpty());
 
+		// boardHistory
+		List<BoardHistory> histories = boardFreeComment.getHistory();
+
+		if (CollectionUtils.isEmpty(histories))
+			histories = new ArrayList<>();
+
+		ObjectId boardHistoryId = new ObjectId();
+		BoardHistory history = new BoardHistory(boardHistoryId.toString(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.EDIT.name(), writer);
+		histories.add(history);
+		boardFreeComment.setHistory(histories);
+
 		boardFreeCommentRepository.save(boardFreeComment);
 
 		// 엘라스틱서치 색인 요청
@@ -615,7 +632,7 @@ public class BoardFreeService {
 
 		List<BoardFreeComment> comments;
 
-		if (! ObjectUtils.isEmpty(commentId)) {
+		if (StringUtils.isNotBlank(commentId)) {
 			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, new ObjectId(commentId));
 		} else {
 			comments  = boardFreeCommentRepository.findByBoardSeqAndGTId(seq, null);
@@ -634,15 +651,29 @@ public class BoardFreeService {
 					FreePostDetailComment freePostDetailComment = new FreePostDetailComment();
 					BeanUtils.copyProperties(boardFreeComment, freePostDetailComment);
 
-					Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
-					Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
+					List<CommonFeelingUser> usersLiking = boardFreeComment.getUsersLiking();
+					List<CommonFeelingUser> usersDisliking = boardFreeComment.getUsersDisliking();
 
-					freePostDetailComment.setNumberOfLike(numberOfLike);
-					freePostDetailComment.setNumberOfDislike(numberOfDisLike);
+					freePostDetailComment.setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
+					freePostDetailComment.setNumberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
 
 					if (Objects.nonNull(commonWriter))
-						freePostDetailComment.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
-								boardFreeComment.getUsersDisliking()));
+						freePostDetailComment.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
+
+					List<BoardFreeCommentHistory> histories = boardFreeComment.getHistory().stream()
+							.map(boardHistory -> {
+								BoardFreeCommentHistory boardFreeCommentHistory = new BoardFreeCommentHistory();
+								BeanUtils.copyProperties(boardHistory, boardFreeCommentHistory);
+								LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeCommentHistory.getId()).getDate());
+								boardFreeCommentHistory.setType(JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.valueOf(boardHistory.getType()));
+								boardFreeCommentHistory.setTimestamp(timestamp);
+
+								return boardFreeCommentHistory;
+							})
+							.sorted(Comparator.comparing(BoardFreeCommentHistory::getId).reversed())
+							.collect(Collectors.toList());
+
+					freePostDetailComment.setHistory(histories);
 
 					// 엮인 사진들
 					if (boardFreeComment.getLinkedGallery()) {

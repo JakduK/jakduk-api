@@ -205,7 +205,7 @@ public class BoardRestController {
         return boardFreeService.getBoardFreeDetailComments(seq, commentId);
     }
 
-    @ApiOperation(value = "자유게시판 글의 댓글 달기")
+    @ApiOperation("자유게시판 글의 댓글 달기")
     @SecuredRoleUser
     @PostMapping("/comment")
     public BoardFreeComment addFreeComment(
