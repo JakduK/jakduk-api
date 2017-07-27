@@ -62,13 +62,7 @@ core:
       enabled: true
       webhook: https://hooks.slack.com/services/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
   storage:
-    image:
-      path: /jakduk/storage/image/
-    thumbnail:
-      path: /jakduk/storage/thumbnail/
-    user:
-      picture:
-        large:
-          path: /jakduk/storage/user/picture/large/
-        small:
-          path: /jakduk/storage/user/picture/small/
+    image-path: /jakduk/storage/image/
+    thumbnail-path: /jakduk/storage/thumbnail/
+    user-picture-large-path: /jakduk/storage/user/picture/large/
+    user-picture-small-path: /jakduk/storage/user/picture/small/

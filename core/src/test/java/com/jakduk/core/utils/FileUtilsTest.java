@@ -14,7 +14,7 @@ public class FileUtilsTest {
 
     @Test
     public void getBytesByUrl() throws IOException {
-        FileUtils.FileInfo fileInfo = FileUtils.getBytesByUrl("https://api.jakduk.com/gallery/58ba9ebb1033ba2b775b215c");
+        FileUtils.FileInfo fileInfo = FileUtils.getBytesByUrl("https://avatars1.githubusercontent.com/u/19828371?v=4&s=200");
 
         Assert.assertTrue(Objects.nonNull(fileInfo));
     }

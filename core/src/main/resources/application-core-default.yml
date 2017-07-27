@@ -64,13 +64,7 @@ core:
       enabled: false
       webhook: https://hooks.slack.com/services/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
   storage:
-    image:
-      path: /Users/pyohwanjang/storage/image/
-    thumbnail:
-      path: /Users/pyohwanjang/storage/thumbnail/
-    user:
-      picture:
-        large:
-          path: /Users/pyohwanjang/storage/user/picture/large/
-        small:
-          path: /Users/pyohwanjang/storage/user/picture/small/
+    image-path: /Users/pyohwanjang/storage/image/
+    thumbnail-path: /Users/pyohwanjang/storage/thumbnail/
+    user-picture-large-path: /Users/pyohwanjang/storage/user/picture/large/
+    user-picture-small-path: /Users/pyohwanjang/storage/user/picture/small/
