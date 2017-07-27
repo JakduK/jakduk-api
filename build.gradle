@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.4.RELEASE'
+        springBootVersion = '1.5.6.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -28,7 +28,7 @@ test {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 
     // 프로젝트에 import한 jar 보관 폴더.
     flatDir {
