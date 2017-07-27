@@ -10,7 +10,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -49,7 +48,7 @@ public class FreePostDetailComment {
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallery> galleries;
 
-    @ApiModelProperty(example = "2017-07-18T00:25:45", value = "마지막으로 수정한 날 (ISO 8601)")
-    private LocalDateTime lastUpdated;
+    @ApiModelProperty(value = "히스토리")
+    private List<BoardFreeCommentHistory> history;
 
 }
