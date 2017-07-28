@@ -17,7 +17,7 @@ import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
-import com.jakduk.api.vo.user.*;
+import com.jakduk.api.restcontroller.vo.user.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

@@ -20,7 +20,7 @@ import com.jakduk.api.repository.footballclub.FootballClubRepository;
 import com.jakduk.api.repository.user.UserPictureRepository;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
-import com.jakduk.api.vo.user.UserProfileResponse;
+import com.jakduk.api.restcontroller.vo.user.UserProfileResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;

@@ -8,10 +8,10 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.service.UserService;
-import com.jakduk.api.vo.user.AttemptSocialUser;
-import com.jakduk.api.vo.user.AuthUserProfile;
-import com.jakduk.api.vo.user.LoginSocialUserForm;
-import com.jakduk.api.vo.user.SocialProfile;
+import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
+import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
+import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

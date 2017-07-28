@@ -2,7 +2,7 @@ package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.model.simple.UserProfile;
-import com.jakduk.api.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
 import com.jakduk.api.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
