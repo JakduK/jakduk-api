@@ -1,7 +1,7 @@
 package com.jakduk.api.model.db;
 
 import com.jakduk.api.common.JakdukConst;
-import com.jakduk.api.model.embedded.BoardHistory;
+import com.jakduk.api.model.embedded.BoardLog;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
@@ -24,7 +24,7 @@ import java.util.List;
 @Getter
 @Setter
 @Document
-public class BoardFree {
+public class BoardFree implements UsersFeeling {
 
 	@Id
 	private String id;
@@ -65,7 +65,7 @@ public class BoardFree {
 	
 	private BoardStatus status;
 	
-	private List<BoardHistory> history;
+	private List<BoardLog> logs;
 
 	private List<JakdukConst.BATCH_TYPE> batch;
 

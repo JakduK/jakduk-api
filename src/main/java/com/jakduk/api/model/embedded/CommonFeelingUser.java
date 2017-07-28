@@ -24,4 +24,5 @@ public class CommonFeelingUser {
 	private String userId;
 	
 	private String username;
+
 }

@@ -1,7 +1,7 @@
 logging:
   file: /jakduk/api/logs/api.log
   level:
-    root: WARN
+    root: INFO
 
 server:
   session:
