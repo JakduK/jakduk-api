@@ -4,6 +4,7 @@ import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistUsername;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -19,6 +20,7 @@ import javax.validation.constraints.Size;
 
 @ApiModel(description = "SNS 기반 회원 가입 폼")
 @Getter
+@Builder
 public class SocialUserForm {
 
 	@ApiModelProperty(required = true, example = "example@jakduk.com")

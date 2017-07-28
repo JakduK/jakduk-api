@@ -32,12 +32,14 @@ public class UserControllerTest extends AbstractMvcTest<UserRestController> {
         initMvc(sut);
     }
 
-    @Ignore
     @Test
-    public void 소셜기반회원가입() throws Exception {
-        SocialUserForm form = new SocialUserForm();
+    public void createSnsUser() throws Exception {
+        SocialUserForm form = SocialUserForm.builder()
+                .email("example@jakduk.com")
+                .username("JakdukUser")
+                .build();
 
-        mockMvc.perform(post("/api/user/facebook")
+        mockMvc.perform(post("/api/user/social")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(form)))
                 .andExpect(status().isOk());
