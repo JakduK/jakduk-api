@@ -50,8 +50,8 @@ public class FreePostDetail {
     @ApiModelProperty(value = "글상태")
     private BoardStatus status;
 
-    @ApiModelProperty(value = "히스토리")
-    private List<BoardFreeHistory> history;
+    @ApiModelProperty(value = "로그")
+    private List<BoardFreeLog> logs;
 
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallery> galleries;

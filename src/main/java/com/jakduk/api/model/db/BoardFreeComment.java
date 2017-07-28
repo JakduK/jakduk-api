@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @Document
-public class BoardFreeComment {
+public class BoardFreeComment implements UsersFeeling {
 
 	@Id
 	private String id;
@@ -40,7 +40,7 @@ public class BoardFreeComment {
 
 	private Boolean linkedGallery;
 
-	private List<BoardHistory> history;
+	private List<BoardLog> logs;
 
     private List<JakdukConst.BATCH_TYPE> batch;
 

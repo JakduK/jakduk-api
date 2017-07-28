@@ -9,10 +9,7 @@ import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.dao.BoardDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.db.BoardCategory;
-import com.jakduk.api.model.db.BoardFree;
-import com.jakduk.api.model.db.BoardFreeComment;
-import com.jakduk.api.model.db.Gallery;
+import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.etc.CommonCount;
 import com.jakduk.api.model.jongo.BoardFeelingCount;
@@ -93,14 +90,9 @@ public class BoardFreeService {
 				.device(device)
 				.build();
 
-		// boardHistory
-		List<BoardHistory> histories = new ArrayList<>();
-		ObjectId boardHistoryId = new ObjectId();
-		BoardHistory history = new BoardHistory(boardHistoryId.toString(), JakdukConst.BOARD_FREE_HISTORY_TYPE.CREATE.name(), writer);
-		histories.add(history);
-
+		ObjectId logId = new ObjectId();
 		// lastUpdated
-		LocalDateTime lastUpdated = LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault());
+		LocalDateTime lastUpdated = LocalDateTime.ofInstant(logId.getDate().toInstant(), ZoneId.systemDefault());
 
 		// 연관된 사진 id 배열 (검증 후)
 		List<String> galleryIds = galleries.stream()
@@ -116,7 +108,7 @@ public class BoardFreeService {
 				.views(0)
 				.seq(commonService.getNextSequence(JakdukConst.BOARD_TYPE.BOARD_FREE.name()))
 				.status(boardStatus)
-				.history(histories)
+				.logs(this.initBoardLogs(logId, JakdukConst.BOARD_FREE_HISTORY_TYPE.CREATE.name(), writer))
 				.lastUpdated(lastUpdated)
 				.linkedGallery(! galleries.isEmpty())
 				.build();
@@ -185,15 +177,15 @@ public class BoardFreeService {
 		boardFree.setStatus(boardStatus);
 
 		// boardHistory
-		List<BoardHistory> histories = boardFree.getHistory();
+		List<BoardLog> histories = boardFree.getLogs();
 
 		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
 		ObjectId boardHistoryId = new ObjectId();
-		BoardHistory history = new BoardHistory(boardHistoryId.toString(), JakdukConst.BOARD_FREE_HISTORY_TYPE.EDIT.name(), writer);
+		BoardLog history = new BoardLog(boardHistoryId.toString(), JakdukConst.BOARD_FREE_HISTORY_TYPE.EDIT.name(), writer);
 		histories.add(history);
-		boardFree.setHistory(histories);
+		boardFree.setLogs(histories);
 
 		// lastUpdated
 		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
@@ -233,15 +225,15 @@ public class BoardFreeService {
 			boardFree.setSubject(null);
 			boardFree.setWriter(null);
 
-            List<BoardHistory> histories = boardFree.getHistory();
+            List<BoardLog> histories = boardFree.getLogs();
 
             if (Objects.isNull(histories))
                 histories = new ArrayList<>();
 
 			ObjectId boardHistoryId = new ObjectId();
-            BoardHistory history = new BoardHistory(boardHistoryId.toString(), JakdukConst.BOARD_FREE_HISTORY_TYPE.DELETE.name(), writer);
+            BoardLog history = new BoardLog(boardHistoryId.toString(), JakdukConst.BOARD_FREE_HISTORY_TYPE.DELETE.name(), writer);
             histories.add(history);
-			boardFree.setHistory(histories);
+			boardFree.setLogs(histories);
 
             BoardStatus boardStatus = boardFree.getStatus();
 
@@ -449,71 +441,11 @@ public class BoardFreeService {
 
 		CommonWriter postWriter = boardFree.getWriter();
 
-		List<CommonFeelingUser> usersLiking = boardFree.getUsersLiking();
-		List<CommonFeelingUser> usersDisliking = boardFree.getUsersDisliking();
-
-		if (Objects.isNull(usersLiking)) usersLiking = new ArrayList<>();
-		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
-
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
 		if (userId.equals(postWriter.getUserId()))
 			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
-        // 해당 회원이 좋아요를 이미 했는지 검사
-		Optional<CommonFeelingUser> alreadyLike = usersLiking.stream()
-                .filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
-                .findFirst();
-
-        // 해당 회원이 싫어요를 이미 했는지 검사
-        Optional<CommonFeelingUser> alreadyDislike = usersDisliking.stream()
-                .filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
-                .findFirst();
-
-		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
-
-		switch (feeling) {
-			case LIKE:
-			    // 이미 좋아요를 했을 때, 좋아요를 취소
-			    if (alreadyLike.isPresent()) {
-			        usersLiking.remove(alreadyLike.get());
-                }
-                // 이미 싫어요를 했을 때, 싫어요를 없애고 좋아요로 바꿈
-                else if (alreadyDislike.isPresent()) {
-			        usersDisliking.remove(alreadyDislike.get());
-			        usersLiking.add(feelingUser);
-
-                    boardFree.setUsersDisliking(usersDisliking);
-                }
-                // 아직 감정 표현을 하지 않아 좋아요로 등록
-                else {
-			    	usersLiking.add(feelingUser);
-				}
-
-				boardFree.setUsersLiking(usersLiking);
-
-				break;
-
-			case DISLIKE:
-                // 이미 싫어요를 했을 때, 싫어요를 취소
-                if (alreadyDislike.isPresent()) {
-                    usersDisliking.remove(alreadyDislike.get());
-                }
-                // 이미 좋아요를 했을 때, 좋아요를 없애고 싫어요로 바꿈
-                else if (alreadyLike.isPresent()) {
-                    usersLiking.remove(alreadyLike.get());
-                    usersDisliking.add(feelingUser);
-
-                    boardFree.setUsersLiking(usersLiking);
-                }
-				// 아직 감정 표현을 하지 않아 싫어요로 등록
-                else {
-					usersDisliking.add(feelingUser);
-				}
-
-				boardFree.setUsersDisliking(usersDisliking);
-
-				break;
-		}
+		this.setUsersFeeling(userId, username, feeling, boardFree);
 
 		boardFreeRepository.save(boardFree);
 
@@ -534,19 +466,13 @@ public class BoardFreeService {
 				.map(Gallery::getId)
 				.collect(Collectors.toList());
 
-		// boardHistory
-		List<BoardHistory> histories = new ArrayList<>();
-		ObjectId boardHistoryId = new ObjectId();
-		BoardHistory history = new BoardHistory(boardHistoryId.toString(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.CREATE.name(), writer);
-		histories.add(history);
-
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
 				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
 				.writer(writer)
 				.content(content)
 				.status(new BoardCommentStatus(device))
 				.linkedGallery(! galleries.isEmpty())
-				.history(histories)
+				.logs(this.initBoardLogs(new ObjectId(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.CREATE.name(), writer))
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
@@ -586,16 +512,12 @@ public class BoardFreeService {
 		boardFreeComment.setStatus(boardCommentStatus);
 		boardFreeComment.setLinkedGallery(! galleryIds.isEmpty());
 
-		// boardHistory
-		List<BoardHistory> histories = boardFreeComment.getHistory();
+		// boardLogs
+		List<BoardLog> logs = Optional.ofNullable(boardFreeComment.getLogs())
+				.orElseGet(ArrayList::new);
 
-		if (CollectionUtils.isEmpty(histories))
-			histories = new ArrayList<>();
-
-		ObjectId boardHistoryId = new ObjectId();
-		BoardHistory history = new BoardHistory(boardHistoryId.toString(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.EDIT.name(), writer);
-		histories.add(history);
-		boardFreeComment.setHistory(histories);
+		logs.add(new BoardLog(new ObjectId().toString(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.EDIT.name(), writer));
+		boardFreeComment.setLogs(logs);
 
 		boardFreeCommentRepository.save(boardFreeComment);
 
@@ -641,7 +563,6 @@ public class BoardFreeService {
 		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		BoardFreeSimple boardFreeSimple = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
-
 		BoardItem boardItem = new BoardItem(boardFreeSimple.getId(), boardFreeSimple.getSeq());
 
 		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
@@ -660,20 +581,22 @@ public class BoardFreeService {
 					if (Objects.nonNull(commonWriter))
 						freePostDetailComment.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
 
-					List<BoardFreeCommentHistory> histories = boardFreeComment.getHistory().stream()
-							.map(boardHistory -> {
-								BoardFreeCommentHistory boardFreeCommentHistory = new BoardFreeCommentHistory();
-								BeanUtils.copyProperties(boardHistory, boardFreeCommentHistory);
-								LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeCommentHistory.getId()).getDate());
-								boardFreeCommentHistory.setType(JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.valueOf(boardHistory.getType()));
-								boardFreeCommentHistory.setTimestamp(timestamp);
+					if (! ObjectUtils.isEmpty(boardFreeComment.getLogs())) {
+						List<BoardFreeCommentLog> logs = boardFreeComment.getLogs().stream()
+								.map(boardLog -> {
+									BoardFreeCommentLog boardFreeCommentLog = new BoardFreeCommentLog();
+									BeanUtils.copyProperties(boardLog, boardFreeCommentLog);
+									LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeCommentLog.getId()).getDate());
+									boardFreeCommentLog.setType(JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.valueOf(boardLog.getType()));
+									boardFreeCommentLog.setTimestamp(timestamp);
 
-								return boardFreeCommentHistory;
-							})
-							.sorted(Comparator.comparing(BoardFreeCommentHistory::getId).reversed())
-							.collect(Collectors.toList());
+									return boardFreeCommentLog;
+								})
+								.sorted(Comparator.comparing(BoardFreeCommentLog::getId).reversed())
+								.collect(Collectors.toList());
 
-					freePostDetailComment.setHistory(histories);
+						freePostDetailComment.setLogs(logs);
+					}
 
 					// 엮인 사진들
 					if (boardFreeComment.getLinkedGallery()) {
@@ -721,71 +644,11 @@ public class BoardFreeService {
 
 		CommonWriter postWriter = boardComment.getWriter();
 
-		List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
-		List<CommonFeelingUser> usersDisliking = boardComment.getUsersDisliking();
-
-		if (Objects.isNull(usersLiking)) usersLiking = new ArrayList<>();
-		if (Objects.isNull(usersDisliking)) usersDisliking = new ArrayList<>();
-
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
 		if (userId.equals(postWriter.getUserId()))
 			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
-		// 해당 회원이 좋아요를 이미 했는지 검사
-		Optional<CommonFeelingUser> alreadyLike = usersLiking.stream()
-				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
-				.findFirst();
-
-		// 해당 회원이 싫어요를 이미 했는지 검사
-		Optional<CommonFeelingUser> alreadyDislike = usersDisliking.stream()
-				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
-				.findFirst();
-
-		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
-
-		switch (feeling) {
-			case LIKE:
-				// 이미 좋아요를 했을 때, 좋아요를 취소
-				if (alreadyLike.isPresent()) {
-					usersLiking.remove(alreadyLike.get());
-				}
-				// 이미 싫어요를 했을 때, 싫어요를 없애고 좋아요로 바꿈
-				else if (alreadyDislike.isPresent()) {
-					usersDisliking.remove(alreadyDislike.get());
-					usersLiking.add(feelingUser);
-
-					boardComment.setUsersDisliking(usersDisliking);
-				}
-				// 아직 감정 표현을 하지 않아 좋아요로 등록
-				else {
-					usersLiking.add(feelingUser);
-				}
-
-				boardComment.setUsersLiking(usersLiking);
-
-				break;
-
-			case DISLIKE:
-				// 이미 싫어요를 했을 때, 싫어요를 취소
-				if (alreadyDislike.isPresent()) {
-					usersDisliking.remove(alreadyDislike.get());
-				}
-				// 이미 좋아요를 했을 때, 좋아요를 없애고 싫어요로 바꿈
-				else if (alreadyLike.isPresent()) {
-					usersLiking.remove(alreadyLike.get());
-					usersDisliking.add(feelingUser);
-
-					boardComment.setUsersLiking(usersLiking);
-				}
-				// 아직 감정 표현을 하지 않아 싫어요로 등록
-				else {
-					usersDisliking.add(feelingUser);
-				}
-
-				boardComment.setUsersDisliking(usersDisliking);
-
-				break;
-		}
+		this.setUsersFeeling(userId, username, feeling, boardComment);
 
 		boardFreeCommentRepository.save(boardComment);
 
@@ -828,16 +691,16 @@ public class BoardFreeService {
 
 		getBoardFree.setStatus(status);
 
-		List<BoardHistory> histories = getBoardFree.getHistory();
+		List<BoardLog> histories = getBoardFree.getLogs();
 
 		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
 		String historyType = isEnable ? JakdukConst.BOARD_FREE_HISTORY_TYPE.ENABLE_NOTICE.name() : JakdukConst.BOARD_FREE_HISTORY_TYPE.DISABLE_NOTICE.name();
-		BoardHistory history = new BoardHistory(new ObjectId().toString(), historyType, writer);
+		BoardLog history = new BoardLog(new ObjectId().toString(), historyType, writer);
 		histories.add(history);
 
-		getBoardFree.setHistory(histories);
+		getBoardFree.setLogs(histories);
 
 		boardFreeRepository.save(getBoardFree);
 
@@ -933,11 +796,8 @@ public class BoardFreeService {
 											.orElse(new BoardFreeOnSearch())
 							);
 
-							Integer numberOfLike = ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size();
-							Integer numberOfDisLike = ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size();
-
-							comment.setNumberOfLike(numberOfLike);
-							comment.setNumberOfDislike(numberOfDisLike);
+							comment.setNumberOfLike(ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size());
+							comment.setNumberOfDislike(ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size());
 
 							if (Objects.nonNull(commonWriter))
 								comment.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
@@ -1013,28 +873,26 @@ public class BoardFreeService {
 		FreePostDetail freePostDetail = new FreePostDetail();
 		BeanUtils.copyProperties(boardFree, freePostDetail);
 
-		List<BoardFreeHistory> histories = boardFree.getHistory().stream()
-				.map(boardHistory -> {
-					BoardFreeHistory boardFreeHistory = new BoardFreeHistory();
-					BeanUtils.copyProperties(boardHistory, boardFreeHistory);
-					LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeHistory.getId()).getDate());
-					boardFreeHistory.setType(JakdukConst.BOARD_FREE_HISTORY_TYPE.valueOf(boardHistory.getType()));
-					boardFreeHistory.setTimestamp(timestamp);
+		if (! ObjectUtils.isEmpty(boardFree.getLogs())) {
+			List<BoardFreeLog> logs = boardFree.getLogs().stream()
+					.map(boardLog -> {
+						BoardFreeLog boardFreeLog = new BoardFreeLog();
+						BeanUtils.copyProperties(boardLog, boardFreeLog);
+						LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeLog.getId()).getDate());
+						boardFreeLog.setType(JakdukConst.BOARD_FREE_HISTORY_TYPE.valueOf(boardLog.getType()));
+						boardFreeLog.setTimestamp(timestamp);
 
-					return boardFreeHistory;
-				})
-				.sorted(Comparator.comparing(BoardFreeHistory::getId).reversed())
-				.collect(Collectors.toList());
+						return boardFreeLog;
+					})
+					.sorted(Comparator.comparing(BoardFreeLog::getId).reversed())
+					.collect(Collectors.toList());
 
-		freePostDetail.setHistory(histories);
+			freePostDetail.setLogs(logs);
+		}
 
-		Integer numberOfLike = CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
-		Integer numberOfDisLike = CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
-		BoardCategory boardCategory = boardCategoryRepository.findByCodeAndLanguage(boardFree.getCategory().name(), JakdukUtils.getLanguageCode());
-
-		freePostDetail.setCategory(boardCategory);
-		freePostDetail.setNumberOfLike(numberOfLike);
-		freePostDetail.setNumberOfDislike(numberOfDisLike);
+		freePostDetail.setCategory(boardCategoryRepository.findByCodeAndLanguage(boardFree.getCategory().name(), JakdukUtils.getLanguageCode()));
+		freePostDetail.setNumberOfLike(CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size());
+		freePostDetail.setNumberOfDislike(CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size());
 
 		// 엮인 사진들
 		if (boardFree.getLinkedGallery()) {
@@ -1117,6 +975,90 @@ public class BoardFreeService {
 		int views = boardFree.getViews();
 		boardFree.setViews(++views);
 		boardFreeRepository.save(boardFree);
+	}
+
+	/**
+	 * BoardLogs 생성
+	 */
+	private List<BoardLog> initBoardLogs(ObjectId objectId, String type, CommonWriter writer) {
+		List<BoardLog> logs = new ArrayList<>();
+		BoardLog history = new BoardLog(objectId.toString(), type, writer);
+		logs.add(history);
+
+		return logs;
+	}
+
+	/**
+	 * 감정 표현 CRUD
+	 *
+	 * @param userId 회원 ID
+	 * @param username 회원 별명
+	 * @param feeling 입력받은 감정
+	 * @param usersFeeling 편집할 객체
+	 */
+	private void setUsersFeeling(String userId, String username, JakdukConst.FEELING_TYPE feeling, UsersFeeling usersFeeling) {
+
+		List<CommonFeelingUser> usersLiking = usersFeeling.getUsersLiking();
+		List<CommonFeelingUser> usersDisliking = usersFeeling.getUsersDisliking();
+
+		if (CollectionUtils.isEmpty(usersLiking)) usersLiking = new ArrayList<>();
+		if (CollectionUtils.isEmpty(usersDisliking)) usersDisliking = new ArrayList<>();
+
+		// 해당 회원이 좋아요를 이미 했는지 검사
+		Optional<CommonFeelingUser> alreadyLike = usersLiking.stream()
+				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+				.findFirst();
+
+		// 해당 회원이 싫어요를 이미 했는지 검사
+		Optional<CommonFeelingUser> alreadyDislike = usersDisliking.stream()
+				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+				.findFirst();
+
+		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
+
+		switch (feeling) {
+			case LIKE:
+				// 이미 좋아요를 했을 때, 좋아요를 취소
+				if (alreadyLike.isPresent()) {
+					usersLiking.remove(alreadyLike.get());
+				}
+				// 이미 싫어요를 했을 때, 싫어요를 없애고 좋아요로 바꿈
+				else if (alreadyDislike.isPresent()) {
+					usersDisliking.remove(alreadyDislike.get());
+					usersLiking.add(feelingUser);
+
+					usersFeeling.setUsersDisliking(usersDisliking);
+				}
+				// 아직 감정 표현을 하지 않아 좋아요로 등록
+				else {
+					usersLiking.add(feelingUser);
+				}
+
+				usersFeeling.setUsersLiking(usersLiking);
+
+				break;
+
+			case DISLIKE:
+				// 이미 싫어요를 했을 때, 싫어요를 취소
+				if (alreadyDislike.isPresent()) {
+					usersDisliking.remove(alreadyDislike.get());
+				}
+				// 이미 좋아요를 했을 때, 좋아요를 없애고 싫어요로 바꿈
+				else if (alreadyLike.isPresent()) {
+					usersLiking.remove(alreadyLike.get());
+					usersDisliking.add(feelingUser);
+
+					usersFeeling.setUsersLiking(usersLiking);
+				}
+				// 아직 감정 표현을 하지 않아 싫어요로 등록
+				else {
+					usersDisliking.add(feelingUser);
+				}
+
+				usersFeeling.setUsersDisliking(usersDisliking);
+
+				break;
+		}
 	}
 
 }

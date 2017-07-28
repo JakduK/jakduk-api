@@ -48,7 +48,7 @@ public class FreePostDetailComment {
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallery> galleries;
 
-    @ApiModelProperty(value = "히스토리")
-    private List<BoardFreeCommentHistory> history;
+    @ApiModelProperty(value = "로그")
+    private List<BoardFreeCommentLog> logs;
 
 }

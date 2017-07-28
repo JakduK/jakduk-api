@@ -15,7 +15,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @Setter
 @Getter
-public class BoardHistory {
+public class BoardLog {
 	
 	@Id
 	private String id;
