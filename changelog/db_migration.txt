@@ -1,3 +1,7 @@
+v0.7.12 / 2017-07-28
+// linkedGallery 필드가 없는 경우도 있어서 기본 false로 추가함.
+db.boardFreeComment.update({"linkedGallery":{$exists:false}}, {$set:{"linkedGallery":false}}, {multi:true})
+
 Version 0.7.9 / 2017-04-23
 // 사진 posts -> linkedItems 으로 인한 posts 필드 지움
 db.gallery.update({}, {$unset:{"posts":""}}, {multi:true})
