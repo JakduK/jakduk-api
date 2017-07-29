@@ -67,7 +67,7 @@ public class BoardFree implements UsersFeeling {
 	
 	private List<BoardLog> logs;
 
-	private List<JakdukConst.BATCH_TYPE> batch;
+	private List<String> batch;
 
 	private String shortContent;
 
