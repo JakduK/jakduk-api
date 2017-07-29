@@ -17,7 +17,7 @@ import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.service.BoardCategoryService;
 import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.api.service.GalleryService;
-import com.jakduk.api.vo.board.*;
+import com.jakduk.api.restcontroller.vo.board.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

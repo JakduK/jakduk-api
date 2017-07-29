@@ -1,13 +1,13 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.common.CommonRole;
+import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
 import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.vo.user.AuthUserProfile;
-import com.jakduk.api.vo.user.SocialProfile;
+import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -304,8 +304,8 @@ public class AuthUtils {
 
     private static List<String> getRoles(List<Integer> roles) {
         return roles.stream()
-                .map(CommonRole::findByCode)
-                .map(CommonRole::name)
+                .map(JakdukAuthority::findByCode)
+                .map(JakdukAuthority::name)
                 .collect(Collectors.toList());
     }
 

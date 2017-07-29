@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.CommonRole;
+import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
@@ -20,7 +20,7 @@ import com.jakduk.api.repository.footballclub.FootballClubRepository;
 import com.jakduk.api.repository.user.UserPictureRepository;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
-import com.jakduk.api.vo.user.UserProfileResponse;
+import com.jakduk.api.restcontroller.vo.user.UserProfileResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -123,7 +123,7 @@ public class UserService {
 				.username(username.trim())
 				.password(password)
 				.providerId(JakdukConst.ACCOUNT_TYPE.JAKDUK)
-				.roles(Collections.singletonList(CommonRole.ROLE_USER_01.getCode()))
+				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 
@@ -170,7 +170,7 @@ public class UserService {
 				.username(username)
 				.providerId(providerId)
 				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(CommonRole.ROLE_USER_01.getCode()))
+				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 

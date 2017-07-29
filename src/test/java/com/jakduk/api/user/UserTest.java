@@ -2,7 +2,6 @@ package com.jakduk.api.user;
 
 import com.jakduk.api.ApiApplicationTests;
 
-import com.jakduk.api.common.CommonRole;
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.db.User;
