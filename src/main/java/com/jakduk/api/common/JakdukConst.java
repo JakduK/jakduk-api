@@ -235,8 +235,7 @@ public class JakdukConst {
 	 * 읽음 중복 방지를 위한 쿠키
 	 */
 	public enum VIEWS_COOKIE_TYPE {
-		FREE_BOARD,
-		GALLERY
+		FREE_BOARD
 	}
 
 	/**

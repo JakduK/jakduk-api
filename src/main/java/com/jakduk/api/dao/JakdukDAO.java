@@ -41,26 +41,6 @@ public class JakdukDAO {
 	@Autowired
 	private Jongo jongo;
 
-	// 사진 목록.
-	public List<GallerySimple> findGalleriesById(Direction direction, Integer size, ObjectId galleryId) {
-		
-		AggregationOperation match1 = Aggregation.match(Criteria.where("status.status").is(JakdukConst.GALLERY_STATUS_TYPE.ENABLE.name()));
-		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").lt(galleryId));
-		AggregationOperation sort = Aggregation.sort(direction, "_id");
-		AggregationOperation limit = Aggregation.limit(size);
-		
-		Aggregation aggregation;
-		if (galleryId != null) {
-			aggregation = Aggregation.newAggregation(match1, match2, sort, limit);
-		} else {
-			aggregation = Aggregation.newAggregation(match1, sort, limit);
-		}
-		
-		AggregationResults<GallerySimple> results = mongoTemplate.aggregate(aggregation, "gallery", GallerySimple.class);
-		
-		return results.getMappedResults();
-	}
-
 	/**
 	 * 사진의 좋아요, 싫어요 갯수 가져오기
 	 */

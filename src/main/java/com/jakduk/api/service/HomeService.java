@@ -9,7 +9,6 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
-import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
 import com.jakduk.api.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
@@ -63,14 +62,6 @@ public class HomeService {
 	// 최근 가입 회원 가져오기.
 	public List<UserOnHome> getUsersLatest(String language) {
 		return jakdukDAO.getUserOnHome(language);
-	}
-
-	/**
-	 * 최근 그림 목록 가져오기
-	 * @return 사진 목록
-     */
-	public List<GallerySimple> getGalleriesLatest() {
-		return jakdukDAO.findGalleriesById(Direction.DESC, JakdukConst.HOME_SIZE_GALLERY, null);
 	}
 
 	// 최근 댓글 가져오기.

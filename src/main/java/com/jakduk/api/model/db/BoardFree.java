@@ -64,7 +64,8 @@ public class BoardFree implements UsersFeeling {
 	private List<CommonFeelingUser> usersDisliking;
 	
 	private BoardStatus status;
-	
+
+	// 오래된 글은 logs가 없는 경우도 있다.
 	private List<BoardLog> logs;
 
 	private List<String> batch;

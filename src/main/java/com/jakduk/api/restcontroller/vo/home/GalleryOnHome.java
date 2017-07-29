@@ -26,9 +26,6 @@ public class GalleryOnHome {
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
 
-    @ApiModelProperty(value = "읽음 수")
-    private int views = 0;
-
     @ApiModelProperty(value = "사진 URL")
     private String imageUrl;
 
@@ -39,6 +36,6 @@ public class GalleryOnHome {
         this.id = gallery.getId();
         this.name = gallery.getName();
         this.writer = gallery.getWriter();
-        this.views = gallery.getViews();
     }
+
 }

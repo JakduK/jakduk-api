@@ -18,11 +18,7 @@ public class GallerySimple {
 	
 	@Id 
 	private String id;
-	
 	private String name;
-	
 	private CommonWriter writer;
-	
-	private int views = 0;
-	
+
 }

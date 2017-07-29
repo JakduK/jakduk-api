@@ -67,11 +67,4 @@ public class HomeTest extends ApiApplicationTests {
 		System.out.println("getFootballClubs=" + footballClubs);
 	}
 
-	@Test
-	public void 최근사진목록() {
-		List<GallerySimple> galleries = homeService.getGalleriesLatest();
-
-		System.out.println("galleries=" + galleries);
-	}
-
 }

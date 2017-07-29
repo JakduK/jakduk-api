@@ -17,6 +17,7 @@ import com.jakduk.api.model.embedded.GalleryStatus;
 import com.jakduk.api.model.embedded.LinkedItem;
 import com.jakduk.api.model.jongo.GalleryFeelingCount;
 import com.jakduk.api.model.simple.BoardFreeSimple;
+import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.repository.board.free.BoardFreeRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.GalleryOnBoard;
@@ -76,6 +77,10 @@ public class GalleryService {
 		return galleryRepository.findByIdIn(galleryIds);
 	}
 
+	public List<GallerySimple> findSimpleById(ObjectId id, Integer limit) {
+		return galleryRepository.findSimpleById(id, limit);
+	}
+
 	/**
 	 * 사진 목록
 	 */
@@ -123,12 +128,9 @@ public class GalleryService {
 				.build();
 	}
 
-    public GalleryResponse getGalleryDetail(String id, Boolean isAddCookie) {
+    public GalleryResponse getGalleryDetail(String id) {
 
 		Gallery gallery = galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
-
-		if (isAddCookie)
-			this.increaseViews(gallery);
 
 		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
@@ -136,12 +138,8 @@ public class GalleryService {
 		BeanUtils.copyProperties(gallery, galleryDetail);
 
 		galleryDetail.setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
-
-		Integer numberOfLike = ObjectUtils.isEmpty(gallery.getUsersLiking()) ? 0 : gallery.getUsersLiking().size();
-		Integer numberOfDisLike = ObjectUtils.isEmpty(gallery.getUsersDisliking()) ? 0 : gallery.getUsersDisliking().size();
-
-		galleryDetail.setNumberOfLike(numberOfLike);
-		galleryDetail.setNumberOfDislike(numberOfDisLike);
+		galleryDetail.setNumberOfLike(CollectionUtils.isEmpty(gallery.getUsersLiking()) ? 0 : gallery.getUsersLiking().size());
+		galleryDetail.setNumberOfDislike(CollectionUtils.isEmpty(gallery.getUsersDisliking()) ? 0 : gallery.getUsersDisliking().size());
 		galleryDetail.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
 		galleryDetail.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
@@ -556,16 +554,6 @@ public class GalleryService {
 				}
 			});
 		}
-	}
-
-	/**
-	 * 읽음수 1 증가
-	 */
-	private void increaseViews(Gallery gallery) {
-		int views = gallery.getViews();
-		gallery.setViews(++views);
-
-		galleryRepository.save(gallery);
 	}
 
 }

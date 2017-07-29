@@ -2,8 +2,8 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.annotation.SecuredRoleUser;
-import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -11,12 +11,12 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
-import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.restcontroller.vo.gallery.GalleriesResponse;
 import com.jakduk.api.restcontroller.vo.gallery.GalleryResponse;
 import com.jakduk.api.restcontroller.vo.gallery.GalleryUploadResponse;
 import com.jakduk.api.restcontroller.vo.gallery.LinkedItemForm;
 import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -105,16 +104,12 @@ public class GalleryRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "사진 상세")
+    @ApiOperation("사진 상세")
     @GetMapping("/gallery/{id}")
     public GalleryResponse view(
-            @ApiParam(value = "Gallery ID", required = true) @PathVariable String id,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @ApiParam(value = "Gallery ID", required = true) @PathVariable String id) {
 
-        Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, JakdukConst.VIEWS_COOKIE_TYPE.GALLERY, id);
-
-        return galleryService.getGalleryDetail(id, isAddCookie);
+        return galleryService.getGalleryDetail(id);
     }
 
     @ApiOperation(value = "사진 좋아요 싫어요")

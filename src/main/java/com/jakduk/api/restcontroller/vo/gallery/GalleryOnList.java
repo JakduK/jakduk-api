@@ -24,9 +24,6 @@ public class GalleryOnList {
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
 
-    @ApiModelProperty(example = "10", value = "읽음 수")
-    private int views;
-
     @ApiModelProperty(example = "5", value = "좋아요 수")
     private int likingCount;
 

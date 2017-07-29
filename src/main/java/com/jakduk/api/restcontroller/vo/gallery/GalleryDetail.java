@@ -30,9 +30,6 @@ public class GalleryDetail {
     @ApiModelProperty(example = "https://staging.jakduk.com:8080/gallery/thumbnail/58b9050b807d714eaf50a111", value = "사진 썸네일 URL")
     private String thumbnailUrl;
 
-    @ApiModelProperty(example = "10", value = "읽음 수")
-    private int views;
-
     @ApiModelProperty(example = "5", value = "좋아요 수")
     private Integer numberOfLike;
 
