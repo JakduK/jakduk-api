@@ -5,6 +5,7 @@ import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.constraint.FieldMatch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -19,6 +20,7 @@ import javax.validation.constraints.Size;
 @ApiModel(description = "이메일 기반 회원 가입 폼")
 @FieldMatch(first = "password", second = "passwordConfirm", message = "{validation.msg.password.mismatch}")
 @Getter
+@Builder
 public class UserForm {
 
     @ApiModelProperty(required = true, example = "example@jakduk.com")
