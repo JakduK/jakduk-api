@@ -9,6 +9,7 @@ import com.jakduk.api.restcontroller.vo.home.GalleryOnHome;
 import com.jakduk.api.restcontroller.vo.home.HomeResponse;
 import com.jakduk.api.restcontroller.vo.home.LatestPost;
 import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +32,7 @@ public class HomeRestController {
     @Autowired private UrlGenerationUtils urlGenerationUtils;
     @Autowired private HomeService homeService;
     @Autowired private BoardFreeService boardFreeService;
+    @Autowired private GalleryService galleryService;
 
     @ApiOperation(value = "랜덤하게 백과사전 하나 가져오기")
     @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
@@ -41,7 +43,7 @@ public class HomeRestController {
         return homeService.getEncyclopediaWithRandom(language);
     }
 
-    @ApiOperation(value = "홈에서 보여줄 각종 최근 데이터 가져오기")
+    @ApiOperation("홈에서 보여줄 각종 최근 데이터 가져오기")
     @GetMapping("/home/latest")
     public HomeResponse getLatest(
             @RequestParam(required = false) String lang) {
@@ -57,10 +59,8 @@ public class HomeRestController {
         List<LatestPost> latestPosts = boardFreeService.getFreeLatest();
         response.setPosts(latestPosts);
 
-        /*
-        최근 사진
-         */
-        List<GallerySimple> galleries =  homeService.getGalleriesLatest();
+        // 최근 사진
+        List<GallerySimple> galleries = galleryService.findSimpleById(null, JakdukConst.HOME_SIZE_GALLERY);
 
         // 사진 경로 붙히기.
         List<GalleryOnHome> galleriesOfHome = galleries.stream()
