@@ -1,7 +1,7 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.common.CommonRole;
+import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
@@ -304,8 +304,8 @@ public class AuthUtils {
 
     private static List<String> getRoles(List<Integer> roles) {
         return roles.stream()
-                .map(CommonRole::findByCode)
-                .map(CommonRole::name)
+                .map(JakdukAuthority::findByCode)
+                .map(JakdukAuthority::name)
                 .collect(Collectors.toList());
     }
 

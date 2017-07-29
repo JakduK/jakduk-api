@@ -1,4 +1,4 @@
-package com.jakduk.api.common;
+package com.jakduk.api.configuration.security;
 
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 
 @Getter
-public enum CommonRole {
+public enum JakdukAuthority {
 
 	ROLE_USER_01(10), // 미인증 회원
 	ROLE_USER_02(11), // 인증 회원
@@ -24,12 +24,12 @@ public enum CommonRole {
 
 	private Integer code;
 
-	CommonRole(Integer code) {
+	JakdukAuthority(Integer code) {
 		this.code = code;
 	}
 
-	static public CommonRole findByCode(Integer code) {
-		return Arrays.stream(CommonRole.values())
+	static public JakdukAuthority findByCode(Integer code) {
+		return Arrays.stream(JakdukAuthority.values())
 				.filter(commonRole -> commonRole.code.equals(code))
 				.findFirst()
 				.orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
