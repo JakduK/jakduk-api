@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserRestController.class)
+@WithMockUser
 public class UserControllerTests {
 
     @Autowired
@@ -47,7 +49,6 @@ public class UserControllerTests {
     }
 
     @Test
-    @WithMockUser
     public void createJakdukUser() throws Exception {
         UserForm form = UserForm.builder()
                 .email("example@jakduk.com")

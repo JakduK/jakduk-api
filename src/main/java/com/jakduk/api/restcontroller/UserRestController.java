@@ -1,7 +1,8 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.JakdukConst;
-import com.jakduk.api.common.annotation.SecuredRoleUser;
+import com.jakduk.api.common.annotation.SecuredAnonymousUser;
+import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
 import com.jakduk.api.common.constraint.ExistUsername;
@@ -25,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -65,6 +67,7 @@ public class UserRestController {
 
 
     @ApiOperation("이메일 기반 회원 가입")
+    @SecuredAnonymousUser
     @PostMapping("")
     public EmptyJsonResponse addJakdukUser(
             @ApiParam(value = "회원 폼", required = true) @Valid @RequestBody UserForm form,
@@ -72,8 +75,6 @@ public class UserRestController {
 
         User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
-
-        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         // Perform the security
         Authentication authentication = authenticationManager.authenticate(
@@ -84,6 +85,8 @@ public class UserRestController {
         );
 
         AuthUtils.setAuthentication(authentication);
+
+        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         return EmptyJsonResponse.newInstance();
     }
@@ -109,8 +112,6 @@ public class UserRestController {
                 attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
                 largePictureUrl);
 
-        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
-
         // Perform the security
         Authentication authentication = authenticationManager.authenticate(
                 new SnsAuthenticationToken(
@@ -121,6 +122,8 @@ public class UserRestController {
         session.removeAttribute(JakdukConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         AuthUtils.setAuthentication(authentication);
+
+        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
 
         return EmptyJsonResponse.newInstance();
     }
@@ -135,7 +138,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사")
-    @SecuredRoleUser
+    @SecuredUser
     @RequestMapping(value = "/exist/email/edit", method = RequestMethod.GET)
     public EmptyJsonResponse existEmailOnEdit(@NotEmpty @Email @ExistEmailOnEdit @RequestParam String email) {
 
@@ -157,7 +160,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "회원 프로필 편집 시 별명 중복 검사")
-    @SecuredRoleUser
+    @SecuredUser
     @RequestMapping(value = "/exist/username/edit", method = RequestMethod.GET)
     public EmptyJsonResponse existUsernameOnEdit(@NotEmpty @ExistUsernameOnEdit @RequestParam String username) {
 
@@ -188,7 +191,7 @@ public class UserRestController {
     }
 
     @ApiOperation("내 프로필 정보 보기")
-    @SecuredRoleUser
+    @SecuredUser
     @GetMapping("/profile/me")
     public UserProfileResponse getProfileMe() {
 
@@ -200,20 +203,19 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")
-    @SecuredRoleUser
+    @SecuredUser
     @PutMapping("/profile/me")
     public EmptyJsonResponse editProfileMe(
             @Valid @RequestBody UserProfileEditForm form,
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response,
+            Authentication authentication) {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
         User user = userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
                 form.getAbout(), form.getUserPictureId());
 
-
-        Authentication authentication = AuthUtils.getAuthentication();
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 
         if (AuthUtils.isJakdukUser()) {
@@ -236,7 +238,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
-    @SecuredRoleUser
+    @SecuredUser
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
@@ -268,7 +270,7 @@ public class UserRestController {
     }
 
     @ApiOperation("회원 탈퇴")
-    @SecuredRoleUser
+    @SecuredUser
     @DeleteMapping("")
     public EmptyJsonResponse deleteUser(
             HttpServletRequest request,

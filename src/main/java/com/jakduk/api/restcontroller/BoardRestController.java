@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.JakdukConst;
-import com.jakduk.api.common.annotation.SecuredRoleUser;
+import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.exception.ServiceError;
@@ -110,7 +110,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글쓰기")
-    @SecuredRoleUser
+    @SecuredUser
     @PostMapping("")
     public FreePostWriteResponse addFreePost(
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
@@ -140,7 +140,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글 고치기")
-    @SecuredRoleUser
+    @SecuredUser
     @PutMapping("/{seq}")
     public FreePostWriteResponse editFreePost(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
@@ -182,7 +182,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 지움")
-    @SecuredRoleUser
+    @SecuredUser
     @DeleteMapping("/{seq}")
     public FreePostDeleteResponse deleteFree(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
@@ -206,7 +206,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 달기")
-    @SecuredRoleUser
+    @SecuredUser
     @PostMapping("/comment")
     public BoardFreeComment addFreeComment(
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
@@ -235,7 +235,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 고치기")
-    @SecuredRoleUser
+    @SecuredUser
     @PutMapping("/comment/{id}")
     public BoardFreeComment editFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
@@ -281,7 +281,7 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 지우기")
-    @SecuredRoleUser
+    @SecuredUser
     @DeleteMapping("/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
@@ -297,7 +297,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글 감정 표현")
-    @SecuredRoleUser
+    @SecuredUser
     @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeFeeling(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
@@ -339,7 +339,7 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 댓글 감정 표현")
-    @SecuredRoleUser
+    @SecuredUser
     @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse addFreeCommentFeeling(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
