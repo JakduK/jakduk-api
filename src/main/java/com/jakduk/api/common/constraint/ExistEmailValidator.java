@@ -2,12 +2,11 @@ package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.service.UserService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Objects;
 
 /**
  * @author pyohwan
@@ -26,11 +25,11 @@ public class ExistEmailValidator implements ConstraintValidator<ExistEmail, Stri
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        if (StringUtils.isEmpty(value))
-            return false;
+        Objects.requireNonNull(value);
 
         UserProfile existEmail = userService.findOneByEmail(value);
 
-        return ObjectUtils.isEmpty(existEmail);
+        return Objects.isNull(existEmail);
     }
+
 }

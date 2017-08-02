@@ -3,6 +3,8 @@ package com.jakduk.api.configuration.security.handler;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.restcontroller.vo.RestErrorResponse;
+import org.apache.commons.codec.CharEncoding;
+import org.apache.http.entity.ContentType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
@@ -22,9 +24,9 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
-        response.setContentType("application/json");
+        response.setContentType(ContentType.APPLICATION_JSON.toString());
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setCharacterEncoding("utf-8");
+        response.setCharacterEncoding(CharEncoding.UTF_8);
 
         RestErrorResponse restErrorResponse = new RestErrorResponse(ServiceError.UNAUTHORIZED_ACCESS);
         String errorJson = ObjectMapperUtils.getObjectMapper().writeValueAsString(restErrorResponse);

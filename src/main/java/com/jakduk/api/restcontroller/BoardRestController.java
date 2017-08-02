@@ -24,10 +24,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -110,7 +113,6 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글쓰기")
-    @SecuredUser
     @PostMapping("")
     public FreePostWriteResponse addFreePost(
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,

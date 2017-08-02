@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableGlobalMethodSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource private JakdukProperties jakdukProperties;
@@ -67,10 +67,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //Configures url based authorization
                 .and().authorizeRequests()
                     .antMatchers(
-                            HttpMethod.GET,
-                            "/api/user/exist/email",                // 이메일 중복 검사
-                            "/api/user/exist/username"              // 별명 중복 검사
-                    ).permitAll()
+                            HttpMethod.POST,
+                            "/api/board/free"                // 글 쓰기
+                    ).hasAnyAuthority(
+                            JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 
                     .antMatchers(
                             HttpMethod.POST,
