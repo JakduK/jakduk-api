@@ -3,6 +3,7 @@ package com.jakduk.api.restcontroller.vo.board;
 import com.jakduk.api.common.JakdukConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -15,8 +16,9 @@ import java.util.List;
  *         16. 7. 16 오후 7:55
  */
 
-@Getter
 @ApiModel(value = "글쓰기/글고치기 폼")
+@Getter
+@Builder
 public class FreePostForm {
 
     @ApiModelProperty(required = true, value = "글 제목", example = "글 제목입니다.")

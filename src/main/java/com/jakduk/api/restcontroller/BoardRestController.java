@@ -2,8 +2,8 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.annotation.SecuredUser;
-import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.BoardCategory;
@@ -14,23 +14,19 @@ import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
+import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.BoardCategoryService;
 import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.api.service.GalleryService;
-import com.jakduk.api.restcontroller.vo.board.*;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -48,14 +44,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/${jakduk.api-url-path.board-free}")
 public class BoardRestController {
 
-    @Autowired
-    private BoardFreeService boardFreeService;
-
-    @Autowired
-    private BoardCategoryService boardCategoryService;
-
-    @Autowired
-    private GalleryService galleryService;
+    @Autowired private BoardFreeService boardFreeService;
+    @Autowired private BoardCategoryService boardCategoryService;
+    @Autowired private GalleryService galleryService;
 
     @ApiOperation("자유게시판 글 목록")
     @GetMapping("/posts")
@@ -208,7 +199,6 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 달기")
-    @SecuredUser
     @PostMapping("/comment")
     public BoardFreeComment addFreeComment(
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
@@ -298,26 +288,19 @@ public class BoardRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "자유게시판 글 감정 표현")
-    @SecuredUser
-    @RequestMapping(value = "/{seq}/{feeling}", method = RequestMethod.POST)
+    @ApiOperation("자유게시판 글 감정 표현")
+    @PostMapping("/{seq}/{feeling}")
     public UserFeelingResponse addFreeFeeling(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "감정", required = true) @PathVariable JakdukConst.FEELING_TYPE feeling) {
-
-        if (! AuthUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, JakdukUtils.getExceptionMessage("exception.need.login.to.feel"));
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         BoardFree boardFree = boardFreeService.setFreeFeelings(commonWriter, seq, feeling);
 
-        Integer numberOfLike = ObjectUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size();
-        Integer numberOfDisLike = ObjectUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size();
-
         UserFeelingResponse response = UserFeelingResponse.builder()
-                .numberOfLike(numberOfLike)
-                .numberOfDislike(numberOfDisLike)
+                .numberOfLike(CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size())
+                .numberOfDislike(CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size())
                 .build();
 
         if (Objects.nonNull(commonWriter))
@@ -340,26 +323,19 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "자유게시판 댓글 감정 표현")
-    @SecuredUser
-    @RequestMapping(value = "/comment/{commentId}/{feeling}", method = RequestMethod.POST)
+    @ApiOperation("자유게시판 댓글 감정 표현")
+    @PostMapping("/comment/{commentId}/{feeling}")
     public UserFeelingResponse addFreeCommentFeeling(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
             @ApiParam(value = "감정", required = true) @PathVariable JakdukConst.FEELING_TYPE feeling) {
-
-        if (! AuthUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS, JakdukUtils.getExceptionMessage("exception.need.login.to.feel"));
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         BoardFreeComment boardComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
 
-        Integer numberOfLike = ObjectUtils.isEmpty(boardComment.getUsersLiking()) ? 0 : boardComment.getUsersLiking().size();
-        Integer numberOfDisLike = ObjectUtils.isEmpty(boardComment.getUsersDisliking()) ? 0 : boardComment.getUsersDisliking().size();
-
         UserFeelingResponse response = UserFeelingResponse.builder()
-                .numberOfLike(numberOfLike)
-                .numberOfDislike(numberOfDisLike)
+                .numberOfLike(CollectionUtils.isEmpty(boardComment.getUsersLiking()) ? 0 : boardComment.getUsersLiking().size())
+                .numberOfDislike(CollectionUtils.isEmpty(boardComment.getUsersDisliking()) ? 0 : boardComment.getUsersDisliking().size())
                 .build();
 
         if (Objects.nonNull(commonWriter))

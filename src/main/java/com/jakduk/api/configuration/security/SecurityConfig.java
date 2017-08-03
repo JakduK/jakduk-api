@@ -66,10 +66,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //Configures url based authorization
                 .and().authorizeRequests()
-                    .antMatchers(
+                    .regexMatchers(
                             HttpMethod.POST,
-                            "/api/board/free"                // 글 쓰기
-                    ).hasAnyAuthority(
+                            "/api/board/free",                      // 글 쓰기
+                            "/api/board/comment",                               // 댓글 달기
+                            "/api/board/free/\\d+/[a-zA-Z]+",                   // 글 감정 표현
+                            "/api/board/free/comment/[\\da-zA-Z]+/[a-zA-Z]+"    // 글 감정 표현
+                            ).hasAnyAuthority(
                             JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 
                     .antMatchers(
