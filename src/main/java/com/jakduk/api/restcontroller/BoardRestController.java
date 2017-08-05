@@ -114,7 +114,7 @@ public class BoardRestController {
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
 
-        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+        if (! CollectionUtils.isEmpty(form.getGalleries())) {
             unverifiableGalleryIds = form.getGalleries().stream()
                     .map(GalleryOnBoard::getId)
                     .collect(Collectors.toList());
