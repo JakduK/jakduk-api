@@ -47,7 +47,7 @@ public class BoardFree implements UsersFeeling {
 	/**
 	 * 글 번호
 	 */
-	private int seq;
+	private Integer seq;
 	
 	/**
 	 * 분류 ID

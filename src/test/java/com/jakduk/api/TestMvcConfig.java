@@ -1,4 +1,4 @@
-package com.jakduk.api.board;
+package com.jakduk.api;
 
 import org.springframework.mobile.device.DeviceWebArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -7,8 +7,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ServletWebArgumentR
 
 import java.util.List;
 
-public class CustomizationConfiguration extends WebMvcConfigurerAdapter {
+public class TestMvcConfig extends WebMvcConfigurerAdapter {
 
+    // org.springframework.mobile.device.Device 구현체를 주입하기 위함
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new ServletWebArgumentResolverAdapter(new DeviceWebArgumentResolver()));

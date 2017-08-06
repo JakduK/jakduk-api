@@ -1,5 +1,6 @@
 package com.jakduk.api.restcontroller;
 
+import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.util.AuthUtils;
@@ -23,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +49,7 @@ public class BoardRestController {
     @Autowired private BoardFreeService boardFreeService;
     @Autowired private BoardCategoryService boardCategoryService;
     @Autowired private GalleryService galleryService;
+    @Autowired private AuthHelper authHelper;
 
     @ApiOperation("자유게시판 글 목록")
     @GetMapping("/posts")
@@ -58,8 +61,8 @@ public class BoardRestController {
         return boardFreeService.getFreePosts(category, page, size);
     }
 
-    @ApiOperation(value = "자유게시판 주간 선두 글")
-    @RequestMapping(value = "/tops", method = RequestMethod.GET)
+    @ApiOperation("자유게시판 주간 선두 글")
+    @GetMapping("/tops")
     public FreeTopsResponse getFreePostsTops() {
 
         List<BoardFreeOnBest> topLikes = boardFreeService.getFreeTopLikes();
@@ -107,9 +110,10 @@ public class BoardRestController {
     @PostMapping("")
     public FreePostWriteResponse addFreePost(
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
-            Device device) {
+            Device device,
+            Authentication authentication) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;

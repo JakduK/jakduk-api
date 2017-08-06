@@ -1,6 +1,8 @@
 package com.jakduk.api.model.simple;
 
 import com.jakduk.api.model.embedded.BoardStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +14,8 @@ import lombok.NoArgsConstructor;
 */
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 public class BoardFreeOnSearch {
 	
