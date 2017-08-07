@@ -1,7 +1,6 @@
 package com.jakduk.api.common.util;
 
 import com.jakduk.api.common.JakdukConst;
-
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
@@ -122,15 +121,19 @@ public class JakdukUtils {
      * @return JakdukConst.DEVICE_TYPE enum 타입
      */
     public static JakdukConst.DEVICE_TYPE getDeviceInfo(Device device) {
-        if (device.isNormal()) {
-            return JakdukConst.DEVICE_TYPE.NORMAL;
-        } else if (device.isMobile()) {
-            return JakdukConst.DEVICE_TYPE.MOBILE;
+
+        JakdukConst.DEVICE_TYPE returnDeviceType = JakdukConst.DEVICE_TYPE.NORMAL;
+
+        if (Objects.isNull(device))
+            return returnDeviceType;
+
+        if (device.isMobile()) {
+            returnDeviceType = JakdukConst.DEVICE_TYPE.MOBILE;
         } else if (device.isTablet()) {
-            return JakdukConst.DEVICE_TYPE.TABLET;
-        } else {
-            return JakdukConst.DEVICE_TYPE.NORMAL;
+            returnDeviceType = JakdukConst.DEVICE_TYPE.TABLET;
         }
+
+        return returnDeviceType;
     }
 
     /**
