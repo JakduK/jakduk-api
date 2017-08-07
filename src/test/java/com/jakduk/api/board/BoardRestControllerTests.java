@@ -4,13 +4,16 @@ import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.common.util.ObjectMapperUtils;
+import com.jakduk.api.model.db.BoardCategory;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.BoardCommentStatus;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
+import com.jakduk.api.model.embedded.LocalSimpleName;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import com.jakduk.api.model.simple.BoardFreeOnSearch;
+import com.jakduk.api.model.simple.BoardFreeSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.BoardCategoryService;
@@ -19,6 +22,7 @@ import com.jakduk.api.service.GalleryService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -57,6 +61,7 @@ public class BoardRestControllerTests {
 
     private CommonWriter commonWriter;
     private BoardFree boardFree;
+    private BoardCategory boardCategory;
 
     @Before
     public void setUp(){
@@ -75,6 +80,12 @@ public class BoardRestControllerTests {
                 .category(JakdukConst.BOARD_CATEGORY_TYPE.FOOTBALL)
                 .linkedGallery(true)
                 .status(BoardStatus.builder().notice(false).delete(false).device(JakdukConst.DEVICE_TYPE.NORMAL).build())
+                .build();
+
+        boardCategory = BoardCategory.builder()
+                .id("boardCategoryId01")
+                .code("FREE")
+                .names(Arrays.asList(new LocalSimpleName("ko", "자유"), new LocalSimpleName("en", "FREE")))
                 .build();
     }
 
@@ -170,7 +181,58 @@ public class BoardRestControllerTests {
         mvc.perform(get("/api/board/free/comments")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(response)));
+
+    }
+
+    @Test
+    @WithMockUser
+    public void getFreePostTest() throws Exception {
+
+        FreePostDetail freePostDetail = new FreePostDetail();
+        BeanUtils.copyProperties(boardFree, freePostDetail);
+        freePostDetail.setCategory(boardCategory);
+        freePostDetail.setNumberOfLike(5);
+        freePostDetail.setNumberOfDislike(4);
+        freePostDetail.setGalleries(
+                Arrays.asList(
+                        BoardGallery.builder()
+                        .id("boardGalleryId01")
+                        .name("성남FC 시즌권 사진")
+                        .imageUrl("https://staging.jakduk.com:8080/gallery/58b9050b807d714eaf50a111")
+                        .thumbnailUrl("https://staging.jakduk.com:8080/gallery/thumbnail/58b9050b807d714eaf50a111")
+                        .build()
+                )
+        );
+
+        BoardFreeSimple prevPost = BoardFreeSimple.builder()
+                .id("boardFreeId02")
+                .seq(2)
+                .subject("이전 글 제목")
+                .writer(commonWriter)
+                .build();
+
+        BoardFreeSimple nextPost = BoardFreeSimple.builder()
+                .id("boardFreeId03")
+                .seq(3)
+                .subject("다음 글 제목")
+                .writer(commonWriter)
+                .build();
+
+        FreePostDetailResponse response = FreePostDetailResponse.builder()
+                .post(freePostDetail)
+                .prevPost(prevPost)
+                .nextPost(nextPost)
+                .build();
+
+        when(boardFreeService.getBoardFreeDetail(anyInt(), anyBoolean()))
+                .thenReturn(response);
+
+        mvc.perform(get("/api/board/free/{seq}", boardFree.getSeq())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(response)));
     }
 
     @Test

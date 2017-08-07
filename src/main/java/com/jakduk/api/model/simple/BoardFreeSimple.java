@@ -1,8 +1,7 @@
 package com.jakduk.api.model.simple;
 
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,8 +12,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Document(collection = "boardFree")
 public class BoardFreeSimple {
 	

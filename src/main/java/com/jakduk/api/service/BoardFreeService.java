@@ -873,7 +873,7 @@ public class BoardFreeService {
 		FreePostDetail freePostDetail = new FreePostDetail();
 		BeanUtils.copyProperties(boardFree, freePostDetail);
 
-		if (! ObjectUtils.isEmpty(boardFree.getLogs())) {
+		if (! CollectionUtils.isEmpty(boardFree.getLogs())) {
 			List<BoardFreeLog> logs = boardFree.getLogs().stream()
 					.map(boardLog -> {
 						BoardFreeLog boardFreeLog = new BoardFreeLog();

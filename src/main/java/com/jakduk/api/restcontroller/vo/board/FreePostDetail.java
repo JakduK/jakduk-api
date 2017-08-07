@@ -30,7 +30,7 @@ public class FreePostDetail {
     private String subject;
 
     @ApiModelProperty(example = "2", value = "글번호")
-    private int seq;
+    private Integer seq;
 
     @ApiModelProperty(example = "본문입니다", value = "본문")
     private String content;
