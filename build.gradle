@@ -1,9 +1,11 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.6.RELEASE'
+        springBootVersion = '2.0.0.M3'
     }
     repositories {
-        mavenCentral()
+        jcenter()
+        maven { url 'http://repo.spring.io/snapshot' }
+        maven { url 'http://repo.spring.io/milestone' }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -14,13 +16,14 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 version = '1.0.0'
 sourceCompatibility = 1.8
 
-springBoot {
+/*springBoot {
     executable = true
-}
+}*/
 
 // test task 에서 spring.profiles.active 를 위한 설정.
 test {
@@ -28,7 +31,9 @@ test {
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
+    maven { url 'http://repo.spring.io/snapshot' }
+    maven { url 'http://repo.spring.io/milestone' }
 
     // 프로젝트에 import한 jar 보관 폴더.
     flatDir {
