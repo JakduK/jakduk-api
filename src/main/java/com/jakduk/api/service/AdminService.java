@@ -78,7 +78,7 @@ public class AdminService {
 	}
 
 	// 알림판 하나.
-	public HomeDescription findHomeDescriptionById(String id) throws ServiceException {
+	public HomeDescription findHomeDescriptionById(String id) {
 		return homeDescriptionReposotiry.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_HOMEDESCRIPTION));
 	}
 
