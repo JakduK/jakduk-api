@@ -3,7 +3,6 @@ package com.jakduk.api.exception;
 import lombok.Getter;
 import org.apache.http.HttpStatus;
 import org.springframework.context.i18n.LocaleContextHolder;
-import sun.net.www.http.HttpClient;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
