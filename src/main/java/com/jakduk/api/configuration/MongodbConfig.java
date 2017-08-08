@@ -40,7 +40,7 @@ public class MongodbConfig extends AbstractMongoConfiguration {
     }
 
     @Override
-    public Mongo mongo() throws Exception {
+    public MongoClient mongoClient() {
 
         List<ServerAddress> seeds = Stream.of(StringUtils.split(mongodbProperties.getHost(), ","))
                 .map(hostName -> {
@@ -58,7 +58,7 @@ public class MongodbConfig extends AbstractMongoConfiguration {
 
     @Bean
     public Jongo jongo() throws Exception {
-        return new Jongo(mongo().getDB(getDatabaseName()));
+        return new Jongo(mongoClient().getDB(getDatabaseName()));
     }
 
     @Bean
