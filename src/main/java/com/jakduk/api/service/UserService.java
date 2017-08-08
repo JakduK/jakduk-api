@@ -396,7 +396,7 @@ public class UserService {
 	}
 
 	public void deleteUser(String id) {
-		userRepository.delete(id);
+		userRepository.deleteById(id);
 	}
 
 }

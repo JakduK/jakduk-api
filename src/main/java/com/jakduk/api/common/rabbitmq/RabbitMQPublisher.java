@@ -43,7 +43,7 @@ public class RabbitMQPublisher {
                 .recipientEmail(recipientEmail)
                 .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("username", userName);
                             }
@@ -70,7 +70,7 @@ public class RabbitMQPublisher {
                         }
                 )
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("email", recipientEmail);
                             }

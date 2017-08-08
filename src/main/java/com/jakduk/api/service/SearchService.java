@@ -20,13 +20,16 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.support.QueryInnerHitBuilder;
+import org.elasticsearch.join.query.JoinQueryBuilders;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.highlight.HighlightField;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,7 +133,7 @@ public class SearchService {
 								.size(size)
 				);
 
-		log.debug("aggregateSearchWord Query:\n{}", searchRequestBuilder.internalBuilder());
+		//log.debug("aggregateSearchWord Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
 		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
@@ -172,7 +175,7 @@ public class SearchService {
 				.setId(id)
 				.get();
 
-		if (! response.isFound())
+		if (! (response.status() == RestStatus.OK))
 			log.info("board id {} is not found. so can't delete it!", id);
 	}
 
@@ -203,7 +206,7 @@ public class SearchService {
 				.setId(id)
 				.get();
 
-		if (! response.isFound())
+		if (! (response.status() == RestStatus.OK))
 			log.info("comment id {} is not found. so can't delete it!", id);
 	}
 
@@ -235,7 +238,7 @@ public class SearchService {
 				.setId(id)
 				.get();
 
-		if (! response.isFound())
+		if (! (response.status() == RestStatus.OK))
 			log.info("gallery id {} is not found. so can't delete it!", id);
 	}
 
@@ -260,6 +263,12 @@ public class SearchService {
 	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
 															  String postTags) {
 
+		HighlightBuilder highlightBuilder = new HighlightBuilder()
+				.noMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
+				.fragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
+				.field("subject", JakdukConst.SEARCH_FRAGMENT_SIZE, 0)
+				.field("content", JakdukConst.SEARCH_FRAGMENT_SIZE, 1);
+
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexBoard())
 				.setTypes(JakdukConst.ES_TYPE_BOARD)
@@ -268,20 +277,17 @@ public class SearchService {
 						QueryBuilders.boolQuery()
 								.should(QueryBuilders.multiMatchQuery(query, "subject^1.5", "content"))
 				)
-				.setHighlighterNoMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
-				.setHighlighterFragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
-				.addHighlightedField("subject", JakdukConst.SEARCH_FRAGMENT_SIZE, 0)
-				.addHighlightedField("content", JakdukConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
 		if (StringUtils.isNotBlank(preTags))
-			searchRequestBuilder.setHighlighterPreTags(preTags);
+			highlightBuilder.preTags(preTags);
 
 		if (StringUtils.isNotBlank(postTags))
-			searchRequestBuilder.setHighlighterPostTags(postTags);
+			highlightBuilder.postTags(postTags);
 
-		log.debug("getBoardSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
+		searchRequestBuilder.highlighter(highlightBuilder);
+		//log.debug("getBoardSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		return searchRequestBuilder;
 	}
@@ -328,8 +334,12 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
-																String postTags) {
+	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size, String preTags, String postTags) {
+
+		HighlightBuilder highlightBuilder = new HighlightBuilder()
+			.noMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
+			.fragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
+			.field("content", JakdukConst.SEARCH_FRAGMENT_SIZE, 1);
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexBoard())
@@ -339,24 +349,22 @@ public class SearchService {
 						QueryBuilders.boolQuery()
 								.must(QueryBuilders.matchQuery("content", query))
 								.must(
-										QueryBuilders
-												.hasParentQuery(JakdukConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
-												.innerHit(new QueryInnerHitBuilder())
+										JoinQueryBuilders
+												.hasParentQuery(JakdukConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery(), false)
+												.innerHit(new InnerHitBuilder())
 								)
 				)
-				.setHighlighterNoMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
-				.setHighlighterFragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
-				.addHighlightedField("content", JakdukConst.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
 		if (StringUtils.isNotBlank(preTags))
-			searchRequestBuilder.setHighlighterPreTags(preTags);
+			highlightBuilder.preTags(preTags);
 
 		if (StringUtils.isNotBlank(postTags))
-			searchRequestBuilder.setHighlighterPostTags(postTags);
+			highlightBuilder.postTags(postTags);
 
-		log.debug("getBoardCommentSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
+		//log.debug("getBoardCommentSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
+		searchRequestBuilder.highlighter(highlightBuilder);
 
 		return searchRequestBuilder;
 	}
@@ -393,20 +401,24 @@ public class SearchService {
 	}
 
 	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
+
+		HighlightBuilder highlightBuilder = new HighlightBuilder()
+			.noMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
+			.fragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
+			.preTags("<span class=\"color-orange\">")
+			.postTags("</span>")
+			.field("name", JakdukConst.SEARCH_FRAGMENT_SIZE, 0);
+
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexGallery())
 				.setTypes(JakdukConst.ES_TYPE_GALLERY)
 				.setFetchSource(null, new String[]{"name"})
 				.setQuery(QueryBuilders.matchQuery("name", query))
-				.setHighlighterNoMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
-				.setHighlighterFragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
-				.addHighlightedField("name", JakdukConst.SEARCH_FRAGMENT_SIZE, 0)
+				.highlighter(highlightBuilder)
 				.setFrom(from)
 				.setSize(size);
 
-		log.debug("getGallerySearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
+		//log.debug("getGallerySearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		return searchRequestBuilder;
 	}

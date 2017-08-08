@@ -406,7 +406,7 @@ public class GalleryService {
 		String accountId = writer.getUserId();
 		String accountName = writer.getUsername();
 
-		Gallery gallery = galleryRepository.findOne(id);
+		Gallery gallery = galleryRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
 		CommonWriter galleryWriter = gallery.getWriter();
 
 		List<CommonFeelingUser> usersLiking = gallery.getUsersLiking();

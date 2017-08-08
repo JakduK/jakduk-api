@@ -57,6 +57,9 @@ public enum ServiceError {
     NOT_FOUND_ATTENDANCE_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.attendance.club"),
     NOT_FOUND_FOOTBALL_CLUB_ORIGIN(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club.origin"),
     NOT_FOUND_ENCYCLOPEDIA(HttpStatus.SC_NOT_FOUND, "exception.not.found.encyclopedia"),
+    NOT_FOUND_HOMEDESCRIPTION(HttpStatus.SC_NOT_FOUND, "exception.not.found.homedescription"),
+    NOT_FOUND_JAKDUSCHEDULE(HttpStatus.SC_NOT_FOUND, "exception.not.found.jakduschedule"),
+    NOT_FOUND_JAKDUSCHEDULEGROUP(HttpStatus.SC_NOT_FOUND, "exception.not.found.jakduschedulegroup"),
     ALREADY_ENABLE(HttpStatus.SC_NOT_FOUND, "exception.already.enable"),
     ALREADY_DISABLE(HttpStatus.SC_NOT_FOUND, "exception.already.disable"),
 

@@ -539,7 +539,7 @@ public class BoardFreeService {
 		if (! boardFreeComment.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
-		boardFreeCommentRepository.delete(id);
+		boardFreeCommentRepository.deleteById(id);
 
 		// 색인 지움
 		rabbitMQPublisher.deleteDocumentComment(id);
