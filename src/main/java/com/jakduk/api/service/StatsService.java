@@ -73,7 +73,7 @@ public class StatsService {
 
 	// 대회별 관중수 하나 지움.
 	public void deleteLeagueAttendance(String id) {
-		attendanceLeagueRepository.delete(id);
+		attendanceLeagueRepository.deleteById(id);
 	}
 
 	public Map<String, Object> getSupportersData(String language) {

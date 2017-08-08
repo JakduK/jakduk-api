@@ -68,7 +68,7 @@ public class BoardCategoryService {
                         .build()
         );
 
-        boardCategoryRepository.save(boardCategories);
+        boardCategoryRepository.saveAll(boardCategories);
 
         log.debug("inital board category.");
     }
