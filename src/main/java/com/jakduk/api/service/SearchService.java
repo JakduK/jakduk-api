@@ -20,6 +20,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.JoinQueryBuilders;
 import org.elasticsearch.rest.RestStatus;
@@ -349,8 +350,8 @@ public class SearchService {
 								.must(QueryBuilders.matchQuery("content", query))
 								.must(
 										JoinQueryBuilders
-												.hasParentQuery(JakdukConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
-												.innerHit(new QueryInnerHitBuilder())
+												.hasParentQuery(JakdukConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery(), false)
+												.innerHit(new InnerHitBuilder())
 								)
 				)
 				.setFrom(from)
