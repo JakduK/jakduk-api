@@ -4,6 +4,7 @@ import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
 import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.BoardFreeOnList;
 import com.jakduk.api.model.simple.BoardFreeOnRSS;
 import com.jakduk.api.model.simple.BoardFreeOnSitemap;
@@ -17,15 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
@@ -34,6 +33,9 @@ public class BoardFreeRepositoryTests {
 
     @Autowired
     private BoardFreeRepository repository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     private BoardFree randomBoardFree;
 
@@ -86,6 +88,15 @@ public class BoardFreeRepositoryTests {
     @Test
     public void findByIdInAndLinkedGalleryIsTrue() {
         List<BoardFree> posts = repository.findByIdInAndLinkedGalleryIsTrue(Arrays.asList(randomBoardFree.getId()));
+    }
+
+    @Test
+    public void test02() {
+        List<BoardFeelingCount> feelingCounts = repository.findUsersFeelingCount(Arrays.asList(new ObjectId(randomBoardFree.getId())));
+
+        System.out.println("phjang=" + feelingCounts);
+
+        Assert.assertTrue(! CollectionUtils.isEmpty(feelingCounts));
     }
 
 

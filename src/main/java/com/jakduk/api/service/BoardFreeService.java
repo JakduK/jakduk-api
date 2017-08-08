@@ -11,8 +11,8 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.*;
+import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.etc.CommonCount;
-import com.jakduk.api.model.jongo.BoardFeelingCount;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import com.jakduk.api.model.simple.*;
 import com.jakduk.api.repository.board.category.BoardCategoryRepository;
@@ -20,8 +20,8 @@ import com.jakduk.api.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.api.repository.board.free.BoardFreeRepository;
 import com.jakduk.api.repository.board.free.comment.BoardFreeCommentRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
-import com.jakduk.api.restcontroller.vo.home.LatestPost;
 import com.jakduk.api.restcontroller.vo.board.*;
+import com.jakduk.api.restcontroller.vo.home.LatestPost;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -304,7 +304,7 @@ public class BoardFreeService {
 				List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 						new ObjectId(post.getId()), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
-				if (! ObjectUtils.isEmpty(galleries)) {
+				if (! CollectionUtils.isEmpty(galleries)) {
 					List<BoardGallerySimple> boardGalleries = galleries.stream()
 							.map(gallery -> BoardGallerySimple.builder()
 									.id(gallery.getId())
@@ -330,38 +330,30 @@ public class BoardFreeService {
 		// Board ID 뽑아내기.
 		ArrayList<ObjectId> ids = new ArrayList<>();
 
-		Consumer<FreePost> extractIds = board -> {
-			String boardId = board.getId();
-			ObjectId objId = new ObjectId(boardId);
-
-			ids.add(objId);
-		};
-
-		freePosts.forEach(extractIds);
-		freeNotices.forEach(extractIds);
+		freePosts.forEach(board -> ids.add(new ObjectId(board.getId())));
+		freeNotices.forEach(board -> ids.add(new ObjectId(board.getId())));
 
 		// 게시물의 댓글수
-		List<CommonCount> numberOfItems = boardFreeCommentRepository.findCommentsCountByIds(ids);
-
-		Map<String, Integer> commentCounts =  numberOfItems.stream()
+		Map<String, Integer> commentCounts = boardFreeCommentRepository.findCommentsCountByIds(ids).stream()
 				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 
 		// 게시물의 감정수
-		Map<String, BoardFeelingCount> feelingCounts = boardDAO.getBoardFreeUsersFeelingCount(ids);
+		Map<String, BoardFeelingCount> feelingCounts = boardFreeRepository.findUsersFeelingCount(ids).stream()
+				.collect(Collectors.toMap(BoardFeelingCount::getId, Function.identity()));
 
 		// 댓글수, 감정 표현수 합치기.
 		Consumer<FreePost> applyCounts = board -> {
 			String boardId = board.getId();
 			Integer commentCount = commentCounts.get(boardId);
 
-			if (! ObjectUtils.isEmpty(commentCount))
+			if (Objects.nonNull(commentCount))
 				board.setCommentCount(commentCount);
 
 			BoardFeelingCount feelingCount = feelingCounts.get(boardId);
 
 			if (Objects.nonNull(feelingCount)) {
 				board.setLikingCount(feelingCount.getUsersLikingCount());
-				board.setDislikingCount(feelingCount.getUsersDisLikingCount());
+				board.setDislikingCount(feelingCount.getUsersDislikingCount());
 			}
 		};
 

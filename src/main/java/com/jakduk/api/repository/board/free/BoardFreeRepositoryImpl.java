@@ -2,19 +2,19 @@ package com.jakduk.api.repository.board.free;
 
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -172,4 +172,27 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
 
         return mongoTemplate.findOne(query, BoardFreeSimple.class);
     }
+
+    /**
+     * 게시물의 감정 갯수를 가져온다
+     *
+     * db.getCollection('boardFree').aggregate([{$match:{seq:{$in:[9]}}}, {$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}])
+     */
+    @Override
+    public List<BoardFeelingCount> findUsersFeelingCount(List<ObjectId> ids) {
+        AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(ids));
+
+        AggregationExpression usersLikingCount = ArrayOperators.Size.lengthOfArray(ConditionalOperators.ifNull("usersLiking").then(new ArrayList<>()));
+        AggregationExpression usersDislikingCount = ArrayOperators.Size.lengthOfArray(ConditionalOperators.ifNull("usersDisliking").then(new ArrayList<>()));
+
+        AggregationOperation project1 = Aggregation.project("_id")
+                .and(usersLikingCount).as("usersLikingCount")
+                .and(usersDislikingCount).as("usersDislikingCount");
+
+        Aggregation aggregation = Aggregation.newAggregation(match1, project1);
+        AggregationResults<BoardFeelingCount> results = mongoTemplate.aggregate(aggregation, JakdukConst.COLLECTION_BOARD_FREE, BoardFeelingCount.class);
+
+        return results.getMappedResults();
+    }
+
 }
