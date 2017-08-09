@@ -2,7 +2,7 @@ package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jakduk.api.configuration.security.JakdukAuthority;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
 import com.jakduk.api.model.embedded.CommonWriter;
@@ -128,7 +128,7 @@ public class AuthUtils {
         if (authentication.getPrincipal() instanceof UserDetailsImpl) {
             UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
-            return userDetail.getProviderId().equals(JakdukConst.ACCOUNT_TYPE.JAKDUK);
+            return userDetail.getProviderId().equals(Constants.ACCOUNT_TYPE.JAKDUK);
         } else {
             return false;
         }
@@ -141,9 +141,9 @@ public class AuthUtils {
         if (authentication.getPrincipal() instanceof UserDetailsImpl) {
             UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
-            JakdukConst.ACCOUNT_TYPE providerId = userDetail.getProviderId();
+            Constants.ACCOUNT_TYPE providerId = userDetail.getProviderId();
 
-            return providerId.equals(JakdukConst.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(JakdukConst.ACCOUNT_TYPE.DAUM);
+            return providerId.equals(Constants.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(Constants.ACCOUNT_TYPE.DAUM);
         } else {
             return false;
         }
@@ -266,7 +266,7 @@ public class AuthUtils {
      * @param sizeType size 타입
      * @param id UserImage의 ID
      */
-    public String generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE sizeType, String id) {
+    public String generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE sizeType, String id) {
 
         if (StringUtils.isBlank(id))
             return null;

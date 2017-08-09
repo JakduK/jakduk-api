@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +25,7 @@ public class JakduScheduleGroup {
 
     private int seq;
 
-    private JakdukConst.JAKDU_GROUP_STATE state;
+    private Constants.JAKDU_GROUP_STATE state;
 
     private Date openDate;
 

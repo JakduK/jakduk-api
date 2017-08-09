@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.BoardLog;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
@@ -52,7 +52,7 @@ public class BoardFree implements UsersFeeling {
 	/**
 	 * 분류 ID
 	 */
-	private JakdukConst.BOARD_CATEGORY_TYPE category;
+	private Constants.BOARD_CATEGORY_TYPE category;
 	
 	/**
 	 * 조회

@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.admin;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.Data;
 
 /**
@@ -13,6 +13,6 @@ import lombok.Data;
 public class BoardListInfo {
 
 	private int page = 1;
-	private int size = JakdukConst.BOARD_MAX_LIMIT;
-	private String category = JakdukConst.BOARD_CATEGORY_NONE;
+	private int size = Constants.BOARD_MAX_LIMIT;
+	private String category = Constants.BOARD_CATEGORY_NONE;
 }

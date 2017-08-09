@@ -2,7 +2,7 @@ package com.jakduk.api.gallery;
 
 import com.jakduk.api.ApiApplicationTests;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import org.bson.types.ObjectId;
@@ -23,14 +23,14 @@ public class GalleryRepositoryTest extends ApiApplicationTests {
 
     @Test
     public void findGalleriesById() {
-        List<Gallery> galleries = sut.findGalleriesById(new ObjectId("58d64035807d714ce35675d4"), JakdukConst.CRITERIA_OPERATOR.GT, 3);
+        List<Gallery> galleries = sut.findGalleriesById(new ObjectId("58d64035807d714ce35675d4"), Constants.CRITERIA_OPERATOR.GT, 3);
 
         Assert.assertTrue(Objects.nonNull(galleries));
     }
 
     @Test
     public void findByItemIdAndFromType() {
-        List<Gallery> galleries = sut.findByItemIdAndFromType(new ObjectId("58ee422be846b60526cd3382"), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 10);
+        List<Gallery> galleries = sut.findByItemIdAndFromType(new ObjectId("58ee422be846b60526cd3382"), Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 10);
 
         Assert.assertTrue(Objects.nonNull(galleries));
     }

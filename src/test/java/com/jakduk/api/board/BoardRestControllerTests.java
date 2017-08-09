@@ -2,7 +2,7 @@ package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.AuthHelper;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.model.db.BoardCategory;
 import com.jakduk.api.model.db.BoardFree;
@@ -68,7 +68,7 @@ public class BoardRestControllerTests {
         commonWriter = CommonWriter.builder()
                 .userId("userid01")
                 .username("user01")
-                .providerId(JakdukConst.ACCOUNT_TYPE.JAKDUK)
+                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
                 .build();
 
         boardFree = BoardFree.builder()
@@ -77,9 +77,9 @@ public class BoardRestControllerTests {
                 .writer(commonWriter)
                 .subject("제목입니다.")
                 .content("내용입니다.")
-                .category(JakdukConst.BOARD_CATEGORY_TYPE.FOOTBALL)
+                .category(Constants.BOARD_CATEGORY_TYPE.FOOTBALL)
                 .linkedGallery(true)
-                .status(BoardStatus.builder().notice(false).delete(false).device(JakdukConst.DEVICE_TYPE.NORMAL).build())
+                .status(BoardStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
                 .build();
 
         boardCategory = BoardCategory.builder()
@@ -160,7 +160,7 @@ public class BoardRestControllerTests {
                                                         .build())
                                         .writer(commonWriter)
                                         .content("댓글 내용입니다.")
-                                        .status(new BoardCommentStatus(JakdukConst.DEVICE_TYPE.NORMAL))
+                                        .status(new BoardCommentStatus(Constants.DEVICE_TYPE.NORMAL))
                                         .numberOfDislike(5)
                                         .numberOfDislike(3)
                                         .build()
@@ -244,7 +244,7 @@ public class BoardRestControllerTests {
         FreePostForm form = FreePostForm.builder()
                 .subject("제목입니다.")
                 .content("내용입니다.")
-                .categoryCode(JakdukConst.BOARD_CATEGORY_TYPE.FOOTBALL)
+                .categoryCode(Constants.BOARD_CATEGORY_TYPE.FOOTBALL)
                 .galleries(Arrays.asList(galleryOnBoard))
                 .build();
 
@@ -265,13 +265,13 @@ public class BoardRestControllerTests {
         when(galleryService.findByIdIn(any()))
                 .thenReturn(expectGalleries);
 
-        when(boardFreeService.insertFreePost(any(CommonWriter.class), anyString(), anyString(), any(JakdukConst.BOARD_CATEGORY_TYPE.class),
-                anyListOf(Gallery.class), any(JakdukConst.DEVICE_TYPE.class)))
+        when(boardFreeService.insertFreePost(any(CommonWriter.class), anyString(), anyString(), any(Constants.BOARD_CATEGORY_TYPE.class),
+                anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
                 .thenReturn(boardFree);
 
         doNothing().when(galleryService)
                 .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(JakdukConst.GALLERY_FROM_TYPE.class), anyString());
+                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         FreePostWriteResponse expectResponse = FreePostWriteResponse.builder()
                 .seq(boardFree.getSeq())

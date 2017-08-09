@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -26,7 +26,7 @@ public class User {
 	
 	private String password;						// 비밀번호
 
-	private JakdukConst.ACCOUNT_TYPE providerId;		// 제공자
+	private Constants.ACCOUNT_TYPE providerId;		// 제공자
 
 	private String providerUserId;					// SNS USER ID
 

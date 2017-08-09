@@ -1,6 +1,6 @@
 package com.jakduk.api.common.rabbitmq;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.elasticsearch.EsBoard;
@@ -39,7 +39,7 @@ public class RabbitMQPublisher {
     public void sendWelcome(Locale locale, String recipientEmail, String userName) {
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(locale)
-                .type(JakdukConst.EMAIL_TYPE.WELCOME)
+                .type(Constants.EMAIL_TYPE.WELCOME)
                 .recipientEmail(recipientEmail)
                 .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
@@ -59,7 +59,7 @@ public class RabbitMQPublisher {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(locale)
-                .type(JakdukConst.EMAIL_TYPE.RESET_PASSWORD)
+                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail(recipientEmail)
                 .subject("jakduk.com-" + JakdukUtils.getResourceBundleMessage("messages.user", "user.password.reset.instructions"))
                 .extra(

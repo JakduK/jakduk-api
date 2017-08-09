@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class BoardFreeCommentLog {
     @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "사진 ID")
     private String id;
 
-    private JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE type;
+    private Constants.BOARD_FREE_COMMENT_HISTORY_TYPE type;
 
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;

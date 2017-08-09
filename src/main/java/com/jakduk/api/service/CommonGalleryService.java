@@ -1,6 +1,6 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.FileUtils;
 import com.jakduk.api.configuration.JakdukProperties;
@@ -54,7 +54,7 @@ public class CommonGalleryService {
      * @param itemId Item ID
      * @param fromType 출처
      */
-    public void unlinkGalleries(String itemId, JakdukConst.GALLERY_FROM_TYPE fromType) {
+    public void unlinkGalleries(String itemId, Constants.GALLERY_FROM_TYPE fromType) {
         List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(new ObjectId(itemId), fromType, 100);
 
         galleries.forEach(gallery -> {

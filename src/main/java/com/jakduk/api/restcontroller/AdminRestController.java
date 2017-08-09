@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.LocalName;
 import com.jakduk.api.model.embedded.LocalSimpleName;
@@ -191,9 +191,9 @@ public class AdminRestController {
 		encyclopedia.setId(null);
 
 		if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(JakdukConst.ENCYCLOPEDIA_EN));
+			encyclopedia.setSeq(commonService.getNextSequence(Constants.ENCYCLOPEDIA_EN));
 		} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(JakdukConst.ENCYCLOPEDIA_KO));
+			encyclopedia.setSeq(commonService.getNextSequence(Constants.ENCYCLOPEDIA_KO));
 		}
 
 		adminService.saveEncyclopedia(encyclopedia);
@@ -617,8 +617,8 @@ public class AdminRestController {
 	public Map<String, Object> thumbnailSizeWrite() {
 
 		Map<String, Object> data = new HashMap<>();
-		data.put("resWidth", JakdukConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
-		data.put("resHeight", JakdukConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+		data.put("resWidth", Constants.GALLERY_THUMBNAIL_SIZE_WIDTH);
+		data.put("resHeight", Constants.GALLERY_THUMBNAIL_SIZE_HEIGHT);
 
 		return data;
 	}

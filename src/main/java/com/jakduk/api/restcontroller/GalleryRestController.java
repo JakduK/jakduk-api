@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -50,7 +50,7 @@ public class GalleryRestController {
             @ApiParam(value = "이 ID 이후부터 목록 가져옴") @RequestParam(required = false) String id,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "0") Integer size) {
 
-        if (size < JakdukConst.GALLERY_SIZE) size = JakdukConst.GALLERY_SIZE;
+        if (size < Constants.GALLERY_SIZE) size = Constants.GALLERY_SIZE;
 
         return galleryService.getGalleries(id, size);
     }
@@ -76,8 +76,8 @@ public class GalleryRestController {
         GalleryUploadResponse response = new GalleryUploadResponse();
 
         BeanUtils.copyProperties(gallery, response);
-        response.setImageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-        response.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+        response.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+        response.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
         return response;
     }
@@ -114,7 +114,7 @@ public class GalleryRestController {
 
     @ApiOperation(value = "사진 좋아요 싫어요")
     @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable JakdukConst.FEELING_TYPE feeling) {
+    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable Constants.FEELING_TYPE feeling) {
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -124,7 +124,7 @@ public class GalleryRestController {
         Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
 
         return UserFeelingResponse.builder()
-          .myFeeling((JakdukConst.FEELING_TYPE) data.get("feeling"))
+          .myFeeling((Constants.FEELING_TYPE) data.get("feeling"))
           .numberOfLike((Integer) data.get("numberOfLike"))
           .numberOfDislike((Integer) data.get("numberOfDislike"))
           .build();

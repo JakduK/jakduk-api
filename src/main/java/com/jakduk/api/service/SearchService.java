@@ -1,6 +1,6 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
@@ -63,32 +63,32 @@ public class SearchService {
 											   String postTags) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
-		Queue<JakdukConst.SEARCH_TYPE> searchOrder = new LinkedList<>();
+		Queue<Constants.SEARCH_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
-		if (StringUtils.contains(include, JakdukConst.SEARCH_TYPE.PO.name())) {
+		if (StringUtils.contains(include, Constants.SEARCH_TYPE.PO.name())) {
 			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(query, from, size, preTags, postTags);
 			multiSearchRequestBuilder.add(postSearchRequestBuilder);
-			searchOrder.offer(JakdukConst.SEARCH_TYPE.PO);
+			searchOrder.offer(Constants.SEARCH_TYPE.PO);
 		}
 
-		if (StringUtils.contains(include, JakdukConst.SEARCH_TYPE.CO.name())) {
+		if (StringUtils.contains(include, Constants.SEARCH_TYPE.CO.name())) {
 			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
 			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
-			searchOrder.offer(JakdukConst.SEARCH_TYPE.CO);
+			searchOrder.offer(Constants.SEARCH_TYPE.CO);
 		}
 
-		if (StringUtils.contains(include, JakdukConst.SEARCH_TYPE.GA.name())) {
+		if (StringUtils.contains(include, Constants.SEARCH_TYPE.GA.name())) {
 			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size);
 			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
-			searchOrder.offer(JakdukConst.SEARCH_TYPE.GA);
+			searchOrder.offer(Constants.SEARCH_TYPE.GA);
 		}
 
 		MultiSearchResponse multiSearchResponse = multiSearchRequestBuilder.execute().actionGet();
 
 		for (MultiSearchResponse.Item item : multiSearchResponse.getResponses()) {
 			SearchResponse searchResponse = item.getResponse();
-			JakdukConst.SEARCH_TYPE order = searchOrder.poll();
+			Constants.SEARCH_TYPE order = searchOrder.poll();
 
 			if (item.isFailure())
 				continue;
@@ -118,7 +118,7 @@ public class SearchService {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexSearchWord())
-				.setTypes(JakdukConst.ES_TYPE_SEARCH_WORD)
+				.setTypes(Constants.ES_TYPE_SEARCH_WORD)
 				.setSize(0)
 				.setQuery(
 						QueryBuilders.rangeQuery("registerDate").gte(gteDate)
@@ -155,7 +155,7 @@ public class SearchService {
 		try {
 			IndexResponse response = client.prepareIndex()
 					.setIndex(elasticsearchProperties.getIndexBoard())
-					.setType(JakdukConst.ES_TYPE_BOARD)
+					.setType(Constants.ES_TYPE_BOARD)
 					.setId(id)
 					.setSource(ObjectMapperUtils.writeValueAsString(esBoard))
 					.get();
@@ -168,7 +168,7 @@ public class SearchService {
 	public void deleteDocumentBoard(String id) {
 		DeleteResponse response = client.prepareDelete()
 				.setIndex(elasticsearchProperties.getIndexBoard())
-				.setType(JakdukConst.ES_TYPE_BOARD)
+				.setType(Constants.ES_TYPE_BOARD)
 				.setId(id)
 				.get();
 
@@ -184,7 +184,7 @@ public class SearchService {
 		try {
 			IndexResponse response = client.prepareIndex()
 					.setIndex(elasticsearchProperties.getIndexBoard())
-					.setType(JakdukConst.ES_TYPE_COMMENT)
+					.setType(Constants.ES_TYPE_COMMENT)
 					.setId(id)
 					.setParent(parentBoardId)
 					.setSource(ObjectMapperUtils.writeValueAsString(esComment))
@@ -199,7 +199,7 @@ public class SearchService {
 
 		DeleteResponse response = client.prepareDelete()
 				.setIndex(elasticsearchProperties.getIndexBoard())
-				.setType(JakdukConst.ES_TYPE_COMMENT)
+				.setType(Constants.ES_TYPE_COMMENT)
 				.setId(id)
 				.get();
 
@@ -217,7 +217,7 @@ public class SearchService {
 		try {
 			IndexResponse response = client.prepareIndex()
 					.setIndex(elasticsearchProperties.getIndexGallery())
-					.setType(JakdukConst.ES_TYPE_GALLERY)
+					.setType(Constants.ES_TYPE_GALLERY)
 					.setId(id)
 					.setSource(ObjectMapperUtils.writeValueAsString(esGallery))
 					.get();
@@ -231,7 +231,7 @@ public class SearchService {
 
 		DeleteResponse response = client.prepareDelete()
 				.setIndex(elasticsearchProperties.getIndexGallery())
-				.setType(JakdukConst.ES_TYPE_GALLERY)
+				.setType(Constants.ES_TYPE_GALLERY)
 				.setId(id)
 				.get();
 
@@ -246,7 +246,7 @@ public class SearchService {
 
 			IndexResponse response = indexRequestBuilder
 					.setIndex(elasticsearchProperties.getIndexSearchWord())
-					.setType(JakdukConst.ES_TYPE_SEARCH_WORD)
+					.setType(Constants.ES_TYPE_SEARCH_WORD)
 					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
 					.get();
 
@@ -262,16 +262,16 @@ public class SearchService {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexBoard())
-				.setTypes(JakdukConst.ES_TYPE_BOARD)
+				.setTypes(Constants.ES_TYPE_BOARD)
 				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
 								.should(QueryBuilders.multiMatchQuery(query, "subject^1.5", "content"))
 				)
-				.setHighlighterNoMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
-				.setHighlighterFragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
-				.addHighlightedField("subject", JakdukConst.SEARCH_FRAGMENT_SIZE, 0)
-				.addHighlightedField("content", JakdukConst.SEARCH_FRAGMENT_SIZE, 1)
+				.setHighlighterNoMatchSize(Constants.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(Constants.SEARCH_FRAGMENT_SIZE)
+				.addHighlightedField("subject", Constants.SEARCH_FRAGMENT_SIZE, 0)
+				.addHighlightedField("content", Constants.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
@@ -310,7 +310,7 @@ public class SearchService {
 								.limit(1)
 								.map(galleryId -> BoardGallerySimple.builder()
 										.id(galleryId)
-										.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, galleryId))
+										.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, galleryId))
 										.build())
 								.collect(Collectors.toList());
 
@@ -333,20 +333,20 @@ public class SearchService {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexBoard())
-				.setTypes(JakdukConst.ES_TYPE_COMMENT)
+				.setTypes(Constants.ES_TYPE_COMMENT)
 				.setFetchSource(null, new String[]{"content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
 								.must(QueryBuilders.matchQuery("content", query))
 								.must(
 										QueryBuilders
-												.hasParentQuery(JakdukConst.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
+												.hasParentQuery(Constants.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
 												.innerHit(new QueryInnerHitBuilder())
 								)
 				)
-				.setHighlighterNoMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
-				.setHighlighterFragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
-				.addHighlightedField("content", JakdukConst.SEARCH_FRAGMENT_SIZE, 1)
+				.setHighlighterNoMatchSize(Constants.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(Constants.SEARCH_FRAGMENT_SIZE)
+				.addHighlightedField("content", Constants.SEARCH_FRAGMENT_SIZE, 1)
 				.setFrom(from)
 				.setSize(size);
 
@@ -371,7 +371,7 @@ public class SearchService {
 					esCommentSource.setScore(searchHit.getScore());
 
 					if (! searchHit.getInnerHits().isEmpty()) {
-						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(JakdukConst.ES_TYPE_BOARD).getHits();
+						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(Constants.ES_TYPE_BOARD).getHits();
 						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
 						EsParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, EsParentBoard.class);
 
@@ -395,14 +395,14 @@ public class SearchService {
 	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexGallery())
-				.setTypes(JakdukConst.ES_TYPE_GALLERY)
+				.setTypes(Constants.ES_TYPE_GALLERY)
 				.setFetchSource(null, new String[]{"name"})
 				.setQuery(QueryBuilders.matchQuery("name", query))
-				.setHighlighterNoMatchSize(JakdukConst.SEARCH_NO_MATCH_SIZE)
-				.setHighlighterFragmentSize(JakdukConst.SEARCH_FRAGMENT_SIZE)
+				.setHighlighterNoMatchSize(Constants.SEARCH_NO_MATCH_SIZE)
+				.setHighlighterFragmentSize(Constants.SEARCH_FRAGMENT_SIZE)
 				.setHighlighterPreTags("<span class=\"color-orange\">")
 				.setHighlighterPostTags("</span>")
-				.addHighlightedField("name", JakdukConst.SEARCH_FRAGMENT_SIZE, 0)
+				.addHighlightedField("name", Constants.SEARCH_FRAGMENT_SIZE, 0)
 				.setFrom(from)
 				.setSize(size);
 

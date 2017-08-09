@@ -1,6 +1,6 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.DateUtils;
@@ -75,15 +75,15 @@ public class BoardFreeService {
      * @param galleries 글과 연동된 사진들
      * @param device 디바이스
      */
-	public BoardFree insertFreePost(CommonWriter writer, String subject, String content, JakdukConst.BOARD_CATEGORY_TYPE categoryCode,
-									List<Gallery> galleries, JakdukConst.DEVICE_TYPE device) {
+	public BoardFree insertFreePost(CommonWriter writer, String subject, String content, Constants.BOARD_CATEGORY_TYPE categoryCode,
+									List<Gallery> galleries, Constants.DEVICE_TYPE device) {
 
 		boardCategoryRepository.findOneByCode(categoryCode.name())
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
 
 		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(JakdukUtils.stripHtmlTag(content), StringUtils.EMPTY);
-		String shortContent = StringUtils.truncate(stripHtmlContent, JakdukConst.BOARD_SHORT_CONTENT_LENGTH);
+		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.BOARD_SHORT_CONTENT_LENGTH);
 
 		// 글 상태
 		BoardStatus boardStatus = BoardStatus.builder()
@@ -106,9 +106,9 @@ public class BoardFreeService {
 				.content(content)
 				.shortContent(shortContent)
 				.views(0)
-				.seq(commonService.getNextSequence(JakdukConst.BOARD_TYPE.BOARD_FREE.name()))
+				.seq(commonService.getNextSequence(Constants.BOARD_TYPE.BOARD_FREE.name()))
 				.status(boardStatus)
-				.logs(this.initBoardLogs(logId, JakdukConst.BOARD_FREE_HISTORY_TYPE.CREATE.name(), writer))
+				.logs(this.initBoardLogs(logId, Constants.BOARD_FREE_HISTORY_TYPE.CREATE.name(), writer))
 				.lastUpdated(lastUpdated)
 				.linkedGallery(! galleries.isEmpty())
 				.build();
@@ -148,8 +148,8 @@ public class BoardFreeService {
 	 * @param galleryIds 글과 연동된 사진들
      * @param device 디바이스
      */
-	public BoardFree updateFreePost(CommonWriter writer, Integer seq, String subject, String content, JakdukConst.BOARD_CATEGORY_TYPE categoryCode,
-									List<String> galleryIds, JakdukConst.DEVICE_TYPE device) {
+	public BoardFree updateFreePost(CommonWriter writer, Integer seq, String subject, String content, Constants.BOARD_CATEGORY_TYPE categoryCode,
+									List<String> galleryIds, Constants.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -159,7 +159,7 @@ public class BoardFreeService {
 
 		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(JakdukUtils.stripHtmlTag(content), StringUtils.EMPTY);
-		String shortContent = StringUtils.truncate(stripHtmlContent, JakdukConst.BOARD_SHORT_CONTENT_LENGTH);
+		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.BOARD_SHORT_CONTENT_LENGTH);
 
 		boardFree.setSubject(subject);
 		boardFree.setContent(content);
@@ -183,7 +183,7 @@ public class BoardFreeService {
 			histories = new ArrayList<>();
 
 		ObjectId boardHistoryId = new ObjectId();
-		BoardLog history = new BoardLog(boardHistoryId.toString(), JakdukConst.BOARD_FREE_HISTORY_TYPE.EDIT.name(), writer);
+		BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.BOARD_FREE_HISTORY_TYPE.EDIT.name(), writer);
 		histories.add(history);
 		boardFree.setLogs(histories);
 
@@ -205,9 +205,9 @@ public class BoardFreeService {
 	 * 자유게시판 글 지움
 	 *
 	 * @param seq 글 seq
-	 * @return JakdukConst.BOARD_DELETE_TYPE
+	 * @return Constants.BOARD_DELETE_TYPE
      */
-    public JakdukConst.BOARD_DELETE_TYPE deleteFreePost(CommonWriter writer, Integer seq) {
+    public Constants.BOARD_DELETE_TYPE deleteFreePost(CommonWriter writer, Integer seq) {
 
         BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -231,7 +231,7 @@ public class BoardFreeService {
                 histories = new ArrayList<>();
 
 			ObjectId boardHistoryId = new ObjectId();
-            BoardLog history = new BoardLog(boardHistoryId.toString(), JakdukConst.BOARD_FREE_HISTORY_TYPE.DELETE.name(), writer);
+            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.BOARD_FREE_HISTORY_TYPE.DELETE.name(), writer);
             histories.add(history);
 			boardFree.setLogs(histories);
 
@@ -260,12 +260,12 @@ public class BoardFreeService {
 
         // 연결된 사진 끊기
         if (boardFree.getLinkedGallery())
-			commonGalleryService.unlinkGalleries(boardFree.getId(), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE);
+			commonGalleryService.unlinkGalleries(boardFree.getId(), Constants.GALLERY_FROM_TYPE.BOARD_FREE);
 
 		// 색인 지움
 		rabbitMQPublisher.deleteDocumentBoard(boardFree.getId());
 
-        return count > 0 ? JakdukConst.BOARD_DELETE_TYPE.CONTENT : JakdukConst.BOARD_DELETE_TYPE.ALL;
+        return count > 0 ? Constants.BOARD_DELETE_TYPE.CONTENT : Constants.BOARD_DELETE_TYPE.ALL;
     }
 
 	/**
@@ -276,7 +276,7 @@ public class BoardFreeService {
 	 * @param size 크기
      * @return 글 목록
      */
-	public FreePostsResponse getFreePosts(JakdukConst.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
+	public FreePostsResponse getFreePosts(Constants.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
@@ -302,13 +302,13 @@ public class BoardFreeService {
 
 			if (post.isLinkedGallery()) {
 				List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-						new ObjectId(post.getId()), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
+						new ObjectId(post.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
 				if (! CollectionUtils.isEmpty(galleries)) {
 					List<BoardGallerySimple> boardGalleries = galleries.stream()
 							.map(gallery -> BoardGallerySimple.builder()
 									.id(gallery.getId())
-									.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+									.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 									.build())
 							.collect(Collectors.toList());
 
@@ -389,7 +389,7 @@ public class BoardFreeService {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
-		List<BoardFreeOnList> posts = boardFreeRepository.findLatest(sort, JakdukConst.HOME_SIZE_POST);
+		List<BoardFreeOnList> posts = boardFreeRepository.findLatest(sort, Constants.HOME_SIZE_POST);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
 		List<LatestPost> latestPosts = posts.stream()
@@ -399,14 +399,14 @@ public class BoardFreeService {
 
 					if (post.isLinkedGallery()) {
 						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-								new ObjectId(post.getId()), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
+								new ObjectId(post.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
 						List<BoardGallerySimple> boardGalleries = galleries.stream()
 								.sorted(Comparator.comparing(Gallery::getId))
 								.limit(1)
 								.map(gallery -> BoardGallerySimple.builder()
 										.id(gallery.getId())
-										.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+										.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 										.build())
 								.collect(Collectors.toList());
 
@@ -423,7 +423,7 @@ public class BoardFreeService {
     /**
      * 글 감정 표현.
      */
-	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, JakdukConst.FEELING_TYPE feeling) {
+	public BoardFree setFreeFeelings(CommonWriter writer, Integer seq, Constants.FEELING_TYPE feeling) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -448,7 +448,7 @@ public class BoardFreeService {
 	 * 게시판 댓글 달기
 	 */
 	public BoardFreeComment insertFreeComment(Integer seq, CommonWriter writer, String content, List<Gallery> galleries,
-											  JakdukConst.DEVICE_TYPE device) {
+											  Constants.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -464,7 +464,7 @@ public class BoardFreeService {
 				.content(content)
 				.status(new BoardCommentStatus(device))
 				.linkedGallery(! galleries.isEmpty())
-				.logs(this.initBoardLogs(new ObjectId(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.CREATE.name(), writer))
+				.logs(this.initBoardLogs(new ObjectId(), Constants.BOARD_FREE_COMMENT_HISTORY_TYPE.CREATE.name(), writer))
 				.build();
 
 		boardFreeCommentRepository.save(boardFreeComment);
@@ -480,7 +480,7 @@ public class BoardFreeService {
 	 * 게시판 댓글 고치기
 	 */
 	public BoardFreeComment updateFreeComment(String id, Integer seq, CommonWriter writer, String content, List<String> galleryIds,
-											  JakdukConst.DEVICE_TYPE device) {
+											  Constants.DEVICE_TYPE device) {
 
 		boardFreeRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_POST));
@@ -508,7 +508,7 @@ public class BoardFreeService {
 		List<BoardLog> logs = Optional.ofNullable(boardFreeComment.getLogs())
 				.orElseGet(ArrayList::new);
 
-		logs.add(new BoardLog(new ObjectId().toString(), JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.EDIT.name(), writer));
+		logs.add(new BoardLog(new ObjectId().toString(), Constants.BOARD_FREE_COMMENT_HISTORY_TYPE.EDIT.name(), writer));
 		boardFreeComment.setLogs(logs);
 
 		boardFreeCommentRepository.save(boardFreeComment);
@@ -536,7 +536,7 @@ public class BoardFreeService {
 		// 색인 지움
 		rabbitMQPublisher.deleteDocumentComment(id);
 
-		commonGalleryService.unlinkGalleries(id, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
+		commonGalleryService.unlinkGalleries(id, Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT);
 	}
 
 	/**
@@ -579,7 +579,7 @@ public class BoardFreeService {
 									BoardFreeCommentLog boardFreeCommentLog = new BoardFreeCommentLog();
 									BeanUtils.copyProperties(boardLog, boardFreeCommentLog);
 									LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeCommentLog.getId()).getDate());
-									boardFreeCommentLog.setType(JakdukConst.BOARD_FREE_COMMENT_HISTORY_TYPE.valueOf(boardLog.getType()));
+									boardFreeCommentLog.setType(Constants.BOARD_FREE_COMMENT_HISTORY_TYPE.valueOf(boardLog.getType()));
 									boardFreeCommentLog.setTimestamp(timestamp);
 
 									return boardFreeCommentLog;
@@ -593,15 +593,15 @@ public class BoardFreeService {
 					// 엮인 사진들
 					if (boardFreeComment.getLinkedGallery()) {
 						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-								new ObjectId(boardFreeComment.getId()), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
+								new ObjectId(boardFreeComment.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
 
 						if (! ObjectUtils.isEmpty(galleries)) {
 							List<BoardGallery> postDetailGalleries = galleries.stream()
 									.map(gallery -> BoardGallery.builder()
 											.id(gallery.getId())
 											.name(StringUtils.isNotBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
-											.imageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
-											.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+											.imageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+											.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
 											.build())
 									.collect(Collectors.toList());
 
@@ -626,7 +626,7 @@ public class BoardFreeService {
 	 * @param feeling 감정표현 종류
      * @return 자유게시판 댓글 객체
      */
-	public BoardFreeComment setFreeCommentFeeling(CommonWriter writer, String commentId, JakdukConst.FEELING_TYPE feeling) {
+	public BoardFreeComment setFreeCommentFeeling(CommonWriter writer, String commentId, Constants.FEELING_TYPE feeling) {
 
 		BoardFreeComment boardComment = boardFreeCommentRepository.findOneById(commentId)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
@@ -688,7 +688,7 @@ public class BoardFreeService {
 		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
-		String historyType = isEnable ? JakdukConst.BOARD_FREE_HISTORY_TYPE.ENABLE_NOTICE.name() : JakdukConst.BOARD_FREE_HISTORY_TYPE.DISABLE_NOTICE.name();
+		String historyType = isEnable ? Constants.BOARD_FREE_HISTORY_TYPE.ENABLE_NOTICE.name() : Constants.BOARD_FREE_HISTORY_TYPE.DISABLE_NOTICE.name();
 		BoardLog history = new BoardLog(new ObjectId().toString(), historyType, writer);
 		histories.add(history);
 
@@ -748,7 +748,7 @@ public class BoardFreeService {
 
 		posts = posts.stream()
 				.sorted(byCount.thenComparing(byView))
-				.limit(JakdukConst.BOARD_TOP_LIMIT)
+				.limit(Constants.BOARD_TOP_LIMIT)
 				.collect(Collectors.toList());
 
 		return posts;
@@ -797,13 +797,13 @@ public class BoardFreeService {
 
 							if (boardFreeComment.getLinkedGallery()) {
 								List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-										new ObjectId(boardFreeComment.getId()), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
+										new ObjectId(boardFreeComment.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
 
 								if (! ObjectUtils.isEmpty(galleries)) {
 									List<BoardGallerySimple> boardGalleries = galleries.stream()
 											.map(gallery -> BoardGallerySimple.builder()
 													.id(gallery.getId())
-													.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+													.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 													.build())
 											.collect(Collectors.toList());
 
@@ -871,7 +871,7 @@ public class BoardFreeService {
 						BoardFreeLog boardFreeLog = new BoardFreeLog();
 						BeanUtils.copyProperties(boardLog, boardFreeLog);
 						LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(boardFreeLog.getId()).getDate());
-						boardFreeLog.setType(JakdukConst.BOARD_FREE_HISTORY_TYPE.valueOf(boardLog.getType()));
+						boardFreeLog.setType(Constants.BOARD_FREE_HISTORY_TYPE.valueOf(boardLog.getType()));
 						boardFreeLog.setTimestamp(timestamp);
 
 						return boardFreeLog;
@@ -889,15 +889,15 @@ public class BoardFreeService {
 		// 엮인 사진들
 		if (boardFree.getLinkedGallery()) {
             List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-                    new ObjectId(boardFree.getId()), JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, 100);
+                    new ObjectId(boardFree.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE, 100);
 
             if (! CollectionUtils.isEmpty(galleries)) {
                 List<BoardGallery> postDetailGalleries = galleries.stream()
                         .map(gallery -> BoardGallery.builder()
                                 .id(gallery.getId())
                                 .name(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
-                                .imageUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
-                                .thumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                                .imageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
+                                .thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
                                 .build())
                         .collect(Collectors.toList());
 
@@ -910,12 +910,12 @@ public class BoardFreeService {
 			freePostDetail.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
 
 		// 앞, 뒤 글
-		JakdukConst.BOARD_CATEGORY_TYPE categoryType = JakdukConst.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
+		Constants.BOARD_CATEGORY_TYPE categoryType = Constants.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
 
 		BoardFreeSimple prevPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId()),
-				categoryType, JakdukConst.CRITERIA_OPERATOR.GT);
+				categoryType, Constants.CRITERIA_OPERATOR.GT);
 		BoardFreeSimple nextPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId()),
-				categoryType, JakdukConst.CRITERIA_OPERATOR.LT);
+				categoryType, Constants.CRITERIA_OPERATOR.LT);
 
         // 글쓴이의 최근 글
 		List<LatestFreePost> latestFreePosts = null;
@@ -933,13 +933,13 @@ public class BoardFreeService {
 
 						if (! post.isLinkedGallery()) {
 							List<Gallery> latestPostGalleries = galleryRepository.findByItemIdAndFromType(new ObjectId(post.getId()),
-									JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, 1);
+									Constants.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
 							if (! ObjectUtils.isEmpty(latestPostGalleries)) {
 								List<BoardGallerySimple> boardGalleries = latestPostGalleries.stream()
 										.map(gallery -> BoardGallerySimple.builder()
 												.id(gallery.getId())
-												.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
+												.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 												.build())
 										.collect(Collectors.toList());
 
@@ -988,7 +988,7 @@ public class BoardFreeService {
 	 * @param feeling 입력받은 감정
 	 * @param usersFeeling 편집할 객체
 	 */
-	private void setUsersFeeling(String userId, String username, JakdukConst.FEELING_TYPE feeling, UsersFeeling usersFeeling) {
+	private void setUsersFeeling(String userId, String username, Constants.FEELING_TYPE feeling, UsersFeeling usersFeeling) {
 
 		List<CommonFeelingUser> usersLiking = usersFeeling.getUsersLiking();
 		List<CommonFeelingUser> usersDisliking = usersFeeling.getUsersDisliking();

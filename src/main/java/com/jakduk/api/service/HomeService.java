@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
@@ -68,7 +68,7 @@ public class HomeService {
 	public List<BoardFreeCommentOnHome> getBoardCommentsLatest() {
 		
 		Sort sort = new Sort(Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, JakdukConst.HOME_SIZE_LINE_NUMBER, sort);
+		Pageable pageable = new PageRequest(0, Constants.HOME_SIZE_LINE_NUMBER, sort);
 		
 		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
 		
@@ -78,8 +78,8 @@ public class HomeService {
 			if (StringUtils.isNotBlank(content)) {
 				Integer contentLength = content.length() + comment.getWriter().getUsername().length();
 
-				if (contentLength > JakdukConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
-					content = content.substring(0, JakdukConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
+				if (contentLength > Constants.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+					content = content.substring(0, Constants.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
 					content = String.format("%s...", content);
 				}
 				comment.setContent(content);

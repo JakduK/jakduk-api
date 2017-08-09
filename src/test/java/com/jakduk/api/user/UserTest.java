@@ -2,7 +2,7 @@ package com.jakduk.api.user;
 
 import com.jakduk.api.ApiApplicationTests;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.etc.SupporterCount;
@@ -13,8 +13,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +62,7 @@ public class UserTest extends ApiApplicationTests {
 		UserProfile userProfile01 = userProfileRepository.findByNEIdAndUsername("545cbdfb3d9627e574001668", "test07");
 		System.out.println("userProfile01=" + userProfile01);
 
-		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(JakdukConst.ACCOUNT_TYPE.DAUM, "1lnkE");
+		UserProfile userProfile02 = userProfileRepository.findOneByProviderIdAndProviderUserId(Constants.ACCOUNT_TYPE.DAUM, "1lnkE");
 		System.out.println("userProfile02=" + userProfile02);
 	}
 	

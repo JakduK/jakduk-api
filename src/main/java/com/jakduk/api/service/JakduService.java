@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
@@ -151,7 +151,7 @@ public class JakduService {
     /**
      * 작두 댓글 감정 표현
      */
-    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, JakdukConst.FEELING_TYPE feeling) {
+    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, Constants.FEELING_TYPE feeling) {
 
         String userId = writer.getUserId();
         String username = writer.getUsername();

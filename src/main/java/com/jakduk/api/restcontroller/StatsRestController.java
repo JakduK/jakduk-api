@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.db.AttendanceLeague;
@@ -71,7 +71,7 @@ public class StatsRestController {
     @ApiOperation(value = "연도별 관중수 목록")
     @RequestMapping(value = "/attendance/season/{season}", method = RequestMethod.GET)
     public List<AttendanceClub> getAttendanceSeason(@PathVariable Integer season,
-                                                    @RequestParam(required = false, defaultValue = JakdukConst.K_LEAGUE_ABBREVIATION) String league){
+                                                    @RequestParam(required = false, defaultValue = Constants.K_LEAGUE_ABBREVIATION) String league){
 
         return statsService.getAttendancesSeason(season, league);
     }

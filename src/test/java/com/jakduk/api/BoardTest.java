@@ -1,7 +1,7 @@
 package com.jakduk.api;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.BoardDAO;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import org.bson.types.ObjectId;
@@ -92,7 +92,7 @@ public class BoardTest extends ApiApplicationTests {
 
 		boardFreeList = boardFreeList.stream()
 				.sorted(byCount.thenComparing(byView))
-				.limit(JakdukConst.BOARD_TOP_LIMIT)
+				.limit(Constants.BOARD_TOP_LIMIT)
 				.collect(Collectors.toList());
 		
 		System.out.println("getBoardFreeCountOfCommentBest01=" + boardFreeList);
@@ -109,7 +109,7 @@ public class BoardTest extends ApiApplicationTests {
 		//Map boardFree = boardFreeC.findOne("{seq:1}").as(Map.class);
 
 		Iterator<Map> boardFree = boardFreeC.aggregate("{$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
-				.and("{$limit:#}", JakdukConst.BOARD_TOP_LIMIT)
+				.and("{$limit:#}", Constants.BOARD_TOP_LIMIT)
                 .as(Map.class);
 
 		while (boardFree.hasNext()) {

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.repository.gallery.GalleryRepository;
@@ -180,7 +180,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrTemp));
 		//AggregationOperation group = Aggregation.group("boardItem").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(JakdukConst.BOARD_LINE_NUMBER);
+		//AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, /*group, */ sort /*, limit*/);
 		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
 		
@@ -210,7 +210,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 	public void imageCapacity01() {
 		
 		long temp = 2548576;
-		double bb = JakdukConst.GALLERY_MAXIMUM_CAPACITY / (double) temp;
+		double bb = Constants.GALLERY_MAXIMUM_CAPACITY / (double) temp;
 		long width = 100;
 		long height = 90;
 		

@@ -1,6 +1,6 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.FileUtils;
 import com.jakduk.api.configuration.JakdukProperties;
@@ -73,7 +73,7 @@ public class DefaultViewController {
 			Boolean existPosts = true;
 
 			do {
-				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, JakdukConst.NUMBER_OF_ITEMS_EACH_PAGES);
+				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 				if (ObjectUtils.isEmpty(posts)) {
 					existPosts = false;
@@ -125,7 +125,7 @@ public class DefaultViewController {
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-				JakdukConst.IMAGE_TYPE.FULL);
+				Constants.IMAGE_TYPE.FULL);
 		response.setContentType(gallery.getContentType());
 
 		try {
@@ -143,7 +143,7 @@ public class DefaultViewController {
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-				JakdukConst.IMAGE_TYPE.THUMBNAIL);
+				Constants.IMAGE_TYPE.THUMBNAIL);
 		response.setContentType(gallery.getContentType());
 
 		try {

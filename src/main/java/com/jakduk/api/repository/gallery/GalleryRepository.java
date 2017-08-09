@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.gallery;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.Gallery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface GalleryRepository extends MongoRepository<Gallery, String>, GalleryRepositoryCustom {
 
 	Optional<Gallery> findOneById(String id);
-	Optional<Gallery> findOneByHashAndStatusStatus(String hash, JakdukConst.GALLERY_STATUS_TYPE status);
+	Optional<Gallery> findOneByHashAndStatusStatus(String hash, Constants.GALLERY_STATUS_TYPE status);
 	
 	@Query(value="{'status.status' : 'use'}")
 	List<Gallery> findAll();

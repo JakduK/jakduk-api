@@ -1,6 +1,6 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
@@ -59,7 +59,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 		List<Item> items = new ArrayList<>();
 
 		do {
-			List<BoardFreeOnRSS> posts = boardFreeService.getBoardFreeOnRss(postId, JakdukConst.NUMBER_OF_ITEMS_EACH_PAGES);
+			List<BoardFreeOnRSS> posts = boardFreeService.getBoardFreeOnRss(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 			if (ObjectUtils.isEmpty(posts)) {
 				existPosts = false;

@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.AuthHelper;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -56,7 +56,7 @@ public class BoardRestController {
     public FreePostsResponse getFreePosts(
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
-            @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") JakdukConst.BOARD_CATEGORY_TYPE category) {
+            @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") Constants.BOARD_CATEGORY_TYPE category) {
 
         return boardFreeService.getFreePosts(category, page, size);
     }
@@ -90,7 +90,7 @@ public class BoardRestController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, JakdukConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
+        Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, Constants.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
         return boardFreeService.getBoardFreeDetail(seq, isAddCookie);
     }
@@ -129,7 +129,7 @@ public class BoardRestController {
         BoardFree boardFree = boardFreeService.insertFreePost(commonWriter, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleries, JakdukUtils.getDeviceInfo(device));
 
-        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
         return FreePostWriteResponse.builder()
                 .seq(boardFree.getSeq())
@@ -167,11 +167,11 @@ public class BoardRestController {
         BoardFree boardFree = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleryIds, JakdukUtils.getDeviceInfo(device));
 
-        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
-        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
-        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
         return FreePostWriteResponse.builder()
                 .seq(boardFree.getSeq())
@@ -186,7 +186,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-		JakdukConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(commonWriter, seq);
+		Constants.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(commonWriter, seq);
 
         return FreePostDeleteResponse.builder()
                 .result(deleteType)
@@ -225,7 +225,7 @@ public class BoardRestController {
                 galleries, JakdukUtils.getDeviceInfo(device));
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), null,
-                JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
 
         return boardFreeComment;
     }
@@ -265,12 +265,12 @@ public class BoardRestController {
                 JakdukUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,
-                JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval,
-                JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
 
-        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
 
         return boardFreeComment;
 
@@ -296,7 +296,7 @@ public class BoardRestController {
     @PostMapping("/{seq}/{feeling}")
     public UserFeelingResponse addFreeFeeling(
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            @ApiParam(value = "감정", required = true) @PathVariable JakdukConst.FEELING_TYPE feeling) {
+            @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE feeling) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
@@ -331,7 +331,7 @@ public class BoardRestController {
     @PostMapping("/comment/{commentId}/{feeling}")
     public UserFeelingResponse addFreeCommentFeeling(
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
-            @ApiParam(value = "감정", required = true) @PathVariable JakdukConst.FEELING_TYPE feeling) {
+            @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE feeling) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 

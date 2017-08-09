@@ -1,11 +1,10 @@
 package com.jakduk.api;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
-import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
 import com.jakduk.api.repository.footballclub.FootballClubOriginRepository;
@@ -62,7 +61,7 @@ public class HomeTest extends ApiApplicationTests {
 	@Test
 	public void getFootballClubList() {
 
-		List<FootballClub> footballClubs = footballService.getFootballClubs("ko", JakdukConst.CLUB_TYPE.FOOTBALL_CLUB, JakdukConst.NAME_TYPE.shortName);
+		List<FootballClub> footballClubs = footballService.getFootballClubs("ko", Constants.CLUB_TYPE.FOOTBALL_CLUB, Constants.NAME_TYPE.shortName);
 
 		System.out.println("getFootballClubs=" + footballClubs);
 	}

@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredAnonymousUser;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.constraint.ExistEmail;
@@ -97,7 +97,7 @@ public class UserRestController {
             Locale locale,
             HttpSession session) {
 
-        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(JakdukConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         if (Objects.isNull(attemptSocialUser))
             throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
@@ -118,7 +118,7 @@ public class UserRestController {
                 )
         );
 
-        session.removeAttribute(JakdukConst.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+        session.removeAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
         AuthUtils.setAuthentication(authentication);
 

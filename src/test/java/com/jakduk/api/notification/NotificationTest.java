@@ -1,7 +1,7 @@
 package com.jakduk.api.notification;
 
 import com.jakduk.api.ApiApplicationTests;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.EmailRoutingKey;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -47,7 +47,7 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREAN)
-                .type(JakdukConst.EMAIL_TYPE.WELCOME)
+                .type(Constants.EMAIL_TYPE.WELCOME)
                 .recipientEmail("phjang1983@daum.net")
                 .body(
                         new HashMap<String, String>() {
@@ -68,7 +68,7 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREA)
-                .type(JakdukConst.EMAIL_TYPE.RESET_PASSWORD)
+                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail("phjang1983@daum.net")
                 .subject("jakduk.com-" + JakdukUtils.getResourceBundleMessage("messages.user", "user.password.reset.instructions"))
                 .extra(
@@ -97,7 +97,7 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREAN)
-                .type(JakdukConst.EMAIL_TYPE.WELCOME)
+                .type(Constants.EMAIL_TYPE.WELCOME)
                 .recipientEmail("phjang1983@daum.net")
                 .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
@@ -122,7 +122,7 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREA)
-                .type(JakdukConst.EMAIL_TYPE.RESET_PASSWORD)
+                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail("phjang1983@daum.net")
                 .subject("jakduk.com-" + JakdukUtils.getResourceBundleMessage("messages.user", "user.password.reset.instructions"))
                 .extra(

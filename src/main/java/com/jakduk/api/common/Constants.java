@@ -5,7 +5,7 @@ package com.jakduk.api.common;
  * @date     : 2014. 4. 29.
  * @desc     :
  */
-public class JakdukConst {
+public class Constants {
 
 	/**
 	 * 게시판 종류.

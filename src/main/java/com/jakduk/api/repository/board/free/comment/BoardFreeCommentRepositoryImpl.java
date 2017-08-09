@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.board.free.comment;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.BoardFreeComment;
 import com.jakduk.api.model.etc.CommonCount;
 import org.bson.types.ObjectId;
@@ -59,7 +59,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         AggregationOperation match = Aggregation.match(Criteria.where("boardItem._id").in(ids));
         AggregationOperation group = Aggregation.group("boardItem").count().as("count");
         //AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-        //AggregationOperation limit = Aggregation.limit(JakdukConst.BOARD_LINE_NUMBER);
+        //AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
         Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
         AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
 
@@ -81,7 +81,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
             query.addCriteria(Criteria.where("_id").gt(commentId));
 
         query.with(new Sort(Sort.Direction.ASC, "_id"));
-        query.limit(JakdukConst.COMMENT_MAX_LIMIT);
+        query.limit(Constants.COMMENT_MAX_LIMIT);
 
         return mongoTemplate.find(query, BoardFreeComment.class);
     }

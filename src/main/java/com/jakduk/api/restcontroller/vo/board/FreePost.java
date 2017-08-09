@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,7 +30,7 @@ public class FreePost {
     private int seq;
 
     @ApiModelProperty(example = "FREE", value = "말머리")
-    private JakdukConst.BOARD_CATEGORY_TYPE category;
+    private Constants.BOARD_CATEGORY_TYPE category;
 
     @ApiModelProperty(example = "10", value = "읽음 수")
     private int views = 0;

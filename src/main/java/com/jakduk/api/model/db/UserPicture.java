@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -25,10 +25,10 @@ public class UserPicture {
     @Setter
     private User user;
 
-    @Setter private JakdukConst.GALLERY_STATUS_TYPE status;
+    @Setter private Constants.GALLERY_STATUS_TYPE status;
 
     private String contentType;
 
-    private JakdukConst.ACCOUNT_TYPE sourceType;
+    private Constants.ACCOUNT_TYPE sourceType;
 
 }

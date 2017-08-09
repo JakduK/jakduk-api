@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.board.free;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.*;
@@ -35,7 +35,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         AggregationOperation sort1 = Aggregation.sort(Sort.Direction.DESC, "_id");
         AggregationOperation limit1 = Aggregation.limit(limit);
         Aggregation aggregation = Aggregation.newAggregation(match1, match2, sort1, limit1);
-        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, JakdukConst.COLLECTION_BOARD_FREE, BoardFreeOnList.class);
+        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFreeOnList.class);
 
         return results.getMappedResults();
     }
@@ -58,7 +58,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
             aggregation = Aggregation.newAggregation(match1, sort, limit1);
         }
 
-        AggregationResults<BoardFree> results = mongoTemplate.aggregate(aggregation, JakdukConst.COLLECTION_BOARD_FREE, BoardFree.class);
+        AggregationResults<BoardFree> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFree.class);
 
         return results.getMappedResults();
 
@@ -94,7 +94,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
     public List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(ids));
         Aggregation aggregation = Aggregation.newAggregation(match1);
-        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, JakdukConst.COLLECTION_BOARD_FREE, BoardFreeOnSearch.class);
+        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFreeOnSearch.class);
 
         return results.getMappedResults();
     }
@@ -149,7 +149,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
     @Override
-    public BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, JakdukConst.BOARD_CATEGORY_TYPE category, JakdukConst.CRITERIA_OPERATOR operator) {
+    public BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, Constants.BOARD_CATEGORY_TYPE category, Constants.CRITERIA_OPERATOR operator) {
         Query query = new Query();
 
         switch (category) {
@@ -190,7 +190,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
                 .and(usersDislikingCount).as("usersDislikingCount");
 
         Aggregation aggregation = Aggregation.newAggregation(match1, project1);
-        AggregationResults<BoardFeelingCount> results = mongoTemplate.aggregate(aggregation, JakdukConst.COLLECTION_BOARD_FREE, BoardFeelingCount.class);
+        AggregationResults<BoardFeelingCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFeelingCount.class);
 
         return results.getMappedResults();
     }

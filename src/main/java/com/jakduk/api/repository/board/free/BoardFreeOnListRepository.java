@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.board.free;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.simple.BoardFreeOnList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,5 +15,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface BoardFreeOnListRepository extends MongoRepository<BoardFreeOnList, String> {
 	
 	Page<BoardFreeOnList> findAll(Pageable pageable);
-	Page<BoardFreeOnList> findByCategory(JakdukConst.BOARD_CATEGORY_TYPE category, Pageable pageable);
+	Page<BoardFreeOnList> findByCategory(Constants.BOARD_CATEGORY_TYPE category, Pageable pageable);
 }

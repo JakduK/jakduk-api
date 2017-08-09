@@ -1,6 +1,6 @@
 package com.jakduk.api.configuration.security;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
@@ -53,8 +53,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
             if (! ObjectUtils.isEmpty(userPicture)) {
                 UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
-                        authUtils.generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-                        authUtils.generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+                        authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+                        authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
                 userDetailsImpl.setPicture(userPictureInfo);
             }

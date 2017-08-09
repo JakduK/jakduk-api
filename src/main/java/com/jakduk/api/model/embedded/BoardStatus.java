@@ -1,6 +1,6 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.*;
 
 /**
@@ -21,6 +21,6 @@ public class BoardStatus {
 	
 	private Boolean delete;
 	
-	private JakdukConst.DEVICE_TYPE device;
+	private Constants.DEVICE_TYPE device;
 
 }

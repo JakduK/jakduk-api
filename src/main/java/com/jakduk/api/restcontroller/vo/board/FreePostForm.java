@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -33,7 +33,7 @@ public class FreePostForm {
 
     @ApiModelProperty(required = true, value = "말머리 코드", example = "FREE")
     @NotNull
-    private JakdukConst.BOARD_CATEGORY_TYPE categoryCode;
+    private Constants.BOARD_CATEGORY_TYPE categoryCode;
 
     @ApiModelProperty(value = "사진 목록")
     private List<GalleryOnBoard> galleries;

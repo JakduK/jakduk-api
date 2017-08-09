@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
@@ -402,7 +402,7 @@ public class AdminService {
 		jakduScheduleGroup.setState(jakduScheduleGroupWrite.getState());
 
 		if (jakduScheduleGroupWrite.isNextSeq()) {
-			jakduScheduleGroup.setSeq(commonService.getNextSequence(JakdukConst.SEQ_JAKDU_SCHEDULE_GROUP));
+			jakduScheduleGroup.setSeq(commonService.getNextSequence(Constants.SEQ_JAKDU_SCHEDULE_GROUP));
 		} else {
 			jakduScheduleGroup.setSeq(jakduScheduleGroupWrite.getSeq());
 		}

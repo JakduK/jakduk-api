@@ -1,6 +1,6 @@
 package com.jakduk.api.model.rabbitmq;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 public class EmailPayload {
 
     private Locale locale;
-    private JakdukConst.EMAIL_TYPE type;
+    private Constants.EMAIL_TYPE type;
     private String recipientEmail;
     private String subject;
     private Map<String, String> extra;

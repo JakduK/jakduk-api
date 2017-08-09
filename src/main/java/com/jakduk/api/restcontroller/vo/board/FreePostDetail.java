@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.vo.board;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.BoardCategory;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
@@ -57,6 +57,6 @@ public class FreePostDetail {
     private List<BoardGallery> galleries;
 
     @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
-    private JakdukConst.FEELING_TYPE myFeeling;
+    private Constants.FEELING_TYPE myFeeling;
 
 }

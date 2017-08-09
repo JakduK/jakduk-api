@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.board.free;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.*;
@@ -58,7 +58,7 @@ public interface BoardFreeRepositoryCustom {
     /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
-    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, JakdukConst.BOARD_CATEGORY_TYPE category, JakdukConst.CRITERIA_OPERATOR operator);
+    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, Constants.BOARD_CATEGORY_TYPE category, Constants.CRITERIA_OPERATOR operator);
 
     /**
      * 게시물의 감정 갯수를 가져온다

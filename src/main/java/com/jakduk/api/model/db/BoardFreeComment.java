@@ -1,6 +1,5 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.embedded.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;

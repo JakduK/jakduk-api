@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.user;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.*;
 
 /**
@@ -19,7 +19,7 @@ public class AttemptSocialUser {
 
     private String email;
     private String username;
-    private JakdukConst.ACCOUNT_TYPE providerId;
+    private Constants.ACCOUNT_TYPE providerId;
     private String providerUserId;
     private String externalSmallPictureUrl;
     private String externalLargePictureUrl;
