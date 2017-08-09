@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 
@@ -33,9 +32,6 @@ public class BoardFreeRepositoryTests {
 
     @Autowired
     private BoardFreeRepository repository;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
     private BoardFree randomBoardFree;
 
@@ -91,13 +87,16 @@ public class BoardFreeRepositoryTests {
     }
 
     @Test
-    public void test02() {
+    public void findUsersFeelingCountTest() {
         List<BoardFeelingCount> feelingCounts = repository.findUsersFeelingCount(Arrays.asList(new ObjectId(randomBoardFree.getId())));
 
-        System.out.println("phjang=" + feelingCounts);
+        BoardFeelingCount boardFeelingCount = feelingCounts.stream()
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
 
-        Assert.assertTrue(! CollectionUtils.isEmpty(feelingCounts));
+        Assert.assertTrue(boardFeelingCount.getId().equals(randomBoardFree.getId()));
+        Assert.assertTrue(boardFeelingCount.getUsersLikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersLiking()) ? 0 : randomBoardFree.getUsersLiking().size()));
+        Assert.assertTrue(boardFeelingCount.getUsersDislikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersDisliking()) ? 0 : randomBoardFree.getUsersDisliking().size()));
     }
-
 
 }
