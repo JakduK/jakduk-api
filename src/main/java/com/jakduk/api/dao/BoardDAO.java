@@ -2,7 +2,6 @@ package com.jakduk.api.dao;
 
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.etc.CommonCount;
-import com.jakduk.api.model.jongo.BoardFeelingCount;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import org.apache.commons.collections4.IteratorUtils;
 import org.bson.types.ObjectId;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -38,24 +36,6 @@ public class BoardDAO {
 	@Autowired
 	private Jongo jongo;
 
-	public Map<String, BoardFeelingCount> getBoardFreeUsersFeelingCount(List<ObjectId> arrId) {
-		MongoCollection boardFreeC = jongo.getCollection("boardFree");
-
-		Iterator<BoardFeelingCount> iPosts = boardFreeC.aggregate("{$match:{_id:{$in:#}}}", arrId)
-				.and("{$project:{_id:1, seq:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
-				.as(BoardFeelingCount.class);
-
-		HashMap<String, BoardFeelingCount> feelingCount = new HashMap<String, BoardFeelingCount>();
-
-		while (iPosts.hasNext()) {
-			BoardFeelingCount boardFeelingCount = iPosts.next();
-			feelingCount.put(boardFeelingCount.getId().toString(), boardFeelingCount);
-
-		}
-		
-		return feelingCount;
-	}
-	
 	public HashMap<String, Integer> getBoardFreeGalleriesCount(List<Integer> arrSeq) {
 		AggregationOperation unwind = Aggregation.unwind("galleries");
 		AggregationOperation match = Aggregation.match(Criteria.where("seq").in(arrSeq));

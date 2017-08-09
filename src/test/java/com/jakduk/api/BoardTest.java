@@ -3,7 +3,6 @@ package com.jakduk.api;
 
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.dao.BoardDAO;
-import com.jakduk.api.model.jongo.BoardFeelingCount;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -33,20 +32,6 @@ public class BoardTest extends ApiApplicationTests {
 
 	@Autowired
 	private Jongo jongo;
-
-	@Test
-	public void mongoAggregationTest02() {
-		
-		ArrayList<ObjectId> arrTemp = new ArrayList<ObjectId>();
-		arrTemp.add(new ObjectId("54b160d33d96e261974f2cf7"));
-		arrTemp.add(new ObjectId("54b2330a3d96026a3de8d3fd"));
-		arrTemp.add(new ObjectId("54c256c23d96b24e3f9dd1d5"));
-		
-		//Map<String, Integer> map = jakdukDAO.getBoardFreeUsersLikingCount(arrTemp);
-		Map<String, BoardFeelingCount> map = boardDAO.getBoardFreeUsersFeelingCount(arrTemp);
-		
-		System.out.println("mongoAggregationTest02=" + map);
-	}
 
 	@Test
 	public void getBoardFreeCountOfLikeBest01() {

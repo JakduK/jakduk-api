@@ -4,6 +4,7 @@ import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
 import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.BoardFreeOnList;
 import com.jakduk.api.model.simple.BoardFreeOnRSS;
 import com.jakduk.api.model.simple.BoardFreeOnSitemap;
@@ -22,10 +23,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
@@ -88,5 +86,17 @@ public class BoardFreeRepositoryTests {
         List<BoardFree> posts = repository.findByIdInAndLinkedGalleryIsTrue(Arrays.asList(randomBoardFree.getId()));
     }
 
+    @Test
+    public void findUsersFeelingCountTest() {
+        List<BoardFeelingCount> feelingCounts = repository.findUsersFeelingCount(Arrays.asList(new ObjectId(randomBoardFree.getId())));
+
+        BoardFeelingCount boardFeelingCount = feelingCounts.stream()
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+
+        Assert.assertTrue(boardFeelingCount.getId().equals(randomBoardFree.getId()));
+        Assert.assertTrue(boardFeelingCount.getUsersLikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersLiking()) ? 0 : randomBoardFree.getUsersLiking().size()));
+        Assert.assertTrue(boardFeelingCount.getUsersDislikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersDisliking()) ? 0 : randomBoardFree.getUsersDisliking().size()));
+    }
 
 }

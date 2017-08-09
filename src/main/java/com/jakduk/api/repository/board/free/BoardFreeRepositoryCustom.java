@@ -2,6 +2,7 @@ package com.jakduk.api.repository.board.free;
 
 import com.jakduk.api.common.JakdukConst;
 import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
@@ -58,5 +59,12 @@ public interface BoardFreeRepositoryCustom {
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
     BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, JakdukConst.BOARD_CATEGORY_TYPE category, JakdukConst.CRITERIA_OPERATOR operator);
+
+    /**
+     * 게시물의 감정 갯수를 가져온다
+     *
+     * db.getCollection('boardFree').aggregate([{$match:{seq:{$in:[9]}}}, {$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}])
+     */
+    List<BoardFeelingCount> findUsersFeelingCount(List<ObjectId> ids);
 
 }
