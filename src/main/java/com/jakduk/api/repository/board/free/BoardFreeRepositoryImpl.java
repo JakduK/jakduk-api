@@ -4,6 +4,7 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.*;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -149,15 +150,11 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
     @Override
-    public BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, Constants.BOARD_CATEGORY_TYPE category, Constants.CRITERIA_OPERATOR operator) {
+    public BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, String category, Constants.CRITERIA_OPERATOR operator) {
         Query query = new Query();
 
-        switch (category) {
-            case FREE:
-            case FOOTBALL:
-                query.addCriteria(Criteria.where("category").is(category));
-                break;
-        }
+        if (StringUtils.isNotBlank(category))
+            query.addCriteria(Criteria.where("category").is(category));
 
         switch (operator) {
             case GT:

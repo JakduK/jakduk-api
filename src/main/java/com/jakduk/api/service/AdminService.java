@@ -9,22 +9,19 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.JakduScheduleScore;
 import com.jakduk.api.model.embedded.LocalName;
-import com.jakduk.api.model.embedded.LocalSimpleName;
-import com.jakduk.api.restcontroller.vo.admin.CompetitionWrite;
-import com.jakduk.api.restcontroller.vo.admin.ThumbnailSizeWrite;
-import com.jakduk.api.restcontroller.vo.admin.BoardCategoryWrite;
-import com.jakduk.api.restcontroller.vo.admin.JakduScheduleGroupWrite;
-import com.jakduk.api.restcontroller.vo.admin.JakduScheduleWrite;
 import com.jakduk.api.repository.AttendanceClubRepository;
 import com.jakduk.api.repository.CompetitionRepository;
 import com.jakduk.api.repository.EncyclopediaRepository;
 import com.jakduk.api.repository.HomeDescriptionRepository;
-import com.jakduk.api.repository.board.category.BoardCategoryRepository;
 import com.jakduk.api.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.api.repository.footballclub.FootballClubRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.repository.jakdu.JakduScheduleGroupRepository;
 import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
+import com.jakduk.api.restcontroller.vo.admin.CompetitionWrite;
+import com.jakduk.api.restcontroller.vo.admin.JakduScheduleGroupWrite;
+import com.jakduk.api.restcontroller.vo.admin.JakduScheduleWrite;
+import com.jakduk.api.restcontroller.vo.admin.ThumbnailSizeWrite;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -61,7 +58,6 @@ public class AdminService {
 
 	@Autowired private JakdukDAO jakdukDAO;
 	@Autowired private CommonService commonService;
-	@Autowired private BoardCategoryRepository boardCategoryRepository;
 	@Autowired private EncyclopediaRepository encyclopediaRepository;
 	@Autowired private FootballClubRepository footballClubRepository;
 	@Autowired private FootballClubOriginRepository footballClubOriginRepository;
@@ -147,27 +143,6 @@ public class AdminService {
 		footballClubRepository.save(footballClub);
 	}
 
-	public BoardCategory boardCategoryWrite(BoardCategoryWrite boardCategoryWrite) {
-
-		ArrayList<LocalSimpleName> names = new ArrayList<>();
-		names.add(new LocalSimpleName(Locale.KOREAN.getLanguage(), boardCategoryWrite.getNameKr()));
-		names.add(new LocalSimpleName(Locale.ENGLISH.getLanguage(), boardCategoryWrite.getNameEn()));
-
-		BoardCategory boardCategory = BoardCategory.builder()
-				.id(StringUtils.defaultIfBlank(boardCategoryWrite.getId(), null))
-				.code(boardCategoryWrite.getCode())
-				.names(names)
-				.build();
-
-		log.debug("boardCategory=" + boardCategory);
-
-		return boardCategoryRepository.save(boardCategory);
-	}
-
-	public List<BoardCategory> getBoardCategoryList() {
-		return boardCategoryRepository.findAll();
-	}
-
 	public List<AttendanceClub> getAttendanceClubList() {
 		
 		List<AttendanceClub> attendanceClubs;
@@ -175,24 +150,6 @@ public class AdminService {
 		attendanceClubs = attendanceClubRepository.findAll(sort);
 		
 		return attendanceClubs;
-	}
-
-	public BoardCategoryWrite getBoardCategory(String id) {
-		BoardCategory boardCategory = boardCategoryRepository.findOne(id);
-		
-		BoardCategoryWrite boardCategoryWrite = new BoardCategoryWrite();
-		boardCategoryWrite.setId(boardCategory.getId());
-		boardCategoryWrite.setCode(boardCategory.getCode());
-
-		for (LocalSimpleName fcName : boardCategory.getNames()) {
-			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-				boardCategoryWrite.setNameKr(fcName.getName());
-			} else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-				boardCategoryWrite.setNameEn(fcName.getName());
-			}
-		}
-
-		return boardCategoryWrite;
 	}
 	
 	public void thumbnailSizeWrite(ThumbnailSizeWrite thumbnailSizeWrite) {

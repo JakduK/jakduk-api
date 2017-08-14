@@ -2,7 +2,7 @@ package com.jakduk.api.restcontroller.vo.board;
 
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.db.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;

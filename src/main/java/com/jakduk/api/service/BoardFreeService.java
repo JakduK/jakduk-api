@@ -1,6 +1,8 @@
 package com.jakduk.api.service;
 
 import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.board.category.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.DateUtils;
@@ -9,13 +11,15 @@ import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.dao.BoardDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.db.*;
+import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.db.BoardFreeComment;
+import com.jakduk.api.model.db.Gallery;
+import com.jakduk.api.model.db.UsersFeeling;
 import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.etc.CommonCount;
 import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import com.jakduk.api.model.simple.*;
-import com.jakduk.api.repository.board.category.BoardCategoryRepository;
 import com.jakduk.api.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.api.repository.board.free.BoardFreeRepository;
 import com.jakduk.api.repository.board.free.comment.BoardFreeCommentRepository;
@@ -54,7 +58,6 @@ public class BoardFreeService {
 	@Autowired private BoardFreeRepository boardFreeRepository;
 	@Autowired private BoardFreeOnListRepository boardFreeOnListRepository;
 	@Autowired private BoardFreeCommentRepository boardFreeCommentRepository;
-	@Autowired private BoardCategoryRepository boardCategoryRepository;
 	@Autowired private GalleryRepository galleryRepository;
 	@Autowired private BoardDAO boardDAO;
 	@Autowired private CommonService commonService;
@@ -75,11 +78,11 @@ public class BoardFreeService {
      * @param galleries 글과 연동된 사진들
      * @param device 디바이스
      */
-	public BoardFree insertFreePost(CommonWriter writer, String subject, String content, Constants.BOARD_CATEGORY_TYPE categoryCode,
+	public BoardFree insertFreePost(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content, String categoryCode,
 									List<Gallery> galleries, Constants.DEVICE_TYPE device) {
 
-		boardCategoryRepository.findOneByCode(categoryCode.name())
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_CATEGORY));
+		if (! new BoardCategoryGenerator().existCategory(board, categoryCode))
+			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);
 
 		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(JakdukUtils.stripHtmlTag(content), StringUtils.EMPTY);
@@ -101,12 +104,13 @@ public class BoardFreeService {
 
 		BoardFree boardFree = BoardFree.builder()
 				.writer(writer)
+				.board(board)
 				.category(categoryCode)
 				.subject(subject)
 				.content(content)
 				.shortContent(shortContent)
 				.views(0)
-				.seq(commonService.getNextSequence(Constants.BOARD_TYPE.BOARD_FREE.name()))
+				.seq(commonService.getNextSequence(Constants.BOARD_TYPE.FREE.name()))
 				.status(boardStatus)
 				.logs(this.initBoardLogs(logId, Constants.BOARD_FREE_HISTORY_TYPE.CREATE.name(), writer))
 				.lastUpdated(lastUpdated)
@@ -117,7 +121,7 @@ public class BoardFreeService {
 
 	 	// 엘라스틱서치 색인 요청
 		rabbitMQPublisher.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
+				boardFree.getContent(), boardFree.getCategory(), galleryIds);
 
 		/*
 		// 슬랙 알림
@@ -148,7 +152,7 @@ public class BoardFreeService {
 	 * @param galleryIds 글과 연동된 사진들
      * @param device 디바이스
      */
-	public BoardFree updateFreePost(CommonWriter writer, Integer seq, String subject, String content, Constants.BOARD_CATEGORY_TYPE categoryCode,
+	public BoardFree updateFreePost(CommonWriter writer, Integer seq, String subject, String content, String categoryCode,
 									List<String> galleryIds, Constants.DEVICE_TYPE device) {
 
 		BoardFree boardFree = boardFreeRepository.findOneBySeq(seq)
@@ -196,7 +200,7 @@ public class BoardFreeService {
 
 		// 엘라스틱서치 색인 요청
 		rabbitMQPublisher.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory().name(), galleryIds);
+				boardFree.getContent(), boardFree.getCategory(), galleryIds);
 
 		return boardFree;
 	}
@@ -270,26 +274,17 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 글 목록
-	 *
-	 * @param category 말머리
-	 * @param page 페이지
-	 * @param size 크기
-     * @return 글 목록
      */
-	public FreePostsResponse getFreePosts(Constants.BOARD_CATEGORY_TYPE category, Integer page, Integer size) {
+	public FreePostsResponse getFreePosts(Constants.BOARD_TYPE board, String categoryCode, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
-		Page<BoardFreeOnList> postsPage = null;
+		Page<BoardFreeOnList> postsPage;
 
-		switch (category) {
-			case ALL:
-				postsPage = boardFreeOnListRepository.findAll(pageable);
-				break;
-			case FOOTBALL:
-			case FREE:
-				postsPage = boardFreeOnListRepository.findByCategory(category, pageable);
-				break;
+		if ("ALL".equals(categoryCode)) {
+			postsPage = boardFreeOnListRepository.findByBoard(board, pageable);
+		} else {
+			postsPage = boardFreeOnListRepository.findByBoardAndCategory(board, categoryCode, pageable);
 		}
 
 		// 자유 게시판 공지글 목록
@@ -300,7 +295,7 @@ public class BoardFreeService {
 			FreePost freePosts = new FreePost();
 			BeanUtils.copyProperties(post, freePosts);
 
-			if (post.isLinkedGallery()) {
+			if (post.getLinkedGallery()) {
 				List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 						new ObjectId(post.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
@@ -330,8 +325,8 @@ public class BoardFreeService {
 		// Board ID 뽑아내기.
 		ArrayList<ObjectId> ids = new ArrayList<>();
 
-		freePosts.forEach(board -> ids.add(new ObjectId(board.getId())));
-		freeNotices.forEach(board -> ids.add(new ObjectId(board.getId())));
+		freePosts.forEach(post -> ids.add(new ObjectId(post.getId())));
+		freeNotices.forEach(post -> ids.add(new ObjectId(post.getId())));
 
 		// 게시물의 댓글수
 		Map<String, Integer> commentCounts = boardFreeCommentRepository.findCommentsCountByIds(ids).stream()
@@ -342,18 +337,18 @@ public class BoardFreeService {
 				.collect(Collectors.toMap(BoardFeelingCount::getId, Function.identity()));
 
 		// 댓글수, 감정 표현수 합치기.
-		Consumer<FreePost> applyCounts = board -> {
-			String boardId = board.getId();
+		Consumer<FreePost> applyCounts = post -> {
+			String boardId = post.getId();
 			Integer commentCount = commentCounts.get(boardId);
 
 			if (Objects.nonNull(commentCount))
-				board.setCommentCount(commentCount);
+				post.setCommentCount(commentCount);
 
 			BoardFeelingCount feelingCount = feelingCounts.get(boardId);
 
 			if (Objects.nonNull(feelingCount)) {
-				board.setLikingCount(feelingCount.getUsersLikingCount());
-				board.setDislikingCount(feelingCount.getUsersDislikingCount());
+				post.setLikingCount(feelingCount.getUsersLikingCount());
+				post.setDislikingCount(feelingCount.getUsersDislikingCount());
 			}
 		};
 
@@ -361,12 +356,15 @@ public class BoardFreeService {
 		freeNotices.forEach(applyCounts);
 
 		// 말머리
-		List<BoardCategory> categories = boardCategoryRepository.findByLanguage(JakdukUtils.getLanguageCode());
+		List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
+		Map<String, String> categoriesMap = null;
 
-		Map<String, String> categoriesMap = categories.stream()
-				.collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+		if (! CollectionUtils.isEmpty(categories)) {
+			categoriesMap = categories.stream()
+					.collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
 
-		categoriesMap.put("ALL", JakdukUtils.getResourceBundleMessage("messages.board", "board.category.all"));
+			categoriesMap.put("ALL", JakdukUtils.getResourceBundleMessage("messages.board", "board.category.all"));
+		}
 
 		return FreePostsResponse.builder()
 				.categories(categoriesMap)
@@ -397,7 +395,7 @@ public class BoardFreeService {
 					LatestPost latestPost = new LatestPost();
 					BeanUtils.copyProperties(post, latestPost);
 
-					if (post.isLinkedGallery()) {
+					if (post.getLinkedGallery()) {
 						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 								new ObjectId(post.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 
@@ -882,7 +880,9 @@ public class BoardFreeService {
 			freePostDetail.setLogs(logs);
 		}
 
-		freePostDetail.setCategory(boardCategoryRepository.findByCodeAndLanguage(boardFree.getCategory().name(), JakdukUtils.getLanguageCode()));
+		BoardCategory boardCategory = new BoardCategoryGenerator().getCategory(Constants.BOARD_TYPE.FOOTBALL, boardFree.getCategory(), JakdukUtils.getLocale());
+
+		freePostDetail.setCategory(boardCategory);
 		freePostDetail.setNumberOfLike(CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size());
 		freePostDetail.setNumberOfDislike(CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size());
 
@@ -910,12 +910,10 @@ public class BoardFreeService {
 			freePostDetail.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
 
 		// 앞, 뒤 글
-		Constants.BOARD_CATEGORY_TYPE categoryType = Constants.BOARD_CATEGORY_TYPE.valueOf(freePostDetail.getCategory().getCode());
-
 		BoardFreeSimple prevPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId()),
-				categoryType, Constants.CRITERIA_OPERATOR.GT);
+				boardCategory.getCode(), Constants.CRITERIA_OPERATOR.GT);
 		BoardFreeSimple nextPost = boardFreeRepository.findByIdAndCategoryWithOperator(new ObjectId(freePostDetail.getId()),
-				categoryType, Constants.CRITERIA_OPERATOR.LT);
+				boardCategory.getCode(), Constants.CRITERIA_OPERATOR.LT);
 
         // 글쓴이의 최근 글
 		List<LatestFreePost> latestFreePosts = null;
@@ -931,7 +929,7 @@ public class BoardFreeService {
 						LatestFreePost latestFreePost = new LatestFreePost();
 						BeanUtils.copyProperties(post, latestFreePost);
 
-						if (! post.isLinkedGallery()) {
+						if (! post.getLinkedGallery()) {
 							List<Gallery> latestPostGalleries = galleryRepository.findByItemIdAndFromType(new ObjectId(post.getId()),
 									Constants.GALLERY_FROM_TYPE.BOARD_FREE, 1);
 

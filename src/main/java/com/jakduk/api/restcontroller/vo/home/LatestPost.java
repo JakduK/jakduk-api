@@ -30,8 +30,8 @@ public class LatestPost {
     @ApiModelProperty(example = "2", value = "글번호")
     private int seq;
 
-    @ApiModelProperty(example = "FREE", value = "말머리")
-    private Constants.BOARD_CATEGORY_TYPE category;
+    @ApiModelProperty(example = "CLASSIC", value = "말머리")
+    private String category;
 
     @ApiModelProperty(example = "10", value = "읽음 수")
     private int views = 0;

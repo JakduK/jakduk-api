@@ -3,7 +3,7 @@ package com.jakduk.api.board;
 import com.jakduk.api.ApiApplicationTests;
 
 import com.jakduk.api.common.util.JakdukUtils;
-import com.jakduk.api.model.db.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.repository.board.category.BoardCategoryRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

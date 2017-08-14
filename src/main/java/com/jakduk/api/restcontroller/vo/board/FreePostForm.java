@@ -31,9 +31,9 @@ public class FreePostForm {
     @NotEmpty
     private String content;
 
-    @ApiModelProperty(required = true, value = "말머리 코드", example = "FREE")
-    @NotNull
-    private Constants.BOARD_CATEGORY_TYPE categoryCode;
+    @ApiModelProperty(required = true, value = "말머리 코드", example = "CLASSIC")
+    @NotEmpty
+    private String categoryCode;
 
     @ApiModelProperty(value = "사진 목록")
     private List<GalleryOnBoard> galleries;

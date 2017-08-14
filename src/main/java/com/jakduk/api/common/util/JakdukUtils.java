@@ -55,6 +55,23 @@ public class JakdukUtils {
         return returnLanguage;
     }
 
+    public static Locale getLocale() {
+        return JakdukUtils.getLocale(null);
+    }
+
+    public static Locale getLocale(String wantLanguage) {
+        Locale locale = LocaleContextHolder.getLocale();
+        Locale returnLocale = Locale.US;
+
+        if (StringUtils.isBlank(wantLanguage))
+            wantLanguage = locale.getLanguage();
+
+        if (wantLanguage.contains(Locale.KOREA.getLanguage()))
+            returnLocale = Locale.KOREA;
+
+        return returnLocale;
+    }
+
     /**
      * ResourceBundle에서 메시지 가져오기.
      *

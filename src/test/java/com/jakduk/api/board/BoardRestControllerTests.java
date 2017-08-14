@@ -4,7 +4,7 @@ import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.ObjectMapperUtils;
-import com.jakduk.api.model.db.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.BoardCommentStatus;
@@ -16,7 +16,6 @@ import com.jakduk.api.model.simple.BoardFreeOnSearch;
 import com.jakduk.api.model.simple.BoardFreeSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
 import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.service.BoardCategoryService;
 import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.api.service.GalleryService;
 import org.junit.Before;
@@ -83,7 +82,6 @@ public class BoardRestControllerTests {
                 .build();
 
         boardCategory = BoardCategory.builder()
-                .id("boardCategoryId01")
                 .code("FREE")
                 .names(Arrays.asList(new LocalSimpleName("ko", "자유"), new LocalSimpleName("en", "FREE")))
                 .build();

@@ -11,7 +11,15 @@ public class Constants {
 	 * 게시판 종류.
 	 */
 	public enum BOARD_TYPE {
-		BOARD_FREE
+		FREE,
+		FOOTBALL,
+		DEVELOPER
+	}
+
+	public enum BOARD_TYPE_LOWERCASE {
+		free,
+		football,
+		developer
 	}
 
 	/**
@@ -35,26 +43,7 @@ public class Constants {
 	public final static Integer COMMENT_MAX_LIMIT = 30;
 	public final static Integer GALLERY_SIZE = 24;
 	public final static Integer BOARD_TOP_LIMIT = 3;
-
-	/**
-	 * 게시판 말머리.
-	 */
-	public final static String BOARD_CATEGORY_NONE = "none";
-	public final static String BOARD_CATEGORY_FREE = "free";
-	public final static String BOARD_CATEGORY_FOOTBALL = "football";
-	public final static String BOARD_CATEGORY_DEVELOP = "develop";
-	public final static String BOARD_CATEGORY_ALL = "all";
-
 	public final static Integer BOARD_SHORT_CONTENT_LENGTH = 100;
-
-	/**
-	 * 게시판 말머리 종류.
-	 */
-	public enum BOARD_CATEGORY_TYPE {
-		ALL,		// 전체
-		FREE,		// 자유
-		FOOTBALL	// 축구
-	}
 
 	/**
 	 * 글의 좋아요 싫어요에 대한 에러 코드

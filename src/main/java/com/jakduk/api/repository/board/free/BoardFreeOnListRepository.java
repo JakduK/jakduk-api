@@ -14,6 +14,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  */
 public interface BoardFreeOnListRepository extends MongoRepository<BoardFreeOnList, String> {
 	
-	Page<BoardFreeOnList> findAll(Pageable pageable);
-	Page<BoardFreeOnList> findByCategory(Constants.BOARD_CATEGORY_TYPE category, Pageable pageable);
+	Page<BoardFreeOnList> findByBoard(Constants.BOARD_TYPE board, Pageable pageable);
+	Page<BoardFreeOnList> findByBoardAndCategory(Constants.BOARD_TYPE board, String category, Pageable pageable);
 }

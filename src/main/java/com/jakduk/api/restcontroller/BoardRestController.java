@@ -3,11 +3,12 @@ package com.jakduk.api.restcontroller;
 import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
+import com.jakduk.api.common.board.category.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.db.BoardCategory;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.db.BoardFreeComment;
 import com.jakduk.api.model.db.Gallery;
@@ -16,12 +17,12 @@ import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.service.BoardCategoryService;
 import com.jakduk.api.service.BoardFreeService;
 import com.jakduk.api.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.Authentication;
@@ -43,27 +44,30 @@ import java.util.stream.Collectors;
 
 @Api(tags = "BoardFree", description = "자유게시판 API")
 @RestController
-@RequestMapping("/api/${jakduk.api-url-path.board-free}")
+@RequestMapping("/api/board")
 public class BoardRestController {
 
     @Autowired private BoardFreeService boardFreeService;
-    @Autowired private BoardCategoryService boardCategoryService;
     @Autowired private GalleryService galleryService;
     @Autowired private AuthHelper authHelper;
 
     @ApiOperation("자유게시판 글 목록")
-    @GetMapping("/posts")
+    @GetMapping("/{board}/posts")
     public FreePostsResponse getFreePosts(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
-            @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") Constants.BOARD_CATEGORY_TYPE category) {
+            @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") String categoryCode) {
 
-        return boardFreeService.getFreePosts(category, page, size);
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
+
+        return boardFreeService.getFreePosts(boardType, categoryCode, page, size);
     }
 
     @ApiOperation("자유게시판 주간 선두 글")
-    @GetMapping("/tops")
-    public FreeTopsResponse getFreePostsTops() {
+    @GetMapping("/{board}/tops")
+    public FreeTopsResponse getFreePostsTops(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
 
         List<BoardFreeOnBest> topLikes = boardFreeService.getFreeTopLikes();
         List<BoardFreeOnBest> topComments = boardFreeService.getFreeTopComments();
@@ -75,8 +79,9 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 댓글 목록")
-    @GetMapping("/comments")
+    @GetMapping("/{board}/comments")
     public FreePostCommentsResponse getFreeComments(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size) {
 
@@ -84,8 +89,9 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글 상세")
-    @GetMapping("/{seq}")
+    @GetMapping("/{board}/{seq}")
     public FreePostDetailResponse getFreePost(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -95,11 +101,14 @@ public class BoardRestController {
         return boardFreeService.getBoardFreeDetail(seq, isAddCookie);
     }
 
-    @ApiOperation(value = "자유게시판 말머리 목록")
-    @RequestMapping(value = "/categories", method = RequestMethod.GET)
-    public FreeCategoriesResponse getFreeCategories() {
+    @ApiOperation("자유게시판 말머리 목록")
+    @GetMapping("/{board}/categories")
+    public FreeCategoriesResponse getFreeCategories(
+            @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
 
-        List<BoardCategory> categories = boardCategoryService.getFreeCategories();
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
+
+        List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(boardType, JakdukUtils.getLocale());
 
         return FreeCategoriesResponse.builder()
                 .categories(categories)
@@ -107,11 +116,14 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글쓰기")
-    @PostMapping("")
+    @PostMapping("/{board}")
     public FreePostWriteResponse addFreePost(
+            @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
             Device device,
             Authentication authentication) {
+
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
         CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
 
@@ -126,8 +138,8 @@ public class BoardRestController {
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        BoardFree boardFree = boardFreeService.insertFreePost(commonWriter, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), galleries, JakdukUtils.getDeviceInfo(device));
+        BoardFree boardFree = boardFreeService.insertFreePost(commonWriter, boardType, form.getSubject().trim(), form.getContent().trim(),
+                form.getCategoryCode().trim(), galleries, JakdukUtils.getDeviceInfo(device));
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
 
@@ -138,8 +150,9 @@ public class BoardRestController {
 
     @ApiOperation("자유게시판 글 고치기")
     @SecuredUser
-    @PutMapping("/{seq}")
+    @PutMapping("/{board}/{seq}")
     public FreePostWriteResponse editFreePost(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody FreePostForm form,
             HttpServletRequest request,
@@ -180,8 +193,9 @@ public class BoardRestController {
 
     @ApiOperation(value = "자유게시판 글 지움")
     @SecuredUser
-    @DeleteMapping("/{seq}")
+    @DeleteMapping("/{board}/{seq}")
     public FreePostDeleteResponse deleteFree(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
@@ -194,8 +208,9 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 목록")
-    @GetMapping("/{seq}/comments")
+    @GetMapping("/{board}/{seq}/comments")
     public FreePostDetailCommentsResponse getFreePostDetailComments(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
@@ -203,8 +218,9 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 달기")
-    @PostMapping("/comment")
+    @PostMapping("/{board}/comment")
     public BoardFreeComment addFreeComment(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             Device device) {
 
@@ -232,8 +248,9 @@ public class BoardRestController {
 
     @ApiOperation("자유게시판 글의 댓글 고치기")
     @SecuredUser
-    @PutMapping("/comment/{id}")
+    @PutMapping("/{board}/comment/{id}")
     public BoardFreeComment editFreeComment(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             HttpServletRequest request,
@@ -278,8 +295,9 @@ public class BoardRestController {
 
     @ApiOperation("자유게시판 글의 댓글 지우기")
     @SecuredUser
-    @DeleteMapping("/comment/{id}")
+    @DeleteMapping("/{board}/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
 
         if (! AuthUtils.isUser())
@@ -293,8 +311,9 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글 감정 표현")
-    @PostMapping("/{seq}/{feeling}")
+    @PostMapping("/{board}/{seq}/{feeling}")
     public UserFeelingResponse addFreeFeeling(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE feeling) {
 
@@ -314,8 +333,9 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 감정 표현 회원 목록")
-    @RequestMapping(value = "/{seq}/feeling/users", method = RequestMethod.GET)
+    @RequestMapping(value = "/{board}/{seq}/feeling/users", method = RequestMethod.GET)
     public FreePostFeelingsResponse getFreeFeelings (
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
         BoardFree boardFree = boardFreeService.findOneBySeq(seq);
@@ -328,8 +348,9 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 댓글 감정 표현")
-    @PostMapping("/comment/{commentId}/{feeling}")
+    @PostMapping("/{board}/comment/{commentId}/{feeling}")
     public UserFeelingResponse addFreeCommentFeeling(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
             @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE feeling) {
 
@@ -349,8 +370,10 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 공지 활성화")
-    @RequestMapping(value = "/{seq}/notice", method = RequestMethod.POST)
-    public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
+    @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.POST)
+    public EmptyJsonResponse enableFreeNotice(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @PathVariable int seq) {
 
         if (! AuthUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -363,8 +386,10 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 공지 비활성화")
-    @RequestMapping(value = "/{seq}/notice", method = RequestMethod.DELETE)
-    public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
+    @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.DELETE)
+    public EmptyJsonResponse disableFreeNotice(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @PathVariable int seq) {
 
         if (! AuthUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);

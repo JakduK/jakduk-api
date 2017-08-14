@@ -25,16 +25,19 @@ public class BoardFreeOnList {
 	
 	private String subject;
 	
-	private int seq;
+	private Integer seq;
+
+	// 게시판
+	private Constants.BOARD_TYPE board;
 	
-	private Constants.BOARD_CATEGORY_TYPE category;
+	private String category;
 	
-	private int views = 0;
+	private Integer views;
 	
 	private BoardStatus status;
 
 	private String shortContent;
 
-	private boolean linkedGallery;
+	private Boolean linkedGallery;
 
 }

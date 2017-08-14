@@ -58,7 +58,7 @@ public interface BoardFreeRepositoryCustom {
     /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
-    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, Constants.BOARD_CATEGORY_TYPE category, Constants.CRITERIA_OPERATOR operator);
+    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, String category, Constants.CRITERIA_OPERATOR operator);
 
     /**
      * 게시물의 감정 갯수를 가져온다

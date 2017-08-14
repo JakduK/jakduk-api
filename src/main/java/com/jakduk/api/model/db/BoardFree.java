@@ -48,11 +48,14 @@ public class BoardFree implements UsersFeeling {
 	 * 글 번호
 	 */
 	private Integer seq;
+
+	// 게시판
+	private Constants.BOARD_TYPE board;
 	
 	/**
 	 * 분류 ID
 	 */
-	private Constants.BOARD_CATEGORY_TYPE category;
+	private String category;
 	
 	/**
 	 * 조회

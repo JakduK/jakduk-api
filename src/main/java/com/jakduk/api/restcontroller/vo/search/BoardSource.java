@@ -26,7 +26,7 @@ public class BoardSource {
     @ApiModelProperty(example = "2", value = "글번호")
     private Integer seq;
 
-    @ApiModelProperty(example = "FREE", value = "말머리")
+    @ApiModelProperty(example = "CLASSIC", value = "말머리")
     private String category;
 
     @ApiModelProperty(value = "그림 목록")

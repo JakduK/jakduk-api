@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.model.db.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategory;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

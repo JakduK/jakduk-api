@@ -9,6 +9,7 @@ import lombok.*;
 
 @AllArgsConstructor
 @Getter
+@ToString
 public class LocalSimpleName {
 
     private String language;
