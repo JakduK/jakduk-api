@@ -1,5 +1,6 @@
 package com.jakduk.api.board;
 
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
@@ -34,6 +35,7 @@ public class BoardFreeRepositoryTests {
     private BoardFreeRepository repository;
 
     private BoardFree randomBoardFree;
+    private Constants.BOARD_TYPE board;
 
     @Before
     public void setUp(){
@@ -42,6 +44,8 @@ public class BoardFreeRepositoryTests {
         Long hours = ChronoUnit.MINUTES.between(localDateTime, LocalDateTime.now());
         LocalDateTime randomDate = localDateTime.plusMinutes(new Random().nextInt((int) (hours + 1)));
         randomBoardFree = repository.findTopByIdLessThanEqualOrderByIdDesc(new ObjectId(DateUtils.localDateTimeToDate(randomDate))).get();
+
+        board = Constants.BOARD_TYPE.FOOTBALL;
     }
 
     @Test
@@ -69,7 +73,9 @@ public class BoardFreeRepositoryTests {
     @Test
     public void findNotices() {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-        List<BoardFreeOnList> notices = repository.findNotices(sort);
+        List<BoardFreeOnList> notices = repository.findNotices(board, sort);
+
+        System.out.println("notices=" + notices);
     }
 
     @Test

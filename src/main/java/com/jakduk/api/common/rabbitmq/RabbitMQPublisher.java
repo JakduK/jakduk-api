@@ -82,8 +82,8 @@ public class RabbitMQPublisher {
         this.publishEmail(routingKey, emailPayload);
     }
 
-    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String category,
-                                   List<String> galleryIds) {
+    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String board,
+                                   String category, List<String> galleryIds) {
 
         EsBoard esBoard = EsBoard.builder()
                 .id(id)
@@ -91,6 +91,7 @@ public class RabbitMQPublisher {
                 .writer(writer)
                 .subject(JakdukUtils.stripHtmlTag(subject))
                 .content(JakdukUtils.stripHtmlTag(content))
+                .board(board)
                 .category(category)
                 .galleries(galleryIds)
                 .build();

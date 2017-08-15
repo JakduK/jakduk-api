@@ -1,5 +1,6 @@
 package com.jakduk.api.model.elasticsearch;
 
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,8 @@ public class EsBoard {
 	private String content;
 	
 	private Integer seq;
+
+	private String board;
 	
 	private String category;
 

@@ -104,7 +104,7 @@ public class BoardFreeService {
 
 		BoardFree boardFree = BoardFree.builder()
 				.writer(writer)
-				.board(board)
+				.board(board.name())
 				.category(categoryCode)
 				.subject(subject)
 				.content(content)
@@ -121,21 +121,7 @@ public class BoardFreeService {
 
 	 	// 엘라스틱서치 색인 요청
 		rabbitMQPublisher.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory(), galleryIds);
-
-		/*
-		// 슬랙 알림
-		slackService.sendPost(
-				boardFree.getWriter().getUsername(),
-				boardFree.getSubject(),
-				"New post created.",
-				UrlUtils.buildFullRequestUrl(
-						request.getScheme(),
-						request.getServerName(),
-						request.getServerPort(),
-						request.getContextPath(), null) + "/board/free/" + boardFree.getSeq()
-		);
-		*/
+				boardFree.getContent(), boardFree.getBoard(), boardFree.getCategory(), galleryIds);
 
 		log.info("new post created. post seq={}, subject={}", boardFree.getSeq(), boardFree.getSubject());
 
@@ -200,7 +186,7 @@ public class BoardFreeService {
 
 		// 엘라스틱서치 색인 요청
 		rabbitMQPublisher.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
-				boardFree.getContent(), boardFree.getCategory(), galleryIds);
+				boardFree.getContent(), boardFree.getBoard(), boardFree.getCategory(), galleryIds);
 
 		return boardFree;
 	}
@@ -288,7 +274,7 @@ public class BoardFreeService {
 		}
 
 		// 자유 게시판 공지글 목록
-		List<BoardFreeOnList> notices = boardFreeRepository.findNotices(sort);
+		List<BoardFreeOnList> notices = boardFreeRepository.findNotices(board, sort);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
 		Function<BoardFreeOnList, FreePost> convertToFreePost = post -> {

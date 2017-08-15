@@ -50,7 +50,7 @@ public class BoardFree implements UsersFeeling {
 	private Integer seq;
 
 	// 게시판
-	private Constants.BOARD_TYPE board;
+	private String board;
 	
 	/**
 	 * 분류 ID

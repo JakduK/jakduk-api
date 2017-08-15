@@ -104,11 +104,12 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
      * 공지 글 목록
      */
     @Override
-    public List<BoardFreeOnList> findNotices(Sort sort) {
+    public List<BoardFreeOnList> findNotices(Constants.BOARD_TYPE board, Sort sort) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("status.notice").is(true));
-        query.with(sort);
-        query.limit(10);
+        query.addCriteria(Criteria.where("status.notice").is(true))
+                .addCriteria(Criteria.where("board").is(board.name()))
+                .with(sort)
+                .limit(10);
 
         return mongoTemplate.find(query, BoardFreeOnList.class);
     }

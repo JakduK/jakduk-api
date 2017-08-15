@@ -3,8 +3,8 @@ package com.jakduk.api.board;
 import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.common.board.category.BoardCategory;
+import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.BoardCommentStatus;
@@ -36,8 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,7 +52,6 @@ public class BoardRestControllerTests {
     private MockMvc mvc;
 
     @MockBean private BoardFreeService boardFreeService;
-    @MockBean private BoardCategoryService boardCategoryService;
     @MockBean private GalleryService galleryService;
     @MockBean private AuthHelper authHelper;
 
@@ -76,7 +73,8 @@ public class BoardRestControllerTests {
                 .writer(commonWriter)
                 .subject("제목입니다.")
                 .content("내용입니다.")
-                .category(Constants.BOARD_CATEGORY_TYPE.FOOTBALL)
+                .board(Constants.BOARD_TYPE.FOOTBALL.name())
+                .category("CLASSIC")
                 .linkedGallery(true)
                 .status(BoardStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
                 .build();
@@ -242,7 +240,7 @@ public class BoardRestControllerTests {
         FreePostForm form = FreePostForm.builder()
                 .subject("제목입니다.")
                 .content("내용입니다.")
-                .categoryCode(Constants.BOARD_CATEGORY_TYPE.FOOTBALL)
+                .categoryCode("CLASSIC")
                 .galleries(Arrays.asList(galleryOnBoard))
                 .build();
 
@@ -263,7 +261,7 @@ public class BoardRestControllerTests {
         when(galleryService.findByIdIn(any()))
                 .thenReturn(expectGalleries);
 
-        when(boardFreeService.insertFreePost(any(CommonWriter.class), anyString(), anyString(), any(Constants.BOARD_CATEGORY_TYPE.class),
+        when(boardFreeService.insertFreePost(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
                 anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
                 .thenReturn(boardFree);
 

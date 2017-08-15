@@ -39,7 +39,7 @@ public interface BoardFreeRepositoryCustom {
     /**
      * 공지 글 목록
      */
-    List<BoardFreeOnList> findNotices(Sort sort);
+    List<BoardFreeOnList> findNotices(Constants.BOARD_TYPE board, Sort sort);
 
     /**
      * 홈에서 보여지는 최근글 목록

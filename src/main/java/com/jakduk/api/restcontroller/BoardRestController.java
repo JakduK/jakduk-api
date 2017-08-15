@@ -156,9 +156,10 @@ public class BoardRestController {
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody FreePostForm form,
             HttpServletRequest request,
-            Device device) {
+            Device device,
+            Authentication authentication) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;

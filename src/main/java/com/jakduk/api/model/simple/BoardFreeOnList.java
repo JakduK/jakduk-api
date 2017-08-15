@@ -1,6 +1,5 @@
 package com.jakduk.api.model.simple;
 
-import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Getter;
@@ -28,7 +27,7 @@ public class BoardFreeOnList {
 	private Integer seq;
 
 	// 게시판
-	private Constants.BOARD_TYPE board;
+	private String board;
 	
 	private String category;
 	
