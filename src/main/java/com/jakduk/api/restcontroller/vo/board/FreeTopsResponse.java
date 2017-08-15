@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -23,8 +23,8 @@ import java.util.List;
 public class FreeTopsResponse {
 
     @ApiModelProperty(value = "주간 좋아요수 선두")
-    private List<BoardFreeOnBest> topLikes;
+    private List<BoardPostTop> topLikes;
 
     @ApiModelProperty(value = "주간 댓글수 선두")
-    private List<BoardFreeOnBest> topComments;
+    private List<BoardPostTop> topComments;
 }

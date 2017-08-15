@@ -1,8 +1,8 @@
 package com.jakduk.api.dao;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.etc.CommonCount;
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
+import com.jakduk.api.model.aggregate.CommonCount;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import org.apache.commons.collections4.IteratorUtils;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
@@ -55,28 +55,14 @@ public class BoardDAO {
 		
 		return counts;
 	}	
-	
-	public List<BoardFreeOnBest> getBoardFreeCountOfLikeBest(ObjectId commentId) {
 
-		MongoCollection boardFreeC = jongo.getCollection("boardFree");
-
-		Iterator<BoardFreeOnBest> iPosts = boardFreeC.aggregate("{$match:{_id:{$gt:#}}}", commentId)
-				.and("{$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}}")
-				.and("{$sort:{count:-1, views:-1}}")
-				.and("{$limit:#}", Constants.BOARD_TOP_LIMIT)
-				.as(BoardFreeOnBest.class);
-
-		return IteratorUtils.toList(iPosts);
-	}
-
-	
-	public List<BoardFreeOnBest> getBoardFreeListOfTop(List<ObjectId> arrId) {
+	public List<BoardPostTop> getBoardFreeListOfTop(List<ObjectId> arrId) {
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrId));
 		Aggregation aggregation = Aggregation.newAggregation(match);
-		AggregationResults<BoardFreeOnBest> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardFreeOnBest.class);
+		AggregationResults<BoardPostTop> results = mongoTemplate.aggregate(aggregation, "boardFree", BoardPostTop.class);
 		
-		List<BoardFreeOnBest> posts = results.getMappedResults();
+		List<BoardPostTop> posts = results.getMappedResults();
 		
 		return posts;
 	}

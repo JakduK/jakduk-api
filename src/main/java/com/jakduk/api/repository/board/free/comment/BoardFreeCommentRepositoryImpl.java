@@ -2,7 +2,7 @@ package com.jakduk.api.repository.board.free.comment;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.BoardFreeComment;
-import com.jakduk.api.model.etc.CommonCount;
+import com.jakduk.api.model.aggregate.CommonCount;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

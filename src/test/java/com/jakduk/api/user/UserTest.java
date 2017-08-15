@@ -5,7 +5,7 @@ import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.db.User;
-import com.jakduk.api.model.etc.SupporterCount;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;

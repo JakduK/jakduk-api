@@ -1,4 +1,4 @@
-package com.jakduk.api.model.etc;
+package com.jakduk.api.model.aggregate;
 
 import com.jakduk.api.model.db.FootballClub;
 import lombok.Getter;

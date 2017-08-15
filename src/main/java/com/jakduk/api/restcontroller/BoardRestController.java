@@ -13,7 +13,7 @@ import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.db.BoardFreeComment;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
@@ -69,8 +69,10 @@ public class BoardRestController {
     public FreeTopsResponse getFreePostsTops(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
 
-        List<BoardFreeOnBest> topLikes = boardFreeService.getFreeTopLikes();
-        List<BoardFreeOnBest> topComments = boardFreeService.getFreeTopComments();
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
+
+        List<BoardPostTop> topLikes = boardFreeService.getFreeTopLikes(boardType);
+        List<BoardPostTop> topComments = boardFreeService.getFreeTopComments();
 
         return FreeTopsResponse.builder()
                 .topLikes(topLikes)

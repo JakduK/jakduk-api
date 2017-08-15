@@ -11,7 +11,7 @@ import com.jakduk.api.model.embedded.BoardCommentStatus;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalSimpleName;
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.model.simple.BoardFreeOnSearch;
 import com.jakduk.api.model.simple.BoardFreeSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
@@ -101,8 +101,8 @@ public class BoardRestControllerTests {
     @WithMockUser
     public void getFreePostsTopsTest() throws Exception {
 
-        List<BoardFreeOnBest> expectTopLikes = Arrays.asList(
-                BoardFreeOnBest.builder()
+        List<BoardPostTop> expectTopLikes = Arrays.asList(
+                BoardPostTop.builder()
                         .id("boardFreeId01")
                         .seq(1)
                         .subject("인기있는 글 제목")
@@ -111,11 +111,11 @@ public class BoardRestControllerTests {
                         .build()
         );
 
-        when(boardFreeService.getFreeTopLikes())
+        when(boardFreeService.getFreeTopLikes(any(Constants.BOARD_TYPE.class)))
                 .thenReturn(expectTopLikes);
 
-        List<BoardFreeOnBest> expectTopComments = Arrays.asList(
-                BoardFreeOnBest.builder()
+        List<BoardPostTop> expectTopComments = Arrays.asList(
+                BoardPostTop.builder()
                         .id("boardFreeId02")
                         .seq(2)
                         .subject("댓글많은 글 제목")

@@ -5,7 +5,7 @@ import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.db.AttendanceLeague;
 import com.jakduk.api.model.db.Competition;
-import com.jakduk.api.model.etc.SupporterCount;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.restcontroller.vo.stats.SupportersDataResponse;
 
 import com.jakduk.api.service.CompetitionService;

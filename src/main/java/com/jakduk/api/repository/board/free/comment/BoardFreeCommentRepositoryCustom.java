@@ -1,7 +1,7 @@
 package com.jakduk.api.repository.board.free.comment;
 
 import com.jakduk.api.model.db.BoardFreeComment;
-import com.jakduk.api.model.etc.CommonCount;
+import com.jakduk.api.model.aggregate.CommonCount;
 import org.bson.types.ObjectId;
 
 import java.util.List;

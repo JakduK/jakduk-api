@@ -5,7 +5,7 @@ import com.jakduk.api.model.db.Competition;
 import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduScheduleGroup;
-import com.jakduk.api.model.etc.SupporterCount;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.jongo.GalleryFeelingCount;
 import com.jakduk.api.model.simple.UserOnHome;
 import org.bson.types.ObjectId;

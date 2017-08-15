@@ -3,7 +3,7 @@ package com.jakduk.api.board;
 
 import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.model.db.BoardFreeComment;
-import com.jakduk.api.model.etc.CommonCount;
+import com.jakduk.api.model.aggregate.CommonCount;
 import com.jakduk.api.repository.board.free.comment.BoardFreeCommentRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;

@@ -11,14 +11,14 @@ import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.dao.BoardDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
+import com.jakduk.api.model.aggregate.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardPostTop;
+import com.jakduk.api.model.aggregate.CommonCount;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.db.BoardFreeComment;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UsersFeeling;
 import com.jakduk.api.model.embedded.*;
-import com.jakduk.api.model.etc.BoardFeelingCount;
-import com.jakduk.api.model.etc.CommonCount;
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import com.jakduk.api.model.simple.*;
 import com.jakduk.api.repository.board.free.BoardFreeOnListRepository;
 import com.jakduk.api.repository.board.free.BoardFreeRepository;
@@ -274,7 +274,7 @@ public class BoardFreeService {
 		}
 
 		// 자유 게시판 공지글 목록
-		List<BoardFreeOnList> notices = boardFreeRepository.findNotices(board, sort);
+		List<BoardFreeOnList> notices = boardFreeRepository.findNotices(board.name(), sort);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
 		Function<BoardFreeOnList, FreePost> convertToFreePost = post -> {
@@ -687,20 +687,18 @@ public class BoardFreeService {
 
 	/**
 	 * 자유게시판 주간 좋아요수 선두
-	 * @return 게시물 목록
      */
-	public List<BoardFreeOnBest> getFreeTopLikes() {
-		LocalDate date = LocalDate.now().minusWeeks(1);
-		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+	public List<BoardPostTop> getFreeTopLikes(Constants.BOARD_TYPE board) {
+		LocalDate localDate = LocalDate.now().minusWeeks(1);
 
-		return boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
+		return boardFreeRepository.findTopLikes(board.name(), new ObjectId(DateUtils.localDateToDate(localDate)));
 	}
 
 	/**
 	 * 자유게시판 주간 댓글수 선두
 	 * @return 게시물 목록
 	 */
-	public List<BoardFreeOnBest> getFreeTopComments() {
+	public List<BoardPostTop> getFreeTopComments() {
 		LocalDate date = LocalDate.now().minusWeeks(1);
 		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
 
@@ -718,17 +716,17 @@ public class BoardFreeService {
 		}
 
 		// commentIds를 파라미터로 다시 글을 가져온다.
-		List<BoardFreeOnBest> posts = boardDAO.getBoardFreeListOfTop(commentIds);
+		List<BoardPostTop> posts = boardDAO.getBoardFreeListOfTop(commentIds);
 
-		for (BoardFreeOnBest boardFree : posts) {
+		for (BoardPostTop boardFree : posts) {
 			String id = boardFree.getId();
 			Integer count = boardFreeCommentCount.get(id);
 			boardFree.setCount(count);
 		}
 
 		// sort and limit
-		Comparator<BoardFreeOnBest> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
-		Comparator<BoardFreeOnBest> byView = (b1, b2) -> b2.getViews() - b1.getViews();
+		Comparator<BoardPostTop> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
+		Comparator<BoardPostTop> byView = (b1, b2) -> b2.getViews() - b1.getViews();
 
 		posts = posts.stream()
 				.sorted(byCount.thenComparing(byView))

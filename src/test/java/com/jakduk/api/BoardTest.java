@@ -3,7 +3,7 @@ package com.jakduk.api;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.BoardDAO;
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import org.bson.types.ObjectId;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
@@ -32,16 +32,6 @@ public class BoardTest extends ApiApplicationTests {
 
 	@Autowired
 	private Jongo jongo;
-
-	@Test
-	public void getBoardFreeCountOfLikeBest01() {
-		LocalDate date = LocalDate.now().minusWeeks(1);
-		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-
-		List<BoardFreeOnBest> posts = boardDAO.getBoardFreeCountOfLikeBest(new ObjectId(Date.from(instant)));
-
-		System.out.println("getBoardFreeCountOfLikeBest01=" + posts);
-	}
 
 	@Test
 	public void getGalleriesCount01() {
@@ -79,16 +69,16 @@ public class BoardTest extends ApiApplicationTests {
 			ids.add(objId);
 		}
 		
-		List<BoardFreeOnBest> boardFreeList = boardDAO.getBoardFreeListOfTop(ids);
+		List<BoardPostTop> boardFreeList = boardDAO.getBoardFreeListOfTop(ids);
 		
-		for (BoardFreeOnBest boardFree : boardFreeList) {
+		for (BoardPostTop boardFree : boardFreeList) {
 			String id = boardFree.getId().toString();
 			Integer count = boardFreeCount.get(id);
 			boardFree.setCount(count);
 		}
 
-		Comparator<BoardFreeOnBest> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
-		Comparator<BoardFreeOnBest> byView = (b1, b2) -> b2.getViews() - b1.getViews();
+		Comparator<BoardPostTop> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
+		Comparator<BoardPostTop> byView = (b1, b2) -> b2.getViews() - b1.getViews();
 
 		boardFreeList = boardFreeList.stream()
 				.sorted(byCount.thenComparing(byView))

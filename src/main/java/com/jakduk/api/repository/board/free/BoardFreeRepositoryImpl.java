@@ -1,8 +1,9 @@
 package com.jakduk.api.repository.board.free;
 
 import com.jakduk.api.common.Constants;
+import com.jakduk.api.model.aggregate.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.model.db.BoardFree;
-import com.jakduk.api.model.etc.BoardFeelingCount;
 import com.jakduk.api.model.simple.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -104,10 +105,10 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
      * 공지 글 목록
      */
     @Override
-    public List<BoardFreeOnList> findNotices(Constants.BOARD_TYPE board, Sort sort) {
+    public List<BoardFreeOnList> findNotices(String board, Sort sort) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.notice").is(true))
-                .addCriteria(Criteria.where("board").is(board.name()))
+                .addCriteria(Criteria.where("board").is(board))
                 .with(sort)
                 .limit(10);
 
@@ -189,6 +190,34 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
 
         Aggregation aggregation = Aggregation.newAggregation(match1, project1);
         AggregationResults<BoardFeelingCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFeelingCount.class);
+
+        return results.getMappedResults();
+    }
+
+    /**
+     * 인기있는 게시물 조회
+     *
+     * db.boardFree.aggregate(
+     {$match:{_id:{$gt:ObjectId("5947f1b8479fff0441f1b95b")}}},
+     {$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}},
+     {$sort:{count:-1, views:-1}},
+     {$limit:3})
+     */
+    @Override
+    public List<BoardPostTop> findTopLikes(String board, ObjectId objectId) {
+        AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(objectId).and("board").is(board));
+
+        AggregationExpression usersLikingCount = ArrayOperators.Size.lengthOfArray(ConditionalOperators.ifNull("usersLiking").then(new ArrayList<>()));
+
+        AggregationOperation project1 = Aggregation.project("_id", "seq", "status", "subject", "views")
+                .and(usersLikingCount).as("count");
+
+        AggregationOperation sort1 = Aggregation.sort(Sort.Direction.DESC, "count");
+        AggregationOperation sort2 = Aggregation.sort(Sort.Direction.DESC, "views");
+        AggregationOperation limit1 = Aggregation.limit(Constants.BOARD_TOP_LIMIT);
+
+        Aggregation aggregation = Aggregation.newAggregation(match1, project1, sort1, sort2, limit1);
+        AggregationResults<BoardPostTop> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardPostTop.class);
 
         return results.getMappedResults();
     }

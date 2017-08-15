@@ -4,8 +4,9 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.model.db.BoardFree;
-import com.jakduk.api.model.etc.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.simple.BoardFreeOnList;
 import com.jakduk.api.model.simple.BoardFreeOnRSS;
 import com.jakduk.api.model.simple.BoardFreeOnSitemap;
@@ -22,7 +23,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -73,7 +77,7 @@ public class BoardFreeRepositoryTests {
     @Test
     public void findNotices() {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-        List<BoardFreeOnList> notices = repository.findNotices(board, sort);
+        List<BoardFreeOnList> notices = repository.findNotices(board.name(), sort);
 
         System.out.println("notices=" + notices);
     }
@@ -103,6 +107,13 @@ public class BoardFreeRepositoryTests {
         Assert.assertTrue(boardFeelingCount.getId().equals(randomBoardFree.getId()));
         Assert.assertTrue(boardFeelingCount.getUsersLikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersLiking()) ? 0 : randomBoardFree.getUsersLiking().size()));
         Assert.assertTrue(boardFeelingCount.getUsersDislikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersDisliking()) ? 0 : randomBoardFree.getUsersDisliking().size()));
+    }
+
+    @Test
+    public void findTopLikes() {
+        LocalDate localDate = LocalDate.now().minusWeeks(1);
+
+        List<BoardPostTop> topLikes = repository.findTopLikes(Constants.BOARD_TYPE.FOOTBALL.name(), new ObjectId(DateUtils.localDateToDate(localDate)));
     }
 
 }

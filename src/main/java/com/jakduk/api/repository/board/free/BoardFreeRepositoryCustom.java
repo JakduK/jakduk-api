@@ -2,7 +2,8 @@ package com.jakduk.api.repository.board.free;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.BoardFree;
-import com.jakduk.api.model.etc.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
@@ -39,7 +40,7 @@ public interface BoardFreeRepositoryCustom {
     /**
      * 공지 글 목록
      */
-    List<BoardFreeOnList> findNotices(Constants.BOARD_TYPE board, Sort sort);
+    List<BoardFreeOnList> findNotices(String board, Sort sort);
 
     /**
      * 홈에서 보여지는 최근글 목록
@@ -66,5 +67,16 @@ public interface BoardFreeRepositoryCustom {
      * db.getCollection('boardFree').aggregate([{$match:{seq:{$in:[9]}}}, {$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}])
      */
     List<BoardFeelingCount> findUsersFeelingCount(List<ObjectId> ids);
+
+    /**
+     * 인기있는 게시물 조회
+     *
+     * db.boardFree.aggregate(
+     {$match:{_id:{$gt:ObjectId("5947f1b8479fff0441f1b95b")}}},
+     {$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}},
+     {$sort:{count:-1, views:-1}},
+     {$limit:3})
+     */
+    List<BoardPostTop> findTopLikes(String board, ObjectId commentId);
 
 }

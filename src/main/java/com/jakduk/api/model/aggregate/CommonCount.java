@@ -1,4 +1,4 @@
-package com.jakduk.api.model.etc;
+package com.jakduk.api.model.aggregate;
 
 import lombok.Getter;
 

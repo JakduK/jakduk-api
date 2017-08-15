@@ -1,5 +1,6 @@
 package com.jakduk.api.common.util;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -16,6 +17,10 @@ public class DateUtils {
 
     public static Date localDateTimeToDate(LocalDateTime localDateTime) {
         return Objects.isNull(localDateTime) ? null : Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date localDateToDate(LocalDate localDate) {
+        return Objects.isNull(localDate) ? null : Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 
 }
