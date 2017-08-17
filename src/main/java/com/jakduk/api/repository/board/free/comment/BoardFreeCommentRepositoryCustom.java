@@ -32,8 +32,8 @@ public interface BoardFreeCommentRepositoryCustom {
     /**
      * boardItem의 objectId 기준 이상의 댓글 수를 가져온다
      *
-     * @param objectId 기준이 되는 boardItem의 objectId
+     * @param boardId 기준이 되는 boardItem의 boardId
      */
-    List<CommonCount> findCommentsCountByBoardItem(ObjectId objectId);
+    List<CommonCount> findCommentsCountGreaterThanBoardIdAndBoard(ObjectId boardId, String board);
 
 }

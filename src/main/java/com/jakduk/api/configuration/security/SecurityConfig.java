@@ -68,10 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests()
                     .regexMatchers(
                             HttpMethod.POST,
-                            "/api/board/free",                      // 글 쓰기
-                            "/api/board/comment",                               // 댓글 달기
-                            "/api/board/free/\\d+/[a-zA-Z]+",                   // 글 감정 표현
-                            "/api/board/free/comment/[\\da-zA-Z]+/[a-zA-Z]+"    // 글 감정 표현
+                            "/api/board/[a-z]+",                      // 글 쓰기
+                            "/api/board/[a-z]+/\\d+/comment",                       // 댓글 달기
+                            "/api/board/[a-z]+/\\d+/like|dislike",                  // 글 감정 표현
+                            "/api/board/[a-z]+/comment/[\\da-z]+/like|dislike"      // 댓글 감정 표현
                             ).hasAnyAuthority(
                             JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 

@@ -3,9 +3,8 @@ package com.jakduk.api.restcontroller.vo.board;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -18,13 +17,9 @@ import java.util.List;
 @ApiModel(value = "댓글 달기 / 댓글 고치기 폼")
 public class BoardCommentForm {
 
-    @ApiModelProperty(value = "글 seq")
-    @Min(1)
-    @NotNull
-    private Integer seq;
-
     @ApiModelProperty(value = "댓글 내용")
-    @Size(min = 3, max=800)
+    @NotEmpty
+    @Size(min = 1, max=800)
     private String content;
 
     @ApiModelProperty(value = "사진 목록")

@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * 16. 3. 26 오후 11:05
  */
 
-@Api(tags = "BoardFree", description = "자유게시판 API")
+@Api(tags = "Board", description = "게시판 API")
 @RestController
 @RequestMapping("/api/board")
 public class BoardRestController {
@@ -54,7 +54,7 @@ public class BoardRestController {
     @Autowired private GalleryService galleryService;
     @Autowired private AuthHelper authHelper;
 
-    @ApiOperation("자유게시판 글 목록")
+    @ApiOperation("게시판 글 목록")
     @GetMapping("/{board}/posts")
     public FreePostsResponse getFreePosts(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
@@ -67,7 +67,7 @@ public class BoardRestController {
         return boardFreeService.getFreePosts(boardType, categoryCode, page, size);
     }
 
-    @ApiOperation("자유게시판 주간 선두 글")
+    @ApiOperation("게시판 주간 선두 글")
     @GetMapping("/{board}/tops")
     public FreeTopsResponse getFreePostsTops(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
@@ -86,14 +86,19 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation("자유게시판 댓글 목록")
+    @ApiOperation("게시판 댓글 목록")
     @GetMapping("/{board}/comments")
     public FreePostCommentsResponse getFreeComments(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
-            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size) {
+            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
+            Authentication authentication) {
 
-        return boardFreeService.getBoardFreeComments(page, size);
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
+
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+
+        return boardFreeService.getBoardFreeComments(commonWriter, boardType, page, size);
     }
 
     @ApiOperation("자유게시판 글 상세")
@@ -109,7 +114,7 @@ public class BoardRestController {
         return boardFreeService.getBoardFreeDetail(seq, isAddCookie);
     }
 
-    @ApiOperation("자유게시판 말머리 목록")
+    @ApiOperation("게시판 말머리 목록")
     @GetMapping("/{board}/categories")
     public FreeCategoriesResponse getFreeCategories(
             @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
@@ -123,7 +128,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation("자유게시판 글쓰기")
+    @ApiOperation("게시판 글쓰기")
     @PostMapping("/{board}")
     public FreePostWriteResponse addFreePost(
             @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
@@ -227,18 +232,20 @@ public class BoardRestController {
     }
 
     @ApiOperation("자유게시판 글의 댓글 달기")
-    @PostMapping("/{board}/comment")
+    @PostMapping("/{board}/{seq}/comment")
     public BoardFreeComment addFreeComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
-            Device device) {
+            Device device,
+            Authentication authentication) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
 
-        if (! ObjectUtils.isEmpty(form.getGalleries())) {
+        if (! CollectionUtils.isEmpty(form.getGalleries())) {
             unverifiableGalleryIds = form.getGalleries().stream()
                     .map(GalleryOnBoard::getId)
                     .collect(Collectors.toList());
@@ -246,7 +253,7 @@ public class BoardRestController {
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        BoardFreeComment boardFreeComment =  boardFreeService.insertFreeComment(form.getSeq(), commonWriter, form.getContent().trim(),
+        BoardFreeComment boardFreeComment =  boardFreeService.insertFreeComment(seq, commonWriter, form.getContent().trim(),
                 galleries, JakdukUtils.getDeviceInfo(device));
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), null,
@@ -257,18 +264,20 @@ public class BoardRestController {
 
     @ApiOperation("자유게시판 글의 댓글 고치기")
     @SecuredUser
-    @PutMapping("/{board}/comment/{id}")
+    @PutMapping("/{board}/{seq}/comment/{id}")
     public BoardFreeComment editFreeComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             HttpServletRequest request,
-            Device device) {
+            Device device,
+            Authentication authentication) {
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -287,7 +296,7 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        BoardFreeComment boardFreeComment = boardFreeService.updateFreeComment(id, form.getSeq(), commonWriter, form.getContent().trim(), galleryIds,
+        BoardFreeComment boardFreeComment = boardFreeService.updateFreeComment(id, seq, commonWriter, form.getContent().trim(), galleryIds,
                 JakdukUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,

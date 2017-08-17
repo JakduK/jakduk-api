@@ -29,4 +29,6 @@ public class BoardFreeSimple {
 	
 	private String subject;
 
+	private String board;
+
 }

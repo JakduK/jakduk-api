@@ -106,7 +106,7 @@ public class BoardFreeService {
 				.content(content)
 				.shortContent(shortContent)
 				.views(0)
-				.seq(commonService.getNextSequence(Constants.BOARD_TYPE.FREE.name()))
+				.seq(commonService.getNextSequence(Constants.SEQ_BOARD))
 				.status(boardStatus)
 				.logs(this.initBoardLogs(logId, Constants.BOARD_FREE_HISTORY_TYPE.CREATE.name(), writer))
 				.lastUpdated(lastUpdated)
@@ -163,22 +163,22 @@ public class BoardFreeService {
 		boardFree.setStatus(boardStatus);
 
 		// boardHistory
-		List<BoardLog> histories = boardFree.getLogs();
+		List<BoardLog> logs = boardFree.getLogs();
 
-		if (CollectionUtils.isEmpty(histories))
-			histories = new ArrayList<>();
+		if (CollectionUtils.isEmpty(logs))
+			logs = new ArrayList<>();
 
-		ObjectId boardHistoryId = new ObjectId();
-		BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.BOARD_FREE_HISTORY_TYPE.EDIT.name(), writer);
-		histories.add(history);
-		boardFree.setLogs(histories);
+		ObjectId logId = new ObjectId();
+		BoardLog log = new BoardLog(logId.toString(), Constants.BOARD_FREE_HISTORY_TYPE.EDIT.name(), new SimpleWriter(writer));
+		logs.add(log);
+		boardFree.setLogs(logs);
 
 		// lastUpdated
-		boardFree.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+		boardFree.setLastUpdated(LocalDateTime.ofInstant(logId.getDate().toInstant(), ZoneId.systemDefault()));
 
 		boardFreeRepository.save(boardFree);
 
-		log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
+		BoardFreeService.log.info("post was edited. post seq={}, subject=", boardFree.getSeq(), boardFree.getSubject());
 
 		// 엘라스틱서치 색인 요청
 		rabbitMQPublisher.indexDocumentBoard(boardFree.getId(), boardFree.getSeq(), boardFree.getWriter(), boardFree.getSubject(),
@@ -201,7 +201,7 @@ public class BoardFreeService {
         if (! boardFree.getWriter().getUserId().equals(writer.getUserId()))
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq());
+        BoardItem boardItem = new BoardItem(boardFree.getId(), boardFree.getSeq(), boardFree.getBoard());
 
         Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 
@@ -217,7 +217,7 @@ public class BoardFreeService {
                 histories = new ArrayList<>();
 
 			ObjectId boardHistoryId = new ObjectId();
-            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.BOARD_FREE_HISTORY_TYPE.DELETE.name(), writer);
+            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.BOARD_FREE_HISTORY_TYPE.DELETE.name(), new SimpleWriter(writer));
             histories.add(history);
 			boardFree.setLogs(histories);
 
@@ -439,7 +439,7 @@ public class BoardFreeService {
 				.collect(Collectors.toList());
 
 		BoardFreeComment boardFreeComment = BoardFreeComment.builder()
-				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq()))
+				.boardItem(new BoardItem(boardFree.getId(), boardFree.getSeq(), boardFree.getBoard()))
 				.writer(writer)
 				.content(content)
 				.status(new BoardCommentStatus(device))
@@ -488,7 +488,7 @@ public class BoardFreeService {
 		List<BoardLog> logs = Optional.ofNullable(boardFreeComment.getLogs())
 				.orElseGet(ArrayList::new);
 
-		logs.add(new BoardLog(new ObjectId().toString(), Constants.BOARD_FREE_COMMENT_HISTORY_TYPE.EDIT.name(), writer));
+		logs.add(new BoardLog(new ObjectId().toString(), Constants.BOARD_FREE_COMMENT_HISTORY_TYPE.EDIT.name(), new SimpleWriter(writer)));
 		boardFreeComment.setLogs(logs);
 
 		boardFreeCommentRepository.save(boardFreeComment);
@@ -535,7 +535,7 @@ public class BoardFreeService {
 		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		BoardFreeSimple boardFreeSimple = boardFreeRepository.findBoardFreeOfMinimumBySeq(seq);
-		BoardItem boardItem = new BoardItem(boardFreeSimple.getId(), boardFreeSimple.getSeq());
+		BoardItem boardItem = new BoardItem(boardFreeSimple.getId(), boardFreeSimple.getSeq(), boardFreeSimple.getBoard());
 
 		Integer count = boardFreeCommentRepository.countByBoardItem(boardItem);
 
@@ -669,7 +669,7 @@ public class BoardFreeService {
 			histories = new ArrayList<>();
 
 		String historyType = isEnable ? Constants.BOARD_FREE_HISTORY_TYPE.ENABLE_NOTICE.name() : Constants.BOARD_FREE_HISTORY_TYPE.DISABLE_NOTICE.name();
-		BoardLog history = new BoardLog(new ObjectId().toString(), historyType, writer);
+		BoardLog history = new BoardLog(new ObjectId().toString(), historyType, new SimpleWriter(writer));
 		histories.add(history);
 
 		getBoardFree.setLogs(histories);
@@ -694,7 +694,7 @@ public class BoardFreeService {
 	public List<BoardPostTop> getFreeTopComments(Constants.BOARD_TYPE board, ObjectId objectId) {
 
 		// 게시물의 댓글수
-		Map<String, Integer> commentCounts = boardFreeCommentRepository.findCommentsCountByBoardItem(objectId).stream()
+		Map<String, Integer> commentCounts = boardFreeCommentRepository.findCommentsCountGreaterThanBoardIdAndBoard(objectId, board.name()).stream()
 				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 
 		List<String> postIds = commentCounts.entrySet().stream()
@@ -723,14 +723,12 @@ public class BoardFreeService {
 	/**
 	 * 자유게시판 댓글 목록
      */
-	public FreePostCommentsResponse getBoardFreeComments(int page, int size) {
+	public FreePostCommentsResponse getBoardFreeComments(CommonWriter commonWriter, Constants.BOARD_TYPE board, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 
-		CommonWriter commonWriter = AuthUtils.getCommonWriter();
-
-		Page<BoardFreeComment> commentsPage = boardFreeCommentRepository.findAll(pageable);
+		Page<BoardFreeComment> commentsPage = boardFreeCommentRepository.findByBoardItemBoard(board.name(), pageable);
 
 		// board id 뽑아내기.
 		List<ObjectId> boardIds = commentsPage.getContent().stream()
@@ -754,8 +752,8 @@ public class BoardFreeService {
 											.orElse(new BoardFreeOnSearch())
 							);
 
-							comment.setNumberOfLike(ObjectUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size());
-							comment.setNumberOfDislike(ObjectUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size());
+							comment.setNumberOfLike(CollectionUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size());
+							comment.setNumberOfDislike(CollectionUtils.isEmpty(boardFreeComment.getUsersDisliking()) ? 0 : boardFreeComment.getUsersDisliking().size());
 
 							if (Objects.nonNull(commonWriter))
 								comment.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardFreeComment.getUsersLiking(),
@@ -765,7 +763,7 @@ public class BoardFreeService {
 								List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 										new ObjectId(boardFreeComment.getId()), Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 100);
 
-								if (! ObjectUtils.isEmpty(galleries)) {
+								if (! CollectionUtils.isEmpty(galleries)) {
 									List<BoardGallerySimple> boardGalleries = galleries.stream()
 											.map(gallery -> BoardGallerySimple.builder()
 													.id(gallery.getId())
@@ -940,7 +938,7 @@ public class BoardFreeService {
 	 */
 	private List<BoardLog> initBoardLogs(ObjectId objectId, String type, CommonWriter writer) {
 		List<BoardLog> logs = new ArrayList<>();
-		BoardLog history = new BoardLog(objectId.toString(), type, writer);
+		BoardLog history = new BoardLog(objectId.toString(), type, new SimpleWriter(writer));
 		logs.add(history);
 
 		return logs;

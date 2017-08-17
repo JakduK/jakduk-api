@@ -171,7 +171,7 @@ public class BoardRestControllerTests {
                 .totalElements(1)
                 .build();
 
-        when(boardFreeService.getBoardFreeComments(anyInt(), anyInt()))
+        when(boardFreeService.getBoardFreeComments(boardType, anyInt(), anyInt()))
                 .thenReturn(response);
 
         mvc.perform(get("/api/board/free/comments")

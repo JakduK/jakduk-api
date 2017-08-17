@@ -22,6 +22,6 @@ public class BoardLog {
 	
 	private String type;
 
-	private CommonWriter writer;
+	private SimpleWriter writer;
 	
 }

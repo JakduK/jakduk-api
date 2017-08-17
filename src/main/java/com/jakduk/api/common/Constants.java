@@ -28,6 +28,7 @@ public class Constants {
 	public final static String ENCYCLOPEDIA_EN = "encyclopediaEn";
 	public final static String ENCYCLOPEDIA_KO = "encyclopediaKo";
 
+	public final static String SEQ_BOARD = "BOARD";
 	public final static String SEQ_JAKDU_SCHEDULE_GROUP = "JAKDU_SCHEDULE_GROUP";
 
 	/**

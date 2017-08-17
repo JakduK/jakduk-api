@@ -87,13 +87,13 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
     }
 
     /**
-     * boardItem의 objectId 기준 이상의 댓글 수를 가져온다
+     * boardItem의 boardId 기준 이상의 댓글 수를 가져온다
      *
-     * @param objectId 기준이 되는 boardItem의 objectId
+     * @param boardId 기준이 되는 boardItem의 boardId
      */
     @Override
-    public List<CommonCount> findCommentsCountByBoardItem(ObjectId objectId) {
-        AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(objectId));
+    public List<CommonCount> findCommentsCountGreaterThanBoardIdAndBoard(ObjectId boardId, String board) {
+        AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(boardId).and("boardItem.board").is(board));
         AggregationOperation group = Aggregation.group("boardItem").count().as("count");
         AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
         //AggregationOperation limit = Aggregation.limit(Constants.BOARD_TOP_LIMIT);

@@ -18,5 +18,6 @@ public class BoardItem {
 
 	private String id;
 	private Integer seq;
+	private String board;
 
 }

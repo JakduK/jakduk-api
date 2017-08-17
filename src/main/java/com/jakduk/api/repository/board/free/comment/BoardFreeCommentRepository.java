@@ -19,7 +19,7 @@ public interface BoardFreeCommentRepository extends MongoRepository<BoardFreeCom
 	Optional<BoardFreeComment> findOneById(String id);
 
 	Integer countByBoardItem(BoardItem boardItem);
-	Page<BoardFreeComment> findAll(Pageable pageable);
+	Page<BoardFreeComment> findByBoardItemBoard(String board, Pageable pageable);
 	long count();
 
 }
