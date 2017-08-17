@@ -8,7 +8,6 @@ import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
-import com.jakduk.api.dao.BoardDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
@@ -40,8 +39,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -59,7 +56,6 @@ public class BoardFreeService {
 	@Autowired private BoardFreeOnListRepository boardFreeOnListRepository;
 	@Autowired private BoardFreeCommentRepository boardFreeCommentRepository;
 	@Autowired private GalleryRepository galleryRepository;
-	@Autowired private BoardDAO boardDAO;
 	@Autowired private CommonService commonService;
 	@Autowired private CommonGalleryService commonGalleryService;
 	@Autowired private RabbitMQPublisher rabbitMQPublisher;
@@ -688,52 +684,40 @@ public class BoardFreeService {
 	/**
 	 * 자유게시판 주간 좋아요수 선두
      */
-	public List<BoardPostTop> getFreeTopLikes(Constants.BOARD_TYPE board) {
-		LocalDate localDate = LocalDate.now().minusWeeks(1);
-
-		return boardFreeRepository.findTopLikes(board.name(), new ObjectId(DateUtils.localDateToDate(localDate)));
+	public List<BoardPostTop> getFreeTopLikes(Constants.BOARD_TYPE board, ObjectId objectId) {
+		return boardFreeRepository.findTopLikes(board.name(), objectId);
 	}
 
 	/**
 	 * 자유게시판 주간 댓글수 선두
-	 * @return 게시물 목록
 	 */
-	public List<BoardPostTop> getFreeTopComments() {
-		LocalDate date = LocalDate.now().minusWeeks(1);
-		Instant instant = date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+	public List<BoardPostTop> getFreeTopComments(Constants.BOARD_TYPE board, ObjectId objectId) {
 
-		HashMap<String, Integer> boardFreeCommentCount = boardDAO.getBoardFreeCountOfCommentBest(new ObjectId(Date.from(instant)));
+		// 게시물의 댓글수
+		Map<String, Integer> commentCounts = boardFreeCommentRepository.findCommentsCountByBoardItem(objectId).stream()
+				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 
-		ArrayList<ObjectId> commentIds = new ArrayList<>();
-
-		Iterator<?> commentIterator = boardFreeCommentCount.entrySet().iterator();
-
-		// 댓글 많은 글 id 뽑아내기
-		while (commentIterator.hasNext()) {
-			Entry<String, Integer> entry = (Entry<String, Integer>) commentIterator.next();
-			ObjectId objId = new ObjectId(entry.getKey());
-			commentIds.add(objId);
-		}
+		List<String> postIds = commentCounts.entrySet().stream()
+				.map(Entry::getKey)
+				.collect(Collectors.toList());
 
 		// commentIds를 파라미터로 다시 글을 가져온다.
-		List<BoardPostTop> posts = boardDAO.getBoardFreeListOfTop(commentIds);
+		List<BoardFree> posts = boardFreeRepository.findByIdInAndBoard(postIds, board.name());
 
-		for (BoardPostTop boardFree : posts) {
-			String id = boardFree.getId();
-			Integer count = boardFreeCommentCount.get(id);
-			boardFree.setCount(count);
-		}
-
-		// sort and limit
+		// sort
 		Comparator<BoardPostTop> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
 		Comparator<BoardPostTop> byView = (b1, b2) -> b2.getViews() - b1.getViews();
 
-		posts = posts.stream()
+		return posts.stream()
+				.map(boardFree -> {
+					BoardPostTop boardPostTop = new BoardPostTop();
+					BeanUtils.copyProperties(boardFree, boardPostTop);
+					boardPostTop.setCount(commentCounts.get(boardPostTop.getId()));
+					return boardPostTop;
+				})
 				.sorted(byCount.thenComparing(byView))
 				.limit(Constants.BOARD_TOP_LIMIT)
 				.collect(Collectors.toList());
-
-		return posts;
 	}
 
 	/**

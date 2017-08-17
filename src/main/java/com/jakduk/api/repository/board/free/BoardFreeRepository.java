@@ -13,9 +13,10 @@ public interface BoardFreeRepository extends MongoRepository<BoardFree, String>,
 
 	Optional<BoardFree> findOneById(String id);
 	Optional<BoardFree> findOneBySeq(Integer seq);
-	List<BoardFree> findByIdInAndLinkedGalleryIsTrue(List<String> ids);
 	Optional<BoardFree> findTopByOrderByIdAsc();
 	Optional<BoardFree> findTopByIdLessThanEqualOrderByIdDesc(ObjectId id);
+	List<BoardFree> findByIdInAndLinkedGalleryIsTrue(List<String> ids);
+	List<BoardFree> findByIdInAndBoard(List<String> ids, String board);
 
 	@Query(value="{'seq' : ?0}")
 	BoardFreeSimple findBoardFreeOfMinimumBySeq(Integer seq);

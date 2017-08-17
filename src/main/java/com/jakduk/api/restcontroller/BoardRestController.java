@@ -6,6 +6,7 @@ import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -23,6 +24,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.Authentication;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -71,8 +74,11 @@ public class BoardRestController {
 
         Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
-        List<BoardPostTop> topLikes = boardFreeService.getFreeTopLikes(boardType);
-        List<BoardPostTop> topComments = boardFreeService.getFreeTopComments();
+        LocalDate localDate = LocalDate.now().minusWeeks(1);
+        ObjectId objectId = new ObjectId(DateUtils.localDateToDate(localDate));
+
+        List<BoardPostTop> topLikes = boardFreeService.getFreeTopLikes(boardType, objectId);
+        List<BoardPostTop> topComments = boardFreeService.getFreeTopComments(boardType, objectId);
 
         return FreeTopsResponse.builder()
                 .topLikes(topLikes)

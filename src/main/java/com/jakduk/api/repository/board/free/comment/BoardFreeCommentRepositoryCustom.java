@@ -29,4 +29,11 @@ public interface BoardFreeCommentRepositoryCustom {
      */
     List<BoardFreeComment> findByBoardSeqAndGTId(Integer boardSeq, ObjectId commentId);
 
+    /**
+     * boardItem의 objectId 기준 이상의 댓글 수를 가져온다
+     *
+     * @param objectId 기준이 되는 boardItem의 objectId
+     */
+    List<CommonCount> findCommentsCountByBoardItem(ObjectId objectId);
+
 }

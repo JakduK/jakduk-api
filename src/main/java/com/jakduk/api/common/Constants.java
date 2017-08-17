@@ -198,6 +198,7 @@ public class Constants {
 	 * mongoDB collection 이름
 	 */
 	public final static String COLLECTION_BOARD_FREE = "boardFree";
+	public final static String COLLECTION_BOARD_FREE_COMMENT = "boardFreeComment";
 	public final static String COLLECTION_GALLERY = "gallery";
 
 	public enum EMAIL_TYPE {

@@ -1,8 +1,8 @@
 package com.jakduk.api.repository.board.free.comment;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.db.BoardFreeComment;
 import com.jakduk.api.model.aggregate.CommonCount;
+import com.jakduk.api.model.db.BoardFreeComment;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -46,7 +46,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
             aggregation = Aggregation.newAggregation(sort, limit1);
         }
 
-        AggregationResults<BoardFreeComment> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", BoardFreeComment.class);
+        AggregationResults<BoardFreeComment> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE_COMMENT, BoardFreeComment.class);
 
         return results.getMappedResults();
     }
@@ -61,7 +61,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         //AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
         //AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
         Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
-        AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, "boardFreeComment", CommonCount.class);
+        AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE_COMMENT, CommonCount.class);
 
         return results.getMappedResults();
     }
@@ -84,6 +84,23 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         query.limit(Constants.COMMENT_MAX_LIMIT);
 
         return mongoTemplate.find(query, BoardFreeComment.class);
+    }
+
+    /**
+     * boardItem의 objectId 기준 이상의 댓글 수를 가져온다
+     *
+     * @param objectId 기준이 되는 boardItem의 objectId
+     */
+    @Override
+    public List<CommonCount> findCommentsCountByBoardItem(ObjectId objectId) {
+        AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(objectId));
+        AggregationOperation group = Aggregation.group("boardItem").count().as("count");
+        AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
+        //AggregationOperation limit = Aggregation.limit(Constants.BOARD_TOP_LIMIT);
+        Aggregation aggregation = Aggregation.newAggregation(match1, group, sort/*, limit*/);
+        AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE_COMMENT, CommonCount.class);
+
+        return results.getMappedResults();
     }
 
 }

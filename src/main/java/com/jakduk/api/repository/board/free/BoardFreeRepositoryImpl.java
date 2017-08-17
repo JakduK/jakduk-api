@@ -198,10 +198,10 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
      * 인기있는 게시물 조회
      *
      * db.boardFree.aggregate(
-     {$match:{_id:{$gt:ObjectId("5947f1b8479fff0441f1b95b")}}},
-     {$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}},
-     {$sort:{count:-1, views:-1}},
-     {$limit:3})
+     *  {$match:{_id:{$gt:ObjectId("5947f1b8479fff0441f1b95b")}}},
+     *  {$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}},
+     *  {$sort:{count:-1, views:-1}},
+     *  {$limit:3})
      */
     @Override
     public List<BoardPostTop> findTopLikes(String board, ObjectId objectId) {

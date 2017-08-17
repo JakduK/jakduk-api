@@ -1,6 +1,7 @@
 package com.jakduk.api.repository.board.free;
 
 import com.jakduk.api.common.Constants;
+import com.jakduk.api.model.aggregate.CommonCount;
 import com.jakduk.api.model.db.BoardFree;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.aggregate.BoardPostTop;
@@ -63,19 +64,14 @@ public interface BoardFreeRepositoryCustom {
 
     /**
      * 게시물의 감정 갯수를 가져온다
-     *
-     * db.getCollection('boardFree').aggregate([{$match:{seq:{$in:[9]}}}, {$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}])
      */
     List<BoardFeelingCount> findUsersFeelingCount(List<ObjectId> ids);
 
     /**
      * 인기있는 게시물 조회
      *
-     * db.boardFree.aggregate(
-     {$match:{_id:{$gt:ObjectId("5947f1b8479fff0441f1b95b")}}},
-     {$project:{_id:1, seq:1, status:1, subject:1, views:1, count:{$size:{'$ifNull':['$usersLiking', []]}}}},
-     {$sort:{count:-1, views:-1}},
-     {$limit:3})
+     * @param board 게시판
+     * @param commentId 해당 ID 기준 이상
      */
     List<BoardPostTop> findTopLikes(String board, ObjectId commentId);
 
