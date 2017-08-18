@@ -11,7 +11,7 @@ import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
-import com.jakduk.api.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
+import com.jakduk.api.repository.article.comment.ArticleCommentOnHomeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +42,7 @@ public class HomeService {
 	private EncyclopediaRepository encyclopediaRepository;
 
 	@Autowired
-	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
+	private ArticleCommentOnHomeRepository articleCommentOnHomeRepository;
 
 	/**
 	 * 랜덤하게 백과 사전 하나를 가져온다.
@@ -70,7 +70,7 @@ public class HomeService {
 		Sort sort = new Sort(Direction.DESC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(0, Constants.HOME_SIZE_LINE_NUMBER, sort);
 		
-		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
+		List<BoardFreeCommentOnHome> comments = articleCommentOnHomeRepository.findAll(pageable).getContent();
 		
 		for (BoardFreeCommentOnHome comment : comments) {
 			String content = JakdukUtils.stripHtmlTag(comment.getContent());

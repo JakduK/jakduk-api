@@ -1,6 +1,5 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.BoardLog;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
@@ -24,7 +23,7 @@ import java.util.List;
 @Getter
 @Setter
 @Document
-public class BoardFree implements UsersFeeling {
+public class Article implements UsersFeeling {
 
 	@Id
 	private String id;

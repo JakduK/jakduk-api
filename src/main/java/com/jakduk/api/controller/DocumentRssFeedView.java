@@ -6,7 +6,7 @@ import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.simple.BoardFreeOnRSS;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.ArticleService;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Content;
 import com.rometools.rome.feed.rss.Description;
@@ -36,7 +36,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 
 	@Resource private JakdukProperties jakdukProperties;
 
-	@Autowired private BoardFreeService boardFreeService;
+	@Autowired private ArticleService articleService;
 
 	/**
 	 * Create a new Channel instance to hold the entries.
@@ -59,7 +59,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 		List<Item> items = new ArrayList<>();
 
 		do {
-			List<BoardFreeOnRSS> posts = boardFreeService.getBoardFreeOnRss(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
+			List<BoardFreeOnRSS> posts = articleService.getBoardFreeOnRss(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 			if (ObjectUtils.isEmpty(posts)) {
 				existPosts = false;

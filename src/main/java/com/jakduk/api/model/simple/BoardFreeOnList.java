@@ -1,5 +1,6 @@
 package com.jakduk.api.model.simple;
 
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.BoardStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Getter
-@Document(collection = "boardFree")
+@Document(collection = Constants.COLLECTION_ARTICLE)
 public class BoardFreeOnList {
 	
 	@Id

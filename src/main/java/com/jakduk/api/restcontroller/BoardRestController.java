@@ -10,15 +10,15 @@ import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.db.BoardFree;
-import com.jakduk.api.model.db.BoardFreeComment;
+import com.jakduk.api.model.db.Article;
+import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +49,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/board")
 public class BoardRestController {
 
-    @Autowired private BoardFreeService boardFreeService;
+    @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
     @Autowired private AuthHelper authHelper;
 
@@ -64,7 +63,7 @@ public class BoardRestController {
 
         Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
-        return boardFreeService.getFreePosts(boardType, categoryCode, page, size);
+        return articleService.getFreePosts(boardType, categoryCode, page, size);
     }
 
     @ApiOperation("게시판 주간 선두 글")
@@ -77,8 +76,8 @@ public class BoardRestController {
         LocalDate localDate = LocalDate.now().minusWeeks(1);
         ObjectId objectId = new ObjectId(DateUtils.localDateToDate(localDate));
 
-        List<BoardPostTop> topLikes = boardFreeService.getFreeTopLikes(boardType, objectId);
-        List<BoardPostTop> topComments = boardFreeService.getFreeTopComments(boardType, objectId);
+        List<BoardPostTop> topLikes = articleService.getFreeTopLikes(boardType, objectId);
+        List<BoardPostTop> topComments = articleService.getFreeTopComments(boardType, objectId);
 
         return FreeTopsResponse.builder()
                 .topLikes(topLikes)
@@ -98,7 +97,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
 
-        return boardFreeService.getBoardFreeComments(commonWriter, boardType, page, size);
+        return articleService.getBoardFreeComments(commonWriter, boardType, page, size);
     }
 
     @ApiOperation("자유게시판 글 상세")
@@ -111,7 +110,7 @@ public class BoardRestController {
 
         Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, Constants.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
 
-        return boardFreeService.getBoardFreeDetail(seq, isAddCookie);
+        return articleService.getBoardFreeDetail(seq, isAddCookie);
     }
 
     @ApiOperation("게시판 말머리 목록")
@@ -151,13 +150,13 @@ public class BoardRestController {
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        BoardFree boardFree = boardFreeService.insertFreePost(commonWriter, boardType, form.getSubject().trim(), form.getContent().trim(),
+        Article article = articleService.insertFreePost(commonWriter, boardType, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode().trim(), galleries, JakdukUtils.getDeviceInfo(device));
 
-        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, Constants.GALLERY_FROM_TYPE.BOARD_FREE, article.getId());
 
         return FreePostWriteResponse.builder()
-                .seq(boardFree.getSeq())
+                .seq(article.getSeq())
                 .build();
     }
 
@@ -191,17 +190,17 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        BoardFree boardFree = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
+        Article article = articleService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleryIds, JakdukUtils.getDeviceInfo(device));
 
-        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE, article.getId());
 
-        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE.BOARD_FREE, article.getId());
 
-        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
+        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE, article.getId());
 
         return FreePostWriteResponse.builder()
-                .seq(boardFree.getSeq())
+                .seq(article.getSeq())
                 .build();
     }
 
@@ -214,7 +213,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-		Constants.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(commonWriter, seq);
+		Constants.BOARD_DELETE_TYPE deleteType = articleService.deleteFreePost(commonWriter, seq);
 
         return FreePostDeleteResponse.builder()
                 .result(deleteType)
@@ -228,12 +227,12 @@ public class BoardRestController {
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
-        return boardFreeService.getBoardFreeDetailComments(seq, commentId);
+        return articleService.getBoardFreeDetailComments(seq, commentId);
     }
 
     @ApiOperation("자유게시판 글의 댓글 달기")
     @PostMapping("/{board}/{seq}/comment")
-    public BoardFreeComment addFreeComment(
+    public ArticleComment addFreeComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
@@ -253,19 +252,19 @@ public class BoardRestController {
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        BoardFreeComment boardFreeComment =  boardFreeService.insertFreeComment(seq, commonWriter, form.getContent().trim(),
+        ArticleComment articleComment =  articleService.insertFreeComment(seq, commonWriter, form.getContent().trim(),
                 galleries, JakdukUtils.getDeviceInfo(device));
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), null,
-                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, articleComment.getId());
 
-        return boardFreeComment;
+        return articleComment;
     }
 
     @ApiOperation("자유게시판 글의 댓글 고치기")
     @SecuredUser
     @PutMapping("/{board}/{seq}/comment/{id}")
-    public BoardFreeComment editFreeComment(
+    public ArticleComment editFreeComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
@@ -296,18 +295,18 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        BoardFreeComment boardFreeComment = boardFreeService.updateFreeComment(id, seq, commonWriter, form.getContent().trim(), galleryIds,
+        ArticleComment articleComment = articleService.updateFreeComment(id, seq, commonWriter, form.getContent().trim(), galleryIds,
                 JakdukUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,
-                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, articleComment.getId());
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval,
-                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, articleComment.getId());
 
-        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, articleComment.getId());
 
-        return boardFreeComment;
+        return articleComment;
 
     }
 
@@ -323,7 +322,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        boardFreeService.deleteFreeComment(id, commonWriter);
+        articleService.deleteFreeComment(id, commonWriter);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -337,15 +336,15 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        BoardFree boardFree = boardFreeService.setFreeFeelings(commonWriter, seq, feeling);
+        Article article = articleService.setFreeFeelings(commonWriter, seq, feeling);
 
         UserFeelingResponse response = UserFeelingResponse.builder()
-                .numberOfLike(CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size())
-                .numberOfDislike(CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size())
+                .numberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size())
+                .numberOfDislike(CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size())
                 .build();
 
         if (Objects.nonNull(commonWriter))
-            response.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+            response.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, article.getUsersLiking(), article.getUsersDisliking()));
 
         return response;
     }
@@ -356,12 +355,12 @@ public class BoardRestController {
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
-        BoardFree boardFree = boardFreeService.findOneBySeq(seq);
+        Article article = articleService.findOneBySeq(seq);
 
         return FreePostFeelingsResponse.builder()
                 .seq(seq)
-                .usersLiking(boardFree.getUsersLiking())
-                .usersDisliking(boardFree.getUsersDisliking())
+                .usersLiking(article.getUsersLiking())
+                .usersDisliking(article.getUsersDisliking())
                 .build();
     }
 
@@ -374,7 +373,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        BoardFreeComment boardComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
+        ArticleComment boardComment = articleService.setFreeCommentFeeling(commonWriter, commentId, feeling);
 
         UserFeelingResponse response = UserFeelingResponse.builder()
                 .numberOfLike(CollectionUtils.isEmpty(boardComment.getUsersLiking()) ? 0 : boardComment.getUsersLiking().size())
@@ -398,7 +397,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-		boardFreeService.setFreeNotice(commonWriter, seq, true);
+		articleService.setFreeNotice(commonWriter, seq, true);
 
         return EmptyJsonResponse.newInstance();
     }
@@ -414,7 +413,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        boardFreeService.setFreeNotice(commonWriter, seq, false);
+        articleService.setFreeNotice(commonWriter, seq, false);
 
         return EmptyJsonResponse.newInstance();
     }

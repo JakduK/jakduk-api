@@ -1,4 +1,4 @@
-package com.jakduk.api.repository.board.free.comment;
+package com.jakduk.api.repository.article.comment;
 
 import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -10,6 +10,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @date     : 2015. 2. 27.
  * @desc     :
  */
-public interface BoardFreeCommentOnHomeRepository extends MongoRepository<BoardFreeCommentOnHome, String>{
+public interface ArticleCommentOnHomeRepository extends MongoRepository<BoardFreeCommentOnHome, String>{
 
 }

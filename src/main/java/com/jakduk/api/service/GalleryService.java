@@ -9,7 +9,7 @@ import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
@@ -18,7 +18,7 @@ import com.jakduk.api.model.embedded.LinkedItem;
 import com.jakduk.api.model.jongo.GalleryFeelingCount;
 import com.jakduk.api.model.simple.BoardFreeSimple;
 import com.jakduk.api.model.simple.GallerySimple;
-import com.jakduk.api.repository.board.free.BoardFreeRepository;
+import com.jakduk.api.repository.article.ArticleRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.GalleryOnBoard;
 import com.jakduk.api.restcontroller.vo.gallery.*;
@@ -64,7 +64,7 @@ public class GalleryService {
 
 	@Autowired private UrlGenerationUtils urlGenerationUtils;
 	@Autowired private GalleryRepository galleryRepository;
-	@Autowired private BoardFreeRepository boardFreeRepository;
+	@Autowired private ArticleRepository articleRepository;
 	@Autowired private JakdukDAO jakdukDAO;
 	@Autowired private CommonGalleryService commonGalleryService;
 	@Autowired private RabbitMQPublisher rabbitMQPublisher;
@@ -219,7 +219,7 @@ public class GalleryService {
                     .map(LinkedItem::getId)
                     .collect(Collectors.toList());
 
-            List<BoardFree> posts = boardFreeRepository.findByIdInAndLinkedGalleryIsTrue(ids);
+            List<Article> posts = articleRepository.findByIdInAndLinkedGalleryIsTrue(ids);
 
             linkedPosts = posts.stream()
                     .map(post -> {

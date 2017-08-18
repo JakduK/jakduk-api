@@ -1,8 +1,7 @@
-package com.jakduk.api.repository.board.free;
+package com.jakduk.api.repository.article;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.aggregate.CommonCount;
-import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.model.simple.*;
@@ -14,14 +13,14 @@ import java.util.List;
 /**
  * Created by pyohwan on 16. 10. 9.
  */
-public interface BoardFreeRepositoryCustom {
+public interface ArticleRepositoryCustom {
 
     List<BoardFreeOnList> findByIdAndUserId(ObjectId id, String userId, Integer limit);
 
     /**
-     * 기준 BoardFree ID 이상의 BoardFree 목록을 가져온다.
+     * 기준 Article ID 이상의 Article 목록을 가져온다.
      */
-    List<BoardFree> findPostsGreaterThanId(ObjectId objectId, Integer limit);
+    List<Article> findPostsGreaterThanId(ObjectId objectId, Integer limit);
 
     /**
      * RSS 용 게시물 목록
@@ -33,7 +32,7 @@ public interface BoardFreeRepositoryCustom {
     List<BoardFreeOnRSS> findPostsOnRss(ObjectId objectId, Sort sort, Integer limit);
 
     /**
-     * id 배열에 해당하는 BoardFree 목록.
+     * id 배열에 해당하는 Article 목록.
      * @param ids id 배열
      */
     List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids);

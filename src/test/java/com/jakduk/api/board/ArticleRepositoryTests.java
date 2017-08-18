@@ -5,12 +5,12 @@ import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
 import com.jakduk.api.model.aggregate.BoardPostTop;
-import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.simple.BoardFreeOnList;
 import com.jakduk.api.model.simple.BoardFreeOnRSS;
 import com.jakduk.api.model.simple.BoardFreeOnSitemap;
-import com.jakduk.api.repository.board.free.BoardFreeRepository;
+import com.jakduk.api.repository.article.ArticleRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,47 +23,45 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
 @Import({JakdukProperties.class, MongodbConfig.class})
-public class BoardFreeRepositoryTests {
+public class ArticleRepositoryTests {
 
     @Autowired
-    private BoardFreeRepository repository;
+    private ArticleRepository repository;
 
-    private BoardFree randomBoardFree;
+    private Article randomArticle;
     private Constants.BOARD_TYPE board;
 
     @Before
     public void setUp(){
-        BoardFree firstBoardFree = repository.findTopByOrderByIdAsc().get();
-        LocalDateTime localDateTime = DateUtils.dateToLocalDateTime(new ObjectId(firstBoardFree.getId()).getDate());
+        Article firstArticle = repository.findTopByOrderByIdAsc().get();
+        LocalDateTime localDateTime = DateUtils.dateToLocalDateTime(new ObjectId(firstArticle.getId()).getDate());
         Long hours = ChronoUnit.MINUTES.between(localDateTime, LocalDateTime.now());
         LocalDateTime randomDate = localDateTime.plusMinutes(new Random().nextInt((int) (hours + 1)));
-        randomBoardFree = repository.findTopByIdLessThanEqualOrderByIdDesc(new ObjectId(DateUtils.localDateTimeToDate(randomDate))).get();
+        randomArticle = repository.findTopByIdLessThanEqualOrderByIdDesc(new ObjectId(DateUtils.localDateTimeToDate(randomDate))).get();
 
         board = Constants.BOARD_TYPE.FOOTBALL;
     }
 
     @Test
     public void findOneById() {
-        BoardFree boardFree = repository.findOneById(randomBoardFree.getId()).get();
+        Article article = repository.findOneById(randomArticle.getId()).get();
 
-        Assert.assertTrue(randomBoardFree.getId().equals(boardFree.getId()));
+        Assert.assertTrue(randomArticle.getId().equals(article.getId()));
     }
 
     @Test
     public void findOneBySeq() {
-        BoardFree boardFree = repository.findOneBySeq(randomBoardFree.getSeq()).get();
+        Article article = repository.findOneBySeq(randomArticle.getSeq()).get();
 
-        Assert.assertTrue(randomBoardFree.getSeq().equals(boardFree.getSeq()));
+        Assert.assertTrue(randomArticle.getSeq().equals(article.getSeq()));
     }
 
     @Test
@@ -93,20 +91,20 @@ public class BoardFreeRepositoryTests {
 
     @Test
     public void findByIdInAndLinkedGalleryIsTrue() {
-        List<BoardFree> posts = repository.findByIdInAndLinkedGalleryIsTrue(Arrays.asList(randomBoardFree.getId()));
+        List<Article> posts = repository.findByIdInAndLinkedGalleryIsTrue(Arrays.asList(randomArticle.getId()));
     }
 
     @Test
     public void findUsersFeelingCountTest() {
-        List<BoardFeelingCount> feelingCounts = repository.findUsersFeelingCount(Arrays.asList(new ObjectId(randomBoardFree.getId())));
+        List<BoardFeelingCount> feelingCounts = repository.findUsersFeelingCount(Arrays.asList(new ObjectId(randomArticle.getId())));
 
         BoardFeelingCount boardFeelingCount = feelingCounts.stream()
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
 
-        Assert.assertTrue(boardFeelingCount.getId().equals(randomBoardFree.getId()));
-        Assert.assertTrue(boardFeelingCount.getUsersLikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersLiking()) ? 0 : randomBoardFree.getUsersLiking().size()));
-        Assert.assertTrue(boardFeelingCount.getUsersDislikingCount().equals(CollectionUtils.isEmpty(randomBoardFree.getUsersDisliking()) ? 0 : randomBoardFree.getUsersDisliking().size()));
+        Assert.assertTrue(boardFeelingCount.getId().equals(randomArticle.getId()));
+        Assert.assertTrue(boardFeelingCount.getUsersLikingCount().equals(CollectionUtils.isEmpty(randomArticle.getUsersLiking()) ? 0 : randomArticle.getUsersLiking().size()));
+        Assert.assertTrue(boardFeelingCount.getUsersDislikingCount().equals(CollectionUtils.isEmpty(randomArticle.getUsersDisliking()) ? 0 : randomArticle.getUsersDisliking().size()));
     }
 
     @Test

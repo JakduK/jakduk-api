@@ -2,9 +2,9 @@ package com.jakduk.api.board;
 
 
 import com.jakduk.api.ApiApplicationTests;
-import com.jakduk.api.model.db.BoardFreeComment;
+import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.aggregate.CommonCount;
-import com.jakduk.api.repository.board.free.comment.BoardFreeCommentRepository;
+import com.jakduk.api.repository.article.comment.ArticleCommentRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,10 +17,10 @@ import java.util.Objects;
 /**
  * Created by pyohwanjang on 2017. 3. 27..
  */
-public class BoardFreeCommentRepositoryTest extends ApiApplicationTests {
+public class ArticleCommentRepositoryTest extends ApiApplicationTests {
 
     @Autowired
-    private BoardFreeCommentRepository sut;
+    private ArticleCommentRepository sut;
 
     @Test
     public void findCommentsCountByIds() {
@@ -35,7 +35,7 @@ public class BoardFreeCommentRepositoryTest extends ApiApplicationTests {
         Integer boardSeq = 13;
         ObjectId commentId = new ObjectId("54b916d73d965cb1dbdd4af6");
 
-        List<BoardFreeComment> comments = sut.findByBoardSeqAndGTId(boardSeq, null);
+        List<ArticleComment> comments = sut.findByBoardSeqAndGTId(boardSeq, null);
 
         Assert.assertTrue(Objects.nonNull(comments));
 

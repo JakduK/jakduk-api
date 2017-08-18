@@ -1,6 +1,6 @@
-package com.jakduk.api.repository.board.free.comment;
+package com.jakduk.api.repository.article.comment;
 
-import com.jakduk.api.model.db.BoardFreeComment;
+import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.embedded.BoardItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,12 +14,12 @@ import java.util.Optional;
  * @date     : 2014. 12. 3.
  * @desc     :
  */
-public interface BoardFreeCommentRepository extends MongoRepository<BoardFreeComment, String>, BoardFreeCommentRepositoryCustom {
+public interface ArticleCommentRepository extends MongoRepository<ArticleComment, String>, ArticleCommentRepositoryCustom {
 
-	Optional<BoardFreeComment> findOneById(String id);
+	Optional<ArticleComment> findOneById(String id);
 
 	Integer countByBoardItem(BoardItem boardItem);
-	Page<BoardFreeComment> findByBoardItemBoard(String board, Pageable pageable);
+	Page<ArticleComment> findByBoardItemBoard(String board, Pageable pageable);
 	long count();
 
 }

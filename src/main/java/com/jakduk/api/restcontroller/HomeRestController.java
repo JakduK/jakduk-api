@@ -8,7 +8,7 @@ import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.restcontroller.vo.home.GalleryOnHome;
 import com.jakduk.api.restcontroller.vo.home.HomeResponse;
 import com.jakduk.api.restcontroller.vo.home.LatestPost;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.HomeService;
 import io.swagger.annotations.Api;
@@ -31,7 +31,7 @@ public class HomeRestController {
 
     @Autowired private UrlGenerationUtils urlGenerationUtils;
     @Autowired private HomeService homeService;
-    @Autowired private BoardFreeService boardFreeService;
+    @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
 
     @ApiOperation(value = "랜덤하게 백과사전 하나 가져오기")
@@ -56,7 +56,7 @@ public class HomeRestController {
         response.setComments(homeService.getBoardCommentsLatest());
 
         // 최근 게시물
-        List<LatestPost> latestPosts = boardFreeService.getFreeLatest();
+        List<LatestPost> latestPosts = articleService.getFreeLatest();
         response.setPosts(latestPosts);
 
         // 최근 사진

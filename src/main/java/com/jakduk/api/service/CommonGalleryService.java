@@ -49,7 +49,7 @@ public class CommonGalleryService {
     }
 
     /**
-     * Gallery와 연결된 아이템(BoardFree, BoardFreeComment)을 끊는다
+     * Gallery와 연결된 아이템(Article, ArticleComment)을 끊는다
      *
      * @param itemId Item ID
      * @param fromType 출처

@@ -1,5 +1,6 @@
 package com.jakduk.api.model.simple;
 
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.BoardItem;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Data;
@@ -14,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Data
-@Document(collection = "boardFreeComment")
+@Document(collection = Constants.COLLECTION_ARTICLE_COMMENT)
 public class BoardFreeCommentOnHome {
 	
 	@Id

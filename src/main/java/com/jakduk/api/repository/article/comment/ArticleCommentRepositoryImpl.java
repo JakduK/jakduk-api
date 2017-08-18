@@ -1,8 +1,8 @@
-package com.jakduk.api.repository.board.free.comment;
+package com.jakduk.api.repository.article.comment;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.aggregate.CommonCount;
-import com.jakduk.api.model.db.BoardFreeComment;
+import com.jakduk.api.model.db.ArticleComment;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -23,16 +23,16 @@ import java.util.Objects;
  */
 
 @Repository
-public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositoryCustom {
+public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCustom {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
     /**
-     * 기준 BoardFreeComment ID 이상의 BoardFreeComment 목록을 가져온다.
+     * 기준 ArticleComment ID 이상의 ArticleComment 목록을 가져온다.
      */
     @Override
-    public List<BoardFreeComment> findCommentsGreaterThanId(ObjectId objectId, Integer limit) {
+    public List<ArticleComment> findCommentsGreaterThanId(ObjectId objectId, Integer limit) {
 
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(objectId));
         AggregationOperation sort = Aggregation.sort(Sort.Direction.ASC, "_id");
@@ -46,7 +46,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
             aggregation = Aggregation.newAggregation(sort, limit1);
         }
 
-        AggregationResults<BoardFreeComment> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE_COMMENT, BoardFreeComment.class);
+        AggregationResults<ArticleComment> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE_COMMENT, ArticleComment.class);
 
         return results.getMappedResults();
     }
@@ -61,19 +61,19 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         //AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
         //AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
         Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
-        AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE_COMMENT, CommonCount.class);
+        AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE_COMMENT, CommonCount.class);
 
         return results.getMappedResults();
     }
 
     /**
-     * Board Seq와 기준 BoardFreeComment ID(null 가능) 이상의 BoardFreeComment 목록을 가져온다.
+     * Board Seq와 기준 ArticleComment ID(null 가능) 이상의 ArticleComment 목록을 가져온다.
      *
      * @param boardSeq  게시물 seq
      * @param commentId 댓글 ID
      */
     @Override
-    public List<BoardFreeComment> findByBoardSeqAndGTId(Integer boardSeq, ObjectId commentId) {
+    public List<ArticleComment> findByBoardSeqAndGTId(Integer boardSeq, ObjectId commentId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("boardItem.seq").is(boardSeq));
 
@@ -83,7 +83,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         query.with(new Sort(Sort.Direction.ASC, "_id"));
         query.limit(Constants.COMMENT_MAX_LIMIT);
 
-        return mongoTemplate.find(query, BoardFreeComment.class);
+        return mongoTemplate.find(query, ArticleComment.class);
     }
 
     /**
@@ -98,7 +98,7 @@ public class BoardFreeCommentRepositoryImpl implements BoardFreeCommentRepositor
         AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
         //AggregationOperation limit = Aggregation.limit(Constants.BOARD_TOP_LIMIT);
         Aggregation aggregation = Aggregation.newAggregation(match1, group, sort/*, limit*/);
-        AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE_COMMENT, CommonCount.class);
+        AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE_COMMENT, CommonCount.class);
 
         return results.getMappedResults();
     }

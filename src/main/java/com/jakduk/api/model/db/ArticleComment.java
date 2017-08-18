@@ -20,7 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @Document
-public class BoardFreeComment implements UsersFeeling {
+public class ArticleComment implements UsersFeeling {
 
 	@Id
 	private String id;

@@ -6,7 +6,7 @@ import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
-import com.jakduk.api.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
+import com.jakduk.api.repository.article.comment.ArticleCommentOnHomeRepository;
 import com.jakduk.api.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.api.service.CommonService;
 import com.jakduk.api.service.FootballService;
@@ -26,7 +26,7 @@ import java.util.List;
 public class HomeTest extends ApiApplicationTests {
 	
 	@Autowired
-	BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
+	ArticleCommentOnHomeRepository articleCommentOnHomeRepository;
 
 	@Autowired
 	FootballClubOriginRepository footballClubOriginRepository;

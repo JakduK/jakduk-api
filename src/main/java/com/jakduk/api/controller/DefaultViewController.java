@@ -9,7 +9,7 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.simple.BoardFreeOnSitemap;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
@@ -52,7 +52,7 @@ public class DefaultViewController {
 
 	@Autowired private GalleryService galleryService;
 	@Autowired private UserPictureService userPictureService;
-	@Autowired private BoardFreeService boardFreeService;
+	@Autowired private ArticleService articleService;
 
 	// RSS
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
@@ -73,7 +73,7 @@ public class DefaultViewController {
 			Boolean existPosts = true;
 
 			do {
-				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
+				List<BoardFreeOnSitemap> posts = articleService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 				if (ObjectUtils.isEmpty(posts)) {
 					existPosts = false;

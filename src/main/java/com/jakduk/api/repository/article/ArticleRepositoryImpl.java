@@ -1,9 +1,9 @@
-package com.jakduk.api.repository.board.free;
+package com.jakduk.api.repository.article;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.aggregate.BoardPostTop;
-import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.simple.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 
 @Repository
-public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
+public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -37,16 +37,16 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         AggregationOperation sort1 = Aggregation.sort(Sort.Direction.DESC, "_id");
         AggregationOperation limit1 = Aggregation.limit(limit);
         Aggregation aggregation = Aggregation.newAggregation(match1, match2, sort1, limit1);
-        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFreeOnList.class);
+        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardFreeOnList.class);
 
         return results.getMappedResults();
     }
 
     /**
-     * 기준 BoardFree ID 이상의 BoardFree 목록을 가져온다.
+     * 기준 Article ID 이상의 Article 목록을 가져온다.
      */
     @Override
-    public List<BoardFree> findPostsGreaterThanId(ObjectId objectId, Integer limit) {
+    public List<Article> findPostsGreaterThanId(ObjectId objectId, Integer limit) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("status.delete").ne(true));
         AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(objectId));
         AggregationOperation sort = Aggregation.sort(Sort.Direction.ASC, "_id");
@@ -60,7 +60,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
             aggregation = Aggregation.newAggregation(match1, sort, limit1);
         }
 
-        AggregationResults<BoardFree> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFree.class);
+        AggregationResults<Article> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, Article.class);
 
         return results.getMappedResults();
 
@@ -89,14 +89,14 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
     }
 
     /**
-     * id 배열에 해당하는 BoardFree 목록.
+     * id 배열에 해당하는 Article 목록.
      * @param ids id 배열
      */
     @Override
     public List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(ids));
         Aggregation aggregation = Aggregation.newAggregation(match1);
-        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFreeOnSearch.class);
+        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardFreeOnSearch.class);
 
         return results.getMappedResults();
     }
@@ -189,7 +189,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
                 .and(usersDislikingCount).as("usersDislikingCount");
 
         Aggregation aggregation = Aggregation.newAggregation(match1, project1);
-        AggregationResults<BoardFeelingCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardFeelingCount.class);
+        AggregationResults<BoardFeelingCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardFeelingCount.class);
 
         return results.getMappedResults();
     }
@@ -217,7 +217,7 @@ public class BoardFreeRepositoryImpl implements BoardFreeRepositoryCustom {
         AggregationOperation limit1 = Aggregation.limit(Constants.BOARD_TOP_LIMIT);
 
         Aggregation aggregation = Aggregation.newAggregation(match1, project1, sort1, sort2, limit1);
-        AggregationResults<BoardPostTop> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_BOARD_FREE, BoardPostTop.class);
+        AggregationResults<BoardPostTop> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardPostTop.class);
 
         return results.getMappedResults();
     }
