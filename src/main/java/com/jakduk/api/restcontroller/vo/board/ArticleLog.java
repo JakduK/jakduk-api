@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class BoardFreeLog {
+public class ArticleLog {
 
     @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "사진 ID")
     private String id;
 
-    private Constants.BOARD_FREE_HISTORY_TYPE type;
+    private Constants.ARTICLE_HISTORY_TYPE type;
 
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;

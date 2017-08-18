@@ -46,7 +46,7 @@ public class FreePostDetailComment {
     private Constants.FEELING_TYPE myFeeling;
 
     @ApiModelProperty(value = "그림 목록")
-    private List<BoardGallery> galleries;
+    private List<ArticleGallery> galleries;
 
     @ApiModelProperty(value = "로그")
     private List<BoardFreeCommentLog> logs;

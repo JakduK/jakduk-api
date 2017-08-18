@@ -31,13 +31,13 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<BoardFreeOnList> findByIdAndUserId(ObjectId id, String userId, Integer limit) {
+    public List<ArticleOnList> findByIdAndUserId(ObjectId id, String userId, Integer limit) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("writer.userId").is(userId));
         AggregationOperation match2 = Aggregation.match(Criteria.where("_id").ne(id));
         AggregationOperation sort1 = Aggregation.sort(Sort.Direction.DESC, "_id");
         AggregationOperation limit1 = Aggregation.limit(limit);
         Aggregation aggregation = Aggregation.newAggregation(match1, match2, sort1, limit1);
-        AggregationResults<BoardFreeOnList> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardFreeOnList.class);
+        AggregationResults<ArticleOnList> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, ArticleOnList.class);
 
         return results.getMappedResults();
     }
@@ -105,26 +105,26 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * 공지 글 목록
      */
     @Override
-    public List<BoardFreeOnList> findNotices(String board, Sort sort) {
+    public List<ArticleOnList> findNotices(String board, Sort sort) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.notice").is(true))
                 .addCriteria(Criteria.where("board").is(board))
                 .with(sort)
                 .limit(10);
 
-        return mongoTemplate.find(query, BoardFreeOnList.class);
+        return mongoTemplate.find(query, ArticleOnList.class);
     }
 
     /**
      * 홈에서 보여지는 최근글 목록
      */
     @Override
-    public List<BoardFreeOnList> findLatest(Sort sort, Integer limit) {
+    public List<ArticleOnList> findLatest(Sort sort, Integer limit) {
         Query query = new Query();
         query.with(sort);
         query.limit(limit);
 
-        return mongoTemplate.find(query, BoardFreeOnList.class);
+        return mongoTemplate.find(query, ArticleOnList.class);
     }
 
     /**
@@ -152,7 +152,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
     @Override
-    public BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, String category, Constants.CRITERIA_OPERATOR operator) {
+    public ArticleSimple findByIdAndCategoryWithOperator(ObjectId id, String category, Constants.CRITERIA_OPERATOR operator) {
         Query query = new Query();
 
         if (StringUtils.isNotBlank(category))
@@ -169,7 +169,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 break;
         }
 
-        return mongoTemplate.findOne(query, BoardFreeSimple.class);
+        return mongoTemplate.findOne(query, ArticleSimple.class);
     }
 
     /**

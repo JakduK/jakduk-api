@@ -8,12 +8,12 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.BoardCommentStatus;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalSimpleName;
 import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.model.simple.BoardFreeOnSearch;
-import com.jakduk.api.model.simple.BoardFreeSimple;
+import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.ArticleService;
@@ -76,7 +76,7 @@ public class BoardRestControllerTests {
                 .board(Constants.BOARD_TYPE.FOOTBALL.name())
                 .category("CLASSIC")
                 .linkedGallery(true)
-                .status(BoardStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
+                .status(ArticleStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
                 .build();
 
         boardCategory = BoardCategory.builder()
@@ -127,7 +127,7 @@ public class BoardRestControllerTests {
         when(articleService.getFreeTopComments())
                 .thenReturn(expectTopComments);
 
-        FreeTopsResponse response = FreeTopsResponse.builder()
+        GetBoardTopsResponse response = GetBoardTopsResponse.builder()
                 .topLikes(expectTopLikes)
                 .topComments(expectTopComments)
                 .build();
@@ -143,7 +143,7 @@ public class BoardRestControllerTests {
     @WithMockUser
     public void getFreeCommentsTest() throws Exception {
 
-        FreePostCommentsResponse response = FreePostCommentsResponse.builder()
+        GetArticleCommentsResponse response = GetArticleCommentsResponse.builder()
                 .comments(
                         Arrays.asList(
                                 FreePostComment.builder()
@@ -171,7 +171,7 @@ public class BoardRestControllerTests {
                 .totalElements(1)
                 .build();
 
-        when(articleService.getBoardFreeComments(boardType, anyInt(), anyInt()))
+        when(articleService.getArticleComments(boardType, anyInt(), anyInt()))
                 .thenReturn(response);
 
         mvc.perform(get("/api/board/free/comments")
@@ -186,14 +186,14 @@ public class BoardRestControllerTests {
     @WithMockUser
     public void getFreePostTest() throws Exception {
 
-        FreePostDetail freePostDetail = new FreePostDetail();
-        BeanUtils.copyProperties(article, freePostDetail);
-        freePostDetail.setCategory(boardCategory);
-        freePostDetail.setNumberOfLike(5);
-        freePostDetail.setNumberOfDislike(4);
-        freePostDetail.setGalleries(
+        ArticleDetail articleDetail = new ArticleDetail();
+        BeanUtils.copyProperties(article, articleDetail);
+        articleDetail.setCategory(boardCategory);
+        articleDetail.setNumberOfLike(5);
+        articleDetail.setNumberOfDislike(4);
+        articleDetail.setGalleries(
                 Arrays.asList(
-                        BoardGallery.builder()
+                        ArticleGallery.builder()
                         .id("boardGalleryId01")
                         .name("성남FC 시즌권 사진")
                         .imageUrl("https://staging.jakduk.com:8080/gallery/58b9050b807d714eaf50a111")
@@ -202,27 +202,27 @@ public class BoardRestControllerTests {
                 )
         );
 
-        BoardFreeSimple prevPost = BoardFreeSimple.builder()
+        ArticleSimple prevPost = ArticleSimple.builder()
                 .id("boardFreeId02")
                 .seq(2)
                 .subject("이전 글 제목")
                 .writer(commonWriter)
                 .build();
 
-        BoardFreeSimple nextPost = BoardFreeSimple.builder()
+        ArticleSimple nextPost = ArticleSimple.builder()
                 .id("boardFreeId03")
                 .seq(3)
                 .subject("다음 글 제목")
                 .writer(commonWriter)
                 .build();
 
-        FreePostDetailResponse response = FreePostDetailResponse.builder()
-                .post(freePostDetail)
+        GetArticleDetailResponse response = GetArticleDetailResponse.builder()
+                .post(articleDetail)
                 .prevPost(prevPost)
                 .nextPost(nextPost)
                 .build();
 
-        when(articleService.getBoardFreeDetail(anyInt(), anyBoolean()))
+        when(articleService.getArticleDetail(boardType, anyInt(), anyBoolean()))
                 .thenReturn(response);
 
         mvc.perform(get("/api/board/free/{seq}", article.getSeq())
@@ -237,7 +237,7 @@ public class BoardRestControllerTests {
 
         GalleryOnBoard galleryOnBoard = GalleryOnBoard.builder().id("galleryid01").name("공차는사진").build();
 
-        FreePostForm form = FreePostForm.builder()
+        WriteArticle form = WriteArticle.builder()
                 .subject("제목입니다.")
                 .content("내용입니다.")
                 .categoryCode("CLASSIC")
@@ -261,7 +261,7 @@ public class BoardRestControllerTests {
         when(galleryService.findByIdIn(any()))
                 .thenReturn(expectGalleries);
 
-        when(articleService.insertFreePost(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
+        when(articleService.insertArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
                 anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
                 .thenReturn(article);
 
@@ -269,7 +269,7 @@ public class BoardRestControllerTests {
                 .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
                         any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
-        FreePostWriteResponse expectResponse = FreePostWriteResponse.builder()
+        WriteArticleResponse expectResponse = WriteArticleResponse.builder()
                 .seq(article.getSeq())
                 .build();
 

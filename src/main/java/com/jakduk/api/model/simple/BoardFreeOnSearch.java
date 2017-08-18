@@ -1,6 +1,6 @@
 package com.jakduk.api.model.simple;
 
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +25,6 @@ public class BoardFreeOnSearch {
 
 	private String subject;
 
-	private BoardStatus status;
+	private ArticleStatus status;
 
 }

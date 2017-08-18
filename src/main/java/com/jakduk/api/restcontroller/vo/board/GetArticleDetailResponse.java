@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.model.simple.BoardFreeSimple;
+import com.jakduk.api.model.simple.ArticleSimple;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -20,18 +20,18 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FreePostDetailResponse {
+public class GetArticleDetailResponse {
 
     @ApiModelProperty(value = "글 상세")
-    private FreePostDetail post;
+    private ArticleDetail article;
 
     @ApiModelProperty(value = "앞 글")
-    private BoardFreeSimple prevPost;
+    private ArticleSimple prevPost;
 
     @ApiModelProperty(value = "뒷 글")
-    private BoardFreeSimple nextPost;
+    private ArticleSimple nextPost;
 
     @ApiModelProperty(value = "작성자의 최근 글")
-    private List<LatestFreePost> latestPostsByWriter;
+    private List<LatestArticle> latestArticlesByWriter;
 
 }

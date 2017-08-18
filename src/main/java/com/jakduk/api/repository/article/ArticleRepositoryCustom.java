@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface ArticleRepositoryCustom {
 
-    List<BoardFreeOnList> findByIdAndUserId(ObjectId id, String userId, Integer limit);
+    List<ArticleOnList> findByIdAndUserId(ObjectId id, String userId, Integer limit);
 
     /**
      * 기준 Article ID 이상의 Article 목록을 가져온다.
@@ -40,12 +40,12 @@ public interface ArticleRepositoryCustom {
     /**
      * 공지 글 목록
      */
-    List<BoardFreeOnList> findNotices(String board, Sort sort);
+    List<ArticleOnList> findNotices(String board, Sort sort);
 
     /**
      * 홈에서 보여지는 최근글 목록
      */
-    List<BoardFreeOnList> findLatest(Sort sort, Integer limit);
+    List<ArticleOnList> findLatest(Sort sort, Integer limit);
 
     /**
      * 사이트맵 용 게시물 목록
@@ -59,7 +59,7 @@ public interface ArticleRepositoryCustom {
     /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
      */
-    BoardFreeSimple findByIdAndCategoryWithOperator(ObjectId id, String category, Constants.CRITERIA_OPERATOR operator);
+    ArticleSimple findByIdAndCategoryWithOperator(ObjectId id, String category, Constants.CRITERIA_OPERATOR operator);
 
     /**
      * 게시물의 감정 갯수를 가져온다

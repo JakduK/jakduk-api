@@ -19,7 +19,7 @@ import java.util.List;
 @ApiModel(value = "글쓰기/글고치기 폼")
 @Getter
 @Builder
-public class FreePostForm {
+public class WriteArticle {
 
     @ApiModelProperty(required = true, value = "글 제목", example = "글 제목입니다.")
     @Size(min = 1, max=60)

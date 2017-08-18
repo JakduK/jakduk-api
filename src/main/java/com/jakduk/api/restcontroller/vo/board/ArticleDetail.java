@@ -3,7 +3,7 @@ package com.jakduk.api.restcontroller.vo.board;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class FreePostDetail {
+public class ArticleDetail {
 
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;
@@ -48,13 +48,13 @@ public class FreePostDetail {
     private Integer numberOfDislike;
 
     @ApiModelProperty(value = "글상태")
-    private BoardStatus status;
+    private ArticleStatus status;
 
     @ApiModelProperty(value = "로그")
-    private List<BoardFreeLog> logs;
+    private List<ArticleLog> logs;
 
     @ApiModelProperty(value = "그림 목록")
-    private List<BoardGallery> galleries;
+    private List<ArticleGallery> galleries;
 
     @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
     private Constants.FEELING_TYPE myFeeling;

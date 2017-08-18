@@ -30,7 +30,7 @@ public class GalleryRepositoryTest extends ApiApplicationTests {
 
     @Test
     public void findByItemIdAndFromType() {
-        List<Gallery> galleries = sut.findByItemIdAndFromType(new ObjectId("58ee422be846b60526cd3382"), Constants.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, 10);
+        List<Gallery> galleries = sut.findByItemIdAndFromType(new ObjectId("58ee422be846b60526cd3382"), Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, 10);
 
         Assert.assertTrue(Objects.nonNull(galleries));
     }

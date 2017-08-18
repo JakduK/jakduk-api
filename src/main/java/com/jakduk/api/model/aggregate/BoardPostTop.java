@@ -1,6 +1,6 @@
 package com.jakduk.api.model.aggregate;
 
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import lombok.*;
 
 @NoArgsConstructor
@@ -12,7 +12,7 @@ public class BoardPostTop {
 
 	private String id;
 	private Integer seq;
-	private BoardStatus status;
+	private ArticleStatus status;
 	private String subject;
 	private Integer count;
 	private Integer views;

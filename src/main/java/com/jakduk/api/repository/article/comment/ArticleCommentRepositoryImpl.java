@@ -69,13 +69,13 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
     /**
      * Board Seq와 기준 ArticleComment ID(null 가능) 이상의 ArticleComment 목록을 가져온다.
      *
-     * @param boardSeq  게시물 seq
+     * @param articleSeq  게시물 seq
      * @param commentId 댓글 ID
      */
     @Override
-    public List<ArticleComment> findByBoardSeqAndGTId(Integer boardSeq, ObjectId commentId) {
+    public List<ArticleComment> findByBoardSeqAndGTId(String board, Integer articleSeq, ObjectId commentId) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("boardItem.seq").is(boardSeq));
+        query.addCriteria(Criteria.where("boardItem.seq").is(articleSeq).and("boardItem.board").is(board));
 
         if (Objects.nonNull(commentId))
             query.addCriteria(Criteria.where("_id").gt(commentId));

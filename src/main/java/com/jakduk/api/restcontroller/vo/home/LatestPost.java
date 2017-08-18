@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.vo.home;
 
-import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import io.swagger.annotations.ApiModelProperty;
@@ -37,7 +36,7 @@ public class LatestPost {
     private int views = 0;
 
     @ApiModelProperty(value = "글상태")
-    private BoardStatus status;
+    private ArticleStatus status;
 
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallerySimple> galleries;

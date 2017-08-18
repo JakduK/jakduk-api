@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class BoardGallery {
+public class ArticleGallery {
 
     @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "사진 ID")
     private String id;

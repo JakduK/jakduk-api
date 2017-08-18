@@ -15,7 +15,7 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class BoardStatus {
+public class ArticleStatus {
 	
 	private Boolean notice;
 	

@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @Builder
 @Document(collection = Constants.COLLECTION_ARTICLE)
-public class BoardFreeSimple {
+public class ArticleSimple {
 	
 	@Id
 	private String id;

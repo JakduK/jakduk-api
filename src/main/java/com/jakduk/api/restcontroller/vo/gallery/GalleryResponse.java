@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.gallery;
 
-import com.jakduk.api.model.simple.BoardFreeSimple;
+import com.jakduk.api.model.simple.ArticleSimple;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -24,5 +24,5 @@ public class GalleryResponse {
 	private List<SurroundingsGallery> surroundingsGalleries;
 
 	@ApiModelProperty(value = "이 사진을 사용하는 게시물 목록")
-	private List<BoardFreeSimple> linkedPosts;
+	private List<ArticleSimple> linkedPosts;
 }

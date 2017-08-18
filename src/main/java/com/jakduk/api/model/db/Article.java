@@ -1,7 +1,7 @@
 package com.jakduk.api.model.db;
 
 import com.jakduk.api.model.embedded.BoardLog;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.*;
@@ -65,7 +65,7 @@ public class Article implements UsersFeeling {
 	
 	private List<CommonFeelingUser> usersDisliking;
 	
-	private BoardStatus status;
+	private ArticleStatus status;
 
 	// 오래된 글은 logs가 없는 경우도 있다.
 	private List<BoardLog> logs;

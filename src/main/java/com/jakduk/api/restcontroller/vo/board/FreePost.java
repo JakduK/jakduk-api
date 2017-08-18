@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -36,7 +35,7 @@ public class FreePost {
     private int views = 0;
 
     @ApiModelProperty(value = "글상태")
-    private BoardStatus status;
+    private ArticleStatus status;
 
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallerySimple> galleries;

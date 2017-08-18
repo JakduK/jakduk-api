@@ -8,21 +8,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author pyohwan
- *         16. 7. 13 오후 11:18
+ *         16. 7. 10 오후 11:52
  */
 
-@ApiModel(description = "자유게시판 댓글 목록")
+@ApiModel(description = "자유게시판 글 목록")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FreePostCommentsResponse {
+public class GetArticlesResponse {
 
-    @ApiModelProperty(value = "댓글 목록")
-    List<FreePostComment> comments;
+    @ApiModelProperty(value = "말머리 맵")
+    Map<String, String> categories;
+
+    @ApiModelProperty(value = "글 목록")
+    List<FreePost> articles;
+
+    @ApiModelProperty(value = "공지글 목록")
+    List<FreePost> notices;
 
     @ApiModelProperty(value = "마지막 페이지 여부")
     boolean last;
@@ -44,4 +51,5 @@ public class FreePostCommentsResponse {
 
     @ApiModelProperty(value = "전체 글 수")
     long totalElements;
+
 }

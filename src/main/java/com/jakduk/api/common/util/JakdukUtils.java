@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.Cookie;
@@ -163,10 +164,10 @@ public class JakdukUtils {
      */
     public static Constants.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
         if (Objects.nonNull(commonWriter)) {
-            if (! ObjectUtils.isEmpty(usersLiking) && usersLiking.stream()
+            if (! CollectionUtils.isEmpty(usersLiking) && usersLiking.stream()
                     .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
                 return Constants.FEELING_TYPE.LIKE;
-            } else if (! ObjectUtils.isEmpty(usersDisliking) && usersDisliking.stream()
+            } else if (! CollectionUtils.isEmpty(usersDisliking) && usersDisliking.stream()
                     .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
                 return Constants.FEELING_TYPE.DISLIKE;
             }

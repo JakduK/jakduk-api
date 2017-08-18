@@ -16,7 +16,7 @@ import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.GalleryStatus;
 import com.jakduk.api.model.embedded.LinkedItem;
 import com.jakduk.api.model.jongo.GalleryFeelingCount;
-import com.jakduk.api.model.simple.BoardFreeSimple;
+import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.repository.article.ArticleRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
@@ -209,13 +209,13 @@ public class GalleryService {
 
 		// 이 사진을 사용하는 게시물 목록
         // TODO 댓글도 보여줘야지?
-        List<BoardFreeSimple> linkedPosts = null;
+        List<ArticleSimple> linkedPosts = null;
 
         List<LinkedItem> linkedItems = gallery.getLinkedItems();
 
         if (! ObjectUtils.isEmpty(linkedItems)) {
             List<String> ids = linkedItems.stream()
-                    .filter(linkedItem -> linkedItem.getFrom().equals(Constants.GALLERY_FROM_TYPE.BOARD_FREE))
+                    .filter(linkedItem -> linkedItem.getFrom().equals(Constants.GALLERY_FROM_TYPE.ARTICLE))
                     .map(LinkedItem::getId)
                     .collect(Collectors.toList());
 
@@ -223,10 +223,10 @@ public class GalleryService {
 
             linkedPosts = posts.stream()
                     .map(post -> {
-                        BoardFreeSimple boardFreeSimple = new BoardFreeSimple();
-                        BeanUtils.copyProperties(post, boardFreeSimple);
+                        ArticleSimple articleSimple = new ArticleSimple();
+                        BeanUtils.copyProperties(post, articleSimple);
 
-                        return boardFreeSimple;
+                        return articleSimple;
                     })
                     .collect(Collectors.toList());
         }

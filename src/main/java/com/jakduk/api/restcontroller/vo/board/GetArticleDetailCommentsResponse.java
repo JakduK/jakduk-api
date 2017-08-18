@@ -15,7 +15,7 @@ import java.util.List;
 @ApiModel(description = "특정 글의 댓글 목록")
 @Builder
 @Getter
-public class FreePostDetailCommentsResponse {
+public class GetArticleDetailCommentsResponse {
 
     @ApiModelProperty(value = "댓글 목록")
     private List<FreePostDetailComment> comments;

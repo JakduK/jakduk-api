@@ -1,7 +1,7 @@
 package com.jakduk.api.model.simple;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Document(collection = Constants.COLLECTION_ARTICLE)
-public class BoardFreeOnList {
+public class ArticleOnList {
 	
 	@Id
 	private String id;
@@ -34,7 +34,7 @@ public class BoardFreeOnList {
 	
 	private Integer views;
 	
-	private BoardStatus status;
+	private ArticleStatus status;
 
 	private String shortContent;
 

@@ -71,10 +71,16 @@ public class Constants {
 		DISLIKE
 	}
 
+	// 게시물 감정 표현. 좋아요, 싫어요
+	public enum FEELING_TYPE_LOWERCASE {
+		like,
+		dislike
+	}
+
 	/**
 	 * 글 지움 종류
 	 */
-	public enum BOARD_DELETE_TYPE {
+	public enum ARTICLE_DELETE_TYPE {
 		CONTENT,	// 글 본문만 지움(댓글 유지)
 		ALL			// 모두 지움
 	}
@@ -83,8 +89,8 @@ public class Constants {
      * 사진을 등록한 출처
      */
     public enum GALLERY_FROM_TYPE {
-        BOARD_FREE,
-		BOARD_FREE_COMMENT
+		ARTICLE,
+		ARTICLE_COMMENT
     }
 
 	/**
@@ -226,7 +232,7 @@ public class Constants {
 	 * 읽음 중복 방지를 위한 쿠키
 	 */
 	public enum VIEWS_COOKIE_TYPE {
-		FREE_BOARD
+		ARTICLE
 	}
 
 	/**
@@ -238,7 +244,7 @@ public class Constants {
 	/**
 	 * 글 히스토리 상태
 	 */
-	public enum BOARD_FREE_HISTORY_TYPE {
+	public enum ARTICLE_HISTORY_TYPE {
 		CREATE,
 		EDIT,
 		DELETE,
@@ -249,7 +255,7 @@ public class Constants {
 	/**
 	 * 댓글 히스토리 상태
 	 */
-	public enum BOARD_FREE_COMMENT_HISTORY_TYPE {
+	public enum ARTICLE_COMMENT_HISTORY_TYPE {
 		CREATE,
 		EDIT
 	}

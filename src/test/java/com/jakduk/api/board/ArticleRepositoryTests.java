@@ -7,7 +7,7 @@ import com.jakduk.api.configuration.MongodbConfig;
 import com.jakduk.api.model.aggregate.BoardPostTop;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
-import com.jakduk.api.model.simple.BoardFreeOnList;
+import com.jakduk.api.model.simple.ArticleOnList;
 import com.jakduk.api.model.simple.BoardFreeOnRSS;
 import com.jakduk.api.model.simple.BoardFreeOnSitemap;
 import com.jakduk.api.repository.article.ArticleRepository;
@@ -75,7 +75,7 @@ public class ArticleRepositoryTests {
     @Test
     public void findNotices() {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-        List<BoardFreeOnList> notices = repository.findNotices(board.name(), sort);
+        List<ArticleOnList> notices = repository.findNotices(board.name(), sort);
 
         System.out.println("notices=" + notices);
     }

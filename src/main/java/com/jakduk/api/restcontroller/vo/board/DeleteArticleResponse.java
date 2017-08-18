@@ -14,9 +14,9 @@ import lombok.Getter;
 @ApiModel(value = "자유게시판 글 지움")
 @Builder
 @Getter
-public class FreePostDeleteResponse {
+public class DeleteArticleResponse {
 
     @ApiModelProperty(value = "결과")
-    Constants.BOARD_DELETE_TYPE result;
+    Constants.ARTICLE_DELETE_TYPE result;
 
 }

@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FreeTopsResponse {
+public class GetBoardTopsResponse {
 
     @ApiModelProperty(value = "주간 좋아요수 선두")
     private List<BoardPostTop> topLikes;

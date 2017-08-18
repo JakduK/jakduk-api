@@ -46,7 +46,7 @@ public enum ServiceError {
     ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
     ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
 
-    NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
+    NOT_FOUND_ARTICLE(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
     NOT_FOUND_COMMENT(HttpStatus.SC_NOT_FOUND, "exception.not.found.comment"),
     NOT_FOUND_CATEGORY(HttpStatus.SC_NOT_FOUND, "exception.not.found.category"),
     NOT_FOUND_FOOTBALL_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club"),
