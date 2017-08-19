@@ -7,7 +7,6 @@ import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.restcontroller.vo.home.GalleryOnHome;
 import com.jakduk.api.restcontroller.vo.home.HomeResponse;
-import com.jakduk.api.restcontroller.vo.home.LatestPost;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.HomeService;
@@ -54,10 +53,7 @@ public class HomeRestController {
         response.setHomeDescription(homeService.getHomeDescription());
         response.setUsers(homeService.getUsersLatest(language));
         response.setComments(homeService.getBoardCommentsLatest());
-
-        // 최근 게시물
-        List<LatestPost> latestPosts = articleService.getLatestArticles();
-        response.setPosts(latestPosts);
+        response.setArticles(articleService.getLatestArticles());
 
         // 최근 사진
         List<GallerySimple> galleries = galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY);

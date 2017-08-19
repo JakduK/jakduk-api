@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 @Component
 public class UrlGenerationUtils {
@@ -58,6 +59,24 @@ public class UrlGenerationUtils {
         UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(jakdukProperties.getApiServerUrl())
                 .path("/{urlPathGallery}/{id}")
                 .buildAndExpand(urlPathGallery, id);
+
+        return uriComponents.toUriString();
+    }
+
+    /**
+     * 글 상세 URL 생성
+     *
+     * @param board 게시판
+     * @param seq 글번호
+     */
+    public String generateArticleDetailUrl(String board, Integer seq) {
+
+        if (StringUtils.isBlank(board) || Objects.isNull(seq))
+            return null;
+
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(jakdukProperties.getApiServerUrl())
+                .path("/api/board/{board}/{seq}")
+                .buildAndExpand(board.toLowerCase(), seq);
 
         return uriComponents.toUriString();
     }
