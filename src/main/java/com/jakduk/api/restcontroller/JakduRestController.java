@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
@@ -73,7 +73,7 @@ public class JakduRestController {
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
 
-        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, JakdukConst.NAME_TYPE.fullName);
+        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, Constants.NAME_TYPE.fullName);
         List<Competition> competitions = footballService.getCompetitions(new ArrayList<>(competitionIds), language);
 
         Map<String, LocalName> fcNames = footballClubs.stream()
@@ -158,7 +158,7 @@ public class JakduRestController {
     // 작두 댓글 좋아요 싫어요
     @RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
-                                                 @PathVariable JakdukConst.FEELING_TYPE feeling) {
+                                                 @PathVariable Constants.FEELING_TYPE feeling) {
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);

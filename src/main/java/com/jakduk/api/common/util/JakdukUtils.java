@@ -1,6 +1,6 @@
 package com.jakduk.api.common.util;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.Cookie;
@@ -55,6 +56,23 @@ public class JakdukUtils {
         return returnLanguage;
     }
 
+    public static Locale getLocale() {
+        return JakdukUtils.getLocale(null);
+    }
+
+    public static Locale getLocale(String wantLanguage) {
+        Locale locale = LocaleContextHolder.getLocale();
+        Locale returnLocale = Locale.US;
+
+        if (StringUtils.isBlank(wantLanguage))
+            wantLanguage = locale.getLanguage();
+
+        if (wantLanguage.contains(Locale.KOREA.getLanguage()))
+            returnLocale = Locale.KOREA;
+
+        return returnLocale;
+    }
+
     /**
      * ResourceBundle에서 메시지 가져오기.
      *
@@ -94,7 +112,7 @@ public class JakdukUtils {
      * @param id 쿠키 이름에 쓰일 고유 ID
      * @return 쿠키를 새로 저장했다면 true, 아니면 false.
      */
-    public static Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, JakdukConst.VIEWS_COOKIE_TYPE prefix, String id) {
+    public static Boolean addViewsCookie(HttpServletRequest request, HttpServletResponse response, Constants.VIEWS_COOKIE_TYPE prefix, String id) {
 
         String cookieName = prefix + "_" + id;
         Cookie[] cookies = request.getCookies();
@@ -105,7 +123,7 @@ public class JakdukUtils {
         if (! findCookie.isPresent()) {
             Cookie cookie = new Cookie(cookieName, "r");
             cookie.setHttpOnly(true);
-            cookie.setMaxAge(JakdukConst.VIEWS_COOKIE_EXPIRE_SECONDS);
+            cookie.setMaxAge(Constants.VIEWS_COOKIE_EXPIRE_SECONDS);
             response.addCookie(cookie);
 
             return true;
@@ -118,19 +136,19 @@ public class JakdukUtils {
      * 모바일 디바이스 정보 가져오기.
      *
      * @param device Device 객체
-     * @return JakdukConst.DEVICE_TYPE enum 타입
+     * @return Constants.DEVICE_TYPE enum 타입
      */
-    public static JakdukConst.DEVICE_TYPE getDeviceInfo(Device device) {
+    public static Constants.DEVICE_TYPE getDeviceInfo(Device device) {
 
-        JakdukConst.DEVICE_TYPE returnDeviceType = JakdukConst.DEVICE_TYPE.NORMAL;
+        Constants.DEVICE_TYPE returnDeviceType = Constants.DEVICE_TYPE.NORMAL;
 
         if (Objects.isNull(device))
             return returnDeviceType;
 
         if (device.isMobile()) {
-            returnDeviceType = JakdukConst.DEVICE_TYPE.MOBILE;
+            returnDeviceType = Constants.DEVICE_TYPE.MOBILE;
         } else if (device.isTablet()) {
-            returnDeviceType = JakdukConst.DEVICE_TYPE.TABLET;
+            returnDeviceType = Constants.DEVICE_TYPE.TABLET;
         }
 
         return returnDeviceType;
@@ -144,14 +162,14 @@ public class JakdukUtils {
      * @param usersDisliking 싫어요 목록
      * @return 감정 표현
      */
-    public static JakdukConst.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
+    public static Constants.FEELING_TYPE getMyFeeling(CommonWriter commonWriter, List<CommonFeelingUser> usersLiking, List<CommonFeelingUser> usersDisliking) {
         if (Objects.nonNull(commonWriter)) {
-            if (! ObjectUtils.isEmpty(usersLiking) && usersLiking.stream()
+            if (! CollectionUtils.isEmpty(usersLiking) && usersLiking.stream()
                     .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
-                return JakdukConst.FEELING_TYPE.LIKE;
-            } else if (! ObjectUtils.isEmpty(usersDisliking) && usersDisliking.stream()
+                return Constants.FEELING_TYPE.LIKE;
+            } else if (! CollectionUtils.isEmpty(usersDisliking) && usersDisliking.stream()
                     .anyMatch(commonFeelingUser -> commonFeelingUser.getUserId().equals(commonWriter.getUserId()))) {
-                return JakdukConst.FEELING_TYPE.DISLIKE;
+                return Constants.FEELING_TYPE.DISLIKE;
             }
         }
 
@@ -165,7 +183,7 @@ public class JakdukUtils {
      * @param from 출처
      * @param id Item ID
      */
-    public static List<String> getSessionOfGalleryIdsForRemoval(HttpServletRequest request, JakdukConst.GALLERY_FROM_TYPE from, String id) {
+    public static List<String> getSessionOfGalleryIdsForRemoval(HttpServletRequest request, Constants.GALLERY_FROM_TYPE from, String id) {
         String name = from + ":" + id + GALLERIES_FOR_REMOVAL;
         HttpSession httpSession = request.getSession();
 
@@ -179,7 +197,7 @@ public class JakdukUtils {
      * @param from 출처
      * @param id Item ID
      */
-    public static void removeSessionOfGalleryIdsForRemoval(HttpServletRequest request, JakdukConst.GALLERY_FROM_TYPE from, String id) {
+    public static void removeSessionOfGalleryIdsForRemoval(HttpServletRequest request, Constants.GALLERY_FROM_TYPE from, String id) {
         String name = from + ":" + id + GALLERIES_FOR_REMOVAL;
         HttpSession httpSession = request.getSession();
 
@@ -195,7 +213,7 @@ public class JakdukUtils {
      * @param itemId Item ID
      * @param galleryId Gallery ID
      */
-    public static void setSessionOfGalleryIdsForRemoval(HttpServletRequest request, JakdukConst.GALLERY_FROM_TYPE from, String itemId,
+    public static void setSessionOfGalleryIdsForRemoval(HttpServletRequest request, Constants.GALLERY_FROM_TYPE from, String itemId,
                                                         String galleryId) {
 
         HttpSession httpSession = request.getSession();

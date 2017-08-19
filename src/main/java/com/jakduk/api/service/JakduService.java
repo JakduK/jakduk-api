@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
@@ -10,7 +10,7 @@ import com.jakduk.api.model.db.Jakdu;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduSchedule;
 import com.jakduk.api.model.elasticsearch.EsJakduComment;
-import com.jakduk.api.model.embedded.BoardCommentStatus;
+import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.JakduOnSchedule;
@@ -98,7 +98,7 @@ public class JakduService {
             throw new NoSuchElementException(JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
         }
 
-        BoardCommentStatus status = new BoardCommentStatus(request.getDevice());
+        ArticleCommentStatus status = new ArticleCommentStatus(request.getDevice());
 
         JakduComment jakduComment = new JakduComment();
 
@@ -151,7 +151,7 @@ public class JakduService {
     /**
      * 작두 댓글 감정 표현
      */
-    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, JakdukConst.FEELING_TYPE feeling) {
+    public JakduComment setJakduCommentFeeling(CommonWriter writer, String commentId, Constants.FEELING_TYPE feeling) {
 
         String userId = writer.getUserId();
         String username = writer.getUsername();

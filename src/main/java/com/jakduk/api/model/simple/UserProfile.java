@@ -1,6 +1,6 @@
 package com.jakduk.api.model.simple;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.db.UserPicture;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class UserProfile {
 
 	private String username;
 
-	private JakdukConst.ACCOUNT_TYPE providerId;		// 제공자
+	private Constants.ACCOUNT_TYPE providerId;		// 제공자
 
 	private String providerUserId;					// SNS USER ID
 

@@ -1,21 +1,15 @@
 package com.jakduk.api.restcontroller;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.LocalName;
-import com.jakduk.api.model.embedded.LocalSimpleName;
-import com.jakduk.api.restcontroller.vo.admin.CompetitionWrite;
-import com.jakduk.api.restcontroller.vo.admin.ThumbnailSizeWrite;
-import com.jakduk.api.restcontroller.vo.admin.BoardCategoryWrite;
-import com.jakduk.api.restcontroller.vo.admin.JakduScheduleGroupWrite;
-import com.jakduk.api.restcontroller.vo.admin.JakduScheduleWrite;
-import com.jakduk.api.restcontroller.vo.admin.AttendanceClubForm;
-import com.jakduk.api.restcontroller.vo.admin.FootballClubRequest;
-import com.jakduk.api.restcontroller.vo.admin.HomeDescriptionRequest;
-import com.jakduk.api.restcontroller.vo.admin.LeagueAttendanceForm;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.api.service.*;
+import com.jakduk.api.restcontroller.vo.admin.*;
+import com.jakduk.api.service.AdminService;
+import com.jakduk.api.service.CommonService;
+import com.jakduk.api.service.CompetitionService;
+import com.jakduk.api.service.StatsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +44,6 @@ public class AdminRestController {
 
 	@Autowired
 	private CompetitionService competitionService;
-
-	@Autowired
-	private BoardCategoryService boardCategoryService;
 
 	@ApiOperation(value = "알림판 목록")
 	@RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
@@ -191,9 +182,9 @@ public class AdminRestController {
 		encyclopedia.setId(null);
 
 		if (encyclopedia.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(JakdukConst.ENCYCLOPEDIA_EN));
+			encyclopedia.setSeq(commonService.getNextSequence(Constants.ENCYCLOPEDIA_EN));
 		} else if (encyclopedia.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-			encyclopedia.setSeq(commonService.getNextSequence(JakdukConst.ENCYCLOPEDIA_KO));
+			encyclopedia.setSeq(commonService.getNextSequence(Constants.ENCYCLOPEDIA_KO));
 		}
 
 		adminService.saveEncyclopedia(encyclopedia);
@@ -391,60 +382,6 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "게시판 말머리 목록")
-	@RequestMapping(value = "/board/categories", method = RequestMethod.GET)
-	public Map<String, Object> getBoardCategories() {
-		Map<String, Object> response = new HashMap<>();
-		response.put("boardCategories", adminService.getBoardCategoryList());
-
-		return response;
-	}
-
-	@ApiOperation(value = "게시판 말머리 하나")
-	@RequestMapping(value = "/board/category/{id}", method = RequestMethod.GET)
-	public Map<String, Object> getBoardCategory(@PathVariable String id) {
-		BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
-		if (Objects.isNull(boardCategoryWrite)) {
-			throw new IllegalArgumentException("유효하지 않은 id입니다.");
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("boardCategory", boardCategoryWrite);
-
-		return response;
-	}
-
-	@ApiOperation(value = "게시판 말머리 편집")
-	@RequestMapping(value = "/board/category/write/{id}", method = RequestMethod.PUT)
-	public Map<String, Object> editBoardCategory(
-		@PathVariable String id, @RequestBody BoardCategory boardCategory) {
-
-		BoardCategoryWrite boardCategoryWrite = adminService.getBoardCategory(id);
-		boardCategoryWrite.setCode(boardCategory.getCode());
-
-		for (LocalSimpleName fcName : boardCategory.getNames()) {
-			if (fcName.getLanguage().equals(Locale.KOREAN.getLanguage())) {
-				boardCategoryWrite.setNameKr(fcName.getName());
-			} else if (fcName.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-				boardCategoryWrite.setNameEn(fcName.getName());
-			}
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("boardCategory", adminService.boardCategoryWrite(boardCategoryWrite));
-
-		return response;
-	}
-
-	@ApiOperation(value = "새 게시판 말머리 저장")
-	@RequestMapping(value = "/board/category/write", method = RequestMethod.POST)
-	public EmptyJsonResponse writeBoardCategory(@RequestBody BoardCategory boardCategory) {
-
-		// spring-data-rest를 사용하자.
-
-		return EmptyJsonResponse.newInstance();
-	}
-
 	@ApiOperation(value = "대회별 관중수 목록")
 	@RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
 	public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId,
@@ -605,20 +542,12 @@ public class AdminRestController {
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "게시판 말머리 초기화")
-	@RequestMapping(value = "/board/category/init", method = RequestMethod.POST)
-	public EmptyJsonResponse initBoardCategory() {
-		boardCategoryService.initBoardCategory();
-
-		return EmptyJsonResponse.newInstance();
-	}
-
 	@RequestMapping(value = "/thumbnail/size", method = RequestMethod.GET)
 	public Map<String, Object> thumbnailSizeWrite() {
 
 		Map<String, Object> data = new HashMap<>();
-		data.put("resWidth", JakdukConst.GALLERY_THUMBNAIL_SIZE_WIDTH);
-		data.put("resHeight", JakdukConst.GALLERY_THUMBNAIL_SIZE_HEIGHT);
+		data.put("resWidth", Constants.GALLERY_THUMBNAIL_SIZE_WIDTH);
+		data.put("resHeight", Constants.GALLERY_THUMBNAIL_SIZE_HEIGHT);
 
 		return data;
 	}

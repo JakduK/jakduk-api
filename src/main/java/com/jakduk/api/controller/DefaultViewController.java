@@ -1,6 +1,6 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.FileUtils;
 import com.jakduk.api.configuration.JakdukProperties;
@@ -8,8 +8,8 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UserPicture;
-import com.jakduk.api.model.simple.BoardFreeOnSitemap;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.model.simple.ArticleOnSitemap;
+import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
@@ -52,7 +52,7 @@ public class DefaultViewController {
 
 	@Autowired private GalleryService galleryService;
 	@Autowired private UserPictureService userPictureService;
-	@Autowired private BoardFreeService boardFreeService;
+	@Autowired private ArticleService articleService;
 
 	// RSS
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
@@ -73,13 +73,13 @@ public class DefaultViewController {
 			Boolean existPosts = true;
 
 			do {
-				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, JakdukConst.NUMBER_OF_ITEMS_EACH_PAGES);
+				List<ArticleOnSitemap> posts = articleService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 				if (ObjectUtils.isEmpty(posts)) {
 					existPosts = false;
 				} else {
-					BoardFreeOnSitemap post = posts.stream()
-							.sorted(Comparator.comparing(BoardFreeOnSitemap::getId))
+					ArticleOnSitemap post = posts.stream()
+							.sorted(Comparator.comparing(ArticleOnSitemap::getId))
 							.findFirst()
 							.orElseThrow(() -> new ServiceException(ServiceError.INTERNAL_SERVER_ERROR));
 
@@ -125,7 +125,7 @@ public class DefaultViewController {
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-				JakdukConst.IMAGE_TYPE.FULL);
+				Constants.IMAGE_TYPE.FULL);
 		response.setContentType(gallery.getContentType());
 
 		try {
@@ -143,7 +143,7 @@ public class DefaultViewController {
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-				JakdukConst.IMAGE_TYPE.THUMBNAIL);
+				Constants.IMAGE_TYPE.THUMBNAIL);
 		response.setContentType(gallery.getContentType());
 
 		try {

@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.Token;
@@ -47,10 +47,10 @@ public class PasswordRestController {
 					rabbitMQPublisher.sendResetPassword(locale, host, email);
 					break;
 				case DAUM:
-					message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", JakdukConst.ACCOUNT_TYPE.DAUM);
+					message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
 					break;
 				case FACEBOOK:
-					message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", JakdukConst.ACCOUNT_TYPE.FACEBOOK);
+					message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
 					break;
 			}
 		}

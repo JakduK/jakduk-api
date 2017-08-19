@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.service.FootballService;
@@ -33,6 +33,6 @@ public class FootballRestController {
 
         String language = JakdukUtils.getLanguageCode(lang);
 
-        return footballService.getFootballClubs(language, JakdukConst.CLUB_TYPE.FOOTBALL_CLUB, JakdukConst.NAME_TYPE.fullName);
+        return footballService.getFootballClubs(language, Constants.CLUB_TYPE.FOOTBALL_CLUB, Constants.NAME_TYPE.fullName);
     }
 }

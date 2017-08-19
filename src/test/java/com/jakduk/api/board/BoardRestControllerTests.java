@@ -2,23 +2,23 @@ package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.AuthHelper;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.util.ObjectMapperUtils;
-import com.jakduk.api.model.db.BoardCategory;
-import com.jakduk.api.model.db.BoardFree;
+import com.jakduk.api.model.aggregate.BoardTop;
+import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.Gallery;
-import com.jakduk.api.model.embedded.BoardCommentStatus;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleCommentStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalSimpleName;
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
-import com.jakduk.api.model.simple.BoardFreeOnSearch;
-import com.jakduk.api.model.simple.BoardFreeSimple;
+import com.jakduk.api.model.simple.ArticleOnSearch;
+import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
 import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.service.BoardCategoryService;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
+import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,13 +52,12 @@ public class BoardRestControllerTests {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean private BoardFreeService boardFreeService;
-    @MockBean private BoardCategoryService boardCategoryService;
+    @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
     @MockBean private AuthHelper authHelper;
 
     private CommonWriter commonWriter;
-    private BoardFree boardFree;
+    private Article article;
     private BoardCategory boardCategory;
 
     @Before
@@ -68,22 +65,22 @@ public class BoardRestControllerTests {
         commonWriter = CommonWriter.builder()
                 .userId("userid01")
                 .username("user01")
-                .providerId(JakdukConst.ACCOUNT_TYPE.JAKDUK)
+                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
                 .build();
 
-        boardFree = BoardFree.builder()
+        article = Article.builder()
                 .id("boardFreeId01")
                 .seq(1)
                 .writer(commonWriter)
                 .subject("제목입니다.")
                 .content("내용입니다.")
-                .category(JakdukConst.BOARD_CATEGORY_TYPE.FOOTBALL)
+                .board(Constants.BOARD_TYPE.FOOTBALL.name())
+                .category("CLASSIC")
                 .linkedGallery(true)
-                .status(BoardStatus.builder().notice(false).delete(false).device(JakdukConst.DEVICE_TYPE.NORMAL).build())
+                .status(ArticleStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
                 .build();
 
         boardCategory = BoardCategory.builder()
-                .id("boardCategoryId01")
                 .code("FREE")
                 .names(Arrays.asList(new LocalSimpleName("ko", "자유"), new LocalSimpleName("en", "FREE")))
                 .build();
@@ -105,8 +102,8 @@ public class BoardRestControllerTests {
     @WithMockUser
     public void getFreePostsTopsTest() throws Exception {
 
-        List<BoardFreeOnBest> expectTopLikes = Arrays.asList(
-                BoardFreeOnBest.builder()
+        List<BoardTop> expectTopLikes = Arrays.asList(
+                BoardTop.builder()
                         .id("boardFreeId01")
                         .seq(1)
                         .subject("인기있는 글 제목")
@@ -115,11 +112,11 @@ public class BoardRestControllerTests {
                         .build()
         );
 
-        when(boardFreeService.getFreeTopLikes())
+        when(articleService.getFreeTopLikes(anyString(), any(ObjectId.class)))
                 .thenReturn(expectTopLikes);
 
-        List<BoardFreeOnBest> expectTopComments = Arrays.asList(
-                BoardFreeOnBest.builder()
+        List<BoardTop> expectTopComments = Arrays.asList(
+                BoardTop.builder()
                         .id("boardFreeId02")
                         .seq(2)
                         .subject("댓글많은 글 제목")
@@ -128,10 +125,10 @@ public class BoardRestControllerTests {
                         .build()
         );
 
-        when(boardFreeService.getFreeTopComments())
+        when(articleService.getFreeTopComments(anyString(), any(ObjectId.class)))
                 .thenReturn(expectTopComments);
 
-        FreeTopsResponse response = FreeTopsResponse.builder()
+        GetBoardTopsResponse response = GetBoardTopsResponse.builder()
                 .topLikes(expectTopLikes)
                 .topComments(expectTopComments)
                 .build();
@@ -147,20 +144,20 @@ public class BoardRestControllerTests {
     @WithMockUser
     public void getFreeCommentsTest() throws Exception {
 
-        FreePostCommentsResponse response = FreePostCommentsResponse.builder()
+        GetArticleCommentsResponse response = GetArticleCommentsResponse.builder()
                 .comments(
                         Arrays.asList(
-                                FreePostComment.builder()
+                                GetArticleComment.builder()
                                         .id("boardFreeCommentId01")
-                                        .boardItem(
-                                                BoardFreeOnSearch.builder()
-                                                        .id(boardFree.getId())
-                                                        .seq(boardFree.getSeq())
-                                                        .subject(boardFree.getSubject())
+                                        .article(
+                                                ArticleOnSearch.builder()
+                                                        .id(article.getId())
+                                                        .seq(article.getSeq())
+                                                        .subject(article.getSubject())
                                                         .build())
                                         .writer(commonWriter)
                                         .content("댓글 내용입니다.")
-                                        .status(new BoardCommentStatus(JakdukConst.DEVICE_TYPE.NORMAL))
+                                        .status(new ArticleCommentStatus(Constants.DEVICE_TYPE.NORMAL))
                                         .numberOfDislike(5)
                                         .numberOfDislike(3)
                                         .build()
@@ -175,7 +172,7 @@ public class BoardRestControllerTests {
                 .totalElements(1)
                 .build();
 
-        when(boardFreeService.getBoardFreeComments(anyInt(), anyInt()))
+        when(articleService.getArticleComments(any(CommonWriter.class), anyString(), anyInt(), anyInt()))
                 .thenReturn(response);
 
         mvc.perform(get("/api/board/free/comments")
@@ -190,14 +187,14 @@ public class BoardRestControllerTests {
     @WithMockUser
     public void getFreePostTest() throws Exception {
 
-        FreePostDetail freePostDetail = new FreePostDetail();
-        BeanUtils.copyProperties(boardFree, freePostDetail);
-        freePostDetail.setCategory(boardCategory);
-        freePostDetail.setNumberOfLike(5);
-        freePostDetail.setNumberOfDislike(4);
-        freePostDetail.setGalleries(
+        ArticleDetail articleDetail = new ArticleDetail();
+        BeanUtils.copyProperties(article, articleDetail);
+        articleDetail.setCategory(boardCategory);
+        articleDetail.setNumberOfLike(5);
+        articleDetail.setNumberOfDislike(4);
+        articleDetail.setGalleries(
                 Arrays.asList(
-                        BoardGallery.builder()
+                        ArticleGallery.builder()
                         .id("boardGalleryId01")
                         .name("성남FC 시즌권 사진")
                         .imageUrl("https://staging.jakduk.com:8080/gallery/58b9050b807d714eaf50a111")
@@ -206,30 +203,30 @@ public class BoardRestControllerTests {
                 )
         );
 
-        BoardFreeSimple prevPost = BoardFreeSimple.builder()
+        ArticleSimple prevPost = ArticleSimple.builder()
                 .id("boardFreeId02")
                 .seq(2)
                 .subject("이전 글 제목")
                 .writer(commonWriter)
                 .build();
 
-        BoardFreeSimple nextPost = BoardFreeSimple.builder()
+        ArticleSimple nextPost = ArticleSimple.builder()
                 .id("boardFreeId03")
                 .seq(3)
                 .subject("다음 글 제목")
                 .writer(commonWriter)
                 .build();
 
-        FreePostDetailResponse response = FreePostDetailResponse.builder()
-                .post(freePostDetail)
-                .prevPost(prevPost)
-                .nextPost(nextPost)
+        GetArticleDetailResponse response = GetArticleDetailResponse.builder()
+                .article(articleDetail)
+                .prevArticle(prevPost)
+                .nextArticle(nextPost)
                 .build();
 
-        when(boardFreeService.getBoardFreeDetail(anyInt(), anyBoolean()))
+        when(articleService.getArticleDetail(anyString(), anyInt(), anyBoolean()))
                 .thenReturn(response);
 
-        mvc.perform(get("/api/board/free/{seq}", boardFree.getSeq())
+        mvc.perform(get("/api/board/free/{seq}", article.getSeq())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(response)));
@@ -241,10 +238,10 @@ public class BoardRestControllerTests {
 
         GalleryOnBoard galleryOnBoard = GalleryOnBoard.builder().id("galleryid01").name("공차는사진").build();
 
-        FreePostForm form = FreePostForm.builder()
+        WriteArticle form = WriteArticle.builder()
                 .subject("제목입니다.")
                 .content("내용입니다.")
-                .categoryCode(JakdukConst.BOARD_CATEGORY_TYPE.FOOTBALL)
+                .categoryCode("CLASSIC")
                 .galleries(Arrays.asList(galleryOnBoard))
                 .build();
 
@@ -265,16 +262,16 @@ public class BoardRestControllerTests {
         when(galleryService.findByIdIn(any()))
                 .thenReturn(expectGalleries);
 
-        when(boardFreeService.insertFreePost(any(CommonWriter.class), anyString(), anyString(), any(JakdukConst.BOARD_CATEGORY_TYPE.class),
-                anyListOf(Gallery.class), any(JakdukConst.DEVICE_TYPE.class)))
-                .thenReturn(boardFree);
+        when(articleService.insertArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
+                anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
+                .thenReturn(article);
 
         doNothing().when(galleryService)
                 .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(JakdukConst.GALLERY_FROM_TYPE.class), anyString());
+                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
-        FreePostWriteResponse expectResponse = FreePostWriteResponse.builder()
-                .seq(boardFree.getSeq())
+        WriteArticleResponse expectResponse = WriteArticleResponse.builder()
+                .seq(article.getSeq())
                 .build();
 
         mvc.perform(post("/api/board/free")

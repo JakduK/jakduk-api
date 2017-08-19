@@ -1,37 +1,40 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.AuthHelper;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
+import com.jakduk.api.common.board.category.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.db.BoardCategory;
-import com.jakduk.api.model.db.BoardFree;
-import com.jakduk.api.model.db.BoardFreeComment;
+import com.jakduk.api.model.aggregate.BoardTop;
+import com.jakduk.api.model.db.Article;
+import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.model.jongo.BoardFreeOnBest;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.service.BoardCategoryService;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,75 +44,192 @@ import java.util.stream.Collectors;
  * 16. 3. 26 오후 11:05
  */
 
-@Api(tags = "BoardFree", description = "자유게시판 API")
+@Api(tags = "Board", description = "게시판 API")
 @RestController
-@RequestMapping("/api/${jakduk.api-url-path.board-free}")
+@RequestMapping("/api/board")
 public class BoardRestController {
 
-    @Autowired private BoardFreeService boardFreeService;
-    @Autowired private BoardCategoryService boardCategoryService;
+    @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
     @Autowired private AuthHelper authHelper;
 
-    @ApiOperation("자유게시판 글 목록")
-    @GetMapping("/posts")
-    public FreePostsResponse getFreePosts(
+    @ApiOperation("게시판 글 목록")
+    @GetMapping("/{board}/articles")
+    public GetArticlesResponse getArticles(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
-            @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") JakdukConst.BOARD_CATEGORY_TYPE category) {
+            @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") String categoryCode) {
 
-        return boardFreeService.getFreePosts(category, page, size);
+        return articleService.getArticles(StringUtils.upperCase(board.name()), categoryCode, page, size);
     }
 
-    @ApiOperation("자유게시판 주간 선두 글")
-    @GetMapping("/tops")
-    public FreeTopsResponse getFreePostsTops() {
+    @ApiOperation("게시판 주간 선두 글")
+    @GetMapping("/{board}/tops")
+    public GetBoardTopsResponse getBoardTops(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
 
-        List<BoardFreeOnBest> topLikes = boardFreeService.getFreeTopLikes();
-        List<BoardFreeOnBest> topComments = boardFreeService.getFreeTopComments();
+        LocalDate localDate = LocalDate.now().minusWeeks(1);
+        ObjectId objectId = new ObjectId(DateUtils.localDateToDate(localDate));
 
-        return FreeTopsResponse.builder()
+        List<BoardTop> topLikes = articleService.getFreeTopLikes(StringUtils.upperCase(board.name()), objectId);
+        List<BoardTop> topComments = articleService.getFreeTopComments(StringUtils.upperCase(board.name()), objectId);
+
+        return GetBoardTopsResponse.builder()
                 .topLikes(topLikes)
                 .topComments(topComments)
                 .build();
     }
 
-    @ApiOperation("자유게시판 댓글 목록")
-    @GetMapping("/comments")
-    public FreePostCommentsResponse getFreeComments(
+    @ApiOperation("게시판 댓글 목록")
+    @GetMapping("/{board}/comments")
+    public GetArticleCommentsResponse getArticleComments(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size) {
 
-        return boardFreeService.getBoardFreeComments(page, size);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+
+        return articleService.getArticleComments(commonWriter, StringUtils.upperCase(board.name()), page, size);
     }
 
-    @ApiOperation("자유게시판 글 상세")
-    @GetMapping("/{seq}")
-    public FreePostDetailResponse getFreePost(
+    @ApiOperation("게시판 글 상세")
+    @GetMapping("/{board}/{seq}")
+    public GetArticleDetailResponse getArticleDetail(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, JakdukConst.VIEWS_COOKIE_TYPE.FREE_BOARD, String.valueOf(seq));
+        Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, Constants.VIEWS_COOKIE_TYPE.ARTICLE, String.valueOf(seq));
 
-        return boardFreeService.getBoardFreeDetail(seq, isAddCookie);
+        return articleService.getArticleDetail(StringUtils.upperCase(board.name()), seq, isAddCookie);
     }
 
-    @ApiOperation(value = "자유게시판 말머리 목록")
-    @RequestMapping(value = "/categories", method = RequestMethod.GET)
-    public FreeCategoriesResponse getFreeCategories() {
+    @ApiOperation("게시판 말머리 목록")
+    @GetMapping("/{board}/categories")
+    public GetBoardCategoriesResponse getBoardCategories(
+            @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
 
-        List<BoardCategory> categories = boardCategoryService.getFreeCategories();
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
-        return FreeCategoriesResponse.builder()
+        List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(boardType, JakdukUtils.getLocale());
+
+        return GetBoardCategoriesResponse.builder()
                 .categories(categories)
                 .build();
     }
 
-    @ApiOperation("자유게시판 글쓰기")
-    @PostMapping("")
-    public FreePostWriteResponse addFreePost(
-            @ApiParam(value = "글 폼", required = true) @Valid @RequestBody FreePostForm form,
+    @ApiOperation("게시판 글쓰기")
+    @PostMapping("/{board}")
+    public WriteArticleResponse writeArticle(
+            @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 폼", required = true) @Valid @RequestBody WriteArticle form,
+            Device device,
+            Authentication authentication) {
+
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
+
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+
+        // 연관된 사진 id 배열 (검증 전)
+        List<String> unverifiableGalleryIds = null;
+
+        if (! CollectionUtils.isEmpty(form.getGalleries())) {
+            unverifiableGalleryIds = form.getGalleries().stream()
+                    .map(GalleryOnBoard::getId)
+                    .collect(Collectors.toList());
+        }
+
+        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
+
+        Article article = articleService.insertArticle(commonWriter, boardType, form.getSubject().trim(), form.getContent().trim(),
+                form.getCategoryCode().trim(), galleries, JakdukUtils.getDeviceInfo(device));
+
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
+
+        return WriteArticleResponse.builder()
+                .seq(article.getSeq())
+                .build();
+    }
+
+    @ApiOperation("게시판 글 고치기")
+    @SecuredUser
+    @PutMapping("/{board}/{seq}")
+    public WriteArticleResponse editArticle(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody WriteArticle form,
+            HttpServletRequest request,
+            Device device,
+            Authentication authentication) {
+
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+
+        // 연관된 사진 id 배열 (검증 전)
+        List<String> unverifiableGalleryIds = null;
+
+        if (! CollectionUtils.isEmpty(form.getGalleries())) {
+            unverifiableGalleryIds = form.getGalleries().stream()
+                    .map(GalleryOnBoard::getId)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
+        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
+
+        // 연관된 사진 id 배열 (검증 후)
+        List<String> galleryIds = galleries.stream()
+                .map(Gallery::getId)
+                .collect(Collectors.toList());
+
+        Article article = articleService.updateArticle(commonWriter, StringUtils.upperCase(board.name()), seq, form.getSubject().trim(), form.getContent().trim(),
+                form.getCategoryCode(), galleryIds, JakdukUtils.getDeviceInfo(device));
+
+        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
+
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
+
+        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
+
+        return WriteArticleResponse.builder()
+                .seq(article.getSeq())
+                .build();
+    }
+
+    @ApiOperation(value = "게시판 글 지움")
+    @SecuredUser
+    @DeleteMapping("/{board}/{seq}")
+    public DeleteArticleResponse deleteArticle(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            Authentication authentication) {
+
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+
+		Constants.ARTICLE_DELETE_TYPE deleteType = articleService.deleteArticle(commonWriter, StringUtils.upperCase(board.name()), seq);
+
+        return DeleteArticleResponse.builder()
+                .result(deleteType)
+                .build();
+    }
+
+    @ApiOperation("게시판 글의 댓글 목록")
+    @GetMapping("/{board}/{seq}/comments")
+    public GetArticleDetailCommentsResponse getArticleDetailComments(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
+
+        return articleService.getArticleDetailComments(StringUtils.upperCase(board.name()), seq, commentId);
+    }
+
+    @ApiOperation("게시판 글의 댓글 달기")
+    @PostMapping("/{board}/{seq}/comment")
+    public ArticleComment addArticleComment(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
+            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             Device device,
             Authentication authentication) {
 
@@ -126,123 +246,31 @@ public class BoardRestController {
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        BoardFree boardFree = boardFreeService.insertFreePost(commonWriter, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), galleries, JakdukUtils.getDeviceInfo(device));
-
-        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
-
-        return FreePostWriteResponse.builder()
-                .seq(boardFree.getSeq())
-                .build();
-    }
-
-    @ApiOperation("자유게시판 글 고치기")
-    @SecuredUser
-    @PutMapping("/{seq}")
-    public FreePostWriteResponse editFreePost(
-            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody FreePostForm form,
-            HttpServletRequest request,
-            Device device) {
-
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
-
-        // 연관된 사진 id 배열 (검증 전)
-        List<String> unverifiableGalleryIds = null;
-
-        if (! CollectionUtils.isEmpty(form.getGalleries())) {
-            unverifiableGalleryIds = form.getGalleries().stream()
-                    .map(GalleryOnBoard::getId)
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
-
-        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
-
-        // 연관된 사진 id 배열 (검증 후)
-        List<String> galleryIds = galleries.stream()
-                .map(Gallery::getId)
-                .collect(Collectors.toList());
-
-        BoardFree boardFree = boardFreeService.updateFreePost(commonWriter, seq, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), galleryIds, JakdukUtils.getDeviceInfo(device));
-
-        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
-
-        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
-
-        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE, boardFree.getId());
-
-        return FreePostWriteResponse.builder()
-                .seq(boardFree.getSeq())
-                .build();
-    }
-
-    @ApiOperation(value = "자유게시판 글 지움")
-    @SecuredUser
-    @DeleteMapping("/{seq}")
-    public FreePostDeleteResponse deleteFree(
-            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
-
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
-
-		JakdukConst.BOARD_DELETE_TYPE deleteType = boardFreeService.deleteFreePost(commonWriter, seq);
-
-        return FreePostDeleteResponse.builder()
-                .result(deleteType)
-                .build();
-    }
-
-    @ApiOperation("자유게시판 글의 댓글 목록")
-    @GetMapping("/{seq}/comments")
-    public FreePostDetailCommentsResponse getFreePostDetailComments(
-            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
-
-        return boardFreeService.getBoardFreeDetailComments(seq, commentId);
-    }
-
-    @ApiOperation("자유게시판 글의 댓글 달기")
-    @PostMapping("/comment")
-    public BoardFreeComment addFreeComment(
-            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
-            Device device) {
-
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
-
-        // 연관된 사진 id 배열 (검증 전)
-        List<String> unverifiableGalleryIds = null;
-
-        if (! ObjectUtils.isEmpty(form.getGalleries())) {
-            unverifiableGalleryIds = form.getGalleries().stream()
-                    .map(GalleryOnBoard::getId)
-                    .collect(Collectors.toList());
-        }
-
-        List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
-
-        BoardFreeComment boardFreeComment =  boardFreeService.insertFreeComment(form.getSeq(), commonWriter, form.getContent().trim(),
+        ArticleComment articleComment =  articleService.insertArticleComment(StringUtils.upperCase(board.name()), seq, commonWriter, form.getContent().trim(),
                 galleries, JakdukUtils.getDeviceInfo(device));
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), null,
-                JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
 
-        return boardFreeComment;
+        return articleComment;
     }
 
-    @ApiOperation("자유게시판 글의 댓글 고치기")
+    @ApiOperation("게시판 글의 댓글 고치기")
     @SecuredUser
-    @PutMapping("/comment/{id}")
-    public BoardFreeComment editFreeComment(
+    @PutMapping("/{board}/{seq}/comment/{id}")
+    public ArticleComment editArticleComment(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             HttpServletRequest request,
-            Device device) {
+            Device device,
+            Authentication authentication) {
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -261,25 +289,26 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        BoardFreeComment boardFreeComment = boardFreeService.updateFreeComment(id, form.getSeq(), commonWriter, form.getContent().trim(), galleryIds,
+        ArticleComment articleComment = articleService.updateArticleComment(id, StringUtils.upperCase(board.name()), seq, commonWriter, form.getContent().trim(), galleryIds,
                 JakdukUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,
-                JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval,
-                JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+                Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
 
-        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, JakdukConst.GALLERY_FROM_TYPE.BOARD_FREE_COMMENT, boardFreeComment.getId());
+        JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
 
-        return boardFreeComment;
+        return articleComment;
 
     }
 
-    @ApiOperation("자유게시판 글의 댓글 지우기")
+    @ApiOperation("게시판 글의 댓글 지우기")
     @SecuredUser
-    @DeleteMapping("/comment/{id}")
+    @DeleteMapping("/{board}/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
 
         if (! AuthUtils.isUser())
@@ -287,55 +316,60 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        boardFreeService.deleteFreeComment(id, commonWriter);
+        articleService.deleteArticleComment(id, StringUtils.upperCase(board.name()), commonWriter);
 
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation("자유게시판 글 감정 표현")
-    @PostMapping("/{seq}/{feeling}")
+    @ApiOperation("게시판 글 감정 표현")
+    @PostMapping("/{board}/{seq}/{feeling}")
     public UserFeelingResponse addFreeFeeling(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            @ApiParam(value = "감정", required = true) @PathVariable JakdukConst.FEELING_TYPE feeling) {
+            @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE_LOWERCASE feeling) {
+
+        Constants.FEELING_TYPE feelingType = Constants.FEELING_TYPE.valueOf(StringUtils.upperCase(feeling.name()));
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        BoardFree boardFree = boardFreeService.setFreeFeelings(commonWriter, seq, feeling);
+        Article article = articleService.setFreeFeelings(commonWriter, StringUtils.upperCase(board.name()), seq, feelingType);
 
         UserFeelingResponse response = UserFeelingResponse.builder()
-                .numberOfLike(CollectionUtils.isEmpty(boardFree.getUsersLiking()) ? 0 : boardFree.getUsersLiking().size())
-                .numberOfDislike(CollectionUtils.isEmpty(boardFree.getUsersDisliking()) ? 0 : boardFree.getUsersDisliking().size())
+                .numberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size())
+                .numberOfDislike(CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size())
                 .build();
 
         if (Objects.nonNull(commonWriter))
-            response.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardFree.getUsersLiking(), boardFree.getUsersDisliking()));
+            response.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, article.getUsersLiking(), article.getUsersDisliking()));
 
         return response;
     }
 
     @ApiOperation(value = "자유게시판 글의 감정 표현 회원 목록")
-    @RequestMapping(value = "/{seq}/feeling/users", method = RequestMethod.GET)
+    @RequestMapping(value = "/{board}/{seq}/feeling/users", method = RequestMethod.GET)
     public FreePostFeelingsResponse getFreeFeelings (
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
-        BoardFree boardFree = boardFreeService.findOneBySeq(seq);
+        Article article = articleService.findOneBySeq(StringUtils.upperCase(board.name()), seq);
 
         return FreePostFeelingsResponse.builder()
                 .seq(seq)
-                .usersLiking(boardFree.getUsersLiking())
-                .usersDisliking(boardFree.getUsersDisliking())
+                .usersLiking(article.getUsersLiking())
+                .usersDisliking(article.getUsersDisliking())
                 .build();
     }
 
     @ApiOperation("자유게시판 댓글 감정 표현")
-    @PostMapping("/comment/{commentId}/{feeling}")
+    @PostMapping("/{board}/comment/{commentId}/{feeling}")
     public UserFeelingResponse addFreeCommentFeeling(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
-            @ApiParam(value = "감정", required = true) @PathVariable JakdukConst.FEELING_TYPE feeling) {
+            @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE feeling) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        BoardFreeComment boardComment = boardFreeService.setFreeCommentFeeling(commonWriter, commentId, feeling);
+        ArticleComment boardComment = articleService.setFreeCommentFeeling(commonWriter, commentId, feeling);
 
         UserFeelingResponse response = UserFeelingResponse.builder()
                 .numberOfLike(CollectionUtils.isEmpty(boardComment.getUsersLiking()) ? 0 : boardComment.getUsersLiking().size())
@@ -348,30 +382,34 @@ public class BoardRestController {
         return response;
     }
 
-    @ApiOperation(value = "자유게시판 글의 공지 활성화")
-    @RequestMapping(value = "/{seq}/notice", method = RequestMethod.POST)
-    public EmptyJsonResponse enableFreeNotice(@PathVariable int seq) {
+    @ApiOperation(value = "게시판 글의 공지 활성화")
+    @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.POST)
+    public EmptyJsonResponse enableFreeNotice(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @PathVariable int seq) {
 
         if (! AuthUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-		boardFreeService.setFreeNotice(commonWriter, seq, true);
+		articleService.setFreeNotice(commonWriter, StringUtils.upperCase(board.name()), seq, true);
 
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "자유게시판 글의 공지 비활성화")
-    @RequestMapping(value = "/{seq}/notice", method = RequestMethod.DELETE)
-    public EmptyJsonResponse disableFreeNotice(@PathVariable int seq) {
+    @ApiOperation(value = "게시판 글의 공지 비활성화")
+    @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.DELETE)
+    public EmptyJsonResponse disableFreeNotice(
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @PathVariable int seq) {
 
         if (! AuthUtils.isAdmin())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        boardFreeService.setFreeNotice(commonWriter, seq, false);
+        articleService.setFreeNotice(commonWriter, StringUtils.upperCase(board.name()), seq, false);
 
         return EmptyJsonResponse.newInstance();
     }

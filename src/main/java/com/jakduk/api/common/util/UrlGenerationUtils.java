@@ -1,6 +1,6 @@
 package com.jakduk.api.common.util;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.util.UrlUtils;
@@ -39,7 +39,7 @@ public class UrlGenerationUtils {
      * @param sizeType size 타입
      * @param id Gallery ID
      */
-    public String generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE sizeType, String id) {
+    public String generateGalleryUrl(Constants.IMAGE_SIZE_TYPE sizeType, String id) {
 
         if (StringUtils.isBlank(id))
             return null;

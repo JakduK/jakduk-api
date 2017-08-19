@@ -1,17 +1,17 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.db.HomeDescription;
-import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
+import com.jakduk.api.model.simple.ArticleCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
-import com.jakduk.api.repository.board.free.comment.BoardFreeCommentOnHomeRepository;
+import com.jakduk.api.repository.article.comment.ArticleCommentOnHomeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +42,7 @@ public class HomeService {
 	private EncyclopediaRepository encyclopediaRepository;
 
 	@Autowired
-	private BoardFreeCommentOnHomeRepository boardFreeCommentOnHomeRepository;
+	private ArticleCommentOnHomeRepository articleCommentOnHomeRepository;
 
 	/**
 	 * 랜덤하게 백과 사전 하나를 가져온다.
@@ -65,21 +65,21 @@ public class HomeService {
 	}
 
 	// 최근 댓글 가져오기.
-	public List<BoardFreeCommentOnHome> getBoardCommentsLatest() {
+	public List<ArticleCommentOnHome> getBoardCommentsLatest() {
 		
 		Sort sort = new Sort(Direction.DESC, Arrays.asList("_id"));
-		Pageable pageable = new PageRequest(0, JakdukConst.HOME_SIZE_LINE_NUMBER, sort);
+		Pageable pageable = new PageRequest(0, Constants.HOME_SIZE_LINE_NUMBER, sort);
 		
-		List<BoardFreeCommentOnHome> comments = boardFreeCommentOnHomeRepository.findAll(pageable).getContent();
+		List<ArticleCommentOnHome> comments = articleCommentOnHomeRepository.findAll(pageable).getContent();
 		
-		for (BoardFreeCommentOnHome comment : comments) {
+		for (ArticleCommentOnHome comment : comments) {
 			String content = JakdukUtils.stripHtmlTag(comment.getContent());
 
 			if (StringUtils.isNotBlank(content)) {
 				Integer contentLength = content.length() + comment.getWriter().getUsername().length();
 
-				if (contentLength > JakdukConst.HOME_COMMENT_CONTENT_MAX_LENGTH) {
-					content = content.substring(0, JakdukConst.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
+				if (contentLength > Constants.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+					content = content.substring(0, Constants.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
 					content = String.format("%s...", content);
 				}
 				comment.setContent(content);

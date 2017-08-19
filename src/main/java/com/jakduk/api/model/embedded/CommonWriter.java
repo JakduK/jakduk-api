@@ -1,6 +1,6 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class CommonWriter {
 	
 	private String userId;
 	private String username;
-	private JakdukConst.ACCOUNT_TYPE providerId;
+	private Constants.ACCOUNT_TYPE providerId;
 	private UserPictureInfo picture;
 
 }

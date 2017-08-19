@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.vo.home;
 
 import com.jakduk.api.model.db.HomeDescription;
-import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
+import com.jakduk.api.model.simple.ArticleCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,7 +30,7 @@ public class HomeResponse {
     private List<GalleryOnHome> galleries;
 
     @ApiModelProperty(value = "최근 댓글")
-    private List<BoardFreeCommentOnHome> comments;
+    private List<ArticleCommentOnHome> comments;
 
     @ApiModelProperty(value = "상단 글")
     private HomeDescription homeDescription;

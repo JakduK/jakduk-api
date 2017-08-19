@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.gallery;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.simple.GallerySimple;
 import org.bson.types.ObjectId;
@@ -28,9 +28,9 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
      * 사진첩 보기의 앞, 뒤 사진을 가져온다.
      */
     @Override
-    public List<Gallery> findGalleriesById(ObjectId id, JakdukConst.CRITERIA_OPERATOR operator, Integer limit) {
+    public List<Gallery> findGalleriesById(ObjectId id, Constants.CRITERIA_OPERATOR operator, Integer limit) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("status.status").is(JakdukConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+        query.addCriteria(Criteria.where("status.status").is(Constants.GALLERY_STATUS_TYPE.ENABLE.name()));
         query.limit(limit);
 
         if (Objects.nonNull(id)) {
@@ -53,9 +53,9 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
      * ItemID와 FromType에 해당하는 Gallery 목록을 가져온다.
      */
     @Override
-    public List<Gallery> findByItemIdAndFromType(ObjectId itemId, JakdukConst.GALLERY_FROM_TYPE fromType, Integer limit) {
+    public List<Gallery> findByItemIdAndFromType(ObjectId itemId, Constants.GALLERY_FROM_TYPE fromType, Integer limit) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("status.status").is(JakdukConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+        query.addCriteria(Criteria.where("status.status").is(Constants.GALLERY_STATUS_TYPE.ENABLE.name()));
         query.addCriteria(Criteria.where("linkedItems._id").is(itemId));
         query.addCriteria(Criteria.where("linkedItems.from").is(fromType));
         query.limit(limit);
@@ -69,7 +69,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
     public List<GallerySimple> findSimpleById(ObjectId id, Integer limit) {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("status.status").is(JakdukConst.GALLERY_STATUS_TYPE.ENABLE.name()));
+        query.addCriteria(Criteria.where("status.status").is(Constants.GALLERY_STATUS_TYPE.ENABLE.name()));
         query.limit(limit);
 
         if (Objects.nonNull(id)) {

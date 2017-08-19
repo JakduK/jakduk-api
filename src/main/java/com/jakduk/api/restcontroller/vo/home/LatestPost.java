@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.vo.home;
 
-import com.jakduk.api.common.JakdukConst;
-import com.jakduk.api.model.embedded.BoardStatus;
+import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,14 +29,14 @@ public class LatestPost {
     @ApiModelProperty(example = "2", value = "글번호")
     private int seq;
 
-    @ApiModelProperty(example = "FREE", value = "말머리")
-    private JakdukConst.BOARD_CATEGORY_TYPE category;
+    @ApiModelProperty(example = "CLASSIC", value = "말머리")
+    private String category;
 
     @ApiModelProperty(example = "10", value = "읽음 수")
     private int views = 0;
 
     @ApiModelProperty(value = "글상태")
-    private BoardStatus status;
+    private ArticleStatus status;
 
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallerySimple> galleries;

@@ -1,6 +1,6 @@
 package com.jakduk.api.common.util;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import lombok.Builder;
@@ -56,8 +56,8 @@ public class FileUtils {
                 Files.write(imageFilePath, bytes);
             } else {
 
-                double scale = JakdukConst.GALLERY_MAXIMUM_CAPACITY < size ?
-                        JakdukConst.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
+                double scale = Constants.GALLERY_MAXIMUM_CAPACITY < size ?
+                        Constants.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
 
                 InputStream inputStream = new ByteArrayInputStream(bytes);
 

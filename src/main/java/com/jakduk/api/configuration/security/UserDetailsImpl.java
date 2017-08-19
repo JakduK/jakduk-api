@@ -1,7 +1,7 @@
 package com.jakduk.api.configuration.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.UserPictureInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +19,7 @@ public class UserDetailsImpl implements UserDetails {
 	private String username;									// email
 	@Getter private final String id;
 	@Getter private final String nickname;						// 별명
-	@Getter private final JakdukConst.ACCOUNT_TYPE providerId;
+	@Getter private final Constants.ACCOUNT_TYPE providerId;
 	@Getter @Setter	private UserPictureInfo picture;
 
 	private final Set<GrantedAuthority> authorities;
@@ -28,7 +28,7 @@ public class UserDetailsImpl implements UserDetails {
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
 
-	public UserDetailsImpl(String username, String id, String password, String nickname, JakdukConst.ACCOUNT_TYPE providerId,
+	public UserDetailsImpl(String username, String id, String password, String nickname, Constants.ACCOUNT_TYPE providerId,
                            boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
                            Collection<? extends GrantedAuthority> authorities) {
 

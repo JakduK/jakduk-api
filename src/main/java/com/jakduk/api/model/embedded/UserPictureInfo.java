@@ -1,6 +1,6 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.UserPicture;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserPictureInfo {
 
     private String id;
-    private JakdukConst.ACCOUNT_TYPE sourceType;
+    private Constants.ACCOUNT_TYPE sourceType;
     private String smallPictureUrl;
     private String largePictureUrl;
 

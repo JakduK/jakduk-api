@@ -1,6 +1,6 @@
 package com.jakduk.api.model.elasticsearch;
 
-import com.jakduk.api.model.embedded.BoardItem;
+import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class EsComment {
 	
     private String id;
 	
-	private BoardItem boardItem;
+	private ArticleItem article;
 	
 	private CommonWriter writer;
 

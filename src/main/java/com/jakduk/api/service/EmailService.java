@@ -1,5 +1,6 @@
 package com.jakduk.api.service;
 
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.Token;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
@@ -85,6 +86,7 @@ public class EmailService {
 			});
 		} else {
 			Token token = Token.builder()
+					.type(Constants.TOKEN_TYPE.RESET_PASSWORD.name())
 					.email(recipientEmail)
 					.code(code)
 					.expireAt(
