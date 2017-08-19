@@ -15,7 +15,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class LatestPost {
+public class LatestHomeArticle {
 
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;
@@ -27,13 +27,16 @@ public class LatestPost {
     private String subject;
 
     @ApiModelProperty(example = "2", value = "글번호")
-    private int seq;
+    private Integer seq;
+
+    @ApiModelProperty(example = "FREE", value = "게시판")
+    private String board;
 
     @ApiModelProperty(example = "CLASSIC", value = "말머리")
     private String category;
 
     @ApiModelProperty(example = "10", value = "읽음 수")
-    private int views = 0;
+    private Integer views;
 
     @ApiModelProperty(value = "글상태")
     private ArticleStatus status;

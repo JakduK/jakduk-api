@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
@@ -95,7 +96,7 @@ public class BoardRestController {
 
     @ApiOperation("게시판 글 상세")
     @GetMapping("/{board}/{seq}")
-    public GetArticleDetailResponse getArticleDetail(
+    public ResponseEntity<GetArticleDetailResponse> getArticleDetail(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             HttpServletRequest request,
@@ -109,7 +110,7 @@ public class BoardRestController {
     @ApiOperation("게시판 말머리 목록")
     @GetMapping("/{board}/categories")
     public GetBoardCategoriesResponse getBoardCategories(
-            @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
 
         Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
@@ -197,7 +198,7 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation(value = "게시판 글 지움")
+    @ApiOperation("게시판 글 지움")
     @SecuredUser
     @DeleteMapping("/{board}/{seq}")
     public DeleteArticleResponse deleteArticle(
@@ -257,10 +258,9 @@ public class BoardRestController {
 
     @ApiOperation("게시판 글의 댓글 고치기")
     @SecuredUser
-    @PutMapping("/{board}/{seq}/comment/{id}")
+    @PutMapping("/{board}/comment/{id}")
     public ArticleComment editArticleComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
-            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             HttpServletRequest request,
@@ -289,7 +289,7 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        ArticleComment articleComment = articleService.updateArticleComment(id, StringUtils.upperCase(board.name()), seq, commonWriter, form.getContent().trim(), galleryIds,
+        ArticleComment articleComment = articleService.updateArticleComment(id, StringUtils.upperCase(board.name()), commonWriter, form.getContent().trim(), galleryIds,
                 JakdukUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,

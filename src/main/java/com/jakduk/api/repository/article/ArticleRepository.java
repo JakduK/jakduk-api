@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface ArticleRepository extends MongoRepository<Article, String>, ArticleRepositoryCustom {
 
 	Optional<Article> findOneById(String id);
+	Optional<Article> findOneBySeq(Integer seq);
 	Optional<Article> findOneByBoardAndSeq(String board, Integer seq);
 	Optional<Article> findTopByOrderByIdAsc();
 	Optional<Article> findTopByIdLessThanEqualOrderByIdDesc(ObjectId id);

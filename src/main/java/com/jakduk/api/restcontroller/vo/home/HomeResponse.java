@@ -21,7 +21,7 @@ import java.util.List;
 public class HomeResponse {
 
     @ApiModelProperty(value = "최근 글")
-    private List<LatestPost> posts;
+    private List<LatestHomeArticle> articles;
 
     @ApiModelProperty(value = "최근 가입 회원")
     private List<UserOnHome> users;

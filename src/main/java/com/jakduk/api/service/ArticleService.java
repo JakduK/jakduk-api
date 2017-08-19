@@ -24,7 +24,7 @@ import com.jakduk.api.repository.article.ArticleRepository;
 import com.jakduk.api.repository.article.comment.ArticleCommentRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.restcontroller.vo.home.LatestPost;
+import com.jakduk.api.restcontroller.vo.home.LatestHomeArticle;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +35,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -367,7 +370,7 @@ public class ArticleService {
 	/**
 	 * 최근 글 가져오기
 	 */
-	public List<LatestPost> getLatestArticles() {
+	public List<LatestHomeArticle> getLatestArticles() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
@@ -377,8 +380,8 @@ public class ArticleService {
 
 		return posts.stream()
 				.map(post -> {
-					LatestPost latestPost = new LatestPost();
-					BeanUtils.copyProperties(post, latestPost);
+					LatestHomeArticle latestHomeArticle = new LatestHomeArticle();
+					BeanUtils.copyProperties(post, latestHomeArticle);
 
 					if (post.getLinkedGallery()) {
 						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
@@ -393,10 +396,10 @@ public class ArticleService {
 										.build())
 								.collect(Collectors.toList());
 
-						latestPost.setGalleries(boardGalleries);
+						latestHomeArticle.setGalleries(boardGalleries);
 					}
 
-					return latestPost;
+					return latestHomeArticle;
 				})
 				.collect(Collectors.toList());
 	}
@@ -460,11 +463,8 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 고치기
 	 */
-	public ArticleComment updateArticleComment(String board, String id, Integer seq, CommonWriter writer, String content, List<String> galleryIds,
+	public ArticleComment updateArticleComment(String board, String id, CommonWriter writer, String content, List<String> galleryIds,
 											   Constants.DEVICE_TYPE device) {
-
-		articleRepository.findOneByBoardAndSeq(board, seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 		ArticleComment articleComment = articleCommentRepository.findOneById(id)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
@@ -816,10 +816,16 @@ public class ArticleService {
 	/**
 	 * 글 상세 객체 가져오기
 	 */
-	public GetArticleDetailResponse getArticleDetail(String board, Integer seq, Boolean isAddCookie) {
+	public ResponseEntity<GetArticleDetailResponse> getArticleDetail(String board, Integer seq, Boolean isAddCookie) {
 
-		Article article = articleRepository.findOneByBoardAndSeq(board, seq)
+		Article article = articleRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+
+		if (! StringUtils.equals(article.getBoard(), board)) {
+			return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+					.header(HttpHeaders.LOCATION, urlGenerationUtils.generateArticleDetailUrl(article.getBoard(), seq))
+					.build();
+		}
 
 		if (isAddCookie)
 			this.increaseViews(article);
@@ -885,7 +891,7 @@ public class ArticleService {
         // 글쓴이의 최근 글
 		List<LatestArticle> latestArticles = null;
 
-		if (ObjectUtils.isEmpty(articleDetail.getStatus()) || BooleanUtils.isNotTrue(articleDetail.getStatus().getDelete())) {
+		if (Objects.isNull(articleDetail.getStatus()) || BooleanUtils.isNotTrue(articleDetail.getStatus().getDelete())) {
 
 			List<ArticleOnList> latestPostsByWriter = articleRepository.findByIdAndUserId(
 					new ObjectId(articleDetail.getId()), articleDetail.getWriter().getUserId(), 3);
@@ -917,12 +923,13 @@ public class ArticleService {
 					.collect(Collectors.toList());
 		}
 
-		return GetArticleDetailResponse.builder()
-				.article(articleDetail)
-				.prevArticle(prevPost)
-				.nextArticle(nextPost)
-				.latestArticlesByWriter(CollectionUtils.isEmpty(latestArticles) ? null : latestArticles)
-				.build();
+		return ResponseEntity.ok()
+				.body(GetArticleDetailResponse.builder()
+						.article(articleDetail)
+						.prevArticle(prevPost)
+						.nextArticle(nextPost)
+						.latestArticlesByWriter(CollectionUtils.isEmpty(latestArticles) ? null : latestArticles)
+						.build());
 	}
 
 	/**

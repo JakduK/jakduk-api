@@ -28,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -224,7 +225,7 @@ public class BoardRestControllerTests {
                 .build();
 
         when(articleService.getArticleDetail(anyString(), anyInt(), anyBoolean()))
-                .thenReturn(response);
+                .thenReturn(ResponseEntity.ok().body(response));
 
         mvc.perform(get("/api/board/free/{seq}", article.getSeq())
                 .accept(MediaType.APPLICATION_JSON))
