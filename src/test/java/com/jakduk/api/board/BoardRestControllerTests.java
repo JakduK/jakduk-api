@@ -91,8 +91,8 @@ public class BoardRestControllerTests {
      */
     @Test
     @WithMockUser
-    public void getFreePostsTest() throws Exception {
-        mvc.perform(get("/api/board/free/posts")
+    public void getArticlesTest() throws Exception {
+        mvc.perform(get("/api/board/free/articles")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
