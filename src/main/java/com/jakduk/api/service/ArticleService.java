@@ -11,7 +11,7 @@ import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
-import com.jakduk.api.model.aggregate.BoardPostTop;
+import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.aggregate.CommonCount;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.ArticleComment;
@@ -203,9 +203,9 @@ public class ArticleService {
         if (! article.getWriter().getUserId().equals(writer.getUserId()))
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        BoardItem boardItem = new BoardItem(article.getId(), article.getSeq(), article.getBoard());
+        ArticleItem articleItem = new ArticleItem(article.getId(), article.getSeq(), article.getBoard());
 
-        Integer count = articleCommentRepository.countByBoardItem(boardItem);
+        Integer count = articleCommentRepository.countByArticle(articleItem);
 
         // 댓글이 하나라도 달리면 글을 몽땅 지우지 못한다.
         if (count > 0) {
@@ -259,7 +259,7 @@ public class ArticleService {
 	/**
 	 * 자유게시판 글 목록
      */
-	public GetArticlesResponse getArticles(Constants.BOARD_TYPE board, String categoryCode, Integer page, Integer size) {
+	public GetArticlesResponse getArticles(String board, String categoryCode, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
@@ -272,11 +272,11 @@ public class ArticleService {
 		}
 
 		// 자유 게시판 공지글 목록
-		List<ArticleOnList> notices = articleRepository.findNotices(board.name(), sort);
+		List<ArticleOnList> notices = articleRepository.findNotices(board, sort);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
-		Function<ArticleOnList, FreePost> convertToFreePost = post -> {
-			FreePost freePosts = new FreePost();
+		Function<ArticleOnList, GetArticle> convertToFreePost = post -> {
+			GetArticle freePosts = new GetArticle();
 			BeanUtils.copyProperties(post, freePosts);
 
 			if (post.getLinkedGallery()) {
@@ -298,18 +298,18 @@ public class ArticleService {
 			return freePosts;
 		};
 
-		List<FreePost> freePosts = postsPage.getContent().stream()
+		List<GetArticle> getArticles = postsPage.getContent().stream()
 				.map(convertToFreePost)
 				.collect(Collectors.toList());
 
-		List<FreePost> freeNotices = notices.stream()
+		List<GetArticle> freeNotices = notices.stream()
 				.map(convertToFreePost)
 				.collect(Collectors.toList());
 
 		// Board ID 뽑아내기.
 		ArrayList<ObjectId> ids = new ArrayList<>();
 
-		freePosts.forEach(post -> ids.add(new ObjectId(post.getId())));
+		getArticles.forEach(post -> ids.add(new ObjectId(post.getId())));
 		freeNotices.forEach(post -> ids.add(new ObjectId(post.getId())));
 
 		// 게시물의 댓글수
@@ -321,7 +321,7 @@ public class ArticleService {
 				.collect(Collectors.toMap(BoardFeelingCount::getId, Function.identity()));
 
 		// 댓글수, 감정 표현수 합치기.
-		Consumer<FreePost> applyCounts = post -> {
+		Consumer<GetArticle> applyCounts = post -> {
 			String boardId = post.getId();
 			Integer commentCount = commentCounts.get(boardId);
 
@@ -336,11 +336,11 @@ public class ArticleService {
 			}
 		};
 
-		freePosts.forEach(applyCounts);
+		getArticles.forEach(applyCounts);
 		freeNotices.forEach(applyCounts);
 
 		// 말머리
-		List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
+		List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(Constants.BOARD_TYPE.valueOf(board), JakdukUtils.getLocale());
 		Map<String, String> categoriesMap = null;
 
 		if (! CollectionUtils.isEmpty(categories)) {
@@ -352,7 +352,7 @@ public class ArticleService {
 
 		return GetArticlesResponse.builder()
 				.categories(categoriesMap)
-				.articles(freePosts)
+				.articles(getArticles)
 				.notices(freeNotices)
 				.first(postsPage.isFirst())
 				.last(postsPage.isLast())
@@ -367,14 +367,15 @@ public class ArticleService {
 	/**
 	 * 최근 글 가져오기
 	 */
-	public List<LatestPost> getFreeLatest() {
+	public List<LatestPost> getLatestArticles() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
 		List<ArticleOnList> posts = articleRepository.findLatest(sort, Constants.HOME_SIZE_POST);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
-		List<LatestPost> latestPosts = posts.stream()
+
+		return posts.stream()
 				.map(post -> {
 					LatestPost latestPost = new LatestPost();
 					BeanUtils.copyProperties(post, latestPost);
@@ -398,8 +399,6 @@ public class ArticleService {
 					return latestPost;
 				})
 				.collect(Collectors.toList());
-
-		return latestPosts;
 	}
 
     /**
@@ -441,10 +440,10 @@ public class ArticleService {
 				.collect(Collectors.toList());
 
 		ArticleComment articleComment = ArticleComment.builder()
-				.boardItem(new BoardItem(article.getId(), article.getSeq(), article.getBoard()))
+				.article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
 				.writer(writer)
 				.content(content)
-				.status(new BoardCommentStatus(device))
+				.status(new ArticleCommentStatus(device))
 				.linkedGallery(! galleries.isEmpty())
 				.logs(this.initBoardLogs(new ObjectId(), Constants.ARTICLE_COMMENT_HISTORY_TYPE.CREATE.name(), writer))
 				.build();
@@ -452,7 +451,7 @@ public class ArticleService {
 		articleCommentRepository.save(articleComment);
 
 		// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getBoardItem(), articleComment.getWriter(),
+		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getArticle(), articleComment.getWriter(),
 				articleComment.getContent(), galleryIds);
 
 		return articleComment;
@@ -475,15 +474,15 @@ public class ArticleService {
 
 		articleComment.setWriter(writer);
 		articleComment.setContent(StringUtils.trim(content));
-		BoardCommentStatus boardCommentStatus = articleComment.getStatus();
+		ArticleCommentStatus articleCommentStatus = articleComment.getStatus();
 
-		if (Objects.isNull(boardCommentStatus)) {
-			boardCommentStatus = new BoardCommentStatus(device);
+		if (Objects.isNull(articleCommentStatus)) {
+			articleCommentStatus = new ArticleCommentStatus(device);
 		} else {
-			boardCommentStatus.setDevice(device);
+			articleCommentStatus.setDevice(device);
 		}
 
-		articleComment.setStatus(boardCommentStatus);
+		articleComment.setStatus(articleCommentStatus);
 		articleComment.setLinkedGallery(! galleryIds.isEmpty());
 
 		// boardLogs
@@ -496,7 +495,7 @@ public class ArticleService {
 		articleCommentRepository.save(articleComment);
 
 		// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getBoardItem(), articleComment.getWriter(),
+		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getArticle(), articleComment.getWriter(),
 				articleComment.getContent(), galleryIds);
 
 		return articleComment;
@@ -537,9 +536,9 @@ public class ArticleService {
 		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
 		ArticleSimple articleSimple = articleRepository.findBoardFreeOfMinimumBySeq(seq);
-		BoardItem boardItem = new BoardItem(articleSimple.getId(), articleSimple.getSeq(), articleSimple.getBoard());
+		ArticleItem articleItem = new ArticleItem(articleSimple.getId(), articleSimple.getSeq(), articleSimple.getBoard());
 
-		Integer count = articleCommentRepository.countByBoardItem(boardItem);
+		Integer count = articleCommentRepository.countByArticle(articleItem);
 
 		List<FreePostDetailComment> postComments = comments.stream()
 				.map(boardFreeComment -> {
@@ -686,17 +685,17 @@ public class ArticleService {
 	/**
 	 * 자유게시판 주간 좋아요수 선두
      */
-	public List<BoardPostTop> getFreeTopLikes(Constants.BOARD_TYPE board, ObjectId objectId) {
-		return articleRepository.findTopLikes(board.name(), objectId);
+	public List<BoardTop> getFreeTopLikes(String board, ObjectId objectId) {
+		return articleRepository.findTopLikes(board, objectId);
 	}
 
 	/**
 	 * 자유게시판 주간 댓글수 선두
 	 */
-	public List<BoardPostTop> getFreeTopComments(Constants.BOARD_TYPE board, ObjectId objectId) {
+	public List<BoardTop> getFreeTopComments(String board, ObjectId objectId) {
 
 		// 게시물의 댓글수
-		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountGreaterThanBoardIdAndBoard(objectId, board.name()).stream()
+		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountGreaterThanBoardIdAndBoard(objectId, board).stream()
 				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 
 		List<String> postIds = commentCounts.entrySet().stream()
@@ -704,18 +703,18 @@ public class ArticleService {
 				.collect(Collectors.toList());
 
 		// commentIds를 파라미터로 다시 글을 가져온다.
-		List<Article> posts = articleRepository.findByIdInAndBoard(postIds, board.name());
+		List<Article> posts = articleRepository.findByIdInAndBoard(postIds, board);
 
 		// sort
-		Comparator<BoardPostTop> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
-		Comparator<BoardPostTop> byView = (b1, b2) -> b2.getViews() - b1.getViews();
+		Comparator<BoardTop> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
+		Comparator<BoardTop> byView = (b1, b2) -> b2.getViews() - b1.getViews();
 
 		return posts.stream()
 				.map(boardFree -> {
-					BoardPostTop boardPostTop = new BoardPostTop();
-					BeanUtils.copyProperties(boardFree, boardPostTop);
-					boardPostTop.setCount(commentCounts.get(boardPostTop.getId()));
-					return boardPostTop;
+					BoardTop boardTop = new BoardTop();
+					BeanUtils.copyProperties(boardFree, boardTop);
+					boardTop.setCount(commentCounts.get(boardTop.getId()));
+					return boardTop;
 				})
 				.sorted(byCount.thenComparing(byView))
 				.limit(Constants.BOARD_TOP_LIMIT)
@@ -725,33 +724,33 @@ public class ArticleService {
 	/**
 	 * 자유게시판 댓글 목록
      */
-	public GetArticleCommentsResponse getArticleComments(CommonWriter commonWriter, Constants.BOARD_TYPE board, Integer page, Integer size) {
+	public GetArticleCommentsResponse getArticleComments(CommonWriter commonWriter, String board, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
 
-		Page<ArticleComment> commentsPage = articleCommentRepository.findByBoardItemBoard(board.name(), pageable);
+		Page<ArticleComment> commentsPage = articleCommentRepository.findByArticleBoard(board, pageable);
 
 		// board id 뽑아내기.
 		List<ObjectId> boardIds = commentsPage.getContent().stream()
-				.map(comment -> new ObjectId(comment.getBoardItem().getId()))
+				.map(comment -> new ObjectId(comment.getArticle().getId()))
 				.distinct()
 				.collect(Collectors.toList());
 
 		// 댓글을 가진 글 목록
-		List<BoardFreeOnSearch> posts = articleRepository.findPostsOnSearchByIds(boardIds);
+		List<ArticleOnSearch> posts = articleRepository.findPostsOnSearchByIds(boardIds);
 
-		Map<String, BoardFreeOnSearch> postsHavingComments = posts.stream()
-				.collect(Collectors.toMap(BoardFreeOnSearch::getId, Function.identity()));
+		Map<String, ArticleOnSearch> postsHavingComments = posts.stream()
+				.collect(Collectors.toMap(ArticleOnSearch::getId, Function.identity()));
 
-		List<FreePostComment> freePostComments = commentsPage.getContent().stream()
+		List<GetArticleComment> getArticleComments = commentsPage.getContent().stream()
 				.map(boardFreeComment -> {
-							FreePostComment comment = new FreePostComment();
+							GetArticleComment comment = new GetArticleComment();
 							BeanUtils.copyProperties(boardFreeComment, comment);
 
-							comment.setBoardItem(
-									Optional.ofNullable(postsHavingComments.get(boardFreeComment.getBoardItem().getId()))
-											.orElse(new BoardFreeOnSearch())
+							comment.setArticle(
+									Optional.ofNullable(postsHavingComments.get(boardFreeComment.getArticle().getId()))
+											.orElse(new ArticleOnSearch())
 							);
 
 							comment.setNumberOfLike(CollectionUtils.isEmpty(boardFreeComment.getUsersLiking()) ? 0 : boardFreeComment.getUsersLiking().size());
@@ -783,7 +782,7 @@ public class ArticleService {
 				.collect(Collectors.toList());
 
 		return GetArticleCommentsResponse.builder()
-				.comments(freePostComments)
+				.comments(getArticleComments)
 				.first(commentsPage.isFirst())
 				.last(commentsPage.isLast())
 				.totalPages(commentsPage.getTotalPages())
@@ -797,7 +796,7 @@ public class ArticleService {
 	/**
 	 * RSS 용 게시물 목록
 	 */
-	public List<BoardFreeOnRSS> getBoardFreeOnRss(ObjectId objectId, Integer limit) {
+	public List<ArticleOnRSS> getBoardFreeOnRss(ObjectId objectId, Integer limit) {
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
 		return articleRepository.findPostsOnRss(objectId, sort, limit);
@@ -807,7 +806,7 @@ public class ArticleService {
 	/**
 	 * 사이트맵 용 게시물 목록
 	 */
-	public List<BoardFreeOnSitemap> getBoardFreeOnSitemap(ObjectId objectId, Integer limit) {
+	public List<ArticleOnSitemap> getBoardFreeOnSitemap(ObjectId objectId, Integer limit) {
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
 		return articleRepository.findPostsOnSitemap(objectId, sort, limit);
@@ -848,7 +847,7 @@ public class ArticleService {
 			articleDetail.setLogs(logs);
 		}
 
-		BoardCategory boardCategory = new BoardCategoryGenerator().getCategory(Constants.BOARD_TYPE.FOOTBALL, article.getCategory(), JakdukUtils.getLocale());
+		BoardCategory boardCategory = new BoardCategoryGenerator().getCategory(Constants.BOARD_TYPE.valueOf(board), article.getCategory(), JakdukUtils.getLocale());
 
 		articleDetail.setCategory(boardCategory);
 		articleDetail.setNumberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size());
@@ -879,9 +878,9 @@ public class ArticleService {
 
 		// 앞, 뒤 글
 		ArticleSimple prevPost = articleRepository.findByIdAndCategoryWithOperator(new ObjectId(articleDetail.getId()),
-				boardCategory.getCode(), Constants.CRITERIA_OPERATOR.GT);
+				Objects.nonNull(boardCategory) ? boardCategory.getCode() : null, Constants.CRITERIA_OPERATOR.GT);
 		ArticleSimple nextPost = articleRepository.findByIdAndCategoryWithOperator(new ObjectId(articleDetail.getId()),
-				boardCategory.getCode(), Constants.CRITERIA_OPERATOR.LT);
+				Objects.nonNull(boardCategory) ? boardCategory.getCode() : null, Constants.CRITERIA_OPERATOR.LT);
 
         // 글쓴이의 최근 글
 		List<LatestArticle> latestArticles = null;
@@ -920,8 +919,8 @@ public class ArticleService {
 
 		return GetArticleDetailResponse.builder()
 				.article(articleDetail)
-				.prevPost(prevPost)
-				.nextPost(nextPost)
+				.prevArticle(prevPost)
+				.nextArticle(nextPost)
 				.latestArticlesByWriter(CollectionUtils.isEmpty(latestArticles) ? null : latestArticles)
 				.build();
 	}

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class BoardFreeOnSearch {
+public class ArticleOnSearch {
 	
 	private String id;
 

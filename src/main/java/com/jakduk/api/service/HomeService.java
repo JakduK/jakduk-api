@@ -8,7 +8,7 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.db.HomeDescription;
-import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
+import com.jakduk.api.model.simple.ArticleCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
 import com.jakduk.api.repository.article.comment.ArticleCommentOnHomeRepository;
@@ -65,14 +65,14 @@ public class HomeService {
 	}
 
 	// 최근 댓글 가져오기.
-	public List<BoardFreeCommentOnHome> getBoardCommentsLatest() {
+	public List<ArticleCommentOnHome> getBoardCommentsLatest() {
 		
 		Sort sort = new Sort(Direction.DESC, Arrays.asList("_id"));
 		Pageable pageable = new PageRequest(0, Constants.HOME_SIZE_LINE_NUMBER, sort);
 		
-		List<BoardFreeCommentOnHome> comments = articleCommentOnHomeRepository.findAll(pageable).getContent();
+		List<ArticleCommentOnHome> comments = articleCommentOnHomeRepository.findAll(pageable).getContent();
 		
-		for (BoardFreeCommentOnHome comment : comments) {
+		for (ArticleCommentOnHome comment : comments) {
 			String content = JakdukUtils.stripHtmlTag(comment.getContent());
 
 			if (StringUtils.isNotBlank(content)) {

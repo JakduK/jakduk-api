@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthHelper {
 
+    /**
+     * 컨트롤러에서 파라미터로 넘어오면 미인증의 경우 authentication이 null 일 경우가 있다.
+     * @param authentication
+     * @return
+     */
+    @Deprecated
     public CommonWriter getCommonWriter(Authentication authentication) {
         if (authentication.getPrincipal() instanceof UserDetailsImpl) {
             UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();

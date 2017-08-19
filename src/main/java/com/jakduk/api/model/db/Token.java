@@ -18,7 +18,7 @@ public class Token {
 	@Id
 	private String email;
 	private String code;
-	private Constants.TOKEN_TYPE tokenType = Constants.TOKEN_TYPE.RESET_PASSWORD;
+	private String type;
 	private Date expireAt;
 
 }

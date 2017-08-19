@@ -14,7 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class FreePost {
+public class GetArticle {
 
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;

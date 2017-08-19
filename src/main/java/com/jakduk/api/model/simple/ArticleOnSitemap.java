@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Document(collection = Constants.COLLECTION_ARTICLE)
-public class BoardFreeOnSitemap {
+public class ArticleOnSitemap {
 
     private String id;
 

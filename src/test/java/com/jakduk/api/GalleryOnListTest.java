@@ -178,7 +178,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 		arrTemp.add(new ObjectId("54c4e4833d96deb0f8592907"));
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrTemp));
-		//AggregationOperation group = Aggregation.group("boardItem").count().as("count");
+		//AggregationOperation group = Aggregation.group("article").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
 		//AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, /*group, */ sort /*, limit*/);
@@ -200,7 +200,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 		/*
 		Gallery gallery = galleryRepository.findOne("54d623828bf8513a58f41b60");
 		System.out.println("streamAPITest01=" + gallery);
-		Stream<BoardItem> tests = gallery.getFreePosts().stream();
+		Stream<ArticleItem> tests = gallery.getFreePosts().stream();
 		long count = tests.filter(item -> item.getId().equals("54d6238a8bf8513a58f4b62")).count();
 		System.out.println("streamAPITest01=" + count);
 		*/

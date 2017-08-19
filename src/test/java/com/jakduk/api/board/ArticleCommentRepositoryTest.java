@@ -35,7 +35,7 @@ public class ArticleCommentRepositoryTest extends ApiApplicationTests {
         Integer boardSeq = 13;
         ObjectId commentId = new ObjectId("54b916d73d965cb1dbdd4af6");
 
-        List<ArticleComment> comments = sut.findByBoardSeqAndGTId(boardSeq, null);
+        List<ArticleComment> comments = sut.findByBoardSeqAndGTId("FREE", boardSeq, null);
 
         Assert.assertTrue(Objects.nonNull(comments));
 

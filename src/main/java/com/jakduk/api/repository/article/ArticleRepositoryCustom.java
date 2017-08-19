@@ -3,7 +3,7 @@ package com.jakduk.api.repository.article;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
-import com.jakduk.api.model.aggregate.BoardPostTop;
+import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
@@ -29,13 +29,13 @@ public interface ArticleRepositoryCustom {
      * @param sort sort
      * @param limit limit
      */
-    List<BoardFreeOnRSS> findPostsOnRss(ObjectId objectId, Sort sort, Integer limit);
+    List<ArticleOnRSS> findPostsOnRss(ObjectId objectId, Sort sort, Integer limit);
 
     /**
      * id 배열에 해당하는 Article 목록.
      * @param ids id 배열
      */
-    List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids);
+    List<ArticleOnSearch> findPostsOnSearchByIds(List<ObjectId> ids);
 
     /**
      * 공지 글 목록
@@ -54,7 +54,7 @@ public interface ArticleRepositoryCustom {
      * @param sort sort
      * @param limit limit
      */
-    List<BoardFreeOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit);
+    List<ArticleOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit);
 
     /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.
@@ -72,6 +72,6 @@ public interface ArticleRepositoryCustom {
      * @param board 게시판
      * @param commentId 해당 ID 기준 이상
      */
-    List<BoardPostTop> findTopLikes(String board, ObjectId commentId);
+    List<BoardTop> findTopLikes(String board, ObjectId commentId);
 
 }

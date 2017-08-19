@@ -56,7 +56,7 @@ public class HomeRestController {
         response.setComments(homeService.getBoardCommentsLatest());
 
         // 최근 게시물
-        List<LatestPost> latestPosts = articleService.getFreeLatest();
+        List<LatestPost> latestPosts = articleService.getLatestArticles();
         response.setPosts(latestPosts);
 
         // 최근 사진

@@ -26,10 +26,10 @@ public class GetArticlesResponse {
     Map<String, String> categories;
 
     @ApiModelProperty(value = "글 목록")
-    List<FreePost> articles;
+    List<GetArticle> articles;
 
     @ApiModelProperty(value = "공지글 목록")
-    List<FreePost> notices;
+    List<GetArticle> notices;
 
     @ApiModelProperty(value = "마지막 페이지 여부")
     boolean last;

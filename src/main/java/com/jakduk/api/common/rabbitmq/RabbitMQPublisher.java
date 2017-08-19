@@ -7,7 +7,7 @@ import com.jakduk.api.model.elasticsearch.EsBoard;
 import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.elasticsearch.EsGallery;
 import com.jakduk.api.model.elasticsearch.EsSearchWord;
-import com.jakduk.api.model.embedded.BoardItem;
+import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
 import lombok.extern.slf4j.Slf4j;
@@ -105,11 +105,11 @@ public class RabbitMQPublisher {
         this.publishElasticsearch(routingKey, id);
     }
 
-    public void indexDocumentComment(String id, BoardItem boardItem, CommonWriter writer, String content, List<String> galleryIds) {
+    public void indexDocumentComment(String id, ArticleItem articleItem, CommonWriter writer, String content, List<String> galleryIds) {
 
         EsComment esComment = EsComment.builder()
                 .id(id)
-                .boardItem(boardItem)
+                .article(articleItem)
                 .writer(writer)
                 .content(JakdukUtils.stripHtmlTag(content))
                 .galleries(galleryIds)

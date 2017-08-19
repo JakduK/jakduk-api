@@ -5,19 +5,20 @@ import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.util.ObjectMapperUtils;
+import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.Gallery;
-import com.jakduk.api.model.embedded.BoardCommentStatus;
+import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalSimpleName;
-import com.jakduk.api.model.aggregate.BoardPostTop;
-import com.jakduk.api.model.simple.BoardFreeOnSearch;
+import com.jakduk.api.model.simple.ArticleOnSearch;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
+import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -101,8 +102,8 @@ public class BoardRestControllerTests {
     @WithMockUser
     public void getFreePostsTopsTest() throws Exception {
 
-        List<BoardPostTop> expectTopLikes = Arrays.asList(
-                BoardPostTop.builder()
+        List<BoardTop> expectTopLikes = Arrays.asList(
+                BoardTop.builder()
                         .id("boardFreeId01")
                         .seq(1)
                         .subject("인기있는 글 제목")
@@ -111,11 +112,11 @@ public class BoardRestControllerTests {
                         .build()
         );
 
-        when(articleService.getFreeTopLikes(any(Constants.BOARD_TYPE.class)))
+        when(articleService.getFreeTopLikes(anyString(), any(ObjectId.class)))
                 .thenReturn(expectTopLikes);
 
-        List<BoardPostTop> expectTopComments = Arrays.asList(
-                BoardPostTop.builder()
+        List<BoardTop> expectTopComments = Arrays.asList(
+                BoardTop.builder()
                         .id("boardFreeId02")
                         .seq(2)
                         .subject("댓글많은 글 제목")
@@ -124,7 +125,7 @@ public class BoardRestControllerTests {
                         .build()
         );
 
-        when(articleService.getFreeTopComments())
+        when(articleService.getFreeTopComments(anyString(), any(ObjectId.class)))
                 .thenReturn(expectTopComments);
 
         GetBoardTopsResponse response = GetBoardTopsResponse.builder()
@@ -146,17 +147,17 @@ public class BoardRestControllerTests {
         GetArticleCommentsResponse response = GetArticleCommentsResponse.builder()
                 .comments(
                         Arrays.asList(
-                                FreePostComment.builder()
+                                GetArticleComment.builder()
                                         .id("boardFreeCommentId01")
-                                        .boardItem(
-                                                BoardFreeOnSearch.builder()
+                                        .article(
+                                                ArticleOnSearch.builder()
                                                         .id(article.getId())
                                                         .seq(article.getSeq())
                                                         .subject(article.getSubject())
                                                         .build())
                                         .writer(commonWriter)
                                         .content("댓글 내용입니다.")
-                                        .status(new BoardCommentStatus(Constants.DEVICE_TYPE.NORMAL))
+                                        .status(new ArticleCommentStatus(Constants.DEVICE_TYPE.NORMAL))
                                         .numberOfDislike(5)
                                         .numberOfDislike(3)
                                         .build()
@@ -171,7 +172,7 @@ public class BoardRestControllerTests {
                 .totalElements(1)
                 .build();
 
-        when(articleService.getArticleComments(boardType, anyInt(), anyInt()))
+        when(articleService.getArticleComments(any(CommonWriter.class), anyString(), anyInt(), anyInt()))
                 .thenReturn(response);
 
         mvc.perform(get("/api/board/free/comments")
@@ -217,12 +218,12 @@ public class BoardRestControllerTests {
                 .build();
 
         GetArticleDetailResponse response = GetArticleDetailResponse.builder()
-                .post(articleDetail)
-                .prevPost(prevPost)
-                .nextPost(nextPost)
+                .article(articleDetail)
+                .prevArticle(prevPost)
+                .nextArticle(nextPost)
                 .build();
 
-        when(articleService.getArticleDetail(boardType, anyInt(), anyBoolean()))
+        when(articleService.getArticleDetail(anyString(), anyInt(), anyBoolean()))
                 .thenReturn(response);
 
         mvc.perform(get("/api/board/free/{seq}", article.getSeq())

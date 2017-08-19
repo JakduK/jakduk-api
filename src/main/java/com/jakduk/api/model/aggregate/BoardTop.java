@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class BoardPostTop {
+public class BoardTop {
 
 	private String id;
 	private Integer seq;

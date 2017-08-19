@@ -1,29 +1,29 @@
 package com.jakduk.api.model.simple;
 
 import com.jakduk.api.common.Constants;
+import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.Getter;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
- * @date     : 2015. 2. 24.
+ * @date     : 2015. 2. 27.
  * @desc     :
  */
 
-@Getter
-@Document(collection = Constants.COLLECTION_ARTICLE)
-public class BoardFreeOnRSS {
-
+@Data
+@Document(collection = Constants.COLLECTION_ARTICLE_COMMENT)
+public class ArticleCommentOnHome {
+	
+	@Id
 	private String id;
 	
-	private Integer seq;
-
+	private ArticleItem article;
+	
 	private CommonWriter writer;
 	
-	private String subject;
-	
 	private String content;
-
 }

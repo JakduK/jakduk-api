@@ -2,7 +2,7 @@ package com.jakduk.api.repository.article;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
-import com.jakduk.api.model.aggregate.BoardPostTop;
+import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.simple.*;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +74,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * @param limit limit
      */
     @Override
-    public List<BoardFreeOnRSS> findPostsOnRss(ObjectId objectId, Sort sort, Integer limit) {
+    public List<ArticleOnRSS> findPostsOnRss(ObjectId objectId, Sort sort, Integer limit) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where("status.delete").ne(true));
@@ -85,7 +85,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         query.with(sort);
         query.limit(limit);
 
-        return mongoTemplate.find(query, BoardFreeOnRSS.class);
+        return mongoTemplate.find(query, ArticleOnRSS.class);
     }
 
     /**
@@ -93,10 +93,10 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * @param ids id 배열
      */
     @Override
-    public List<BoardFreeOnSearch> findPostsOnSearchByIds(List<ObjectId> ids) {
+    public List<ArticleOnSearch> findPostsOnSearchByIds(List<ObjectId> ids) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").in(ids));
         Aggregation aggregation = Aggregation.newAggregation(match1);
-        AggregationResults<BoardFreeOnSearch> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardFreeOnSearch.class);
+        AggregationResults<ArticleOnSearch> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, ArticleOnSearch.class);
 
         return results.getMappedResults();
     }
@@ -135,7 +135,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * @param limit limit
      */
     @Override
-    public List<BoardFreeOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit) {
+    public List<ArticleOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.delete").ne(true));
 
@@ -145,7 +145,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         query.with(sort);
         query.limit(limit);
 
-        return mongoTemplate.find(query, BoardFreeOnSitemap.class);
+        return mongoTemplate.find(query, ArticleOnSitemap.class);
     }
 
     /**
@@ -204,7 +204,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      *  {$limit:3})
      */
     @Override
-    public List<BoardPostTop> findTopLikes(String board, ObjectId objectId) {
+    public List<BoardTop> findTopLikes(String board, ObjectId objectId) {
         AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(objectId).and("board").is(board));
 
         AggregationExpression usersLikingCount = ArrayOperators.Size.lengthOfArray(ConditionalOperators.ifNull("usersLiking").then(new ArrayList<>()));
@@ -217,7 +217,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         AggregationOperation limit1 = Aggregation.limit(Constants.BOARD_TOP_LIMIT);
 
         Aggregation aggregation = Aggregation.newAggregation(match1, project1, sort1, sort2, limit1);
-        AggregationResults<BoardPostTop> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardPostTop.class);
+        AggregationResults<BoardTop> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE, BoardTop.class);
 
         return results.getMappedResults();
     }

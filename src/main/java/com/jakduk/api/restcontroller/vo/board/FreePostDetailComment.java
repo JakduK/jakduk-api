@@ -2,8 +2,8 @@ package com.jakduk.api.restcontroller.vo.board;
 
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.embedded.BoardCommentStatus;
-import com.jakduk.api.model.embedded.BoardItem;
+import com.jakduk.api.model.embedded.ArticleItem;
+import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,10 +25,10 @@ public class FreePostDetailComment {
     private String id;
 
     @ApiModelProperty(value = "댓글 ID")
-    private BoardItem boardItem;
+    private ArticleItem article;
 
     @ApiModelProperty(value = "댓글 상태")
-    private BoardCommentStatus status;
+    private ArticleCommentStatus status;
 
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;

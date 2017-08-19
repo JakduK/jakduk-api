@@ -4,12 +4,12 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
-import com.jakduk.api.model.aggregate.BoardPostTop;
-import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardTop;
+import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.simple.ArticleOnList;
-import com.jakduk.api.model.simple.BoardFreeOnRSS;
-import com.jakduk.api.model.simple.BoardFreeOnSitemap;
+import com.jakduk.api.model.simple.ArticleOnRSS;
+import com.jakduk.api.model.simple.ArticleOnSitemap;
 import com.jakduk.api.repository.article.ArticleRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
@@ -59,14 +59,14 @@ public class ArticleRepositoryTests {
 
     @Test
     public void findOneBySeq() {
-        Article article = repository.findOneBySeq(randomArticle.getSeq()).get();
+        Article article = repository.findOneByBoardAndSeq(randomArticle.getBoard(), randomArticle.getSeq()).get();
 
         Assert.assertTrue(randomArticle.getSeq().equals(article.getSeq()));
     }
 
     @Test
     public void findPostsOnRss() {
-        List<BoardFreeOnRSS> posts = repository.findPostsOnRss(null,
+        List<ArticleOnRSS> posts = repository.findPostsOnRss(null,
                 new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
 
         Assert.assertTrue(! CollectionUtils.isEmpty(posts));
@@ -83,7 +83,7 @@ public class ArticleRepositoryTests {
     @Test
     public void findPostsOnSitemap() {
 
-        List<BoardFreeOnSitemap> posts = repository.findPostsOnSitemap(null,
+        List<ArticleOnSitemap> posts = repository.findPostsOnSitemap(null,
                 new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
 
         Assert.assertTrue(! CollectionUtils.isEmpty(posts));
@@ -111,7 +111,7 @@ public class ArticleRepositoryTests {
     public void findTopLikes() {
         LocalDate localDate = LocalDate.now().minusWeeks(1);
 
-        List<BoardPostTop> topLikes = repository.findTopLikes(Constants.BOARD_TYPE.FOOTBALL.name(), new ObjectId(DateUtils.localDateToDate(localDate)));
+        List<BoardTop> topLikes = repository.findTopLikes(Constants.BOARD_TYPE.FOOTBALL.name(), new ObjectId(DateUtils.localDateToDate(localDate)));
     }
 
 }

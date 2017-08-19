@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
 import com.jakduk.api.model.simple.ArticleSimple;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +14,6 @@ import java.util.List;
  *         16. 7. 16 오후 7:28
  */
 
-@ApiModel(description = "자유게시판 글 상세")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,10 +24,10 @@ public class GetArticleDetailResponse {
     private ArticleDetail article;
 
     @ApiModelProperty(value = "앞 글")
-    private ArticleSimple prevPost;
+    private ArticleSimple prevArticle;
 
     @ApiModelProperty(value = "뒷 글")
-    private ArticleSimple nextPost;
+    private ArticleSimple nextArticle;
 
     @ApiModelProperty(value = "작성자의 최근 글")
     private List<LatestArticle> latestArticlesByWriter;

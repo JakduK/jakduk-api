@@ -22,7 +22,7 @@ import java.util.List;
 public class GetArticleCommentsResponse {
 
     @ApiModelProperty(value = "댓글 목록")
-    List<FreePostComment> comments;
+    List<GetArticleComment> comments;
 
     @ApiModelProperty(value = "마지막 페이지 여부")
     boolean last;

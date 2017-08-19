@@ -179,7 +179,7 @@ public class SearchService {
 	public void indexDocumentBoardComment(EsComment esComment) {
 
 		String id = esComment.getId();
-		String parentBoardId = esComment.getBoardItem().getId();
+		String parentBoardId = esComment.getArticle().getId();
 
 		try {
 			IndexResponse response = client.prepareIndex()

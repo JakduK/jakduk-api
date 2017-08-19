@@ -8,7 +8,7 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UserPicture;
-import com.jakduk.api.model.simple.BoardFreeOnSitemap;
+import com.jakduk.api.model.simple.ArticleOnSitemap;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.UserPictureService;
@@ -73,13 +73,13 @@ public class DefaultViewController {
 			Boolean existPosts = true;
 
 			do {
-				List<BoardFreeOnSitemap> posts = articleService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
+				List<ArticleOnSitemap> posts = articleService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 				if (ObjectUtils.isEmpty(posts)) {
 					existPosts = false;
 				} else {
-					BoardFreeOnSitemap post = posts.stream()
-							.sorted(Comparator.comparing(BoardFreeOnSitemap::getId))
+					ArticleOnSitemap post = posts.stream()
+							.sorted(Comparator.comparing(ArticleOnSitemap::getId))
 							.findFirst()
 							.orElseThrow(() -> new ServiceException(ServiceError.INTERNAL_SERVER_ERROR));
 

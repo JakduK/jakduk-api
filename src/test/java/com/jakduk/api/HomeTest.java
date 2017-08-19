@@ -4,7 +4,7 @@ package com.jakduk.api;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.db.FootballClub;
-import com.jakduk.api.model.simple.BoardFreeCommentOnHome;
+import com.jakduk.api.model.simple.ArticleCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.article.comment.ArticleCommentOnHomeRepository;
 import com.jakduk.api.repository.footballclub.FootballClubOriginRepository;
@@ -53,7 +53,7 @@ public class HomeTest extends ApiApplicationTests {
 	
 	@Test
 	public void getCommentLatest() {
-		List<BoardFreeCommentOnHome> comments = homeService.getBoardCommentsLatest();
+		List<ArticleCommentOnHome> comments = homeService.getBoardCommentsLatest();
 
 		System.out.println("getCommentLatest=" +comments);
 	}

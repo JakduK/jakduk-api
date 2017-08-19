@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class BoardCommentStatus {
+public class ArticleCommentStatus {
 	
 	private Constants.DEVICE_TYPE device;
 

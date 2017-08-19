@@ -10,7 +10,7 @@ import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.aggregate.BoardPostTop;
+import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.db.Gallery;
@@ -61,9 +61,7 @@ public class BoardRestController {
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
             @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") String categoryCode) {
 
-        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
-
-        return articleService.getArticles(boardType, categoryCode, page, size);
+        return articleService.getArticles(StringUtils.upperCase(board.name()), categoryCode, page, size);
     }
 
     @ApiOperation("게시판 주간 선두 글")
@@ -71,13 +69,11 @@ public class BoardRestController {
     public GetBoardTopsResponse getBoardTops(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
 
-        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
-
         LocalDate localDate = LocalDate.now().minusWeeks(1);
         ObjectId objectId = new ObjectId(DateUtils.localDateToDate(localDate));
 
-        List<BoardPostTop> topLikes = articleService.getFreeTopLikes(boardType, objectId);
-        List<BoardPostTop> topComments = articleService.getFreeTopComments(boardType, objectId);
+        List<BoardTop> topLikes = articleService.getFreeTopLikes(StringUtils.upperCase(board.name()), objectId);
+        List<BoardTop> topComments = articleService.getFreeTopComments(StringUtils.upperCase(board.name()), objectId);
 
         return GetBoardTopsResponse.builder()
                 .topLikes(topLikes)
@@ -90,14 +86,11 @@ public class BoardRestController {
     public GetArticleCommentsResponse getArticleComments(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
-            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
-            Authentication authentication) {
+            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size) {
 
-        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
-
-        return articleService.getArticleComments(commonWriter, boardType, page, size);
+        return articleService.getArticleComments(commonWriter, StringUtils.upperCase(board.name()), page, size);
     }
 
     @ApiOperation("게시판 글 상세")

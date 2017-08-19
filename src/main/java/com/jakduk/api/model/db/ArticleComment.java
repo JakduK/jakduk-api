@@ -25,9 +25,9 @@ public class ArticleComment implements UsersFeeling {
 	@Id
 	private String id;
 	
-	private BoardItem boardItem;
+	private ArticleItem article;
 
-	private BoardCommentStatus status;
+	private ArticleCommentStatus status;
 
 	private CommonWriter writer;
 

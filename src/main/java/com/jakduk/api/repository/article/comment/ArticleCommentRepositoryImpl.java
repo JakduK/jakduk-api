@@ -56,8 +56,8 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
      */
     @Override
     public List<CommonCount> findCommentsCountByIds(List<ObjectId> ids) {
-        AggregationOperation match = Aggregation.match(Criteria.where("boardItem._id").in(ids));
-        AggregationOperation group = Aggregation.group("boardItem").count().as("count");
+        AggregationOperation match = Aggregation.match(Criteria.where("article._id").in(ids));
+        AggregationOperation group = Aggregation.group("article").count().as("count");
         //AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
         //AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
         Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
@@ -75,7 +75,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
     @Override
     public List<ArticleComment> findByBoardSeqAndGTId(String board, Integer articleSeq, ObjectId commentId) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("boardItem.seq").is(articleSeq).and("boardItem.board").is(board));
+        query.addCriteria(Criteria.where("article.seq").is(articleSeq).and("article.board").is(board));
 
         if (Objects.nonNull(commentId))
             query.addCriteria(Criteria.where("_id").gt(commentId));
@@ -93,8 +93,8 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
      */
     @Override
     public List<CommonCount> findCommentsCountGreaterThanBoardIdAndBoard(ObjectId boardId, String board) {
-        AggregationOperation match1 = Aggregation.match(Criteria.where("boardItem._id").gt(boardId).and("boardItem.board").is(board));
-        AggregationOperation group = Aggregation.group("boardItem").count().as("count");
+        AggregationOperation match1 = Aggregation.match(Criteria.where("article._id").gt(boardId).and("article.board").is(board));
+        AggregationOperation group = Aggregation.group("article").count().as("count");
         AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
         //AggregationOperation limit = Aggregation.limit(Constants.BOARD_TOP_LIMIT);
         Aggregation aggregation = Aggregation.newAggregation(match1, group, sort/*, limit*/);

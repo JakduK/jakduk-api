@@ -2,10 +2,9 @@ package com.jakduk.api.restcontroller.vo.board;
 
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.embedded.BoardCommentStatus;
+import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.model.simple.BoardFreeOnSearch;
-import io.swagger.annotations.ApiModel;
+import com.jakduk.api.model.simple.ArticleOnSearch;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -16,19 +15,18 @@ import java.util.List;
  *         16. 7. 13 오후 11:19
  */
 
-@ApiModel(value = "자유게시판 댓글")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
-public class FreePostComment {
+public class GetArticleComment {
 
     @ApiModelProperty(value = "댓글ID")
     private String id;
 
     @ApiModelProperty(value = "연동 글")
-    private BoardFreeOnSearch boardItem;
+    private ArticleOnSearch article;
 
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
@@ -37,7 +35,7 @@ public class FreePostComment {
     private String content;
 
     @ApiModelProperty(value = "댓글상태")
-    private BoardCommentStatus status;
+    private ArticleCommentStatus status;
 
     @ApiModelProperty(example = "5", value = "좋아요 수")
     private Integer numberOfLike;
