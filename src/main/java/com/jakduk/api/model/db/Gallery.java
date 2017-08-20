@@ -1,6 +1,5 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.GalleryStatus;
 import com.jakduk.api.model.embedded.LinkedItem;
@@ -36,17 +35,13 @@ public class Gallery {
 	
 	private CommonWriter writer;
 
-	private long size;
+	private Long size;
 	
-	private long fileSize;
+	private Long fileSize;
 	
 	private String contentType;
 
 	private GalleryStatus status;
-
-	private List<CommonFeelingUser> usersLiking;
-
-	private List<CommonFeelingUser> usersDisliking;
 
 	private List<String> batch;
 

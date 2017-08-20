@@ -1,6 +1,5 @@
 package com.jakduk.api.common.annotation;
 
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.lang.annotation.*;

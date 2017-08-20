@@ -30,16 +30,7 @@ public class GalleryDetail {
     @ApiModelProperty(example = "https://staging.jakduk.com:8080/gallery/thumbnail/58b9050b807d714eaf50a111", value = "사진 썸네일 URL")
     private String thumbnailUrl;
 
-    @ApiModelProperty(example = "5", value = "좋아요 수")
-    private Integer numberOfLike;
-
-    @ApiModelProperty(example = "5", value = "싫어요 수")
-    private Integer numberOfDislike;
-
     @ApiModelProperty(value = "사진 상태")
     private GalleryStatus status;
-
-    @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
-    private Constants.FEELING_TYPE myFeeling;
 
 }

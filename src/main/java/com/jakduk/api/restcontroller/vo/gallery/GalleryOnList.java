@@ -24,12 +24,6 @@ public class GalleryOnList {
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
 
-    @ApiModelProperty(example = "5", value = "좋아요 수")
-    private int likingCount;
-
-    @ApiModelProperty(example = "5", value = "싫어요 수")
-    private int dislikingCount;
-
     @ApiModelProperty(example = "https://staging.jakduk.com:8080/gallery/58b9050b807d714eaf50a111", value = "사진 풀 URL")
     private String imageUrl;
 

@@ -10,11 +10,7 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
-import com.jakduk.api.restcontroller.vo.gallery.GalleriesResponse;
-import com.jakduk.api.restcontroller.vo.gallery.GalleryResponse;
-import com.jakduk.api.restcontroller.vo.gallery.GalleryUploadResponse;
-import com.jakduk.api.restcontroller.vo.gallery.LinkedItemForm;
+import com.jakduk.api.restcontroller.vo.gallery.*;
 import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
 import com.jakduk.api.service.GalleryService;
 import io.swagger.annotations.Api;
@@ -28,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -44,7 +40,7 @@ public class GalleryRestController {
     @Autowired private UrlGenerationUtils urlGenerationUtils;
     @Autowired private GalleryService galleryService;
 
-    @ApiOperation(value = "사진 목록")
+    @ApiOperation("사진 목록")
     @GetMapping("/galleries")
     public GalleriesResponse getGalleries(
             @ApiParam(value = "이 ID 이후부터 목록 가져옴") @RequestParam(required = false) String id,
@@ -52,7 +48,11 @@ public class GalleryRestController {
 
         if (size < Constants.GALLERY_SIZE) size = Constants.GALLERY_SIZE;
 
-        return galleryService.getGalleries(id, size);
+        List<GalleryOnList> galleries = galleryService.getGalleries(id, size);
+
+        return GalleriesResponse.builder()
+                .galleries(galleries)
+                .build();
     }
 
     @ApiOperation(value = "사진 올리기")
@@ -110,24 +110,6 @@ public class GalleryRestController {
             @ApiParam(value = "Gallery ID", required = true) @PathVariable String id) {
 
         return galleryService.getGalleryDetail(id);
-    }
-
-    @ApiOperation(value = "사진 좋아요 싫어요")
-    @RequestMapping(value = "/gallery/{id}/{feeling}", method = RequestMethod.POST)
-    public UserFeelingResponse setGalleryFeeling(@PathVariable String id, @PathVariable Constants.FEELING_TYPE feeling) {
-
-        if (! AuthUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
-        CommonWriter writer = AuthUtils.getCommonWriter();
-
-        Map<String, Object> data = galleryService.setUserFeeling(writer, id, feeling);
-
-        return UserFeelingResponse.builder()
-          .myFeeling((Constants.FEELING_TYPE) data.get("feeling"))
-          .numberOfLike((Integer) data.get("numberOfLike"))
-          .numberOfDislike((Integer) data.get("numberOfDislike"))
-          .build();
     }
 
 }
