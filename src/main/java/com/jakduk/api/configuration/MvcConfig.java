@@ -67,8 +67,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames(
-                "messages/common", "messages/board", "messages/user", "messages/about", "messages/home",
-                "messages/gallery", "messages/search", "messages/jakdu", "messages/email", "messages/exception"
+                "messages/common", "messages/board", "messages/user", "messages/jakdu", "messages/email", "messages/exception"
         );
 
         return messageSource;
