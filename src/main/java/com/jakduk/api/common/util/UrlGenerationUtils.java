@@ -64,12 +64,12 @@ public class UrlGenerationUtils {
     }
 
     /**
-     * 글 상세 URL 생성
+     * 글 상세 API URL 생성
      *
      * @param board 게시판
      * @param seq 글번호
      */
-    public String generateArticleDetailUrl(String board, Integer seq) {
+    public String generateArticleDetailApiUrl(String board, Integer seq) {
 
         if (StringUtils.isBlank(board) || Objects.isNull(seq))
             return null;
@@ -80,4 +80,23 @@ public class UrlGenerationUtils {
 
         return uriComponents.toUriString();
     }
+
+    /**
+     * 글 상세 URL 생성
+     *
+     * @param board 게시판
+     * @param seq 글번호
+     */
+    public String generateArticleDetailUrl(String board, Integer seq) {
+
+        if (StringUtils.isBlank(board) || Objects.isNull(seq))
+            return null;
+
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(jakdukProperties.getWebServerUrl())
+                .path("/board/{board}/{seq}")
+                .buildAndExpand(board.toLowerCase(), seq);
+
+        return uriComponents.toUriString();
+    }
+
 }

@@ -17,13 +17,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ArticleOnRSS {
 
 	private String id;
-	
+	private String board;
 	private Integer seq;
-
 	private CommonWriter writer;
-	
 	private String subject;
-	
 	private String content;
 
 }

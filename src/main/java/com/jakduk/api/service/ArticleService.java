@@ -809,7 +809,7 @@ public class ArticleService {
 	public List<ArticleOnSitemap> getBoardFreeOnSitemap(ObjectId objectId, Integer limit) {
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
-		return articleRepository.findPostsOnSitemap(objectId, sort, limit);
+		return articleRepository.findSitemapArticles(objectId, sort, limit);
 
 	}
 
@@ -823,7 +823,7 @@ public class ArticleService {
 
 		if (! StringUtils.equals(article.getBoard(), board)) {
 			return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-					.header(HttpHeaders.LOCATION, urlGenerationUtils.generateArticleDetailUrl(article.getBoard(), seq))
+					.header(HttpHeaders.LOCATION, urlGenerationUtils.generateArticleDetailApiUrl(article.getBoard(), seq))
 					.build();
 		}
 

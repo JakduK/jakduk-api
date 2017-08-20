@@ -2,7 +2,6 @@ package com.jakduk.api.model.simple;
 
 import com.jakduk.api.common.Constants;
 import lombok.Getter;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -16,9 +15,8 @@ import java.time.LocalDateTime;
 public class ArticleOnSitemap {
 
     private String id;
-
+    private String board;
     private Integer seq;
-
     private LocalDateTime lastUpdated;
 
 }

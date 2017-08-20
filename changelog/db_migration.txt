@@ -6,9 +6,13 @@ db.gallery.update({}, {$unset:{"usersDisliking":""}}, {multi:true})
 // collection 이름 변경
 db.boardFree.renameCollection("article")
 db.boardFreeComment.renameCollection("articleComment")
+db.article.update({}, {$set:{"_class":"com.jakduk.api.model.db.Article"}}, {multi:true})
+db.articleComment.update({}, {$set:{"_class":"com.jakduk.api.model.db.ArticleComment"}}, {multi:true})
 db.article.update({"category":"FREE"}, {$set:{"board":"FREE"}}, {multi:true})
 db.article.update({"category":"FOOTBALL"}, {$set:{"board":"FOOTBALL", "category":"CLASSIC"}}, {multi:true})
 db.articleComment.update({}, {$rename:{"article":"article"}}, {multi:true})
+// 혹시 board가 없으면 FREE로 설정
+db.article.update({"board":{$exists:false}}, {$set:{"board":"FREE"}}, {multi:true})
 db.article.update({"board":"FREE"}, {$unset:{"category":""}}, {multi:true})
 // 여러번 시도
 db.gallery.update({'linkedItems.from':'BOARD_FREE'}, {$set:{'linkedItems.$.from':'ARTICLE'}}, {multi:true})

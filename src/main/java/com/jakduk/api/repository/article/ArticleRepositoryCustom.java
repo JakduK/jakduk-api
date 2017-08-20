@@ -54,7 +54,7 @@ public interface ArticleRepositoryCustom {
      * @param sort sort
      * @param limit limit
      */
-    List<ArticleOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit);
+    List<ArticleOnSitemap> findSitemapArticles(ObjectId objectId, Sort sort, Integer limit);
 
     /**
      * 글 보기에서 앞 글, 뒷 글의 정보를 가져온다.

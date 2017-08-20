@@ -40,7 +40,6 @@ public class JakdukProperties {
         private String userPictureSmall;
         private String galleryImage;
         private String galleryThumbnail;
-        private String boardFree;
     }
 
     @Getter

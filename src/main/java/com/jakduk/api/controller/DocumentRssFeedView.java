@@ -2,6 +2,7 @@ package com.jakduk.api.controller;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -36,6 +37,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 
 	@Resource private JakdukProperties jakdukProperties;
 
+	@Autowired private UrlGenerationUtils urlGenerationUtils;
 	@Autowired private ArticleService articleService;
 
 	/**
@@ -67,7 +69,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 				ArticleOnRSS post = posts.stream()
 						.sorted(Comparator.comparing(ArticleOnRSS::getId))
 						.findFirst()
-						.orElseThrow(() -> new ServiceException(ServiceError.INTERNAL_SERVER_ERROR));
+						.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 				postId = new ObjectId(post.getId());
 			}
@@ -75,7 +77,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 			if (existPosts) {
 				List<Item> eachPostsOfRss = posts.stream()
 						.map(post -> {
-							String url = String.format("%s/%s/%d", jakdukProperties.getWebServerUrl(), jakdukProperties.getApiUrlPath().getBoardFree(), post.getSeq());
+							String url = urlGenerationUtils.generateArticleDetailUrl(post.getBoard(), post.getSeq());
 
 							Item item = new Item();
 							item.setAuthor(post.getWriter().getUsername());

@@ -83,7 +83,7 @@ public class ArticleRepositoryTests {
     @Test
     public void findPostsOnSitemap() {
 
-        List<ArticleOnSitemap> posts = repository.findPostsOnSitemap(null,
+        List<ArticleOnSitemap> posts = repository.findSitemapArticles(null,
                 new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
 
         Assert.assertTrue(! CollectionUtils.isEmpty(posts));

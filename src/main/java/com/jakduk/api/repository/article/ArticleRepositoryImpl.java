@@ -135,7 +135,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * @param limit limit
      */
     @Override
-    public List<ArticleOnSitemap> findPostsOnSitemap(ObjectId objectId, Sort sort, Integer limit) {
+    public List<ArticleOnSitemap> findSitemapArticles(ObjectId objectId, Sort sort, Integer limit) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.delete").ne(true));
 
