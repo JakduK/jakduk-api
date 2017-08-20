@@ -2,8 +2,6 @@ package com.jakduk.api.service;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
-import com.jakduk.api.common.util.AuthUtils;
-import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
@@ -11,11 +9,9 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.Gallery;
-import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.GalleryStatus;
 import com.jakduk.api.model.embedded.LinkedItem;
-import com.jakduk.api.model.jongo.GalleryFeelingCount;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.repository.article.ArticleRepository;
@@ -44,10 +40,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -84,67 +82,38 @@ public class GalleryService {
 	/**
 	 * 사진 목록
 	 */
-	public GalleriesResponse getGalleries(String id, Integer size) {
+	public List<GalleryOnList> getGalleries(String id, Integer size) {
 
 		ObjectId objectId = null;
 
 		if (StringUtils.isNotBlank(id))
 			objectId = new ObjectId(id);
 
-		List<Gallery> galleries = galleryRepository.findGalleriesById(objectId, Constants.CRITERIA_OPERATOR.LT, size);
-
-		// Gallery ID 뽑아내기.
-		List<ObjectId> ids = galleries.stream()
-				.map(gallery -> new ObjectId(gallery.getId()))
-				.collect(Collectors.toList());
-
-		// 사진들의 감정수
-		Map<String, GalleryFeelingCount> feelingCounts = jakdukDAO.getGalleryUsersFeelingCount(ids);
-
-		List<GalleryOnList> cvtGalleries = galleries.stream()
+		return galleryRepository.findGalleriesById(objectId, Constants.CRITERIA_OPERATOR.LT, size).stream()
 				.map(gallery -> {
 					GalleryOnList galleryOnList = new GalleryOnList();
 					BeanUtils.copyProperties(gallery, galleryOnList);
 
-					galleryOnList.setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
-
-					GalleryFeelingCount galleryFeelingCount = feelingCounts.get(gallery.getId());
-
-					if (Objects.nonNull(galleryFeelingCount)) {
-						galleryOnList.setLikingCount(galleryFeelingCount.getUsersLikingCount());
-						galleryOnList.setDislikingCount(galleryFeelingCount.getUsersDisLikingCount());
-					}
-
+					galleryOnList.setName(StringUtils.isNotBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
 					galleryOnList.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
 					galleryOnList.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
 					return galleryOnList;
 				})
 				.collect(Collectors.toList());
-
-
-		return GalleriesResponse.builder()
-				.galleries(cvtGalleries)
-				.build();
 	}
 
     public GalleryResponse getGalleryDetail(String id) {
 
-		Gallery gallery = galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
-
-		CommonWriter commonWriter = AuthUtils.getCommonWriter();
+		Gallery gallery = galleryRepository.findOneById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 
 		GalleryDetail galleryDetail = new GalleryDetail();
 		BeanUtils.copyProperties(gallery, galleryDetail);
 
 		galleryDetail.setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
-		galleryDetail.setNumberOfLike(CollectionUtils.isEmpty(gallery.getUsersLiking()) ? 0 : gallery.getUsersLiking().size());
-		galleryDetail.setNumberOfDislike(CollectionUtils.isEmpty(gallery.getUsersDisliking()) ? 0 : gallery.getUsersDisliking().size());
 		galleryDetail.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
 		galleryDetail.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-
-		if (Objects.nonNull(commonWriter))
-			galleryDetail.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, gallery.getUsersLiking(), gallery.getUsersDisliking()));
 
 		// 사진첩 보기의 앞, 뒤 사진을 가져온다.
 		List<Gallery> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), Constants.CRITERIA_OPERATOR.GT,
@@ -397,74 +366,6 @@ public class GalleryService {
 
 			commonGalleryService.deleteGallery(id, gallery.getContentType());
 		}
-	}
-
-	public Map<String, Object> setUserFeeling(CommonWriter writer, String id, Constants.FEELING_TYPE feeling) {
-
-		String errCode = Constants.BOARD_USERS_FEELINGS_STATUS_NONE;
-
-		String accountId = writer.getUserId();
-		String accountName = writer.getUsername();
-
-		Gallery gallery = galleryRepository.findOne(id);
-		CommonWriter galleryWriter = gallery.getWriter();
-
-		List<CommonFeelingUser> usersLiking = gallery.getUsersLiking();
-		List<CommonFeelingUser> usersDisliking = gallery.getUsersDisliking();
-
-		if (usersLiking == null) {
-			usersLiking = new ArrayList<>();
-		}
-
-		if (usersDisliking == null) {
-			usersDisliking = new ArrayList<>();
-		}
-
-		if (accountId != null && accountName != null) {
-			if (galleryWriter != null && accountId.equals(galleryWriter.getUserId())) {
-				errCode = Constants.BOARD_USERS_FEELINGS_STATUS_WRITER;
-			}
-
-			if (errCode.equals(Constants.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				Stream<CommonFeelingUser> users = usersLiking.stream();
-				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
-				if (itemCount > 0) {
-					errCode = Constants.BOARD_USERS_FEELINGS_STATUS_ALREADY;
-				}
-			}
-
-			if (errCode.equals(Constants.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				Stream<CommonFeelingUser> users = usersDisliking.stream();
-				Long itemCount = users.filter(item -> item.getUserId().equals(accountId)).count();
-				if (itemCount > 0) {
-					errCode = Constants.BOARD_USERS_FEELINGS_STATUS_ALREADY;
-				}
-			}
-
-			if (errCode.equals(Constants.BOARD_USERS_FEELINGS_STATUS_NONE)) {
-				CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), accountId, accountName);
-
-				if (Constants.FEELING_TYPE.LIKE.equals(feeling)) {
-					usersLiking.add(feelingUser);
-					gallery.setUsersLiking(usersLiking);
-				} else {
-					usersDisliking.add(feelingUser);
-					gallery.setUsersDisliking(usersDisliking);
-				}
-
-				galleryRepository.save(gallery);
-			} else {
-				throw new ServiceException(ServiceError.FEELING_SELECT_ALREADY_LIKE);
-			}
-		} else {
-			throw new ServiceException(ServiceError.FORBIDDEN);
-		}
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("feeling", feeling);
-		data.put("numberOfLike", usersLiking.size());
-		data.put("numberOfDislike", usersDisliking.size());
-		return data;
 	}
 
 	/**
