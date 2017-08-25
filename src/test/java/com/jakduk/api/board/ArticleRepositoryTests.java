@@ -76,8 +76,6 @@ public class ArticleRepositoryTests {
     public void findNotices() {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
         List<ArticleOnList> notices = repository.findNotices(board.name(), sort);
-
-        System.out.println("notices=" + notices);
     }
 
     @Test

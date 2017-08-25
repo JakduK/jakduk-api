@@ -13,7 +13,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 
 /**
  * @author pyohwan
@@ -40,9 +39,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
      */
     @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
+    public MethodValidationPostProcessor methodValidationPostProcessor(LocalValidatorFactoryBean localValidatorFactoryBean) {
         MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
-        methodValidationPostProcessor.setValidatorFactory(localValidatorFactoryBean());
+        methodValidationPostProcessor.setValidatorFactory(localValidatorFactoryBean);
 
         return methodValidationPostProcessor;
     }
@@ -53,14 +52,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    // for springfox
-    @Bean
-    public BeanValidatorPluginsConfiguration beanValidatorPluginsConfiguration() {
-        return new BeanValidatorPluginsConfiguration();
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder.build();
     }
 
     @Bean

@@ -34,6 +34,10 @@ public class ObjectMapperUtilsTest {
         LocalDateTime localDateTime = LocalDateTime.now();
 
         String expect = "\"" + localDateTime.toString() + "\"";
+
+        System.out.println(expect);
+        System.out.println(ObjectMapperUtils.writeValueAsString(localDateTime));
+
         Assert.assertTrue(expect.equals(ObjectMapperUtils.writeValueAsString(localDateTime)));
     }
 

@@ -14,12 +14,15 @@ public interface ArticleRepository extends MongoRepository<Article, String>, Art
 	Optional<Article> findOneById(String id);
 	Optional<Article> findOneBySeq(Integer seq);
 	Optional<Article> findOneByBoardAndSeq(String board, Integer seq);
-	Optional<Article> findTopByOrderByIdAsc();
-	Optional<Article> findTopByIdLessThanEqualOrderByIdDesc(ObjectId id);
+
 	List<Article> findByIdInAndLinkedGalleryIsTrue(List<String> ids);
 	List<Article> findByIdInAndBoard(List<String> ids, String board);
 
 	@Query(value="{'seq' : ?0}")
     ArticleSimple findBoardFreeOfMinimumBySeq(Integer seq);
+
+	// for JUnit
+	Optional<Article> findTopByOrderByIdAsc();
+	Optional<Article> findTopByIdLessThanEqualOrderByIdDesc(ObjectId id);
 
 }

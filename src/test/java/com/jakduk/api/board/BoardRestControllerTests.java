@@ -26,6 +26,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,7 @@ public class BoardRestControllerTests {
     @Autowired
     private MockMvc mvc;
 
+    @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
     @MockBean private AuthHelper authHelper;

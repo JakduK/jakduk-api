@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -38,6 +39,7 @@ public class UserControllerTests {
     @Autowired
     private MockMvc mvc;
 
+    @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private AuthenticationManager authenticationManager;
     @MockBean private UserService userService;
     @MockBean private PasswordEncoder passwordEncoder;
