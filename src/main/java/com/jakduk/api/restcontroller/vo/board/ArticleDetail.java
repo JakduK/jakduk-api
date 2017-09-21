@@ -23,6 +23,9 @@ public class ArticleDetail {
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;
 
+    @ApiModelProperty(example = "FREE", value = "게시판 ID")
+    private String board;
+
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
 

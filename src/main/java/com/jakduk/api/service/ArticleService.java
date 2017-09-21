@@ -855,6 +855,7 @@ public class ArticleService {
 
 		BoardCategory boardCategory = new BoardCategoryGenerator().getCategory(Constants.BOARD_TYPE.valueOf(board), article.getCategory(), JakdukUtils.getLocale());
 
+		articleDetail.setBoard(board);
 		articleDetail.setCategory(boardCategory);
 		articleDetail.setNumberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size());
 		articleDetail.setNumberOfDislike(CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size());
