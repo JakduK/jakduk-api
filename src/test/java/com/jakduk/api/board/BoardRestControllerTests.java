@@ -200,8 +200,8 @@ public class BoardRestControllerTests {
                         ArticleGallery.builder()
                         .id("boardGalleryId01")
                         .name("성남FC 시즌권 사진")
-                        .imageUrl("https://staging.jakduk.com:8080/gallery/58b9050b807d714eaf50a111")
-                        .thumbnailUrl("https://staging.jakduk.com:8080/gallery/thumbnail/58b9050b807d714eaf50a111")
+                        .imageUrl("https://dev-web.jakduk.com/api/gallery/58b9050b807d714eaf50a111")
+                        .thumbnailUrl("https://dev-web.jakduk.com/api/gallery/thumbnail/58b9050b807d714eaf50a111")
                         .build()
                 )
         );

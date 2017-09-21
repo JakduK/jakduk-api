@@ -28,8 +28,8 @@ spring:
           max-attempts: 3
 
 jakduk:
-  api-server-url: https://staging.jakduk.com:8080
-  web-server-url: https://staging.jakduk.com
+  api-server-url: https://dev-web.jakduk.com/api
+  web-server-url: https://dev-web.jakduk.com
   remember-me-expiration: 14400 # 4 hours
 
   mongodb:
@@ -37,7 +37,7 @@ jakduk:
     host: http://192.168.35.194:27017,http://192.168.35.138:27017
   swagger: # swagger
     protocol: https
-    host: staging.jakduk.com:8080
+    host: dev-web.jakduk.com
   slackLog: # alert slack
     enabled: true
     level: WARN
