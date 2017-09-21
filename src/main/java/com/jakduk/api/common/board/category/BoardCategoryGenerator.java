@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class BoardCategoryGenerator {
 
-    List<BoardCategory> footballCategories = Arrays.asList(
+    private static final List<BoardCategory> FOOTBALL_CATEGORIES = Arrays.asList(
             BoardCategory.builder()
                     .code("CLASSIC")
                     .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Classic"), new LocalSimpleName(Locale.KOREA.getLanguage(), "클래식")))
@@ -38,7 +38,7 @@ public class BoardCategoryGenerator {
                     .build()
     );
 
-    List<BoardCategory> developerCategories = Arrays.asList(
+    private static final List<BoardCategory> DEVELOPER_CATEGORIES = Arrays.asList(
             BoardCategory.builder()
                     .code("QUESTION")
                     .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Question"), new LocalSimpleName(Locale.KOREA.getLanguage(), "물음")))
@@ -79,11 +79,11 @@ public class BoardCategoryGenerator {
 
         switch (boardType) {
             case FOOTBALL:
-                return footballCategories.stream()
+                return FOOTBALL_CATEGORIES.stream()
                         .peek(localeNamesConsumer)
                         .collect(Collectors.toList());
             case DEVELOPER:
-                return developerCategories.stream()
+                return DEVELOPER_CATEGORIES.stream()
                         .peek(localeNamesConsumer)
                         .collect(Collectors.toList());
             default:
@@ -105,13 +105,13 @@ public class BoardCategoryGenerator {
 
         switch (boardType) {
             case FOOTBALL:
-                return footballCategories.stream()
+                return FOOTBALL_CATEGORIES.stream()
                         .filter(boardCategory -> boardCategory.getCode().equals(code))
                         .peek(localeNamesConsumer)
                         .findFirst()
                         .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
             case DEVELOPER:
-                return developerCategories.stream()
+                return DEVELOPER_CATEGORIES.stream()
                         .filter(boardCategory -> boardCategory.getCode().equals(code))
                         .peek(localeNamesConsumer)
                         .findFirst()
@@ -128,13 +128,13 @@ public class BoardCategoryGenerator {
     public Boolean existCategory(Constants.BOARD_TYPE boardType, String code) {
         switch (boardType) {
             case FOOTBALL:
-                return footballCategories.stream()
+                return FOOTBALL_CATEGORIES.stream()
                         .anyMatch(boardCategory -> boardCategory.getCode().equals(code));
             case DEVELOPER:
-                return developerCategories.stream()
+                return DEVELOPER_CATEGORIES.stream()
                         .anyMatch(boardCategory -> boardCategory.getCode().equals(code));
             default:
-                return null;
+                return Boolean.TRUE;
         }
     }
 
