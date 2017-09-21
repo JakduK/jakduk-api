@@ -23,6 +23,7 @@ spring:
       write-dates-as-timestamps: false
 
 jakduk:
+  remember-me-seed: 2f76392e-8b1d-4beb-aca0-b7f53a010e0c
   api-url-path:
     user-picture-large: user/picture
     user-picture-small: user/picture/small
