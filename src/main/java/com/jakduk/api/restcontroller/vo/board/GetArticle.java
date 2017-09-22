@@ -3,8 +3,7 @@ package com.jakduk.api.restcontroller.vo.board;
 import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +11,9 @@ import java.util.List;
  * Created by pyohwanjang on 2017. 3. 3..
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class GetArticle {
@@ -29,13 +31,13 @@ public class GetArticle {
     private String subject;
 
     @ApiModelProperty(example = "2", value = "글번호")
-    private int seq;
+    private Integer seq;
 
     @ApiModelProperty(example = "CLASSIC", value = "말머리")
     private String category;
 
     @ApiModelProperty(example = "10", value = "읽음 수")
-    private int views = 0;
+    private Integer views;
 
     @ApiModelProperty(value = "글상태")
     private ArticleStatus status;
@@ -47,12 +49,12 @@ public class GetArticle {
     private String shortContent;
 
     @ApiModelProperty(example = "5", value = "댓글 수")
-    private int commentCount;
+    private Integer commentCount;
 
     @ApiModelProperty(example = "5", value = "좋아요 수")
-    private int likingCount;
+    private Integer likingCount;
 
     @ApiModelProperty(example = "5", value = "싫어요 수")
-    private int dislikingCount;
+    private Integer dislikingCount;
 
 }

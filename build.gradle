@@ -3,17 +3,18 @@ buildscript {
         springBootVersion = '1.5.7.RELEASE'
     }
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
     }
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'org.asciidoctor.convert'
 
 // tag::jar[]
 jar {
@@ -34,12 +35,7 @@ test {
 }
 
 repositories {
-    mavenCentral()
-
-    // 프로젝트에 import한 jar 보관 폴더.
-    flatDir {
-        dirs getRootDir().path + '/custom-lib'
-    }
+    jcenter()
 }
 
 dependencies {
@@ -68,5 +64,12 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
     testCompile 'org.springframework.security:spring-security-test:4.2.3.RELEASE'
+}
+
+asciidoctor {
+    sourceDir 'src/main/asciidoc'
+    attributes \
+      'snippets': file('build/snippets')
 }

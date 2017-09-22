@@ -46,7 +46,7 @@ public class BoardCategoryGenerator {
             // by siverprize
             BoardCategory.builder()
                     .code("JOBS")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Jobs"), new LocalSimpleName(Locale.KOREA.getLanguage(), "일자")))
+                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Jobs"), new LocalSimpleName(Locale.KOREA.getLanguage(), "일자리")))
                     .build(),
             // 특정문제에 대해서 가장 작은 바이트로 코딩하면 우승 by fxpark
             BoardCategory.builder()

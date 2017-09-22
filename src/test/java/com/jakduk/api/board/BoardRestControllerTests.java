@@ -4,6 +4,8 @@ import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategoryGenerator;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
@@ -24,12 +26,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -37,11 +41,18 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,6 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(BoardRestController.class)
 @Import(TestMvcConfig.class)
+@AutoConfigureRestDocs(outputDir = "build/snippets")
 public class BoardRestControllerTests {
 
     @Autowired
@@ -62,6 +74,7 @@ public class BoardRestControllerTests {
     private CommonWriter commonWriter;
     private Article article;
     private BoardCategory boardCategory;
+    private Map<String, String> categoriesMap;
 
     @Before
     public void setUp(){
@@ -83,22 +96,101 @@ public class BoardRestControllerTests {
                 .status(ArticleStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
                 .build();
 
-        boardCategory = BoardCategory.builder()
-                .code("FREE")
-                .names(Arrays.asList(new LocalSimpleName("ko", "자유"), new LocalSimpleName("en", "FREE")))
-                .build();
+        List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
+
+        boardCategory = categories.get(0);
+
+        categoriesMap = categories.stream()
+                .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+
+        categoriesMap.put("ALL", JakdukUtils.getResourceBundleMessage("messages.board", "board.category.all"));
     }
 
-    /**
-     * TODO content json 이 맞는지 검증은 안했는데 넣는게 나을듯
-     */
     @Test
     @WithMockUser
     public void getArticlesTest() throws Exception {
-        mvc.perform(get("/api/board/free/articles")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
 
+        BoardGallerySimple gallerySimple = BoardGallerySimple.builder()
+                .id("58b9050b807d714eaf50a111")
+                .thumbnailUrl("https://dev-web.jakduk.com/api/gallery/thumbnail/58b9050b807d714eaf50a111")
+                .build();
+
+        GetArticle article = GetArticle.builder()
+                .id("58b7b9dd716dce06b10e449a")
+                .board(Constants.BOARD_TYPE.FOOTBALL.name())
+                .writer(commonWriter)
+                .subject("글 제목입니다.")
+                .seq(2)
+                .category(boardCategory.getCode())
+                .views(10)
+                .status(new ArticleStatus(false, false, Constants.DEVICE_TYPE.NORMAL))
+                .galleries(Arrays.asList(gallerySimple))
+                .shortContent("본문입니다. (100자)")
+                .commentCount(5)
+                .likingCount(3)
+                .dislikingCount(1)
+                .build();
+
+        GetArticle notice = GetArticle.builder()
+                .id("58b7b9dd716dce06b10e449a")
+                .board(Constants.BOARD_TYPE.FOOTBALL.name())
+                .writer(commonWriter)
+                .subject("공지글 제목입니다.")
+                .seq(3)
+                .category(boardCategory.getCode())
+                .views(15)
+                .status(new ArticleStatus(true, false, Constants.DEVICE_TYPE.NORMAL))
+                .galleries(Arrays.asList(gallerySimple))
+                .shortContent("본문입니다. (100자)")
+                .commentCount(8)
+                .likingCount(10)
+                .dislikingCount(2)
+                .build();
+
+        GetArticlesResponse expectResponse = GetArticlesResponse.builder()
+                .categories(categoriesMap)
+                .articles(Arrays.asList(article))
+                .notices(Arrays.asList(notice))
+                .last(false)
+                .first(true)
+                .totalPages(50)
+                .size(20)
+                .number(0)
+                .numberOfElements(20)
+                .totalElements(1011L)
+                .build();
+
+        when(articleService.getArticles(anyString(), anyString(), anyInt(), anyInt()))
+                .thenReturn(expectResponse);
+
+        mvc.perform(
+                get("/api/board/{board}/articles", Constants.BOARD_TYPE_LOWERCASE.football)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(document("getArticles",
+                        pathParameters(
+                                parameterWithName("board").description("게시판 " + Stream.of(Constants.BOARD_TYPE_LOWERCASE.values()).map(Enum::name).collect(Collectors.toList()))
+                        ),
+                        requestParameters(
+                                parameterWithName("page").description("페이지 번호(1부터 시작)").optional(),
+                                parameterWithName("size").description("페이지 사이즈").optional(),
+                                parameterWithName("categoryCode").description("말머리").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵"),
+                                fieldWithPath("articles").type(JsonFieldType.ARRAY).description("글 목록"),
+                                fieldWithPath("notices").type(JsonFieldType.ARRAY).description("공지글 목록"),
+                                fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                                fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
+                                fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지당 글 수"),
+                                fieldWithPath("number").type(JsonFieldType.NUMBER).description("현재 페이지(0부터 시작)"),
+                                fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현제 페이지에서 글 수"),
+                                fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("전체 글 수")
+                        )
+                ));
     }
 
     @Test
