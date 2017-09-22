@@ -30,11 +30,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.beans.PropertyEditorSupport;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +59,7 @@ public class BoardRestController {
     @ApiOperation("게시판 글 목록")
     @GetMapping("/{board}/articles")
     public GetArticlesResponse getArticles(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
             @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") String categoryCode) {
@@ -68,7 +70,7 @@ public class BoardRestController {
     @ApiOperation("게시판 주간 선두 글")
     @GetMapping("/{board}/tops")
     public GetBoardTopsResponse getBoardTops(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board) {
 
         LocalDate localDate = LocalDate.now().minusWeeks(1);
         ObjectId objectId = new ObjectId(DateUtils.localDateToDate(localDate));
@@ -85,7 +87,7 @@ public class BoardRestController {
     @ApiOperation("게시판 댓글 목록")
     @GetMapping("/{board}/comments")
     public GetArticleCommentsResponse getArticleComments(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size) {
 
@@ -97,7 +99,7 @@ public class BoardRestController {
     @ApiOperation("게시판 글 상세")
     @GetMapping("/{board}/{seq}")
     public ResponseEntity<GetArticleDetailResponse> getArticleDetail(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -110,7 +112,7 @@ public class BoardRestController {
     @ApiOperation("게시판 말머리 목록")
     @GetMapping("/{board}/categories")
     public GetBoardCategoriesResponse getBoardCategories(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board) {
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board) {
 
         Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
@@ -124,7 +126,7 @@ public class BoardRestController {
     @ApiOperation("게시판 글쓰기")
     @PostMapping("/{board}")
     public WriteArticleResponse writeArticle(
-            @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody WriteArticle form,
             Device device,
             Authentication authentication) {
@@ -158,7 +160,7 @@ public class BoardRestController {
     @SecuredUser
     @PutMapping("/{board}/{seq}")
     public WriteArticleResponse editArticle(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody WriteArticle form,
             HttpServletRequest request,
@@ -202,7 +204,7 @@ public class BoardRestController {
     @SecuredUser
     @DeleteMapping("/{board}/{seq}")
     public DeleteArticleResponse deleteArticle(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             Authentication authentication) {
 
@@ -218,7 +220,7 @@ public class BoardRestController {
     @ApiOperation("게시판 글의 댓글 목록")
     @GetMapping("/{board}/{seq}/comments")
     public GetArticleDetailCommentsResponse getArticleDetailComments(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
@@ -228,7 +230,7 @@ public class BoardRestController {
     @ApiOperation("게시판 글의 댓글 달기")
     @PostMapping("/{board}/{seq}/comment")
     public ArticleComment addArticleComment(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             Device device,
@@ -260,7 +262,7 @@ public class BoardRestController {
     @SecuredUser
     @PutMapping("/{board}/comment/{id}")
     public ArticleComment editArticleComment(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
             @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
             HttpServletRequest request,
@@ -308,7 +310,7 @@ public class BoardRestController {
     @SecuredUser
     @DeleteMapping("/{board}/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
 
         if (! AuthUtils.isUser())
@@ -324,7 +326,7 @@ public class BoardRestController {
     @ApiOperation("게시판 글 감정 표현")
     @PostMapping("/{board}/{seq}/{feeling}")
     public UserFeelingResponse addFreeFeeling(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE_LOWERCASE feeling) {
 
@@ -348,7 +350,7 @@ public class BoardRestController {
     @ApiOperation(value = "자유게시판 글의 감정 표현 회원 목록")
     @RequestMapping(value = "/{board}/{seq}/feeling/users", method = RequestMethod.GET)
     public FreePostFeelingsResponse getFreeFeelings (
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
         Article article = articleService.findOneBySeq(StringUtils.upperCase(board.name()), seq);
@@ -363,7 +365,7 @@ public class BoardRestController {
     @ApiOperation("자유게시판 댓글 감정 표현")
     @PostMapping("/{board}/comment/{commentId}/{feeling}")
     public UserFeelingResponse addFreeCommentFeeling(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String commentId,
             @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE feeling) {
 
@@ -385,7 +387,7 @@ public class BoardRestController {
     @ApiOperation(value = "게시판 글의 공지 활성화")
     @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.POST)
     public EmptyJsonResponse enableFreeNotice(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @PathVariable int seq) {
 
         if (! AuthUtils.isAdmin())
@@ -401,7 +403,7 @@ public class BoardRestController {
     @ApiOperation(value = "게시판 글의 공지 비활성화")
     @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.DELETE)
     public EmptyJsonResponse disableFreeNotice(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE_LOWERCASE board,
+            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @PathVariable int seq) {
 
         if (! AuthUtils.isAdmin())
@@ -414,4 +416,16 @@ public class BoardRestController {
         return EmptyJsonResponse.newInstance();
     }
 
+    @InitBinder
+    public void initBoardTypeEnumBinder(WebDataBinder dataBinder) {
+        dataBinder.registerCustomEditor(Constants.BOARD_TYPE.class, new BoardTypeEnumConverter());
+    }
+
+    private static class BoardTypeEnumConverter extends PropertyEditorSupport {
+
+        @Override
+        public void setAsText(String text) throws IllegalArgumentException {
+            setValue(text.toUpperCase());
+        }
+    }
 }
