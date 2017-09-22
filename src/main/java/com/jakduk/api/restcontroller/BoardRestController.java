@@ -145,7 +145,7 @@ public class BoardRestController {
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
         Article article = articleService.insertArticle(commonWriter, boardType, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode().trim(), galleries, JakdukUtils.getDeviceInfo(device));
+                StringUtils.trim(form.getCategoryCode()), galleries, JakdukUtils.getDeviceInfo(device));
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
 

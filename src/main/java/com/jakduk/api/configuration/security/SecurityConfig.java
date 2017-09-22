@@ -52,6 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .failureHandler(new RestJakdukFailureHandler())
 
                 .and().rememberMe()
+                    .key(jakdukProperties.getRememberMeSeed())
                     .tokenValiditySeconds(jakdukProperties.getRememberMeExpiration())
 
                 .and().logout()

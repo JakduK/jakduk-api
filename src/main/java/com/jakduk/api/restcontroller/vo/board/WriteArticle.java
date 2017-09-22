@@ -1,13 +1,11 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import com.jakduk.api.common.Constants;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -32,7 +30,6 @@ public class WriteArticle {
     private String content;
 
     @ApiModelProperty(required = true, value = "말머리 코드", example = "CLASSIC")
-    @NotEmpty
     private String categoryCode;
 
     @ApiModelProperty(value = "사진 목록")

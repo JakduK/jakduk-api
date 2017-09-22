@@ -504,7 +504,7 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 지움
 	 */
-	public void deleteArticleComment(String board, String id, CommonWriter writer) {
+	public void deleteArticleComment(String id, String board, CommonWriter writer) {
 
 		ArticleComment articleComment = articleCommentRepository.findOneById(id)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
@@ -855,6 +855,7 @@ public class ArticleService {
 
 		BoardCategory boardCategory = new BoardCategoryGenerator().getCategory(Constants.BOARD_TYPE.valueOf(board), article.getCategory(), JakdukUtils.getLocale());
 
+		articleDetail.setBoard(board);
 		articleDetail.setCategory(boardCategory);
 		articleDetail.setNumberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size());
 		articleDetail.setNumberOfDislike(CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size());

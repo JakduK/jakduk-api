@@ -20,6 +20,7 @@ import java.util.Map;
 @ConfigurationProperties("jakduk")
 public class JakdukProperties {
 
+    private String rememberMeSeed;
     private Integer rememberMeExpiration;
     private String apiServerUrl;
     private String webServerUrl;
