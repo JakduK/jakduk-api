@@ -425,6 +425,9 @@ public class BoardRestController {
 
         @Override
         public void setAsText(String text) throws IllegalArgumentException {
+            if (text.equals(text.toUpperCase())) {
+            	throw new ServiceException(ServiceError.NOT_FOUND);
+			}
             setValue(text.toUpperCase());
         }
     }
