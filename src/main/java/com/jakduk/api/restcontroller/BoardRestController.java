@@ -116,7 +116,7 @@ public class BoardRestController {
 
         Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
-        List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(boardType, JakdukUtils.getLocale());
+        List<BoardCategory> categories = BoardCategoryGenerator.getCategories(boardType, JakdukUtils.getLocale());
 
         return GetBoardCategoriesResponse.builder()
                 .categories(categories)
