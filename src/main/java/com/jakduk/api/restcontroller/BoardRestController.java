@@ -427,8 +427,9 @@ public class BoardRestController {
         public void setAsText(String text) throws IllegalArgumentException {
             if (text.equals(text.toLowerCase())) {
 				setValue(text.toUpperCase());
+			} else {
+				throw new ServiceException(ServiceError.NOT_FOUND);
 			}
-			throw new ServiceException(ServiceError.NOT_FOUND);
         }
     }
 }
