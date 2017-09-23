@@ -13,7 +13,6 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.model.embedded.LocalSimpleName;
 import com.jakduk.api.model.simple.ArticleOnSearch;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
@@ -41,6 +40,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
