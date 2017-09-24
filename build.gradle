@@ -42,8 +42,6 @@ test {
 asciidoctor {
     dependsOn test
     sourceDir 'src/main/asciidoc'
-    attributes \
-      'snippets': file('build/snippets')
 }
 
 repositories {
@@ -76,6 +74,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
-    testCompile 'org.springframework.security:spring-security-test:4.2.3.RELEASE'
+    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
+    testCompile('org.springframework.security:spring-security-test')
 }
