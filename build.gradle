@@ -42,6 +42,8 @@ test {
 asciidoctor {
     dependsOn test
     sourceDir 'src/main/asciidoc'
+    attributes \
+      'snippets': file('build/snippets')
 }
 
 repositories {
