@@ -108,4 +108,12 @@ public class BoardCategoryGenerator {
 		}
     }
 
+	/**
+	 * 해당 말머리가 존재 하지 않는지 확인 한다.
+	 */
+	public static Boolean notExistCategory(Constants.BOARD_TYPE boardType, String targetCategoryName) {
+
+		return ! BoardCategoryGenerator.existCategory(boardType, targetCategoryName);
+	}
+
 }
