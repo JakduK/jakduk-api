@@ -80,7 +80,7 @@ public class ArticleService {
 	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content, String categoryCode,
 								 List<Gallery> galleries, Constants.DEVICE_TYPE device) {
 
-		if (!BoardCategoryGenerator.existCategory(board, categoryCode))
+		if (! BoardCategoryGenerator.existCategory(board, categoryCode))
 			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);
 
 		// shortContent 만듦
@@ -104,7 +104,7 @@ public class ArticleService {
 		Article article = Article.builder()
 				.writer(writer)
 				.board(board.name())
-				.category(categoryCode)
+				.category(board.equals(Constants.BOARD_TYPE.FREE) ? null : categoryCode)
 				.subject(subject)
 				.content(content)
 				.shortContent(shortContent)
