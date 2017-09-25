@@ -40,7 +40,7 @@ public interface ArticleRepositoryCustom {
     /**
      * 공지 글 목록
      */
-    List<ArticleOnList> findNotices(String board, Sort sort);
+    List<ArticleOnList> findNotices(Constants.BOARD_TYPE board, Sort sort);
 
     /**
      * 홈에서 보여지는 최근글 목록
@@ -72,6 +72,6 @@ public interface ArticleRepositoryCustom {
      * @param board 게시판
      * @param commentId 해당 ID 기준 이상
      */
-    List<BoardTop> findTopLikes(String board, ObjectId commentId);
+    List<BoardTop> findTopLikes(Constants.BOARD_TYPE board, ObjectId commentId);
 
 }

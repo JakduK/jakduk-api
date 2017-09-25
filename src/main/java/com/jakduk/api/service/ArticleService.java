@@ -262,7 +262,7 @@ public class ArticleService {
 	/**
 	 * 자유게시판 글 목록
      */
-	public GetArticlesResponse getArticles(String board, String categoryCode, Integer page, Integer size) {
+	public GetArticlesResponse getArticles(Constants.BOARD_TYPE board, String categoryCode, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
@@ -343,7 +343,7 @@ public class ArticleService {
 		freeNotices.forEach(applyCounts);
 
 		// 말머리
-		List<BoardCategory> categories = BoardCategoryGenerator.getCategories(Constants.BOARD_TYPE.valueOf(board), JakdukUtils.getLocale());
+		List<BoardCategory> categories = BoardCategoryGenerator.getCategories(board, JakdukUtils.getLocale());
 		Map<String, String> categoriesMap = null;
 
 		if (! CollectionUtils.isEmpty(categories)) {
@@ -685,14 +685,14 @@ public class ArticleService {
 	/**
 	 * 자유게시판 주간 좋아요수 선두
      */
-	public List<BoardTop> getFreeTopLikes(String board, ObjectId objectId) {
+	public List<BoardTop> getArticlesTopLikes(Constants.BOARD_TYPE board, ObjectId objectId) {
 		return articleRepository.findTopLikes(board, objectId);
 	}
 
 	/**
 	 * 자유게시판 주간 댓글수 선두
 	 */
-	public List<BoardTop> getFreeTopComments(String board, ObjectId objectId) {
+	public List<BoardTop> getArticlesTopComments(Constants.BOARD_TYPE board, ObjectId objectId) {
 
 		// 게시물의 댓글수
 		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountGreaterThanBoardIdAndBoard(objectId, board).stream()

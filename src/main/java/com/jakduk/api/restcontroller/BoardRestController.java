@@ -64,21 +64,21 @@ public class BoardRestController {
             @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size,
             @ApiParam(value = "말머리") @RequestParam(required = false, defaultValue = "ALL") String categoryCode) {
 
-        return articleService.getArticles(StringUtils.upperCase(board.name()), categoryCode, page, size);
+        return articleService.getArticles(board, categoryCode, page, size);
     }
 
     @ApiOperation("게시판 주간 선두 글")
     @GetMapping("/{board}/tops")
-    public GetBoardTopsResponse getBoardTops(
+    public GetArticlesTopsResponse getArticlesTops(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board) {
 
         LocalDate localDate = LocalDate.now().minusWeeks(1);
         ObjectId objectId = new ObjectId(DateUtils.localDateToDate(localDate));
 
-        List<BoardTop> topLikes = articleService.getFreeTopLikes(StringUtils.upperCase(board.name()), objectId);
-        List<BoardTop> topComments = articleService.getFreeTopComments(StringUtils.upperCase(board.name()), objectId);
+        List<BoardTop> topLikes = articleService.getArticlesTopLikes(board, objectId);
+        List<BoardTop> topComments = articleService.getArticlesTopComments(board, objectId);
 
-        return GetBoardTopsResponse.builder()
+        return GetArticlesTopsResponse.builder()
                 .topLikes(topLikes)
                 .topComments(topComments)
                 .build();

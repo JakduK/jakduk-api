@@ -105,10 +105,10 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * 공지 글 목록
      */
     @Override
-    public List<ArticleOnList> findNotices(String board, Sort sort) {
+    public List<ArticleOnList> findNotices(Constants.BOARD_TYPE board, Sort sort) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.notice").is(true))
-                .addCriteria(Criteria.where("board").is(board))
+                .addCriteria(Criteria.where("board").is(board.name()))
                 .with(sort)
                 .limit(10);
 
@@ -204,8 +204,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      *  {$limit:3})
      */
     @Override
-    public List<BoardTop> findTopLikes(String board, ObjectId objectId) {
-        AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(objectId).and("board").is(board));
+    public List<BoardTop> findTopLikes(Constants.BOARD_TYPE board, ObjectId objectId) {
+        AggregationOperation match1 = Aggregation.match(Criteria.where("_id").gt(objectId).and("board").is(board.name()));
 
         AggregationExpression usersLikingCount = ArrayOperators.Size.lengthOfArray(ConditionalOperators.ifNull("usersLiking").then(new ArrayList<>()));
 

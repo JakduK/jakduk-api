@@ -14,11 +14,12 @@ Doc Writer <phjang1983@daum.net>
 
 This is an example output for a service running at https://dev-api.jakduk.com
 
+As you can see the format is very simple, and in fact you always get the same message.
+
 [[overview-http-verbs]]
 == HTTP verbs
 
-RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
-use of HTTP verbs.
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
 
 |===
 | Verb | Usage
@@ -42,7 +43,7 @@ use of HTTP verbs.
 [[get-articles]]
 == 게시물 목록
 
-게시판의 글 목록을 가져온다.
+특정 게시판의 글 목록을 가져온다. (최신순)
 
 include::{snippets}/getArticles/path-parameters.adoc[]
 
@@ -58,4 +59,38 @@ include::{snippets}/getArticles/response-fields.adoc[]
 .http response
 include::{snippets}/getArticles/http-response.adoc[]
 
-As you can see the format is very simple, and in fact you always get the same message.
+[[get-articles-tops]]
+== 주간 선두 글 목록
+
+특정 게시판의 주간 선두 글 목록을 가져온다.
+
+include::{snippets}/getArticlesTops/path-parameters.adoc[]
+
+.curl request
+include::{snippets}/getArticlesTops/curl-request.adoc[]
+.http request
+include::{snippets}/getArticlesTops/http-request.adoc[]
+
+.response fields
+include::{snippets}/getArticlesTops/response-fields.adoc[]
+.http response
+include::{snippets}/getArticlesTops/http-response.adoc[]
+
+[[get-comments]]
+== 댓글 목록
+
+특정 게시판의 댓글 목록을 가져온다. (최신순)
+
+include::{snippets}/getArticleComments/path-parameters.adoc[]
+
+.request parameters
+include::{snippets}/getArticleComments/request-parameters.adoc[]
+.curl request
+include::{snippets}/getArticleComments/curl-request.adoc[]
+.http request
+include::{snippets}/getArticleComments/http-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleComments/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleComments/http-response.adoc[]

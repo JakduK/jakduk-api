@@ -95,7 +95,7 @@ public class BoardRestControllerTests {
                 .status(ArticleStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
                 .build();
 
-        List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
+        List<BoardCategory> categories = BoardCategoryGenerator.getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
 
         boardCategory = categories.get(0);
 
@@ -159,11 +159,11 @@ public class BoardRestControllerTests {
                 .totalElements(1011L)
                 .build();
 
-        when(articleService.getArticles(anyString(), anyString(), anyInt(), anyInt()))
+        when(articleService.getArticles(any(Constants.BOARD_TYPE.class), anyString(), anyInt(), anyInt()))
                 .thenReturn(expectResponse);
 
         mvc.perform(
-                get("/api/board/{board}/articles", Constants.BOARD_TYPE_LOWERCASE.football)
+                get("/api/board/{board}/articles", Constants.BOARD_TYPE.FOOTBALL.name().toLowerCase())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -172,12 +172,12 @@ public class BoardRestControllerTests {
                         document("getArticles",
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
-                                                Stream.of(Constants.BOARD_TYPE_LOWERCASE.values()).map(Enum::name).collect(Collectors.toList()))
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
                                 ),
                                 requestParameters(
-                                        parameterWithName("page").description("페이지 번호(1부터 시작)").optional(),
-                                        parameterWithName("size").description("페이지 사이즈").optional(),
-                                        parameterWithName("categoryCode").description("말머리").optional()
+                                        parameterWithName("page").description("(optional) 페이지 번호. 1부터 시작 default : 1").optional(),
+                                        parameterWithName("size").description("(optional) 페이지 사이즈 default : 20").optional(),
+                                        parameterWithName("categoryCode").description("(optional) 말머리 default : ALL").optional()
                                 ),
                                 responseFields(
                                         fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵"),
@@ -208,7 +208,7 @@ public class BoardRestControllerTests {
                         .build()
         );
 
-        when(articleService.getFreeTopLikes(anyString(), any(ObjectId.class)))
+        when(articleService.getArticlesTopLikes(any(Constants.BOARD_TYPE.class), any(ObjectId.class)))
                 .thenReturn(expectTopLikes);
 
         List<BoardTop> expectTopComments = Arrays.asList(
@@ -221,23 +221,32 @@ public class BoardRestControllerTests {
                         .build()
         );
 
-        when(articleService.getFreeTopComments(anyString(), any(ObjectId.class)))
+        when(articleService.getArticlesTopComments(any(Constants.BOARD_TYPE.class), any(ObjectId.class)))
                 .thenReturn(expectTopComments);
 
-        GetBoardTopsResponse expectResponse = GetBoardTopsResponse.builder()
+        GetArticlesTopsResponse expectResponse = GetArticlesTopsResponse.builder()
                 .topLikes(expectTopLikes)
                 .topComments(expectTopComments)
                 .build();
 
         mvc.perform(
-                get("/api/board/{board}/tops", Constants.BOARD_TYPE_LOWERCASE.football)
+                get("/api/board/{board}/tops", Constants.BOARD_TYPE.FOOTBALL.name().toLowerCase())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
-                        document("getArticles")
-                );
+                        document("getArticlesTops",
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                                ),
+
+                                responseFields(
+                                        fieldWithPath("topLikes").type(JsonFieldType.ARRAY).description("주간 좋아요수 선두 목록"),
+                                        fieldWithPath("topComments").type(JsonFieldType.ARRAY).description("주간 댓글수 선두 목록")
+                                )
+                        ));
     }
 
     @Test
@@ -248,7 +257,7 @@ public class BoardRestControllerTests {
                 .comments(
                         Arrays.asList(
                                 GetArticleComment.builder()
-                                        .id("boardFreeCommentId01")
+                                        .id("54b5058c3d96b205dc7e2809")
                                         .article(
                                                 ArticleOnSearch.builder()
                                                         .id(article.getId())
@@ -265,22 +274,43 @@ public class BoardRestControllerTests {
                 )
                 .last(true)
                 .first(true)
-                .totalPages(1)
-                .size(10)
+                .totalPages(10)
+                .size(20)
                 .number(0)
-                .numberOfElements(1)
-                .totalElements(1)
+                .numberOfElements(20)
+                .totalElements(201L)
                 .build();
 
         when(articleService.getArticleComments(any(CommonWriter.class), anyString(), anyInt(), anyInt()))
                 .thenReturn(expectResponse);
 
         mvc.perform(
-                get("/api/board/free/comments")
+                get("/api/board/{board}/comments", Constants.BOARD_TYPE.FOOTBALL.name().toLowerCase())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)));
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("getArticleComments",
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                                ),
+                                requestParameters(
+                                        parameterWithName("page").description("(optional) 페이지 번호. 1부터 시작 default : 1").optional(),
+                                        parameterWithName("size").description("(optional) 페이지 사이즈 default : 20").optional()
+                                ),
+                                responseFields(
+                                        fieldWithPath("comments").type(JsonFieldType.ARRAY).description("댓글 목록"),
+                                        fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                                        fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
+                                        fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                        fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지당 글 수"),
+                                        fieldWithPath("number").type(JsonFieldType.NUMBER).description("현재 페이지(0부터 시작)"),
+                                        fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현제 페이지에서 글 수"),
+                                        fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("전체 글 수")
+                                )
+                        ));
 
     }
 
