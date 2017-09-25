@@ -80,7 +80,7 @@ public class ArticleService {
 	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content, String categoryCode,
 								 List<Gallery> galleries, Constants.DEVICE_TYPE device) {
 
-		if (! new BoardCategoryGenerator().existCategory(board, categoryCode))
+		if (BoardCategoryGenerator.notExistCategory(board, categoryCode))
 			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);
 
 		// shortContent 만듦
@@ -104,7 +104,7 @@ public class ArticleService {
 		Article article = Article.builder()
 				.writer(writer)
 				.board(board.name())
-				.category(categoryCode)
+				.category(Constants.BOARD_TYPE.FREE.equals(board) ? null : categoryCode)
 				.subject(subject)
 				.content(content)
 				.shortContent(shortContent)
@@ -343,7 +343,7 @@ public class ArticleService {
 		freeNotices.forEach(applyCounts);
 
 		// 말머리
-		List<BoardCategory> categories = new BoardCategoryGenerator().getCategories(Constants.BOARD_TYPE.valueOf(board), JakdukUtils.getLocale());
+		List<BoardCategory> categories = BoardCategoryGenerator.getCategories(Constants.BOARD_TYPE.valueOf(board), JakdukUtils.getLocale());
 		Map<String, String> categoriesMap = null;
 
 		if (! CollectionUtils.isEmpty(categories)) {
@@ -853,7 +853,10 @@ public class ArticleService {
 			articleDetail.setLogs(logs);
 		}
 
-		BoardCategory boardCategory = new BoardCategoryGenerator().getCategory(Constants.BOARD_TYPE.valueOf(board), article.getCategory(), JakdukUtils.getLocale());
+		BoardCategory boardCategory = BoardCategoryGenerator.getCategory(
+				Constants.BOARD_TYPE.valueOf(board),
+				article.getCategory(),
+				JakdukUtils.getLocale());
 
 		articleDetail.setBoard(board);
 		articleDetail.setCategory(boardCategory);

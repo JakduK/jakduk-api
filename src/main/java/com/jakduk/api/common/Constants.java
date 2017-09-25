@@ -16,12 +16,6 @@ public class Constants {
 		DEVELOPER
 	}
 
-	public enum BOARD_TYPE_LOWERCASE {
-		free,
-		football,
-		developer
-	}
-
 	/**
 	 * 백과사전 언어 구분.
 	 */

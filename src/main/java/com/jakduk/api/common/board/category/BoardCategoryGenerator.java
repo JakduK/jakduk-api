@@ -5,137 +5,115 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.embedded.LocalSimpleName;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BoardCategoryGenerator {
 
-    private List<BoardCategory> footballCategories = Arrays.asList(
-            BoardCategory.builder()
-                    .code("CLASSIC")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Classic"), new LocalSimpleName(Locale.KOREA.getLanguage(), "클래식")))
-                    .build(),
-            BoardCategory.builder()
-                    .code("CHALLENGE")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "챌린지")))
-                    .build(),
-            BoardCategory.builder()
-                    .code("NATIONAL_LEAGUE")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "National league"), new LocalSimpleName(Locale.KOREA.getLanguage(), "내셔널리그")))
-                    .build(),
-            BoardCategory.builder()
-                    .code("K3")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "K3"), new LocalSimpleName(Locale.KOREA.getLanguage(), "K3")))
-                    .build(),
-            BoardCategory.builder()
-                    .code("WK")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "WK"), new LocalSimpleName(Locale.KOREA.getLanguage(), "WK")))
-                    .build(),
-            BoardCategory.builder()
-                    .code("NATIONAL_TEAM")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "National team"), new LocalSimpleName(Locale.KOREA.getLanguage(), "국가대표팀")))
-                    .build()
-    );
+	private BoardCategoryGenerator() {}
 
-    private List<BoardCategory> developerCategories = Arrays.asList(
-            BoardCategory.builder()
-                    .code("QUESTION")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Question"), new LocalSimpleName(Locale.KOREA.getLanguage(), "물음")))
-                    .build(),
-            // by siverprize
-            BoardCategory.builder()
-                    .code("JOBS")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Jobs"), new LocalSimpleName(Locale.KOREA.getLanguage(), "일자리")))
-                    .build(),
-            // 특정문제에 대해서 가장 작은 바이트로 코딩하면 우승 by fxpark
-            BoardCategory.builder()
-                    .code("CODE_CHALLENGE")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Code challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "코드 챌린지")))
-                    .build(),
-            // by nari
-            BoardCategory.builder()
-                    .code("IDEA")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Idea"), new LocalSimpleName(Locale.KOREA.getLanguage(), "아이디어")))
-                    .build(),
-            // by nari
-            BoardCategory.builder()
-                    .code("TIP")
-                    .names(Arrays.asList(new LocalSimpleName(Locale.US.getLanguage(), "Tip"), new LocalSimpleName(Locale.KOREA.getLanguage(), "팁")))
-                    .build()
-    );
+    public enum Category {
+        CLASSIC(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Classic"), new LocalSimpleName(Locale.KOREA.getLanguage(), "클래식")),
+        CHALLENGE(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "챌린지")),
+        NATIONAL_LEAGUE(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "National League"), new LocalSimpleName(Locale.KOREA.getLanguage(), "내셔널리그")),
+        K3(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "K3"), new LocalSimpleName(Locale.KOREA.getLanguage(), "K3")),
+        WK(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "WK"), new LocalSimpleName(Locale.KOREA.getLanguage(), "WK")),
+        NATIONAL_TEAM(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "National Team"), new LocalSimpleName(Locale.KOREA.getLanguage(), "국가대표팀")),
+
+		QUESTION(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Question"), new LocalSimpleName(Locale.KOREA.getLanguage(), "물음")),
+		JOBS(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Jobs"), new LocalSimpleName(Locale.KOREA.getLanguage(), "일자리")),
+		CODE_CHALLENGE(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Code challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "코드 챌린지")),
+		IDEA(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Idea"), new LocalSimpleName(Locale.KOREA.getLanguage(), "아이디어")),
+		TIP(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Tip"), new LocalSimpleName(Locale.KOREA.getLanguage(), "팁"));
+
+		private static List<Category> FREE = Collections.emptyList();
+		private static List<Category> FOOTBALL = Stream.of(Category.values()).filter(category -> Constants.BOARD_TYPE.FOOTBALL.equals(category.board)).collect(Collectors.toList());
+		private static List<Category> DEVELOPER = Stream.of(Category.values()).filter(category -> Constants.BOARD_TYPE.DEVELOPER.equals(category.board)).collect(Collectors.toList());
+
+        private Constants.BOARD_TYPE board;
+		private List<LocalSimpleName> names;
+
+        Category(Constants.BOARD_TYPE board, LocalSimpleName... names) {
+        	this.board = board;
+			this.names = Arrays.asList(names);
+        }
+
+        static List<Category> list(Constants.BOARD_TYPE board) {
+			switch (board) {
+				case FOOTBALL:
+					return FOOTBALL;
+				case DEVELOPER:
+					return DEVELOPER;
+				default:
+					return FREE;
+			}
+		}
+    }
 
     /**
      * 해당 언어에 맞는 게시판 말머리 목록을 가져온다.
      */
-    public List<BoardCategory> getCategories(Constants.BOARD_TYPE boardType, Locale locale) {
-
-        Consumer<BoardCategory> localeNamesConsumer = boardCategory -> {
-            List<LocalSimpleName> names = boardCategory.getNames().stream()
-                    .filter(localSimpleName -> localSimpleName.getLanguage().equals(locale.getLanguage()))
-                    .collect(Collectors.toList());
-            boardCategory.setNames(names);
-        };
-
-        switch (boardType) {
-            case FOOTBALL:
-                return footballCategories.stream()
-                        .peek(localeNamesConsumer)
-                        .collect(Collectors.toList());
-            case DEVELOPER:
-                return developerCategories.stream()
-                        .peek(localeNamesConsumer)
-                        .collect(Collectors.toList());
-            default:
-                return new ArrayList<>();
-        }
-    }
+    public static List<BoardCategory> getCategories(Constants.BOARD_TYPE boardType, Locale locale) {
+		return Category.list(boardType)
+				.stream()
+				.map(category -> BoardCategory.builder()
+						.code(category.name())
+						.names(category.names
+								.stream()
+								.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
+								.collect(Collectors.toList()))
+						.build())
+				.collect(Collectors.toList());
+	}
 
     /**
      * 해당 언어에 맞는 게시판 말머리 하나를 가져온다.
      */
-    public BoardCategory getCategory(Constants.BOARD_TYPE boardType, String code, Locale locale) {
-
-        Consumer<BoardCategory> localeNamesConsumer = boardCategory -> {
-            List<LocalSimpleName> names = boardCategory.getNames().stream()
-                    .filter(localSimpleName -> localSimpleName.getLanguage().equals(locale.getLanguage()))
-                    .collect(Collectors.toList());
-            boardCategory.setNames(names);
-        };
-
-        switch (boardType) {
-            case FOOTBALL:
-                return footballCategories.stream()
-                        .filter(boardCategory -> boardCategory.getCode().equals(code))
-                        .peek(localeNamesConsumer)
-                        .findFirst()
-                        .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
-            case DEVELOPER:
-                return developerCategories.stream()
-                        .filter(boardCategory -> boardCategory.getCode().equals(code))
-                        .peek(localeNamesConsumer)
-                        .findFirst()
-                        .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
-            default:
-                return null;
-        }
-
+    public static BoardCategory getCategory(Constants.BOARD_TYPE boardType, String targetCategoryName, Locale locale) {
+		if (Constants.BOARD_TYPE.FREE.equals(boardType)) {
+			return null;
+		} else {
+			Category targetCategory = Category.valueOf(targetCategoryName);
+			return Category.list(boardType)
+					.stream()
+					.filter(category -> category.equals(targetCategory))
+					.findFirst()
+					.map(category -> BoardCategory.builder()
+							.code(category.name())
+							.names(category.names
+									.stream()
+									.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
+									.collect(Collectors.toList()))
+							.build()
+					)
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
+		}
     }
 
     /**
      * 해당 말머리가 존재 하는지 확인 한다.
      */
-    public Boolean existCategory(Constants.BOARD_TYPE boardType, String code) {
-        switch (boardType) {
-            case FOOTBALL:
-                return footballCategories.stream()
-                        .anyMatch(boardCategory -> boardCategory.getCode().equals(code));
-            case DEVELOPER:
-                return developerCategories.stream()
-                        .anyMatch(boardCategory -> boardCategory.getCode().equals(code));
-            default:
-                return Boolean.FALSE;
-        }
+    public static Boolean existCategory(Constants.BOARD_TYPE boardType, String targetCategoryName) {
+    	if (Constants.BOARD_TYPE.FREE.equals(boardType)) {
+    		return Boolean.TRUE;
+		} else {
+    		Category targetCategory = Category.valueOf(targetCategoryName);
+    		return Category.list(boardType)
+					.stream()
+					.anyMatch(category -> category.equals(targetCategory));
+		}
     }
+
+	/**
+	 * 해당 말머리가 존재 하지 않는지 확인 한다.
+	 */
+	public static Boolean notExistCategory(Constants.BOARD_TYPE boardType, String targetCategoryName) {
+
+		return ! BoardCategoryGenerator.existCategory(boardType, targetCategoryName);
+	}
 
 }
