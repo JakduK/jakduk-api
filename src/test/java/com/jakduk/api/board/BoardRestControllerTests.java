@@ -40,7 +40,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -112,7 +111,7 @@ public class BoardRestControllerTests {
 
         BoardGallerySimple gallerySimple = BoardGallerySimple.builder()
                 .id("58b9050b807d714eaf50a111")
-                .thumbnailUrl("https://dev-web.jakduk.com/api/gallery/thumbnail/58b9050b807d714eaf50a111")
+                .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
                 .build();
 
         GetArticle article = GetArticle.builder()
@@ -169,28 +168,30 @@ public class BoardRestControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
-                .andDo(document("getArticles",
-                        pathParameters(
-                                parameterWithName("board").description("게시판 " + Stream.of(Constants.BOARD_TYPE_LOWERCASE.values()).map(Enum::name).collect(Collectors.toList()))
-                        ),
-                        requestParameters(
-                                parameterWithName("page").description("페이지 번호(1부터 시작)").optional(),
-                                parameterWithName("size").description("페이지 사이즈").optional(),
-                                parameterWithName("categoryCode").description("말머리").optional()
-                        ),
-                        responseFields(
-                                fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵"),
-                                fieldWithPath("articles").type(JsonFieldType.ARRAY).description("글 목록"),
-                                fieldWithPath("notices").type(JsonFieldType.ARRAY).description("공지글 목록"),
-                                fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
-                                fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
-                                fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                                fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지당 글 수"),
-                                fieldWithPath("number").type(JsonFieldType.NUMBER).description("현재 페이지(0부터 시작)"),
-                                fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현제 페이지에서 글 수"),
-                                fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("전체 글 수")
-                        )
-                ));
+                .andDo(
+                        document("getArticles",
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE_LOWERCASE.values()).map(Enum::name).collect(Collectors.toList()))
+                                ),
+                                requestParameters(
+                                        parameterWithName("page").description("페이지 번호(1부터 시작)").optional(),
+                                        parameterWithName("size").description("페이지 사이즈").optional(),
+                                        parameterWithName("categoryCode").description("말머리").optional()
+                                ),
+                                responseFields(
+                                        fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵"),
+                                        fieldWithPath("articles").type(JsonFieldType.ARRAY).description("글 목록"),
+                                        fieldWithPath("notices").type(JsonFieldType.ARRAY).description("공지글 목록"),
+                                        fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                                        fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
+                                        fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                        fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지당 글 수"),
+                                        fieldWithPath("number").type(JsonFieldType.NUMBER).description("현재 페이지(0부터 시작)"),
+                                        fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현제 페이지에서 글 수"),
+                                        fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("전체 글 수")
+                                )
+                        ));
     }
 
     @Test
@@ -199,7 +200,7 @@ public class BoardRestControllerTests {
 
         List<BoardTop> expectTopLikes = Arrays.asList(
                 BoardTop.builder()
-                        .id("boardFreeId01")
+                        .id("58b7b9dd716dce06b10e449a")
                         .seq(1)
                         .subject("인기있는 글 제목")
                         .count(5)
@@ -212,7 +213,7 @@ public class BoardRestControllerTests {
 
         List<BoardTop> expectTopComments = Arrays.asList(
                 BoardTop.builder()
-                        .id("boardFreeId02")
+                        .id("58b7b9dd716dce06b10e449a")
                         .seq(2)
                         .subject("댓글많은 글 제목")
                         .count(10)
@@ -223,23 +224,27 @@ public class BoardRestControllerTests {
         when(articleService.getFreeTopComments(anyString(), any(ObjectId.class)))
                 .thenReturn(expectTopComments);
 
-        GetBoardTopsResponse response = GetBoardTopsResponse.builder()
+        GetBoardTopsResponse expectResponse = GetBoardTopsResponse.builder()
                 .topLikes(expectTopLikes)
                 .topComments(expectTopComments)
                 .build();
 
-        mvc.perform(get("/api/board/free/tops")
-                .accept(MediaType.APPLICATION_JSON))
+        mvc.perform(
+                get("/api/board/{board}/tops", Constants.BOARD_TYPE_LOWERCASE.football)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(response)));
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("getArticles")
+                );
     }
 
     @Test
     @WithMockUser
     public void getFreeCommentsTest() throws Exception {
 
-        GetArticleCommentsResponse response = GetArticleCommentsResponse.builder()
+        GetArticleCommentsResponse expectResponse = GetArticleCommentsResponse.builder()
                 .comments(
                         Arrays.asList(
                                 GetArticleComment.builder()
@@ -268,13 +273,14 @@ public class BoardRestControllerTests {
                 .build();
 
         when(articleService.getArticleComments(any(CommonWriter.class), anyString(), anyInt(), anyInt()))
-                .thenReturn(response);
+                .thenReturn(expectResponse);
 
-        mvc.perform(get("/api/board/free/comments")
-                .accept(MediaType.APPLICATION_JSON))
+        mvc.perform(
+                get("/api/board/free/comments")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(response)));
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)));
 
     }
 
@@ -292,8 +298,8 @@ public class BoardRestControllerTests {
                         ArticleGallery.builder()
                         .id("boardGalleryId01")
                         .name("성남FC 시즌권 사진")
-                        .imageUrl("https://dev-web.jakduk.com/api/gallery/58b9050b807d714eaf50a111")
-                        .thumbnailUrl("https://dev-web.jakduk.com/api/gallery/thumbnail/58b9050b807d714eaf50a111")
+                        .imageUrl("https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111")
+                        .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
                         .build()
                 )
         );

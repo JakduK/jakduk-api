@@ -1,8 +1,48 @@
 = jakduk-api REST Docs
 Doc Writer <phjang1983@daum.net>
+:doctype: book
 :icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
 
-This is an example output for a service running at http://localhost:8080:
+[[overview]]
+= Overview
+
+This is an example output for a service running at https://dev-api.jakduk.com
+
+[[overview-http-verbs]]
+== HTTP verbs
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PUT`
+| Used to update an existing resource, including partial updates
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[board-api]]
+= 게시판 API
+
+[[get-articles]]
+== 게시물 목록
+
+게시판의 글 목록을 가져온다.
 
 include::{snippets}/getArticles/path-parameters.adoc[]
 

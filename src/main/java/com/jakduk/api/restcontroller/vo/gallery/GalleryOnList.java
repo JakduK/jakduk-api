@@ -24,10 +24,10 @@ public class GalleryOnList {
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
 
-    @ApiModelProperty(example = "https://dev-web.jakduk.com/api/gallery/58b9050b807d714eaf50a111", value = "사진 풀 URL")
+    @ApiModelProperty(example = "https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111", value = "사진 풀 URL")
     private String imageUrl;
 
-    @ApiModelProperty(example = "https://dev-web.jakduk.com/api/gallery/thumbnail/58b9050b807d714eaf50a111", value = "사진 썸네일 URL")
+    @ApiModelProperty(example = "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111", value = "사진 썸네일 URL")
     private String thumbnailUrl;
 
 }
