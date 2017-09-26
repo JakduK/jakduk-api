@@ -49,8 +49,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -175,14 +174,27 @@ public class BoardRestControllerTests {
                                                 Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
                                 ),
                                 requestParameters(
-                                        parameterWithName("page").description("(optional) 페이지 번호. 1부터 시작 default : 1").optional(),
-                                        parameterWithName("size").description("(optional) 페이지 사이즈 default : 20").optional(),
-                                        parameterWithName("categoryCode").description("(optional) 말머리 default : ALL").optional()
+                                        parameterWithName("page").description("(optional, default 1) 페이지 번호. 1부터 시작.").optional(),
+                                        parameterWithName("size").description("(optional, default 20) 페이지 크기.").optional(),
+                                        parameterWithName("categoryCode").description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시한다. FOOTBALL, DEVELOPER일 때에는 필수다.").optional()
                                 ),
                                 responseFields(
-                                        fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵"),
+                                        fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵. key는 말머리코드, value는 표시되는 이름(다국어 지원)"),
                                         fieldWithPath("articles").type(JsonFieldType.ARRAY).description("글 목록"),
-                                        fieldWithPath("notices").type(JsonFieldType.ARRAY).description("공지글 목록"),
+                                        fieldWithPath("articles.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                        fieldWithPath("articles.[].board").type(JsonFieldType.STRING).description("게시판"),
+                                        fieldWithPath("articles.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                        fieldWithPath("articles.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                        fieldWithPath("articles.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                        fieldWithPath("articles.[].category").type(JsonFieldType.STRING).description("말머리"),
+                                        fieldWithPath("articles.[].views").type(JsonFieldType.NUMBER).description("읽음 수"),
+                                        fieldWithPath("articles.[].status").type(JsonFieldType.OBJECT).description("글 상태"),
+                                        fieldWithPath("articles.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
+                                        fieldWithPath("articles.[].shortContent").type(JsonFieldType.STRING).description("본문 100자"),
+                                        fieldWithPath("articles.[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                                        fieldWithPath("articles.[].likingCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                        fieldWithPath("articles.[].dislikingCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                                        fieldWithPath("notices").type(JsonFieldType.ARRAY).description("공지글 목록. json 형식은 articles와 같음."),
                                         fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
                                         fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
                                         fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
@@ -241,10 +253,19 @@ public class BoardRestControllerTests {
                                         parameterWithName("board").description("게시판 " +
                                                 Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
                                 ),
-
                                 responseFields(
                                         fieldWithPath("topLikes").type(JsonFieldType.ARRAY).description("주간 좋아요수 선두 목록"),
-                                        fieldWithPath("topComments").type(JsonFieldType.ARRAY).description("주간 댓글수 선두 목록")
+                                        fieldWithPath("topLikes.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                        fieldWithPath("topLikes.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                        fieldWithPath("topLikes.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                        fieldWithPath("topLikes.[].count").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                        fieldWithPath("topLikes.[].views").type(JsonFieldType.NUMBER).description("읽음 수"),
+                                        fieldWithPath("topComments").type(JsonFieldType.ARRAY).description("주간 댓글수 선두 목록"),
+                                        fieldWithPath("topComments.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                        fieldWithPath("topComments.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                        fieldWithPath("topComments.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                        fieldWithPath("topComments.[].count").type(JsonFieldType.NUMBER).description("댓글 수"),
+                                        fieldWithPath("topComments.[].views").type(JsonFieldType.NUMBER).description("읽음 수")
                                 )
                         ));
     }
@@ -267,7 +288,7 @@ public class BoardRestControllerTests {
                                         .writer(commonWriter)
                                         .content("댓글 내용입니다.")
                                         .status(new ArticleCommentStatus(Constants.DEVICE_TYPE.NORMAL))
-                                        .numberOfDislike(5)
+                                        .numberOfLike(5)
                                         .numberOfDislike(3)
                                         .build()
                         )
@@ -297,11 +318,18 @@ public class BoardRestControllerTests {
                                                 Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
                                 ),
                                 requestParameters(
-                                        parameterWithName("page").description("(optional) 페이지 번호. 1부터 시작 default : 1").optional(),
-                                        parameterWithName("size").description("(optional) 페이지 사이즈 default : 20").optional()
+                                        parameterWithName("page").description("(optional, default 1) 페이지 번호. 1부터 시작.").optional(),
+                                        parameterWithName("size").description("(optional, default 20) 페이지 크기.").optional()
                                 ),
                                 responseFields(
                                         fieldWithPath("comments").type(JsonFieldType.ARRAY).description("댓글 목록"),
+                                        fieldWithPath("comments.[].id").type(JsonFieldType.STRING).description("댓글 ID"),
+                                        fieldWithPath("comments.[].article").type(JsonFieldType.OBJECT).description("연동 글"),
+                                        fieldWithPath("comments.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                        fieldWithPath("comments.[].content").type(JsonFieldType.STRING).description("댓글 내용"),
+                                        fieldWithPath("comments.[].status").type(JsonFieldType.OBJECT).description("댓글 상태"),
+                                        fieldWithPath("comments.[].numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                        fieldWithPath("comments.[].numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수"),
                                         fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
                                         fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
                                         fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),

@@ -13,7 +13,6 @@ Doc Writer <phjang1983@daum.net>
 = Overview
 
 This is an example output for a service running at https://dev-api.jakduk.com
-
 As you can see the format is very simple, and in fact you always get the same message.
 
 [[overview-http-verbs]]
@@ -37,10 +36,10 @@ RESTful notes tries to adhere as closely as possible to standard HTTP and REST c
 | Used to delete an existing resource
 |===
 
-[[board-api]]
+[[board]]
 = 게시판 API
 
-[[get-articles]]
+[[board-get-articles]]
 == 게시물 목록
 
 특정 게시판의 글 목록을 가져온다. (최신순)
@@ -59,7 +58,7 @@ include::{snippets}/getArticles/response-fields.adoc[]
 .http response
 include::{snippets}/getArticles/http-response.adoc[]
 
-[[get-articles-tops]]
+[[board-get-articles-tops]]
 == 주간 선두 글 목록
 
 특정 게시판의 주간 선두 글 목록을 가져온다.
@@ -76,7 +75,7 @@ include::{snippets}/getArticlesTops/response-fields.adoc[]
 .http response
 include::{snippets}/getArticlesTops/http-response.adoc[]
 
-[[get-comments]]
+[[board-get-comments]]
 == 댓글 목록
 
 특정 게시판의 댓글 목록을 가져온다. (최신순)
