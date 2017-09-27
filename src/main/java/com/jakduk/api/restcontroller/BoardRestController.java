@@ -106,7 +106,9 @@ public class BoardRestController {
 
         Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, Constants.VIEWS_COOKIE_TYPE.ARTICLE, String.valueOf(seq));
 
-        return articleService.getArticleDetail(StringUtils.upperCase(board.name()), seq, isAddCookie);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+
+        return articleService.getArticleDetail(commonWriter, board, seq, isAddCookie);
     }
 
     @ApiOperation("게시판 말머리 목록")
@@ -428,7 +430,7 @@ public class BoardRestController {
             if (StringUtils.isAllLowerCase(text)) {
 				setValue(text.toUpperCase());
 			} else {
-				throw new ServiceException(ServiceError.NOT_FOUND);
+				throw new ServiceException(ServiceError.INVALID_PARAMETER);
 			}
         }
     }

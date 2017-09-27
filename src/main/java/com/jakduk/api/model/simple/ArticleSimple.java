@@ -23,13 +23,9 @@ public class ArticleSimple {
 	
 	@Id
 	private String id;
-
 	private Integer seq;
-
 	private CommonWriter writer;
-	
 	private String subject;
-
 	private String board;
 
 }

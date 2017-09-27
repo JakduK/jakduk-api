@@ -88,9 +88,8 @@ public class ArticleService {
 		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.BOARD_SHORT_CONTENT_LENGTH);
 
 		// 글 상태
-		ArticleStatus articleStatus = ArticleStatus.builder()
-				.device(device)
-				.build();
+		ArticleStatus articleStatus = new ArticleStatus();
+		articleStatus.setDevice(device);
 
 		ObjectId logId = new ObjectId();
 		// lastUpdated
@@ -111,7 +110,7 @@ public class ArticleService {
 				.views(0)
 				.seq(commonService.getNextSequence(Constants.SEQ_BOARD))
 				.status(articleStatus)
-				.logs(this.initBoardLogs(logId, Constants.ARTICLE_HISTORY_TYPE.CREATE.name(), writer))
+				.logs(this.initBoardLogs(logId, Constants.ARTICLE_LOG_TYPE.CREATE.name(), writer))
 				.lastUpdated(lastUpdated)
 				.linkedGallery(! galleries.isEmpty())
 				.build();
@@ -173,7 +172,7 @@ public class ArticleService {
 			logs = new ArrayList<>();
 
 		ObjectId logId = new ObjectId();
-		BoardLog log = new BoardLog(logId.toString(), Constants.ARTICLE_HISTORY_TYPE.EDIT.name(), new SimpleWriter(writer));
+		BoardLog log = new BoardLog(logId.toString(), Constants.ARTICLE_LOG_TYPE.EDIT.name(), new SimpleWriter(writer));
 		logs.add(log);
 		article.setLogs(logs);
 
@@ -222,7 +221,7 @@ public class ArticleService {
                 histories = new ArrayList<>();
 
 			ObjectId boardHistoryId = new ObjectId();
-            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.ARTICLE_HISTORY_TYPE.DELETE.name(), new SimpleWriter(writer));
+            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.ARTICLE_LOG_TYPE.DELETE.name(), new SimpleWriter(writer));
             histories.add(history);
 			article.setLogs(histories);
 
@@ -669,7 +668,7 @@ public class ArticleService {
 		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
-		String historyType = isEnable ? Constants.ARTICLE_HISTORY_TYPE.ENABLE_NOTICE.name() : Constants.ARTICLE_HISTORY_TYPE.DISABLE_NOTICE.name();
+		String historyType = isEnable ? Constants.ARTICLE_LOG_TYPE.ENABLE_NOTICE.name() : Constants.ARTICLE_LOG_TYPE.DISABLE_NOTICE.name();
 		BoardLog history = new BoardLog(new ObjectId().toString(), historyType, new SimpleWriter(writer));
 		histories.add(history);
 
@@ -703,7 +702,7 @@ public class ArticleService {
 				.collect(Collectors.toList());
 
 		// commentIds를 파라미터로 다시 글을 가져온다.
-		List<Article> posts = articleRepository.findByIdInAndBoard(postIds, board);
+		List<Article> posts = articleRepository.findByIdInAndBoard(postIds, board.name());
 
 		// sort
 		Comparator<BoardTop> byCount = (b1, b2) -> b2.getCount() - b1.getCount();
@@ -816,12 +815,12 @@ public class ArticleService {
 	/**
 	 * 글 상세 객체 가져오기
 	 */
-	public ResponseEntity<GetArticleDetailResponse> getArticleDetail(String board, Integer seq, Boolean isAddCookie) {
+	public ResponseEntity<GetArticleDetailResponse> getArticleDetail(CommonWriter commonWriter, Constants.BOARD_TYPE board, Integer seq, Boolean isAddCookie) {
 
 		Article article = articleRepository.findOneBySeq(seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
-		if (! StringUtils.equals(article.getBoard(), board)) {
+		if (! StringUtils.equals(article.getBoard(), board.name())) {
 			return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
 					.header(HttpHeaders.LOCATION, urlGenerationUtils.generateArticleDetailApiUrl(article.getBoard(), seq))
 					.build();
@@ -829,8 +828,6 @@ public class ArticleService {
 
 		if (isAddCookie)
 			this.increaseViews(article);
-
-		CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 글 상세
 		ArticleDetail articleDetail = new ArticleDetail();
@@ -842,7 +839,7 @@ public class ArticleService {
 						ArticleLog articleLog = new ArticleLog();
 						BeanUtils.copyProperties(boardLog, articleLog);
 						LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(articleLog.getId()).getDate());
-						articleLog.setType(Constants.ARTICLE_HISTORY_TYPE.valueOf(boardLog.getType()));
+						articleLog.setType(Constants.ARTICLE_LOG_TYPE.valueOf(boardLog.getType()));
 						articleLog.setTimestamp(timestamp);
 
 						return articleLog;
@@ -853,12 +850,9 @@ public class ArticleService {
 			articleDetail.setLogs(logs);
 		}
 
-		BoardCategory boardCategory = BoardCategoryGenerator.getCategory(
-				Constants.BOARD_TYPE.valueOf(board),
-				article.getCategory(),
-				JakdukUtils.getLocale());
+		BoardCategory boardCategory = BoardCategoryGenerator.getCategory(board, article.getCategory(), JakdukUtils.getLocale());
 
-		articleDetail.setBoard(board);
+		articleDetail.setBoard(board.name());
 		articleDetail.setCategory(boardCategory);
 		articleDetail.setNumberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size());
 		articleDetail.setNumberOfDislike(CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size());

@@ -5,15 +5,13 @@ import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
+import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.Gallery;
-import com.jakduk.api.model.embedded.ArticleCommentStatus;
-import com.jakduk.api.model.embedded.ArticleStatus;
-import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.model.simple.ArticleOnSearch;
+import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
 import com.jakduk.api.restcontroller.vo.board.*;
@@ -38,7 +36,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,9 +47,12 @@ import java.util.stream.Stream;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -59,7 +62,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(BoardRestController.class)
 @Import(TestMvcConfig.class)
 @AutoConfigureRestDocs(outputDir = "build/snippets")
-public class BoardRestControllerTests {
+public class ArticleMvcTests {
 
     @Autowired
     private MockMvc mvc;
@@ -82,18 +85,6 @@ public class BoardRestControllerTests {
                 .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
                 .build();
 
-        article = Article.builder()
-                .id("boardFreeId01")
-                .seq(1)
-                .writer(commonWriter)
-                .subject("제목입니다.")
-                .content("내용입니다.")
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .category("CLASSIC")
-                .linkedGallery(true)
-                .status(ArticleStatus.builder().notice(false).delete(false).device(Constants.DEVICE_TYPE.NORMAL).build())
-                .build();
-
         List<BoardCategory> categories = BoardCategoryGenerator.getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
 
         boardCategory = categories.get(0);
@@ -102,6 +93,25 @@ public class BoardRestControllerTests {
                 .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
 
         categoriesMap.put("ALL", JakdukUtils.getResourceBundleMessage("messages.board", "board.category.all"));
+
+        article = Article.builder()
+                .id("59c8879fa2b594c5d33e6ac4")
+                .seq(2)
+                .writer(commonWriter)
+                .subject("글 제목입니다.")
+                .content("내용입니다. 아주 길 수도 있음.")
+                .board(Constants.BOARD_TYPE.FOOTBALL.name())
+                .category(boardCategory.getCode())
+                .views(15)
+                .usersLiking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
+                .usersDisliking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
+                .status(new ArticleStatus(false, false, Constants.DEVICE_TYPE.NORMAL))
+                .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
+                .shortContent("본문입니다. (100자)")
+                .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
+                .linkedGallery(true)
+                .build();
+
     }
 
     @Test
@@ -113,21 +123,12 @@ public class BoardRestControllerTests {
                 .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
                 .build();
 
-        GetArticle article = GetArticle.builder()
-                .id("58b7b9dd716dce06b10e449a")
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .writer(commonWriter)
-                .subject("글 제목입니다.")
-                .seq(2)
-                .category(boardCategory.getCode())
-                .views(10)
-                .status(new ArticleStatus(false, false, Constants.DEVICE_TYPE.NORMAL))
-                .galleries(Arrays.asList(gallerySimple))
-                .shortContent("본문입니다. (100자)")
-                .commentCount(5)
-                .likingCount(3)
-                .dislikingCount(1)
-                .build();
+        GetArticle getArticle = new GetArticle();
+        BeanUtils.copyProperties(article, getArticle);
+        getArticle.setGalleries(Arrays.asList(gallerySimple));
+        getArticle.setCommentCount(5);
+        getArticle.setLikingCount(article.getUsersLiking().size());
+        getArticle.setDislikingCount(article.getUsersDisliking().size());
 
         GetArticle notice = GetArticle.builder()
                 .id("58b7b9dd716dce06b10e449a")
@@ -147,7 +148,7 @@ public class BoardRestControllerTests {
 
         GetArticlesResponse expectResponse = GetArticlesResponse.builder()
                 .categories(categoriesMap)
-                .articles(Arrays.asList(article))
+                .articles(Arrays.asList(getArticle))
                 .notices(Arrays.asList(notice))
                 .last(false)
                 .first(true)
@@ -176,7 +177,7 @@ public class BoardRestControllerTests {
                                 requestParameters(
                                         parameterWithName("page").description("(optional, default 1) 페이지 번호. 1부터 시작.").optional(),
                                         parameterWithName("size").description("(optional, default 20) 페이지 크기.").optional(),
-                                        parameterWithName("categoryCode").description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시한다. FOOTBALL, DEVELOPER일 때에는 필수다.").optional()
+                                        parameterWithName("categoryCode").description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다.").optional()
                                 ),
                                 responseFields(
                                         fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵. key는 말머리코드, value는 표시되는 이름(다국어 지원)"),
@@ -208,7 +209,7 @@ public class BoardRestControllerTests {
 
     @Test
     @WithMockUser
-    public void getFreePostsTopsTest() throws Exception {
+    public void getTopsTest() throws Exception {
 
         List<BoardTop> expectTopLikes = Arrays.asList(
                 BoardTop.builder()
@@ -272,123 +273,118 @@ public class BoardRestControllerTests {
 
     @Test
     @WithMockUser
-    public void getFreeCommentsTest() throws Exception {
-
-        GetArticleCommentsResponse expectResponse = GetArticleCommentsResponse.builder()
-                .comments(
-                        Arrays.asList(
-                                GetArticleComment.builder()
-                                        .id("54b5058c3d96b205dc7e2809")
-                                        .article(
-                                                ArticleOnSearch.builder()
-                                                        .id(article.getId())
-                                                        .seq(article.getSeq())
-                                                        .subject(article.getSubject())
-                                                        .build())
-                                        .writer(commonWriter)
-                                        .content("댓글 내용입니다.")
-                                        .status(new ArticleCommentStatus(Constants.DEVICE_TYPE.NORMAL))
-                                        .numberOfLike(5)
-                                        .numberOfDislike(3)
-                                        .build()
-                        )
-                )
-                .last(true)
-                .first(true)
-                .totalPages(10)
-                .size(20)
-                .number(0)
-                .numberOfElements(20)
-                .totalElements(201L)
-                .build();
-
-        when(articleService.getArticleComments(any(CommonWriter.class), anyString(), anyInt(), anyInt()))
-                .thenReturn(expectResponse);
-
-        mvc.perform(
-                get("/api/board/{board}/comments", Constants.BOARD_TYPE.FOOTBALL.name().toLowerCase())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
-                .andDo(
-                        document("getArticleComments",
-                                pathParameters(
-                                        parameterWithName("board").description("게시판 " +
-                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
-                                ),
-                                requestParameters(
-                                        parameterWithName("page").description("(optional, default 1) 페이지 번호. 1부터 시작.").optional(),
-                                        parameterWithName("size").description("(optional, default 20) 페이지 크기.").optional()
-                                ),
-                                responseFields(
-                                        fieldWithPath("comments").type(JsonFieldType.ARRAY).description("댓글 목록"),
-                                        fieldWithPath("comments.[].id").type(JsonFieldType.STRING).description("댓글 ID"),
-                                        fieldWithPath("comments.[].article").type(JsonFieldType.OBJECT).description("연동 글"),
-                                        fieldWithPath("comments.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                                        fieldWithPath("comments.[].content").type(JsonFieldType.STRING).description("댓글 내용"),
-                                        fieldWithPath("comments.[].status").type(JsonFieldType.OBJECT).description("댓글 상태"),
-                                        fieldWithPath("comments.[].numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                                        fieldWithPath("comments.[].numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수"),
-                                        fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
-                                        fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
-                                        fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                                        fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지당 글 수"),
-                                        fieldWithPath("number").type(JsonFieldType.NUMBER).description("현재 페이지(0부터 시작)"),
-                                        fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현제 페이지에서 글 수"),
-                                        fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("전체 글 수")
-                                )
-                        ));
-
-    }
-
-    @Test
-    @WithMockUser
-    public void getFreePostTest() throws Exception {
+    public void getArticleDetailTest() throws Exception {
 
         ArticleDetail articleDetail = new ArticleDetail();
         BeanUtils.copyProperties(article, articleDetail);
         articleDetail.setCategory(boardCategory);
-        articleDetail.setNumberOfLike(5);
-        articleDetail.setNumberOfDislike(4);
+        articleDetail.setNumberOfLike(article.getUsersLiking().size());
+        articleDetail.setNumberOfDislike(article.getUsersDisliking().size());
+        articleDetail.setLogs(
+                article.getLogs().stream()
+                        .map(boardLog -> {
+                            ArticleLog articleLog = new ArticleLog();
+                            BeanUtils.copyProperties(boardLog, articleLog);
+                            LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(articleLog.getId()).getDate());
+                            articleLog.setType(Constants.ARTICLE_LOG_TYPE.valueOf(boardLog.getType()));
+                            articleLog.setTimestamp(timestamp);
+
+                            return articleLog;
+                        })
+                        .sorted(Comparator.comparing(ArticleLog::getId).reversed())
+                        .collect(Collectors.toList())
+        );
         articleDetail.setGalleries(
                 Arrays.asList(
                         ArticleGallery.builder()
-                        .id("boardGalleryId01")
-                        .name("성남FC 시즌권 사진")
-                        .imageUrl("https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111")
-                        .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                        .build()
+                                .id("58b9050b807d714eaf50a111")
+                                .name("성남FC 시즌권 사진")
+                                .imageUrl("https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111")
+                                .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
+                                .build()
                 )
         );
+        articleDetail.setMyFeeling(Constants.FEELING_TYPE.LIKE);
 
         ArticleSimple prevPost = ArticleSimple.builder()
-                .id("boardFreeId02")
-                .seq(2)
+                .id("59c88b2ea2b594ca18fecf05")
+                .seq(286)
                 .subject("이전 글 제목")
                 .writer(commonWriter)
+                .board(Constants.BOARD_TYPE.FOOTBALL.name())
                 .build();
 
         ArticleSimple nextPost = ArticleSimple.builder()
-                .id("boardFreeId03")
-                .seq(3)
+                .id("59c8879fa2b594c5d33e6ac4")
+                .seq(285)
                 .subject("다음 글 제목")
                 .writer(commonWriter)
+                .board(Constants.BOARD_TYPE.FOOTBALL.name())
                 .build();
 
-        GetArticleDetailResponse response = GetArticleDetailResponse.builder()
+        LatestArticle latestArticle = LatestArticle.builder()
+                .id("58e9959b807d71113a999c6e")
+                .seq(216)
+                .writer(commonWriter)
+                .subject("작성자의 최근 글 제목")
+                .galleries(Arrays.asList(new BoardGallerySimple("58b9050b807d714eaf50a111", "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")))
+                .build();
+
+        GetArticleDetailResponse expectResponse = GetArticleDetailResponse.builder()
                 .article(articleDetail)
                 .prevArticle(prevPost)
                 .nextArticle(nextPost)
+                .latestArticlesByWriter(Arrays.asList(latestArticle))
                 .build();
 
-        when(articleService.getArticleDetail(anyString(), anyInt(), anyBoolean()))
-                .thenReturn(ResponseEntity.ok().body(response));
+        when(articleService.getArticleDetail(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyBoolean()))
+                .thenReturn(ResponseEntity.ok().body(expectResponse));
 
-        mvc.perform(get("/api/board/free/{seq}", article.getSeq())
-                .accept(MediaType.APPLICATION_JSON))
+        mvc.perform(
+                get("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(response)));
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("getArticleDetail",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글 번호")
+                                ),
+                                responseFields(
+                                        fieldWithPath("article").type(JsonFieldType.OBJECT).description("글 상세"),
+                                        fieldWithPath("article.id").type(JsonFieldType.STRING).description("글 ID"),
+                                        fieldWithPath("article.board").type(JsonFieldType.STRING).description("게시판"),
+                                        fieldWithPath("article.writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                        fieldWithPath("article.subject").type(JsonFieldType.STRING).description("글제목"),
+                                        fieldWithPath("article.seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                        fieldWithPath("article.category").type(JsonFieldType.OBJECT).description("말머리"),
+                                        fieldWithPath("article.views").type(JsonFieldType.NUMBER).description("읽음 수"),
+                                        fieldWithPath("article.numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                        fieldWithPath("article.numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                                        fieldWithPath("article.status").type(JsonFieldType.OBJECT).description("글 상태"),
+                                        fieldWithPath("article.logs").type(JsonFieldType.ARRAY).description("로그 기록 목록"),
+                                        fieldWithPath("article.galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
+                                        fieldWithPath("article.myFeeling").type(JsonFieldType.STRING).description("나의 감정 상태. 인증 쿠키가 있을때에만 추가 된다."),
+                                        fieldWithPath("prevArticle").type(JsonFieldType.OBJECT).description("이전 글"),
+                                        fieldWithPath("prevArticle.id").type(JsonFieldType.STRING).description("글 ID"),
+                                        fieldWithPath("prevArticle.seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                        fieldWithPath("prevArticle.writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                        fieldWithPath("prevArticle.board").type(JsonFieldType.STRING).description("게시판"),
+                                        fieldWithPath("nextArticle").type(JsonFieldType.OBJECT).description("다음 글. json 형식은 prevArticle과 같음."),
+                                        fieldWithPath("latestArticlesByWriter").type(JsonFieldType.ARRAY).description("글쓴이의 최근 글."),
+                                        fieldWithPath("latestArticlesByWriter.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                        fieldWithPath("latestArticlesByWriter.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                        fieldWithPath("latestArticlesByWriter.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                        fieldWithPath("latestArticlesByWriter.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                        fieldWithPath("latestArticlesByWriter.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록")
+                                )
+                        ));
     }
 
     @Test

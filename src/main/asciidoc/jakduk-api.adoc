@@ -38,6 +38,7 @@ RESTful notes tries to adhere as closely as possible to standard HTTP and REST c
 
 [[board]]
 = 게시판 API
+게시판과 관련된 API.
 
 [[board-get-articles]]
 == 게시물 목록
@@ -57,6 +58,25 @@ include::{snippets}/getArticles/http-request.adoc[]
 include::{snippets}/getArticles/response-fields.adoc[]
 .http response
 include::{snippets}/getArticles/http-response.adoc[]
+
+[[board-get-article-detail]]
+== 게시물 상세
+
+특정 게시판의 글의 상세 내용을 가져온다.
+
+include::{snippets}/getArticleDetail/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/getArticleDetail/request-headers.adoc[]
+.curl request
+include::{snippets}/getArticleDetail/curl-request.adoc[]
+.http request
+include::{snippets}/getArticleDetail/http-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleDetail/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleDetail/http-response.adoc[]
 
 [[board-get-articles-tops]]
 == 주간 선두 글 목록

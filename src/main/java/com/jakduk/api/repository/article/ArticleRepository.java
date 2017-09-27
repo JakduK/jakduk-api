@@ -1,6 +1,5 @@
 package com.jakduk.api.repository.article;
 
-import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.simple.ArticleSimple;
 import org.bson.types.ObjectId;
@@ -17,7 +16,7 @@ public interface ArticleRepository extends MongoRepository<Article, String>, Art
 	Optional<Article> findOneByBoardAndSeq(String board, Integer seq);
 
 	List<Article> findByIdInAndLinkedGalleryIsTrue(List<String> ids);
-	List<Article> findByIdInAndBoard(List<String> ids, Constants.BOARD_TYPE board);
+	List<Article> findByIdInAndBoard(List<String> ids, String board);
 
 	@Query(value="{'seq' : ?0}")
     ArticleSimple findBoardFreeOfMinimumBySeq(Integer seq);
