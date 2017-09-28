@@ -30,12 +30,13 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -51,10 +52,9 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -74,6 +74,7 @@ public class ArticleMvcTests {
 
     private CommonWriter commonWriter;
     private Article article;
+    private List<BoardCategory> categories;
     private BoardCategory boardCategory;
     private Map<String, String> categoriesMap;
 
@@ -85,7 +86,7 @@ public class ArticleMvcTests {
                 .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
                 .build();
 
-        List<BoardCategory> categories = BoardCategoryGenerator.getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
+        categories = BoardCategoryGenerator.getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
 
         boardCategory = categories.get(0);
 
@@ -180,7 +181,7 @@ public class ArticleMvcTests {
                                         parameterWithName("categoryCode").description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다.").optional()
                                 ),
                                 responseFields(
-                                        fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵. key는 말머리코드, value는 표시되는 이름(다국어 지원)"),
+                                        fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵. key는 말머리코드, value는 표시되는 이름(Locale 지원)"),
                                         fieldWithPath("articles").type(JsonFieldType.ARRAY).description("글 목록"),
                                         fieldWithPath("articles.[].id").type(JsonFieldType.STRING).description("글 ID"),
                                         fieldWithPath("articles.[].board").type(JsonFieldType.STRING).description("게시판"),
@@ -344,6 +345,7 @@ public class ArticleMvcTests {
                 get("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
                         .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
                         .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
@@ -389,28 +391,30 @@ public class ArticleMvcTests {
 
     @Test
     @WithMockUser
-    public void addFreePostTest() throws Exception {
+    public void writeArticleTest() throws Exception {
 
-        GalleryOnBoard galleryOnBoard = GalleryOnBoard.builder().id("galleryid01").name("공차는사진").build();
+        ConstraintDescriptions userConstraints = new ConstraintDescriptions(WriteArticle.class);
+
+        GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
 
         WriteArticle form = WriteArticle.builder()
                 .subject("제목입니다.")
                 .content("내용입니다.")
-                .categoryCode("CLASSIC")
+                .categoryCode(boardCategory.getCode())
                 .galleries(Arrays.asList(galleryOnBoard))
                 .build();
-
-        when(authHelper.getCommonWriter(any(Authentication.class)))
-                .thenReturn(commonWriter);
 
         List<Gallery> expectGalleries = Arrays.asList(
                 Gallery.builder()
                         .id(galleryOnBoard.getId())
                         .name(galleryOnBoard.getName())
-                        .fileName("galleryFileName01")
-                        .contentType("image/jpeg")
+                        .fileName("Cat Profile-48.png")
+                        .contentType("image/png")
                         .writer(commonWriter)
-                        .hash("HEXVALUE")
+                        .size(1149L)
+                        .fileSize(1870L)
+                        .status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
+                        .hash("7eb65b85521d247ab4c5f79e279c03db")
                         .build()
         );
 
@@ -429,12 +433,60 @@ public class ArticleMvcTests {
                 .seq(article.getSeq())
                 .build();
 
-        mvc.perform(post("/api/board/free")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(ObjectMapperUtils.writeValueAsString(form)))
+        mvc.perform(
+                post("/api/board/{board}", article.getBoard().toLowerCase())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(form)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)));
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("writeArticle",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                requestFields(
+                                        fieldWithPath("subject").type(JsonFieldType.STRING).description("글 제목" + userConstraints.descriptionsForProperty("subject")),
+                                        fieldWithPath("content").type(JsonFieldType.STRING).description("글 내용" + userConstraints.descriptionsForProperty("content")),
+                                        fieldWithPath("categoryCode").type(JsonFieldType.STRING)
+                                                .description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다."),
+                                        fieldWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                                ),
+                                responseFields(
+                                        fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void getBoardCategories() throws Exception {
+        mvc.perform(
+                get("/api/board/{board}/categories", article.getBoard().toLowerCase())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andDo(
+                        document("getBoardCategories",
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                                ),
+                                responseFields(
+                                        fieldWithPath("categories").type(JsonFieldType.ARRAY).description("말머리 목록"),
+                                        fieldWithPath("categories.[].code").type(JsonFieldType.STRING).description("말머리 코드"),
+                                        fieldWithPath("categories.[].names").type(JsonFieldType.ARRAY).description("말머리 이름 목록(Locale 지원)"),
+                                        fieldWithPath("categories.[].names.[].language").type(JsonFieldType.STRING).description("언어"),
+                                        fieldWithPath("categories.[].names.[].name").type(JsonFieldType.STRING).description("이름")
+                                )
+                        ));
     }
 
 }

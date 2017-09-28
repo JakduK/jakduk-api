@@ -38,7 +38,24 @@ RESTful notes tries to adhere as closely as possible to standard HTTP and REST c
 
 [[board]]
 = 게시판 API
-게시판과 관련된 API.
+게시판과 관련된 API. 현재 FREE, FOOTBALL, DEVELOPER 게시판이 있다.
+
+[[board-get-articles]]
+== 게시판 말머리 목록
+
+특정 게시판의 말머리 목록을 가져온다. Locale에 따라 한국어와 영어 지원이 가능하다.
+
+include::{snippets}/getBoardCategories/path-parameters.adoc[]
+
+.curl request
+include::{snippets}/getBoardCategories/curl-request.adoc[]
+.http request
+include::{snippets}/getBoardCategories/http-request.adoc[]
+
+.response fields
+include::{snippets}/getBoardCategories/response-fields.adoc[]
+.http response
+include::{snippets}/getBoardCategories/http-response.adoc[]
 
 [[board-get-articles]]
 == 게시물 목록
@@ -62,7 +79,7 @@ include::{snippets}/getArticles/http-response.adoc[]
 [[board-get-article-detail]]
 == 게시물 상세
 
-특정 게시판의 글의 상세 내용을 가져온다.
+특정 게시판의 글 상세 내용을 가져온다. 인증은 옵션.
 
 include::{snippets}/getArticleDetail/path-parameters.adoc[]
 
@@ -77,6 +94,27 @@ include::{snippets}/getArticleDetail/http-request.adoc[]
 include::{snippets}/getArticleDetail/response-fields.adoc[]
 .http response
 include::{snippets}/getArticleDetail/http-response.adoc[]
+
+[[board-write-article]]
+== 글쓰기
+
+특정 게시판에 글을 쓴다. 인증은 필수.
+
+include::{snippets}/writeArticle/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/writeArticle/request-headers.adoc[]
+.request fields
+include::{snippets}/writeArticle/request-fields.adoc[]
+.curl request
+include::{snippets}/writeArticle/curl-request.adoc[]
+.http request
+include::{snippets}/writeArticle/http-request.adoc[]
+
+.response fields
+include::{snippets}/writeArticle/response-fields.adoc[]
+.http response
+include::{snippets}/writeArticle/http-response.adoc[]
 
 [[board-get-articles-tops]]
 == 주간 선두 글 목록

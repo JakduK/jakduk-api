@@ -116,9 +116,7 @@ public class BoardRestController {
     public GetBoardCategoriesResponse getBoardCategories(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board) {
 
-        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
-
-        List<BoardCategory> categories = BoardCategoryGenerator.getCategories(boardType, JakdukUtils.getLocale());
+        List<BoardCategory> categories = BoardCategoryGenerator.getCategories(board, JakdukUtils.getLocale());
 
         return GetBoardCategoriesResponse.builder()
                 .categories(categories)
@@ -130,12 +128,11 @@ public class BoardRestController {
     public WriteArticleResponse writeArticle(
             @ApiParam(value = "게시판", required = true, example = "FOOTBALL") @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody WriteArticle form,
-            Device device,
-            Authentication authentication) {
+            Device device) {
 
         Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
 
-        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
