@@ -31,12 +31,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -51,8 +51,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -77,12 +76,15 @@ public class ArticleMvcTests {
     private List<BoardCategory> categories;
     private BoardCategory boardCategory;
     private Map<String, String> categoriesMap;
+    private WriteArticle writeArticleform;
+    private List<Gallery> galleries;
+    private List<BoardGallerySimple> simpleGalleires;
 
     @Before
     public void setUp(){
         commonWriter = CommonWriter.builder()
-                .userId("userid01")
-                .username("user01")
+                .userId("571ccf50ccbfc325b20711c5")
+                .username("test07")
                 .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
                 .build();
 
@@ -113,20 +115,41 @@ public class ArticleMvcTests {
                 .linkedGallery(true)
                 .build();
 
+        GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
+
+        writeArticleform = WriteArticle.builder()
+                .subject("제목입니다.")
+                .content("내용입니다.")
+                .categoryCode(boardCategory.getCode())
+                .galleries(Arrays.asList(galleryOnBoard))
+                .build();
+
+        galleries = Arrays.asList(
+                Gallery.builder()
+                        .id(galleryOnBoard.getId())
+                        .name(galleryOnBoard.getName())
+                        .fileName("Cat Profile-48.png")
+                        .contentType("image/png")
+                        .writer(commonWriter)
+                        .size(1149L)
+                        .fileSize(1870L)
+                        .status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
+                        .hash("7eb65b85521d247ab4c5f79e279c03db")
+                        .build()
+        );
+
+        simpleGalleires = Arrays.asList(
+                new BoardGallerySimple("58b9050b807d714eaf50a111", "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111"));
+
     }
 
     @Test
     @WithMockUser
     public void getArticlesTest() throws Exception {
 
-        BoardGallerySimple gallerySimple = BoardGallerySimple.builder()
-                .id("58b9050b807d714eaf50a111")
-                .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                .build();
-
         GetArticle getArticle = new GetArticle();
         BeanUtils.copyProperties(article, getArticle);
-        getArticle.setGalleries(Arrays.asList(gallerySimple));
+        getArticle.setGalleries(simpleGalleires);
         getArticle.setCommentCount(5);
         getArticle.setLikingCount(article.getUsersLiking().size());
         getArticle.setDislikingCount(article.getUsersDisliking().size());
@@ -140,7 +163,7 @@ public class ArticleMvcTests {
                 .category(boardCategory.getCode())
                 .views(15)
                 .status(new ArticleStatus(true, false, Constants.DEVICE_TYPE.NORMAL))
-                .galleries(Arrays.asList(gallerySimple))
+                .galleries(simpleGalleires)
                 .shortContent("본문입니다. (100자)")
                 .commentCount(8)
                 .likingCount(10)
@@ -328,7 +351,7 @@ public class ArticleMvcTests {
                 .seq(216)
                 .writer(commonWriter)
                 .subject("작성자의 최근 글 제목")
-                .galleries(Arrays.asList(new BoardGallerySimple("58b9050b807d714eaf50a111", "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")))
+                .galleries(simpleGalleires)
                 .build();
 
         GetArticleDetailResponse expectResponse = GetArticleDetailResponse.builder()
@@ -372,7 +395,7 @@ public class ArticleMvcTests {
                                         fieldWithPath("article.status").type(JsonFieldType.OBJECT).description("글 상태"),
                                         fieldWithPath("article.logs").type(JsonFieldType.ARRAY).description("로그 기록 목록"),
                                         fieldWithPath("article.galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
-                                        fieldWithPath("article.myFeeling").type(JsonFieldType.STRING).description("나의 감정 상태. 인증 쿠키가 있을때에만 추가 된다."),
+                                        fieldWithPath("article.myFeeling").type(JsonFieldType.STRING).description("나의 감정 상태. 인증 쿠키가 있고, 감정 표현을 한 경우 포함 된다."),
                                         fieldWithPath("prevArticle").type(JsonFieldType.OBJECT).description("이전 글"),
                                         fieldWithPath("prevArticle.id").type(JsonFieldType.STRING).description("글 ID"),
                                         fieldWithPath("prevArticle.seq").type(JsonFieldType.NUMBER).description("글번호"),
@@ -393,33 +416,8 @@ public class ArticleMvcTests {
     @WithMockUser
     public void writeArticleTest() throws Exception {
 
-        ConstraintDescriptions userConstraints = new ConstraintDescriptions(WriteArticle.class);
-
-        GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
-
-        WriteArticle form = WriteArticle.builder()
-                .subject("제목입니다.")
-                .content("내용입니다.")
-                .categoryCode(boardCategory.getCode())
-                .galleries(Arrays.asList(galleryOnBoard))
-                .build();
-
-        List<Gallery> expectGalleries = Arrays.asList(
-                Gallery.builder()
-                        .id(galleryOnBoard.getId())
-                        .name(galleryOnBoard.getName())
-                        .fileName("Cat Profile-48.png")
-                        .contentType("image/png")
-                        .writer(commonWriter)
-                        .size(1149L)
-                        .fileSize(1870L)
-                        .status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
-                        .hash("7eb65b85521d247ab4c5f79e279c03db")
-                        .build()
-        );
-
         when(galleryService.findByIdIn(any()))
-                .thenReturn(expectGalleries);
+                .thenReturn(galleries);
 
         when(articleService.insertArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
                 anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
@@ -436,25 +434,19 @@ public class ArticleMvcTests {
         mvc.perform(
                 post("/api/board/{board}", article.getBoard().toLowerCase())
                         .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(ObjectMapperUtils.writeValueAsString(form)))
+                        .content(ObjectMapperUtils.writeValueAsString(writeArticleform)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
                         document("writeArticle",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
                                 ),
-                                requestFields(
-                                        fieldWithPath("subject").type(JsonFieldType.STRING).description("글 제목" + userConstraints.descriptionsForProperty("subject")),
-                                        fieldWithPath("content").type(JsonFieldType.STRING).description("글 내용" + userConstraints.descriptionsForProperty("content")),
-                                        fieldWithPath("categoryCode").type(JsonFieldType.STRING)
-                                                .description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다."),
-                                        fieldWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
-                                ),
+                                requestFields(this.getWriteArticleFormDescriptor()),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
                                                 Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
@@ -487,6 +479,102 @@ public class ArticleMvcTests {
                                         fieldWithPath("categories.[].names.[].name").type(JsonFieldType.STRING).description("이름")
                                 )
                         ));
+    }
+
+    @Test
+    @WithMockUser
+    public void editArticleTest() throws Exception {
+
+        when(galleryService.findByIdIn(any()))
+                .thenReturn(galleries);
+
+        when(articleService.updateArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString(), anyString(), anyString(),
+                anyListOf(String.class), any(Constants.DEVICE_TYPE.class)))
+                .thenReturn(article);
+
+        doNothing().when(galleryService)
+                .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
+                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+
+        WriteArticleResponse expectResponse = WriteArticleResponse.builder()
+                .seq(article.getSeq())
+                .build();
+
+        mvc.perform(
+                put("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(writeArticleform)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("editArticle",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                requestFields(this.getWriteArticleFormDescriptor()),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글번호")
+                                ),
+                                responseFields(
+                                        fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void deleteArticleTest() throws Exception {
+
+        Constants.ARTICLE_DELETE_TYPE expectDeleteType = Constants.ARTICLE_DELETE_TYPE.ALL;
+
+        when(articleService.deleteArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt()))
+                .thenReturn(expectDeleteType);
+
+        DeleteArticleResponse expectResponse = DeleteArticleResponse.builder()
+                .result(expectDeleteType)
+                .build();
+
+        mvc.perform(
+                delete("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("deleteArticle",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글번호")
+                                ),
+                                responseFields(
+                                        fieldWithPath("result").type(JsonFieldType.STRING).description("결과 타입. [ALL : 모두 지움, CONTENT : 글 본문만 지움(댓글 유지)]")
+                                )
+                        ));
+    }
+
+    private FieldDescriptor[] getWriteArticleFormDescriptor() {
+        ConstraintDescriptions userConstraints = new ConstraintDescriptions(WriteArticle.class);
+
+        return new FieldDescriptor[] {
+                fieldWithPath("subject").type(JsonFieldType.STRING).description("글 제목. " + userConstraints.descriptionsForProperty("subject")),
+                fieldWithPath("content").type(JsonFieldType.STRING).description("글 내용. " + userConstraints.descriptionsForProperty("content")),
+                fieldWithPath("categoryCode").type(JsonFieldType.STRING)
+                        .description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다."),
+                fieldWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
+        };
     }
 
 }

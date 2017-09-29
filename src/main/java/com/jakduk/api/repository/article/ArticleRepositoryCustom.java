@@ -4,6 +4,7 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.aggregate.BoardTop;
+import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.simple.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
@@ -35,7 +36,7 @@ public interface ArticleRepositoryCustom {
      * id 배열에 해당하는 Article 목록.
      * @param ids id 배열
      */
-    List<ArticleOnSearch> findPostsOnSearchByIds(List<ObjectId> ids);
+    List<ArticleSimple> findArticleSimplesByIds(List<ObjectId> ids);
 
     /**
      * 공지 글 목록

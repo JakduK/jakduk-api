@@ -18,7 +18,7 @@ import java.util.List;
 public class GetArticleDetailCommentsResponse {
 
     @ApiModelProperty(value = "댓글 목록")
-    private List<FreePostDetailComment> comments;
+    private List<GetArticleComment> comments;
 
     @ApiModelProperty(example = "10", value = "댓글 수")
     private Integer count;

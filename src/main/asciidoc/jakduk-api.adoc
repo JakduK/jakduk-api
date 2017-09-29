@@ -10,13 +10,13 @@ Doc Writer <phjang1983@daum.net>
 :operation-http-response-title: Example response
 
 [[overview]]
-= Overview
+== Overview
 
 This is an example output for a service running at https://dev-api.jakduk.com
 As you can see the format is very simple, and in fact you always get the same message.
 
 [[overview-http-verbs]]
-== HTTP verbs
+=== HTTP verbs
 
 RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
 
@@ -37,20 +37,20 @@ RESTful notes tries to adhere as closely as possible to standard HTTP and REST c
 |===
 
 [[board]]
-= 게시판 API
+== 게시판 API
 게시판과 관련된 API. 현재 FREE, FOOTBALL, DEVELOPER 게시판이 있다.
 
-[[board-get-articles]]
-== 게시판 말머리 목록
+[[board-get-categories]]
+=== 말머리 목록
 
-특정 게시판의 말머리 목록을 가져온다. Locale에 따라 한국어와 영어 지원이 가능하다.
+게시판의 말머리 목록을 가져온다. Locale에 따라 한국어와 영어 지원이 가능하다.
 
 include::{snippets}/getBoardCategories/path-parameters.adoc[]
 
-.curl request
-include::{snippets}/getBoardCategories/curl-request.adoc[]
 .http request
 include::{snippets}/getBoardCategories/http-request.adoc[]
+.curl request
+include::{snippets}/getBoardCategories/curl-request.adoc[]
 
 .response fields
 include::{snippets}/getBoardCategories/response-fields.adoc[]
@@ -58,18 +58,18 @@ include::{snippets}/getBoardCategories/response-fields.adoc[]
 include::{snippets}/getBoardCategories/http-response.adoc[]
 
 [[board-get-articles]]
-== 게시물 목록
+=== 게시물 목록
 
-특정 게시판의 글 목록을 가져온다. (최신순)
+글의 최신 목록을 가져온다.
 
 include::{snippets}/getArticles/path-parameters.adoc[]
 
 .request parameters
 include::{snippets}/getArticles/request-parameters.adoc[]
-.curl request
-include::{snippets}/getArticles/curl-request.adoc[]
 .http request
 include::{snippets}/getArticles/http-request.adoc[]
+.curl request
+include::{snippets}/getArticles/curl-request.adoc[]
 
 .response fields
 include::{snippets}/getArticles/response-fields.adoc[]
@@ -77,18 +77,18 @@ include::{snippets}/getArticles/response-fields.adoc[]
 include::{snippets}/getArticles/http-response.adoc[]
 
 [[board-get-article-detail]]
-== 게시물 상세
+=== 게시물 상세
 
-특정 게시판의 글 상세 내용을 가져온다. 인증은 옵션.
+글 상세 내용을 가져온다. 인증은 옵션.
 
 include::{snippets}/getArticleDetail/path-parameters.adoc[]
 
 .request headers
 include::{snippets}/getArticleDetail/request-headers.adoc[]
-.curl request
-include::{snippets}/getArticleDetail/curl-request.adoc[]
 .http request
 include::{snippets}/getArticleDetail/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleDetail/curl-request.adoc[]
 
 .response fields
 include::{snippets}/getArticleDetail/response-fields.adoc[]
@@ -96,9 +96,9 @@ include::{snippets}/getArticleDetail/response-fields.adoc[]
 include::{snippets}/getArticleDetail/http-response.adoc[]
 
 [[board-write-article]]
-== 글쓰기
+=== 글쓰기
 
-특정 게시판에 글을 쓴다. 인증은 필수.
+글을 쓴다. 인증은 필수.
 
 include::{snippets}/writeArticle/path-parameters.adoc[]
 
@@ -106,48 +106,112 @@ include::{snippets}/writeArticle/path-parameters.adoc[]
 include::{snippets}/writeArticle/request-headers.adoc[]
 .request fields
 include::{snippets}/writeArticle/request-fields.adoc[]
-.curl request
-include::{snippets}/writeArticle/curl-request.adoc[]
 .http request
 include::{snippets}/writeArticle/http-request.adoc[]
+.curl request
+include::{snippets}/writeArticle/curl-request.adoc[]
 
 .response fields
 include::{snippets}/writeArticle/response-fields.adoc[]
 .http response
 include::{snippets}/writeArticle/http-response.adoc[]
 
-[[board-get-articles-tops]]
-== 주간 선두 글 목록
+[[board-edit-article]]
+=== 글 고치기
 
-특정 게시판의 주간 선두 글 목록을 가져온다.
+글을 고친다. 인증은 필수이며, 글쓴이만 고칠 수 있다.
+
+include::{snippets}/editArticle/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/editArticle/request-headers.adoc[]
+.request fields
+include::{snippets}/editArticle/request-fields.adoc[]
+.http request
+include::{snippets}/editArticle/http-request.adoc[]
+.curl request
+include::{snippets}/editArticle/curl-request.adoc[]
+
+.response fields
+include::{snippets}/editArticle/response-fields.adoc[]
+.http response
+include::{snippets}/editArticle/http-response.adoc[]
+
+[[board-delete-article]]
+=== 글 지우기
+
+글을 지운다. 인증은 필수이며, 글쓴이만 고칠 수 있다.
+지우고 싶은 글에 댓글이 달려있는지 없는지에 따라 동작이 다르다.
+댓글이 하나라도 달렸다면, 글 본문만 지우고 댓글은 유지된다.
+댓글이 하나도 없다면, 글 전체를 지운다.
+
+include::{snippets}/deleteArticle/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/deleteArticle/request-headers.adoc[]
+.http request
+include::{snippets}/deleteArticle/http-request.adoc[]
+.curl request
+include::{snippets}/deleteArticle/curl-request.adoc[]
+
+.response fields
+include::{snippets}/deleteArticle/response-fields.adoc[]
+.http response
+include::{snippets}/deleteArticle/http-response.adoc[]
+
+[[board-get-articles-tops]]
+=== 주간 선두 글 목록
+
+게시판의 주간 선두 글 목록을 가져온다.
 
 include::{snippets}/getArticlesTops/path-parameters.adoc[]
 
-.curl request
-include::{snippets}/getArticlesTops/curl-request.adoc[]
 .http request
 include::{snippets}/getArticlesTops/http-request.adoc[]
+.curl request
+include::{snippets}/getArticlesTops/curl-request.adoc[]
 
 .response fields
 include::{snippets}/getArticlesTops/response-fields.adoc[]
 .http response
 include::{snippets}/getArticlesTops/http-response.adoc[]
 
-[[board-get-comments]]
-== 댓글 목록
+[[board-get-article-comments]]
+=== 댓글 목록
 
-특정 게시판의 댓글 목록을 가져온다. (최신순)
+댓글의 최신 목록을 가져온다.
+인증은 옵션.
 
 include::{snippets}/getArticleComments/path-parameters.adoc[]
 
 .request parameters
 include::{snippets}/getArticleComments/request-parameters.adoc[]
-.curl request
-include::{snippets}/getArticleComments/curl-request.adoc[]
 .http request
 include::{snippets}/getArticleComments/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleComments/curl-request.adoc[]
 
 .response fields
 include::{snippets}/getArticleComments/response-fields.adoc[]
 .http response
 include::{snippets}/getArticleComments/http-response.adoc[]
+
+[[board-get-article-detail-comments]]
+=== 글의 댓글 목록
+
+글의의 최신 댓글 목록을 가져온다.
+인증은 옵션.
+
+include::{snippets}/getArticleDetailComments/path-parameters.adoc[]
+
+.request parameters
+include::{snippets}/getArticleDetailComments/request-parameters.adoc[]
+.http request
+include::{snippets}/getArticleDetailComments/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleDetailComments/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleDetailComments/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleDetailComments/http-response.adoc[]

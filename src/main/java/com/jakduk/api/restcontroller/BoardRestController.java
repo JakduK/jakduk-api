@@ -93,7 +93,7 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        return articleService.getArticleComments(commonWriter, StringUtils.upperCase(board.name()), page, size);
+        return articleService.getArticleComments(commonWriter, board, page, size);
     }
 
     @ApiOperation("게시판 글 상세")
@@ -163,10 +163,9 @@ public class BoardRestController {
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "글 폼", required = true)  @Valid @RequestBody WriteArticle form,
             HttpServletRequest request,
-            Device device,
-            Authentication authentication) {
+            Device device) {
 
-        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -185,7 +184,7 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        Article article = articleService.updateArticle(commonWriter, StringUtils.upperCase(board.name()), seq, form.getSubject().trim(), form.getContent().trim(),
+        Article article = articleService.updateArticle(commonWriter, board, seq, form.getSubject().trim(), form.getContent().trim(),
                 form.getCategoryCode(), galleryIds, JakdukUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
@@ -204,12 +203,11 @@ public class BoardRestController {
     @DeleteMapping("/{board}/{seq}")
     public DeleteArticleResponse deleteArticle(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
-            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            Authentication authentication) {
+            @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
-        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-		Constants.ARTICLE_DELETE_TYPE deleteType = articleService.deleteArticle(commonWriter, StringUtils.upperCase(board.name()), seq);
+		Constants.ARTICLE_DELETE_TYPE deleteType = articleService.deleteArticle(commonWriter, board, seq);
 
         return DeleteArticleResponse.builder()
                 .result(deleteType)
@@ -223,7 +221,9 @@ public class BoardRestController {
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
             @ApiParam(value = "이 CommentId 이후부터 목록 가져옴") @RequestParam(required = false) String commentId) {
 
-        return articleService.getArticleDetailComments(StringUtils.upperCase(board.name()), seq, commentId);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+
+        return articleService.getArticleDetailComments(commonWriter, board, seq, commentId);
     }
 
     @ApiOperation("게시판 글의 댓글 달기")

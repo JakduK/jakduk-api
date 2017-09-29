@@ -27,16 +27,16 @@ public class Article implements UsersFeeling {
 
 	@Id
 	private String id;
+	private Integer seq; // 글 번호
+	private ArticleStatus status;
+	private String board; // 게시판
 	private CommonWriter writer; // 작성자
 	private String subject; // 글 제목
 	private String content; // 글 내용
-	private Integer seq; // 글 번호
-	private String board; // 게시판
 	private String category; // 말머리 코드
 	private Integer views; // 읽음 수
 	private List<CommonFeelingUser> usersLiking;
 	private List<CommonFeelingUser> usersDisliking;
-	private ArticleStatus status;
 	private List<BoardLog> logs; // 오래된 글은 logs가 없는 경우도 있다.
 	private List<String> batch;
 	private String shortContent;
