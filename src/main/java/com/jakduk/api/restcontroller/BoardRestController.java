@@ -28,7 +28,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mobile.device.Device;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -228,14 +227,13 @@ public class BoardRestController {
 
     @ApiOperation("게시판 글의 댓글 달기")
     @PostMapping("/{board}/{seq}/comment")
-    public ArticleComment addArticleComment(
+    public ArticleComment writeArticleComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
-            Device device,
-            Authentication authentication) {
+            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody WriteArticleComment form,
+            Device device) {
 
-        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -248,7 +246,7 @@ public class BoardRestController {
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        ArticleComment articleComment =  articleService.insertArticleComment(StringUtils.upperCase(board.name()), seq, commonWriter, form.getContent().trim(),
+        ArticleComment articleComment =  articleService.insertArticleComment(commonWriter, board, seq, form.getContent().trim(),
                 galleries, JakdukUtils.getDeviceInfo(device));
 
         galleryService.processLinkedGalleries(galleries, form.getGalleries(), null,
@@ -258,20 +256,15 @@ public class BoardRestController {
     }
 
     @ApiOperation("게시판 글의 댓글 고치기")
-    @SecuredUser
     @PutMapping("/{board}/comment/{id}")
     public ArticleComment editArticleComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id,
-            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody BoardCommentForm form,
+            @ApiParam(value = "댓글 폼", required = true) @Valid @RequestBody WriteArticleComment form,
             HttpServletRequest request,
-            Device device,
-            Authentication authentication) {
+            Device device) {
 
-        if (! AuthUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
-        CommonWriter commonWriter = authHelper.getCommonWriter(authentication);
+        CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -290,7 +283,7 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        ArticleComment articleComment = articleService.updateArticleComment(id, StringUtils.upperCase(board.name()), commonWriter, form.getContent().trim(), galleryIds,
+        ArticleComment articleComment = articleService.updateArticleComment(commonWriter, board, id, form.getContent().trim(), galleryIds,
                 JakdukUtils.getDeviceInfo(device));
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,
@@ -306,18 +299,14 @@ public class BoardRestController {
     }
 
     @ApiOperation("게시판 글의 댓글 지우기")
-    @SecuredUser
     @DeleteMapping("/{board}/comment/{id}")
     public EmptyJsonResponse deleteFreeComment(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "댓글 ID", required = true) @PathVariable String id) {
 
-        if (! AuthUtils.isUser())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        articleService.deleteArticleComment(id, StringUtils.upperCase(board.name()), commonWriter);
+        articleService.deleteArticleComment(commonWriter, board, id);
 
         return EmptyJsonResponse.newInstance();
     }

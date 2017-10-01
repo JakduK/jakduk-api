@@ -3,7 +3,6 @@ package com.jakduk.api.restcontroller.vo.board;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.ArticleCommentStatus;
-import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.ArticleSimple;
 import io.swagger.annotations.ApiModelProperty;
@@ -49,7 +48,7 @@ public class GetArticleComment {
     private Constants.FEELING_TYPE myFeeling;
 
     @ApiModelProperty(value = "그림 목록")
-    private List<ArticleGallery> galleries;
+    private List<BoardGallerySimple> galleries;
 
     @ApiModelProperty(value = "로그")
     private List<ArticleCommentLog> logs;

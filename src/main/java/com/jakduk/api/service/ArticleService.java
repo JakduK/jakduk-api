@@ -434,10 +434,10 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 달기
 	 */
-	public ArticleComment insertArticleComment(String board, Integer seq, CommonWriter writer, String content, List<Gallery> galleries,
+	public ArticleComment insertArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String content, List<Gallery> galleries,
 											   Constants.DEVICE_TYPE device) {
 
-		Article article = articleRepository.findOneByBoardAndSeq(board, seq)
+		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 		// 연관된 사진 id 배열 (검증 후)
@@ -466,7 +466,7 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 고치기
 	 */
-	public ArticleComment updateArticleComment(String board, String id, CommonWriter writer, String content, List<String> galleryIds,
+	public ArticleComment updateArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, String id, String content, List<String> galleryIds,
 											   Constants.DEVICE_TYPE device) {
 
 		ArticleComment articleComment = articleCommentRepository.findOneById(id)
@@ -507,7 +507,7 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 지움
 	 */
-	public void deleteArticleComment(String id, String board, CommonWriter writer) {
+	public void deleteArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, String id) {
 
 		ArticleComment articleComment = articleCommentRepository.findOneById(id)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
@@ -929,17 +929,15 @@ public class ArticleService {
 	 *
 	 * @param articleCommentId 댓글 ID
 	 */
-	private List<ArticleGallery> getArticleCommentGalleries(String articleCommentId) {
+	private List<BoardGallerySimple> getArticleCommentGalleries(String articleCommentId) {
 
 		List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
 				new ObjectId(articleCommentId), Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, 100);
 
 		if (! CollectionUtils.isEmpty(galleries)) {
 			return galleries.stream()
-					.map(gallery -> ArticleGallery.builder()
+					.map(gallery -> BoardGallerySimple.builder()
 							.id(gallery.getId())
-							.name(StringUtils.isNotBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
-							.imageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
 							.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
 							.build())
 					.collect(Collectors.toList());

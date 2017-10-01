@@ -215,3 +215,62 @@ include::{snippets}/getArticleDetailComments/curl-request.adoc[]
 include::{snippets}/getArticleDetailComments/response-fields.adoc[]
 .http response
 include::{snippets}/getArticleDetailComments/http-response.adoc[]
+
+[[board-write-article-comment]]
+=== 댓글 달기
+
+댓글을 단다. 인증은 필수.
+
+include::{snippets}/writeArticleComment/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/writeArticleComment/request-headers.adoc[]
+.request fields
+include::{snippets}/writeArticleComment/request-fields.adoc[]
+.http request
+include::{snippets}/writeArticleComment/http-request.adoc[]
+.curl request
+include::{snippets}/writeArticleComment/curl-request.adoc[]
+
+.response fields
+include::{snippets}/writeArticleComment/response-fields.adoc[]
+.http response
+include::{snippets}/writeArticleComment/http-response.adoc[]
+
+[[board-edit-article-comment]]
+=== 댓글 고치기
+
+댓글을 단다. 인증은 필수.
+
+include::{snippets}/editArticleComment/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/editArticleComment/request-headers.adoc[]
+.request fields
+include::{snippets}/editArticleComment/request-fields.adoc[]
+.http request
+include::{snippets}/editArticleComment/http-request.adoc[]
+.curl request
+include::{snippets}/editArticleComment/curl-request.adoc[]
+
+.response fields
+include::{snippets}/editArticleComment/response-fields.adoc[]
+.http response
+include::{snippets}/editArticleComment/http-response.adoc[]
+
+[[board-delete-article-comment]]
+=== 댓글 지우기
+
+댓글을 지운다. 인증은 필수.
+
+include::{snippets}/deleteArticleComment/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/deleteArticleComment/request-headers.adoc[]
+.http request
+include::{snippets}/deleteArticleComment/http-request.adoc[]
+.curl request
+include::{snippets}/deleteArticleComment/curl-request.adoc[]
+
+.http response
+include::{snippets}/deleteArticleComment/http-response.adoc[]

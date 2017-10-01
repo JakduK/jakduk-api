@@ -10,9 +10,11 @@ import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.ArticleComment;
+import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
+import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
@@ -28,6 +30,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -44,13 +47,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,6 +80,8 @@ public class ArticleCommentMvcTests {
     private List<BoardCategory> categories;
     private BoardCategory boardCategory;
     private List<GetArticleComment> articleComments;
+    private List<Gallery> galleries;
+    private WriteArticleComment writeArticleComment;
 
     @Before
     public void setUp(){
@@ -122,11 +127,9 @@ public class ArticleCommentMvcTests {
                 .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
                 .build();
 
-        List<ArticleGallery> articleGalleries = Arrays.asList(
-                ArticleGallery.builder()
+        List<BoardGallerySimple> articleGalleries = Arrays.asList(
+                BoardGallerySimple.builder()
                         .id("58b9050b807d714eaf50a111")
-                        .name("공차는사진")
-                        .imageUrl("https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111")
                         .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
                         .build()
         );
@@ -160,6 +163,27 @@ public class ArticleCommentMvcTests {
         );
 
         articleComments = Arrays.asList(getArticleComment);
+
+        GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
+
+        galleries = Arrays.asList(
+                Gallery.builder()
+                        .id(galleryOnBoard.getId())
+                        .name(galleryOnBoard.getName())
+                        .fileName("Cat Profile-48.png")
+                        .contentType("image/png")
+                        .writer(commonWriter)
+                        .size(1149L)
+                        .fileSize(1870L)
+                        .status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
+                        .hash("7eb65b85521d247ab4c5f79e279c03db")
+                        .build()
+        );
+
+        writeArticleComment = WriteArticleComment.builder()
+                .content(articleComment.getContent())
+                .galleries(Arrays.asList(galleryOnBoard))
+                .build();
     }
 
     @Test
@@ -254,6 +278,114 @@ public class ArticleCommentMvcTests {
                         );
     }
 
+    @Test
+    @WithMockUser
+    public void writeArticleComment() throws Exception {
+
+        when(galleryService.findByIdIn(any()))
+                .thenReturn(galleries);
+
+        when(articleService.insertArticleComment(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString(),
+                anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
+                .thenReturn(articleComment);
+
+        doNothing().when(galleryService)
+                .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
+                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+        mvc.perform(
+                post("/api/board/{board}/{seq}/comment", article.getBoard().toLowerCase(), articleComment.getArticle().getSeq())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(writeArticleComment)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(articleComment)))
+                .andDo(
+                        document("writeArticleComment",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글 번호")
+                                ),
+                                requestFields(this.getWriteArticleCommentFormDescriptor()),
+                                responseFields(this.getWriteArticleCommentDescriptor())
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void editArticleCommentTest() throws Exception {
+
+        when(galleryService.findByIdIn(any()))
+                .thenReturn(galleries);
+
+        when(articleService.updateArticleComment(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(),
+                anyListOf(String.class), any(Constants.DEVICE_TYPE.class)))
+                .thenReturn(articleComment);
+
+        doNothing().when(galleryService)
+                .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
+                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+
+        mvc.perform(
+                put("/api/board/{board}/comment/{id}", article.getBoard().toLowerCase(), articleComment.getId())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(writeArticleComment)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(articleComment)))
+                .andDo(
+                        document("editArticleComment",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("id").description("댓글 ID")
+                                ),
+                                requestFields(this.getWriteArticleCommentFormDescriptor()),
+                                responseFields(this.getWriteArticleCommentDescriptor())
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void deleteArticleCommentTest() throws Exception {
+
+        doNothing().when(articleService)
+                .deleteArticleComment(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString());
+
+        mvc.perform(
+                delete("/api/board/{board}/comment/{id}", article.getBoard().toLowerCase(), articleComment.getId())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("deleteArticleComment",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("id").description("댓글 ID")
+                                )
+                        ));
+    }
+
     private List<FieldDescriptor> getArticleCommentsDescriptor(FieldDescriptor... descriptors) {
         List<FieldDescriptor> fieldDescriptors = new ArrayList<>(
                 Arrays.asList(
@@ -274,6 +406,34 @@ public class ArticleCommentMvcTests {
         CollectionUtils.mergeArrayIntoCollection(descriptors, fieldDescriptors);
 
         return fieldDescriptors;
+    }
+
+    private FieldDescriptor[] getWriteArticleCommentFormDescriptor() {
+        ConstraintDescriptions userConstraints = new ConstraintDescriptions(WriteArticleComment.class);
+
+        return new FieldDescriptor[] {
+                fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용. " + userConstraints.descriptionsForProperty("content")),
+                fieldWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
+        };
+    }
+
+    private FieldDescriptor[] getWriteArticleCommentDescriptor() {
+        return new FieldDescriptor[] {
+                fieldWithPath("id").type(JsonFieldType.STRING).description("댓글 ID"),
+                fieldWithPath("article").type(JsonFieldType.OBJECT).description("연동 글"),
+                fieldWithPath("article.id").type(JsonFieldType.STRING).description("글 ID"),
+                fieldWithPath("article.seq").type(JsonFieldType.NUMBER).description("글 번호"),
+                fieldWithPath("article.board").type(JsonFieldType.STRING).description("게시판"),
+                fieldWithPath("status").type(JsonFieldType.OBJECT).description("댓글 상태"),
+                fieldWithPath("status.device").type(JsonFieldType.STRING).description("디바이스 종류 " +
+                        Stream.of(Constants.DEVICE_TYPE.values()).map(Enum::name).collect(Collectors.toList())),
+                fieldWithPath("writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
+                fieldWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요를 한 회원 목록"),
+                fieldWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요를 한 회원 목록"),
+                fieldWithPath("linkedGallery").type(JsonFieldType.BOOLEAN).description("연동 그림 존재 여부"),
+                fieldWithPath("logs").type(JsonFieldType.ARRAY).description("로그 기록 목록")
+        };
     }
 
 }
