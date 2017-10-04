@@ -14,6 +14,7 @@ import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.db.Gallery;
+import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
@@ -313,26 +314,23 @@ public class BoardRestController {
 
     @ApiOperation("게시판 글 감정 표현")
     @PostMapping("/{board}/{seq}/{feeling}")
-    public UserFeelingResponse addFreeFeeling(
+    public UserFeelingResponse setArticleFeeling(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq,
-            @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE_LOWERCASE feeling) {
-
-        Constants.FEELING_TYPE feelingType = Constants.FEELING_TYPE.valueOf(StringUtils.upperCase(feeling.name()));
+            @ApiParam(value = "감정", required = true) @PathVariable Constants.FEELING_TYPE feeling) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        Article article = articleService.setFreeFeelings(commonWriter, StringUtils.upperCase(board.name()), seq, feelingType);
+        Article article = articleService.setArticleFeelings(commonWriter, board, seq, feeling);
 
-        UserFeelingResponse response = UserFeelingResponse.builder()
-                .numberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size())
-                .numberOfDislike(CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size())
+        List<CommonFeelingUser> usersLiking = article.getUsersLiking();
+        List<CommonFeelingUser> usersDisliking = article.getUsersDisliking();
+
+        return UserFeelingResponse.builder()
+                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
+                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
+                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
                 .build();
-
-        if (Objects.nonNull(commonWriter))
-            response.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, article.getUsersLiking(), article.getUsersDisliking()));
-
-        return response;
     }
 
     @ApiOperation(value = "자유게시판 글의 감정 표현 회원 목록")
@@ -407,9 +405,10 @@ public class BoardRestController {
     @InitBinder
     public void initBoardTypeEnumBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(Constants.BOARD_TYPE.class, new BoardTypeEnumConverter());
+        dataBinder.registerCustomEditor(Constants.FEELING_TYPE.class, new FeelingTypeEnumConverter());
     }
 
-    private static class BoardTypeEnumConverter extends PropertyEditorSupport {
+    private class BoardTypeEnumConverter extends PropertyEditorSupport {
 
         @Override
         public void setAsText(String text) throws IllegalArgumentException {
@@ -418,6 +417,18 @@ public class BoardRestController {
 			} else {
 				throw new ServiceException(ServiceError.INVALID_PARAMETER);
 			}
+        }
+    }
+
+    private class FeelingTypeEnumConverter extends PropertyEditorSupport {
+
+        @Override
+        public void setAsText(String text) throws IllegalArgumentException {
+            if (StringUtils.isAllLowerCase(text)) {
+                setValue(text.toUpperCase());
+            } else {
+                throw new ServiceException(ServiceError.INVALID_PARAMETER);
+            }
         }
     }
 }

@@ -410,18 +410,18 @@ public class ArticleService {
     /**
      * 글 감정 표현.
      */
-	public Article setFreeFeelings(CommonWriter writer, String board, Integer seq, Constants.FEELING_TYPE feeling) {
+	public Article setArticleFeelings(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, Constants.FEELING_TYPE feeling) {
 
-		Article article = articleRepository.findOneByBoardAndSeq(board, seq)
+		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
         String userId = writer.getUserId();
         String username = writer.getUsername();
 
-		CommonWriter postWriter = article.getWriter();
+		CommonWriter articleWriter = article.getWriter();
 
 		// 이 게시물의 작성자라서 감정 표현을 할 수 없음
-		if (userId.equals(postWriter.getUserId()))
+		if (userId.equals(articleWriter.getUserId()))
 			throw new ServiceException(ServiceError.FEELING_YOU_ARE_WRITER);
 
 		this.setUsersFeeling(userId, username, feeling, article);

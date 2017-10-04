@@ -14,6 +14,7 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
+import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
@@ -36,6 +37,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -561,6 +563,55 @@ public class ArticleMvcTests {
                                 ),
                                 responseFields(
                                         fieldWithPath("result").type(JsonFieldType.STRING).description("결과 타입. [ALL : 모두 지움, CONTENT : 글 본문만 지움(댓글 유지)]")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void setArticleFeeling() throws Exception {
+
+        when(articleService.setArticleFeelings(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(),
+                any(Constants.FEELING_TYPE.class)))
+                .thenReturn(article);
+
+        List<CommonFeelingUser> usersLiking = article.getUsersLiking();
+        List<CommonFeelingUser> usersDisliking = article.getUsersDisliking();
+
+        UserFeelingResponse expectResponse = UserFeelingResponse.builder()
+                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
+                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
+                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
+                .build();
+
+        mvc.perform(
+                post("/api/board/{board}/{seq}/{feeling}", article.getBoard().toLowerCase(), article.getSeq(),
+                        Constants.FEELING_TYPE.LIKE.name().toLowerCase())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(writeArticleform)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("setArticleFeeling",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글번호"),
+                                        parameterWithName("feeling").description("감정 표현 종류 " +
+                                                Stream.of(Constants.FEELING_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                                ),
+                                responseFields(
+                                        fieldWithPath("myFeeling").type(JsonFieldType.STRING).description("나의 감정 표현 종류 " +
+                                                Stream.of(Constants.FEELING_TYPE.values()).map(Enum::name).collect(Collectors.toList())).optional(),
+                                        fieldWithPath("numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                        fieldWithPath("numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수")
                                 )
                         ));
     }

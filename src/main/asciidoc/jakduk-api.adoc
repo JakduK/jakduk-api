@@ -159,6 +159,25 @@ include::{snippets}/deleteArticle/response-fields.adoc[]
 .http response
 include::{snippets}/deleteArticle/http-response.adoc[]
 
+[[board-set-article-feeling]]
+=== 글 감정표현 하기
+
+글에 감정 표현을 한다. 인증은 필수.
+
+include::{snippets}/setArticleFeeling/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/setArticleFeeling/request-headers.adoc[]
+.http request
+include::{snippets}/setArticleFeeling/http-request.adoc[]
+.curl request
+include::{snippets}/setArticleFeeling/curl-request.adoc[]
+
+.response fields
+include::{snippets}/setArticleFeeling/response-fields.adoc[]
+.http response
+include::{snippets}/setArticleFeeling/http-response.adoc[]
+
 [[board-get-articles-tops]]
 === 주간 선두 글 목록
 
