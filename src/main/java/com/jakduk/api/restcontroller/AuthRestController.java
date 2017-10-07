@@ -7,12 +7,11 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.api.service.UserService;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
 import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
-
+import com.jakduk.api.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,14 +38,9 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthRestController {
 
-    @Autowired
-    private AuthUtils authUtils;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UserService userService;
+    @Autowired private AuthUtils authUtils;
+    @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private UserService userService;
 
     @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
     @PostMapping("/login/{providerId}")
@@ -123,7 +117,7 @@ public class AuthRestController {
 
     @ApiOperation(value = "세션에 있는 나의 프로필 정보")
     @GetMapping("/user")
-    public AuthUserProfile getMyProfile() {
+    public AuthUserProfile getMySessionProfile() {
 
         AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 

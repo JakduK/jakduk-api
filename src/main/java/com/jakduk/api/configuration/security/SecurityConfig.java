@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity
+@EnableGlobalMethodSecurity // TODO 훗날 제거
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource private JakdukProperties jakdukProperties;

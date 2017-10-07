@@ -1,6 +1,5 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.board.category.BoardCategory;
@@ -53,7 +52,6 @@ public class BoardRestController {
 
     @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
-    @Autowired private AuthHelper authHelper;
 
     @ApiOperation("게시판 글 목록")
     @GetMapping("/{board}/articles")

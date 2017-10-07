@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserPictureInfo {
 
     private String id;
+    @Deprecated
     private Constants.ACCOUNT_TYPE sourceType;
     private String smallPictureUrl;
     private String largePictureUrl;

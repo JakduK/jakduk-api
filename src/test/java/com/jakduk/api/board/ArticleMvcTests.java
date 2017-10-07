@@ -1,7 +1,6 @@
 package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.common.AuthHelper;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
@@ -72,7 +71,6 @@ public class ArticleMvcTests {
     @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
-    @MockBean private AuthHelper authHelper;
 
     private CommonWriter commonWriter;
     private Article article;

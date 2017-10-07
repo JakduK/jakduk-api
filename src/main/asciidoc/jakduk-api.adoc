@@ -36,6 +36,44 @@ RESTful notes tries to adhere as closely as possible to standard HTTP and REST c
 | Used to delete an existing resource
 |===
 
+[[auth]]
+== 인증 API
+회원 인증과 관련된 API.
+
+[[auth-login-jakduk-user]]
+=== JakduK 로그인
+
+이메일 주소 기반인 JakduK 계열 회원을 로그인한다.
+
+.request parameters
+include::{snippets}/login-jakduk-user/request-parameters.adoc[]
+.http request
+include::{snippets}/login-jakduk-user/http-request.adoc[]
+.curl request
+include::{snippets}/login-jakduk-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/login-jakduk-user/response-headers.adoc[]
+.http response
+include::{snippets}/login-jakduk-user/http-response.adoc[]
+
+[[auth-get-my-session-user]]
+=== 나의 세션 프로필
+
+로그인 중인 나의 세션 프로필 내용을 가져온다.
+
+.request headers
+include::{snippets}/getMySessionUser/request-headers.adoc[]
+.http request
+include::{snippets}/getMySessionUser/http-request.adoc[]
+.curl request
+include::{snippets}/getMySessionUser/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getMySessionUser/response-fields.adoc[]
+.http response
+include::{snippets}/getMySessionUser/http-response.adoc[]
+
 [[board]]
 == 게시판 API
 게시판과 관련된 API. 현재 FREE, FOOTBALL, DEVELOPER 게시판이 있다.
