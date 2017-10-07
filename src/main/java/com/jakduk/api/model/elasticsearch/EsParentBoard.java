@@ -9,6 +9,8 @@ import lombok.Getter;
 @Getter
 public class EsParentBoard {
     private String id;
+    private String board;
+    private String category;
     private Integer seq;
     private String subject;
 }
