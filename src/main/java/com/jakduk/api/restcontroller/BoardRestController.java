@@ -39,7 +39,6 @@ import javax.validation.Valid;
 import java.beans.PropertyEditorSupport;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -334,14 +333,14 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "자유게시판 글의 감정 표현 회원 목록")
-    @RequestMapping(value = "/{board}/{seq}/feeling/users", method = RequestMethod.GET)
-    public FreePostFeelingsResponse getFreeFeelings (
+    @GetMapping("/{board}/{seq}/feeling/users")
+    public GetArticleFeelingUsersResponse getArticleFeelingUsers (
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
             @ApiParam(value = "글 seq", required = true) @PathVariable Integer seq) {
 
-        Article article = articleService.findOneBySeq(StringUtils.upperCase(board.name()), seq);
+        Article article = articleService.findOneBySeq(board, seq);
 
-        return FreePostFeelingsResponse.builder()
+        return GetArticleFeelingUsersResponse.builder()
                 .seq(seq)
                 .usersLiking(article.getUsersLiking())
                 .usersDisliking(article.getUsersDisliking())
@@ -357,17 +356,16 @@ public class BoardRestController {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        ArticleComment boardComment = articleService.setFreeCommentFeeling(commonWriter, commentId, feeling);
+        ArticleComment boardComment = articleService.setArticleCommentFeeling(commonWriter, commentId, feeling);
 
-        UserFeelingResponse response = UserFeelingResponse.builder()
-                .numberOfLike(CollectionUtils.isEmpty(boardComment.getUsersLiking()) ? 0 : boardComment.getUsersLiking().size())
-                .numberOfDislike(CollectionUtils.isEmpty(boardComment.getUsersDisliking()) ? 0 : boardComment.getUsersDisliking().size())
+        List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
+        List<CommonFeelingUser> usersDisliking = boardComment.getUsersDisliking();
+
+        return UserFeelingResponse.builder()
+                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
+                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
+                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
                 .build();
-
-        if (Objects.nonNull(commonWriter))
-            response.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, boardComment.getUsersLiking(), boardComment.getUsersDisliking()));
-
-        return response;
     }
 
     @ApiOperation(value = "게시판 글의 공지 활성화")

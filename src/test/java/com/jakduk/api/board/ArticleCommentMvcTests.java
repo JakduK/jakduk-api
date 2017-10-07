@@ -15,6 +15,7 @@ import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
@@ -382,6 +383,52 @@ public class ArticleCommentMvcTests {
                                         parameterWithName("board").description("게시판 " +
                                                 Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
                                         parameterWithName("id").description("댓글 ID")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void setArticleCommentFeelingTest() throws Exception {
+
+        when(articleService.setArticleCommentFeeling(any(CommonWriter.class), anyString(), any(Constants.FEELING_TYPE.class)))
+                .thenReturn(articleComment);
+
+        List<CommonFeelingUser> usersLiking = articleComment.getUsersLiking();
+        List<CommonFeelingUser> usersDisliking = articleComment.getUsersDisliking();
+
+        UserFeelingResponse expectResponse = UserFeelingResponse.builder()
+                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
+                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
+                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
+                .build();
+
+        mvc.perform(
+                post("/api/board/{board}/comment/{commentId}/{feeling}", articleComment.getArticle().getBoard().toLowerCase(),
+                        articleComment.getId(), Constants.FEELING_TYPE.LIKE.name().toLowerCase())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("setArticleCommentFeeling",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("commentId").description("댓글 ID"),
+                                        parameterWithName("feeling").description("감정 표현 종류 " +
+                                                Stream.of(Constants.FEELING_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                                ),
+                                responseFields(
+                                        fieldWithPath("myFeeling").type(JsonFieldType.STRING).description("나의 감정 표현 종류 " +
+                                                Stream.of(Constants.FEELING_TYPE.values()).map(Enum::name).collect(Collectors.toList())).optional(),
+                                        fieldWithPath("numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                        fieldWithPath("numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수")
                                 )
                         ));
     }

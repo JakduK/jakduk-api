@@ -65,8 +65,8 @@ public class ArticleService {
 	@Autowired private CommonGalleryService commonGalleryService;
 	@Autowired private RabbitMQPublisher rabbitMQPublisher;
 
-	public Article findOneBySeq(String board, Integer seq) {
-        return articleRepository.findOneByBoardAndSeq(board, seq)
+	public Article findOneBySeq(Constants.BOARD_TYPE board, Integer seq) {
+        return articleRepository.findOneByBoardAndSeq(board.name(), seq)
                 .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
     }
 
@@ -555,7 +555,7 @@ public class ArticleService {
 	 * @param feeling 감정표현 종류
      * @return 자유게시판 댓글 객체
      */
-	public ArticleComment setFreeCommentFeeling(CommonWriter writer, String commentId, Constants.FEELING_TYPE feeling) {
+	public ArticleComment setArticleCommentFeeling(CommonWriter writer, String commentId, Constants.FEELING_TYPE feeling) {
 
 		ArticleComment boardComment = articleCommentRepository.findOneById(commentId)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));

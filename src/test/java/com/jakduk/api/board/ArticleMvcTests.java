@@ -589,9 +589,7 @@ public class ArticleMvcTests {
                         Constants.FEELING_TYPE.LIKE.name().toLowerCase())
                         .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
                         //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(ObjectMapperUtils.writeValueAsString(writeArticleform)))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
@@ -612,6 +610,41 @@ public class ArticleMvcTests {
                                                 Stream.of(Constants.FEELING_TYPE.values()).map(Enum::name).collect(Collectors.toList())).optional(),
                                         fieldWithPath("numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
                                         fieldWithPath("numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void getArticleFeelingUsersTest() throws Exception {
+
+        when(articleService.findOneBySeq(any(Constants.BOARD_TYPE.class), anyInt()))
+                .thenReturn(article);
+
+        GetArticleFeelingUsersResponse expectResponse = GetArticleFeelingUsersResponse.builder()
+                .seq(article.getSeq())
+                .usersLiking(article.getUsersLiking())
+                .usersDisliking(article.getUsersDisliking())
+                .build();
+
+        mvc.perform(
+                get("/api/board/{board}/{seq}/feeling/users",
+                        Constants.BOARD_TYPE.FOOTBALL.name().toLowerCase(), article.getSeq())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("getArticleFeelingUsers",
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글번호")
+                                ),
+                                responseFields(
+                                        fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                        fieldWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요 회원 목록"),
+                                        fieldWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요 회원 목록")
                                 )
                         ));
     }

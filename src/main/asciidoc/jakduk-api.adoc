@@ -178,6 +178,23 @@ include::{snippets}/setArticleFeeling/response-fields.adoc[]
 .http response
 include::{snippets}/setArticleFeeling/http-response.adoc[]
 
+[[board-get-article-feeling-users]]
+=== 글의 감정 표현 회원 목록
+
+글에 감정 표현을 한 회원 목록을 가져온다.
+
+include::{snippets}/getArticleFeelingUsers/path-parameters.adoc[]
+
+.http request
+include::{snippets}/getArticleFeelingUsers/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleFeelingUsers/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleFeelingUsers/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleFeelingUsers/http-response.adoc[]
+
 [[board-get-articles-tops]]
 === 주간 선두 글 목록
 
@@ -293,3 +310,22 @@ include::{snippets}/deleteArticleComment/curl-request.adoc[]
 
 .http response
 include::{snippets}/deleteArticleComment/http-response.adoc[]
+
+[[board-set-article-comment-feeling]]
+=== 댓글 감정표현 하기
+
+댓글에 감정 표현을 한다. 인증은 필수.
+
+include::{snippets}/setArticleCommentFeeling/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/setArticleCommentFeeling/request-headers.adoc[]
+.http request
+include::{snippets}/setArticleCommentFeeling/http-request.adoc[]
+.curl request
+include::{snippets}/setArticleCommentFeeling/curl-request.adoc[]
+
+.response fields
+include::{snippets}/setArticleCommentFeeling/response-fields.adoc[]
+.http response
+include::{snippets}/setArticleCommentFeeling/http-response.adoc[]
