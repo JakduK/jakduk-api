@@ -576,20 +576,25 @@ public class ArticleService {
 		return boardComment;
 	}
 
+	public void enableArticleNotice(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq) {
+		this.setArticleNotice(writer, board, seq, true);
+	}
+
+	public void disableArticleNotice(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq) {
+		this.setArticleNotice(writer, board, seq, false);
+	}
+
 	/**
 	 * 자유게시판 글의 공지를 활성화/비활성화 한다.
 	 * @param seq 글 seq
 	 * @param isEnable 활성화/비활성화
      */
-	public void setFreeNotice(CommonWriter writer, String board, Integer seq, Boolean isEnable) {
+	private void setArticleNotice(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, Boolean isEnable) {
 
-		Optional<Article> boardFree = articleRepository.findOneByBoardAndSeq(board, seq);
+		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
-		if (!boardFree.isPresent())
-			throw new ServiceException(ServiceError.NOT_FOUND_ARTICLE);
-
-		Article getArticle = boardFree.get();
-		ArticleStatus status = getArticle.getStatus();
+		ArticleStatus status = article.getStatus();
 
 		if (Objects.isNull(status))
 			status = new ArticleStatus();
@@ -610,23 +615,22 @@ public class ArticleService {
 			status.setNotice(null);
 		}
 
-		getArticle.setStatus(status);
+		article.setStatus(status);
 
-		List<BoardLog> histories = getArticle.getLogs();
+		List<BoardLog> histories = article.getLogs();
 
 		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
 		String historyType = isEnable ? Constants.ARTICLE_LOG_TYPE.ENABLE_NOTICE.name() : Constants.ARTICLE_LOG_TYPE.DISABLE_NOTICE.name();
-		BoardLog history = new BoardLog(new ObjectId().toString(), historyType, new SimpleWriter(writer));
-		histories.add(history);
+		histories.add(new BoardLog(new ObjectId().toString(), historyType, new SimpleWriter(writer)));
 
-		getArticle.setLogs(histories);
+		article.setLogs(histories);
 
-		articleRepository.save(getArticle);
+		articleRepository.save(article);
 
 		if (log.isInfoEnabled())
-			log.info("Set notice. post seq=" + getArticle.getSeq() + ", type=" + status.getNotice());
+			log.info("Set notice for article. seq={}, type={}", article.getSeq(), status.getNotice());
 	}
 
 

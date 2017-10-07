@@ -212,6 +212,40 @@ include::{snippets}/getArticlesTops/response-fields.adoc[]
 .http response
 include::{snippets}/getArticlesTops/http-response.adoc[]
 
+[[board-enable-article-notice]]
+=== 공지 글 만들기
+
+공지글로 설정한다. 인증은 필수며 관리자 권한이 필요하다.
+
+include::{snippets}/enableArticleNotice/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/enableArticleNotice/request-headers.adoc[]
+.http request
+include::{snippets}/enableArticleNotice/http-request.adoc[]
+.curl request
+include::{snippets}/enableArticleNotice/curl-request.adoc[]
+
+.http response
+include::{snippets}/enableArticleNotice/http-response.adoc[]
+
+[[board-disable-article-notice]]
+=== 공지 글 없애기
+
+공지글을 해제한다. 인증은 필수며 관리자 권한이 필요하다.
+
+include::{snippets}/disableArticleNotice/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/disableArticleNotice/request-headers.adoc[]
+.http request
+include::{snippets}/disableArticleNotice/http-request.adoc[]
+.curl request
+include::{snippets}/disableArticleNotice/curl-request.adoc[]
+
+.http response
+include::{snippets}/disableArticleNotice/http-response.adoc[]
+
 [[board-get-article-comments]]
 === 댓글 목록
 

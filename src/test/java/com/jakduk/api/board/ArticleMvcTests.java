@@ -14,6 +14,7 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.restcontroller.BoardRestController;
+import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.ArticleService;
@@ -645,6 +646,62 @@ public class ArticleMvcTests {
                                         fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글번호"),
                                         fieldWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요 회원 목록"),
                                         fieldWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요 회원 목록")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void enableArticleNoticeTest() throws Exception {
+
+        doNothing().when(articleService)
+                .enableArticleNotice(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt());
+
+        mvc.perform(
+                post("/api/board/{board}/{seq}/notice", article.getBoard().toLowerCase(), article.getSeq())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("enableArticleNotice",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글번호")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void disableArticleNoticeTest() throws Exception {
+
+        doNothing().when(articleService)
+                .disableArticleNotice(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt());
+
+        mvc.perform(
+                delete("/api/board/{board}/{seq}/notice", article.getBoard().toLowerCase(), article.getSeq())
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("disableArticleNotice",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                ),
+                                pathParameters(
+                                        parameterWithName("board").description("게시판 " +
+                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                        parameterWithName("seq").description("글번호")
                                 )
                         ));
     }

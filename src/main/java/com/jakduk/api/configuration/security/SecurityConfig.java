@@ -88,6 +88,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 
+                .regexMatchers(
+                        HttpMethod.POST,
+                        "/api/board/[a-z]+/\\d+/notice" // 글의 공지 만들기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_ADMIN.name())
+
+                .regexMatchers(
+                        HttpMethod.DELETE,
+                        "/api/board/[a-z]+/\\d+/notice" // 글의 공지 없애기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_ADMIN.name())
+
                 .antMatchers(
                         HttpMethod.POST,
                         "/api/auth/user",                            // 이메일 기반 회원 가입

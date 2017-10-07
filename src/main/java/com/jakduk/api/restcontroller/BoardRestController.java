@@ -369,33 +369,27 @@ public class BoardRestController {
     }
 
     @ApiOperation(value = "게시판 글의 공지 활성화")
-    @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.POST)
-    public EmptyJsonResponse enableFreeNotice(
+    @PostMapping("/{board}/{seq}/notice")
+    public EmptyJsonResponse enableArticleNotice(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
-            @PathVariable int seq) {
-
-        if (! AuthUtils.isAdmin())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            @PathVariable Integer seq) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-		articleService.setFreeNotice(commonWriter, StringUtils.upperCase(board.name()), seq, true);
+		articleService.enableArticleNotice(commonWriter, board, seq);
 
         return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "게시판 글의 공지 비활성화")
-    @RequestMapping(value = "/{board}/{seq}/notice", method = RequestMethod.DELETE)
-    public EmptyJsonResponse disableFreeNotice(
+    @DeleteMapping("/{board}/{seq}/notice")
+    public EmptyJsonResponse disableArticleNotice(
             @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
-            @PathVariable int seq) {
-
-        if (! AuthUtils.isAdmin())
-            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+            @PathVariable Integer seq) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
-        articleService.setFreeNotice(commonWriter, StringUtils.upperCase(board.name()), seq, false);
+        articleService.disableArticleNotice(commonWriter, board, seq);
 
         return EmptyJsonResponse.newInstance();
     }
