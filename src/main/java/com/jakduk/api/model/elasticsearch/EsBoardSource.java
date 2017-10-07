@@ -21,6 +21,8 @@ public class EsBoardSource {
 
 	private String id;
 
+	private String board;
+
 	private CommonWriter writer;
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
