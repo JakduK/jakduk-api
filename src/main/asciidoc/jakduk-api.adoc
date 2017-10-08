@@ -43,7 +43,7 @@ RESTful notes tries to adhere as closely as possible to standard HTTP and REST c
 [[auth-login-jakduk-user]]
 === JakduK 로그인
 
-이메일 주소 기반인 JakduK 계열 회원을 로그인한다.
+이메일 주소 기반인 JakduK 계열 회원을 로그인한다. 로그인 중이 아니어야 한다.
 
 .request parameters
 include::{snippets}/login-jakduk-user/request-parameters.adoc[]
@@ -57,22 +57,37 @@ include::{snippets}/login-jakduk-user/response-headers.adoc[]
 .http response
 include::{snippets}/login-jakduk-user/http-response.adoc[]
 
+[[auth-logout]]
+=== 로그아웃
+
+로그인 중인 회원을 로그 아웃 한다.
+
+.request headers
+include::{snippets}/logout/request-headers.adoc[]
+.http request
+include::{snippets}/logout/http-request.adoc[]
+.curl request
+include::{snippets}/logout/curl-request.adoc[]
+
+.http response
+include::{snippets}/logout/http-response.adoc[]
+
 [[auth-get-my-session-user]]
 === 나의 세션 프로필
 
 로그인 중인 나의 세션 프로필 내용을 가져온다.
 
 .request headers
-include::{snippets}/getMySessionUser/request-headers.adoc[]
+include::{snippets}/get-my-session-user/request-headers.adoc[]
 .http request
-include::{snippets}/getMySessionUser/http-request.adoc[]
+include::{snippets}/get-my-session-user/http-request.adoc[]
 .curl request
-include::{snippets}/getMySessionUser/curl-request.adoc[]
+include::{snippets}/get-my-session-user/curl-request.adoc[]
 
 .response fields
-include::{snippets}/getMySessionUser/response-fields.adoc[]
+include::{snippets}/get-my-session-user/response-fields.adoc[]
 .http response
-include::{snippets}/getMySessionUser/http-response.adoc[]
+include::{snippets}/get-my-session-user/http-response.adoc[]
 
 [[board]]
 == 게시판 API

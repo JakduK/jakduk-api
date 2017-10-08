@@ -44,15 +44,15 @@ public class AuthRestController {
 
     @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
     @PostMapping("/login/{providerId}")
-    public EmptyJsonResponse loginSNSUser(
+    public EmptyJsonResponse loginSnsUser(
             @ApiParam(value = "Provider ID", required = true) @PathVariable String providerId,
             @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody LoginSocialUserForm form,
             HttpSession session) {
 
-        Constants.ACCOUNT_TYPE convertProviderId = Constants.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
+        Constants.ACCOUNT_TYPE cvtProviderId = Constants.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
         SocialProfile socialProfile = null;
 
-        switch (convertProviderId) {
+        switch (cvtProviderId) {
             case DAUM:
                 socialProfile = authUtils.getDaumProfile(form.getAccessToken());
                 break;
@@ -62,19 +62,18 @@ public class AuthRestController {
         }
 
         log.info("socialProfile providerId:{} providerUserId:{} nickname:{} email:{}",
-                convertProviderId.name(), socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
+                cvtProviderId.name(), socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
 
-        Optional<User> oUser = userService.findOneByProviderIdAndProviderUserId(convertProviderId, socialProfile.getId());
+        Optional<User> optUser = userService.findOneByProviderIdAndProviderUserId(cvtProviderId, socialProfile.getId());
 
         // 가입 회원이라 로그인
-        if (oUser.isPresent()) {
-            userService.checkBackwardCompatibilityOfSnsUser(socialProfile.getEmail(), oUser.get());
+        if (optUser.isPresent()) {
+            User user = optUser.get();
+            userService.checkBackwardCompatibilityOfSnsUser(socialProfile.getEmail(), user);
 
             // Perform the security
             Authentication authentication = authenticationManager.authenticate(
-                    new SnsAuthenticationToken(
-                            oUser.get().getEmail()
-                    )
+                    new SnsAuthenticationToken(user.getEmail())
             );
 
             AuthUtils.setAuthentication(authentication);
@@ -85,7 +84,7 @@ public class AuthRestController {
         // 그냥 신규 가입으로 프로필을 세션에 임시 저장한다.
         AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
                 .username(socialProfile.getNickname())
-                .providerId(convertProviderId)
+                .providerId(cvtProviderId)
                 .providerUserId(socialProfile.getId())
                 .build();
 

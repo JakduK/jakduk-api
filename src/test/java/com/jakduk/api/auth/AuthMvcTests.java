@@ -6,7 +6,10 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.restcontroller.AuthRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.board.WriteArticle;
 import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
+import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -29,17 +33,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({AuthRestController.class, AuthMvcTests.Controller.class})
@@ -82,7 +84,68 @@ public class AuthMvcTests {
                                         headerWithName("Set-Cookie").description("인증 쿠키. value는 JESSIONID=키값").optional()
                                 )
                         ));
+    }
 
+    @Test
+    @WithMockUser
+    public void snsLoginTest() throws Exception {
+
+        ConstraintDescriptions loginSocialUserConstraints = new ConstraintDescriptions(WriteArticle.class);
+
+        LoginSocialUserForm requestForm = LoginSocialUserForm.builder()
+                .accessToken("EAALwXK...")
+                .build();
+
+        SocialProfile socialProfile = SocialProfile.builder()
+                .build();
+
+        when(authUtils.getDaumProfile(anyString()))
+                .thenReturn(socialProfile);
+
+        mvc.perform(
+                post("/api/auth/login/{providerId}", Constants.ACCOUNT_TYPE.DAUM)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(requestForm)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("login-sns-user",
+                                requestFields(
+                                        fieldWithPath("accessToken").type(JsonFieldType.STRING).description("OAuth의 Access Token " +
+                                                loginSocialUserConstraints.descriptionsForProperty("accessToken"))
+                                ),
+                                pathParameters(
+                                        parameterWithName("providerId").description("SNS 분류 " +
+                                                Stream.of(Constants.ACCOUNT_TYPE.values())
+                                                        .filter(accountType -> ! accountType.equals(Constants.ACCOUNT_TYPE.JAKDUK))
+                                                        .map(Enum::name)
+                                                        .collect(Collectors.toList())
+                                        )
+                                ),
+                                responseHeaders(
+                                        headerWithName("Set-Cookie").description("인증 쿠키. value는 JESSIONID=키값").optional()
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void logoutTest() throws Exception {
+        mvc.perform(
+                post("/api/auth/logout")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("logout",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                )
+                        ));
     }
 
     @Test
@@ -99,9 +162,9 @@ public class AuthMvcTests {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
-                        document("getMySessionUser",
+                        document("get-my-session-user",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
                                 ),
                                 responseFields(
                                         fieldWithPath("id").type(JsonFieldType.STRING).description("회원 ID"),
@@ -128,6 +191,11 @@ public class AuthMvcTests {
         @PostMapping(value = "/api/auth/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
         public EmptyJsonResponse formLogin(HttpServletResponse servletResponse) {
             servletResponse.addCookie(new Cookie("JESSIONID", "3F0E029648484BEAEF6B5C3578164E99"));
+            return EmptyJsonResponse.newInstance();
+        }
+
+        @PostMapping(value = "/api/auth/logout")
+        public EmptyJsonResponse logout() {
             return EmptyJsonResponse.newInstance();
         }
     }
