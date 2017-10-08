@@ -212,7 +212,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("getArticleComments",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -259,7 +259,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("getArticleDetailComments",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -303,7 +303,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("writeArticleComment",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -343,7 +343,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("editArticleComment",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -374,7 +374,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("deleteArticleComment",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -412,7 +412,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("setArticleCommentFeeling",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JESSIONID=키값")
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +

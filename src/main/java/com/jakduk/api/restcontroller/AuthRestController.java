@@ -61,8 +61,7 @@ public class AuthRestController {
                 break;
         }
 
-        log.info("socialProfile providerId:{} providerUserId:{} nickname:{} email:{}",
-                cvtProviderId.name(), socialProfile.getId(), socialProfile.getNickname(), socialProfile.getEmail());
+        log.info("loginSnsUser form={}, socialProfile={}", form, socialProfile);
 
         Optional<User> optUser = userService.findOneByProviderIdAndProviderUserId(cvtProviderId, socialProfile.getId());
 

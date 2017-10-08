@@ -43,7 +43,8 @@ RESTful notes tries to adhere as closely as possible to standard HTTP and REST c
 [[auth-login-jakduk-user]]
 === JakduK 로그인
 
-이메일 주소 기반인 JakduK 계열 회원을 로그인한다. 로그인 중이 아니어야 한다.
+이메일 주소 기반인 JakduK 계열 회원을 로그인한다.
+비로그인 상태에서 사용 가능 하다.
 
 .request parameters
 include::{snippets}/login-jakduk-user/request-parameters.adoc[]
@@ -56,6 +57,27 @@ include::{snippets}/login-jakduk-user/curl-request.adoc[]
 include::{snippets}/login-jakduk-user/response-headers.adoc[]
 .http response
 include::{snippets}/login-jakduk-user/http-response.adoc[]
+
+[[auth-login-sns-user]]
+=== SNS 로그인 & 회원 가입
+
+SNS(다음, 페이스북) 기반 회원을 로그인한다.
+비로그인 상태에서 사용 가능 하다.
+또한 미가입 회원일 경우에는, SNS 기반 회원 가입을 진행한다.
+
+include::{snippets}/login-sns-user/path-parameters.adoc[]
+
+.request fields
+include::{snippets}/login-sns-user/request-fields.adoc[]
+.http request
+include::{snippets}/login-sns-user/http-request.adoc[]
+.curl request
+include::{snippets}/login-sns-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/login-sns-user/response-headers.adoc[]
+.http response
+include::{snippets}/login-sns-user/http-response.adoc[]
 
 [[auth-logout]]
 === 로그아웃

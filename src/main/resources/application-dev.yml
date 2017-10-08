@@ -1,8 +1,9 @@
 logging:
   file: /jakduk/api/logs/api.log
   level:
-    root: INFO
+    root: DEBUG
     org.mongodb.driver.cluster: INFO
+    org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
 
 server:
   session:
