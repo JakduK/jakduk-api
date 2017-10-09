@@ -7,6 +7,7 @@ import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.AuthRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
+import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
 import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
@@ -32,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,8 +63,20 @@ public class AuthMvcTests {
     @MockBean private AuthUtils authUtils;
     @MockBean private AuthenticationManager authenticationManager;
 
+    private SocialProfile socialProfile;
+    private Constants.ACCOUNT_TYPE providerId;
+
     @Before
     public void setup() {
+        providerId = Constants.ACCOUNT_TYPE.DAUM;
+
+        socialProfile = SocialProfile.builder()
+                .id("abc123")
+                .nickname("daumUser01")
+                .email("test17@test.com")
+                .smallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
+                .largePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
+                .build();
     }
 
     @Test
@@ -95,17 +110,8 @@ public class AuthMvcTests {
     @WithMockUser
     public void snsLoginTest() throws Exception {
 
-        Constants.ACCOUNT_TYPE providerId = Constants.ACCOUNT_TYPE.DAUM;
-
         LoginSocialUserForm requestForm = LoginSocialUserForm.builder()
                 .accessToken("baada13b7df9af000fa20355bf07b25f808940ab69dd7f32b6c009efdd0f6d29")
-                .build();
-
-        SocialProfile socialProfile = SocialProfile.builder()
-                .id("abc123")
-                .nickname("daumUser01")
-                .smallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
-                .largePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
                 .build();
 
         when(authUtils.getDaumProfile(anyString()))
@@ -153,6 +159,51 @@ public class AuthMvcTests {
                                 ),
                                 responseHeaders(
                                         headerWithName("Set-Cookie").description("인증 쿠키. value는 JSESSIONID=키값").optional()
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void getAttemptSocialUserTest() throws Exception {
+
+        AttemptSocialUser expectAttemptSocialUser = AttemptSocialUser.builder()
+                .email(socialProfile.getEmail())
+                .username(socialProfile.getNickname())
+                .providerId(providerId)
+                .providerUserId(socialProfile.getId())
+                .externalLargePictureUrl(socialProfile.getLargePictureUrl())
+                .externalSmallPictureUrl(socialProfile.getSmallPictureUrl())
+                .build();
+
+        Map<String, Object> sessionAttributes = new HashMap<>();
+        sessionAttributes.put(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, expectAttemptSocialUser);
+
+        mvc.perform(
+                get("/api/auth/user/attempt")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        .sessionAttrs(sessionAttributes)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectAttemptSocialUser)))
+                .andDo(
+                        document("get-attempt-social-session-user",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                ),
+                                responseFields(
+                                        fieldWithPath("email").type(JsonFieldType.STRING).description("Provider에서 제공한 이메일 주소"),
+                                        fieldWithPath("username").type(JsonFieldType.STRING).description("Provider에서 제공한 별명"),
+                                        fieldWithPath("providerId").type(JsonFieldType.STRING).description("SNS 분류 " +
+                                                        Stream.of(Constants.ACCOUNT_TYPE.values())
+                                                                .filter(accountType -> ! accountType.equals(Constants.ACCOUNT_TYPE.JAKDUK))
+                                                                .map(Enum::name)
+                                                                .collect(Collectors.toList())
+                                                ),
+                                        fieldWithPath("providerUserId").type(JsonFieldType.STRING).description("Provider에서 제공한 사용자 ID"),
+                                        fieldWithPath("externalLargePictureUrl").type(JsonFieldType.STRING).description("Provider에서 제공한 큰 사진 URL"),
+                                        fieldWithPath("externalSmallPictureUrl").type(JsonFieldType.STRING).description("Provider에서 제공한 작은 사진 URL")
                                 )
                         ));
     }
@@ -209,7 +260,6 @@ public class AuthMvcTests {
                                         fieldWithPath("picture.largePictureUrl").type(JsonFieldType.STRING).description("회원 큰 사진 URL")
                                 )
                         ));
-
     }
 
     @RestController
