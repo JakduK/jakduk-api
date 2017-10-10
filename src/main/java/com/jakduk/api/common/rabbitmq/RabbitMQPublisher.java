@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Created by pyohwanjang on 2017. 6. 17..
@@ -144,7 +145,7 @@ public class RabbitMQPublisher {
     public void indexDocumentSearchWord(String word, CommonWriter writer) {
         EsSearchWord esSearchWord = EsSearchWord.builder()
                 .word(word)
-                .writer(new SimpleWriter(writer))
+                .writer(Objects.nonNull(writer) ? new SimpleWriter(writer) : null)
                 .registerDate(LocalDateTime.now())
                 .build();
 
