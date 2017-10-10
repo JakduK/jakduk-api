@@ -29,6 +29,8 @@ public class UserPicture {
 
     private String contentType;
 
+    // 존재 이유가?
+    @Deprecated
     private Constants.ACCOUNT_TYPE sourceType;
 
 }

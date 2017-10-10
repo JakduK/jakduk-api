@@ -5,5 +5,7 @@
 .settings
 .project
 .gradle
+.tmp
 *.iml
 build
+application-my.yml

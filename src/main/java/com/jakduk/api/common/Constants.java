@@ -16,12 +16,6 @@ public class Constants {
 		DEVELOPER
 	}
 
-	public enum BOARD_TYPE_LOWERCASE {
-		free,
-		football,
-		developer
-	}
-
 	/**
 	 * 백과사전 언어 구분.
 	 */
@@ -244,7 +238,7 @@ public class Constants {
 	/**
 	 * 글 히스토리 상태
 	 */
-	public enum ARTICLE_HISTORY_TYPE {
+	public enum ARTICLE_LOG_TYPE {
 		CREATE,
 		EDIT,
 		DELETE,
@@ -255,7 +249,7 @@ public class Constants {
 	/**
 	 * 댓글 히스토리 상태
 	 */
-	public enum ARTICLE_COMMENT_HISTORY_TYPE {
+	public enum ARTICLE_COMMENT_LOG_TYPE {
 		CREATE,
 		EDIT
 	}

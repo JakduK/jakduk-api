@@ -23,33 +23,33 @@ import java.util.Map;
 public class GetArticlesResponse {
 
     @ApiModelProperty(value = "말머리 맵")
-    Map<String, String> categories;
+    private Map<String, String> categories;
 
     @ApiModelProperty(value = "글 목록")
-    List<GetArticle> articles;
+    private List<GetArticle> articles;
 
     @ApiModelProperty(value = "공지글 목록")
-    List<GetArticle> notices;
+    private List<GetArticle> notices;
 
     @ApiModelProperty(value = "마지막 페이지 여부")
-    boolean last;
+    private Boolean last;
 
     @ApiModelProperty(value = "첫 페이지 여부")
-    boolean first;
+    private Boolean first;
 
     @ApiModelProperty(value = "전체 페이지 수")
-    int totalPages;
+    private Integer totalPages;
 
     @ApiModelProperty(value = "페이지당 글 수")
-    int size;
+    private Integer size;
 
     @ApiModelProperty(value = "현재 페이지(0부터 시작)")
-    int number;
+    private Integer number;
 
     @ApiModelProperty(value = "현제 페이지에서 글 수")
-    int numberOfElements;
+    private Integer numberOfElements;
 
     @ApiModelProperty(value = "전체 글 수")
-    long totalElements;
+    private Long totalElements;
 
 }

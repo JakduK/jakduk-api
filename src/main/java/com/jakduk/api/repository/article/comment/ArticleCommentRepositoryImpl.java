@@ -92,8 +92,8 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
      * @param boardId 기준이 되는 boardItem의 boardId
      */
     @Override
-    public List<CommonCount> findCommentsCountGreaterThanBoardIdAndBoard(ObjectId boardId, String board) {
-        AggregationOperation match1 = Aggregation.match(Criteria.where("article._id").gt(boardId).and("article.board").is(board));
+    public List<CommonCount> findCommentsCountGreaterThanBoardIdAndBoard(ObjectId boardId, Constants.BOARD_TYPE board) {
+        AggregationOperation match1 = Aggregation.match(Criteria.where("article._id").gt(boardId).and("article.board").is(board.name()));
         AggregationOperation group = Aggregation.group("article").count().as("count");
         AggregationOperation sort = Aggregation.sort(Sort.Direction.DESC, "count");
         //AggregationOperation limit = Aggregation.limit(Constants.BOARD_TOP_LIMIT);

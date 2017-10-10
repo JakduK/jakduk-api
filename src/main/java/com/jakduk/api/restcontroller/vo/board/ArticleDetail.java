@@ -23,6 +23,9 @@ public class ArticleDetail {
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;
 
+    @ApiModelProperty(example = "FREE", value = "게시판 ID")
+    private String board;
+
     @ApiModelProperty(value = "글쓴이")
     private CommonWriter writer;
 
@@ -39,7 +42,7 @@ public class ArticleDetail {
     private BoardCategory category;
 
     @ApiModelProperty(example = "10", value = "읽음 수")
-    private int views;
+    private Integer views;
 
     @ApiModelProperty(example = "5", value = "좋아요 수")
     private Integer numberOfLike;

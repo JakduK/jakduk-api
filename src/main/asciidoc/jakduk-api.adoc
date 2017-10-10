@@ -1,0 +1,545 @@
+= jakduk-api REST Docs
+Doc Writer <phjang1983@daum.net>
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
+
+[[overview]]
+== Overview
+
+This is an example output for a service running at https://dev-api.jakduk.com
+As you can see the format is very simple, and in fact you always get the same message.
+
+[[overview-http-verbs]]
+=== HTTP verbs
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PUT`
+| Used to update an existing resource, including partial updates
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[overview-http-status-codes]]
+=== HTTP status codes
+orbit tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| Standard response for successful HTTP requests.
+ The actual response will depend on the request method used.
+ In a GET request, the response will contain an entity corresponding to the requested resource.
+ In a POST request, the response will contain an entity describing or containing the result of the action.
+
+| `400 Bad Request`
+| The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).
+
+| `401 Unauthorized`
+| The request has not been applied because it lacks valid authentication credentials for the target resource.
+
+| `404 Not Found`
+| The requested resource could not be found but may be available again in the future. Subsequent requests by the client are permissible.
+
+| `500 Internal Server Error`
+| A generic error message, given when an unexpected condition was encountered and no more specific message is suitable.
+|===
+
+[[Error-format]]
+=== Error format
+
+[[Error-format]]
+.Error Format Example
+
+[source,json]
+{
+    "code": "FORM_VALIDATION_FAILED",
+    "message": "Form validation failed",
+    "fields": {
+        "coverThumbnailPath_NotEmpty": "반드시 값이 존재하고 길이 혹은 크기가 0보다 커야 합니다.",
+        "thumbnailPolicy_NotNull": "반드시 값이 있어야 합니다.",
+        "title_NotEmpty": "반드시 값이 존재하고 길이 혹은 크기가 0보다 커야 합니다.",
+        "multiTrackItems_NotNull": "반드시 값이 있어야 합니다.",
+        "datePath_NotEmpty": "반드시 값이 존재하고 길이 혹은 크기가 0보다 커야 합니다.",
+        "qualityIdPrefixes_NotNull": "반드시 값이 있어야 합니다."
+    },
+    "detail": {
+        "timestamp": 1498125964650,
+        "status": 999,
+        "error": "None",
+        "exception": "java.lang.NullPointerException",
+        "message": "No message available"
+    }
+}
+
+.Table Error format Description
+|===
+| Field | Description
+
+| `code`
+| Identifiable error code name.
+
+| `message`
+| the root cause message of the exception.
+
+| `fields`
+| (Optional) list of fields that failed form validation. showed why the verification failed and what the message is.
+
+| `detail`
+| (Optional) simple information about the exception occurrence. It contains timestamp, exception name, class and so on.
+|===
+
+[[auth]]
+== 인증 API
+회원 인증과 관련된 API.
+
+[[auth-login-jakduk-user]]
+=== JakduK 로그인
+
+이메일 주소 기반인 JakduK 계열 회원을 로그인한다.
+비로그인 상태에서 사용 가능 하다.
+
+.request parameters
+include::{snippets}/login-jakduk-user/request-parameters.adoc[]
+.http request
+include::{snippets}/login-jakduk-user/http-request.adoc[]
+.curl request
+include::{snippets}/login-jakduk-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/login-jakduk-user/response-headers.adoc[]
+.http response
+include::{snippets}/login-jakduk-user/http-response.adoc[]
+
+[[auth-login-sns-user]]
+=== SNS 로그인 & SNS 프로필 세션 저장
+
+SNS(다음, 페이스북) 기반 회원을 로그인한다.
+비로그인 상태에서 사용 가능 하다.
+또한 미가입 회원일 경우에는, SNS 기반 회원 가입을 진행하기 위해, 프로필 정보를 세션에 저장한다.
+
+include::{snippets}/login-sns-user/path-parameters.adoc[]
+
+.request fields
+include::{snippets}/login-sns-user/request-fields.adoc[]
+.http request
+include::{snippets}/login-sns-user/http-request.adoc[]
+.curl request
+include::{snippets}/login-sns-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/login-sns-user/response-headers.adoc[]
+.http response
+include::{snippets}/login-sns-user/http-response.adoc[]
+
+[[auth-set-attempt-social-session-user]]
+==== SNS 프로필 세션 저장
+
+만약 아직 가입 하지 않은 accessToken 라면, SNS 회원 가입을 진행한다.
+Provider(다음, 페이스북)에서 얻은 프로필 정보를 세션에 저장해 두고, SNS 회원 가입때 사용하면 된다.
+<<auth-get-attempt-social-session-user, SNS 프로필 세션 가져오기>> 에서, SNS 프로필 정보를 얻을 수 있다.
+
+다음은 Http 응답구조이며, Header는 `Status 404`, `Set-Cookie: JSESSIONID=키값` 이고 Body는 다음과 같다.
+[source,json,indent=0]
+----
+{
+   "code":"NOT_REGISTER_WITH_SNS",
+   "message":"SNS 기반으로 가입 하지 않은 회원입니다. 신규 가입 처리가 필요합니다."
+}
+----
+
+[[auth-get-attempt-social-session-user]]
+=== SNS 프로필 세션 가져오기
+
+SNS 회원 가입시에 필요한 세션 프로필을 가져온다. Provider(다음, 페이스북)에서 얻은 프로필 정보가 담겨 있다.
+<<auth-set-attempt-social-session-user, SNS 프로필 세션 저장>> 에서 발급 받은 Cookie가 필요하다.
+
+.request headers
+include::{snippets}/get-attempt-social-session-user/request-headers.adoc[]
+.http request
+include::{snippets}/get-attempt-social-session-user/http-request.adoc[]
+.curl request
+include::{snippets}/get-attempt-social-session-user/curl-request.adoc[]
+
+.response fields
+include::{snippets}/get-attempt-social-session-user/response-fields.adoc[]
+.http response
+include::{snippets}/get-attempt-social-session-user/http-response.adoc[]
+
+[[auth-logout]]
+=== 로그아웃
+
+로그인 중인 회원을 로그 아웃 한다.
+
+.request headers
+include::{snippets}/logout/request-headers.adoc[]
+.http request
+include::{snippets}/logout/http-request.adoc[]
+.curl request
+include::{snippets}/logout/curl-request.adoc[]
+
+.http response
+include::{snippets}/logout/http-response.adoc[]
+
+[[auth-get-my-session-user]]
+=== 나의 세션 프로필
+
+로그인 중인 나의 세션 프로필 내용을 가져온다.
+
+.request headers
+include::{snippets}/get-my-session-user/request-headers.adoc[]
+.http request
+include::{snippets}/get-my-session-user/http-request.adoc[]
+.curl request
+include::{snippets}/get-my-session-user/curl-request.adoc[]
+
+.response fields
+include::{snippets}/get-my-session-user/response-fields.adoc[]
+.http response
+include::{snippets}/get-my-session-user/http-response.adoc[]
+
+[[board]]
+== 게시판 API
+게시판과 관련된 API. 현재 FREE, FOOTBALL, DEVELOPER 게시판이 있다.
+
+[[board-get-categories]]
+=== 말머리 목록
+
+게시판의 말머리 목록을 가져온다. Locale에 따라 한국어와 영어 지원이 가능하다.
+
+include::{snippets}/getBoardCategories/path-parameters.adoc[]
+
+.http request
+include::{snippets}/getBoardCategories/http-request.adoc[]
+.curl request
+include::{snippets}/getBoardCategories/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getBoardCategories/response-fields.adoc[]
+.http response
+include::{snippets}/getBoardCategories/http-response.adoc[]
+
+[[board-get-articles]]
+=== 게시물 목록
+
+글의 최신 목록을 가져온다.
+
+include::{snippets}/getArticles/path-parameters.adoc[]
+
+.request parameters
+include::{snippets}/getArticles/request-parameters.adoc[]
+.http request
+include::{snippets}/getArticles/http-request.adoc[]
+.curl request
+include::{snippets}/getArticles/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticles/response-fields.adoc[]
+.http response
+include::{snippets}/getArticles/http-response.adoc[]
+
+[[board-get-article-detail]]
+=== 게시물 상세
+
+글 상세 내용을 가져온다. 인증은 옵션.
+
+include::{snippets}/getArticleDetail/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/getArticleDetail/request-headers.adoc[]
+.http request
+include::{snippets}/getArticleDetail/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleDetail/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleDetail/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleDetail/http-response.adoc[]
+
+[[board-write-article]]
+=== 글쓰기
+
+글을 쓴다. 인증은 필수.
+
+include::{snippets}/writeArticle/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/writeArticle/request-headers.adoc[]
+.request fields
+include::{snippets}/writeArticle/request-fields.adoc[]
+.http request
+include::{snippets}/writeArticle/http-request.adoc[]
+.curl request
+include::{snippets}/writeArticle/curl-request.adoc[]
+
+.response fields
+include::{snippets}/writeArticle/response-fields.adoc[]
+.http response
+include::{snippets}/writeArticle/http-response.adoc[]
+
+[[board-edit-article]]
+=== 글 고치기
+
+글을 고친다. 인증은 필수이며, 글쓴이만 고칠 수 있다.
+
+include::{snippets}/editArticle/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/editArticle/request-headers.adoc[]
+.request fields
+include::{snippets}/editArticle/request-fields.adoc[]
+.http request
+include::{snippets}/editArticle/http-request.adoc[]
+.curl request
+include::{snippets}/editArticle/curl-request.adoc[]
+
+.response fields
+include::{snippets}/editArticle/response-fields.adoc[]
+.http response
+include::{snippets}/editArticle/http-response.adoc[]
+
+[[board-delete-article]]
+=== 글 지우기
+
+글을 지운다. 인증은 필수이며, 글쓴이만 고칠 수 있다.
+지우고 싶은 글에 댓글이 달려있는지 없는지에 따라 동작이 다르다.
+댓글이 하나라도 달렸다면, 글 본문만 지우고 댓글은 유지된다.
+댓글이 하나도 없다면, 글 전체를 지운다.
+
+include::{snippets}/deleteArticle/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/deleteArticle/request-headers.adoc[]
+.http request
+include::{snippets}/deleteArticle/http-request.adoc[]
+.curl request
+include::{snippets}/deleteArticle/curl-request.adoc[]
+
+.response fields
+include::{snippets}/deleteArticle/response-fields.adoc[]
+.http response
+include::{snippets}/deleteArticle/http-response.adoc[]
+
+[[board-set-article-feeling]]
+=== 글 감정표현 하기
+
+글에 감정 표현을 한다. 인증은 필수.
+
+include::{snippets}/setArticleFeeling/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/setArticleFeeling/request-headers.adoc[]
+.http request
+include::{snippets}/setArticleFeeling/http-request.adoc[]
+.curl request
+include::{snippets}/setArticleFeeling/curl-request.adoc[]
+
+.response fields
+include::{snippets}/setArticleFeeling/response-fields.adoc[]
+.http response
+include::{snippets}/setArticleFeeling/http-response.adoc[]
+
+[[board-get-article-feeling-users]]
+=== 글의 감정 표현 회원 목록
+
+글에 감정 표현을 한 회원 목록을 가져온다.
+
+include::{snippets}/getArticleFeelingUsers/path-parameters.adoc[]
+
+.http request
+include::{snippets}/getArticleFeelingUsers/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleFeelingUsers/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleFeelingUsers/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleFeelingUsers/http-response.adoc[]
+
+[[board-get-articles-tops]]
+=== 주간 선두 글 목록
+
+게시판의 주간 선두 글 목록을 가져온다.
+
+include::{snippets}/getArticlesTops/path-parameters.adoc[]
+
+.http request
+include::{snippets}/getArticlesTops/http-request.adoc[]
+.curl request
+include::{snippets}/getArticlesTops/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticlesTops/response-fields.adoc[]
+.http response
+include::{snippets}/getArticlesTops/http-response.adoc[]
+
+[[board-enable-article-notice]]
+=== 공지 글 만들기
+
+공지글로 설정한다. 인증은 필수며 관리자 권한이 필요하다.
+
+include::{snippets}/enableArticleNotice/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/enableArticleNotice/request-headers.adoc[]
+.http request
+include::{snippets}/enableArticleNotice/http-request.adoc[]
+.curl request
+include::{snippets}/enableArticleNotice/curl-request.adoc[]
+
+.http response
+include::{snippets}/enableArticleNotice/http-response.adoc[]
+
+[[board-disable-article-notice]]
+=== 공지 글 없애기
+
+공지글을 해제한다. 인증은 필수며 관리자 권한이 필요하다.
+
+include::{snippets}/disableArticleNotice/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/disableArticleNotice/request-headers.adoc[]
+.http request
+include::{snippets}/disableArticleNotice/http-request.adoc[]
+.curl request
+include::{snippets}/disableArticleNotice/curl-request.adoc[]
+
+.http response
+include::{snippets}/disableArticleNotice/http-response.adoc[]
+
+[[board-get-article-comments]]
+=== 댓글 목록
+
+댓글의 최신 목록을 가져온다.
+인증은 옵션.
+
+include::{snippets}/getArticleComments/path-parameters.adoc[]
+
+.request parameters
+include::{snippets}/getArticleComments/request-parameters.adoc[]
+.http request
+include::{snippets}/getArticleComments/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleComments/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleComments/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleComments/http-response.adoc[]
+
+[[board-get-article-detail-comments]]
+=== 글의 댓글 목록
+
+글의의 최신 댓글 목록을 가져온다.
+인증은 옵션.
+
+include::{snippets}/getArticleDetailComments/path-parameters.adoc[]
+
+.request parameters
+include::{snippets}/getArticleDetailComments/request-parameters.adoc[]
+.http request
+include::{snippets}/getArticleDetailComments/http-request.adoc[]
+.curl request
+include::{snippets}/getArticleDetailComments/curl-request.adoc[]
+
+.response fields
+include::{snippets}/getArticleDetailComments/response-fields.adoc[]
+.http response
+include::{snippets}/getArticleDetailComments/http-response.adoc[]
+
+[[board-write-article-comment]]
+=== 댓글 달기
+
+댓글을 단다. 인증은 필수.
+
+include::{snippets}/writeArticleComment/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/writeArticleComment/request-headers.adoc[]
+.request fields
+include::{snippets}/writeArticleComment/request-fields.adoc[]
+.http request
+include::{snippets}/writeArticleComment/http-request.adoc[]
+.curl request
+include::{snippets}/writeArticleComment/curl-request.adoc[]
+
+.response fields
+include::{snippets}/writeArticleComment/response-fields.adoc[]
+.http response
+include::{snippets}/writeArticleComment/http-response.adoc[]
+
+[[board-edit-article-comment]]
+=== 댓글 고치기
+
+댓글을 단다. 인증은 필수.
+
+include::{snippets}/editArticleComment/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/editArticleComment/request-headers.adoc[]
+.request fields
+include::{snippets}/editArticleComment/request-fields.adoc[]
+.http request
+include::{snippets}/editArticleComment/http-request.adoc[]
+.curl request
+include::{snippets}/editArticleComment/curl-request.adoc[]
+
+.response fields
+include::{snippets}/editArticleComment/response-fields.adoc[]
+.http response
+include::{snippets}/editArticleComment/http-response.adoc[]
+
+[[board-delete-article-comment]]
+=== 댓글 지우기
+
+댓글을 지운다. 인증은 필수.
+
+include::{snippets}/deleteArticleComment/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/deleteArticleComment/request-headers.adoc[]
+.http request
+include::{snippets}/deleteArticleComment/http-request.adoc[]
+.curl request
+include::{snippets}/deleteArticleComment/curl-request.adoc[]
+
+.http response
+include::{snippets}/deleteArticleComment/http-response.adoc[]
+
+[[board-set-article-comment-feeling]]
+=== 댓글 감정표현 하기
+
+댓글에 감정 표현을 한다. 인증은 필수.
+
+include::{snippets}/setArticleCommentFeeling/path-parameters.adoc[]
+
+.request headers
+include::{snippets}/setArticleCommentFeeling/request-headers.adoc[]
+.http request
+include::{snippets}/setArticleCommentFeeling/http-request.adoc[]
+.curl request
+include::{snippets}/setArticleCommentFeeling/curl-request.adoc[]
+
+.response fields
+include::{snippets}/setArticleCommentFeeling/response-fields.adoc[]
+.http response
+include::{snippets}/setArticleCommentFeeling/http-response.adoc[]

@@ -75,7 +75,7 @@ public class ArticleRepositoryTests {
     @Test
     public void findNotices() {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-        List<ArticleOnList> notices = repository.findNotices(board.name(), sort);
+        List<ArticleOnList> notices = repository.findNotices(board, sort);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class ArticleRepositoryTests {
     public void findTopLikes() {
         LocalDate localDate = LocalDate.now().minusWeeks(1);
 
-        List<BoardTop> topLikes = repository.findTopLikes(Constants.BOARD_TYPE.FOOTBALL.name(), new ObjectId(DateUtils.localDateToDate(localDate)));
+        List<BoardTop> topLikes = repository.findTopLikes(Constants.BOARD_TYPE.FOOTBALL, new ObjectId(DateUtils.localDateToDate(localDate)));
     }
 
 }
