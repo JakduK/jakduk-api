@@ -17,28 +17,19 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EsBoardSource {
+public class EsArticleSource {
 
 	private String id;
-
+	private Integer seq;
 	private String board;
-
+	private String category;
 	private CommonWriter writer;
-
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String subject;
-
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String content;
-
-	private Integer seq;
-
-	private String category;
-
 	private List<String> galleries;
-
 	private Float score;
-
 	private Map<String, List<String>> highlight;
 
 }

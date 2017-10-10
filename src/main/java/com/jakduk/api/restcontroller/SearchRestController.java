@@ -41,7 +41,7 @@ public class SearchRestController {
 	@GetMapping("")
 	public SearchUnifiedResponse searchUnified(
 			@ApiParam(value = "검색어", required = true) @NotEmpty @RequestParam String q,
-			@ApiParam(value = "PO;CO;GA", required = true) @NotEmpty @RequestParam(defaultValue = "PO;CO;GA") String w,
+			@ApiParam(value = "ARTICLE;COMMENT;GALLERY", required = true) @NotEmpty @RequestParam(defaultValue = "ARTICLE;COMMENT;GALLERY") String w,
 			@ApiParam(value = "페이지 시작 위치") @RequestParam(required = false, defaultValue = "0") Integer from,
 			@ApiParam(value = "페이지 크기") @RequestParam(required = false, defaultValue = "10") Integer size,
 			@ApiParam(value = "하이라이트의 태그") @RequestParam(required = false) String tag,

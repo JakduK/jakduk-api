@@ -120,8 +120,8 @@ public class ArticleService {
 		articleRepository.save(article);
 
 	 	// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentBoard(article.getId(), article.getSeq(), article.getWriter(), article.getSubject(),
-				article.getContent(), article.getBoard(), article.getCategory(), galleryIds);
+		rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
+				article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
 		log.info("new post created. post seq={}, subject={}", article.getSeq(), article.getSubject());
 
@@ -188,8 +188,8 @@ public class ArticleService {
 		log.info("post was edited. post seq={}, subject={}", article.getSeq(), article.getSubject());
 
 		// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentBoard(article.getId(), article.getSeq(), article.getWriter(), article.getSubject(),
-				article.getContent(), article.getBoard(), article.getCategory(), galleryIds);
+		rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
+				article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
 		return article;
 	}
@@ -257,7 +257,7 @@ public class ArticleService {
 			commonGalleryService.unlinkGalleries(article.getId(), Constants.GALLERY_FROM_TYPE.ARTICLE);
 
 		// 색인 지움
-		rabbitMQPublisher.deleteDocumentBoard(article.getId());
+		rabbitMQPublisher.deleteDocumentArticle(article.getId());
 
         return count > 0 ? Constants.ARTICLE_DELETE_TYPE.CONTENT : Constants.ARTICLE_DELETE_TYPE.ALL;
     }

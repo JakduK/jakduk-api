@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 
 @Getter
-public class EsParentBoard {
+public class EsParentArticle {
     private String id;
     private String board;
     private String category;

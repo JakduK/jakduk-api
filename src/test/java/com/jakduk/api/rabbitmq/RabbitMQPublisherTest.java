@@ -4,7 +4,7 @@ import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.common.rabbitmq.ElasticsearchRoutingKey;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.model.elasticsearch.EsBoard;
+import com.jakduk.api.model.elasticsearch.EsArticle;
 import com.jakduk.api.model.embedded.CommonWriter;
 import org.junit.After;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class RabbitMQPublisherTest extends ApiApplicationTests {
     @Test
     public void publishElasticsearchTest() throws InterruptedException {
 
-        EsBoard esBoard = EsBoard.builder()
+        EsArticle esArticle = EsArticle.builder()
                 .id("595bb024290ad3035636f2ba")
                 .seq(262)
                 .writer(CommonWriter.builder().userId("userId").username("testUser").build())
@@ -36,9 +36,9 @@ public class RabbitMQPublisherTest extends ApiApplicationTests {
 //                .galleries(Collections.EMPTY_LIST)
                 .build();
 
-        String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
+        String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE.getRoutingKey());
 
-        sut.publishElasticsearch(routingKey, esBoard);
+        sut.publishElasticsearch(routingKey, esArticle);
     }
 
     @After
@@ -46,7 +46,7 @@ public class RabbitMQPublisherTest extends ApiApplicationTests {
 
         String id = "595bb024290ad3035636f2ba";
 
-        String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
+        String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE.getRoutingKey());
 
         sut.publishElasticsearch(routingKey, id);
 

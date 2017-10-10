@@ -15,22 +15,22 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class BoardSource {
+public class ArticleSource {
 
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;
 
-    @ApiModelProperty(example = "FREE", value = "게시판 ID")
-    private String board;
-
-    @ApiModelProperty(value = "글쓴이")
-    private CommonWriter writer;
-
     @ApiModelProperty(example = "2", value = "글번호")
     private Integer seq;
 
+    @ApiModelProperty(example = "FREE", value = "게시판 ID")
+    private String board;
+
     @ApiModelProperty(example = "CLASSIC", value = "말머리")
     private String category;
+
+    @ApiModelProperty(value = "글쓴이")
+    private CommonWriter writer;
 
     @ApiModelProperty(value = "그림 목록")
     private List<BoardGallerySimple> galleries;

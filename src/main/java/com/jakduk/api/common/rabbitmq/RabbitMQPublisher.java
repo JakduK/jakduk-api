@@ -3,7 +3,7 @@ package com.jakduk.api.common.rabbitmq;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.model.elasticsearch.EsBoard;
+import com.jakduk.api.model.elasticsearch.EsArticle;
 import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.elasticsearch.EsGallery;
 import com.jakduk.api.model.elasticsearch.EsSearchWord;
@@ -82,26 +82,26 @@ public class RabbitMQPublisher {
         this.publishEmail(routingKey, emailPayload);
     }
 
-    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String board,
-                                   String category, List<String> galleryIds) {
+    public void indexDocumentArticle(String id, Integer seq, String board, String category, CommonWriter writer, String subject,
+                                     String content, List<String> galleryIds) {
 
-        EsBoard esBoard = EsBoard.builder()
+        EsArticle esArticle = EsArticle.builder()
                 .id(id)
                 .seq(seq)
+                .board(board)
+                .category(category)
                 .writer(writer)
                 .subject(JakdukUtils.stripHtmlTag(subject))
                 .content(JakdukUtils.stripHtmlTag(content))
-                .board(board)
-                .category(category)
                 .galleries(galleryIds)
                 .build();
 
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
-        this.publishElasticsearch(routingKey, esBoard);
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE.getRoutingKey());
+        this.publishElasticsearch(routingKey, esArticle);
     }
 
-    public void deleteDocumentBoard(String id) {
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
+    public void deleteDocumentArticle(String id) {
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE.getRoutingKey());
         this.publishElasticsearch(routingKey, id);
     }
 
@@ -115,12 +115,12 @@ public class RabbitMQPublisher {
                 .galleries(galleryIds)
                 .build();
 
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_COMMENT.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT.getRoutingKey());
         this.publishElasticsearch(routingKey, esComment);
     }
 
     public void deleteDocumentComment(String id) {
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_COMMENT.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE_COMMENT.getRoutingKey());
         this.publishElasticsearch(routingKey, id);
     }
 

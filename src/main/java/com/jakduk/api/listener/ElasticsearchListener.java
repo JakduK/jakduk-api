@@ -5,7 +5,7 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.elasticsearch.EsBoard;
+import com.jakduk.api.model.elasticsearch.EsArticle;
 import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.elasticsearch.EsGallery;
 import com.jakduk.api.model.elasticsearch.EsSearchWord;
@@ -46,22 +46,22 @@ public class ElasticsearchListener {
         ElasticsearchRoutingKey elasticsearchRoutingKey = ElasticsearchRoutingKey.find(findKey);
 
         switch (elasticsearchRoutingKey) {
-            case ELASTICSEARCH_INDEX_DOCUMENT_BOARD:
-                EsBoard esBoard = ObjectMapperUtils.readValue(message.getBody(), EsBoard.class);
-                searchService.indexDocumentBoard(esBoard);
+            case ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE:
+                EsArticle esArticle = ObjectMapperUtils.readValue(message.getBody(), EsArticle.class);
+                searchService.indexDocumentArticle(esArticle);
                 break;
 
-                case ELASTICSEARCH_DELETE_DOCUMENT_BOARD:
+                case ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE:
                 String boardId = ObjectMapperUtils.readValue(message.getBody(), String.class);
                     searchService.deleteDocumentBoard(boardId);
                 break;
 
-            case ELASTICSEARCH_INDEX_DOCUMENT_COMMENT:
+            case ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT:
                 EsComment esComment = ObjectMapperUtils.readValue(message.getBody(), EsComment.class);
                 searchService.indexDocumentBoardComment(esComment);
                 break;
 
-            case ELASTICSEARCH_DELETE_DOCUMENT_COMMENT:
+            case ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE_COMMENT:
                 String commentId = ObjectMapperUtils.readValue(message.getBody(), String.class);
                 searchService.deleteDocumentBoardComment(commentId);
                 break;

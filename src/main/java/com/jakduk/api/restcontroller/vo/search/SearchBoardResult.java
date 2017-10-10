@@ -23,6 +23,6 @@ public class SearchBoardResult {
 	private Long totalCount;
 
 	@ApiModelProperty(value = "매칭되는 게시물 목록")
-	private List<BoardSource> posts;
+	private List<ArticleSource> articles;
 
 }

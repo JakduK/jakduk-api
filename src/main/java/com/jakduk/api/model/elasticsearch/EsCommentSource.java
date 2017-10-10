@@ -21,7 +21,7 @@ public class EsCommentSource {
 
 	private String id;
 
-	private EsParentBoard parentBoard;
+	private EsParentArticle parentArticle;
 
 	private CommonWriter writer;
 
