@@ -449,7 +449,7 @@ include::{snippets}/getArticleComments/http-response.adoc[]
 [[board-get-article-detail-comments]]
 === 글의 댓글 목록
 
-글의의 최신 댓글 목록을 가져온다.
+글의 최신 댓글 목록을 가져온다.
 인증은 옵션.
 
 include::{snippets}/getArticleDetailComments/path-parameters.adoc[]
@@ -552,7 +552,7 @@ include::{snippets}/setArticleCommentFeeling/http-response.adoc[]
 === 통합 찾기
 
 게시물, 댓글, 그림에서 검색어에 해당하는 아이템을 찾는다.
-인증은 옵션이며, 검색어는 최근 검색어에 활용된다.
+인증은 옵션이며, 검색어는 <<search-popular-words, 인기 검색어 목록>>에 활용된다.
 
 .request headers
 include::{snippets}/search-unified/request-headers.adoc[]
@@ -567,3 +567,20 @@ include::{snippets}/search-unified/curl-request.adoc[]
 include::{snippets}/search-unified/response-fields.adoc[]
 .http response
 include::{snippets}/search-unified/http-response.adoc[]
+
+[[search-popular-words]]
+=== 인기 검색어 목록
+
+3주전~오늘 까지의 기간중, 많이 검색된 검색어 목록을 가져온다.
+
+.request parameters
+include::{snippets}/search-popular-words/request-parameters.adoc[]
+.http request
+include::{snippets}/search-popular-words/http-request.adoc[]
+.curl request
+include::{snippets}/search-popular-words/curl-request.adoc[]
+
+.response fields
+include::{snippets}/search-popular-words/response-fields.adoc[]
+.http response
+include::{snippets}/search-popular-words/http-response.adoc[]

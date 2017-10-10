@@ -9,6 +9,7 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.model.elasticsearch.EsCommentSource;
 import com.jakduk.api.model.elasticsearch.EsGallerySource;
 import com.jakduk.api.model.elasticsearch.EsParentArticle;
+import com.jakduk.api.model.elasticsearch.EsTermsBucket;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.SearchRestController;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
@@ -28,13 +29,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -43,7 +43,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -219,7 +218,44 @@ public class SearchMvcTests {
                                         fieldWithPath("galleryResult.galleries.[].highlight").type(JsonFieldType.OBJECT).description("매칭 단어 하이라이트")
                                 )
                         ));
+    }
 
+    @Test
+    @WithMockUser
+    public void searchPopularWordsTest() throws Exception {
+
+        PopularSearchWordResult expectResponse = PopularSearchWordResult.builder()
+                .took(18L)
+                .popularSearchWords(
+                        Arrays.asList(
+                                new EsTermsBucket("제목입니다", 33L),
+                                new EsTermsBucket("test", 10L),
+                                new EsTermsBucket("축구", 21L)
+                        ))
+                .build();
+
+        when(searchService.aggregateSearchWord(any(LocalDate.class), anyInt()))
+                .thenReturn(expectResponse);
+
+        mvc.perform(
+                get("/api/search/popular-words")
+                        .param("size", "5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("search-popular-words",
+                                requestParameters(
+                                        parameterWithName("size").description("(default 5) 반환 개수")
+                                ),
+                                responseFields(
+                                        fieldWithPath("took").type(JsonFieldType.NUMBER).description("찾는데 걸린 시간(ms)"),
+                                        fieldWithPath("popularSearchWords").type(JsonFieldType.ARRAY).description("인기 검색어 목록"),
+                                        fieldWithPath("popularSearchWords.[].key").type(JsonFieldType.STRING).description("검색어"),
+                                        fieldWithPath("popularSearchWords.[].count").type(JsonFieldType.NUMBER).description("검색수")
+                                )
+                        ));
     }
 
 }

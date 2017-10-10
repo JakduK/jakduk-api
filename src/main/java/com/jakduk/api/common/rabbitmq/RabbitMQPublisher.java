@@ -9,6 +9,7 @@ import com.jakduk.api.model.elasticsearch.EsGallery;
 import com.jakduk.api.model.elasticsearch.EsSearchWord;
 import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
+import com.jakduk.api.model.embedded.SimpleWriter;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -143,7 +144,7 @@ public class RabbitMQPublisher {
     public void indexDocumentSearchWord(String word, CommonWriter writer) {
         EsSearchWord esSearchWord = EsSearchWord.builder()
                 .word(word)
-                .writer(writer)
+                .writer(new SimpleWriter(writer))
                 .registerDate(LocalDateTime.now())
                 .build();
 
