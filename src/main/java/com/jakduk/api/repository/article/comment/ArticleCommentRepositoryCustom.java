@@ -1,5 +1,6 @@
 package com.jakduk.api.repository.article.comment;
 
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.aggregate.CommonCount;
 import org.bson.types.ObjectId;
@@ -34,6 +35,6 @@ public interface ArticleCommentRepositoryCustom {
      *
      * @param boardId 기준이 되는 boardItem의 boardId
      */
-    List<CommonCount> findCommentsCountGreaterThanBoardIdAndBoard(ObjectId boardId, String board);
+    List<CommonCount> findCommentsCountGreaterThanBoardIdAndBoard(ObjectId boardId, Constants.BOARD_TYPE board);
 
 }

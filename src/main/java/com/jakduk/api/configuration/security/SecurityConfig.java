@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity
+@EnableGlobalMethodSecurity // TODO 훗날 제거
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource private JakdukProperties jakdukProperties;
@@ -67,29 +67,53 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //Configures url based authorization
                 .and().authorizeRequests()
-                    .regexMatchers(
-                            HttpMethod.POST,
-                            "/api/board/[a-z]+",                      // 글 쓰기
-                            "/api/board/[a-z]+/\\d+/comment",                       // 댓글 달기
-                            "/api/board/[a-z]+/\\d+/like|dislike",                  // 글 감정 표현
-                            "/api/board/[a-z]+/comment/[\\da-z]+/like|dislike"      // 댓글 감정 표현
-                            ).hasAnyAuthority(
-                            JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
+                .regexMatchers(
+                        HttpMethod.POST,
+                        "/api/board/[a-z]+", // 글 쓰기
+                        "/api/board/[a-z]+/\\d+/comment", // 댓글 달기
+                        "/api/board/[a-z]+/\\d+/like|dislike", // 글 감정 표현
+                        "/api/board/[a-z]+/comment/[\\da-z]+/like|dislike" // 댓글 감정 표현
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 
-                    .antMatchers(
-                            HttpMethod.POST,
-                            "/api/auth/user",                            // 이메일 기반 회원 가입
-                            "/api/auth/user/*"                      // SNS 기반 회원 가입 및 SNS 임시 프로필 조회
-                    ).anonymous()
-                    .antMatchers(
-                            HttpMethod.GET,
-                            "/api/auth/login",                  // 로그인
-                            "/api/auth/login/*",                    // SNS 로그인
-                            "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
-                            "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
-                    ).anonymous()
+                .regexMatchers(
+                        HttpMethod.PUT,
+                        "/api/board/[a-z]+/comment/[\\da-z]+" // 댓글 고치기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 
-                    .anyRequest().permitAll();
+                .regexMatchers(
+                        HttpMethod.DELETE,
+                        "/api/board/[a-z]+/comment/[\\da-z]+" // 댓글 지우기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
+
+                .regexMatchers(
+                        HttpMethod.POST,
+                        "/api/board/[a-z]+/\\d+/notice" // 글의 공지 만들기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_ADMIN.name())
+
+                .regexMatchers(
+                        HttpMethod.DELETE,
+                        "/api/board/[a-z]+/\\d+/notice" // 글의 공지 없애기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_ADMIN.name())
+
+                .antMatchers(
+                        HttpMethod.POST,
+                        "/api/auth/user",                            // 이메일 기반 회원 가입
+                        "/api/auth/user/*"                      // SNS 기반 회원 가입 및 SNS 임시 프로필 조회
+                ).anonymous()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/api/auth/login",                  // 로그인
+                        "/api/auth/login/*",                    // SNS 로그인
+                        "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
+                        "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
+                ).anonymous()
+
+                .anyRequest().permitAll();
 
     }
 

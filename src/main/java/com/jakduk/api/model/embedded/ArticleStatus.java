@@ -12,15 +12,12 @@ import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Getter
 @Setter
 public class ArticleStatus {
-	
+
 	private Boolean notice;
-	
 	private Boolean delete;
-	
 	private Constants.DEVICE_TYPE device;
 
 }

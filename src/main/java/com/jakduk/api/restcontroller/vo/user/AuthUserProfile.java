@@ -16,9 +16,9 @@ import java.util.List;
  *         16. 7. 14 오전 12:21
  */
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 public class AuthUserProfile {
 

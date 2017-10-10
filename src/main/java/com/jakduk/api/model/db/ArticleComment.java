@@ -24,23 +24,14 @@ public class ArticleComment implements UsersFeeling {
 
 	@Id
 	private String id;
-	
 	private ArticleItem article;
-
 	private ArticleCommentStatus status;
-
 	private CommonWriter writer;
-
 	private String content;
-
 	private List<CommonFeelingUser> usersLiking;
-
 	private List<CommonFeelingUser> usersDisliking;
-
 	private Boolean linkedGallery;
-
 	private List<BoardLog> logs;
-
     private List<String> batch;
 
 }

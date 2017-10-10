@@ -64,7 +64,6 @@ public class UserRestController {
     @Autowired private RabbitMQPublisher rabbitMQPublisher;
     @Autowired private UserDetailsService userDetailsService;
 
-
     @ApiOperation("이메일 기반 회원 가입")
     @SecuredAnonymousUser
     @PostMapping("")

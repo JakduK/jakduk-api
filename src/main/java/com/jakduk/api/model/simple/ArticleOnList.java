@@ -20,24 +20,14 @@ public class ArticleOnList {
 	
 	@Id
 	private String id;
-
 	private CommonWriter writer;
-	
 	private String subject;
-	
 	private Integer seq;
-
-	// 게시판
 	private String board;
-	
 	private String category;
-	
 	private Integer views;
-	
 	private ArticleStatus status;
-
 	private String shortContent;
-
 	private Boolean linkedGallery;
 
 }

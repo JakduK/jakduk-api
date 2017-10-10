@@ -2,7 +2,7 @@ package com.jakduk.api.restcontroller.vo.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
+import lombok.*;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -10,7 +10,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  *         16. 7. 9 오후 11:48
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
+@ToString
 @ApiModel(description = "SNS 기반 로그인 폼")
 public class LoginSocialUserForm {
 

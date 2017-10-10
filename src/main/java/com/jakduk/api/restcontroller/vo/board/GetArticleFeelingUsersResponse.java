@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FreePostFeelingsResponse {
+public class GetArticleFeelingUsersResponse {
 
     @ApiModelProperty(example = "2", value = "글번호")
     private Integer seq;

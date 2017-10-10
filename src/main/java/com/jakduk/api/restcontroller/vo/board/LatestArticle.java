@@ -3,8 +3,7 @@ package com.jakduk.api.restcontroller.vo.board;
 import com.jakduk.api.model.embedded.CommonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,6 +12,9 @@ import java.util.List;
  */
 
 @ApiModel(description = "글쓴이의 최근글")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class LatestArticle {

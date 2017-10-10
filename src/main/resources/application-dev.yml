@@ -1,8 +1,9 @@
 logging:
   file: /jakduk/api/logs/api.log
   level:
-    root: INFO
+    root: DEBUG
     org.mongodb.driver.cluster: INFO
+    org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
 
 server:
   session:
@@ -28,7 +29,7 @@ spring:
           max-attempts: 3
 
 jakduk:
-  api-server-url: https://dev-web.jakduk.com/api
+  api-server-url: https://dev-api.jakduk.com
   web-server-url: https://dev-web.jakduk.com
   remember-me-expiration: 14400 # 4 hours
 
