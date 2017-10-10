@@ -24,9 +24,7 @@ public class EsArticleSource {
 	private String board;
 	private String category;
 	private CommonWriter writer;
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String subject;
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String content;
 	private List<String> galleries;
 	private Float score;

@@ -3,8 +3,7 @@ package com.jakduk.api.restcontroller.vo.search;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +12,9 @@ import java.util.Map;
  * Created by pyohwanjang on 2017. 4. 8..
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class ArticleSource {

@@ -67,20 +67,20 @@ public class SearchService {
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
 		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.ARTICLE.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getArticleSearchRequestBuilder(query, from, size, preTags, postTags);
-			multiSearchRequestBuilder.add(postSearchRequestBuilder);
+			SearchRequestBuilder searchRequestBuilder = getArticleSearchRequestBuilder(query, from, size, preTags, postTags);
+			multiSearchRequestBuilder.add(searchRequestBuilder);
 			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.ARTICLE);
 		}
 
 		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.COMMENT.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
-			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
+			SearchRequestBuilder searchRequestBuilder = getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
+			multiSearchRequestBuilder.add(searchRequestBuilder);
 			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.COMMENT);
 		}
 
 		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.GALLERY.name())) {
-			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size);
-			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
+			SearchRequestBuilder searchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size, preTags, postTags);
+			multiSearchRequestBuilder.add(searchRequestBuilder);
 			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.GALLERY);
 		}
 
@@ -96,8 +96,8 @@ public class SearchService {
 			if (! ObjectUtils.isEmpty(order)) {
 				switch (order) {
 					case ARTICLE:
-						SearchBoardResult searchBoardResult = getArticleSearchResponse(searchResponse);
-						searchUnifiedResponse.setPostResult(searchBoardResult);
+						SearchArticleResult searchArticleResult = getArticleSearchResponse(searchResponse);
+						searchUnifiedResponse.setArticleResult(searchArticleResult);
 						break;
 					case COMMENT:
 						SearchCommentResult searchCommentResult = getCommentSearchResponse(searchResponse);
@@ -286,7 +286,7 @@ public class SearchService {
 		return searchRequestBuilder;
 	}
 
-	private SearchBoardResult getArticleSearchResponse(SearchResponse searchResponse) {
+	private SearchArticleResult getArticleSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
 		List<ArticleSource> searchList = Arrays.stream(searchHits.getHits())
@@ -321,7 +321,7 @@ public class SearchService {
 				})
 				.collect(Collectors.toList());
 
-		return SearchBoardResult.builder()
+		return SearchArticleResult.builder()
 				.took(searchResponse.getTook().getMillis())
 				.totalCount(searchHits.getTotalHits())
 				.articles(searchList)
@@ -375,7 +375,7 @@ public class SearchService {
 						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
 						EsParentArticle esParentArticle = ObjectMapperUtils.convertValue(innerSourceMap, EsParentArticle.class);
 
-						esCommentSource.setParentArticle(esParentArticle);
+						esCommentSource.setArticle(esParentArticle);
 					}
 
 					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
@@ -392,7 +392,9 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
+	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+																String postTags) {
+
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexGallery())
 				.setTypes(Constants.ES_TYPE_GALLERY)
@@ -400,11 +402,15 @@ public class SearchService {
 				.setQuery(QueryBuilders.matchQuery("name", query))
 				.setHighlighterNoMatchSize(Constants.SEARCH_NO_MATCH_SIZE)
 				.setHighlighterFragmentSize(Constants.SEARCH_FRAGMENT_SIZE)
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
 				.addHighlightedField("name", Constants.SEARCH_FRAGMENT_SIZE, 0)
 				.setFrom(from)
 				.setSize(size);
+
+		if (StringUtils.isNotBlank(preTags))
+			searchRequestBuilder.setHighlighterPreTags(preTags);
+
+		if (StringUtils.isNotBlank(postTags))
+			searchRequestBuilder.setHighlighterPostTags(postTags);
 
 		log.debug("getGallerySearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 

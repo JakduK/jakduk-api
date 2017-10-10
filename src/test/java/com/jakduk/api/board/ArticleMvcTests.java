@@ -79,7 +79,7 @@ public class ArticleMvcTests {
     private Map<String, String> categoriesMap;
     private WriteArticle writeArticleform;
     private List<Gallery> galleries;
-    private List<BoardGallerySimple> simpleGalleires;
+    private List<BoardGallerySimple> simpleGalleries;
 
     @Before
     public void setUp(){
@@ -139,7 +139,7 @@ public class ArticleMvcTests {
                         .build()
         );
 
-        simpleGalleires = Arrays.asList(
+        simpleGalleries = Arrays.asList(
                 new BoardGallerySimple("58b9050b807d714eaf50a111", "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111"));
 
     }
@@ -150,7 +150,7 @@ public class ArticleMvcTests {
 
         GetArticle getArticle = new GetArticle();
         BeanUtils.copyProperties(article, getArticle);
-        getArticle.setGalleries(simpleGalleires);
+        getArticle.setGalleries(simpleGalleries);
         getArticle.setCommentCount(5);
         getArticle.setLikingCount(article.getUsersLiking().size());
         getArticle.setDislikingCount(article.getUsersDisliking().size());
@@ -164,7 +164,7 @@ public class ArticleMvcTests {
                 .category(boardCategory.getCode())
                 .views(15)
                 .status(new ArticleStatus(true, false, Constants.DEVICE_TYPE.NORMAL))
-                .galleries(simpleGalleires)
+                .galleries(simpleGalleries)
                 .shortContent("본문입니다. (100자)")
                 .commentCount(8)
                 .likingCount(10)
@@ -352,7 +352,7 @@ public class ArticleMvcTests {
                 .seq(216)
                 .writer(commonWriter)
                 .subject("작성자의 최근 글 제목")
-                .galleries(simpleGalleires)
+                .galleries(simpleGalleries)
                 .build();
 
         GetArticleDetailResponse expectResponse = GetArticleDetailResponse.builder()

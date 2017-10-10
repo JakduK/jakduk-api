@@ -14,7 +14,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class SearchBoardResult {
+public class SearchArticleResult {
 
 	@ApiModelProperty(example = "330", value = "찾기에 걸린 시간(ms)")
 	private Long took;

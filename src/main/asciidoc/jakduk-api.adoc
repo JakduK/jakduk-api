@@ -543,3 +543,27 @@ include::{snippets}/setArticleCommentFeeling/curl-request.adoc[]
 include::{snippets}/setArticleCommentFeeling/response-fields.adoc[]
 .http response
 include::{snippets}/setArticleCommentFeeling/http-response.adoc[]
+
+[[search]]
+== 찾기 API
+찾기와 관련된 API.
+
+[[search-unified]]
+=== 통합 찾기
+
+게시물, 댓글, 그림에서 검색어에 해당하는 아이템을 찾는다.
+인증은 옵션이며, 검색어는 최근 검색어에 활용된다.
+
+.request headers
+include::{snippets}/search-unified/request-headers.adoc[]
+.request parameters
+include::{snippets}/search-unified/request-parameters.adoc[]
+.http request
+include::{snippets}/search-unified/http-request.adoc[]
+.curl request
+include::{snippets}/search-unified/curl-request.adoc[]
+
+.response fields
+include::{snippets}/search-unified/response-fields.adoc[]
+.http response
+include::{snippets}/search-unified/http-response.adoc[]
