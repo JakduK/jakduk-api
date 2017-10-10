@@ -16,8 +16,6 @@ import lombok.*;
 public class EsGallery {
 
     private String id;
-	
 	private String name;
-	
 	private CommonWriter writer;
 }
