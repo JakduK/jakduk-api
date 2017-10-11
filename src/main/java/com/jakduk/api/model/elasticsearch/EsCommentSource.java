@@ -2,9 +2,7 @@ package com.jakduk.api.model.elasticsearch;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
@@ -15,20 +13,16 @@ import java.util.Map;
  */
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class EsCommentSource {
 
 	private String id;
-
-	private EsParentBoard parentBoard;
-
+	private EsParentArticle article;
 	private CommonWriter writer;
-
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String content;
-
 	private Float score;
-
 	private Map<String, List<String>> highlight;
 }

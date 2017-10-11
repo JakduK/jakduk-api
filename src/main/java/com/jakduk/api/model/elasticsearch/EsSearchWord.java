@@ -1,6 +1,7 @@
 package com.jakduk.api.model.elasticsearch;
 
 import com.jakduk.api.model.embedded.CommonWriter;
+import com.jakduk.api.model.embedded.SimpleWriter;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,11 +19,8 @@ import java.time.LocalDateTime;
 public class EsSearchWord {
 
 	private String id;
-
 	private String word;
-
-	private CommonWriter writer;
-
+	private SimpleWriter writer;
 	private LocalDateTime registerDate;
 
 }
