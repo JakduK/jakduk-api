@@ -76,31 +76,24 @@ public class ArticleService {
      * @param subject 글 제목
      * @param content 글 내용
      * @param categoryCode 글 말머리 Code
-     * @param galleries 글과 연동된 사진들
+     * @param linkedGallery 사진 연동 여부
      * @param device 디바이스
      */
 	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content, String categoryCode,
-								 List<Gallery> galleries, Constants.DEVICE_TYPE device) {
+								 Boolean linkedGallery, Constants.DEVICE_TYPE device) {
 
 		if (BoardCategoryGenerator.notExistCategory(board, categoryCode))
 			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);
 
 		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(JakdukUtils.stripHtmlTag(content), StringUtils.EMPTY);
-		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.BOARD_SHORT_CONTENT_LENGTH);
+		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.ARTICLE_SHORT_CONTENT_LENGTH);
 
 		// 글 상태
 		ArticleStatus articleStatus = new ArticleStatus();
 		articleStatus.setDevice(device);
 
-		ObjectId logId = new ObjectId();
-		// lastUpdated
-		LocalDateTime lastUpdated = LocalDateTime.ofInstant(logId.getDate().toInstant(), ZoneId.systemDefault());
-
-		// 연관된 사진 id 배열 (검증 후)
-		List<String> galleryIds = galleries.stream()
-				.map(Gallery::getId)
-				.collect(Collectors.toList());
+		ObjectId objectId = new ObjectId();
 
 		Article article = Article.builder()
 				.writer(writer)
@@ -112,16 +105,12 @@ public class ArticleService {
 				.views(0)
 				.seq(commonService.getNextSequence(Constants.SEQ_BOARD))
 				.status(articleStatus)
-				.logs(this.initBoardLogs(logId, Constants.ARTICLE_LOG_TYPE.CREATE.name(), writer))
-				.lastUpdated(lastUpdated)
-				.linkedGallery(! galleries.isEmpty())
+				.logs(this.initBoardLogs(objectId, Constants.ARTICLE_LOG_TYPE.CREATE.name(), writer))
+				.lastUpdated(LocalDateTime.ofInstant(objectId.getDate().toInstant(), ZoneId.systemDefault()))
+				.linkedGallery(linkedGallery)
 				.build();
 
 		articleRepository.save(article);
-
-	 	// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
-				article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
 		log.info("new post created. post seq={}, subject={}", article.getSeq(), article.getSubject());
 
@@ -136,11 +125,11 @@ public class ArticleService {
 	 * @param subject 글 제목
 	 * @param content 글 내용
 	 * @param categoryCode 글 말머리 Code
-	 * @param galleryIds 글과 연동된 사진들
+	 * @param linkedGallery 사진 연동 여부
 	 * @param device 디바이스
 	 */
 	public Article updateArticle(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String subject, String content, String categoryCode,
-								 List<String> galleryIds, Constants.DEVICE_TYPE device) {
+								 Boolean linkedGallery, Constants.DEVICE_TYPE device) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
@@ -153,13 +142,13 @@ public class ArticleService {
 
 		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(JakdukUtils.stripHtmlTag(content), StringUtils.EMPTY);
-		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.BOARD_SHORT_CONTENT_LENGTH);
+		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.ARTICLE_SHORT_CONTENT_LENGTH);
 
 		article.setSubject(subject);
 		article.setContent(content);
 		article.setCategory(Constants.BOARD_TYPE.FREE.equals(board) ? null : categoryCode);
 		article.setShortContent(shortContent);
-		article.setLinkedGallery(! galleryIds.isEmpty());
+		article.setLinkedGallery(linkedGallery);
 
 		// 글 상태
 		ArticleStatus articleStatus = article.getStatus();
@@ -186,10 +175,6 @@ public class ArticleService {
 		articleRepository.save(article);
 
 		log.info("post was edited. post seq={}, subject={}", article.getSeq(), article.getSubject());
-
-		// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
-				article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
 		return article;
 	}

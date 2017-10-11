@@ -1,4 +1,4 @@
-package com.jakduk.api.auth;
+package com.jakduk.api;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 
