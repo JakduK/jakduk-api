@@ -4,7 +4,6 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Article;
@@ -17,7 +16,10 @@ import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.repository.article.ArticleRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.GalleryOnBoard;
-import com.jakduk.api.restcontroller.vo.gallery.*;
+import com.jakduk.api.restcontroller.vo.gallery.GalleryDetail;
+import com.jakduk.api.restcontroller.vo.gallery.GalleryOnList;
+import com.jakduk.api.restcontroller.vo.gallery.GalleryResponse;
+import com.jakduk.api.restcontroller.vo.gallery.SurroundingsGallery;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -63,7 +65,6 @@ public class GalleryService {
 	@Autowired private UrlGenerationUtils urlGenerationUtils;
 	@Autowired private GalleryRepository galleryRepository;
 	@Autowired private ArticleRepository articleRepository;
-	@Autowired private JakdukDAO jakdukDAO;
 	@Autowired private CommonGalleryService commonGalleryService;
 	@Autowired private RabbitMQPublisher rabbitMQPublisher;
 
@@ -222,10 +223,7 @@ public class GalleryService {
 		Gallery gallery = Gallery.builder()
 				.contentType(contentType)
 				.writer(writer)
-				.status(
-						GalleryStatus.builder()
-								.status(Constants.GALLERY_STATUS_TYPE.TEMP)
-								.build())
+				.status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
 				.fileName(fileName)
 				.size(size)
 				.fileSize(size)
@@ -378,8 +376,8 @@ public class GalleryService {
 	 * @param fromType 아이템 타입
 	 * @param itemId 아이템 ID
 	 */
-	public void processLinkedGalleries(List<Gallery> galleries, List<GalleryOnBoard> galleriesForInsertion, List<String> galleryIdsForRemoval,
-                                       Constants.GALLERY_FROM_TYPE fromType, String itemId) {
+	public void processLinkedGalleries(String userId, List<Gallery> galleries, List<GalleryOnBoard> galleriesForInsertion,
+									   List<String> galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE fromType, String itemId) {
 
 		LinkedItem linkedItem = LinkedItem.builder()
 				.id(itemId)
@@ -399,14 +397,15 @@ public class GalleryService {
 				gallery.setLinkedItems(willBeLinkedItems);
 			}
 
-			// 사용자가 입력한 이름이 있다면 그걸 입력
-			galleriesForInsertion.stream()
-					.filter(galleryOnBoard -> galleryOnBoard.getId().equals(gallery.getId()))
-					.findFirst()
-					.ifPresent(galleryOnBoard -> {
-						if (StringUtils.isNoneBlank(gallery.getName()))
+			// 사용자가 입력한 이름이 있다면 그걸 입력. 그림 글쓴이만 이름을 고칠 수 있다.
+			if (userId.equals(gallery.getWriter().getUserId())) {
+				galleriesForInsertion.stream()
+						.filter(galleryOnBoard -> galleryOnBoard.getId().equals(gallery.getId()))
+						.findFirst()
+						.ifPresent(galleryOnBoard -> {
 							gallery.setName(galleryOnBoard.getName());
-					});
+						});
+			}
 
 			GalleryStatus status = gallery.getStatus();
 
@@ -420,10 +419,8 @@ public class GalleryService {
 			// 엘라스틱서치 색인 요청
 			rabbitMQPublisher.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
 
-			if (! CollectionUtils.isEmpty(galleryIdsForRemoval)) {
-				if (galleryIdsForRemoval.contains(gallery.getId()))
-					galleryIdsForRemoval.remove(gallery.getId());
-			}
+			if (! CollectionUtils.isEmpty(galleryIdsForRemoval) && galleryIdsForRemoval.contains(gallery.getId()))
+				galleryIdsForRemoval.remove(gallery.getId());
 		});
 
 		// Galleries 와 해당 Item을 연결 해제한다. Gallery 가 지워질 수도 있음.
