@@ -38,17 +38,7 @@ public class Constants {
 	public final static Integer COMMENT_MAX_LIMIT = 30;
 	public final static Integer GALLERY_SIZE = 24;
 	public final static Integer BOARD_TOP_LIMIT = 3;
-	public final static Integer BOARD_SHORT_CONTENT_LENGTH = 100;
-
-	/**
-	 * 글의 좋아요 싫어요에 대한 에러 코드
-	 */
-	public final static String BOARD_USERS_FEELINGS_STATUS_NONE = "none";
-	public final static String BOARD_USERS_FEELINGS_STATUS_ALREADY = "already";
-	public final static String BOARD_USERS_FEELINGS_STATUS_LIKE = "like";
-	public final static String BOARD_USERS_FEELINGS_STATUS_DISLIKE = "dislike";
-	public final static String BOARD_USERS_FEELINGS_STATUS_WRITER = "writer";
-	public final static String BOARD_USERS_FEELINGS_STATUS_ANONYMOUS = "anonymous";
+	public final static Integer ARTICLE_SHORT_CONTENT_LENGTH = 100;
 
 	/**
 	 * Social 프로바이더 종류.
@@ -63,12 +53,6 @@ public class Constants {
 	public enum FEELING_TYPE {
 		LIKE,
 		DISLIKE
-	}
-
-	// 게시물 감정 표현. 좋아요, 싫어요
-	public enum FEELING_TYPE_LOWERCASE {
-		like,
-		dislike
 	}
 
 	/**
@@ -124,7 +108,7 @@ public class Constants {
 	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
 	public final static String K_LEAGUE_CHALLENGE_ABBREVIATION = "KLCH";
 
-	public final static String ES_TYPE_BOARD = "board";
+	public final static String ES_TYPE_ARTICLE = "article";
 	public final static String ES_TYPE_COMMENT = "comment";
 	public final static String ES_TYPE_GALLERY = "gallery";
 	public final static String ES_TYPE_SEARCH_WORD = "search_word";
@@ -176,10 +160,10 @@ public class Constants {
 		THUMBNAIL	// 썸네일
 	}
 
-	public enum SEARCH_TYPE {
-		PO,	// 게시물
-		CO,	// 댓글
-		GA	// 사진첩
+	public enum SEARCH_INCLUDE_TYPE {
+		ARTICLE,	// 게시물
+		COMMENT,	// 댓글
+		GALLERY    // 사진첩
 	}
 
 	public enum IMAGE_SIZE_TYPE {
@@ -236,9 +220,9 @@ public class Constants {
 	public final static String PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE = "ProviderSignInAttempt";
 
 	/**
-	 * 글 히스토리 상태
+	 * 글 로그 상태
 	 */
-	public enum ARTICLE_HISTORY_TYPE {
+	public enum ARTICLE_LOG_TYPE {
 		CREATE,
 		EDIT,
 		DELETE,
@@ -247,9 +231,9 @@ public class Constants {
 	}
 
 	/**
-	 * 댓글 히스토리 상태
+	 * 댓글 로그 상태
 	 */
-	public enum ARTICLE_COMMENT_HISTORY_TYPE {
+	public enum ARTICLE_COMMENT_LOG_TYPE {
 		CREATE,
 		EDIT
 	}

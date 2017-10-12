@@ -42,7 +42,7 @@ public class ArticleDetail {
     private BoardCategory category;
 
     @ApiModelProperty(example = "10", value = "읽음 수")
-    private int views;
+    private Integer views;
 
     @ApiModelProperty(example = "5", value = "좋아요 수")
     private Integer numberOfLike;

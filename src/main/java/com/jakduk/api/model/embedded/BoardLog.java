@@ -16,12 +16,10 @@ import org.springframework.data.annotation.Id;
 @Setter
 @Getter
 public class BoardLog {
-	
+
 	@Id
 	private String id;
-	
 	private String type;
-
 	private SimpleWriter writer;
 	
 }

@@ -11,8 +11,8 @@ public class RabbitMQRoutingKeyTest {
 
     @Test
     public void rabbitMqRoutingKeyTest() {
-        ElasticsearchRoutingKey elasticsearchRoutingKey = ElasticsearchRoutingKey.find("elasticsearch-index-document-board");
+        ElasticsearchRoutingKey elasticsearchRoutingKey = ElasticsearchRoutingKey.find("elasticsearch-index-document-article");
 
-        Assert.assertTrue(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.name().equals(elasticsearchRoutingKey.name()));
+        Assert.assertTrue(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE.name().equals(elasticsearchRoutingKey.name()));
     }
 }

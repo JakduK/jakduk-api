@@ -19,13 +19,9 @@ import java.util.List;
 public class EsComment {
 	
     private String id;
-	
 	private ArticleItem article;
-	
 	private CommonWriter writer;
-
 	private String content;
-
 	private List<String> galleries;
 
 }

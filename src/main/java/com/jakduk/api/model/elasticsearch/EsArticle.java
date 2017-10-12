@@ -1,15 +1,17 @@
-package com.jakduk.api.model.simple;
+package com.jakduk.api.model.elasticsearch;
 
-import com.jakduk.api.model.embedded.ArticleStatus;
+import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
 * @company  : http://jakduk.com
-* @date     : 2015. 8. 25.
+* @date     : 2015. 8. 3.
 * @desc     :
 */
 
@@ -17,14 +19,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ArticleOnSearch {
+public class EsArticle {
 	
-	private String id;
-
+    private String id;
 	private Integer seq;
-
+	private String board;
+	private String category;
+	private CommonWriter writer;
 	private String subject;
-
-	private ArticleStatus status;
+	private String content;
+	private List<String> galleries;
 
 }

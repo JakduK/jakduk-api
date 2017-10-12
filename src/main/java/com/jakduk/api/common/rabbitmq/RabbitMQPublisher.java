@@ -3,12 +3,13 @@ package com.jakduk.api.common.rabbitmq;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.model.elasticsearch.EsBoard;
+import com.jakduk.api.model.elasticsearch.EsArticle;
 import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.elasticsearch.EsGallery;
 import com.jakduk.api.model.elasticsearch.EsSearchWord;
 import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
+import com.jakduk.api.model.embedded.SimpleWriter;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Created by pyohwanjang on 2017. 6. 17..
@@ -82,26 +84,26 @@ public class RabbitMQPublisher {
         this.publishEmail(routingKey, emailPayload);
     }
 
-    public void indexDocumentBoard(String id, Integer seq, CommonWriter writer, String subject, String content, String board,
-                                   String category, List<String> galleryIds) {
+    public void indexDocumentArticle(String id, Integer seq, String board, String category, CommonWriter writer, String subject,
+                                     String content, List<String> galleryIds) {
 
-        EsBoard esBoard = EsBoard.builder()
+        EsArticle esArticle = EsArticle.builder()
                 .id(id)
                 .seq(seq)
+                .board(board)
+                .category(category)
                 .writer(writer)
                 .subject(JakdukUtils.stripHtmlTag(subject))
                 .content(JakdukUtils.stripHtmlTag(content))
-                .board(board)
-                .category(category)
                 .galleries(galleryIds)
                 .build();
 
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_BOARD.getRoutingKey());
-        this.publishElasticsearch(routingKey, esBoard);
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE.getRoutingKey());
+        this.publishElasticsearch(routingKey, esArticle);
     }
 
-    public void deleteDocumentBoard(String id) {
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_BOARD.getRoutingKey());
+    public void deleteDocumentArticle(String id) {
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE.getRoutingKey());
         this.publishElasticsearch(routingKey, id);
     }
 
@@ -115,12 +117,12 @@ public class RabbitMQPublisher {
                 .galleries(galleryIds)
                 .build();
 
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_COMMENT.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT.getRoutingKey());
         this.publishElasticsearch(routingKey, esComment);
     }
 
     public void deleteDocumentComment(String id) {
-        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_COMMENT.getRoutingKey());
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE_COMMENT.getRoutingKey());
         this.publishElasticsearch(routingKey, id);
     }
 
@@ -143,7 +145,7 @@ public class RabbitMQPublisher {
     public void indexDocumentSearchWord(String word, CommonWriter writer) {
         EsSearchWord esSearchWord = EsSearchWord.builder()
                 .word(word)
-                .writer(writer)
+                .writer(Objects.nonNull(writer) ? new SimpleWriter(writer) : null)
                 .registerDate(LocalDateTime.now())
                 .build();
 

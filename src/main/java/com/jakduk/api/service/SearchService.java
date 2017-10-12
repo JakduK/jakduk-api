@@ -63,47 +63,47 @@ public class SearchService {
 											   String postTags) {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
-		Queue<Constants.SEARCH_TYPE> searchOrder = new LinkedList<>();
+		Queue<Constants.SEARCH_INCLUDE_TYPE> searchOrder = new LinkedList<>();
 		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
 
-		if (StringUtils.contains(include, Constants.SEARCH_TYPE.PO.name())) {
-			SearchRequestBuilder postSearchRequestBuilder = getBoardSearchRequestBuilder(query, from, size, preTags, postTags);
-			multiSearchRequestBuilder.add(postSearchRequestBuilder);
-			searchOrder.offer(Constants.SEARCH_TYPE.PO);
+		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.ARTICLE.name())) {
+			SearchRequestBuilder searchRequestBuilder = getArticleSearchRequestBuilder(query, from, size, preTags, postTags);
+			multiSearchRequestBuilder.add(searchRequestBuilder);
+			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.ARTICLE);
 		}
 
-		if (StringUtils.contains(include, Constants.SEARCH_TYPE.CO.name())) {
-			SearchRequestBuilder commentSearchRequestBuilder = getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
-			multiSearchRequestBuilder.add(commentSearchRequestBuilder);
-			searchOrder.offer(Constants.SEARCH_TYPE.CO);
+		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.COMMENT.name())) {
+			SearchRequestBuilder searchRequestBuilder = getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
+			multiSearchRequestBuilder.add(searchRequestBuilder);
+			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.COMMENT);
 		}
 
-		if (StringUtils.contains(include, Constants.SEARCH_TYPE.GA.name())) {
-			SearchRequestBuilder gallerySearchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size);
-			multiSearchRequestBuilder.add(gallerySearchRequestBuilder);
-			searchOrder.offer(Constants.SEARCH_TYPE.GA);
+		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.GALLERY.name())) {
+			SearchRequestBuilder searchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size, preTags, postTags);
+			multiSearchRequestBuilder.add(searchRequestBuilder);
+			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.GALLERY);
 		}
 
 		MultiSearchResponse multiSearchResponse = multiSearchRequestBuilder.execute().actionGet();
 
 		for (MultiSearchResponse.Item item : multiSearchResponse.getResponses()) {
 			SearchResponse searchResponse = item.getResponse();
-			Constants.SEARCH_TYPE order = searchOrder.poll();
+			Constants.SEARCH_INCLUDE_TYPE order = searchOrder.poll();
 
 			if (item.isFailure())
 				continue;
 
 			if (! ObjectUtils.isEmpty(order)) {
 				switch (order) {
-					case PO:
-						SearchBoardResult searchBoardResult = getBoardSearchResponse(searchResponse);
-						searchUnifiedResponse.setPostResult(searchBoardResult);
+					case ARTICLE:
+						SearchArticleResult searchArticleResult = getArticleSearchResponse(searchResponse);
+						searchUnifiedResponse.setArticleResult(searchArticleResult);
 						break;
-					case CO:
+					case COMMENT:
 						SearchCommentResult searchCommentResult = getCommentSearchResponse(searchResponse);
 						searchUnifiedResponse.setCommentResult(searchCommentResult);
 						break;
-					case GA:
+					case GALLERY:
 						SearchGalleryResult searchGalleryResult = getGallerySearchResponse(searchResponse);
 						searchUnifiedResponse.setGalleryResult(searchGalleryResult);
 						break;
@@ -148,16 +148,16 @@ public class SearchService {
 				.build();
 	}
 
-	public void indexDocumentBoard(EsBoard esBoard) {
+	public void indexDocumentArticle(EsArticle esArticle) {
 
-		String id = esBoard.getId();
+		String id = esArticle.getId();
 
 		try {
 			IndexResponse response = client.prepareIndex()
 					.setIndex(elasticsearchProperties.getIndexBoard())
-					.setType(Constants.ES_TYPE_BOARD)
+					.setType(Constants.ES_TYPE_ARTICLE)
 					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esBoard))
+					.setSource(ObjectMapperUtils.writeValueAsString(esArticle))
 					.get();
 
 		} catch (IOException e) {
@@ -168,7 +168,7 @@ public class SearchService {
 	public void deleteDocumentBoard(String id) {
 		DeleteResponse response = client.prepareDelete()
 				.setIndex(elasticsearchProperties.getIndexBoard())
-				.setType(Constants.ES_TYPE_BOARD)
+				.setType(Constants.ES_TYPE_ARTICLE)
 				.setId(id)
 				.get();
 
@@ -257,12 +257,12 @@ public class SearchService {
 		}
 	}
 
-	private SearchRequestBuilder getBoardSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
-															  String postTags) {
+	private SearchRequestBuilder getArticleSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+																String postTags) {
 
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexBoard())
-				.setTypes(Constants.ES_TYPE_BOARD)
+				.setTypes(Constants.ES_TYPE_ARTICLE)
 				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
@@ -281,31 +281,31 @@ public class SearchService {
 		if (StringUtils.isNotBlank(postTags))
 			searchRequestBuilder.setHighlighterPostTags(postTags);
 
-		log.debug("getBoardSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
+		log.debug("getArticleSearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 
 		return searchRequestBuilder;
 	}
 
-	private SearchBoardResult getBoardSearchResponse(SearchResponse searchResponse) {
+	private SearchArticleResult getArticleSearchResponse(SearchResponse searchResponse) {
 		SearchHits searchHits = searchResponse.getHits();
 
-		List<BoardSource> searchList = Arrays.stream(searchHits.getHits())
+		List<ArticleSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
 					Map<String, Object> sourceMap = searchHit.getSource();
-					EsBoardSource esBoardSource = ObjectMapperUtils.convertValue(sourceMap, EsBoardSource.class);
-					esBoardSource.setScore(searchHit.getScore());
+					EsArticleSource esArticleSource = ObjectMapperUtils.convertValue(sourceMap, EsArticleSource.class);
+					esArticleSource.setScore(searchHit.getScore());
 
 					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
-					esBoardSource.setHighlight(highlight);
+					esArticleSource.setHighlight(highlight);
 
-					return esBoardSource;
+					return esArticleSource;
 				})
-				.map(esBoardSource -> {
-					BoardSource boardSource = new BoardSource();
-					BeanUtils.copyProperties(esBoardSource, boardSource);
+				.map(esArticleSource -> {
+					ArticleSource articleSource = new ArticleSource();
+					BeanUtils.copyProperties(esArticleSource, articleSource);
 
-					if (! ObjectUtils.isEmpty(esBoardSource.getGalleries())) {
-						List<BoardGallerySimple> boardGalleries = esBoardSource.getGalleries().stream()
+					if (! ObjectUtils.isEmpty(esArticleSource.getGalleries())) {
+						List<BoardGallerySimple> boardGalleries = esArticleSource.getGalleries().stream()
 								.sorted(Comparator.comparing(String::toString))
 								.limit(1)
 								.map(galleryId -> BoardGallerySimple.builder()
@@ -314,17 +314,17 @@ public class SearchService {
 										.build())
 								.collect(Collectors.toList());
 
-						boardSource.setGalleries(boardGalleries);
+						articleSource.setGalleries(boardGalleries);
 					}
 
-					return boardSource;
+					return articleSource;
 				})
 				.collect(Collectors.toList());
 
-		return SearchBoardResult.builder()
+		return SearchArticleResult.builder()
 				.took(searchResponse.getTook().getMillis())
 				.totalCount(searchHits.getTotalHits())
-				.posts(searchList)
+				.articles(searchList)
 				.build();
 	}
 
@@ -340,7 +340,7 @@ public class SearchService {
 								.must(QueryBuilders.matchQuery("content", query))
 								.must(
 										QueryBuilders
-												.hasParentQuery(Constants.ES_TYPE_BOARD, QueryBuilders.matchAllQuery())
+												.hasParentQuery(Constants.ES_TYPE_ARTICLE, QueryBuilders.matchAllQuery())
 												.innerHit(new QueryInnerHitBuilder())
 								)
 				)
@@ -371,11 +371,11 @@ public class SearchService {
 					esCommentSource.setScore(searchHit.getScore());
 
 					if (! searchHit.getInnerHits().isEmpty()) {
-						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(Constants.ES_TYPE_BOARD).getHits();
+						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(Constants.ES_TYPE_ARTICLE).getHits();
 						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
-						EsParentBoard esParentBoard = ObjectMapperUtils.convertValue(innerSourceMap, EsParentBoard.class);
+						EsParentArticle esParentArticle = ObjectMapperUtils.convertValue(innerSourceMap, EsParentArticle.class);
 
-						esCommentSource.setParentBoard(esParentBoard);
+						esCommentSource.setArticle(esParentArticle);
 					}
 
 					Map<String, List<String>> highlight = this.getHighlight(searchHit.getHighlightFields().entrySet());
@@ -392,7 +392,9 @@ public class SearchService {
 				.build();
 	}
 
-	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size) {
+	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+																String postTags) {
+
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
 				.setIndices(elasticsearchProperties.getIndexGallery())
 				.setTypes(Constants.ES_TYPE_GALLERY)
@@ -400,11 +402,15 @@ public class SearchService {
 				.setQuery(QueryBuilders.matchQuery("name", query))
 				.setHighlighterNoMatchSize(Constants.SEARCH_NO_MATCH_SIZE)
 				.setHighlighterFragmentSize(Constants.SEARCH_FRAGMENT_SIZE)
-				.setHighlighterPreTags("<span class=\"color-orange\">")
-				.setHighlighterPostTags("</span>")
 				.addHighlightedField("name", Constants.SEARCH_FRAGMENT_SIZE, 0)
 				.setFrom(from)
 				.setSize(size);
+
+		if (StringUtils.isNotBlank(preTags))
+			searchRequestBuilder.setHighlighterPreTags(preTags);
+
+		if (StringUtils.isNotBlank(postTags))
+			searchRequestBuilder.setHighlighterPostTags(postTags);
 
 		log.debug("getGallerySearchRequestBuilder Query:\n{}", searchRequestBuilder.internalBuilder());
 

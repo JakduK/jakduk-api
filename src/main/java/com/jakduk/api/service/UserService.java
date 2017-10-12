@@ -2,11 +2,11 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.configuration.security.JakdukAuthority;
-import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.FileUtils;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.FootballClub;
@@ -94,7 +94,7 @@ public class UserService {
 
 		// User DB 와 SNS Profile 모두에 email이 없을 경우에는 신규 가입으로 진행한다.
 		// SNS 가입시 이메일 제공 동의를 안해서 그렇다.
-		if (StringUtils.isBlank(user.getEmail()) && StringUtils.isBlank(snsEmail)) {
+		if (StringUtils.isAllBlank(user.getEmail(), snsEmail)) {
 			user.setEmail(JakdukUtils.generateTemporaryEmail());
 			userRepository.save(user);
 
@@ -107,11 +107,6 @@ public class UserService {
 
 			log.info("user({},{}) email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
 		}
-	}
-
-	// 회원 정보 저장.
-	public void save(User user) {
-		userRepository.save(user);
 	}
 
 	public User addJakdukUser(String email, String username, String password, String footballClub, String about, String userPictureId) {
@@ -304,8 +299,8 @@ public class UserService {
 	public void updateUserPassword(String userId, String newPassword) {
 		User user = userRepository.findOneById(userId).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 		user.setPassword(newPassword);
-		
-		this.save(user);
+
+		userRepository.save(user);
 
 		log.info("jakduk user password changed. email=" + user.getEmail() + ", username=" + user.getUsername());
 	}
@@ -314,7 +309,7 @@ public class UserService {
 		User user = userRepository.findOneByEmail(email).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 		user.setPassword(password);
 
-		this.save(user);
+		userRepository.save(user);
 
 		log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
 	}

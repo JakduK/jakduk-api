@@ -62,8 +62,7 @@ public class BoardCategoryGenerator {
 				.stream()
 				.map(category -> BoardCategory.builder()
 						.code(category.name())
-						.names(category.names
-								.stream()
+						.names(category.names.stream()
 								.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
 								.collect(Collectors.toList()))
 						.build())
@@ -84,8 +83,7 @@ public class BoardCategoryGenerator {
 					.findFirst()
 					.map(category -> BoardCategory.builder()
 							.code(category.name())
-							.names(category.names
-									.stream()
+							.names(category.names.stream()
 									.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
 									.collect(Collectors.toList()))
 							.build()
@@ -102,8 +100,7 @@ public class BoardCategoryGenerator {
     		return Boolean.TRUE;
 		} else {
     		Category targetCategory = Category.valueOf(targetCategoryName);
-    		return Category.list(boardType)
-					.stream()
+			return Category.list(boardType).stream()
 					.anyMatch(category -> category.equals(targetCategory));
 		}
     }
