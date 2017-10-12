@@ -4,7 +4,6 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
-import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -53,7 +52,6 @@ public class BoardRestController {
 
     @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
-    @Autowired private RabbitMQPublisher rabbitMQPublisher;
 
     @ApiOperation("게시판 글 목록")
     @GetMapping("/{board}/articles")
@@ -129,35 +127,25 @@ public class BoardRestController {
             @ApiParam(value = "글 폼", required = true) @Valid @RequestBody WriteArticle form,
             Device device) {
 
-        List<GalleryOnBoard> formGalleries = form.getGalleries();
+        Constants.BOARD_TYPE boardType = Constants.BOARD_TYPE.valueOf(StringUtils.upperCase(board.name()));
+
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
 
-        if (! CollectionUtils.isEmpty(formGalleries)) {
-            unverifiableGalleryIds = formGalleries.stream()
+        if (! CollectionUtils.isEmpty(form.getGalleries())) {
+            unverifiableGalleryIds = form.getGalleries().stream()
                     .map(GalleryOnBoard::getId)
-                    .distinct()
                     .collect(Collectors.toList());
         }
 
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
-        // 연관된 사진 id 배열 (검증 후)
-        List<String> galleryIds = galleries.stream()
-                .map(Gallery::getId)
-                .collect(Collectors.toList());
+        Article article = articleService.insertArticle(commonWriter, boardType, form.getSubject().trim(), form.getContent().trim(),
+                StringUtils.trim(form.getCategoryCode()), galleries, JakdukUtils.getDeviceInfo(device));
 
-        Article article = articleService.insertArticle(commonWriter, board, form.getSubject().trim(), form.getContent().trim(),
-                StringUtils.trim(form.getCategoryCode()), ! galleries.isEmpty(), JakdukUtils.getDeviceInfo(device));
-
-        galleryService.processLinkedGalleries(commonWriter.getUserId(), galleries, formGalleries, null,
-                Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
-
-        // 엘라스틱서치 색인 요청
-        rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
-                article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
 
         return WriteArticleResponse.builder()
                 .seq(article.getSeq())
@@ -194,19 +182,13 @@ public class BoardRestController {
                 .collect(Collectors.toList());
 
         Article article = articleService.updateArticle(commonWriter, board, seq, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), ! galleries.isEmpty(), JakdukUtils.getDeviceInfo(device));
+                form.getCategoryCode(), galleryIds, JakdukUtils.getDeviceInfo(device));
 
-        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE,
-                article.getId());
+        List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
 
-        galleryService.processLinkedGalleries(commonWriter.getUserId(), galleries, form.getGalleries(), galleryIdsForRemoval,
-                Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
 
         JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
-
-        // 엘라스틱서치 색인 요청
-        rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
-                article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
         return WriteArticleResponse.builder()
                 .seq(article.getSeq())
@@ -265,7 +247,7 @@ public class BoardRestController {
         ArticleComment articleComment =  articleService.insertArticleComment(commonWriter, board, seq, form.getContent().trim(),
                 galleries, JakdukUtils.getDeviceInfo(device));
 
-        galleryService.processLinkedGalleries(commonWriter.getUserId(), galleries, form.getGalleries(), null,
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), null,
                 Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
 
         return articleComment;
@@ -305,7 +287,7 @@ public class BoardRestController {
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,
                 Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
 
-        galleryService.processLinkedGalleries(commonWriter.getUserId(), galleries, form.getGalleries(), galleryIdsForRemoval,
+        galleryService.processLinkedGalleries(galleries, form.getGalleries(), galleryIdsForRemoval,
                 Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
 
         JakdukUtils.removeSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());

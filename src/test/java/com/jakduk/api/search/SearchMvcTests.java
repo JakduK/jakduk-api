@@ -1,6 +1,5 @@
 package com.jakduk.api.search;
 
-import com.jakduk.api.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
@@ -82,7 +81,7 @@ public class SearchMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void searchUnifiedTest() throws Exception {
 
         SearchArticleResult searchArticleResult = SearchArticleResult.builder()

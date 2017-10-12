@@ -1,11 +1,9 @@
 package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
-import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
@@ -73,14 +71,13 @@ public class ArticleMvcTests {
     @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
-    @MockBean private RabbitMQPublisher rabbitMQPublisher;
 
     private CommonWriter commonWriter;
     private Article article;
     private List<BoardCategory> categories;
     private BoardCategory boardCategory;
     private Map<String, String> categoriesMap;
-    private WriteArticle writeArticleForm;
+    private WriteArticle writeArticleform;
     private List<Gallery> galleries;
     private List<BoardGallerySimple> simpleGalleries;
 
@@ -121,7 +118,7 @@ public class ArticleMvcTests {
 
         GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
 
-        writeArticleForm = WriteArticle.builder()
+        writeArticleform = WriteArticle.builder()
                 .subject("제목입니다.")
                 .content("내용입니다.")
                 .categoryCode(boardCategory.getCode())
@@ -300,7 +297,7 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void getArticleDetailTest() throws Exception {
 
         ArticleDetail articleDetail = new ArticleDetail();
@@ -417,18 +414,18 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void writeArticleTest() throws Exception {
 
         when(galleryService.findByIdIn(any()))
                 .thenReturn(galleries);
 
         when(articleService.insertArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
-                anyBoolean(), any(Constants.DEVICE_TYPE.class)))
+                anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
                 .thenReturn(article);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
+                .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
                         any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         WriteArticleResponse expectResponse = WriteArticleResponse.builder()
@@ -441,7 +438,7 @@ public class ArticleMvcTests {
                         //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(ObjectMapperUtils.writeValueAsString(writeArticleForm)))
+                        .content(ObjectMapperUtils.writeValueAsString(writeArticleform)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
@@ -486,18 +483,18 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void editArticleTest() throws Exception {
 
         when(galleryService.findByIdIn(any()))
                 .thenReturn(galleries);
 
         when(articleService.updateArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(Constants.DEVICE_TYPE.class)))
+                anyListOf(String.class), any(Constants.DEVICE_TYPE.class)))
                 .thenReturn(article);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
+                .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
                         any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         WriteArticleResponse expectResponse = WriteArticleResponse.builder()
@@ -510,7 +507,7 @@ public class ArticleMvcTests {
                         //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(ObjectMapperUtils.writeValueAsString(writeArticleForm)))
+                        .content(ObjectMapperUtils.writeValueAsString(writeArticleform)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
@@ -532,7 +529,7 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void deleteArticleTest() throws Exception {
 
         Constants.ARTICLE_DELETE_TYPE expectDeleteType = Constants.ARTICLE_DELETE_TYPE.ALL;
@@ -570,7 +567,7 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void setArticleFeeling() throws Exception {
 
         when(articleService.setArticleFeelings(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(),
@@ -652,7 +649,7 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void enableArticleNoticeTest() throws Exception {
 
         doNothing().when(articleService)
@@ -680,7 +677,7 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockUser
     public void disableArticleNoticeTest() throws Exception {
 
         doNothing().when(articleService)

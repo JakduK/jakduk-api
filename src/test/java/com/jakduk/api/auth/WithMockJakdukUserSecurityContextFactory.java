@@ -1,4 +1,4 @@
-package com.jakduk.api;
+package com.jakduk.api.auth;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
