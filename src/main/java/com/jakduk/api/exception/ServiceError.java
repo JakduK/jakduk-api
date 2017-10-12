@@ -1,11 +1,11 @@
 package com.jakduk.api.exception;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import lombok.Getter;
 import org.apache.http.HttpStatus;
 import org.springframework.context.i18n.LocaleContextHolder;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * @author pyohwan
@@ -70,11 +70,14 @@ public enum ServiceError {
     private final String message;
 
     ServiceError(Integer httpStatus, String message) {
-        Locale locale = LocaleContextHolder.getLocale();
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.exception", locale);
-
         this.httpStatus = httpStatus;
         this.code = this.name();
-        this.message = resourceBundle.getString(message);
+        this.message = message;
+    }
+
+    public String getMessage() {
+        Locale locale = LocaleContextHolder.getLocaleContext().getLocale();
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.exception", locale);
+        return resourceBundle.getString(message);
     }
 }
