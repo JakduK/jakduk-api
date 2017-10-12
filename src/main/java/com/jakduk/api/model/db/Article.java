@@ -28,9 +28,9 @@ public class Article implements UsersFeeling {
 	@Id
 	private String id;
 	private Integer seq; // 글 번호
-	private ArticleStatus status;
 	private String board; // 게시판
 	private String category; // 말머리 코드
+	private ArticleStatus status;
 	private CommonWriter writer; // 작성자
 	private String subject; // 글 제목
 	private String content; // 글 내용

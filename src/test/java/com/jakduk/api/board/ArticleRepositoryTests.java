@@ -75,7 +75,7 @@ public class ArticleRepositoryTests {
     @Test
     public void findNotices() {
         Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-        List<ArticleOnList> notices = repository.findNotices(board, sort);
+        List<ArticleOnList> notices = repository.findNotices(sort);
     }
 
     @Test
