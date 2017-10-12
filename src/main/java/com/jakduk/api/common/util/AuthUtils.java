@@ -196,7 +196,7 @@ public class AuthUtils {
                     .picture(authUserProfile.getPicture())
                     .build();
         } else {
-            throw new ServiceException(ServiceError.NOT_FOUND_USER);
+            return null;
         }
     }
 
