@@ -38,7 +38,7 @@ public class Constants {
 	public final static Integer COMMENT_MAX_LIMIT = 30;
 	public final static Integer GALLERY_SIZE = 24;
 	public final static Integer BOARD_TOP_LIMIT = 3;
-	public final static Integer ARTICLE_SHORT_CONTENT_LENGTH = 100;
+	public final static Integer BOARD_SHORT_CONTENT_LENGTH = 100;
 
 	/**
 	 * Social 프로바이더 종류.

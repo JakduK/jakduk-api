@@ -1,6 +1,5 @@
 package com.jakduk.api.auth;
 
-import com.jakduk.api.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
