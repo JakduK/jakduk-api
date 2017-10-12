@@ -1,11 +1,13 @@
 package com.jakduk.api.repository.article;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.aggregate.BoardTop;
-import com.jakduk.api.model.embedded.ArticleItem;
-import com.jakduk.api.model.simple.*;
+import com.jakduk.api.model.db.Article;
+import com.jakduk.api.model.simple.ArticleOnList;
+import com.jakduk.api.model.simple.ArticleOnRSS;
+import com.jakduk.api.model.simple.ArticleOnSitemap;
+import com.jakduk.api.model.simple.ArticleSimple;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 
@@ -41,7 +43,7 @@ public interface ArticleRepositoryCustom {
     /**
      * 공지 글 목록
      */
-    List<ArticleOnList> findNotices(Constants.BOARD_TYPE board, Sort sort);
+    List<ArticleOnList> findNotices(Sort sort);
 
     /**
      * 홈에서 보여지는 최근글 목록

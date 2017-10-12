@@ -254,25 +254,25 @@ public class ArticleService {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 		Pageable pageable = new PageRequest(page - 1, size, sort);
-		Page<ArticleOnList> postsPage;
+		Page<ArticleOnList> articlePages;
 
 		if ("ALL".equals(categoryCode)) {
-			postsPage = articleOnListRepository.findByBoard(board, pageable);
+			articlePages = articleOnListRepository.findByBoard(board, pageable);
 		} else {
-			postsPage = articleOnListRepository.findByBoardAndCategory(board, categoryCode, pageable);
+			articlePages = articleOnListRepository.findByBoardAndCategory(board, categoryCode, pageable);
 		}
 
 		// 자유 게시판 공지글 목록
-		List<ArticleOnList> notices = articleRepository.findNotices(board, sort);
+		List<ArticleOnList> notices = articleRepository.findNotices(sort);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
-		Function<ArticleOnList, GetArticle> convertToFreePost = post -> {
-			GetArticle freePosts = new GetArticle();
-			BeanUtils.copyProperties(post, freePosts);
+		Function<ArticleOnList, GetArticle> convertToGetArticle = article -> {
+			GetArticle getArticle = new GetArticle();
+			BeanUtils.copyProperties(article, getArticle);
 
-			if (post.getLinkedGallery()) {
+			if (article.getLinkedGallery()) {
 				List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-						new ObjectId(post.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
+						new ObjectId(article.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
 
 				if (! CollectionUtils.isEmpty(galleries)) {
 					List<BoardGallerySimple> boardGalleries = galleries.stream()
@@ -282,26 +282,26 @@ public class ArticleService {
 									.build())
 							.collect(Collectors.toList());
 
-					freePosts.setGalleries(boardGalleries);
+					getArticle.setGalleries(boardGalleries);
 				}
 			}
 
-			return freePosts;
+			return getArticle;
 		};
 
-		List<GetArticle> getArticles = postsPage.getContent().stream()
-				.map(convertToFreePost)
+		List<GetArticle> getArticles = articlePages.getContent().stream()
+				.map(convertToGetArticle)
 				.collect(Collectors.toList());
 
-		List<GetArticle> freeNotices = notices.stream()
-				.map(convertToFreePost)
+		List<GetArticle> getNotices = notices.stream()
+				.map(convertToGetArticle)
 				.collect(Collectors.toList());
 
 		// Board ID 뽑아내기.
 		ArrayList<ObjectId> ids = new ArrayList<>();
 
-		getArticles.forEach(post -> ids.add(new ObjectId(post.getId())));
-		freeNotices.forEach(post -> ids.add(new ObjectId(post.getId())));
+		getArticles.forEach(article -> ids.add(new ObjectId(article.getId())));
+		getNotices.forEach(article -> ids.add(new ObjectId(article.getId())));
 
 		// 게시물의 댓글수
 		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountByIds(ids).stream()
@@ -312,23 +312,23 @@ public class ArticleService {
 				.collect(Collectors.toMap(BoardFeelingCount::getId, Function.identity()));
 
 		// 댓글수, 감정 표현수 합치기.
-		Consumer<GetArticle> applyCounts = post -> {
-			String boardId = post.getId();
+		Consumer<GetArticle> applyCounts = article -> {
+			String boardId = article.getId();
 			Integer commentCount = commentCounts.get(boardId);
 
 			if (Objects.nonNull(commentCount))
-				post.setCommentCount(commentCount);
+				article.setCommentCount(commentCount);
 
 			BoardFeelingCount feelingCount = feelingCounts.get(boardId);
 
 			if (Objects.nonNull(feelingCount)) {
-				post.setLikingCount(feelingCount.getUsersLikingCount());
-				post.setDislikingCount(feelingCount.getUsersDislikingCount());
+				article.setLikingCount(feelingCount.getUsersLikingCount());
+				article.setDislikingCount(feelingCount.getUsersDislikingCount());
 			}
 		};
 
 		getArticles.forEach(applyCounts);
-		freeNotices.forEach(applyCounts);
+		getNotices.forEach(applyCounts);
 
 		// 말머리
 		List<BoardCategory> categories = BoardCategoryGenerator.getCategories(board, JakdukUtils.getLocale());
@@ -344,14 +344,14 @@ public class ArticleService {
 		return GetArticlesResponse.builder()
 				.categories(categoriesMap)
 				.articles(getArticles)
-				.notices(freeNotices)
-				.first(postsPage.isFirst())
-				.last(postsPage.isLast())
-				.totalPages(postsPage.getTotalPages())
-				.totalElements(postsPage.getTotalElements())
-				.numberOfElements(postsPage.getNumberOfElements())
-				.size(postsPage.getSize())
-				.number(postsPage.getNumber())
+				.notices(getNotices)
+				.first(articlePages.isFirst())
+				.last(articlePages.isLast())
+				.totalPages(articlePages.getTotalPages())
+				.totalElements(articlePages.getTotalElements())
+				.numberOfElements(articlePages.getNumberOfElements())
+				.size(articlePages.getSize())
+				.number(articlePages.getNumber())
 				.build();
 	}
 

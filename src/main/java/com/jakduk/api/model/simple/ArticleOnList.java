@@ -20,13 +20,13 @@ public class ArticleOnList {
 	
 	@Id
 	private String id;
-	private CommonWriter writer;
-	private String subject;
 	private Integer seq;
 	private String board;
 	private String category;
-	private Integer views;
 	private ArticleStatus status;
+	private CommonWriter writer;
+	private String subject;
+	private Integer views;
 	private String shortContent;
 	private Boolean linkedGallery;
 

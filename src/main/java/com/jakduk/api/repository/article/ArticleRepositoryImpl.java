@@ -108,10 +108,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
      * 공지 글 목록
      */
     @Override
-    public List<ArticleOnList> findNotices(Constants.BOARD_TYPE board, Sort sort) {
+    public List<ArticleOnList> findNotices(Sort sort) {
         Query query = new Query();
         query.addCriteria(Criteria.where("status.notice").is(true))
-                .addCriteria(Criteria.where("board").is(board.name()))
                 .with(sort)
                 .limit(10);
 
