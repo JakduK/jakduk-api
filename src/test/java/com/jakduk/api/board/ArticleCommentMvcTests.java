@@ -1,9 +1,11 @@
 package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
+import com.jakduk.api.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
@@ -70,6 +72,7 @@ public class ArticleCommentMvcTests {
     @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
+    @MockBean private RabbitMQPublisher rabbitMQPublisher;
 
     private CommonWriter commonWriter;
     private Article article;
@@ -185,7 +188,7 @@ public class ArticleCommentMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJakdukUser
     public void getArticleCommentsTest() throws Exception {
 
         GetArticleCommentsResponse expectResponse = GetArticleCommentsResponse.builder()
@@ -237,7 +240,7 @@ public class ArticleCommentMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJakdukUser
     public void getArticleDetailCommentsTest() throws Exception {
 
         GetArticleDetailCommentsResponse expectResponse = GetArticleDetailCommentsResponse.builder()
@@ -277,7 +280,7 @@ public class ArticleCommentMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJakdukUser
     public void writeArticleComment() throws Exception {
 
         when(galleryService.findByIdIn(any()))
@@ -288,7 +291,7 @@ public class ArticleCommentMvcTests {
                 .thenReturn(articleComment);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
+                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
                         any(Constants.GALLERY_FROM_TYPE.class), anyString());
         mvc.perform(
                 post("/api/board/{board}/{seq}/comment", article.getBoard().toLowerCase(), articleComment.getArticle().getSeq())
@@ -316,7 +319,7 @@ public class ArticleCommentMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJakdukUser
     public void editArticleCommentTest() throws Exception {
 
         when(galleryService.findByIdIn(any()))
@@ -327,7 +330,7 @@ public class ArticleCommentMvcTests {
                 .thenReturn(articleComment);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
+                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
                         any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         mvc.perform(
@@ -356,7 +359,7 @@ public class ArticleCommentMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJakdukUser
     public void deleteArticleCommentTest() throws Exception {
 
         doNothing().when(articleService)
@@ -385,7 +388,7 @@ public class ArticleCommentMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockJakdukUser
     public void setArticleCommentFeelingTest() throws Exception {
 
         when(articleService.setArticleCommentFeeling(any(CommonWriter.class), anyString(), any(Constants.FEELING_TYPE.class)))

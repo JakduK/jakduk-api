@@ -1,10 +1,12 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
+import com.jakduk.api.exception.ServiceError;
+import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
@@ -194,7 +196,7 @@ public class AuthUtils {
                     .picture(authUserProfile.getPicture())
                     .build();
         } else {
-            return null;
+            throw new ServiceException(ServiceError.NOT_FOUND_USER);
         }
     }
 
