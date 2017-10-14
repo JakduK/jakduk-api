@@ -3,7 +3,7 @@ spring:
     active: default
   http:
     multipart:
-      max-file-size: 8MB
+      max-file-size: 20MB
   mvc:
     locale: ko_KR
     throw-exception-if-no-handler-found: true
