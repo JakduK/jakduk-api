@@ -30,7 +30,7 @@ public class BoardCategoryGenerator {
 
 		QUESTION(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Question"), new LocalSimpleName(Locale.KOREA.getLanguage(), "물음")),
 		JOBS(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Jobs"), new LocalSimpleName(Locale.KOREA.getLanguage(), "일자리")),
-		CODE_CHALLENGE(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Code challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "코드 챌린지")),
+		CODE_CHALLENGE(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Code Challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "코드 챌린지")),
 		IDEA(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Idea"), new LocalSimpleName(Locale.KOREA.getLanguage(), "아이디어")),
 		TIP(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Tip"), new LocalSimpleName(Locale.KOREA.getLanguage(), "팁"));
 
