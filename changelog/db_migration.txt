@@ -1,4 +1,4 @@
-v0.7.13 /
+v0.7.13 / 2017-10-14
 // views 필드 삭제
 db.gallery.update({}, {$unset:{"views":""}}, {multi:true})
 db.gallery.update({}, {$unset:{"usersLiking":""}}, {multi:true})
@@ -10,7 +10,7 @@ db.article.update({}, {$set:{"_class":"com.jakduk.api.model.db.Article"}}, {mult
 db.articleComment.update({}, {$set:{"_class":"com.jakduk.api.model.db.ArticleComment"}}, {multi:true})
 db.article.update({"category":"FREE"}, {$set:{"board":"FREE"}}, {multi:true})
 db.article.update({"category":"FOOTBALL"}, {$set:{"board":"FOOTBALL", "category":"CLASSIC"}}, {multi:true})
-db.articleComment.update({}, {$rename:{"article":"article"}}, {multi:true})
+db.articleComment.update({}, {$rename:{"boardItem":"article"}}, {multi:true})
 // 혹시 board가 없으면 FREE로 설정
 db.article.update({"board":{$exists:false}}, {$set:{"board":"FREE"}}, {multi:true})
 db.article.update({"board":"FREE"}, {$unset:{"category":""}}, {multi:true})

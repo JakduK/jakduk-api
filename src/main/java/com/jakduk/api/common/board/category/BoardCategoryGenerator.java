@@ -21,10 +21,12 @@ public class BoardCategoryGenerator {
         CHALLENGE(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "챌린지")),
 		ACL(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "ACL"), new LocalSimpleName(Locale.KOREA.getLanguage(), "ACL")),
 		NATIONAL_TEAM(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "National Team"), new LocalSimpleName(Locale.KOREA.getLanguage(), "국가대표팀")),
-		OVERSEAS_FOOTBALL(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Overseas football"), new LocalSimpleName(Locale.KOREA.getLanguage(), "해외축구")),
+		OVERSEAS_FOOTBALL(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Overseas Football"), new LocalSimpleName(Locale.KOREA.getLanguage(), "해외축구")),
         NATIONAL_LEAGUE(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "National League"), new LocalSimpleName(Locale.KOREA.getLanguage(), "내셔널리그")),
         K3(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "K3"), new LocalSimpleName(Locale.KOREA.getLanguage(), "K3")),
         WK(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "WK"), new LocalSimpleName(Locale.KOREA.getLanguage(), "WK")),
+		AMATEUR(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Amateur"), new LocalSimpleName(Locale.KOREA.getLanguage(), "아마추어")),
+		ETC(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "ETC"), new LocalSimpleName(Locale.KOREA.getLanguage(), "기타")),
 
 		QUESTION(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Question"), new LocalSimpleName(Locale.KOREA.getLanguage(), "물음")),
 		JOBS(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Jobs"), new LocalSimpleName(Locale.KOREA.getLanguage(), "일자리")),

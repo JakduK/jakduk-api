@@ -17,6 +17,7 @@ public interface ArticleRepository extends MongoRepository<Article, String>, Art
 
 	List<Article> findByIdInAndLinkedGalleryIsTrue(List<String> ids);
 	List<Article> findByIdInAndBoard(List<String> ids, String board);
+	List<Article> findBySeqIn(List<Integer> seqs);
 
 	@Query(value="{'seq' : ?0}")
     ArticleSimple findBoardFreeOfMinimumBySeq(Integer seq);
