@@ -160,6 +160,7 @@ public class BoardRestController {
                 article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
         return WriteArticleResponse.builder()
+                .board(article.getBoard())
                 .seq(article.getSeq())
                 .build();
     }
