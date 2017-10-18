@@ -19,7 +19,9 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WriteArticleResponse {
 
+    @ApiModelProperty(example = "FREE", value = "게시판ID")
+    private String board;
+
     @ApiModelProperty(example = "2", value = "글번호")
     private Integer seq;
-
 }
