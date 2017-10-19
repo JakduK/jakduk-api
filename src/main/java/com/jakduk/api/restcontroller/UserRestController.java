@@ -152,7 +152,7 @@ public class UserRestController {
 
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    JakdukUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.email.exists"));
+                    JakdukUtils.getValidationMessage("validation.msg.email.exists"));
 
         return EmptyJsonResponse.newInstance();
     }
@@ -174,7 +174,7 @@ public class UserRestController {
 
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    JakdukUtils.getResourceBundleMessage("ValidationMessages", "validation.msg.username.exists"));
+                    JakdukUtils.getValidationMessage("validation.msg.username.exists"));
 
         return EmptyJsonResponse.newInstance();
     }

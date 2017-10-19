@@ -99,7 +99,7 @@ public class ArticleMvcTests {
         categoriesMap = categories.stream()
                 .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
 
-        categoriesMap.put("ALL", JakdukUtils.getResourceBundleMessage("messages.board", "board.category.all"));
+        categoriesMap.put("ALL", JakdukUtils.getMessageSource("board.category.all"));
 
         article = Article.builder()
                 .id("59c8879fa2b594c5d33e6ac4")

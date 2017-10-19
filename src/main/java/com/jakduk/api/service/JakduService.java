@@ -14,12 +14,12 @@ import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.JakduOnSchedule;
-import com.jakduk.api.restcontroller.vo.admin.JakduCommentWriteRequest;
-import com.jakduk.api.restcontroller.vo.admin.JakduCommentsResponse;
-import com.jakduk.api.restcontroller.vo.admin.MyJakduRequest;
 import com.jakduk.api.repository.jakdu.JakduCommentRepository;
 import com.jakduk.api.repository.jakdu.JakduRepository;
 import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
+import com.jakduk.api.restcontroller.vo.admin.JakduCommentWriteRequest;
+import com.jakduk.api.restcontroller.vo.admin.JakduCommentsResponse;
+import com.jakduk.api.restcontroller.vo.admin.MyJakduRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,12 +60,12 @@ public class JakduService {
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
 
         if (Objects.isNull(jakduSchedule))
-            throw new NoSuchElementException(JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+            throw new NoSuchElementException(JakdukUtils.getMessageSource("jakdu.msg.not.found.jakdu.schedule.exception"));
 
         JakduOnSchedule existJakdu = jakduRepository.findByUserIdAndWriter(writer.getUserId(), new ObjectId(jakduSchedule.getId()));
 
         if (Objects.nonNull(existJakdu))
-            throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.already.join.jakdu.exception"));
+            throw new ServiceException(ServiceError.INTERNAL_SERVER_ERROR, JakdukUtils.getMessageSource("jakdu.msg.already.join.jakdu.exception"));
 
         Jakdu jakdu = new Jakdu();
         jakdu.setSchedule(jakduSchedule);
@@ -83,7 +83,7 @@ public class JakduService {
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(jakdukScheduleId);
 
         if (Objects.isNull(jakduSchedule))
-            throw new NoSuchElementException(JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+            throw new NoSuchElementException(JakdukUtils.getMessageSource("jakdu.msg.not.found.jakdu.schedule.exception"));
 
         return jakduRepository.findByUserIdAndWriter(userId, new ObjectId(jakduSchedule.getId()));
     }
@@ -95,7 +95,7 @@ public class JakduService {
         JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(request.getId());
 
         if (Objects.isNull(jakduSchedule)) {
-            throw new NoSuchElementException(JakdukUtils.getResourceBundleMessage("messages.jakdu", "jakdu.msg.not.found.jakdu.schedule.exception"));
+            throw new NoSuchElementException(JakdukUtils.getMessageSource("jakdu.msg.not.found.jakdu.schedule.exception"));
         }
 
         ArticleCommentStatus status = new ArticleCommentStatus(request.getDevice());

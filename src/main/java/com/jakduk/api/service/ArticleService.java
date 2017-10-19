@@ -338,7 +338,7 @@ public class ArticleService {
 			categoriesMap = categories.stream()
 					.collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
 
-			categoriesMap.put("ALL", JakdukUtils.getResourceBundleMessage("messages.board", "board.category.all"));
+			categoriesMap.put("ALL", JakdukUtils.getMessageSource("board.category.all"));
 		}
 
 		return GetArticlesResponse.builder()

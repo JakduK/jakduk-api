@@ -41,7 +41,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         } else {
             User user = userRepository.findOneByEmail(username)
                     .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
-                            JakdukUtils.getExceptionMessage("exception.not.found.jakduk.account", username)));
+                            JakdukUtils.getMessageSource("exception.not.found.jakduk.account", username)));
 
             String userId = user.getId();
 
