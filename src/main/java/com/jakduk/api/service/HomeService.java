@@ -11,6 +11,7 @@ import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.simple.ArticleCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
+import com.jakduk.api.repository.HomeDescriptionRepository;
 import com.jakduk.api.repository.article.comment.ArticleCommentOnHomeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -38,11 +38,9 @@ public class HomeService {
 	@Autowired
 	private JakdukDAO jakdukDAO;
 	
-	@Autowired
-	private EncyclopediaRepository encyclopediaRepository;
-
-	@Autowired
-	private ArticleCommentOnHomeRepository articleCommentOnHomeRepository;
+	@Autowired private EncyclopediaRepository encyclopediaRepository;
+	@Autowired private ArticleCommentOnHomeRepository articleCommentOnHomeRepository;
+	@Autowired private HomeDescriptionRepository homeDescriptionRepository;
 
 	/**
 	 * 랜덤하게 백과 사전 하나를 가져온다.
@@ -51,10 +49,10 @@ public class HomeService {
 
 		List<Encyclopedia> encyclopedias = encyclopediaRepository.findListByLanguage(language);
 
-		if (ObjectUtils.isEmpty(encyclopedias))
+		if (CollectionUtils.isEmpty(encyclopedias))
 			throw new ServiceException(ServiceError.NOT_FOUND_ENCYCLOPEDIA);
 
-		int random = (int)(Math.random() * encyclopedias.size());
+		Integer random = (int)(Math.random() * encyclopedias.size());
 
 		return encyclopedias.get(random);
 	}
@@ -91,14 +89,8 @@ public class HomeService {
 
 	// 알림판 가져오기.
 	public HomeDescription getHomeDescription() {
-		
-		HomeDescription homeDescription = jakdukDAO.getHomeDescription();
-
-		if (Objects.nonNull(homeDescription)) {
-			return homeDescription;
-		} else {
-			return new HomeDescription();
-		}
+		return homeDescriptionRepository.findOneByOrderByPriorityDesc()
+				.orElseGet(HomeDescription::new);
 	}
 	
 }

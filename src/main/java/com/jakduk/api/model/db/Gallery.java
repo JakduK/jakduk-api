@@ -26,25 +26,15 @@ public class Gallery {
 	
 	@Id
 	private String id;
-
-	private String name;
-	
-	private String fileName;
-
-	private List<LinkedItem> linkedItems;
-	
-	private CommonWriter writer;
-
-	private Long size;
-	
-	private Long fileSize;
-	
-	private String contentType;
-
 	private GalleryStatus status;
-
-	private List<String> batch;
-
+	private CommonWriter writer;
+	private String contentType;
+	private String name;
+	private String fileName;
+	private Long size;
+	private Long fileSize;
 	private String hash;
+	private List<LinkedItem> linkedItems;
+	private List<String> batch;
 
 }

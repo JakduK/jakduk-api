@@ -3,7 +3,6 @@ package com.jakduk.api.dao;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.db.Competition;
-import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduScheduleGroup;
 import com.jakduk.api.model.simple.UserOnHome;
@@ -74,15 +73,6 @@ public class JakdukDAO {
 		
 		return users;
 	}	
-	
-	public HomeDescription getHomeDescription() {
-		
-		Query query = new Query();
-		query.with(new Sort(Direction.DESC, "priority"));
-		HomeDescription homeDescription = mongoTemplate.findOne(query, HomeDescription.class);
-		
-		return homeDescription;
-	}
 
 	// 대회 목록.
 	public List<Competition> getCompetitions(List<ObjectId> ids, String language) {
