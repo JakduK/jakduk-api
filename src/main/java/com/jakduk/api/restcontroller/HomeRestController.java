@@ -4,7 +4,6 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.model.db.Encyclopedia;
-import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.restcontroller.vo.home.GalleryOnHome;
 import com.jakduk.api.restcontroller.vo.home.HomeResponse;
 import com.jakduk.api.service.ArticleService;
@@ -13,7 +12,9 @@ import com.jakduk.api.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,32 +35,22 @@ public class HomeRestController {
     @Autowired private GalleryService galleryService;
 
     @ApiOperation(value = "랜덤하게 백과사전 하나 가져오기")
-    @RequestMapping(value = "/home/encyclopedia", method = RequestMethod.GET)
-    public Encyclopedia getEncyclopediaWithRandom(@RequestParam(required = false) String lang) {
+    @GetMapping("/home/encyclopedia")
+    public Encyclopedia getEncyclopediaWithRandom() {
 
-        String language = JakdukUtils.getLanguageCode(lang);
+        String language = JakdukUtils.getLanguageCode();
 
         return homeService.getEncyclopediaWithRandom(language);
     }
 
     @ApiOperation("홈에서 보여줄 각종 최근 데이터 가져오기")
     @GetMapping("/home/latest")
-    public HomeResponse getLatest(
-            @RequestParam(required = false) String lang) {
+    public HomeResponse getLatest() {
 
-        String language = JakdukUtils.getLanguageCode(lang);
-
-        HomeResponse response = new HomeResponse();
-        response.setHomeDescription(homeService.getHomeDescription());
-        response.setUsers(homeService.getUsersLatest(language));
-        response.setComments(homeService.getBoardCommentsLatest());
-        response.setArticles(articleService.getLatestArticles());
+        String language = JakdukUtils.getLanguageCode();
 
         // 최근 사진
-        List<GallerySimple> galleries = galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY);
-
-        // 사진 경로 붙히기.
-        List<GalleryOnHome> galleriesOfHome = galleries.stream()
+        List<GalleryOnHome> galleries = galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY).stream()
                 .map(GalleryOnHome::new)
                 .peek(gallery -> {
                     gallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
@@ -67,9 +58,13 @@ public class HomeRestController {
                 })
                 .collect(Collectors.toList());
 
-        response.setGalleries(galleriesOfHome);
-
-        return response;
+        return HomeResponse.builder()
+                .homeDescription(homeService.getHomeDescription())
+                .users(homeService.getUsersLatest(language))
+                .comments(homeService.getBoardCommentsLatest())
+                .articles(articleService.getLatestArticles())
+                .galleries(galleries)
+                .build();
     }
 }
 

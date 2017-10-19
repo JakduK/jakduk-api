@@ -5,8 +5,10 @@ import com.jakduk.api.model.simple.ArticleCommentOnHome;
 import com.jakduk.api.model.simple.UserOnHome;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -16,8 +18,10 @@ import java.util.List;
  */
 
 @ApiModel(description = "홈에서 보여질 데이터 들")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
-@Setter
 public class HomeResponse {
 
     @ApiModelProperty(value = "최근 글")
