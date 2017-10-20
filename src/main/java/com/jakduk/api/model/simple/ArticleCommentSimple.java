@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @Getter
 @Document(collection = Constants.COLLECTION_ARTICLE_COMMENT)
-public class HomeArticleComment {
+public class ArticleCommentSimple {
 	
 	@Id
 	private String id;

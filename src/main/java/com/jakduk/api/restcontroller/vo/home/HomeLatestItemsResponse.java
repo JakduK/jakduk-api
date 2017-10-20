@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.vo.home;
 
 import com.jakduk.api.model.db.HomeDescription;
-import com.jakduk.api.model.simple.HomeArticleComment;
 import com.jakduk.api.model.simple.UserOnHome;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

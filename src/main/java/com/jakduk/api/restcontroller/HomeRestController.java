@@ -2,7 +2,6 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
-import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.restcontroller.vo.home.HomeLatestItemsResponse;
 import com.jakduk.api.service.ArticleService;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class HomeRestController {
 
-    @Autowired private UrlGenerationUtils urlGenerationUtils;
     @Autowired private HomeService homeService;
     @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
@@ -48,10 +46,11 @@ public class HomeRestController {
         return HomeLatestItemsResponse.builder()
                 .homeDescription(homeService.getHomeDescription())
                 .users(homeService.getUsersLatest(language))
-                .comments(homeService.getBoardCommentsLatest())
+                .comments(articleService.getLatestComments())
                 .articles(articleService.getLatestArticles())
                 .galleries(galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY))
                 .build();
     }
+
 }
 

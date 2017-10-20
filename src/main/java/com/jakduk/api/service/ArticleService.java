@@ -17,16 +17,14 @@ import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UsersFeeling;
 import com.jakduk.api.model.embedded.*;
-import com.jakduk.api.model.simple.ArticleOnList;
-import com.jakduk.api.model.simple.ArticleOnRSS;
-import com.jakduk.api.model.simple.ArticleOnSitemap;
-import com.jakduk.api.model.simple.ArticleSimple;
+import com.jakduk.api.model.simple.*;
 import com.jakduk.api.repository.article.ArticleOnListRepository;
 import com.jakduk.api.repository.article.ArticleRepository;
 import com.jakduk.api.repository.article.comment.ArticleCommentRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;
+import com.jakduk.api.restcontroller.vo.home.HomeArticleComment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -362,11 +360,10 @@ public class ArticleService {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
-		List<ArticleOnList> posts = articleRepository.findLatest(sort, Constants.HOME_SIZE_POST);
+		List<ArticleOnList> articles = articleRepository.findLatest(sort, Constants.HOME_SIZE_POST);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
-
-		return posts.stream()
+		return articles.stream()
 				.map(post -> {
 					HomeArticle homeArticle = new HomeArticle();
 					BeanUtils.copyProperties(post, homeArticle);
@@ -388,6 +385,50 @@ public class ArticleService {
 					}
 
 					return homeArticle;
+				})
+				.collect(Collectors.toList());
+	}
+
+	// 최근 댓글 가져오기.
+	public List<HomeArticleComment> getLatestComments() {
+
+		List<ArticleCommentSimple> comments = articleCommentRepository.findSimpleComments();
+
+		// article id 뽑아내기.
+		List<ObjectId> articleIds = comments.stream()
+				.map(comment -> new ObjectId(comment.getArticle().getId()))
+				.distinct()
+				.collect(Collectors.toList());
+
+		// 댓글을 가진 글 목록
+		List<ArticleSimple> articles = articleRepository.findArticleSimplesByIds(articleIds);
+
+		Map<String, ArticleSimple> postsHavingComments = articles.stream()
+				.collect(Collectors.toMap(ArticleSimple::getId, Function.identity()));
+
+		return comments.stream()
+				.map(comment -> {
+					HomeArticleComment homeArticleComment = new HomeArticleComment();
+					BeanUtils.copyProperties(comment, homeArticleComment);
+
+					homeArticleComment.setArticle(
+							Optional.ofNullable(postsHavingComments.get(comment.getArticle().getId()))
+									.orElse(new ArticleSimple()));
+
+					return homeArticleComment;
+				})
+				.peek(comment -> {
+					String content = JakdukUtils.stripHtmlTag(comment.getContent());
+
+					if (StringUtils.isNotBlank(content)) {
+						Integer contentLength = content.length() + comment.getWriter().getUsername().length();
+
+						if (contentLength > Constants.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+							content = content.substring(0, Constants.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
+							content = String.format("%s...", content);
+						}
+						comment.setContent(content);
+					}
 				})
 				.collect(Collectors.toList());
 	}
@@ -937,6 +978,7 @@ public class ArticleService {
 
 	/**
 	 * List<ArticleComment> 를 List<GetArticleComment> 로 변환한다.
+	 *
 	 * @param commonWriter 글쓴이
 	 * @param articleComments ArticleComment 배열
 	 */

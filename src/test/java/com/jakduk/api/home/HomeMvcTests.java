@@ -6,17 +6,16 @@ import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
-import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.db.HomeDescription;
-import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.model.simple.HomeArticleComment;
+import com.jakduk.api.model.simple.ArticleSimple;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.restcontroller.HomeRestController;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;
+import com.jakduk.api.restcontroller.vo.home.HomeArticleComment;
 import com.jakduk.api.restcontroller.vo.home.HomeGallery;
 import com.jakduk.api.restcontroller.vo.home.HomeLatestItemsResponse;
 import com.jakduk.api.service.ArticleService;
@@ -26,6 +25,7 @@ import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -61,7 +61,6 @@ public class HomeMvcTests {
 
     @MockBean private RestTemplateBuilder restTemplateBuilder;
 
-    @MockBean private UrlGenerationUtils urlGenerationUtils;
     @MockBean private HomeService homeService;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
@@ -161,12 +160,15 @@ public class HomeMvcTests {
                 .shortContent("짧은 내용입니다. (100자)")
                 .build();
 
+        ArticleSimple articleSimple = new ArticleSimple();
+        BeanUtils.copyProperties(article, articleSimple);
+
         List<HomeArticle> articles = Arrays.asList(article);
 
         List<HomeArticleComment> comments = Arrays.asList(
                 HomeArticleComment.builder()
                         .id("54b5058c3d96b205dc7e2809")
-                        .article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
+                        .article(articleSimple)
                         .writer(commonWriter)
                         .content("댓글 내용입니다.")
                         .build()
@@ -178,7 +180,7 @@ public class HomeMvcTests {
         when(homeService.getUsersLatest(anyString()))
                 .thenReturn(users);
 
-        when(homeService.getBoardCommentsLatest())
+        when(articleService.getLatestComments())
                 .thenReturn(comments);
 
         when(articleService.getLatestArticles())

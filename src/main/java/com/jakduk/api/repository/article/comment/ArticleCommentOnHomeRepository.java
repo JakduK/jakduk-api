@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.article.comment;
 
-import com.jakduk.api.model.simple.HomeArticleComment;
+import com.jakduk.api.model.simple.ArticleCommentSimple;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 
@@ -10,6 +10,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @date     : 2015. 2. 27.
  * @desc     :
  */
-public interface ArticleCommentOnHomeRepository extends MongoRepository<HomeArticleComment, String>{
+public interface ArticleCommentOnHomeRepository extends MongoRepository<ArticleCommentSimple, String>{
 
 }

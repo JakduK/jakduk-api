@@ -139,9 +139,7 @@ public class ArticleCommentMvcTests {
         BeanUtils.copyProperties(article, articleSimple);
 
         GetArticleComment getArticleComment = new GetArticleComment();
-        ArticleSimple articleSimple = new ArticleSimple();
         BeanUtils.copyProperties(articleComment, getArticleComment);
-        BeanUtils.copyProperties(article, articleSimple);
 
         getArticleComment.setArticle(articleSimple);
         getArticleComment.setNumberOfLike(articleComment.getUsersLiking().size());
