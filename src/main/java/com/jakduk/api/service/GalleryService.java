@@ -12,7 +12,6 @@ import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.GalleryStatus;
 import com.jakduk.api.model.embedded.LinkedItem;
 import com.jakduk.api.model.simple.ArticleSimple;
-import com.jakduk.api.model.simple.GallerySimple;
 import com.jakduk.api.repository.article.ArticleRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.GalleryOnBoard;
@@ -20,6 +19,7 @@ import com.jakduk.api.restcontroller.vo.gallery.GalleryDetail;
 import com.jakduk.api.restcontroller.vo.gallery.GalleryOnList;
 import com.jakduk.api.restcontroller.vo.gallery.GalleryResponse;
 import com.jakduk.api.restcontroller.vo.gallery.SurroundingsGallery;
+import com.jakduk.api.restcontroller.vo.home.HomeGallery;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -76,8 +76,14 @@ public class GalleryService {
 		return galleryRepository.findByIdIn(galleryIds);
 	}
 
-	public List<GallerySimple> findSimpleById(ObjectId id, Integer limit) {
-		return galleryRepository.findSimpleById(id, limit);
+	public List<HomeGallery>findSimpleById(ObjectId id, Integer limit) {
+		return galleryRepository.findSimpleById(id, limit).stream()
+				.map(HomeGallery::new)
+				.peek(gallery -> {
+					gallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+					gallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+				})
+				.collect(Collectors.toList());
 	}
 
 	/**

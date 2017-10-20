@@ -212,7 +212,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         if (serviceError.equals(ServiceError.ANONYMOUS)) {
-            log.info(logMessage);
+//            log.info(logMessage);
         } else if (httpStatus.is4xxClientError()) {
             log.warn(logMessage, ex);
         } else if (httpStatus.is5xxServerError()) {

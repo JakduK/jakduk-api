@@ -26,7 +26,7 @@ import com.jakduk.api.repository.article.ArticleRepository;
 import com.jakduk.api.repository.article.comment.ArticleCommentRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.restcontroller.vo.home.LatestHomeArticle;
+import com.jakduk.api.restcontroller.vo.home.HomeArticle;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -358,7 +358,7 @@ public class ArticleService {
 	/**
 	 * 최근 글 가져오기
 	 */
-	public List<LatestHomeArticle> getLatestArticles() {
+	public List<HomeArticle> getLatestArticles() {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
 
@@ -368,8 +368,8 @@ public class ArticleService {
 
 		return posts.stream()
 				.map(post -> {
-					LatestHomeArticle latestHomeArticle = new LatestHomeArticle();
-					BeanUtils.copyProperties(post, latestHomeArticle);
+					HomeArticle homeArticle = new HomeArticle();
+					BeanUtils.copyProperties(post, homeArticle);
 
 					if (post.getLinkedGallery()) {
 						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
@@ -384,10 +384,10 @@ public class ArticleService {
 										.build())
 								.collect(Collectors.toList());
 
-						latestHomeArticle.setGalleries(boardGalleries);
+						homeArticle.setGalleries(boardGalleries);
 					}
 
-					return latestHomeArticle;
+					return homeArticle;
 				})
 				.collect(Collectors.toList());
 	}

@@ -64,12 +64,7 @@ public class JakdukDAO {
 		AggregationResults<UserOnHome> results = mongoTemplate.aggregate(aggregation, "user", UserOnHome.class);
 		
 		List<UserOnHome> users = results.getMappedResults();
-		
-		for (UserOnHome user : users) {
-			if (user.getSupportFC() != null) {
-				user.getSupportFC().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
-			}
-		}
+
 		
 		return users;
 	}	

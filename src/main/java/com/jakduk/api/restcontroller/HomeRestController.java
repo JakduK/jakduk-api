@@ -4,8 +4,7 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.model.db.Encyclopedia;
-import com.jakduk.api.restcontroller.vo.home.GalleryOnHome;
-import com.jakduk.api.restcontroller.vo.home.HomeResponse;
+import com.jakduk.api.restcontroller.vo.home.HomeLatestItemsResponse;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.HomeService;
@@ -15,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author pyohwan
@@ -45,25 +41,16 @@ public class HomeRestController {
 
     @ApiOperation("홈에서 보여줄 각종 최근 데이터 가져오기")
     @GetMapping("/home/latest")
-    public HomeResponse getLatest() {
+    public HomeLatestItemsResponse getLatestItems() {
 
         String language = JakdukUtils.getLanguageCode();
 
-        // 최근 사진
-        List<GalleryOnHome> galleries = galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY).stream()
-                .map(GalleryOnHome::new)
-                .peek(gallery -> {
-                    gallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-                    gallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-                })
-                .collect(Collectors.toList());
-
-        return HomeResponse.builder()
+        return HomeLatestItemsResponse.builder()
                 .homeDescription(homeService.getHomeDescription())
                 .users(homeService.getUsersLatest(language))
                 .comments(homeService.getBoardCommentsLatest())
                 .articles(articleService.getLatestArticles())
-                .galleries(galleries)
+                .galleries(galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY))
                 .build();
     }
 }

@@ -1,9 +1,10 @@
 package com.jakduk.api.model.simple;
 
-import com.jakduk.api.model.db.FootballClub;
+import com.jakduk.api.common.Constants;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,18 +16,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
-@Setter
-@Document(collection = "user")
+@Document(collection = Constants.COLLECTION_USER)
 public class UserOnHome {
 	
 	@Id
 	private String id;
-	
 	private String username;
-	
 	private String about;
-	
-	private FootballClub supportFC;
-	
+
 }
