@@ -232,8 +232,8 @@ include::{snippets}/get-random-encyclopedia/http-request.adoc[]
 .curl request
 include::{snippets}/get-random-encyclopedia/curl-request.adoc[]
 
-.response headers
-include::{snippets}/get-random-encyclopedia/response-headers.adoc[]
+.response fields
+include::{snippets}/get-random-encyclopedia/response-fields.adoc[]
 .http response
 include::{snippets}/get-random-encyclopedia/http-response.adoc[]
 
@@ -247,8 +247,8 @@ include::{snippets}/get-home-latest-items/http-request.adoc[]
 .curl request
 include::{snippets}/get-home-latest-items/curl-request.adoc[]
 
-.response headers
-include::{snippets}/get-home-latest-items/response-headers.adoc[]
+.response fields
+include::{snippets}/get-home-latest-items/response-fields.adoc[]
 .http response
 include::{snippets}/get-home-latest-items/http-response.adoc[]
 
