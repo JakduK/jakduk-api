@@ -9,7 +9,6 @@ import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
 import com.jakduk.api.repository.HomeDescriptionRepository;
-import com.jakduk.api.repository.article.comment.ArticleCommentOnHomeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -30,7 +29,6 @@ public class HomeService {
 	private JakdukDAO jakdukDAO;
 	
 	@Autowired private EncyclopediaRepository encyclopediaRepository;
-	@Autowired private ArticleCommentOnHomeRepository articleCommentOnHomeRepository;
 	@Autowired private HomeDescriptionRepository homeDescriptionRepository;
 
 	/**

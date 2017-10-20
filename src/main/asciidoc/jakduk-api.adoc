@@ -462,26 +462,6 @@ include::{snippets}/disableArticleNotice/curl-request.adoc[]
 .http response
 include::{snippets}/disableArticleNotice/http-response.adoc[]
 
-[[board-get-article-comments]]
-=== 댓글 목록
-
-댓글의 최신 목록을 가져온다.
-인증은 옵션.
-
-include::{snippets}/getArticleComments/path-parameters.adoc[]
-
-.request parameters
-include::{snippets}/getArticleComments/request-parameters.adoc[]
-.http request
-include::{snippets}/getArticleComments/http-request.adoc[]
-.curl request
-include::{snippets}/getArticleComments/curl-request.adoc[]
-
-.response fields
-include::{snippets}/getArticleComments/response-fields.adoc[]
-.http response
-include::{snippets}/getArticleComments/http-response.adoc[]
-
 [[board-get-article-detail-comments]]
 === 글의 댓글 목록
 

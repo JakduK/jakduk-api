@@ -700,30 +700,6 @@ public class ArticleService {
 	}
 
 	/**
-	 * 자유게시판 댓글 목록
-     */
-	public GetArticleCommentsResponse getArticleComments(CommonWriter commonWriter, Constants.BOARD_TYPE board, Integer page, Integer size) {
-
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-		Pageable pageable = new PageRequest(page - 1, size, sort);
-
-		Page<ArticleComment> commentsPage = articleCommentRepository.findByArticleBoard(board.name(), pageable);
-
-		List<GetArticleComment> getArticleComments = this.toGetArticleComments(commonWriter, commentsPage.getContent());
-
-		return GetArticleCommentsResponse.builder()
-				.comments(getArticleComments)
-				.first(commentsPage.isFirst())
-				.last(commentsPage.isLast())
-				.totalPages(commentsPage.getTotalPages())
-				.totalElements(commentsPage.getTotalElements())
-				.numberOfElements(commentsPage.getNumberOfElements())
-				.size(commentsPage.getSize())
-				.number(commentsPage.getNumber())
-				.build();
-	}
-
-	/**
 	 * RSS 용 게시물 목록
 	 */
 	public List<ArticleOnRSS> getBoardFreeOnRss(ObjectId objectId, Integer limit) {
