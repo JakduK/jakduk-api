@@ -7,7 +7,6 @@ import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduScheduleGroup;
 import com.jakduk.api.model.simple.UserOnHome;
 import org.bson.types.ObjectId;
-import org.jongo.Jongo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -34,9 +33,6 @@ public class JakdukDAO {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
-
-	@Autowired
-	private Jongo jongo;
 
 	public List<SupporterCount> getSupportFCCount(String language) {
 		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));

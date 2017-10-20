@@ -63,7 +63,6 @@ dependencies {
     compile 'io.springfox:springfox-swagger-ui:2.7.0'
     compile 'com.github.dfabulich:sitemapgen4j:1.0.6'
     compile 'commons-beanutils:commons-beanutils:1.9.3'
-    compile 'org.jongo:jongo:1.3.0'
     compile 'org.apache.commons:commons-lang3:3.6'
     compile 'org.apache.commons:commons-io:1.3.2'
     compile 'org.apache.commons:commons-collections4:4.1'

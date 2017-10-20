@@ -6,11 +6,8 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import org.apache.commons.lang3.StringUtils;
-import org.jongo.Jongo;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -56,12 +53,6 @@ public class MongodbConfig extends AbstractMongoConfiguration {
         return new MongoClient(seeds);
     }
 
-    @Bean
-    public Jongo jongo() throws Exception {
-        return new Jongo(mongo().getDB(getDatabaseName()));
-    }
-
-    @Bean
     @Override
     public CustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
