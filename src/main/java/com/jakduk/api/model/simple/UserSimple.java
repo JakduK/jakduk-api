@@ -20,7 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @Getter
 @Document(collection = Constants.COLLECTION_USER)
-public class UserOnHome {
+public class UserSimple {
 	
 	@Id
 	private String id;

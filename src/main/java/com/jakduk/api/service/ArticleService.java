@@ -20,7 +20,7 @@ import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.*;
 import com.jakduk.api.repository.article.ArticleOnListRepository;
 import com.jakduk.api.repository.article.ArticleRepository;
-import com.jakduk.api.repository.article.comment.ArticleCommentRepository;
+import com.jakduk.api.repository.article.ArticleCommentRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;

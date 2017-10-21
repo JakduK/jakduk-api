@@ -1,4 +1,4 @@
-package com.jakduk.api.repository.article.comment;
+package com.jakduk.api.repository.article;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.ArticleComment;

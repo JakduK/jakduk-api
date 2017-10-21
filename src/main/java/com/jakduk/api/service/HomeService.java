@@ -1,12 +1,10 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.db.HomeDescription;
-import com.jakduk.api.model.simple.UserOnHome;
 import com.jakduk.api.repository.EncyclopediaRepository;
 import com.jakduk.api.repository.HomeDescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +23,6 @@ import java.util.List;
 @Service
 public class HomeService {
 
-	@Autowired
-	private JakdukDAO jakdukDAO;
-	
 	@Autowired private EncyclopediaRepository encyclopediaRepository;
 	@Autowired private HomeDescriptionRepository homeDescriptionRepository;
 
@@ -44,11 +39,6 @@ public class HomeService {
 		Integer random = (int)(Math.random() * encyclopedias.size());
 
 		return encyclopedias.get(random);
-	}
-
-	// 최근 가입 회원 가져오기.
-	public List<UserOnHome> getUsersLatest(String language) {
-		return jakdukDAO.getUserOnHome(language);
 	}
 
 	// 알림판 가져오기.

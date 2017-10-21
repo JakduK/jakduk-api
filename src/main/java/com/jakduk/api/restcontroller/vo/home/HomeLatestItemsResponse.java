@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.vo.home;
 
 import com.jakduk.api.model.db.HomeDescription;
-import com.jakduk.api.model.simple.UserOnHome;
+import com.jakduk.api.model.simple.UserSimple;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class HomeLatestItemsResponse {
     private List<HomeArticle> articles;
 
     @ApiModelProperty(value = "최근 가입 회원")
-    private List<UserOnHome> users;
+    private List<UserSimple> users;
 
     @ApiModelProperty(value = "최근 사진")
     private List<HomeGallery> galleries;

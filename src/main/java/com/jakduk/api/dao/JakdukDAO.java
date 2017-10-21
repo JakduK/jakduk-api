@@ -5,7 +5,6 @@ import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.db.Competition;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduScheduleGroup;
-import com.jakduk.api.model.simple.UserOnHome;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -51,19 +50,6 @@ public class JakdukDAO {
 
 		return users;
 	}
-
-	public List<UserOnHome> getUserOnHome(String language) {
-		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
-		AggregationOperation limit = Aggregation.limit(Constants.HOME_SIZE_LINE_NUMBER);
-		Aggregation aggregation = Aggregation.newAggregation(sort, limit);
-		
-		AggregationResults<UserOnHome> results = mongoTemplate.aggregate(aggregation, "user", UserOnHome.class);
-		
-		List<UserOnHome> users = results.getMappedResults();
-
-		
-		return users;
-	}	
 
 	// 대회 목록.
 	public List<Competition> getCompetitions(List<ObjectId> ids, String language) {

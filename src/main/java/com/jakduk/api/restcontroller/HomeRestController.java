@@ -7,6 +7,7 @@ import com.jakduk.api.restcontroller.vo.home.HomeLatestItemsResponse;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.HomeService;
+import com.jakduk.api.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeRestController {
 
     @Autowired private HomeService homeService;
+    @Autowired private UserService userService;
     @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
 
@@ -45,7 +47,7 @@ public class HomeRestController {
 
         return HomeLatestItemsResponse.builder()
                 .homeDescription(homeService.getHomeDescription())
-                .users(homeService.getUsersLatest(language))
+                .users(userService.findSimpleUsers())
                 .comments(articleService.getLatestComments())
                 .articles(articleService.getLatestArticles())
                 .galleries(galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY))

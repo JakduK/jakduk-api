@@ -16,6 +16,7 @@ import com.jakduk.api.model.embedded.LocalName;
 import com.jakduk.api.model.embedded.UserPictureInfo;
 import com.jakduk.api.model.simple.UserOnPasswordUpdate;
 import com.jakduk.api.model.simple.UserProfile;
+import com.jakduk.api.model.simple.UserSimple;
 import com.jakduk.api.repository.footballclub.FootballClubRepository;
 import com.jakduk.api.repository.user.UserPictureRepository;
 import com.jakduk.api.repository.user.UserProfileRepository;
@@ -34,6 +35,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -80,8 +82,11 @@ public class UserService {
 	 * @return UserOnPasswordUpdate
      */
 	public UserOnPasswordUpdate findUserOnPasswordUpdateById(String id){
-
 		return userRepository.findUserOnPasswordUpdateById(id);
+	}
+
+	public List<UserSimple> findSimpleUsers() {
+		return userRepository.findSimpleUsers();
 	}
 
 	/**

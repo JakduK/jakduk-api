@@ -11,7 +11,7 @@ import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.ArticleSimple;
-import com.jakduk.api.model.simple.UserOnHome;
+import com.jakduk.api.model.simple.UserSimple;
 import com.jakduk.api.restcontroller.HomeRestController;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;
@@ -21,6 +21,7 @@ import com.jakduk.api.restcontroller.vo.home.HomeLatestItemsResponse;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.HomeService;
+import com.jakduk.api.service.UserService;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,6 +63,7 @@ public class HomeMvcTests {
     @MockBean private RestTemplateBuilder restTemplateBuilder;
 
     @MockBean private HomeService homeService;
+    @MockBean private UserService userService;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
 
@@ -136,8 +138,8 @@ public class HomeMvcTests {
                         .build()
         );
 
-        List<UserOnHome> users = Arrays.asList(
-                UserOnHome.builder()
+        List<UserSimple> users = Arrays.asList(
+                UserSimple.builder()
                         .id("571ccf50ccbfc325b20711c5")
                         .username("test07")
                         .about("안녕하세요. 반갑습니다.")
@@ -177,7 +179,7 @@ public class HomeMvcTests {
         when(homeService.getHomeDescription())
                 .thenReturn(homeDescription);
 
-        when(homeService.getUsersLatest(anyString()))
+        when(userService.findSimpleUsers())
                 .thenReturn(users);
 
         when(articleService.getLatestComments())
