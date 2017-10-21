@@ -1,7 +1,6 @@
 package com.jakduk.api.board;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
@@ -111,29 +110,6 @@ public class ArticleRepositoryTests {
         LocalDate localDate = LocalDate.now().minusWeeks(1);
 
         List<BoardTop> topLikes = repository.findTopLikes(Constants.BOARD_TYPE.FOOTBALL, new ObjectId(DateUtils.localDateToDate(localDate)));
-    }
-
-    @Test
-    public void changeCategory() {
-        List<Integer> seqs = Arrays.asList(344,
-                950,
-                558,
-                580,
-                589,
-                848,
-                882);
-
-        List<Article> articles = repository.findBySeqIn(seqs);
-
-        articles.forEach(article -> {
-                    article.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
-                    article.setCategory(BoardCategoryGenerator.Category.ETC.name());
-                }
-        );
-
-        repository.save(articles);
-
-        System.out.println("articles=" + articles);
     }
 
 }
