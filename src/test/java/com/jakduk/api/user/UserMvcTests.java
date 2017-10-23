@@ -17,12 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,13 +33,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserRestController.class)
-@WithMockUser
-public class UserControllerTests {
+public class UserMvcTests {
 
     @Autowired
     private MockMvc mvc;
 
     @MockBean private RestTemplateBuilder restTemplateBuilder;
+
     @MockBean private AuthenticationManager authenticationManager;
     @MockBean private UserService userService;
     @MockBean private PasswordEncoder passwordEncoder;
@@ -51,6 +51,7 @@ public class UserControllerTests {
     }
 
     @Test
+    @WithMockUser
     public void createJakdukUser() throws Exception {
         UserForm form = UserForm.builder()
                 .email("example@jakduk.com")
@@ -65,8 +66,8 @@ public class UserControllerTests {
                 .username(form.getUsername())
                 .build();
 
-        given(userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword()), null, null, null))
-                .willReturn(expectUser);
+        when(userService.createJakdukUser(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(expectUser);
 
         mvc.perform(post("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)

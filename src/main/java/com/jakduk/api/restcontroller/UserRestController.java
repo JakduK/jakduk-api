@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.annotation.SecuredAnonymousUser;
 import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistEmailOnEdit;
@@ -44,7 +43,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -65,35 +63,33 @@ public class UserRestController {
     @Autowired private UserDetailsService userDetailsService;
 
     @ApiOperation("이메일 기반 회원 가입")
-    @SecuredAnonymousUser
     @PostMapping("")
-    public EmptyJsonResponse addJakdukUser(
-            @ApiParam(value = "회원 폼", required = true) @Valid @RequestBody UserForm form,
-            Locale locale) {
+    public EmptyJsonResponse createJakdukUser(
+            @ApiParam(value = "회원 폼", required = true) @Valid @RequestBody UserForm form) {
 
-        User user = userService.addJakdukUser(form.getEmail(), form.getUsername(), passwordEncoder.encode(form.getPassword().trim()),
+        String password = form.getPassword().trim();
+
+        User user = userService.createJakdukUser(form.getEmail().trim(), form.getUsername().trim(), password,
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
+
+        String email = user.getEmail();
 
         // Perform the security
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        form.getPassword()
-                )
+                new UsernamePasswordAuthenticationToken(email, password)
         );
 
         AuthUtils.setAuthentication(authentication);
 
-        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
+        rabbitMQPublisher.sendWelcome(JakdukUtils.getLocale(), user.getUsername(), email);
 
         return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation("SNS 기반 회원 가입")
     @PostMapping("/social")
-    public EmptyJsonResponse addSocialUser(
+    public EmptyJsonResponse createSocialUser(
             @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody SocialUserForm form,
-            Locale locale,
             HttpSession session) {
 
         AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
@@ -101,14 +97,11 @@ public class UserRestController {
         if (Objects.isNull(attemptSocialUser))
             throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
 
-        String largePictureUrl = null;
+        String largePictureUrl = StringUtils.defaultIfBlank(form.getExternalLargePictureUrl(), null);
 
-        if (StringUtils.isNotBlank(form.getExternalLargePictureUrl()))
-            largePictureUrl = StringUtils.defaultIfBlank(form.getExternalLargePictureUrl(), null);
-
-        User user = userService.addSocialUser(form.getEmail(), form.getUsername(), attemptSocialUser.getProviderId(),
-                attemptSocialUser.getProviderUserId(), form.getFootballClub(), form.getAbout(), form.getUserPictureId(),
-                largePictureUrl);
+        User user = userService.createSocialUser(form.getEmail().trim(), form.getUsername().trim(), attemptSocialUser.getProviderId(),
+                attemptSocialUser.getProviderUserId().trim(), form.getFootballClub(), form.getAbout(),
+                form.getUserPictureId(), largePictureUrl);
 
         // Perform the security
         Authentication authentication = authenticationManager.authenticate(
@@ -117,11 +110,11 @@ public class UserRestController {
                 )
         );
 
-        session.removeAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
-
         AuthUtils.setAuthentication(authentication);
 
-        rabbitMQPublisher.sendWelcome(locale, user.getUsername(), user.getEmail());
+        session.removeAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+
+        rabbitMQPublisher.sendWelcome(JakdukUtils.getLocale(), user.getUsername(), user.getEmail());
 
         return EmptyJsonResponse.newInstance();
     }

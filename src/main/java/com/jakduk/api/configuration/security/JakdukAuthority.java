@@ -16,8 +16,8 @@ import java.util.Arrays;
 @Getter
 public enum JakdukAuthority {
 
-	ROLE_USER_01(10), // 미인증 회원
-	ROLE_USER_02(11), // 인증 회원
+	ROLE_USER_01(10), // 이메일 미인증 회원
+	ROLE_USER_02(11), // 이메일 인증 회원
 	ROLE_USER_03(12),
 	ROLE_ADMIN(30),
 	ROLE_ROOT(90);

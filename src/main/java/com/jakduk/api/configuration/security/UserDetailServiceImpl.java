@@ -52,7 +52,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
             UserPicture userPicture = user.getUserPicture();
 
             if (! ObjectUtils.isEmpty(userPicture)) {
-                UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
+                UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture.getId(),
                         authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
                         authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 

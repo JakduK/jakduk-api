@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -46,6 +46,7 @@ public class UserService {
 	@Resource private JakdukProperties.Storage storageProperties;
 	@Resource private AuthUtils authUtils;
 
+	@Autowired private PasswordEncoder passwordEncoder;
 	@Autowired private UserRepository userRepository;
 	@Autowired private FootballClubRepository footballClubRepository;
 	@Autowired private UserProfileRepository userProfileRepository;
@@ -114,31 +115,23 @@ public class UserService {
 		}
 	}
 
-	public User addJakdukUser(String email, String username, String password, String footballClub, String about, String userPictureId) {
+	public User createJakdukUser(String email, String username, String password, String footballClub, String about, String userPictureId) {
 
 		UserPicture userPicture = null;
 
 		User user = User.builder()
-				.email(email.trim())
-				.username(username.trim())
-				.password(password)
+				.email(email)
+				.username(username)
+				.password(passwordEncoder.encode(password))
 				.providerId(Constants.ACCOUNT_TYPE.JAKDUK)
 				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 
-		if (StringUtils.isNotBlank(footballClub)) {
-			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
-
-			user.setSupportFC(supportFC);
-		}
-
-		if (StringUtils.isNotBlank(about))
-			user.setAbout(about.trim());
+		this.setUserAdditionalInfo(user, footballClub, about);
 
 		if (StringUtils.isNotBlank(userPictureId)) {
-			userPicture = userPictureRepository.findOneById(userPictureId)
+			userPicture = userPictureRepository.findOneById(userPictureId.trim())
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
@@ -146,13 +139,13 @@ public class UserService {
 
 		userRepository.save(user);
 
-		if (! ObjectUtils.isEmpty(userPicture)) {
+		if (Objects.nonNull(userPicture)) {
 			userPicture.setUser(user);
 			userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
-		log.info("JakduK user created. email:{} username:{}", user.getEmail(), user.getUsername());
+		log.info("JakduK user created. {}", user);
 
 		return user;
 	}
@@ -160,33 +153,25 @@ public class UserService {
 	/**
 	 * SNS 회원 가입
 	 */
-	public User addSocialUser(String email, String username, Constants.ACCOUNT_TYPE providerId, String providerUserId,
-                              String footballClub, String about, String userPictureId, String largePictureUrl) {
+	public User createSocialUser(String email, String username, Constants.ACCOUNT_TYPE providerId, String providerUserId,
+								 String footballClub, String about, String userPictureId, String largePictureUrl) {
 
 		UserPicture userPicture = null;
 
 		User user = User.builder()
-				.email(email.trim())
+				.email(email)
 				.username(username)
 				.providerId(providerId)
 				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
+				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_02.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 
-		if (StringUtils.isNotBlank(footballClub)) {
-			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
-
-			user.setSupportFC(supportFC);
-		}
-
-		if (StringUtils.isNotBlank(about))
-			user.setAbout(about.trim());
+		this.setUserAdditionalInfo(user, footballClub, about);
 
 		// 직접 올린 사진을 User와 연동
 		if (StringUtils.isNotBlank(userPictureId)) {
-			userPicture = userPictureRepository.findOneById(userPictureId)
+			userPicture = userPictureRepository.findOneById(userPictureId.trim())
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
@@ -203,7 +188,6 @@ public class UserService {
 				userPicture = UserPicture.builder()
 						.status(Constants.GALLERY_STATUS_TYPE.TEMP)
 						.contentType(fileInfo.getContentType())
-						.sourceType(providerId)
 						.build();
 
 				userPictureRepository.save(userPicture);
@@ -232,9 +216,21 @@ public class UserService {
 			userPictureRepository.save(userPicture);
 		}
 
-		log.info("social user created. email:{} username:{}, providerId:{}", user.getEmail(), user.getUsername(), user.getProviderId());
+		log.info("social user created. {}", user);
 
 		return user;
+	}
+
+	private void setUserAdditionalInfo(User user, String footballClub, String about) {
+		if (StringUtils.isNotBlank(footballClub)) {
+			FootballClub supportFC = footballClubRepository.findOneById(footballClub.trim())
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+
+			user.setSupportFC(supportFC);
+		}
+
+		if (StringUtils.isNotBlank(about))
+			user.setAbout(about.trim());
 	}
 
 	public User editUserProfile(String userId, String email, String username, String footballClubId, String about,
@@ -327,7 +323,6 @@ public class UserService {
 		UserPicture userPicture = UserPicture.builder()
 				.status(Constants.GALLERY_STATUS_TYPE.TEMP)
 				.contentType(contentType)
-				.sourceType(Constants.ACCOUNT_TYPE.JAKDUK)
 				.build();
 
 		userPictureRepository.save(userPicture);
@@ -373,7 +368,7 @@ public class UserService {
 		}
 
 		if (Objects.nonNull(userPicture)) {
-			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
+			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture.getId(),
 					authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
 					authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 

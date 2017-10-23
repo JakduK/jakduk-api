@@ -1,7 +1,5 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.db.UserPicture;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,14 +12,11 @@ import lombok.NoArgsConstructor;
 public class UserPictureInfo {
 
     private String id;
-    @Deprecated
-    private Constants.ACCOUNT_TYPE sourceType;
     private String smallPictureUrl;
     private String largePictureUrl;
 
-    public UserPictureInfo(UserPicture userPicture, String smallPictureUrl, String largePictureUrl) {
-        this.id = userPicture.getId();
-        this.sourceType = userPicture.getSourceType();
+    public UserPictureInfo(String id, String smallPictureUrl, String largePictureUrl) {
+        this.id = id;
         this.smallPictureUrl = smallPictureUrl;
         this.largePictureUrl = largePictureUrl;
     }
