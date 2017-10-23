@@ -6,7 +6,7 @@ import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.MongodbConfig;
 import com.jakduk.api.model.aggregate.CommonCount;
 import com.jakduk.api.model.db.ArticleComment;
-import com.jakduk.api.repository.article.comment.ArticleCommentRepository;
+import com.jakduk.api.repository.article.ArticleCommentRepository;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 /**

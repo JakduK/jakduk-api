@@ -182,6 +182,7 @@ public class Constants {
 	/**
 	 * mongoDB collection 이름
 	 */
+	public final static String COLLECTION_USER = "user";
 	public final static String COLLECTION_ARTICLE = "article";
 	public final static String COLLECTION_ARTICLE_COMMENT = "articleComment";
 	public final static String COLLECTION_GALLERY = "gallery";

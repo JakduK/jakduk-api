@@ -39,18 +39,18 @@ public class PasswordRestController {
 		UserProfile userProfile = userService.findOneByEmail(email);
 
 		if (Objects.isNull(userProfile)) {
-			message = JakdukUtils.getResourceBundleMessage( "messages.user", "user.msg.you.are.not.registered");
+			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");
 		} else {
 			switch (userProfile.getProviderId()) {
 				case JAKDUK:
-					message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.sendok");
+					message = JakdukUtils.getMessageSource("user.msg.reset.password.sendok");
 					rabbitMQPublisher.sendResetPassword(locale, host, email);
 					break;
 				case DAUM:
-					message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
+					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
 					break;
 				case FACEBOOK:
-					message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
+					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
 					break;
 			}
 		}
@@ -68,13 +68,13 @@ public class PasswordRestController {
 	public Map<String, Object> resetPassword(@PathVariable String code) {
 
 		if (Objects.isNull(code))
-			throw new IllegalArgumentException(JakdukUtils.getExceptionMessage("exception.invalid.parameter"));
+			throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
 
 		Map<String, Object> response = new HashMap<>();
 		Optional<Token> oToken = commonService.getTokenByCode(code);
 
 		if (! oToken.isPresent() || ! StringUtils.equals(oToken.get().getCode(), code))
-			throw new IllegalArgumentException(JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.invalid"));
+			throw new IllegalArgumentException(JakdukUtils.getMessageSource("user.msg.reset.password.invalid"));
 
 		Token token = oToken.get();
 		response.put("subject", token.getEmail());
@@ -97,12 +97,12 @@ public class PasswordRestController {
 		if (oToken.isPresent()) {
 			Token token = oToken.get();
 			userService.userPasswordUpdateByEmail(token.getEmail(), passwordEncoder.encode(password.trim()));
-			message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.success.change.password");
+			message = JakdukUtils.getMessageSource("user.msg.success.change.password");
 			response.put("subject", token.getEmail());
 
 			tokenRepository.delete(token);
 		} else {
-			message = JakdukUtils.getResourceBundleMessage("messages.user", "user.msg.reset.password.invalid");
+			message = JakdukUtils.getMessageSource("user.msg.reset.password.invalid");
 		}
 
 		response.put("message", message);

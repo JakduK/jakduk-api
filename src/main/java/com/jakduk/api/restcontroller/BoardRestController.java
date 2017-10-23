@@ -83,18 +83,6 @@ public class BoardRestController {
                 .build();
     }
 
-    @ApiOperation("게시판 댓글 목록")
-    @GetMapping("/{board}/comments")
-    public GetArticleCommentsResponse getArticleComments(
-            @ApiParam(value = "게시판", required = true) @PathVariable Constants.BOARD_TYPE board,
-            @ApiParam(value = "페이지 번호(1부터 시작)") @RequestParam(required = false, defaultValue = "1") Integer page,
-            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "20") Integer size) {
-
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
-
-        return articleService.getArticleComments(commonWriter, board, page, size);
-    }
-
     @ApiOperation("게시판 글 상세")
     @GetMapping("/{board}/{seq}")
     public ResponseEntity<GetArticleDetailResponse> getArticleDetail(

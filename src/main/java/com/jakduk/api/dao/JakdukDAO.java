@@ -3,12 +3,9 @@ package com.jakduk.api.dao;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.db.Competition;
-import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduScheduleGroup;
-import com.jakduk.api.model.simple.UserOnHome;
 import org.bson.types.ObjectId;
-import org.jongo.Jongo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -36,9 +33,6 @@ public class JakdukDAO {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
-	@Autowired
-	private Jongo jongo;
-
 	public List<SupporterCount> getSupportFCCount(String language) {
 		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));
 		AggregationOperation group = Aggregation.group("supportFC").count().as("count");
@@ -55,33 +49,6 @@ public class JakdukDAO {
 		}
 
 		return users;
-	}
-
-	public List<UserOnHome> getUserOnHome(String language) {
-		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
-		AggregationOperation limit = Aggregation.limit(Constants.HOME_SIZE_LINE_NUMBER);
-		Aggregation aggregation = Aggregation.newAggregation(sort, limit);
-		
-		AggregationResults<UserOnHome> results = mongoTemplate.aggregate(aggregation, "user", UserOnHome.class);
-		
-		List<UserOnHome> users = results.getMappedResults();
-		
-		for (UserOnHome user : users) {
-			if (user.getSupportFC() != null) {
-				user.getSupportFC().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
-			}
-		}
-		
-		return users;
-	}	
-	
-	public HomeDescription getHomeDescription() {
-		
-		Query query = new Query();
-		query.with(new Sort(Direction.DESC, "priority"));
-		HomeDescription homeDescription = mongoTemplate.findOne(query, HomeDescription.class);
-		
-		return homeDescription;
 	}
 
 	// 대회 목록.

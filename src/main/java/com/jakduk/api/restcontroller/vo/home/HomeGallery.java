@@ -4,18 +4,20 @@ import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.GallerySimple;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * @author pyohwan
  *         16. 7. 21 오후 9:47
  */
 
-@ApiModel(description = "최근 사진")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
-public class GalleryOnHome {
+@ApiModel(description = "최근 사진")
+public class HomeGallery {
 
     @ApiModelProperty(value = "사진 ID")
     private String id;
@@ -32,7 +34,7 @@ public class GalleryOnHome {
     @ApiModelProperty(value = "썸네일 URL")
     private String thumbnailUrl;
 
-    public GalleryOnHome(GallerySimple gallery) {
+    public HomeGallery(GallerySimple gallery) {
         this.id = gallery.getId();
         this.name = gallery.getName();
         this.writer = gallery.getWriter();

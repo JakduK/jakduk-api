@@ -1,10 +1,8 @@
 package com.jakduk.api.model.db;
 
-import lombok.Data;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -13,25 +11,20 @@ import javax.validation.constraints.NotNull;
  * @desc     :
  */
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 @Document
 public class Encyclopedia {
-	
+
 	@Id
 	private String id;
-	
-	/**
-	 *  종류. 1이면 최고의 선수, 2이면 추천 책
-	 */
-	private String kind;
-	
+	private Integer seq;
+	private String kind; // 종류. 1이면 최고의 선수, 2이면 추천 책
 	private String language;
-	
-	@NotNull
 	private String subject;
-	
-	@NotNull
 	private String content;
-	
-	private int seq;
+
 }

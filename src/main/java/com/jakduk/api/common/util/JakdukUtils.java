@@ -76,20 +76,19 @@ public class JakdukUtils {
     /**
      * ResourceBundle에서 메시지 가져오기.
      *
-     * @param bundle 번들 이름 ex) messages.common
      * @param getString 메시지 이름 ex) common.exception.you.are.writer
      * @param params 파라미터가 있을 경우 계속 넣을 수 있음
      * @return 언어별 메시지 결과 반환
      */
-    public static String getResourceBundleMessage(String bundle, String getString, Object... params) {
+    public static String getMessageSource(String getString, Object... params) {
         Locale locale = LocaleContextHolder.getLocale();
-        ResourceBundle resourceBundle = ResourceBundle.getBundle(bundle, locale);
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages", locale);
         return MessageFormat.format(resourceBundle.getString(getString), params);
     }
 
-    public static String getExceptionMessage(String getString, Object... params) {
+    public static String getValidationMessage(String getString, Object... params) {
         Locale locale = LocaleContextHolder.getLocale();
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.exception", locale);
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("ValidationMessages", locale);
         return MessageFormat.format(resourceBundle.getString(getString), params);
     }
 

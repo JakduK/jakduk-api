@@ -18,25 +18,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @AllArgsConstructor
 @Getter
-@Document(collection = "user")
+@Document(collection = Constants.COLLECTION_USER)
 public class UserProfile {
 
 	@Id
 	private String id;
-
 	private String email;
-
 	private String username;
-
 	private Constants.ACCOUNT_TYPE providerId;		// 제공자
-
 	private String providerUserId;					// SNS USER ID
-
 	private String about;
-
 	@DBRef
 	private FootballClub supportFC;
-
 	@DBRef
 	private UserPicture userPicture;				// 프로필 사진
 }

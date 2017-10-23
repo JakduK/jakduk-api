@@ -117,7 +117,7 @@ public class JakduRestController {
     public Jakdu myJakduWrite(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
 
         if (Objects.isNull(myJakdu)) {
-            throw new IllegalArgumentException(JakdukUtils.getExceptionMessage("exception.invalid.parameter"));
+            throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
         }
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
@@ -131,7 +131,7 @@ public class JakduRestController {
                                      Device device) {
 
         if (Objects.isNull(jakduCommentWriteRequest))
-            throw new IllegalArgumentException(JakdukUtils.getExceptionMessage("exception.invalid.parameter"));
+            throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);

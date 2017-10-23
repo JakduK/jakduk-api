@@ -216,6 +216,42 @@ include::{snippets}/get-my-session-user/response-fields.adoc[]
 .http response
 include::{snippets}/get-my-session-user/http-response.adoc[]
 
+[[home]]
+== 홈 API
+홈 화면과 관련된 API.
+
+[[get-random-encyclopedia]]
+=== 임의의 백과사전 가져오기
+
+백과사전 중 임의로 하나만 가져온다.
+
+TIP: 쿼리 스트링 lang으로 언어를 바꿀 수 있다. 현재 ko,en 만 가능하다. ex) lang=ko
+
+.http request
+include::{snippets}/get-random-encyclopedia/http-request.adoc[]
+.curl request
+include::{snippets}/get-random-encyclopedia/curl-request.adoc[]
+
+.response fields
+include::{snippets}/get-random-encyclopedia/response-fields.adoc[]
+.http response
+include::{snippets}/get-random-encyclopedia/http-response.adoc[]
+
+[[get-home-latest-items]]
+=== 홈에서 보여지는 아이템들 가져오기
+
+최근 글 목록, 최근 댓글 목록, 최근 가입한 회원 목록, 알림 판 등의 정보를 가져온다.
+
+.http request
+include::{snippets}/get-home-latest-items/http-request.adoc[]
+.curl request
+include::{snippets}/get-home-latest-items/curl-request.adoc[]
+
+.response fields
+include::{snippets}/get-home-latest-items/response-fields.adoc[]
+.http response
+include::{snippets}/get-home-latest-items/http-response.adoc[]
+
 [[board]]
 == 게시판 API
 게시판과 관련된 API. 현재 FREE, FOOTBALL, DEVELOPER 게시판이 있다.
@@ -425,26 +461,6 @@ include::{snippets}/disableArticleNotice/curl-request.adoc[]
 
 .http response
 include::{snippets}/disableArticleNotice/http-response.adoc[]
-
-[[board-get-article-comments]]
-=== 댓글 목록
-
-댓글의 최신 목록을 가져온다.
-인증은 옵션.
-
-include::{snippets}/getArticleComments/path-parameters.adoc[]
-
-.request parameters
-include::{snippets}/getArticleComments/request-parameters.adoc[]
-.http request
-include::{snippets}/getArticleComments/http-request.adoc[]
-.curl request
-include::{snippets}/getArticleComments/curl-request.adoc[]
-
-.response fields
-include::{snippets}/getArticleComments/response-fields.adoc[]
-.http response
-include::{snippets}/getArticleComments/http-response.adoc[]
 
 [[board-get-article-detail-comments]]
 === 글의 댓글 목록

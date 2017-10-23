@@ -1,10 +1,8 @@
 package com.jakduk.api.configuration;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +11,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+
+import java.util.Locale;
 
 /**
  * @author pyohwan
@@ -24,15 +24,19 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("lang");
+        LocaleChangeInterceptor localeInterceptor = new LocaleChangeInterceptor();
+        localeInterceptor.setParamName("lang");
+        localeInterceptor.setIgnoreInvalidLocale(true);
 
-        registry.addInterceptor(localeChangeInterceptor);
+        registry.addInterceptor(localeInterceptor);
     }
 
     @Bean
     public LocaleResolver localeResolver() {
-        return new CookieLocaleResolver();
+        CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+        localeResolver.setDefaultLocale(Locale.ENGLISH);
+
+        return localeResolver;
     }
 
     /**
@@ -54,16 +58,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder.build();
-    }
-
-    @Bean
-    public MessageSource messageSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames(
-                "messages/common", "messages/board", "messages/user", "messages/jakdu", "messages/email", "messages/exception"
-        );
-
-        return messageSource;
     }
 
 }

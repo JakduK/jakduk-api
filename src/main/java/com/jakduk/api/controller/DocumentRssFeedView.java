@@ -47,8 +47,8 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	@Override protected Channel newFeed() {
 		Channel channel = new Channel("rss_2.0");
 		channel.setLink(String.format("%s/%s", jakdukProperties.getWebServerUrl(), "/rss"));
-		channel.setTitle(JakdukUtils.getResourceBundleMessage("messages.common", "common.jakduk"));
-		channel.setDescription(JakdukUtils.getResourceBundleMessage("messages.common", "common.jakduk.rss.description"));
+		channel.setTitle(JakdukUtils.getMessageSource("common.jakduk"));
+		channel.setDescription(JakdukUtils.getMessageSource("common.jakduk.rss.description"));
 
 		return channel;
 	}

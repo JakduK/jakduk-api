@@ -99,7 +99,7 @@ public class ArticleMvcTests {
         categoriesMap = categories.stream()
                 .collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
 
-        categoriesMap.put("ALL", JakdukUtils.getResourceBundleMessage("messages.board", "board.category.all"));
+        categoriesMap.put("ALL", JakdukUtils.getMessageSource("board.category.all"));
 
         article = Article.builder()
                 .id("59c8879fa2b594c5d33e6ac4")
@@ -433,6 +433,7 @@ public class ArticleMvcTests {
 
         WriteArticleResponse expectResponse = WriteArticleResponse.builder()
                 .seq(article.getSeq())
+                .board(article.getBoard())
                 .build();
 
         mvc.perform(
@@ -456,7 +457,8 @@ public class ArticleMvcTests {
                                                 Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
                                 ),
                                 responseFields(
-                                        fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호")
+                                        fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호"),
+                                        fieldWithPath("board").type(JsonFieldType.STRING).description("게시판")
                                 )
                         ));
     }

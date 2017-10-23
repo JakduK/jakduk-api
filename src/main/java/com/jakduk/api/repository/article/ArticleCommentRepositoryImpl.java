@@ -1,8 +1,9 @@
-package com.jakduk.api.repository.article.comment;
+package com.jakduk.api.repository.article;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.aggregate.CommonCount;
 import com.jakduk.api.model.db.ArticleComment;
+import com.jakduk.api.model.simple.ArticleCommentSimple;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -101,6 +102,15 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
         AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE_COMMENT, CommonCount.class);
 
         return results.getMappedResults();
+    }
+
+    @Override
+    public List<ArticleCommentSimple> findSimpleComments() {
+        Query query = new Query();
+        query.with(new Sort(Sort.Direction.DESC, "_id"));
+        query.limit(Constants.HOME_SIZE_LINE_NUMBER);
+
+        return mongoTemplate.find(query, ArticleCommentSimple.class);
     }
 
 }

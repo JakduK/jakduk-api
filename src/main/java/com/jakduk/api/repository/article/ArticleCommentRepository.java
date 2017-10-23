@@ -1,10 +1,8 @@
-package com.jakduk.api.repository.article.comment;
+package com.jakduk.api.repository.article;
 
 import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.embedded.ArticleItem;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
@@ -20,7 +18,6 @@ public interface ArticleCommentRepository extends MongoRepository<ArticleComment
 	Optional<ArticleComment> findOneById(String id);
 
 	Integer countByArticle(ArticleItem articleItem);
-	Page<ArticleComment> findByArticleBoard(String board, Pageable pageable);
 	long count();
 
 	// for JUnit

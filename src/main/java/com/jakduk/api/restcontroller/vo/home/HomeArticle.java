@@ -4,8 +4,7 @@ import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,9 +12,12 @@ import java.util.List;
  * Created by pyohwanjang on 2017. 3. 3..
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
-public class LatestHomeArticle {
+public class HomeArticle {
 
     @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
     private String id;

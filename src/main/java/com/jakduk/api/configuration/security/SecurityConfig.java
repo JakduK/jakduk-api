@@ -4,9 +4,7 @@ import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.security.handler.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,7 +22,6 @@ import javax.annotation.Resource;
  * 16. 4. 6 오후 9:51
  */
 
-@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity // TODO 훗날 제거
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -121,12 +118,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(snsAuthenticationProvider);
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
     }
 
     @Bean
