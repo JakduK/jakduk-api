@@ -216,6 +216,28 @@ include::{snippets}/get-my-session-user/response-fields.adoc[]
 .http response
 include::{snippets}/get-my-session-user/http-response.adoc[]
 
+[[user]]
+== 회원 API
+회원과 관련된 API.
+
+[[create-jakduk-user]]
+=== JakduK 회원 가입
+
+이메일 주소 기반인 JakduK 계열 회원 가입을 한다.
+비로그인 상태에서 사용 가능 하다.
+
+.request fields
+include::{snippets}/create-jakduk-user/request-fields.adoc[]
+.http request
+include::{snippets}/create-jakduk-user/http-request.adoc[]
+.curl request
+include::{snippets}/create-jakduk-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/create-jakduk-user/response-headers.adoc[]
+.http response
+include::{snippets}/create-jakduk-user/http-response.adoc[]
+
 [[home]]
 == 홈 API
 홈 화면과 관련된 API.

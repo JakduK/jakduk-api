@@ -255,8 +255,6 @@ public class AuthMvcTests {
                                                 Stream.of(JakdukAuthority.values()).map(Enum::name).collect(Collectors.toList())),
                                         fieldWithPath("picture").type(JsonFieldType.OBJECT).description("회원 사진"),
                                         fieldWithPath("picture.id").type(JsonFieldType.STRING).description("회원 사진 ID"),
-                                        fieldWithPath("picture.sourceType").type(JsonFieldType.STRING).description("계정 분류 " +
-                                                Stream.of(Constants.ACCOUNT_TYPE.values()).map(Enum::name).collect(Collectors.toList())),
                                         fieldWithPath("picture.smallPictureUrl").type(JsonFieldType.STRING).description("회원 작은 사진 URL"),
                                         fieldWithPath("picture.largePictureUrl").type(JsonFieldType.STRING).description("회원 큰 사진 URL")
                                 )

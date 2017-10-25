@@ -145,7 +145,7 @@ public class UserRestController {
 
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    JakdukUtils.getValidationMessage("validation.msg.email.exists"));
+                    JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
 
         return EmptyJsonResponse.newInstance();
     }
@@ -167,7 +167,7 @@ public class UserRestController {
 
         if (! ObjectUtils.isEmpty(userProfile))
             throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    JakdukUtils.getValidationMessage("validation.msg.username.exists"));
+                    JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
 
         return EmptyJsonResponse.newInstance();
     }

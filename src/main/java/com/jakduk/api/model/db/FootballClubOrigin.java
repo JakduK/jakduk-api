@@ -1,7 +1,7 @@
 package com.jakduk.api.model.db;
 
 import com.jakduk.api.common.Constants;
-import lombok.Data;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,18 +12,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
 @Document
 public class FootballClubOrigin {
 
-	@Id
+	@Id @Setter
 	private String id;
-	
 	private String name;
-
 	private Constants.CLUB_TYPE clubType;
-
 	private Constants.CLUB_AGE age;
-
 	private Constants.CLUB_SEX sex;
+
 }

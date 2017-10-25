@@ -140,7 +140,6 @@ public class UserService {
 		userRepository.save(user);
 
 		if (Objects.nonNull(userPicture)) {
-			userPicture.setUser(user);
 			userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
@@ -209,9 +208,7 @@ public class UserService {
 
 		userRepository.save(user);
 
-		// userImage를 user와 연동 및 활성화 처리
 		if (Objects.nonNull(userPicture)) {
-			userPicture.setUser(user);
 			userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
@@ -268,7 +265,6 @@ public class UserService {
 		userRepository.save(user);
 
 		if (Objects.nonNull(userPicture)) {
-			userPicture.setUser(user);
 			userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}

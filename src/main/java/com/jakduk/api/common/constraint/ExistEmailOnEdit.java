@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExistEmailOnEdit {
 
-    String message() default "{validation.msg.email.exists}";
+    String message() default "{com.jakduk.api.common.constraint.ExistEmail.description}";
 
     Class<?>[] groups() default {};
 
