@@ -10,6 +10,7 @@ import com.jakduk.api.model.db.FootballClubOrigin;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.embedded.LocalName;
+import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.restcontroller.UserRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
@@ -41,6 +42,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static org.mockito.Matchers.any;
@@ -76,6 +78,7 @@ public class UserMvcTests {
     @MockBean private PasswordEncoder passwordEncoder;
     @MockBean private RabbitMQPublisher rabbitMQPublisher;
     @MockBean private UserDetailsService userDetailsService;
+    @MockBean private UserProfileRepository userProfileRepository;
 
     private FootballClub footballClub;
     private UserPicture userPicture;
@@ -110,6 +113,12 @@ public class UserMvcTests {
     @Test
     @WithMockUser
     public void createJakdukUserTest() throws Exception {
+
+        when(userProfileRepository.findOneByEmail(anyString()))
+                .thenReturn(Optional.empty());
+
+        when(userProfileRepository.findOneByUsername(anyString()))
+                .thenReturn(Optional.empty());
 
         UserForm form = UserForm.builder()
                 .email("example@jakduk.com")
@@ -169,6 +178,12 @@ public class UserMvcTests {
     @Test
     @WithMockUser
     public void createSocialUserTest() throws Exception {
+
+        when(userProfileRepository.findOneByEmail(anyString()))
+                .thenReturn(Optional.empty());
+
+        when(userProfileRepository.findOneByUsername(anyString()))
+                .thenReturn(Optional.empty());
 
         AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
                 .username("daumUser01")

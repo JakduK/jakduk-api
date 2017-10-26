@@ -36,7 +36,7 @@ public class PasswordRestController {
 											Locale locale) {
 		String message = "";
 
-		UserProfile userProfile = userService.findOneByEmail(email);
+		UserProfile userProfile = userService.findOneByEmail(email).get();
 
 		if (Objects.isNull(userProfile)) {
 			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");

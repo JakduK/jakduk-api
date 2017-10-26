@@ -3,6 +3,7 @@ package com.jakduk.api.repository.user;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.simple.UserOnPasswordUpdate;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -17,5 +18,9 @@ public interface UserRepository extends MongoRepository<User, String>, UserRepos
 
 	@Query(value="{'id' : ?0}")
 	UserOnPasswordUpdate findUserOnPasswordUpdateById(String id);
+
+	// for JUnit
+	Optional<User> findTopByOrderByIdAsc();
+	Optional<User> findTopByIdLessThanEqualOrderByIdDesc(ObjectId id);
 
 }

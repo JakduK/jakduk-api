@@ -1,6 +1,5 @@
 package com.jakduk.api.repository.user;
 
-import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.simple.UserProfile;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -14,11 +13,8 @@ import java.util.Optional;
 public interface UserProfileRepository extends MongoRepository<UserProfile, String> {
 
     Optional<UserProfile> findOneById(String id);
-    UserProfile findOneByEmail(String email);
-    UserProfile findOneByUsername(String username);
-
-    // SNS 계정으로 가입한 회원 찾기.
-    UserProfile findOneByProviderIdAndProviderUserId(Constants.ACCOUNT_TYPE providerId, String providerUserId);
+    Optional<UserProfile> findOneByEmail(String email);
+    Optional<UserProfile> findOneByUsername(String username);
 
     // 해당 ID를 제외하고 email과 일치하는 회원 찾기.
     @Query(value="{'id' : {$ne : ?0}, 'email' : ?1}", fields="{'id' : 1, 'email' : 1}")
