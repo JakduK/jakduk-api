@@ -103,14 +103,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .regexMatchers(
                         HttpMethod.POST,
                         "/api/user", // 이메일 기반 회원 가입
-                        "/api/auth/login/[a-z]+" // SNS 기반 회원 가입 및 SNS 임시 프로필 조회
+                        "/api/auth/login/[a-z]+" // SNS 기반 회원 가입 및 SNS 임시 프로필 저장
                 ).anonymous()
                 .regexMatchers(
                         HttpMethod.GET,
-                        "/api/auth/user/attempt", // SNS 기반 회원 가입시 필요한 회원 프로필 정보
-                        "/api/auth/login/*",                    // SNS 로그인
-                        "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
-                        "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
+                        "/api/auth/user/attempt" // SNS 기반 회원 가입시 필요한 회원 프로필 정보
                 ).anonymous()
 
                 .anyRequest().permitAll();

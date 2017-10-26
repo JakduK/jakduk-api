@@ -156,6 +156,7 @@ include::{snippets}/login-sns-user/http-response.adoc[]
 만약 아직 가입 하지 않은 accessToken 라면, SNS 회원 가입을 진행한다.
 Provider(다음, 페이스북)에서 얻은 프로필 정보를 세션에 저장해 두고, SNS 회원 가입때 사용하면 된다.
 <<auth-get-attempt-social-session-user, SNS 프로필 세션 가져오기>> 에서, SNS 프로필 정보를 얻을 수 있다.
+또한 <<create-sns-user, SNS 회원 가입>> 를 진행할 수 있게 된다.
 
 다음은 Http 응답구조이며, Header는 `Status 404`, `Set-Cookie: JSESSIONID=키값` 이고 Body는 다음과 같다.
 [source,json,indent=0]
@@ -171,6 +172,7 @@ Provider(다음, 페이스북)에서 얻은 프로필 정보를 세션에 저장
 
 SNS 회원 가입시에 필요한 세션 프로필을 가져온다. Provider(다음, 페이스북)에서 얻은 프로필 정보가 담겨 있다.
 <<auth-set-attempt-social-session-user, SNS 프로필 세션 저장>> 에서 발급 받은 Cookie가 필요하다.
+<<create-sns-user, SNS 회원 가입>> 에서, 회원 가입 폼을 미리 채워두는 용도로 사용한다.
 
 .request headers
 include::{snippets}/get-attempt-social-session-user/request-headers.adoc[]
@@ -221,7 +223,7 @@ include::{snippets}/get-my-session-user/http-response.adoc[]
 회원과 관련된 API.
 
 [[create-jakduk-user]]
-=== JakduK 회원 가입
+=== 이메일 회원 가입
 
 이메일 주소 기반인 JakduK 계열 회원 가입을 한다.
 비로그인 상태에서 사용 가능 하다.
@@ -237,6 +239,25 @@ include::{snippets}/create-jakduk-user/curl-request.adoc[]
 include::{snippets}/create-jakduk-user/response-headers.adoc[]
 .http response
 include::{snippets}/create-jakduk-user/http-response.adoc[]
+
+[[create-sns-user]]
+=== SNS 회원 가입
+
+OAuth2 인증을 제공하는 페이스북, 다음 계정으로 회원 가입을 한다.
+<<auth-set-attempt-social-session-user, SNS 프로필 세션 저장>> 가 선행되어야 한다.
+<<auth-get-attempt-social-session-user, SNS 프로필 세션 가져오기>> 를 통해 이메일 주소, 별명, 프로필 사진 등을 가져올 수 있고, SNS 회원 가입 폼에 미리 값을 넣어둘 수 있다.
+
+.request fields
+include::{snippets}/create-sns-user/request-fields.adoc[]
+.http request
+include::{snippets}/create-sns-user/http-request.adoc[]
+.curl request
+include::{snippets}/create-sns-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/create-sns-user/response-headers.adoc[]
+.http response
+include::{snippets}/create-sns-user/http-response.adoc[]
 
 [[home]]
 == 홈 API

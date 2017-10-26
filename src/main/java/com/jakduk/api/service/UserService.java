@@ -66,16 +66,6 @@ public class UserService {
 		return userProfileRepository.findOneByUsername(username);
 	}
 
-	// 해당 ID를 제외하고 username과 일치하는 회원 찾기.
-	public UserProfile findByNEIdAndUsername(String id, String username) {
-		return userProfileRepository.findByNEIdAndUsername(id, username);
-	};
-
-	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
-	public UserProfile findByNEIdAndEmail(String id, String email) {
-		return userProfileRepository.findByNEIdAndEmail(id, email);
-	}
-
 	/**
 	 * 비밀번호 변경을 위한 이메일 기반 회원 가져오기
 	 *
@@ -278,14 +268,32 @@ public class UserService {
 		Optional<User> oUser = userRepository.findOneByEmail(email);
 
 		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.ALREADY_EXIST_EMAIL);
+			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
+					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
+	}
+
+	public void existEmail(String id, String email) {
+		Optional<UserProfile> oUser = userProfileRepository.findByNEIdAndEmail(id, email);
+
+		if (oUser.isPresent())
+			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
+					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
 	}
 	
 	public void existUsername(String username) {
 		Optional<User> oUser = userRepository.findOneByUsername(username);
 
 		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.ALREADY_EXIST_USERNAME);
+			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
+					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistUsername.description"));
+	}
+
+	public void existUsername(String id, String username) {
+		Optional<UserProfile> oUser = userProfileRepository.findByNEIdAndUsername(id, username);
+
+		if (oUser.isPresent())
+			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
+					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistUsername.description"));
 	}
 
 	/**

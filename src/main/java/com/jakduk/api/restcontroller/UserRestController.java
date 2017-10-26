@@ -2,10 +2,6 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
-import com.jakduk.api.common.constraint.ExistEmail;
-import com.jakduk.api.common.constraint.ExistEmailOnEdit;
-import com.jakduk.api.common.constraint.ExistUsername;
-import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -14,7 +10,6 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
-import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.*;
 import com.jakduk.api.service.UserService;
@@ -33,7 +28,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,63 +114,31 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "이메일 중복 검사")
-    @RequestMapping(value = "/exist/email", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
+    @GetMapping("/exist/email")
+    public EmptyJsonResponse existEmail(@NotEmpty @Email @RequestParam String email) {
 
-        userService.existEmail(StringUtils.trim(email));
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        return EmptyJsonResponse.newInstance();
-    }
-
-    @ApiOperation(value = "회원 프로필 편집 시 Email 중복 검사")
-    @SecuredUser
-    @RequestMapping(value = "/exist/email/edit", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmailOnEdit(@NotEmpty @Email @ExistEmailOnEdit @RequestParam String email) {
-
-        return EmptyJsonResponse.newInstance();
-    }
-
-    @ApiOperation(value = "비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사")
-    @RequestMapping(value = "/exist/email/anonymous", method = RequestMethod.GET)
-    public EmptyJsonResponse existEmailOnAnonymous(@NotEmpty @Email @RequestParam String email,
-                                                   @NotEmpty @RequestParam String id) {
-
-        UserProfile userProfile = userService.findByNEIdAndEmail(StringUtils.trim(id), StringUtils.trim(email));
-
-        if (! ObjectUtils.isEmpty(userProfile))
-            throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
-
-        return EmptyJsonResponse.newInstance();
-    }
-
-    @ApiOperation(value = "회원 프로필 편집 시 별명 중복 검사")
-    @SecuredUser
-    @RequestMapping(value = "/exist/username/edit", method = RequestMethod.GET)
-    public EmptyJsonResponse existUsernameOnEdit(@NotEmpty @ExistUsernameOnEdit @RequestParam String username) {
-
-        return EmptyJsonResponse.newInstance();
-    }
-
-    @ApiOperation(value = "비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사")
-    @RequestMapping(value = "/exist/username/anonymous", method = RequestMethod.GET)
-    public EmptyJsonResponse existUsernameOnAnonymous(@NotEmpty @RequestParam String username,
-                                                      @NotEmpty @RequestParam String id) {
-
-        UserProfile userProfile = userService.findByNEIdAndUsername(StringUtils.trim(id), StringUtils.trim(username));
-
-        if (! ObjectUtils.isEmpty(userProfile))
-            throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-                    JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
+        if (Objects.isNull(authUserProfile)) {
+            userService.existEmail(email.trim());
+        } else {
+            userService.existEmail(authUserProfile.getId(), email.trim());
+        }
 
         return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "별명 중복 검사")
-    @RequestMapping(value = "/exist/username", method = RequestMethod.GET)
-    public EmptyJsonResponse existUsername(@NotEmpty @ExistUsername @RequestParam String username) {
+    @GetMapping("/exist/username")
+    public EmptyJsonResponse existUsername(@NotEmpty @RequestParam String username) {
 
-        userService.existUsername(StringUtils.trim(username));
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+
+        if (Objects.isNull(authUserProfile)) {
+            userService.existUsername(username.trim());
+        } else {
+            userService.existUsername(authUserProfile.getId(), username.trim());
+        }
 
         return EmptyJsonResponse.newInstance();
     }

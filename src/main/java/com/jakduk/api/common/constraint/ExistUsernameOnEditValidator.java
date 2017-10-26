@@ -4,14 +4,15 @@ import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.simple.UserProfile;
+import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
-import com.jakduk.api.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Optional;
 
 /**
  * @author pyohwan
@@ -20,7 +21,7 @@ import javax.validation.ConstraintValidatorContext;
 public class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUsernameOnEdit, String> {
 
     @Autowired
-    private UserService userService;
+    private UserProfileRepository userProfileRepository;
 
     @Override
     public void initialize(ExistUsernameOnEdit constraintAnnotation) {
@@ -37,9 +38,9 @@ public class ExistUsernameOnEditValidator implements ConstraintValidator<ExistUs
         if (ObjectUtils.isEmpty(authUserProfile))
             throw new ServiceException(ServiceError.NEED_TO_LOGIN);
 
-        UserProfile userProfile = userService.findByNEIdAndUsername(authUserProfile.getId().trim(), value.trim());
+        Optional<UserProfile> optUserProfile = userProfileRepository.findByNEIdAndUsername(authUserProfile.getId().trim(), value.trim());
 
-        return ObjectUtils.isEmpty(userProfile);
+        return ! optUserProfile.isPresent();
 
     }
 }
