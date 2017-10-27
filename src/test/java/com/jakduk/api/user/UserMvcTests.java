@@ -49,10 +49,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -250,4 +254,31 @@ public class UserMvcTests {
                                 )
                         ));
     }
+
+    @Test
+    @WithMockUser
+    public void existEmailTest() throws Exception {
+
+        when(userProfileRepository.findOneByEmail(anyString()))
+                .thenReturn(Optional.empty());
+
+        mvc.perform(
+                get("/api/user/exist/email")
+                        .param("email", "example@jakduk.com")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("exist-email",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
+                                ),
+                                requestParameters(
+                                        parameterWithName("email").description("이메일 주소")
+                                )
+                        ));
+    }
+
 }

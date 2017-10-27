@@ -259,38 +259,6 @@ public class UserService {
 		return user;
 	}
 
-	public void existEmail(String email) {
-		Optional<User> oUser = userRepository.findOneByEmail(email);
-
-		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
-	}
-
-	public void existEmail(String id, String email) {
-		Optional<UserProfile> oUser = userProfileRepository.findByNEIdAndEmail(id, email);
-
-		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistEmail.description"));
-	}
-	
-	public void existUsername(String username) {
-		Optional<User> oUser = userRepository.findOneByUsername(username);
-
-		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistUsername.description"));
-	}
-
-	public void existUsername(String id, String username) {
-		Optional<UserProfile> oUser = userProfileRepository.findByNEIdAndUsername(id, username);
-
-		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.FORM_VALIDATION_FAILED,
-					JakdukUtils.getValidationMessage("com.jakduk.api.common.constraint.ExistUsername.description"));
-	}
-
 	/**
 	 * 이메일 기반 회원의 비밀번호 변경.
 	 *

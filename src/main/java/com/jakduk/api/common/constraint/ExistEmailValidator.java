@@ -1,11 +1,11 @@
 package com.jakduk.api.common.constraint;
 
+import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.repository.user.UserProfileRepository;
-import com.jakduk.api.repository.user.UserRepository;
-import com.jakduk.api.service.UserService;
+import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -17,7 +17,6 @@ import java.util.Optional;
  * 16. 7. 3 오후 9:30
  */
 
-@Component
 public class ExistEmailValidator implements ConstraintValidator<ExistEmail, String> {
 
     @Autowired
@@ -30,11 +29,20 @@ public class ExistEmailValidator implements ConstraintValidator<ExistEmail, Stri
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        Objects.requireNonNull(value);
+        if (StringUtils.isEmpty(value))
+            return false;
 
-        Optional<UserProfile> optUserProfile = userProfileRepository.findOneByEmail(value.trim());
+        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
 
-        return ! optUserProfile.isPresent();
+        if (Objects.isNull(authUserProfile)) {
+            Optional<UserProfile> optUserProfile = userProfileRepository.findOneByEmail(value.trim());
+
+            return ! optUserProfile.isPresent();
+        } else {
+            Optional<UserProfile> optUserProfile = userProfileRepository.findByNEIdAndEmail(authUserProfile.getId(), value.trim());
+
+            return ! optUserProfile.isPresent();
+        }
     }
 
 }

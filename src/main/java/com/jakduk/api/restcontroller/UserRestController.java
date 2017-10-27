@@ -2,6 +2,8 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.annotation.SecuredUser;
+import com.jakduk.api.common.constraint.ExistEmail;
+import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -115,31 +117,13 @@ public class UserRestController {
 
     @ApiOperation(value = "이메일 중복 검사")
     @GetMapping("/exist/email")
-    public EmptyJsonResponse existEmail(@NotEmpty @Email @RequestParam String email) {
-
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
-
-        if (Objects.isNull(authUserProfile)) {
-            userService.existEmail(email.trim());
-        } else {
-            userService.existEmail(authUserProfile.getId(), email.trim());
-        }
-
+    public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
         return EmptyJsonResponse.newInstance();
     }
 
     @ApiOperation(value = "별명 중복 검사")
     @GetMapping("/exist/username")
-    public EmptyJsonResponse existUsername(@NotEmpty @RequestParam String username) {
-
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
-
-        if (Objects.isNull(authUserProfile)) {
-            userService.existUsername(username.trim());
-        } else {
-            userService.existUsername(authUserProfile.getId(), username.trim());
-        }
-
+    public EmptyJsonResponse existUsername(@NotEmpty @ExistUsername @RequestParam String username) {
         return EmptyJsonResponse.newInstance();
     }
 

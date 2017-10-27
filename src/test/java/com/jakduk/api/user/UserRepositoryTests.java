@@ -28,7 +28,7 @@ import java.util.Random;
 public class UserRepositoryTests {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository repository;
 
     @Autowired
     private UserProfileRepository userProfileRepository;
@@ -37,11 +37,11 @@ public class UserRepositoryTests {
 
     @Before
     public void setUp(){
-        User user = userRepository.findTopByOrderByIdAsc().get();
+        User user = repository.findTopByOrderByIdAsc().get();
         LocalDateTime localDateTime = DateUtils.dateToLocalDateTime(new ObjectId(user.getId()).getDate());
         Long hours = ChronoUnit.MINUTES.between(localDateTime, LocalDateTime.now());
         LocalDateTime randomDate = localDateTime.plusMinutes(new Random().nextInt((int) (hours + 1)));
-        randomUser = userRepository.findTopByIdLessThanEqualOrderByIdDesc(new ObjectId(DateUtils.localDateTimeToDate(randomDate))).get();
+        randomUser = repository.findTopByIdLessThanEqualOrderByIdDesc(new ObjectId(DateUtils.localDateTimeToDate(randomDate))).get();
     }
 
     @Test
