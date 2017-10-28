@@ -218,64 +218,7 @@ include::{snippets}/get-my-session-user/response-fields.adoc[]
 .http response
 include::{snippets}/get-my-session-user/http-response.adoc[]
 
-[[user]]
-== 회원 API
-회원과 관련된 API.
-
-[[create-jakduk-user]]
-=== 이메일 회원 가입
-
-이메일 주소 기반인 JakduK 계열 회원 가입을 한다.
-비로그인 상태에서 사용 가능 하다.
-
-.request fields
-include::{snippets}/create-jakduk-user/request-fields.adoc[]
-.http request
-include::{snippets}/create-jakduk-user/http-request.adoc[]
-.curl request
-include::{snippets}/create-jakduk-user/curl-request.adoc[]
-
-.response headers
-include::{snippets}/create-jakduk-user/response-headers.adoc[]
-.http response
-include::{snippets}/create-jakduk-user/http-response.adoc[]
-
-[[create-sns-user]]
-=== SNS 회원 가입
-
-OAuth2 인증을 제공하는 페이스북, 다음 계정으로 회원 가입을 한다.
-<<auth-set-attempt-social-session-user, SNS 프로필 세션 저장>> 가 선행되어야 한다.
-<<auth-get-attempt-social-session-user, SNS 프로필 세션 가져오기>> 를 통해 이메일 주소, 별명, 프로필 사진 등을 가져올 수 있고, SNS 회원 가입 폼에 미리 값을 넣어둘 수 있다.
-
-.request fields
-include::{snippets}/create-sns-user/request-fields.adoc[]
-.http request
-include::{snippets}/create-sns-user/http-request.adoc[]
-.curl request
-include::{snippets}/create-sns-user/curl-request.adoc[]
-
-.response headers
-include::{snippets}/create-sns-user/response-headers.adoc[]
-.http response
-include::{snippets}/create-sns-user/http-response.adoc[]
-
-[[exist-email]]
-=== 이메일 중복 검사
-
-해당 이메일 주소를 사용하여 가입된 회원이 있는지 검사한다.
-만약 로그인 중이라면, 입력한 이메일 주소와 로그인 회원의 이메일 주소가 같을 경우는 검사 성공으로 본다.
-
-.request headers
-include::{snippets}/exist-email/request-headers.adoc[]
-.request parameters
-include::{snippets}/exist-email/request-parameters.adoc[]
-.http request
-include::{snippets}/exist-email/http-request.adoc[]
-.curl request
-include::{snippets}/exist-email/curl-request.adoc[]
-
-.http response
-include::{snippets}/exist-email/http-response.adoc[]
+include::user.adoc[]
 
 [[home]]
 == 홈 API

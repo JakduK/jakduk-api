@@ -67,7 +67,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .regexMatchers(
                         HttpMethod.GET,
-                        "/api/auth/user" // 세션에 있는 나의 프로필 정보
+                        "/api/auth/user", // 세션에 있는 나의 프로필 정보
+                        "/api/user/profile/me" // 내 프로필 정보 보기
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
                 .regexMatchers(
@@ -80,7 +81,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
                 .regexMatchers(
                         HttpMethod.PUT,
-                        "/api/board/[a-z]+/comment/[\\da-z]+" // 댓글 고치기
+                        "/api/board/[a-z]+/comment/[\\da-z]+", // 댓글 고치기
+                        "/api/user/profile/me", // 내 프로필 정보 고치기
+                        "/api/user/password" // 비밀번호 바꾸기
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
                 .regexMatchers(

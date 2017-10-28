@@ -14,7 +14,7 @@ import com.jakduk.api.restcontroller.vo.admin.JakduCommentsResponse;
 import com.jakduk.api.restcontroller.vo.admin.MyJakduRequest;
 import com.jakduk.api.service.FootballService;
 import com.jakduk.api.service.JakduService;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.jakdu.JakduScheduleResponse;
 import io.swagger.annotations.Api;
@@ -102,10 +102,10 @@ public class JakduRestController {
         JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
         result.put("jakduSchedule", jakduSchedule);
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
         if (AuthUtils.isUser()) {
-            result.put("myJakdu", jakduService.getMyJakdu(authUserProfile.getId(), id));
+            result.put("myJakdu", jakduService.getMyJakdu(sessionUser.getId(), id));
         }
 
         return result;

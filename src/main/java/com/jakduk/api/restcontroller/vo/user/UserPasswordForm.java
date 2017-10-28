@@ -4,7 +4,10 @@ import com.jakduk.api.common.constraint.FieldMatch;
 import com.jakduk.api.common.constraint.PasswordMatch;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
@@ -16,6 +19,9 @@ import javax.validation.constraints.Size;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @ApiModel(description = "이메일 기반 회원 비밀번호 변경 폼")
 @FieldMatch(first = "newPassword", second = "newPasswordConfirm", message = "{validation.msg.new.password.mismatch}")

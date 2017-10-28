@@ -28,7 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +52,6 @@ import java.util.Objects;
 public class UserRestController {
 
     @Autowired private AuthenticationManager authenticationManager;
-    @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private UserService userService;
     @Autowired private RabbitMQPublisher rabbitMQPublisher;
     @Autowired private UserDetailsService userDetailsService;
@@ -128,19 +126,17 @@ public class UserRestController {
     }
 
     @ApiOperation("내 프로필 정보 보기")
-    @SecuredUser
     @GetMapping("/profile/me")
     public UserProfileResponse getProfileMe() {
 
         String language = JakdukUtils.getLanguageCode();
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
-        return userService.getProfileMe(language, authUserProfile.getId());
+        return userService.getProfileMe(language, sessionUser.getId());
     }
 
     @ApiOperation(value = "내 프로필 정보 편집")
-    @SecuredUser
     @PutMapping("/profile/me")
     public EmptyJsonResponse editProfileMe(
             @Valid @RequestBody UserProfileEditForm form,
@@ -148,10 +144,10 @@ public class UserRestController {
             HttpServletResponse response,
             Authentication authentication) {
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
-        User user = userService.editUserProfile(authUserProfile.getId(), form.getEmail(), form.getUsername(), form.getFootballClub(),
-                form.getAbout(), form.getUserPictureId());
+        User user = userService.editUserProfile(sessionUser.getId(), form.getEmail().trim(), form.getUsername().trim(),
+                form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 
@@ -175,16 +171,15 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
-    @SecuredUser
-    @RequestMapping(value = "/password", method = RequestMethod.PUT)
+    @PutMapping("/password")
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
         if (! AuthUtils.isJakdukUser())
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
-        userService.updateUserPassword(authUserProfile.getId(), passwordEncoder.encode(form.getNewPassword().trim()));
+        userService.updateUserPassword(sessionUser.getId(), form.getNewPassword().trim());
 
         return EmptyJsonResponse.newInstance();
     }
@@ -213,9 +208,9 @@ public class UserRestController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
-        userService.deleteUser(authUserProfile.getId());
+        userService.deleteUser(sessionUser.getId());
 
         // 참고 @{link http://websystique.com/spring-security/spring-security-4-logout-example/}
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());

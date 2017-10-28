@@ -4,6 +4,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.mobile.device.DeviceWebArgumentResolver;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.ServletWebArgumentResolverAdapter;
@@ -17,6 +18,11 @@ public class TestMvcConfig extends WebMvcConfigurerAdapter {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new ServletWebArgumentResolverAdapter(new DeviceWebArgumentResolver()));
         super.addArgumentResolvers(argumentResolvers);
+    }
+
+    @Bean
+    public StandardPasswordEncoder passwordEncoder() {
+        return new StandardPasswordEncoder();
     }
 
 }

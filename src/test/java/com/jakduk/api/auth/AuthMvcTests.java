@@ -9,7 +9,7 @@ import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.AuthRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
@@ -231,7 +231,7 @@ public class AuthMvcTests {
     @WithMockJakdukUser
     public void getMySessionProfileTest() throws Exception {
 
-        AuthUserProfile expectResponse = AuthUtils.getAuthUserProfile();
+        SessionUser expectResponse = AuthUtils.getAuthUserProfile();
 
         mvc.perform(
                 get("/api/auth/user")

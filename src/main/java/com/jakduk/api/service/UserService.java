@@ -266,20 +266,20 @@ public class UserService {
      */
 	public void updateUserPassword(String userId, String newPassword) {
 		User user = userRepository.findOneById(userId).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-		user.setPassword(newPassword);
+		user.setPassword(passwordEncoder.encode(newPassword.trim()));
 
 		userRepository.save(user);
 
-		log.info("jakduk user password changed. email=" + user.getEmail() + ", username=" + user.getUsername());
+		log.info("jakduk user password changed. email={}, username={}", user.getEmail(), user.getUsername());
 	}
 
 	public void userPasswordUpdateByEmail(String email, String password) {
 		User user = userRepository.findOneByEmail(email).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-		user.setPassword(password);
+		user.setPassword(passwordEncoder.encode(password.trim()));
 
 		userRepository.save(user);
 
-		log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
+		log.info("jakduk user password changed. email={}, username={}", user.getEmail(), user.getUsername());
 	}
 
 	/**

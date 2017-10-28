@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Getter
-public class AuthUserProfile {
+public class SessionUser {
 
     private String id;
     private String email;

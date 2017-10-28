@@ -1,10 +1,13 @@
 package com.jakduk.api.restcontroller.vo.user;
 
-import com.jakduk.api.common.constraint.ExistEmailOnEdit;
-import com.jakduk.api.common.constraint.ExistUsernameOnEdit;
+import com.jakduk.api.common.constraint.ExistEmail;
+import com.jakduk.api.common.constraint.ExistUsername;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -18,6 +21,9 @@ import javax.validation.constraints.Size;
  */
 
 @ApiModel(description = "회원 정보 편집 폼")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 public class UserProfileEditForm {
 
@@ -25,13 +31,13 @@ public class UserProfileEditForm {
 	@Size(min = 6, max=30)
 	@NotEmpty
 	@Email
-	@ExistEmailOnEdit
+	@ExistEmail
 	private String email;
 
 	@ApiModelProperty(required = true, example = "test16")
 	@Size(min = 2, max=20)
 	@NotEmpty
-	@ExistUsernameOnEdit
+	@ExistUsername
 	private String username;
 
 	@ApiModelProperty(example = "안녕하세요.", value = "자기 소개")

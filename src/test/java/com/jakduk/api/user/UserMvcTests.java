@@ -1,8 +1,10 @@
 package com.jakduk.api.user;
 
 import com.jakduk.api.TestMvcConfig;
+import com.jakduk.api.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.model.db.FootballClub;
@@ -10,12 +12,12 @@ import com.jakduk.api.model.db.FootballClubOrigin;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.embedded.LocalName;
+import com.jakduk.api.model.embedded.UserPictureInfo;
+import com.jakduk.api.model.simple.UserOnPasswordUpdate;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.restcontroller.UserRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
-import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
-import com.jakduk.api.restcontroller.vo.user.SocialUserForm;
-import com.jakduk.api.restcontroller.vo.user.UserForm;
+import com.jakduk.api.restcontroller.vo.user.*;
 import com.jakduk.api.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +36,6 @@ import org.springframework.restdocs.constraints.ValidatorConstraintResolver;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,16 +45,17 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -79,13 +81,13 @@ public class UserMvcTests {
 
     @MockBean private AuthenticationManager authenticationManager;
     @MockBean private UserService userService;
-    @MockBean private PasswordEncoder passwordEncoder;
     @MockBean private RabbitMQPublisher rabbitMQPublisher;
     @MockBean private UserDetailsService userDetailsService;
     @MockBean private UserProfileRepository userProfileRepository;
 
     private FootballClub footballClub;
     private UserPicture userPicture;
+    private User jakdukUser;
 
     @Before
     public void setUp(){
@@ -112,42 +114,38 @@ public class UserMvcTests {
                 .status(Constants.GALLERY_STATUS_TYPE.ENABLE)
                 .contentType("image/png")
                 .build();
+
+        jakdukUser = User.builder()
+                .id("597df86caaf4fc0545d4f3e9")
+                .email("example@jakduk.com")
+                .username("JakdukUser")
+                .password("841db2bc28e4730906bd82d79e69c80633747570d96ffade7dd77f58270f31a222e129e005cb70d2")
+                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
+                .about("안녕하세요.")
+                .roles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()))
+                .supportFC(footballClub)
+                .lastLogged(LocalDateTime.now())
+                .build();
     }
 
     @Test
     @WithMockUser
     public void createJakdukUserTest() throws Exception {
 
-        when(userProfileRepository.findOneByEmail(anyString()))
-                .thenReturn(Optional.empty());
-
-        when(userProfileRepository.findOneByUsername(anyString()))
-                .thenReturn(Optional.empty());
+        this.whenCustomValdation();
 
         UserForm form = UserForm.builder()
-                .email("example@jakduk.com")
-                .username("JakdukUser")
+                .email(jakdukUser.getEmail())
+                .username(jakdukUser.getUsername())
                 .password("1111")
                 .passwordConfirm("1111")
-                .about("안녕하세요.")
+                .about(jakdukUser.getAbout())
                 .footballClub(footballClub.getId())
                 .userPictureId(userPicture.getId())
                 .build();
 
-        User expectUser = User.builder()
-                .id("597df86caaf4fc0545d4f3e9")
-                .email(form.getEmail())
-                .username(form.getUsername())
-                .password("841db2bc28e4730906bd82d79e69c80633747570d96ffade7dd77f58270f31a222e129e005cb70d2")
-                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
-                .about(form.getAbout())
-                .roles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()))
-                .supportFC(footballClub)
-                .lastLogged(LocalDateTime.now())
-                .build();
-
         when(userService.createJakdukUser(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(expectUser);
+                .thenReturn(jakdukUser);
 
         ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserForm.class, new ValidatorConstraintResolver(),
                 new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
@@ -183,11 +181,7 @@ public class UserMvcTests {
     @WithMockUser
     public void createSocialUserTest() throws Exception {
 
-        when(userProfileRepository.findOneByEmail(anyString()))
-                .thenReturn(Optional.empty());
-
-        when(userProfileRepository.findOneByUsername(anyString()))
-                .thenReturn(Optional.empty());
+        this.whenCustomValdation();
 
         AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
                 .username("daumUser01")
@@ -279,6 +273,192 @@ public class UserMvcTests {
                                         parameterWithName("email").description("이메일 주소")
                                 )
                         ));
+    }
+
+    @Test
+    @WithMockUser
+    public void existUsernameTest() throws Exception {
+
+        when(userProfileRepository.findOneByUsername(anyString()))
+                .thenReturn(Optional.empty());
+
+        mvc.perform(
+                get("/api/user/exist/username")
+                        .param("username", "JakdukUser")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("exist-username",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
+                                ),
+                                requestParameters(
+                                        parameterWithName("username").description("별명")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockJakdukUser
+    public void getProfileMeTest() throws Exception {
+
+        String language = JakdukUtils.getLanguageCode();
+
+        UserProfileResponse expectResponse = UserProfileResponse.builder()
+                .email(jakdukUser.getEmail())
+                .username(jakdukUser.getUsername())
+                .about(jakdukUser.getAbout())
+                .providerId(jakdukUser.getProviderId())
+                .footballClubName(JakdukUtils.getLocalNameOfFootballClub(footballClub, language))
+                .picture(
+                        new UserPictureInfo(
+                                "597a0d53807d710f57420aa5",
+                                "https://dev-api.jakduk.com/user/picture/small/597a0d53807d710f57420aa5",
+                                "https://dev-api.jakduk.com/user/picture/597a0d53807d710f57420aa5"
+                        ))
+                .temporaryEmail(false)
+                .build();
+
+        when(userService.getProfileMe(anyString(), anyString()))
+                .thenReturn(expectResponse);
+
+        mvc.perform(
+                get("/api/user/profile/me")
+                        .param("username", "JakdukUser")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("user-get-profile-me",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                ),
+                                responseFields(
+                                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소"),
+                                        fieldWithPath("username").type(JsonFieldType.STRING).description("별명"),
+                                        fieldWithPath("providerId").type(JsonFieldType.STRING).description("계정 분류 " +
+                                                Stream.of(Constants.ACCOUNT_TYPE.values()).map(Enum::name).collect(Collectors.toList())),
+                                        fieldWithPath("about").type(JsonFieldType.STRING).description("소개"),
+                                        fieldWithPath("footballClubName").type(JsonFieldType.OBJECT).description("지지 축구단"),
+                                        fieldWithPath("footballClubName.language").type(JsonFieldType.STRING).description("언어"),
+                                        fieldWithPath("footballClubName.fullName").type(JsonFieldType.STRING).description("축구단 풀네임"),
+                                        fieldWithPath("footballClubName.shortName").type(JsonFieldType.STRING).description("축구단 숏네임"),
+                                        fieldWithPath("picture").type(JsonFieldType.OBJECT).description("회원 사진"),
+                                        fieldWithPath("picture.id").type(JsonFieldType.STRING).description("회원 사진 ID"),
+                                        fieldWithPath("picture.smallPictureUrl").type(JsonFieldType.STRING).description("회원 작은 사진 URL"),
+                                        fieldWithPath("picture.largePictureUrl").type(JsonFieldType.STRING).description("회원 큰 사진 URL"),
+                                        fieldWithPath("temporaryEmail").type(JsonFieldType.BOOLEAN).description("임시로 발급한 이메일인지 여부")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockJakdukUser
+    public void editProfileMeTest() throws Exception {
+
+        when(userProfileRepository.findByNEIdAndEmail(anyString(), anyString()))
+                .thenReturn(Optional.empty());
+
+        when(userProfileRepository.findByNEIdAndUsername(anyString(), anyString()))
+                .thenReturn(Optional.empty());
+
+        UserProfileEditForm form = UserProfileEditForm.builder()
+                .email(jakdukUser.getEmail())
+                .username(jakdukUser.getUsername())
+                .about(jakdukUser.getAbout())
+                .footballClub(footballClub.getId())
+                .userPictureId(userPicture.getId())
+                .build();
+
+        when(userService.editUserProfile(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(jakdukUser);
+
+        ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserProfileEditForm.class, new ValidatorConstraintResolver(),
+                new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
+
+        mvc.perform(
+                put("/api/user/profile/me")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(form)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("user-edit-profile-me",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                ),
+                                requestFields(
+                                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소. " +
+                                                userConstraints.descriptionsForProperty("email")),
+                                        fieldWithPath("username").type(JsonFieldType.STRING).description("별명. " +
+                                                userConstraints.descriptionsForProperty("username")),
+                                        fieldWithPath("footballClub").type(JsonFieldType.STRING).description("(optional) 축구단 ID"),
+                                        fieldWithPath("about").type(JsonFieldType.STRING).description("(optional) 자기 소개"),
+                                        fieldWithPath("userPictureId").type(JsonFieldType.STRING).description("(optional) 프로필 사진 ID")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockJakdukUser
+    public void editPasswordTest() throws Exception {
+
+        when(userService.findUserOnPasswordUpdateById(anyString()))
+                .thenReturn(new UserOnPasswordUpdate(jakdukUser.getId(), jakdukUser.getPassword()));
+
+        UserPasswordForm form = UserPasswordForm.builder()
+                .password("1111")
+                .newPassword("1112")
+                .newPasswordConfirm("1112")
+                .build();
+
+        doNothing().when(userService)
+                .updateUserPassword(anyString(), anyString());
+
+        ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserPasswordForm.class, new ValidatorConstraintResolver(),
+                new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
+
+        mvc.perform(
+                put("/api/user/password")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(ObjectMapperUtils.writeValueAsString(form)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("user-edit-password",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                ),
+                                requestFields(
+                                        fieldWithPath("password").type(JsonFieldType.STRING).description("현재 비밀번호. " +
+                                                userConstraints.descriptionsForProperty("password")),
+                                        fieldWithPath("newPassword").type(JsonFieldType.STRING).description("새 비밀번호. " +
+                                                userConstraints.descriptionsForProperty("newPassword")),
+                                        fieldWithPath("newPasswordConfirm").type(JsonFieldType.STRING).description("확인 새 비밀번호. " +
+                                                userConstraints.descriptionsForProperty("newPasswordConfirm"))
+                                )
+                        ));
+    }
+
+    private void whenCustomValdation() {
+        when(userProfileRepository.findOneByEmail(anyString()))
+                .thenReturn(Optional.empty());
+
+        when(userProfileRepository.findOneByUsername(anyString()))
+                .thenReturn(Optional.empty());
     }
 
 }

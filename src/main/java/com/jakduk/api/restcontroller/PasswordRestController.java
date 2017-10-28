@@ -12,7 +12,6 @@ import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -23,7 +22,6 @@ import java.util.*;
 @RequestMapping("/api/password")
 public class PasswordRestController {
 
-	@Autowired private PasswordEncoder passwordEncoder;
 	@Autowired private TokenRepository tokenRepository;
 	@Autowired private CommonService commonService;
 	@Autowired private UserService userService;
@@ -96,7 +94,7 @@ public class PasswordRestController {
 
 		if (oToken.isPresent()) {
 			Token token = oToken.get();
-			userService.userPasswordUpdateByEmail(token.getEmail(), passwordEncoder.encode(password.trim()));
+			userService.userPasswordUpdateByEmail(token.getEmail(), password.trim());
 			message = JakdukUtils.getMessageSource("user.msg.success.change.password");
 			response.put("subject", token.getEmail());
 

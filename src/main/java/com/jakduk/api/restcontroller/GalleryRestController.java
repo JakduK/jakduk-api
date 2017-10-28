@@ -11,7 +11,7 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.gallery.*;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.service.GalleryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -92,9 +92,9 @@ public class GalleryRestController {
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
-        galleryService.deleteGallery(id, authUserProfile.getId());
+        galleryService.deleteGallery(id, sessionUser.getId());
 
         // form이 null이 아니면 글, 댓글 편집시 호출 했기 때문에 gallery를 바로 지우면 안된다. 글/댓글 편집 완료 시 실제로 gallery를 지워야 한다.
         // session에 저장해 두자.

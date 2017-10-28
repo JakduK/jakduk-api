@@ -8,7 +8,7 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
@@ -115,14 +115,14 @@ public class AuthRestController {
 
     @ApiOperation(value = "세션에 있는 나의 프로필 정보")
     @GetMapping("/user")
-    public AuthUserProfile getMySessionProfile() {
+    public SessionUser getMySessionProfile() {
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
-        if (Objects.isNull(authUserProfile))
+        if (Objects.isNull(sessionUser))
             throw new ServiceException(ServiceError.ANONYMOUS);
 
-        return authUserProfile;
+        return sessionUser;
     }
 
 }

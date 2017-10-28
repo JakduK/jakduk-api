@@ -1,0 +1,129 @@
+[[user]]
+== 회원 API
+회원과 관련된 API.
+
+[[create-jakduk-user]]
+=== 이메일 회원 가입
+
+이메일 주소 기반인 JakduK 계열 회원 가입을 한다.
+비로그인 상태에서 사용 가능 하다.
+
+.request fields
+include::{snippets}/create-jakduk-user/request-fields.adoc[]
+.http request
+include::{snippets}/create-jakduk-user/http-request.adoc[]
+.curl request
+include::{snippets}/create-jakduk-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/create-jakduk-user/response-headers.adoc[]
+.http response
+include::{snippets}/create-jakduk-user/http-response.adoc[]
+
+[[create-sns-user]]
+=== SNS 회원 가입
+
+OAuth2 인증을 제공하는 페이스북, 다음 계정으로 회원 가입을 한다.
+<<auth-set-attempt-social-session-user, SNS 프로필 세션 저장>> 가 선행되어야 한다.
+<<auth-get-attempt-social-session-user, SNS 프로필 세션 가져오기>> 를 통해 이메일 주소, 별명, 프로필 사진 등을 가져올 수 있고, SNS 회원 가입 폼에 미리 값을 넣어둘 수 있다.
+
+.request fields
+include::{snippets}/create-sns-user/request-fields.adoc[]
+.http request
+include::{snippets}/create-sns-user/http-request.adoc[]
+.curl request
+include::{snippets}/create-sns-user/curl-request.adoc[]
+
+.response headers
+include::{snippets}/create-sns-user/response-headers.adoc[]
+.http response
+include::{snippets}/create-sns-user/http-response.adoc[]
+
+[[exist-email]]
+=== 이메일 중복 검사
+
+해당 이메일 주소를 사용한 회원이 있는지 검사한다.
+만약 로그인 중이라면, 입력한 이메일 주소와 로그인 회원의 이메일 주소가 같을 경우는 검사 성공으로 본다.
+
+.request headers
+include::{snippets}/exist-email/request-headers.adoc[]
+.request parameters
+include::{snippets}/exist-email/request-parameters.adoc[]
+.http request
+include::{snippets}/exist-email/http-request.adoc[]
+.curl request
+include::{snippets}/exist-email/curl-request.adoc[]
+
+.http response
+include::{snippets}/exist-email/http-response.adoc[]
+
+[[exist-username]]
+=== 별명 중복 검사
+
+해당 별명을 사용한 회원이 있는지 검사한다.
+만약 로그인 중이라면, 입력한 별명과 로그인 회원의 별명이 같을 경우는 검사 성공으로 본다.
+
+.request headers
+include::{snippets}/exist-username/request-headers.adoc[]
+.request parameters
+include::{snippets}/exist-username/request-parameters.adoc[]
+.http request
+include::{snippets}/exist-username/http-request.adoc[]
+.curl request
+include::{snippets}/exist-username/curl-request.adoc[]
+
+.http response
+include::{snippets}/exist-username/http-response.adoc[]
+
+[[user-get-profile-me]]
+=== 내 프로필 보기
+
+내 프로필 정보를 가져온다. 인증은 필수.
+
+.request headers
+include::{snippets}/user-get-profile-me/request-headers.adoc[]
+.request parameters
+include::{snippets}/user-get-profile-me/request-parameters.adoc[]
+.http request
+include::{snippets}/user-get-profile-me/http-request.adoc[]
+.curl request
+include::{snippets}/user-get-profile-me/curl-request.adoc[]
+
+.response fields
+include::{snippets}/user-get-profile-me/response-fields.adoc[]
+.http response
+include::{snippets}/user-get-profile-me/http-response.adoc[]
+
+[[user-edit-profile-me]]
+=== 내 프로필 고치기
+
+내 프로필 정보를 고친다. 인증은 필수.
+
+.request headers
+include::{snippets}/user-edit-profile-me/request-headers.adoc[]
+.request fields
+include::{snippets}/user-edit-profile-me/request-fields.adoc[]
+.http request
+include::{snippets}/user-edit-profile-me/http-request.adoc[]
+.curl request
+include::{snippets}/user-edit-profile-me/curl-request.adoc[]
+
+.http response
+include::{snippets}/user-edit-profile-me/http-response.adoc[]
+
+[[user-edit-password]]
+=== 비밀번호 바꾸기
+
+내 비밀번호를 바꾼다. 인증은 필수이며, 이메일 기반 회원만 가능하다.
+
+.request headers
+include::{snippets}/user-edit-password/request-headers.adoc[]
+.request fields
+include::{snippets}/user-edit-password/request-fields.adoc[]
+.http request
+include::{snippets}/user-edit-password/http-request.adoc[]
+.curl request
+include::{snippets}/user-edit-password/curl-request.adoc[]
+
+.http response
+include::{snippets}/user-edit-password/http-response.adoc[]
