@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistUsername;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
@@ -185,7 +184,7 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "프로필 사진 올리기")
-    @RequestMapping(value = "/picture", method = RequestMethod.POST)
+    @PostMapping("/picture")
     public UserPicture uploadUserPicture(@RequestParam MultipartFile file) {
 
         String contentType = file.getContentType();
@@ -202,7 +201,6 @@ public class UserRestController {
     }
 
     @ApiOperation("회원 탈퇴")
-    @SecuredUser
     @DeleteMapping("")
     public EmptyJsonResponse deleteUser(
             HttpServletRequest request,

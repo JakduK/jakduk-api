@@ -88,7 +88,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
                 .regexMatchers(
                         HttpMethod.DELETE,
-                        "/api/board/[a-z]+/comment/[\\da-z]+" // 댓글 지우기
+                        "/api/board/[a-z]+/comment/[\\da-z]+", // 댓글 지우기
+                        "/api/user" // 회원 탈퇴
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 

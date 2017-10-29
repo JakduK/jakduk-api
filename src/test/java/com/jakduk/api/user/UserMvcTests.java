@@ -30,6 +30,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.constraints.ResourceBundleConstraintDescriptionResolver;
 import org.springframework.restdocs.constraints.ValidatorConstraintResolver;
@@ -48,18 +49,16 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -449,6 +448,68 @@ public class UserMvcTests {
                                                 userConstraints.descriptionsForProperty("newPassword")),
                                         fieldWithPath("newPasswordConfirm").type(JsonFieldType.STRING).description("확인 새 비밀번호. " +
                                                 userConstraints.descriptionsForProperty("newPasswordConfirm"))
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void uploadUserPictureTest() throws Exception {
+
+        UserPicture expectUserPicture = UserPicture.builder()
+                .id(userPicture.getId())
+                .status(Constants.GALLERY_STATUS_TYPE.TEMP)
+                .contentType(userPicture.getContentType())
+                .build();
+
+        when(userService.uploadUserPicture(anyString(), anyLong(), anyObject()))
+                .thenReturn(expectUserPicture);
+
+        byte[] ballBytes = new byte[]{
+                (byte) 0x89, (byte) 0x50, (byte) 0x4e, (byte) 0x47, (byte) 0x0d, (byte) 0x0a, (byte) 0x1a, (byte) 0x0a, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x0d, (byte) 0x49, (byte) 0x48, (byte) 0x44, (byte) 0x52, (byte) 0x00, (byte) 0x00
+        };
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "sample.png", MediaType.IMAGE_PNG_VALUE, ballBytes);
+
+        mvc.perform(fileUpload("/api/user/picture")
+                .file(mockMultipartFile))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectUserPicture)))
+                .andDo(
+                        document("user-upload-picture",
+                                requestParts(
+                                        partWithName("file").description("멀티 파트 객체")
+                                ),
+                                responseFields(
+                                        fieldWithPath("id").type(JsonFieldType.STRING).description("그림 ID"),
+                                        fieldWithPath("status").type(JsonFieldType.STRING).description("그림 상태. " +
+                                                Stream.of(Constants.GALLERY_STATUS_TYPE.values()).map(Enum::name).collect(Collectors.toList())),
+                                        fieldWithPath("contentType").type(JsonFieldType.STRING).description("Content-Type. image/* 만 가능하다.")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockJakdukUser
+    public void deleteUserTest() throws Exception {
+
+        doNothing().when(userService)
+                .deleteUser(anyString());
+
+        mvc.perform(
+                delete("/api/user")
+                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
+                .andDo(
+                        document("user-delete",
+                                requestHeaders(
+                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
                                 )
                         ));
     }

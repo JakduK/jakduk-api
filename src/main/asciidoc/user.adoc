@@ -111,6 +111,23 @@ include::{snippets}/user-edit-profile-me/curl-request.adoc[]
 .http response
 include::{snippets}/user-edit-profile-me/http-response.adoc[]
 
+[[user-upload-picture]]
+=== 프로필 사진 올리기
+
+프로필에 쓰일 사진을 올린다.
+
+.request parts
+include::{snippets}/user-upload-picture/request-parts.adoc[]
+.http request
+include::{snippets}/user-upload-picture/http-request.adoc[]
+.curl request
+include::{snippets}/user-upload-picture/curl-request.adoc[]
+
+.response fields
+include::{snippets}/user-upload-picture/response-fields.adoc[]
+.http response
+include::{snippets}/user-upload-picture/http-response.adoc[]
+
 [[user-edit-password]]
 === 비밀번호 바꾸기
 
@@ -127,3 +144,19 @@ include::{snippets}/user-edit-password/curl-request.adoc[]
 
 .http response
 include::{snippets}/user-edit-password/http-response.adoc[]
+
+[[user-delete]]
+=== 회원 탈퇴
+
+로그인 중인 현재 회원을 탈퇴한다.
+
+.request headers
+include::{snippets}/user-delete/request-headers.adoc[]
+.http request
+include::{snippets}/user-delete/http-request.adoc[]
+.curl request
+include::{snippets}/user-delete/curl-request.adoc[]
+
+.http response
+include::{snippets}/user-delete/http-response.adoc[]
+
