@@ -72,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         HttpMethod.POST,
                         "/api/user", // 이메일 기반 회원 가입
                         "/api/auth/login/[a-z]+", // SNS 기반 회원 가입 및 SNS 임시 프로필 저장
-                        "api/user/password/find" // 비밀번호 찾기 이메일 발송
+                        "/api/user/password/find" // 비밀번호 찾기 이메일 발송
                 ).anonymous()
                 .regexMatchers(
                         HttpMethod.GET,

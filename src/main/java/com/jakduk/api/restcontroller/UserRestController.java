@@ -11,7 +11,6 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
-import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.*;
 import com.jakduk.api.service.UserService;
@@ -206,28 +205,15 @@ public class UserRestController {
     public UserPasswordFindResponse findPassword(
             @Valid @RequestBody UserPasswordFindForm form) {
 
-        String message = "";
+        return userService.sendEmailToResetPassword(form.getEmail().trim(), form.getCallbackUrl().trim());
+    }
 
-        String email = form.getEmail().trim();
-        UserProfile userProfile = userService.findOneByEmail(email);
+    // 비밀번호 재설정 처리.
+    @PostMapping("/password/reset")
+    public UserPasswordFindResponse resetPassword(
+            @Valid @RequestBody UserPasswordResetForm form) {
 
-        switch (userProfile.getProviderId()) {
-            case JAKDUK:
-                message = JakdukUtils.getMessageSource("user.msg.reset.password.send.email");
-                rabbitMQPublisher.sendResetPassword(JakdukUtils.getLocale(), form.getCallbackUrl().trim(), email);
-                break;
-            case DAUM:
-                message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
-                break;
-            case FACEBOOK:
-                message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
-                break;
-        }
-
-        return UserPasswordFindResponse.builder()
-                .subject(email)
-                .message(message)
-                .build();
+        return userService.resetPasswordWithToken(form.getCode().trim(), form.getPassword().trim());
     }
 
     @ApiOperation("회원 탈퇴")

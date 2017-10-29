@@ -2,6 +2,7 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.FileUtils;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -10,6 +11,7 @@ import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.FootballClub;
+import com.jakduk.api.model.db.Token;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.embedded.LocalName;
@@ -17,10 +19,12 @@ import com.jakduk.api.model.embedded.UserPictureInfo;
 import com.jakduk.api.model.simple.UserOnPasswordUpdate;
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.model.simple.UserSimple;
+import com.jakduk.api.repository.TokenRepository;
 import com.jakduk.api.repository.footballclub.FootballClubRepository;
 import com.jakduk.api.repository.user.UserPictureRepository;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
+import com.jakduk.api.restcontroller.vo.user.UserPasswordFindResponse;
 import com.jakduk.api.restcontroller.vo.user.UserProfileResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -46,20 +50,16 @@ public class UserService {
 	@Resource private JakdukProperties.Storage storageProperties;
 	@Resource private AuthUtils authUtils;
 
+	@Autowired private RabbitMQPublisher rabbitMQPublisher;
 	@Autowired private PasswordEncoder passwordEncoder;
 	@Autowired private UserRepository userRepository;
 	@Autowired private FootballClubRepository footballClubRepository;
 	@Autowired private UserProfileRepository userProfileRepository;
 	@Autowired private UserPictureRepository userPictureRepository;
+	@Autowired private TokenRepository tokenRepository;
 
 	public Optional<User> findOneByProviderIdAndProviderUserId(Constants.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
-	}
-
-	// email과 일치하는 회원 찾기.
-	public UserProfile findOneByEmail(String email) {
-		return userProfileRepository.findOneByEmail(email)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 
 	/**
@@ -281,6 +281,66 @@ public class UserService {
 		userRepository.save(user);
 
 		log.info("jakduk user password changed. email={}, username={}", user.getEmail(), user.getUsername());
+	}
+
+	public UserPasswordFindResponse sendEmailToResetPassword(String email, String host) {
+		String message = "";
+
+		Optional<UserProfile> optUserProfile = userProfileRepository.findOneByEmail(email);
+
+		if (optUserProfile.isPresent()) {
+			switch (optUserProfile.get().getProviderId()) {
+				case JAKDUK:
+					message = JakdukUtils.getMessageSource("user.msg.reset.password.send.email");
+					rabbitMQPublisher.sendResetPassword(JakdukUtils.getLocale(), email, host);
+					break;
+				case DAUM:
+					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
+					break;
+				case FACEBOOK:
+					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
+					break;
+			}
+		} else {
+			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");
+		}
+
+		return UserPasswordFindResponse.builder()
+				.subject(email)
+				.message(message)
+				.build();
+	}
+
+	public UserPasswordFindResponse resetPasswordWithToken(String code, String password) {
+		Optional<Token> oToken = tokenRepository.findOneByCode(code);
+
+		String message;
+		String subject = null;
+
+		if (oToken.isPresent()) {
+			Token token = oToken.get();
+
+			User user = userRepository.findOneByEmail(token.getEmail())
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+
+			user.setPassword(passwordEncoder.encode(password.trim()));
+
+			userRepository.save(user);
+
+			log.info("jakduk user password changed. email={}, username={}", user.getEmail(), user.getUsername());
+
+			subject = token.getEmail();
+			message = JakdukUtils.getMessageSource("user.msg.success.change.password");
+
+			tokenRepository.delete(token);
+		} else {
+			message = JakdukUtils.getMessageSource("user.msg.reset.password.invalid");
+		}
+
+		return UserPasswordFindResponse.builder()
+				.subject(subject)
+				.message(message)
+				.build();
 	}
 
 	/**

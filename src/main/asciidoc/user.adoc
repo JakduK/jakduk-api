@@ -145,6 +145,42 @@ include::{snippets}/user-edit-password/curl-request.adoc[]
 .http response
 include::{snippets}/user-edit-password/http-response.adoc[]
 
+[[user-find-password]]
+=== 비밀번호 찾기를 위한 이메일 발송
+
+해당 이메일 주소로 비밀번호를 찾기 위한 이메일을 발송한다. 등록되지 않은 이메일 주소이거나, DAUM, FACEBOOK 등 OAuth2로 가입한 회원은 이용할 수 없다.
+메일 내용 중 callbackUrl 에는 임시 토큰 코드(5분간 유지)가 담겨있다.
+
+.request fields
+include::{snippets}/user-find-password/request-fields.adoc[]
+.http request
+include::{snippets}/user-find-password/http-request.adoc[]
+.curl request
+include::{snippets}/user-find-password/curl-request.adoc[]
+
+.response fields
+include::{snippets}/user-find-password/response-fields.adoc[]
+.http response
+include::{snippets}/user-find-password/http-response.adoc[]
+
+[[user-reset-password]]
+==== 비밀번호 재설정
+
+비밀번호를 재설정 한다.
+<<user-find-password, 비밀번호 찾기를 위한 이메일 발송>> 가 선행되어야 한다.
+
+.request fields
+include::{snippets}/user-reset-password/request-fields.adoc[]
+.http request
+include::{snippets}/user-reset-password/http-request.adoc[]
+.curl request
+include::{snippets}/user-reset-password/curl-request.adoc[]
+
+.response fields
+include::{snippets}/user-reset-password/response-fields.adoc[]
+.http response
+include::{snippets}/user-reset-password/http-response.adoc[]
+
 [[user-delete]]
 === 회원 탈퇴
 

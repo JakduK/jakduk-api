@@ -514,6 +514,88 @@ public class UserMvcTests {
                         ));
     }
 
+    @Test
+    @WithMockUser
+    public void findPasswordTest() throws Exception {
+
+        UserPasswordFindForm form = UserPasswordFindForm.builder()
+                .email(jakdukUser.getEmail())
+                .callbackUrl("http://dev-wev.jakduk/find/password")
+                .build();
+
+        UserPasswordFindResponse expectResponse = UserPasswordFindResponse.builder()
+                .subject(form.getEmail())
+                .message(JakdukUtils.getMessageSource("user.msg.reset.password.send.email"))
+                .build();
+
+        when(userService.sendEmailToResetPassword(anyString(), anyString()))
+                .thenReturn(expectResponse);
+
+        ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserPasswordFindForm.class, new ValidatorConstraintResolver(),
+                new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
+
+        mvc.perform(post("/api/user/password/find")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(ObjectMapperUtils.writeValueAsString(form)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("user-find-password",
+                                requestFields(
+                                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소. " +
+                                                userConstraints.descriptionsForProperty("email")),
+                                        fieldWithPath("callbackUrl").type(JsonFieldType.STRING).description("콜백 받을 URL. " +
+                                                userConstraints.descriptionsForProperty("callbackUrl"))
+                                ),
+                                responseFields(
+                                        fieldWithPath("subject").type(JsonFieldType.STRING).description("html에서 쓰일 제목. 이메일 주소"),
+                                        fieldWithPath("message").type(JsonFieldType.STRING).description("html에서 쓰일 내용.")
+                                )
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void resetPasswordTest() throws Exception {
+
+        UserPasswordResetForm form = UserPasswordResetForm.builder()
+                .code("16948f83-1af8-4736-9e12-cf57f03a981c")
+                .password("1112")
+                .build();
+
+        UserPasswordFindResponse expectResponse = UserPasswordFindResponse.builder()
+                .subject(jakdukUser.getEmail())
+                .message(JakdukUtils.getMessageSource("user.msg.success.change.password"))
+                .build();
+
+        when(userService.resetPasswordWithToken(anyString(), anyString()))
+                .thenReturn(expectResponse);
+
+        ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserPasswordResetForm.class, new ValidatorConstraintResolver(),
+                new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
+
+        mvc.perform(post("/api/user/password/reset")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(ObjectMapperUtils.writeValueAsString(form)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("user-reset-password",
+                                requestFields(
+                                        fieldWithPath("code").type(JsonFieldType.STRING).description("임시 발행한 토큰 코드. (5분간 유지) " +
+                                                userConstraints.descriptionsForProperty("code")),
+                                        fieldWithPath("password").type(JsonFieldType.STRING).description("바꿀 비밀번호 " +
+                                                userConstraints.descriptionsForProperty("password"))
+                                ),
+                                responseFields(
+                                        fieldWithPath("subject").type(JsonFieldType.STRING).description("html에서 쓰일 제목. 이메일 주소"),
+                                        fieldWithPath("message").type(JsonFieldType.STRING).description("html에서 쓰일 내용.")
+                                )
+                        ));
+    }
+
     private void whenCustomValdation() {
         when(userProfileRepository.findOneByEmail(anyString()))
                 .thenReturn(Optional.empty());

@@ -10,12 +10,12 @@ import org.hibernate.validator.constraints.NotEmpty;
 @AllArgsConstructor
 @Builder
 @Getter
-public class UserPasswordFindForm {
+public class UserPasswordResetForm {
 
     @NotEmpty
-    private String email;
+    private String code;
 
     @NotEmpty
-    private String callbackUrl;
+    private String password;
 
 }

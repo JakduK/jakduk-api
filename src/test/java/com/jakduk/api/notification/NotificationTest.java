@@ -70,7 +70,7 @@ public class NotificationTest extends ApiApplicationTests {
                 .locale(Locale.KOREA)
                 .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail("phjang1983@daum.net")
-                .subject("jakduk.com-" + JakdukUtils.getLanguageCode("user.password.reset.instructions"))
+                .subject("jakduk.com-" + JakdukUtils.getMessageSource("user.password.reset.instructions"))
                 .extra(
                         new HashMap<String, String>() {
                             {
