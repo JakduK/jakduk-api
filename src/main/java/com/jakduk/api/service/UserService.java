@@ -57,8 +57,9 @@ public class UserService {
 	}
 
 	// email과 일치하는 회원 찾기.
-	public Optional<UserProfile> findOneByEmail(String email) {
-		return userProfileRepository.findOneByEmail(email);
+	public UserProfile findOneByEmail(String email) {
+		return userProfileRepository.findOneByEmail(email)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 	}
 
 	/**

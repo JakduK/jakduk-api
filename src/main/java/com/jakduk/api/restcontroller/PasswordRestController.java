@@ -1,10 +1,8 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.Token;
-import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.repository.TokenRepository;
 import com.jakduk.api.service.CommonService;
 import com.jakduk.api.service.UserService;
@@ -14,7 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Api(tags = "User", description = "회원 API")
@@ -26,40 +27,6 @@ public class PasswordRestController {
 	@Autowired private CommonService commonService;
 	@Autowired private UserService userService;
 	@Autowired private RabbitMQPublisher rabbitMQPublisher;
-
-	// jakduk 비밀번호 찾기 처리.
-	@RequestMapping(value = "/find", method = RequestMethod.POST)
-	public Map<String, Object> findPassword(@RequestParam String email,
-	                                        @RequestParam(value = "callbackUrl") String host,
-											Locale locale) {
-		String message = "";
-
-		UserProfile userProfile = userService.findOneByEmail(email).get();
-
-		if (Objects.isNull(userProfile)) {
-			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");
-		} else {
-			switch (userProfile.getProviderId()) {
-				case JAKDUK:
-					message = JakdukUtils.getMessageSource("user.msg.reset.password.sendok");
-					rabbitMQPublisher.sendResetPassword(locale, host, email);
-					break;
-				case DAUM:
-					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
-					break;
-				case FACEBOOK:
-					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
-					break;
-			}
-		}
-
-		Map<String, Object> response = new HashMap<>();
-
-		response.put("subject", email);
-		response.put("message", message);
-
-		return response;
-	}
 
 	// jakduk 비밀번호 재설정.
 	@RequestMapping(value = "/reset/{code}", method = RequestMethod.GET)

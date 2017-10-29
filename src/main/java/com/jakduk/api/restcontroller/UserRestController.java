@@ -11,6 +11,7 @@ import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
+import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.*;
 import com.jakduk.api.service.UserService;
@@ -169,20 +170,6 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
-    @PutMapping("/password")
-    public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
-
-        if (! AuthUtils.isJakdukUser())
-            throw new ServiceException(ServiceError.FORBIDDEN);
-
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
-
-        userService.updateUserPassword(sessionUser.getId(), form.getNewPassword().trim());
-
-        return EmptyJsonResponse.newInstance();
-    }
-
     @ApiOperation(value = "프로필 사진 올리기")
     @PostMapping("/picture")
     public UserPicture uploadUserPicture(@RequestParam MultipartFile file) {
@@ -198,6 +185,49 @@ public class UserRestController {
         } catch (IOException e) {
             throw new ServiceException(ServiceError.IO_EXCEPTION, e);
         }
+    }
+
+    @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
+    @PutMapping("/password")
+    public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
+
+        if (! AuthUtils.isJakdukUser())
+            throw new ServiceException(ServiceError.FORBIDDEN);
+
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+
+        userService.updateUserPassword(sessionUser.getId(), form.getNewPassword().trim());
+
+        return EmptyJsonResponse.newInstance();
+    }
+
+    // 비밀번호 찾기. 이메일 기반 회원일 경우 메일을 발송한다.
+    @PostMapping("/password/find")
+    public UserPasswordFindResponse findPassword(
+            @Valid @RequestBody UserPasswordFindForm form) {
+
+        String message = "";
+
+        String email = form.getEmail().trim();
+        UserProfile userProfile = userService.findOneByEmail(email);
+
+        switch (userProfile.getProviderId()) {
+            case JAKDUK:
+                message = JakdukUtils.getMessageSource("user.msg.reset.password.send.email");
+                rabbitMQPublisher.sendResetPassword(JakdukUtils.getLocale(), form.getCallbackUrl().trim(), email);
+                break;
+            case DAUM:
+                message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
+                break;
+            case FACEBOOK:
+                message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
+                break;
+        }
+
+        return UserPasswordFindResponse.builder()
+                .subject(email)
+                .message(message)
+                .build();
     }
 
     @ApiOperation("회원 탈퇴")
