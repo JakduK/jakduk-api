@@ -58,11 +58,11 @@ jakduk:
       email:
         binding-queue-name: dev.email
         binding-routing-key: dev.email.*
-        enabled: true
+        enabled: false
       elasticsearch:
         binding-queue-name: dev.elasticsearch
         binding-routing-key: dev.elasticsearch.*
-        enabled: true
+        enabled: false
     routing-keys:
       email-welcome: dev.email.welcome
       email-reset-password: dev.email.reset-password

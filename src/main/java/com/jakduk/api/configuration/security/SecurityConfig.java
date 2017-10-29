@@ -65,6 +65,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //Configures url based authorization
                 .and().authorizeRequests()
 
+                /*
+                  ANONYMOUS ROLE
+                 */
+                .regexMatchers(
+                        HttpMethod.POST,
+                        "/api/user", // 이메일 기반 회원 가입
+                        "/api/auth/login/[a-z]+", // SNS 기반 회원 가입 및 SNS 임시 프로필 저장
+                        "api/user/password/find" // 비밀번호 찾기 이메일 발송
+                ).anonymous()
+                .regexMatchers(
+                        HttpMethod.GET,
+                        "/api/auth/user/attempt" // SNS 기반 회원 가입시 필요한 회원 프로필 정보
+                ).anonymous()
+
+                /*
+                  USER ROLE
+                 */
                 .regexMatchers(
                         HttpMethod.GET,
                         "/api/auth/user", // 세션에 있는 나의 프로필 정보
@@ -93,6 +110,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 
+                /*
+                  ADMIN ROLE
+                 */
                 .regexMatchers(
                         HttpMethod.POST,
                         "/api/board/[a-z]+/\\d+/notice" // 글의 공지 만들기
@@ -103,16 +123,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/board/[a-z]+/\\d+/notice" // 글의 공지 없애기
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_ADMIN.name())
-
-                .regexMatchers(
-                        HttpMethod.POST,
-                        "/api/user", // 이메일 기반 회원 가입
-                        "/api/auth/login/[a-z]+" // SNS 기반 회원 가입 및 SNS 임시 프로필 저장
-                ).anonymous()
-                .regexMatchers(
-                        HttpMethod.GET,
-                        "/api/auth/user/attempt" // SNS 기반 회원 가입시 필요한 회원 프로필 정보
-                ).anonymous()
 
                 .anyRequest().permitAll();
 
