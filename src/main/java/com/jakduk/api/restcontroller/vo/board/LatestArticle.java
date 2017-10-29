@@ -1,17 +1,16 @@
 package com.jakduk.api.restcontroller.vo.board;
 
 import com.jakduk.api.model.embedded.CommonWriter;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.util.List;
 
 /**
+ * 글쓴이의 최근글
+ *
  * Created by pyohwanjang on 2017. 3. 10..
  */
 
-@ApiModel(description = "글쓴이의 최근글")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,19 +18,10 @@ import java.util.List;
 @Setter
 public class LatestArticle {
 
-    @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
-    private String id;
-
-    @ApiModelProperty(example = "2", value = "글번호")
-    private Integer seq;
-
-    @ApiModelProperty(value = "글쓴이")
-    private CommonWriter writer;
-
-    @ApiModelProperty(example = "글제목입니다.", value = "글제목")
-    private String subject;
-
-    @ApiModelProperty(value = "그림 목록")
-    private List<BoardGallerySimple> galleries;
+    private String id; // 글ID
+    private Integer seq; // 글번호
+    private CommonWriter writer; // 글쓴이
+    private String subject; // 글제목
+    private List<BoardGallerySimple> galleries; // 그림 목록
 
 }

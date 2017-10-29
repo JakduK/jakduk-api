@@ -14,9 +14,6 @@ import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.*;
 import com.jakduk.api.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -40,11 +37,12 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
+ * 회원 API
+ *
  * @author pyohawan
  * 16. 4. 5 오전 12:17
  */
 
-@Api(tags = "User", description = "회원 API")
 @RestController
 @RequestMapping("/api/user")
 @Validated
@@ -55,10 +53,10 @@ public class UserRestController {
     @Autowired private RabbitMQPublisher rabbitMQPublisher;
     @Autowired private UserDetailsService userDetailsService;
 
-    @ApiOperation("이메일 기반 회원 가입")
+    // 이메일 기반 회원 가입
     @PostMapping("")
     public EmptyJsonResponse createJakdukUser(
-            @ApiParam(value = "회원 폼", required = true) @Valid @RequestBody UserForm form) {
+            @Valid @RequestBody UserForm form) {
 
         String password = form.getPassword().trim();
 
@@ -79,10 +77,10 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation("SNS 기반 회원 가입")
+    // SNS 기반 회원 가입
     @PostMapping("/social")
     public EmptyJsonResponse createSocialUser(
-            @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody SocialUserForm form,
+            @Valid @RequestBody SocialUserForm form,
             HttpSession session) {
 
         AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
@@ -112,19 +110,19 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "이메일 중복 검사")
+    // 이메일 중복 검사
     @GetMapping("/exist/email")
     public EmptyJsonResponse existEmail(@NotEmpty @Email @ExistEmail @RequestParam String email) {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "별명 중복 검사")
+    // 별명 중복 검사
     @GetMapping("/exist/username")
     public EmptyJsonResponse existUsername(@NotEmpty @ExistUsername @RequestParam String username) {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation("내 프로필 정보 보기")
+    // 내 프로필 정보 보기
     @GetMapping("/profile/me")
     public UserProfileResponse getProfileMe() {
 
@@ -135,7 +133,7 @@ public class UserRestController {
         return userService.getProfileMe(language, sessionUser.getId());
     }
 
-    @ApiOperation(value = "내 프로필 정보 편집")
+    // 내 프로필 정보 편집
     @PutMapping("/profile/me")
     public EmptyJsonResponse editProfileMe(
             @Valid @RequestBody UserProfileEditForm form,
@@ -169,7 +167,7 @@ public class UserRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation(value = "프로필 사진 올리기")
+    // 프로필 사진 올리기
     @PostMapping("/picture")
     public UserPicture uploadUserPicture(@RequestParam MultipartFile file) {
 
@@ -186,7 +184,7 @@ public class UserRestController {
         }
     }
 
-    @ApiOperation(value = "이메일 기반 회원의 비밀번호 변경")
+    // 이메일 기반 회원의 비밀번호 변경
     @PutMapping("/password")
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
@@ -216,7 +214,7 @@ public class UserRestController {
         return userService.resetPasswordWithToken(form.getCode().trim(), form.getPassword().trim());
     }
 
-    @ApiOperation("회원 탈퇴")
+    // 회원 탈퇴
     @DeleteMapping("")
     public EmptyJsonResponse deleteUser(
             HttpServletRequest request,

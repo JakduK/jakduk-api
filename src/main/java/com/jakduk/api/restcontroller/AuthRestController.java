@@ -8,13 +8,10 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
-import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +25,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * 인증 API
+ *
  * @author pyohwan
  * 16. 6. 29 오전 12:27
  */
 
 @Slf4j
-@Api(tags = "Authentication", description = "인증 API")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthRestController {
@@ -42,11 +40,11 @@ public class AuthRestController {
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private UserService userService;
 
-    @ApiOperation("SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)")
+    // SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)
     @PostMapping("/login/{providerId}")
     public EmptyJsonResponse loginSnsUser(
-            @ApiParam(value = "Provider ID", required = true) @PathVariable String providerId,
-            @ApiParam(value = "SNS 회원 폼", required = true) @Valid @RequestBody LoginSocialUserForm form,
+            @PathVariable String providerId,
+            @Valid @RequestBody LoginSocialUserForm form,
             HttpSession session) {
 
         Constants.ACCOUNT_TYPE cvtProviderId = Constants.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
@@ -101,7 +99,7 @@ public class AuthRestController {
         throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
     }
 
-    @ApiOperation("SNS 기반 회원 가입시 필요한 회원 프로필 정보")
+    // SNS 기반 회원 가입시 필요한 회원 프로필 정보
     @GetMapping("/user/attempt")
     public AttemptSocialUser getAttemptSocialUser(HttpSession session) {
 
@@ -113,7 +111,7 @@ public class AuthRestController {
         return attemptSocialUser;
     }
 
-    @ApiOperation(value = "세션에 있는 나의 프로필 정보")
+    // 세션에 있는 나의 프로필 정보
     @GetMapping("/user")
     public SessionUser getMySessionProfile() {
 

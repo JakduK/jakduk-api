@@ -13,9 +13,6 @@ import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.gallery.*;
 import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.service.GalleryService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +25,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * 사진첩 API
+ *
  * @author pyohwan
  * 16. 3. 20 오후 11:17
  */
 
-@Api(tags = "Gallery", description = "사진첩 API")
 @RequestMapping("/api")
 @RestController
 public class GalleryRestController {
@@ -40,11 +38,12 @@ public class GalleryRestController {
     @Autowired private UrlGenerationUtils urlGenerationUtils;
     @Autowired private GalleryService galleryService;
 
-    @ApiOperation("사진 목록")
+    // 사진 목록
     @GetMapping("/galleries")
     public GalleriesResponse getGalleries(
-            @ApiParam(value = "이 ID 이후부터 목록 가져옴") @RequestParam(required = false) String id,
-            @ApiParam(value = "페이지 사이즈") @RequestParam(required = false, defaultValue = "0") Integer size) {
+            @RequestParam(required = false) String id, // 이 ID 이후부터 목록 가져옴
+            @RequestParam(required = false, defaultValue = "0") Integer size // 페이지 사이즈
+    ) {
 
         if (size < Constants.GALLERY_SIZE) size = Constants.GALLERY_SIZE;
 
@@ -55,7 +54,7 @@ public class GalleryRestController {
                 .build();
     }
 
-    @ApiOperation(value = "사진 올리기")
+    // 사진 올리기
     @SecuredUser
     @PostMapping("/gallery")
     public GalleryUploadResponse uploadImage(@RequestParam MultipartFile file) throws IOException {
@@ -82,11 +81,11 @@ public class GalleryRestController {
         return response;
     }
 
-    @ApiOperation(value = "사진 지움")
+    // 사진 지움
     @DeleteMapping("/gallery/{id}")
     public EmptyJsonResponse removeImage(
-            @ApiParam(value = "사진 ID", required = true) @PathVariable String id,
-            @ApiParam(value = "연관된 아이템 폼") @RequestBody(required = false) LinkedItemForm form,
+            @PathVariable String id, // 사진 ID"
+            @RequestBody(required = false) LinkedItemForm form,
             HttpServletRequest request) {
 
         if (! AuthUtils.isUser())
@@ -104,10 +103,10 @@ public class GalleryRestController {
         return EmptyJsonResponse.newInstance();
     }
 
-    @ApiOperation("사진 상세")
+    // 사진 상세
     @GetMapping("/gallery/{id}")
     public GalleryResponse view(
-            @ApiParam(value = "Gallery ID", required = true) @PathVariable String id) {
+            @PathVariable String id) {
 
         return galleryService.getGalleryDetail(id);
     }

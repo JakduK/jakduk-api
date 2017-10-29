@@ -2,7 +2,6 @@ package com.jakduk.api.restcontroller.vo.board;
 
 import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.util.List;
@@ -18,43 +17,18 @@ import java.util.List;
 @Setter
 public class GetArticle {
 
-    @ApiModelProperty(example = "58b7b9dd716dce06b10e449a", value = "글ID")
-    private String id;
-
-    @ApiModelProperty(example = "FREE", value = "게시판 ID")
-    private String board;
-
-    @ApiModelProperty(value = "글쓴이")
-    private CommonWriter writer;
-
-    @ApiModelProperty(example = "글제목입니다.", value = "글제목")
-    private String subject;
-
-    @ApiModelProperty(example = "2", value = "글번호")
-    private Integer seq;
-
-    @ApiModelProperty(example = "CLASSIC", value = "말머리")
-    private String category;
-
-    @ApiModelProperty(example = "10", value = "읽음 수")
-    private Integer views;
-
-    @ApiModelProperty(value = "글상태")
-    private ArticleStatus status;
-
-    @ApiModelProperty(value = "그림 목록")
-    private List<BoardGallerySimple> galleries;
-
-    @ApiModelProperty(example = "본문입니다.", value = "본문 100자")
-    private String shortContent;
-
-    @ApiModelProperty(example = "5", value = "댓글 수")
-    private Integer commentCount;
-
-    @ApiModelProperty(example = "5", value = "좋아요 수")
-    private Integer likingCount;
-
-    @ApiModelProperty(example = "5", value = "싫어요 수")
-    private Integer dislikingCount;
+    private String id; // 글ID
+    private String board; // 게시판 ID
+    private CommonWriter writer; // 글쓴이
+    private String subject; // 글제목
+    private Integer seq; // 글번호
+    private String category; // 말머리
+    private Integer views; // 읽음 수
+    private ArticleStatus status; // 글상태
+    private List<BoardGallerySimple> galleries; // 그림 목록
+    private String shortContent; // 본문 100자
+    private Integer commentCount; // 댓글 수
+    private Integer likingCount; // 좋아요 수
+    private Integer dislikingCount; // 싫어요 수
 
 }

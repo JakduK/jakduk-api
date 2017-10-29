@@ -1,6 +1,5 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,16 +11,9 @@ import lombok.Getter;
 @Getter
 public class ArticleGallery {
 
-    @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "사진 ID")
-    private String id;
-
-    @ApiModelProperty(example = "성남FC 시즌권 사진", value = "사진 이름")
-    private String name;
-
-    @ApiModelProperty(example = "https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111", value = "사진 풀 URL")
-    private String imageUrl;
-
-    @ApiModelProperty(example = "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111", value = "사진 썸네일 URL")
-    private String thumbnailUrl;
+    private String id; // 사진 ID
+    private String name; // 사진 이름
+    private String imageUrl; // 사진 풀 URL
+    private String thumbnailUrl; // 사진 썸네일 URL
 
 }
