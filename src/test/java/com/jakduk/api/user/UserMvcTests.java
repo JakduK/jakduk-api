@@ -29,12 +29,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.constraints.ResourceBundleConstraintDescriptionResolver;
 import org.springframework.restdocs.constraints.ValidatorConstraintResolver;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -43,7 +43,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,11 +55,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -547,10 +548,7 @@ public class UserMvcTests {
                                         fieldWithPath("callbackUrl").type(JsonFieldType.STRING).description("콜백 받을 URL. " +
                                                 userConstraints.descriptionsForProperty("callbackUrl"))
                                 ),
-                                responseFields(
-                                        fieldWithPath("subject").type(JsonFieldType.STRING).description("html에서 쓰일 제목. 이메일 주소"),
-                                        fieldWithPath("message").type(JsonFieldType.STRING).description("html에서 쓰일 내용.")
-                                )
+                                responseFields(this.getPasswordFindDescriptor())
                         ));
     }
 
@@ -588,10 +586,36 @@ public class UserMvcTests {
                                         fieldWithPath("password").type(JsonFieldType.STRING).description("바꿀 비밀번호 " +
                                                 userConstraints.descriptionsForProperty("password"))
                                 ),
-                                responseFields(
-                                        fieldWithPath("subject").type(JsonFieldType.STRING).description("html에서 쓰일 제목. 이메일 주소"),
-                                        fieldWithPath("message").type(JsonFieldType.STRING).description("html에서 쓰일 내용.")
-                                )
+                                responseFields(this.getPasswordFindDescriptor())
+                        ));
+    }
+
+    @Test
+    @WithMockUser
+    public void getResetPasswordTokenTest() throws Exception {
+
+        String code = "16948f83-1af8-4736-9e12-cf57f03a981c";
+
+        UserPasswordFindResponse expectResponse = UserPasswordFindResponse.builder()
+                .subject(jakdukUser.getEmail())
+                .message(code)
+                .build();
+
+        when(userService.validPasswordTokenCode(anyString()))
+                .thenReturn(expectResponse);
+
+        mvc.perform(
+                get("/api/user/password/reset/{code}", code)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
+                .andDo(
+                        document("user-valid-password-token-code",
+                                pathParameters(
+                                        parameterWithName("code").description("토큰 코드")
+                                ),
+                                responseFields(this.getPasswordFindDescriptor())
                         ));
     }
 
@@ -601,6 +625,13 @@ public class UserMvcTests {
 
         when(userProfileRepository.findOneByUsername(anyString()))
                 .thenReturn(Optional.empty());
+    }
+
+    private FieldDescriptor[] getPasswordFindDescriptor() {
+        return new FieldDescriptor[] {
+                fieldWithPath("subject").type(JsonFieldType.STRING).description("html에서 쓰일 제목. 이메일 주소"),
+                fieldWithPath("message").type(JsonFieldType.STRING).description("html에서 쓰일 내용.")
+        };
     }
 
 }

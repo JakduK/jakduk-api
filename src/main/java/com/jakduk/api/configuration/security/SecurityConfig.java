@@ -69,14 +69,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                   ANONYMOUS ROLE
                  */
                 .regexMatchers(
+                        HttpMethod.GET,
+                        "/api/auth/user/attempt", // SNS 기반 회원 가입시 필요한 회원 프로필 정보
+                        "/api/user/password/rest/*" // 비밀번호 토큰 코드 검증
+                ).anonymous()
+                .regexMatchers(
                         HttpMethod.POST,
                         "/api/user", // 이메일 기반 회원 가입
                         "/api/auth/login/[a-z]+", // SNS 기반 회원 가입 및 SNS 임시 프로필 저장
-                        "/api/user/password/find" // 비밀번호 찾기 이메일 발송
-                ).anonymous()
-                .regexMatchers(
-                        HttpMethod.GET,
-                        "/api/auth/user/attempt" // SNS 기반 회원 가입시 필요한 회원 프로필 정보
+                        "/api/user/password/find", // 비밀번호 찾기 이메일 발송
+                        "/api/user/password/rest" // 비밀번호 재설정 하기
                 ).anonymous()
 
                 /*

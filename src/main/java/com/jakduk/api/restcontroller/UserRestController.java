@@ -206,7 +206,13 @@ public class UserRestController {
         return userService.sendEmailToResetPassword(form.getEmail().trim(), form.getCallbackUrl().trim());
     }
 
-    // 비밀번호 재설정 처리.
+    // 비밀번호 토큰 코드 검증
+    @GetMapping("/password/reset/{code}")
+    public UserPasswordFindResponse validPasswordTokenCode(@PathVariable String code) {
+        return userService.validPasswordTokenCode(code.trim());
+    }
+
+    // 비밀번호 재설정 하기
     @PostMapping("/password/reset")
     public UserPasswordFindResponse resetPassword(
             @Valid @RequestBody UserPasswordResetForm form) {

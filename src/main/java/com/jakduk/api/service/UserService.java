@@ -311,6 +311,17 @@ public class UserService {
 				.build();
 	}
 
+	public UserPasswordFindResponse validPasswordTokenCode(String code) {
+
+		Token token = tokenRepository.findOneByCode(code)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND, JakdukUtils.getMessageSource("user.msg.reset.password.invalid")));
+
+		return UserPasswordFindResponse.builder()
+				.subject(token.getEmail())
+				.message(token.getCode())
+				.build();
+	}
+
 	public UserPasswordFindResponse resetPasswordWithToken(String code, String password) {
 		Optional<Token> oToken = tokenRepository.findOneByCode(code);
 
