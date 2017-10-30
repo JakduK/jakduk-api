@@ -82,8 +82,6 @@ include::{snippets}/exist-username/http-response.adoc[]
 
 .request headers
 include::{snippets}/user-get-profile-me/request-headers.adoc[]
-.request parameters
-include::{snippets}/user-get-profile-me/request-parameters.adoc[]
 .http request
 include::{snippets}/user-get-profile-me/http-request.adoc[]
 .curl request
