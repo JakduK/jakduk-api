@@ -1,5 +1,8 @@
 package com.jakduk.api.restcontroller.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.Objects;
 
 /**
@@ -9,6 +12,7 @@ import java.util.Objects;
  * 16. 7. 8 오전 12:55
  */
 
+@JsonInclude
 public class EmptyJsonResponse {
 
     private static EmptyJsonResponse emptyJsonResponse;
