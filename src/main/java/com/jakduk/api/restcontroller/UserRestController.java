@@ -72,7 +72,7 @@ public class UserRestController {
 
         AuthUtils.setAuthentication(authentication);
 
-        rabbitMQPublisher.sendWelcome(JakdukUtils.getLocale(), user.getUsername(), email);
+        rabbitMQPublisher.sendWelcome(JakdukUtils.getLocale(), email, user.getUsername());
 
         return EmptyJsonResponse.newInstance();
     }
@@ -105,7 +105,7 @@ public class UserRestController {
 
         session.removeAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
-        rabbitMQPublisher.sendWelcome(JakdukUtils.getLocale(), user.getUsername(), user.getEmail());
+        rabbitMQPublisher.sendWelcome(JakdukUtils.getLocale(), user.getEmail(), user.getUsername());
 
         return EmptyJsonResponse.newInstance();
     }

@@ -3,6 +3,7 @@ package com.jakduk.api.model.rabbitmq;
 import com.jakduk.api.common.Constants;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Locale;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 @Builder
 @Getter
+@ToString
 public class EmailPayload {
 
     private Locale locale;
