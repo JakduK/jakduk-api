@@ -22,6 +22,6 @@ public class EmailPayload {
     private String recipientEmail;
     private String subject;
     private Map<String, String> extra;
-    private Map<String, String> body;
+    private Map<String, Object> body;
 
 }

@@ -132,7 +132,7 @@ public class EmailService {
 		ctx.setVariable("hobbies", Arrays.asList("Cinema", "Sports", "Music"));
 
 		// Prepare message using a Spring helper
-		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+		final MimeMessage mimeMessage = mailSender.createMimeMessage();
 		final MimeMessageHelper message
 				= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
 		message.setSubject("Example HTML email with inline image");
@@ -140,7 +140,7 @@ public class EmailService {
 		message.setTo(recipientEmail);
 
 		// Create the HTML body using Thymeleaf
-		final String htmlContent = this.htmlTemplateEngine.process("mail/email-inlineimage", ctx);
+		final String htmlContent = htmlTemplateEngine.process("mail/email-inlineimage", ctx);
 		message.setText(htmlContent, true /* isHtml */);
 
 		// Add the inline image, referenced from the HTML code as "cid:${imageResourceName}"
@@ -149,7 +149,7 @@ public class EmailService {
 		message.addInline("sample-image", new ClassPathResource("public/images/logo_type_A_en.png"), "image/png");
 
 		// Send mail
-		this.mailSender.send(mimeMessage);
+		mailSender.send(mimeMessage);
 	}
 
 }

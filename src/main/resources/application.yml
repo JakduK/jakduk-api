@@ -20,8 +20,8 @@ spring:
     default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
-  messages:
-    fallback-to-system-locale: false
+#  messages:
+#    fallback-to-system-locale: false
 
 jakduk:
   remember-me-seed: 2f76392e-8b1d-4beb-aca0-b7f53a010e0c
