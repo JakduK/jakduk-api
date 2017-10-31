@@ -63,7 +63,7 @@ public class RabbitMQPublisher {
                 .locale(locale)
                 .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail(recipientEmail)
-                .subject("jakduk.com-" + JakdukUtils.getMessageSource("user.password.reset.instructions"))
+                .subject(JakdukUtils.getMessageSource("email.user.password.reset.subject"))
                 .extra(
                         new HashMap<String, String>() {
                             {
