@@ -10,8 +10,6 @@ import com.jakduk.api.service.AdminService;
 import com.jakduk.api.service.CommonService;
 import com.jakduk.api.service.CompetitionService;
 import com.jakduk.api.service.StatsService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +21,13 @@ import javax.validation.Valid;
 import java.util.*;
 
 /**
+ * 관리자 API
+ *
  * @author pyohwan
  *         16. 5. 8 오후 11:26
  */
 
 @Slf4j
-@Api(tags = "Admin", description = "관리자 API")
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
@@ -45,7 +44,7 @@ public class AdminRestController {
 	@Autowired
 	private CompetitionService competitionService;
 
-	@ApiOperation(value = "알림판 목록")
+	// 알림판 목록
 	@RequestMapping(value = "/home/descriptions", method = RequestMethod.GET)
 	public Map<String, Object> getHomeDescriptions() {
 
@@ -58,7 +57,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "알림판 하나")
+	// 알림판 하나
 	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getHomeDescription(@PathVariable String id) {
 
@@ -75,7 +74,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "새 알림판 저장")
+	// 새 알림판 저장
 	@RequestMapping(value = "/home/description", method = RequestMethod.POST)
 	public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
 
@@ -99,7 +98,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "알림판 편집")
+	// 알림판 편집
 	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editHomeDescription(@PathVariable String id,
 	                                               @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
@@ -130,7 +129,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "알림판 지움")
+	// 알림판 지움
 	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.DELETE)
 	public Map<String, Object> deleteHomeDescription(@PathVariable String id) {
 
@@ -147,7 +146,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "백과사전 목록")
+	// 백과사전 목록
 	@RequestMapping(value = "/encyclopedias", method = RequestMethod.GET)
 	public Map<String, Object> getEncyclopedias() {
 
@@ -160,7 +159,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "백과사전 하나")
+	// 백과사전 하나
 	@RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getEncyclopedia(@PathVariable String id) {
 
@@ -174,7 +173,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "새 백과사전 저장")
+	// 새 백과사전 저장
 	@RequestMapping(value = "/encyclopedia", method = RequestMethod.POST)
 	public Map<String, Object> addEncyclopedia(@RequestBody Encyclopedia encyclopedia) {
 
@@ -195,7 +194,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "백과사전 편집")
+	// 백과사전 편집
 	@RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editEncyclopedia(@PathVariable String id,
 	                                            @RequestBody Encyclopedia encyclopedia) {
@@ -214,7 +213,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "백과사전 지움")
+	// 백과사전 지움
 	@RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.DELETE)
 	public Map<String, Object> deleteEncyclopedia(@PathVariable String id) {
 
@@ -231,7 +230,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "부모 축구단 목록")
+	// 부모 축구단 목록
 	@RequestMapping(value = "/origin/football/clubs", method = RequestMethod.GET)
 	public Map<String, Object> getOriginFootballClubs() {
 
@@ -243,7 +242,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "부모 축구단 하나")
+	// 부모 축구단 하나
 	@RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getOriginFootballClub(@PathVariable String id) {
 
@@ -258,7 +257,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "새 부모 축구단 하나 저장")
+	// 새 부모 축구단 하나 저장
 	@RequestMapping(value = "/origin/football/club", method = RequestMethod.POST)
 	public Map<String, Object> addOriginFootballClub(@RequestBody FootballClubOrigin footballClubOrigin) {
 
@@ -273,7 +272,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "부모 축구단 하나 편집")
+	// 부모 축구단 하나 편집
 	@RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editOriginFootballClub(@PathVariable String id,
 	                                                  @RequestBody FootballClubOrigin footballClubOrigin) {
@@ -292,7 +291,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "부모 축구단 하나 지움")
+	// 부모 축구단 하나 지움
 	@RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.DELETE)
 	public Map<String, Object> deleteOriginFootballClub(@PathVariable String id) {
 
@@ -309,7 +308,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "축구단 목록")
+	// 축구단 목록
 	@RequestMapping(value = "/football/clubs", method = RequestMethod.GET)
 	public Map<String, Object> getFootballClubs() {
 
@@ -321,7 +320,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "축구단 하나")
+	// 축구단 하나
 	@RequestMapping(value = "/football/club/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getFootballClub(@PathVariable String id) {
 
@@ -354,7 +353,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "새 축구단 하나 저장")
+	// 새 축구단 하나 저장
 	@RequestMapping(value = "/football/club", method = RequestMethod.POST)
 	public Map<String, Object> addFootballClub(@RequestBody FootballClubRequest request) {
 
@@ -370,7 +369,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "축구단 편집")
+	// 축구단 편집
 	@RequestMapping(value = "/football/club/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editFootballClub(@PathVariable String id, @RequestBody FootballClubRequest request) {
 		FootballClub footballClub = buildFootballClub(id, request);
@@ -382,7 +381,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "대회별 관중수 목록")
+	// 대회별 관중수 목록
 	@RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
 	public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId,
 	                                                @RequestParam(required = false) String competitionCode) {
@@ -413,7 +412,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "대회별 관중수 하나")
+	// 대회별 관중수 하나
 	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getLeagueAttendance(@PathVariable String id) {
 
@@ -428,7 +427,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "새 대회별 관중수 하나 저장")
+	// 새 대회별 관중수 하나 저장
 	@RequestMapping(value = "/league/attendance", method = RequestMethod.POST)
 	public EmptyJsonResponse addLeagueAttendance(@Valid @RequestBody LeagueAttendanceForm form) {
 
@@ -450,7 +449,7 @@ public class AdminRestController {
 
 	}
 
-	@ApiOperation(value = "대회별 관중수 하나 편집")
+	// 대회별 관중수 하나 편집
 	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.PUT)
 	public EmptyJsonResponse editLeagueAttendance(@PathVariable String id,
 												  @Valid @RequestBody LeagueAttendanceForm form) {
@@ -475,7 +474,7 @@ public class AdminRestController {
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "대회별 관중수 하나 지움")
+	// 대회별 관중수 하나 지움
 	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.DELETE)
 	public EmptyJsonResponse deleteLeagueAttendance(@PathVariable String id) {
 
@@ -487,7 +486,7 @@ public class AdminRestController {
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "클럽 관중수 목록")
+	// 클럽 관중수 목록
 	@RequestMapping(value = "/club/attendances", method = RequestMethod.GET)
 	public Map<String, Object> getAttendanceClubs() {
 
@@ -497,7 +496,7 @@ public class AdminRestController {
 		return data;
 	}
 
-	@ApiOperation(value = "클럽 관중수 하나")
+	// 클럽 관중수 하나
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getAttendanceClub(@PathVariable String id) {
 
@@ -515,7 +514,7 @@ public class AdminRestController {
 		return response;
 	}
 
-	@ApiOperation(value = "클럽 관중수 변경")
+	// 클럽 관중수 변경
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.PUT)
 	public EmptyJsonResponse addAttendanceClub(@PathVariable String id,
 											   @Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
@@ -529,7 +528,7 @@ public class AdminRestController {
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "클럽 관중수 추가")
+	// 클럽 관중수 추가
 	@RequestMapping(value = "/club/attendance", method = RequestMethod.POST)
 	public EmptyJsonResponse editAttendanceClub(@Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
 
@@ -552,14 +551,14 @@ public class AdminRestController {
 		return data;
 	}
 
-	@ApiOperation(value = "썸네일 크기 지정")
+	// 썸네일 크기 지정
 	@RequestMapping(value = "/thumbnail/size", method = RequestMethod.POST)
 	public EmptyJsonResponse thumbnailSizeWrite(@RequestBody ThumbnailSizeWrite thumbnailSizeWrite) {
 		adminService.thumbnailSizeWrite(thumbnailSizeWrite);
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "경기 목록")
+	// 경기 목록
 	@RequestMapping(value = "/competitions", method = RequestMethod.GET)
 	public Map<String, Object> getCompetitions() {
 		Map<String, Object> data = new HashMap<>();
@@ -567,60 +566,60 @@ public class AdminRestController {
 		return data;
 	}
 
-	@ApiOperation(value = "경기 하나")
+	// 경기 하나
 	@RequestMapping(value = "/competition/{id}", method = RequestMethod.GET)
 	public CompetitionWrite getCompetition(@PathVariable String id) {
 		return adminService.getCompetition(id);
 	}
 
-	@ApiOperation(value = "경기 추가")
+	// 경기 추가
 	@RequestMapping(value = "/competition", method = RequestMethod.POST)
 	public CompetitionWrite addCompetition(@RequestBody CompetitionWrite competitionWrite) {
 		String id = adminService.writeCompetition(null, competitionWrite).getId();
 		return adminService.getCompetition(id);
 	}
 
-	@ApiOperation(value = "경기 수정")
+	// 경기 수정
 	@RequestMapping(value = "/competition/{id}", method = RequestMethod.PUT)
 	public EmptyJsonResponse editCompetition(@PathVariable String id, @RequestBody CompetitionWrite competitionWrite) {
 		adminService.writeCompetition(id, competitionWrite);
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "경기 삭제")
+	// 경기 삭제
 	@RequestMapping(value = "/competition/{id}", method = RequestMethod.DELETE)
 	public EmptyJsonResponse deleteCompetition(@PathVariable String id) {
 		adminService.deleteCompetition(id);
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "작두 하나")
+	// 작두 하나
 	@RequestMapping(value = "/jakdu/schedule/{id}", method = RequestMethod.GET)
 	public JakduScheduleWrite addJakduSchedule(@PathVariable String id) {
 		return adminService.getJakduScheduleWrite(id);
 	}
 
-	@ApiOperation(value = "작두 추가")
+	// 작두 추가
 	@RequestMapping(value = "/jakdu/schedule", method = RequestMethod.POST)
 	public JakduSchedule jakduScheduleWrite(@RequestBody JakduScheduleWrite jakduScheduleWrite) {
 		return adminService.writeJakduSchedule(null, jakduScheduleWrite);
 	}
 
-	@ApiOperation(value = "작두 수정")
+	// 작두 수정
 	@RequestMapping(value = "/jakdu/schedule", method = RequestMethod.PUT)
 	public EmptyJsonResponse editJakduSchedule(@PathVariable String id, @RequestBody JakduScheduleWrite jakduScheduleWrite) {
 		adminService.writeJakduSchedule(id, jakduScheduleWrite);
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "작두 삭제")
+	// 작두 삭제
 	@RequestMapping(value = "/jakdu/schedule/{id}", method = RequestMethod.DELETE)
 	public EmptyJsonResponse deleteSchedule(@PathVariable String id) {
 		adminService.deleteJakduSchedule(id);
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "작두 목록")
+	// 작두 목록
 	@RequestMapping(value = "/jakdu/schedules", method = RequestMethod.GET)
 	public Map<String, Object> jakduSchedules() {
 		Map<String, Object> data = new HashMap<>();
@@ -628,32 +627,32 @@ public class AdminRestController {
 		return data;
 	}
 
-	@ApiOperation(value = "작두그룹 하나")
+	// 작두그룹 하나
 	@RequestMapping(value = "/jakdu/schedule/group/{id}", method = RequestMethod.GET)
 	public JakduScheduleGroupWrite getJakduScheduleGroup(@PathVariable String id) {
 		return adminService.getJakduScheduleGroupWrite(id);
 	}
 
-	@ApiOperation(value = "작두그룹 추가")
+	// 작두그룹 추가
 	@RequestMapping(value = "/jakdu/schedule/group", method = RequestMethod.POST)
 	public JakduScheduleGroup addJakduScheduleGroup(@RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
 		return adminService.writeJakduScheduleGroup(null, jakduScheduleGroupWrite);
 	}
 
-	@ApiOperation(value = "작두그룹 수정")
+	// 작두그룹 수정
 	@RequestMapping(value = "/jakdu/schedule/group", method = RequestMethod.PUT)
 	public JakduScheduleGroup editJakduScheduleGroup(@PathVariable String id, @RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
 		return adminService.writeJakduScheduleGroup(id, jakduScheduleGroupWrite);
 	}
 
-	@ApiOperation(value = "작두그룹 삭제")
+	// 작두그룹 삭제
 	@RequestMapping(value = "jakdu/schedule/group/{id}", method = RequestMethod.DELETE)
 	public EmptyJsonResponse deleteJakduScheduleGroup(@PathVariable String id) {
 		adminService.deleteJakduScheduleGroup(id);
 		return EmptyJsonResponse.newInstance();
 	}
 
-	@ApiOperation(value = "작두그룹 목록")
+	// 작두그룹 목록
 	@RequestMapping(value = "/jakdu/schedule/groups", method = RequestMethod.GET)
 	public Map<String, Object> jakduScheduleGroups() {
 		Map<String, Object> data = new HashMap<>();

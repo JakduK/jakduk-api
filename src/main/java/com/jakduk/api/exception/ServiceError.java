@@ -40,8 +40,6 @@ public enum ServiceError {
     NOT_FOUND_USER_IMAGE(HttpStatus.SC_NOT_FOUND, "exception.not.found.user.image"),
     NOT_REGISTER_WITH_SNS(HttpStatus.SC_NOT_FOUND, "exception.not.register.with.sns"),
     CANNOT_GET_ATTEMPT_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.attempt.sns.profile"),
-    ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
-    ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
 
     NOT_FOUND_ARTICLE(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
     NOT_FOUND_COMMENT(HttpStatus.SC_NOT_FOUND, "exception.not.found.comment"),

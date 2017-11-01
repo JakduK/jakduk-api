@@ -9,7 +9,7 @@ import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.AuthRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
@@ -231,7 +231,7 @@ public class AuthMvcTests {
     @WithMockJakdukUser
     public void getMySessionProfileTest() throws Exception {
 
-        AuthUserProfile expectResponse = AuthUtils.getAuthUserProfile();
+        SessionUser expectResponse = AuthUtils.getAuthUserProfile();
 
         mvc.perform(
                 get("/api/auth/user")
@@ -255,8 +255,6 @@ public class AuthMvcTests {
                                                 Stream.of(JakdukAuthority.values()).map(Enum::name).collect(Collectors.toList())),
                                         fieldWithPath("picture").type(JsonFieldType.OBJECT).description("회원 사진"),
                                         fieldWithPath("picture.id").type(JsonFieldType.STRING).description("회원 사진 ID"),
-                                        fieldWithPath("picture.sourceType").type(JsonFieldType.STRING).description("계정 분류 " +
-                                                Stream.of(Constants.ACCOUNT_TYPE.values()).map(Enum::name).collect(Collectors.toList())),
                                         fieldWithPath("picture.smallPictureUrl").type(JsonFieldType.STRING).description("회원 작은 사진 URL"),
                                         fieldWithPath("picture.largePictureUrl").type(JsonFieldType.STRING).description("회원 큰 사진 URL")
                                 )

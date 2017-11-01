@@ -45,7 +45,7 @@ public class RabbitMQPublisher {
                 .recipientEmail(recipientEmail)
                 .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("username", userName);
                             }
@@ -63,7 +63,7 @@ public class RabbitMQPublisher {
                 .locale(locale)
                 .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail(recipientEmail)
-                .subject("jakduk.com-" + JakdukUtils.getMessageSource("user.password.reset.instructions"))
+                .subject(JakdukUtils.getMessageSource("email.user.password.reset.subject"))
                 .extra(
                         new HashMap<String, String>() {
                             {
@@ -72,7 +72,7 @@ public class RabbitMQPublisher {
                         }
                 )
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("email", recipientEmail);
                             }

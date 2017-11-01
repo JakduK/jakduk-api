@@ -2,14 +2,14 @@ package com.jakduk.api.common.constraint;
 
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.model.simple.UserOnPasswordUpdate;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.Objects;
 
 /**
  * @author pyohwan
@@ -18,7 +18,7 @@ import java.util.Objects;
 public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, String> {
 
     @Autowired
-    private StandardPasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
     private UserService userService;
@@ -31,15 +31,15 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        if (Objects.isNull(value))
+        if (StringUtils.isBlank(value))
             return false;
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
         if (! AuthUtils.isJakdukUser())
             return true;
 
-        UserOnPasswordUpdate user = userService.findUserOnPasswordUpdateById(authUserProfile.getId());
+        UserOnPasswordUpdate user = userService.findUserOnPasswordUpdateById(sessionUser.getId());
         String oldPassword = user.getPassword();
 
         return encoder.matches(value, oldPassword);

@@ -2,7 +2,6 @@ package com.jakduk.api;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
-import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.embedded.UserPictureInfo;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +25,7 @@ public class WithMockJakdukUserSecurityContextFactory implements WithSecurityCon
 
         userDetails.setPicture(
                 new UserPictureInfo(
-                        new UserPicture("597a0d53807d710f57420aa5", null, Constants.GALLERY_STATUS_TYPE.ENABLE, "image/jpeg", Constants.ACCOUNT_TYPE.JAKDUK),
+                        "597a0d53807d710f57420aa5",
                         "https://dev-api.jakduk.com/user/picture/small/597a0d53807d710f57420aa5",
                         "https://dev-api.jakduk.com/user/picture/597a0d53807d710f57420aa5"
                 )

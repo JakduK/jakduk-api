@@ -1,8 +1,11 @@
 package com.jakduk.api.configuration;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.client.RestTemplate;
@@ -58,6 +61,16 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder.build();
+    }
+
+    // yml로 뺄려고 했으나, Bean을 따로 등록 안해주면 thymeleaf에서 인식을 못하더라.
+    @Bean
+    public MessageSource messageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        messageSource.setFallbackToSystemLocale(false);
+
+        return messageSource;
     }
 
 }

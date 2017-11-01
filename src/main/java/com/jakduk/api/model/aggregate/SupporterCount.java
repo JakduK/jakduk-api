@@ -12,9 +12,6 @@ import lombok.Getter;
 
 @Getter
 public class SupporterCount {
-	
 	private FootballClub supportFC;
-	
 	private Integer count;
-
 }

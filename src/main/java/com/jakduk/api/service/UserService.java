@@ -2,6 +2,7 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.FileUtils;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -10,6 +11,7 @@ import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.FootballClub;
+import com.jakduk.api.model.db.Token;
 import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.db.UserPicture;
 import com.jakduk.api.model.embedded.LocalName;
@@ -17,17 +19,19 @@ import com.jakduk.api.model.embedded.UserPictureInfo;
 import com.jakduk.api.model.simple.UserOnPasswordUpdate;
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.model.simple.UserSimple;
+import com.jakduk.api.repository.TokenRepository;
 import com.jakduk.api.repository.footballclub.FootballClubRepository;
 import com.jakduk.api.repository.user.UserPictureRepository;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
+import com.jakduk.api.restcontroller.vo.user.UserPasswordFindResponse;
 import com.jakduk.api.restcontroller.vo.user.UserProfileResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -46,33 +50,16 @@ public class UserService {
 	@Resource private JakdukProperties.Storage storageProperties;
 	@Resource private AuthUtils authUtils;
 
+	@Autowired private RabbitMQPublisher rabbitMQPublisher;
+	@Autowired private PasswordEncoder passwordEncoder;
 	@Autowired private UserRepository userRepository;
 	@Autowired private FootballClubRepository footballClubRepository;
 	@Autowired private UserProfileRepository userProfileRepository;
 	@Autowired private UserPictureRepository userPictureRepository;
+	@Autowired private TokenRepository tokenRepository;
 
 	public Optional<User> findOneByProviderIdAndProviderUserId(Constants.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
-	}
-
-	// email과 일치하는 회원 찾기.
-	public UserProfile findOneByEmail(String email) {
-		return userProfileRepository.findOneByEmail(email);
-	}
-
-	// username과 일치하는 회원 찾기.
-	public UserProfile findOneByUsername(String username) {
-		return userProfileRepository.findOneByUsername(username);
-	}
-
-	// 해당 ID를 제외하고 username과 일치하는 회원 찾기.
-	public UserProfile findByNEIdAndUsername(String id, String username) {
-		return userProfileRepository.findByNEIdAndUsername(id, username);
-	};
-
-	// 해당 ID를 제외하고 email과 일치하는 회원 찾기.
-	public UserProfile findByNEIdAndEmail(String id, String email) {
-		return userProfileRepository.findByNEIdAndEmail(id, email);
 	}
 
 	/**
@@ -114,31 +101,23 @@ public class UserService {
 		}
 	}
 
-	public User addJakdukUser(String email, String username, String password, String footballClub, String about, String userPictureId) {
+	public User createJakdukUser(String email, String username, String password, String footballClub, String about, String userPictureId) {
 
 		UserPicture userPicture = null;
 
 		User user = User.builder()
-				.email(email.trim())
-				.username(username.trim())
-				.password(password)
+				.email(email)
+				.username(username)
+				.password(passwordEncoder.encode(password))
 				.providerId(Constants.ACCOUNT_TYPE.JAKDUK)
 				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 
-		if (StringUtils.isNotBlank(footballClub)) {
-			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
-
-			user.setSupportFC(supportFC);
-		}
-
-		if (StringUtils.isNotBlank(about))
-			user.setAbout(about.trim());
+		this.setUserAdditionalInfo(user, footballClub, about);
 
 		if (StringUtils.isNotBlank(userPictureId)) {
-			userPicture = userPictureRepository.findOneById(userPictureId)
+			userPicture = userPictureRepository.findOneById(userPictureId.trim())
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
@@ -146,13 +125,12 @@ public class UserService {
 
 		userRepository.save(user);
 
-		if (! ObjectUtils.isEmpty(userPicture)) {
-			userPicture.setUser(user);
+		if (Objects.nonNull(userPicture)) {
 			userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
-		log.info("JakduK user created. email:{} username:{}", user.getEmail(), user.getUsername());
+		log.info("JakduK user created. {}", user);
 
 		return user;
 	}
@@ -160,33 +138,25 @@ public class UserService {
 	/**
 	 * SNS 회원 가입
 	 */
-	public User addSocialUser(String email, String username, Constants.ACCOUNT_TYPE providerId, String providerUserId,
-                              String footballClub, String about, String userPictureId, String largePictureUrl) {
+	public User createSocialUser(String email, String username, Constants.ACCOUNT_TYPE providerId, String providerUserId,
+								 String footballClub, String about, String userPictureId, String largePictureUrl) {
 
 		UserPicture userPicture = null;
 
 		User user = User.builder()
-				.email(email.trim())
+				.email(email)
 				.username(username)
 				.providerId(providerId)
 				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
+				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_02.getCode()))
 				.lastLogged(LocalDateTime.now())
 				.build();
 
-		if (StringUtils.isNotBlank(footballClub)) {
-			FootballClub supportFC = footballClubRepository.findOneById(footballClub)
-					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
-
-			user.setSupportFC(supportFC);
-		}
-
-		if (StringUtils.isNotBlank(about))
-			user.setAbout(about.trim());
+		this.setUserAdditionalInfo(user, footballClub, about);
 
 		// 직접 올린 사진을 User와 연동
 		if (StringUtils.isNotBlank(userPictureId)) {
-			userPicture = userPictureRepository.findOneById(userPictureId)
+			userPicture = userPictureRepository.findOneById(userPictureId.trim())
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
@@ -203,7 +173,6 @@ public class UserService {
 				userPicture = UserPicture.builder()
 						.status(Constants.GALLERY_STATUS_TYPE.TEMP)
 						.contentType(fileInfo.getContentType())
-						.sourceType(providerId)
 						.build();
 
 				userPictureRepository.save(userPicture);
@@ -225,16 +194,26 @@ public class UserService {
 
 		userRepository.save(user);
 
-		// userImage를 user와 연동 및 활성화 처리
 		if (Objects.nonNull(userPicture)) {
-			userPicture.setUser(user);
 			userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
 
-		log.info("social user created. email:{} username:{}, providerId:{}", user.getEmail(), user.getUsername(), user.getProviderId());
+		log.info("social user created. {}", user);
 
 		return user;
+	}
+
+	private void setUserAdditionalInfo(User user, String footballClub, String about) {
+		if (StringUtils.isNotBlank(footballClub)) {
+			FootballClub supportFC = footballClubRepository.findOneById(footballClub.trim())
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+
+			user.setSupportFC(supportFC);
+		}
+
+		if (StringUtils.isNotBlank(about))
+			user.setAbout(about.trim());
 	}
 
 	public User editUserProfile(String userId, String email, String username, String footballClubId, String about,
@@ -272,7 +251,6 @@ public class UserService {
 		userRepository.save(user);
 
 		if (Objects.nonNull(userPicture)) {
-			userPicture.setUser(user);
 			userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
 			userPictureRepository.save(userPicture);
 		}
@@ -282,20 +260,6 @@ public class UserService {
 		return user;
 	}
 
-	public void existEmail(String email) {
-		Optional<User> oUser = userRepository.findOneByEmail(email);
-
-		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.ALREADY_EXIST_EMAIL);
-	}
-	
-	public void existUsername(String username) {
-		Optional<User> oUser = userRepository.findOneByUsername(username);
-
-		if (oUser.isPresent())
-			throw new ServiceException(ServiceError.ALREADY_EXIST_USERNAME);
-	}
-
 	/**
 	 * 이메일 기반 회원의 비밀번호 변경.
 	 *
@@ -303,20 +267,91 @@ public class UserService {
      */
 	public void updateUserPassword(String userId, String newPassword) {
 		User user = userRepository.findOneById(userId).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-		user.setPassword(newPassword);
+		user.setPassword(passwordEncoder.encode(newPassword.trim()));
 
 		userRepository.save(user);
 
-		log.info("jakduk user password changed. email=" + user.getEmail() + ", username=" + user.getUsername());
+		log.info("jakduk user password changed. email={}, username={}", user.getEmail(), user.getUsername());
 	}
 
 	public void userPasswordUpdateByEmail(String email, String password) {
 		User user = userRepository.findOneByEmail(email).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
-		user.setPassword(password);
+		user.setPassword(passwordEncoder.encode(password.trim()));
 
 		userRepository.save(user);
 
-		log.info("jakduk user password changed. id=" + user.getId() + ", username=" + user.getUsername());
+		log.info("jakduk user password changed. email={}, username={}", user.getEmail(), user.getUsername());
+	}
+
+	public UserPasswordFindResponse sendEmailToResetPassword(String email, String host) {
+		String message = "";
+
+		Optional<UserProfile> optUserProfile = userProfileRepository.findOneByEmail(email);
+
+		if (optUserProfile.isPresent()) {
+			switch (optUserProfile.get().getProviderId()) {
+				case JAKDUK:
+					message = JakdukUtils.getMessageSource("user.msg.reset.password.send.email");
+					rabbitMQPublisher.sendResetPassword(JakdukUtils.getLocale(), email, host);
+					break;
+				case DAUM:
+					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
+					break;
+				case FACEBOOK:
+					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
+					break;
+			}
+		} else {
+			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");
+		}
+
+		return UserPasswordFindResponse.builder()
+				.subject(email)
+				.message(message)
+				.build();
+	}
+
+	public UserPasswordFindResponse validPasswordTokenCode(String code) {
+
+		Token token = tokenRepository.findOneByCode(code)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND, JakdukUtils.getMessageSource("user.msg.reset.password.invalid")));
+
+		return UserPasswordFindResponse.builder()
+				.subject(token.getEmail())
+				.message(token.getCode())
+				.build();
+	}
+
+	public UserPasswordFindResponse resetPasswordWithToken(String code, String password) {
+		Optional<Token> oToken = tokenRepository.findOneByCode(code);
+
+		String message;
+		String subject = null;
+
+		if (oToken.isPresent()) {
+			Token token = oToken.get();
+
+			User user = userRepository.findOneByEmail(token.getEmail())
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+
+			user.setPassword(passwordEncoder.encode(password.trim()));
+
+			userRepository.save(user);
+
+			log.info("jakduk user password changed. email={}, username={}", user.getEmail(), user.getUsername());
+
+			subject = token.getEmail();
+			message = JakdukUtils.getMessageSource("user.msg.success.change.password");
+
+			tokenRepository.delete(token);
+		} else {
+			message = JakdukUtils.getMessageSource("user.msg.reset.password.invalid");
+		}
+
+		return UserPasswordFindResponse.builder()
+				.subject(subject)
+				.message(message)
+				.build();
 	}
 
 	/**
@@ -327,7 +362,6 @@ public class UserService {
 		UserPicture userPicture = UserPicture.builder()
 				.status(Constants.GALLERY_STATUS_TYPE.TEMP)
 				.contentType(contentType)
-				.sourceType(Constants.ACCOUNT_TYPE.JAKDUK)
 				.build();
 
 		userPictureRepository.save(userPicture);
@@ -373,7 +407,7 @@ public class UserService {
 		}
 
 		if (Objects.nonNull(userPicture)) {
-			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
+			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture.getId(),
 					authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
 					authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 

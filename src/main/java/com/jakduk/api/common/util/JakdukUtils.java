@@ -254,6 +254,9 @@ public class JakdukUtils {
     public static LocalName getLocalNameOfFootballClub(FootballClub footballClub, String language) {
         LocalName localName = null;
 
+        if (StringUtils.isBlank(language))
+            return null;
+
         if (Objects.nonNull(footballClub)) {
             List<LocalName> names = footballClub.getNames();
 

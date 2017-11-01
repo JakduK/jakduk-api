@@ -2,30 +2,31 @@ package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.db.AttendanceLeague;
 import com.jakduk.api.model.db.Competition;
-import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.restcontroller.vo.stats.SupportersDataResponse;
-
 import com.jakduk.api.service.CompetitionService;
 import com.jakduk.api.service.StatsService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
+ * 통계 API
+ *
  * @author pyohwan
  * 16. 3. 20 오후 11:25
  */
 
 @Slf4j
-@Api(tags = "Stats", description = "통계 API")
 @RestController
 @RequestMapping("/api/stats")
 public class StatsRestController {
@@ -36,7 +37,7 @@ public class StatsRestController {
     @Autowired
     private CompetitionService competitionService;
 
-    @ApiOperation(value = "대회별 관중수 목록")
+    // 대회별 관중수 목록
     @RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
     public List<AttendanceLeague> getLeagueAttendances(@RequestParam(required = false) String competitionId,
                                                        @RequestParam(required = false) String competitionCode) {
@@ -61,14 +62,14 @@ public class StatsRestController {
         return leagueAttendances;
     }
 
-    @ApiOperation(value = "구단별 관중수 목록")
+    // 구단별 관중수 목록
     @RequestMapping(value = "/attendance/club/{clubOrigin}", method = RequestMethod.GET)
     public List<AttendanceClub> getAttendancesClubs(@PathVariable String clubOrigin) {
 
         return statsService.getAttendanceClub(clubOrigin);
     }
 
-    @ApiOperation(value = "연도별 관중수 목록")
+    // 연도별 관중수 목록
     @RequestMapping(value = "/attendance/season/{season}", method = RequestMethod.GET)
     public List<AttendanceClub> getAttendanceSeason(@PathVariable Integer season,
                                                     @RequestParam(required = false, defaultValue = Constants.K_LEAGUE_ABBREVIATION) String league){

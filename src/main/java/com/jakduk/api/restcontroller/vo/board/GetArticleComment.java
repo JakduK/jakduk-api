@@ -5,7 +5,6 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.ArticleSimple;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.util.List;
@@ -23,34 +22,15 @@ import java.util.List;
 @Setter
 public class GetArticleComment {
 
-    @ApiModelProperty(value = "댓글ID")
-    private String id;
-
-    @ApiModelProperty(value = "연동 글")
-    private ArticleSimple article;
-
-    @ApiModelProperty(value = "글쓴이")
-    private CommonWriter writer;
-
-    @ApiModelProperty(value = "댓글상태")
-    private ArticleCommentStatus status;
-
-    @ApiModelProperty(value = "내용")
-    private String content;
-
-    @ApiModelProperty(example = "5", value = "좋아요 수")
-    private Integer numberOfLike;
-
-    @ApiModelProperty(example = "5", value = "싫어요 수")
-    private Integer numberOfDislike;
-
-    @ApiModelProperty(example = "LIKE", value = "나의 감정 표현 종류")
-    private Constants.FEELING_TYPE myFeeling;
-
-    @ApiModelProperty(value = "그림 목록")
-    private List<BoardGallerySimple> galleries;
-
-    @ApiModelProperty(value = "로그")
-    private List<ArticleCommentLog> logs;
+    private String id; // 댓글ID
+    private ArticleSimple article; // 연동 글
+    private CommonWriter writer; // 글쓴이
+    private ArticleCommentStatus status; // 댓글상태
+    private String content; // 내용
+    private Integer numberOfLike; // 좋아요 수
+    private Integer numberOfDislike; // 싫어요 수
+    private Constants.FEELING_TYPE myFeeling; // 나의 감정 표현 종류
+    private List<BoardGallerySimple> galleries; // 그림 목록
+    private List<ArticleCommentLog> logs; // 로그
 
 }

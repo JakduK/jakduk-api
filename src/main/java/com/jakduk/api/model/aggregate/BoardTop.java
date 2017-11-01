@@ -9,12 +9,10 @@ import lombok.*;
 @Setter
 @Builder
 public class BoardTop {
-
 	private String id;
 	private Integer seq;
 	private ArticleStatus status;
 	private String subject;
 	private Integer count;
 	private Integer views;
-
 }

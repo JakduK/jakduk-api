@@ -36,9 +36,6 @@ jakduk:
   mongodb:
     database: jakduk_test
     host: http://192.168.35.194:27017,http://192.168.35.138:27017
-  swagger: # swagger
-    protocol: https
-    host: dev-api.jakduk.com
   slackLog: # alert slack
     enabled: true
     level: WARN

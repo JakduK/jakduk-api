@@ -6,7 +6,6 @@ import com.jakduk.api.common.rabbitmq.EmailRoutingKey;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
-
 import com.jakduk.api.model.rabbitmq.EmailPayload;
 import com.jakduk.api.service.EmailService;
 import org.junit.Ignore;
@@ -49,8 +48,9 @@ public class NotificationTest extends ApiApplicationTests {
                 .locale(Locale.KOREAN)
                 .type(Constants.EMAIL_TYPE.WELCOME)
                 .recipientEmail("phjang1983@daum.net")
+                .subject("가입 메일 연습")
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("username", "이은상");
                             }
@@ -70,7 +70,7 @@ public class NotificationTest extends ApiApplicationTests {
                 .locale(Locale.KOREA)
                 .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail("phjang1983@daum.net")
-                .subject("jakduk.com-" + JakdukUtils.getLanguageCode("user.password.reset.instructions"))
+                .subject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"))
                 .extra(
                         new HashMap<String, String>() {
                             {
@@ -79,7 +79,7 @@ public class NotificationTest extends ApiApplicationTests {
                         }
                 )
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("email", "phjang1983@daum.net");
                             }
@@ -101,7 +101,7 @@ public class NotificationTest extends ApiApplicationTests {
                 .recipientEmail("phjang1983@daum.net")
                 .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("username", "이은상");
                             }
@@ -124,7 +124,7 @@ public class NotificationTest extends ApiApplicationTests {
                 .locale(Locale.KOREA)
                 .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail("phjang1983@daum.net")
-                .subject("jakduk.com-" + JakdukUtils.getMessageSource("user.password.reset.instructions"))
+                .subject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"))
                 .extra(
                         new HashMap<String, String>() {
                             {
@@ -133,7 +133,7 @@ public class NotificationTest extends ApiApplicationTests {
                         }
                 )
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("email", "phjang1983@daum.net");
                             }

@@ -11,9 +11,7 @@ import lombok.Getter;
 
 @Getter
 public class BoardFeelingCount {
-	
     private String id;
 	private Integer usersLikingCount;
 	private Integer usersDislikingCount;
-
 }
