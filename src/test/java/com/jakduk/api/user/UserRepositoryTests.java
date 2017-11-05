@@ -7,6 +7,8 @@ import com.jakduk.api.model.db.User;
 import com.jakduk.api.model.simple.UserProfile;
 import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +24,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Random;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @DataMongoTest
 @Import({JakdukProperties.class, MongodbConfig.class})
@@ -42,8 +45,6 @@ public class UserRepositoryTests {
         Long hours = ChronoUnit.MINUTES.between(localDateTime, LocalDateTime.now());
         LocalDateTime randomDate = localDateTime.plusMinutes(new Random().nextInt((int) (hours + 1)));
         randomUser = repository.findTopByIdLessThanEqualOrderByIdDesc(new ObjectId(DateUtils.localDateTimeToDate(randomDate))).get();
-
-        System.out.println("randomUser : " + randomUser);
     }
 
     @Test
@@ -51,8 +52,12 @@ public class UserRepositoryTests {
         Optional<UserProfile> mustFind = userProfileRepository.findOneByEmail(randomUser.getEmail());
         Assert.assertTrue(mustFind.isPresent());
 
-        Optional<UserProfile> mustNotFind = userProfileRepository.findByNEIdAndEmail(randomUser.getId(), randomUser.getEmail());
-        Assert.assertFalse(mustNotFind.isPresent());
+        if (StringUtils.isBlank(randomUser.getEmail())) {
+            log.warn("randomUser email is empty : {}", randomUser);
+        } else {
+            Optional<UserProfile> mustNotFind = userProfileRepository.findByNEIdAndEmail(randomUser.getId(), randomUser.getEmail());
+            Assert.assertFalse(mustNotFind.isPresent());
+        }
     }
 
     @Test
