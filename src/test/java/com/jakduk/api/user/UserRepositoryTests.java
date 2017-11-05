@@ -42,6 +42,8 @@ public class UserRepositoryTests {
         Long hours = ChronoUnit.MINUTES.between(localDateTime, LocalDateTime.now());
         LocalDateTime randomDate = localDateTime.plusMinutes(new Random().nextInt((int) (hours + 1)));
         randomUser = repository.findTopByIdLessThanEqualOrderByIdDesc(new ObjectId(DateUtils.localDateTimeToDate(randomDate))).get();
+
+        System.out.println("randomUser : " + randomUser);
     }
 
     @Test
