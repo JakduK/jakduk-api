@@ -19,6 +19,7 @@ public class EmailPayload {
 
     private Locale locale;
     private Constants.EMAIL_TYPE type;
+    private String templateName;
     private String recipientEmail;
     private String subject;
     private Map<String, String> extra;

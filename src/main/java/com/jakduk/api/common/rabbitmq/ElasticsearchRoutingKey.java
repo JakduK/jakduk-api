@@ -21,7 +21,7 @@ public enum ElasticsearchRoutingKey  {
     ELASTICSEARCH_DELETE_DOCUMENT_GALLERY("elasticsearch-delete-document-gallery"),
     ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD("elasticsearch-index-document-search-word");
 
-    String routingKey;
+    private String routingKey;
 
     ElasticsearchRoutingKey(String routingKey) {
         this.routingKey = routingKey;

@@ -1,4 +1,4 @@
-v0.7.14 /
+v0.7.14 / 2017-11-02
 // sourceType 필드 삭제
 db.gallery.update({}, {$unset:{"sourceType":""}}, {multi:true})
 // db reference 삭제

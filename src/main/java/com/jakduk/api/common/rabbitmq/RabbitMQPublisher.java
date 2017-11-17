@@ -42,6 +42,7 @@ public class RabbitMQPublisher {
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(locale)
                 .type(Constants.EMAIL_TYPE.WELCOME)
+                .templateName("mail/welcome")
                 .recipientEmail(recipientEmail)
                 .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
@@ -62,6 +63,7 @@ public class RabbitMQPublisher {
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(locale)
                 .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
+                .templateName("mail/resetPassword")
                 .recipientEmail(recipientEmail)
                 .subject(JakdukUtils.getMessageSource("email.user.password.reset.subject"))
                 .extra(
