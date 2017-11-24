@@ -14,7 +14,7 @@ import java.util.Optional;
  * @date     : 2015. 3. 18.
  * @desc     :
  */
-public interface AttendanceClubRepository extends MongoRepository<AttendanceClub, String>{
+public interface AttendanceClubRepository extends MongoRepository<AttendanceClub, String> {
 
 	Optional<AttendanceClub> findOneById(String id);
 	List<AttendanceClub> findByClub(FootballClubOrigin club, Sort sort);
