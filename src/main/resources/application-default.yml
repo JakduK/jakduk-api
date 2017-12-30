@@ -63,6 +63,7 @@ jakduk:
     routing-keys:
       email-welcome: dev.email.welcome
       email-reset-password: dev.email.reset-password
+      email-bulk: dev.email.bulk
       elasticsearch-index-document-article: dev.elasticsearch.index-document-article
       elasticsearch-delete-document-article: dev.elasticsearch.delete-document-article
       elasticsearch-index-document-article-comment: dev.elasticsearch.index-document-article-comment

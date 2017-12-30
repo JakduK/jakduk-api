@@ -18,10 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by pyohwanjang on 2017. 6. 17..
@@ -83,6 +80,20 @@ public class RabbitMQPublisher {
                 .build();
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(EmailRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
+        this.publishEmail(routingKey, emailPayload);
+    }
+
+    public void sendBulk(Locale locale, String templateName, String subject, String recipientEmail, Map<String, Object> body) {
+        EmailPayload emailPayload = EmailPayload.builder()
+                .locale(locale)
+                .type(Constants.EMAIL_TYPE.BULK)
+                .templateName(templateName)
+                .recipientEmail(recipientEmail)
+                .subject(subject)
+                .body(body)
+                .build();
+
+        String routingKey = rabbitmqProperties.getRoutingKeys().get(EmailRoutingKey.EMAIL_BULK.getRoutingKey());
         this.publishEmail(routingKey, emailPayload);
     }
 
