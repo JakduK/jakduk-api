@@ -10,8 +10,7 @@ import lombok.Getter;
 public enum EmailRoutingKey {
 
     EMAIL_WELCOME("email-welcome"),
-    EMAIL_RESET_PASSWORD("email-reset-password"),
-    EMAIL_BULK("email-bulk");
+    EMAIL_RESET_PASSWORD("email-reset-password");
 
     private String routingKey;
 
