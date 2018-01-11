@@ -3,7 +3,6 @@ package com.jakduk.api.service;
 
 import com.jakduk.api.model.db.Sequence;
 import com.jakduk.api.repository.SequenceRepository;
-import com.jakduk.api.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -24,14 +23,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class CommonService {
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
-	
-	@Autowired
-	private SequenceRepository sequenceRepository;
-
-	@Autowired
-	private TokenRepository tokenRepository;
+	@Autowired private MongoTemplate mongoTemplate;
+	@Autowired private SequenceRepository sequenceRepository;
 
 	/**
 	 * 차기 SEQUENCE를 가져온다.

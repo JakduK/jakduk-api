@@ -189,7 +189,8 @@ public class Constants {
 
 	public enum EMAIL_TYPE {
 		WELCOME,
-		RESET_PASSWORD
+		RESET_PASSWORD,
+		BULK
 	}
 
 	/**
