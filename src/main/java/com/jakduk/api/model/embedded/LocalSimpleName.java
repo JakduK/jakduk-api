@@ -1,6 +1,8 @@
 package com.jakduk.api.model.embedded;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author pyohwan
