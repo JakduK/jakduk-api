@@ -3,8 +3,11 @@ package com.jakduk.api.board;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
+import com.jakduk.api.model.embedded.LocalSimpleName;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,7 +33,13 @@ public class BoardCategoryTests {
         categories4.forEach(boardCategory -> System.out.println(boardCategory.getNames()));
 
 
-        System.out.println(BoardCategoryGenerator.getCategory(Constants.BOARD_TYPE.FOOTBALL, BoardCategoryGenerator.Category.CLASSIC.name(), Locale.KOREA));
+
+        BoardCategory boardCategory = BoardCategory.builder()
+                .code("KL1")
+                .names(Arrays.asList(new LocalSimpleName("ko", "K리그 1")))
+                .build();
+
+        Assert.assertEquals(boardCategory.toString(), BoardCategoryGenerator.getCategory(Constants.BOARD_TYPE.FOOTBALL, BoardCategoryGenerator.Category.KL1.name(), Locale.KOREA).toString());
 
     }
 
