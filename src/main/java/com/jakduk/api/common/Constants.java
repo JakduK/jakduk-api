@@ -105,8 +105,6 @@ public class Constants {
 	 * K리그 줄임말. 삭제 되어야 한다. Competition 클래스를 만들었다.
 	 */
 	public final static String K_LEAGUE_ABBREVIATION = "KL";
-	public final static String K_LEAGUE_CLASSIC_ABBREVIATION = "KLCL";
-	public final static String K_LEAGUE_CHALLENGE_ABBREVIATION = "KLCH";
 
 	public final static String ES_TYPE_ARTICLE = "article";
 	public final static String ES_TYPE_COMMENT = "comment";
