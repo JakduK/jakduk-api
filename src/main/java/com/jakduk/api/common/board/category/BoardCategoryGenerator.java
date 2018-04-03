@@ -17,8 +17,8 @@ public class BoardCategoryGenerator {
 	private BoardCategoryGenerator() {}
 
     public enum Category {
-        CLASSIC(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Classic"), new LocalSimpleName(Locale.KOREA.getLanguage(), "클래식")),
-        CHALLENGE(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "챌린지")),
+        KL1(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "K LEAGUE 1"), new LocalSimpleName(Locale.KOREA.getLanguage(), "K리그 1")),
+        KL2(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "K LEAGUE 2"), new LocalSimpleName(Locale.KOREA.getLanguage(), "K리그 2")),
 		ACL(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "ACL"), new LocalSimpleName(Locale.KOREA.getLanguage(), "ACL")),
 		NATIONAL_TEAM(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "National Team"), new LocalSimpleName(Locale.KOREA.getLanguage(), "국가대표팀")),
 		OVERSEAS_FOOTBALL(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Overseas Football"), new LocalSimpleName(Locale.KOREA.getLanguage(), "해외축구")),
@@ -28,10 +28,9 @@ public class BoardCategoryGenerator {
 		AMATEUR(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "Amateur"), new LocalSimpleName(Locale.KOREA.getLanguage(), "아마추어")),
 		ETC(Constants.BOARD_TYPE.FOOTBALL, new LocalSimpleName(Locale.US.getLanguage(), "ETC"), new LocalSimpleName(Locale.KOREA.getLanguage(), "기타")),
 
-		QUESTION(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Question"), new LocalSimpleName(Locale.KOREA.getLanguage(), "물음")),
-		JOBS(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Jobs"), new LocalSimpleName(Locale.KOREA.getLanguage(), "일자리")),
-		CODE_CHALLENGE(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Code Challenge"), new LocalSimpleName(Locale.KOREA.getLanguage(), "코드 챌린지")),
-		IDEA(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Idea"), new LocalSimpleName(Locale.KOREA.getLanguage(), "아이디어")),
+		QUESTION(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Question"), new LocalSimpleName(Locale.KOREA.getLanguage(), "궁금")),
+		UPDATE(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Update"), new LocalSimpleName(Locale.KOREA.getLanguage(), "업데이트")),
+		TALKING(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Talking"), new LocalSimpleName(Locale.KOREA.getLanguage(), "사는얘기")),
 		TIP(Constants.BOARD_TYPE.DEVELOPER, new LocalSimpleName(Locale.US.getLanguage(), "Tip"), new LocalSimpleName(Locale.KOREA.getLanguage(), "팁"));
 
 		private static List<Category> FREE = Collections.emptyList();

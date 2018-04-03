@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title th:remove="all">K리그 작두왕 단체 메일</title>
+</head>
+<body>
+<div style="max-width: 580px;">
+    <p th:text="#{email.welcome.hello(${username})}">
+        안녕하세요. 회원님!
+    </p>
+    <p>
+        2018년 새해가 밝았습니다.
+    </p>
+    <p>
+        K리그 작두왕이 첫번째로 보내는 메일입니다.
+    </p>
+    <p>
+        2017년 작년에 업데이트 된 사항을 전하러 왔습니다.
+    </p>
+    <br/>
+
+    <h3>게시판 확장</h3>
+    <ul>
+        <li>자유게시판 하나만 있던 것을 자유게시판, 축구게시판, S/W개발게시판으로 확장했습니다.</li>
+        <li>이에 따라 각 게시판에 맞는 말머리를 다수 추가 했습니다. (자유게시판은 말머리 없이 글쓰기 가능)</li>
+    </ul>
+
+    <h3>기타 기능 업데이트</h3>
+    <ul>
+        <li>프로필 이미지 넣기</li>
+        <li>댓글에 이미지 넣기</li>
+        <li>회원 탈퇴</li>
+        <li>단체 메일 발송</li>
+    </ul>
+
+    <h3>기술 업데이트</h3>
+    <ul>
+        <li>인증 체계 변경 (JWT -> Session, Cookie)</li>
+        <li>RabbitMQ 도입</li>
+        <li>Springfox 제거하고 acsiidoc 도입. https://dev-api.jakduk.com/docs/index.html</li>
+        <li>뷰 템플릿 변경 angular.js -> vue.js</li>
+        <li>에디터 교체 summernote -> quill</li>
+    </ul>
+
+    <p>K리그 작두왕은 오픈 소스입니다. <a href="https://github.com/JakduK">https://github.com/JakduK</a></p>
+    <p>소스 코드를 누구나 볼 수 있고, 소스 코드를 기여할 수 있습니다.</p>
+    <p>사이트 이용시 궁금한점이 있으면 <a href="mailto:phjang1983@daum.net">phjang1983@daum.net</a>로 메일을 보내주세요.</p>
+    <p>
+        감사합니다. <br />
+        &emsp; <em>K리그 작두왕 운영자</em>
+    </p>
+</div>
+</body>
+</html>

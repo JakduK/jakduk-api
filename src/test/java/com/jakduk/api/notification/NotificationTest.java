@@ -6,8 +6,8 @@ import com.jakduk.api.common.rabbitmq.EmailRoutingKey;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.mail.EmailService;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
-import com.jakduk.api.service.EmailService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,10 @@ import java.util.Locale;
  */
 public class NotificationTest extends ApiApplicationTests {
 
-    @Resource
-    private JakdukProperties jakdukProperties;
+    @Resource private JakdukProperties jakdukProperties;
 
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private RabbitMQPublisher rabbitMQPublisher;
+    @Autowired private EmailService emailService;
+    @Autowired private RabbitMQPublisher rabbitMQPublisher;
 
     @Ignore
     @Test
@@ -58,8 +54,7 @@ public class NotificationTest extends ApiApplicationTests {
                 )
                 .build();
 
-        emailService.sendWelcome(emailPayload);
-
+        emailService.sendBulk(emailPayload);
     }
 
     @Ignore
@@ -88,7 +83,28 @@ public class NotificationTest extends ApiApplicationTests {
                 .build();
 
         emailService.sendResetPassword(emailPayload);
+    }
 
+    @Ignore
+    @Test
+    public void testSendBulk() throws MessagingException {
+
+        EmailPayload emailPayload = EmailPayload.builder()
+                .locale(Locale.KOREAN)
+                .type(Constants.EMAIL_TYPE.BULK)
+                .templateName("mail/bulk01")
+                .recipientEmail("phjang1983@daum.net")
+                .subject("단체 메일 연습")
+                .body(
+                        new HashMap<String, Object>() {
+                            {
+                                put("username", "이은상");
+                            }
+                        }
+                )
+                .build();
+
+        emailService.sendBulk(emailPayload);
     }
 
     @Ignore

@@ -1,4 +1,4 @@
-package com.jakduk.api.service;
+package com.jakduk.api.mail;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
@@ -57,7 +57,7 @@ public class EmailService {
 		message.setTo(recipientEmail);
 
 		// Create the HTML body using Thymeleaf
-		final String htmlContent = this.htmlTemplateEngine.process("mail/resetPassword", ctx);
+		final String htmlContent = this.htmlTemplateEngine.process(emailPayload.getTemplateName(), ctx);
 		message.setText(htmlContent, true /* isHtml */);
 
 		String logoPath = "";
@@ -98,7 +98,7 @@ public class EmailService {
 		}
 	}
 
-	public void sendWelcome(EmailPayload emailPayload) throws MessagingException {
+	public void sendBulk(EmailPayload emailPayload) throws MessagingException {
 
 		// Prepare the evaluation context
 		final Context ctx = new Context(emailPayload.getLocale());
@@ -112,7 +112,7 @@ public class EmailService {
 		message.setTo(emailPayload.getRecipientEmail());
 
 		// Create the HTML body using Thymeleaf
-		final String htmlContent = this.htmlTemplateEngine.process("mail/welcome", ctx);
+		final String htmlContent = this.htmlTemplateEngine.process(emailPayload.getTemplateName(), ctx);
 		message.setText(htmlContent, true /* isHtml */);
 
 		// Send email

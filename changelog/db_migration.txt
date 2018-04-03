@@ -6,7 +6,7 @@ db.attendanceClub.update({"league":"KLCH"}, {$set:{"league":"KL2"}}, {multi:true
 db.article.update({"category":"CLASSIC"}, {$set:{"category":"KL1"}}, {multi:true})
 db.article.update({"category":"CHALLENGE"}, {$set:{"category":"KL2"}}, {multi:true})
 
-v0.7.14 /
+v0.7.14 / 2017-11-02
 // sourceType 필드 삭제
 db.gallery.update({}, {$unset:{"sourceType":""}}, {multi:true})
 // db reference 삭제
