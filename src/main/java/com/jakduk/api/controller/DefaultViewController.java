@@ -1,27 +1,27 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.FileUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UserPicture;
-import com.jakduk.api.model.simple.BoardFreeOnSitemap;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.model.simple.ArticleOnSitemap;
+import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.UserPictureService;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.W3CDateFormat;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
-import org.apache.commons.lang3.CharEncoding;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ObjectUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Comparator;
@@ -50,9 +51,10 @@ public class DefaultViewController {
 	@Resource private JakdukProperties jakdukProperties;
 	@Resource private JakdukProperties.Storage storageProperties;
 
+	@Autowired private UrlGenerationUtils urlGenerationUtils;
 	@Autowired private GalleryService galleryService;
 	@Autowired private UserPictureService userPictureService;
-	@Autowired private BoardFreeService boardFreeService;
+	@Autowired private ArticleService articleService;
 
 	// RSS
 	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
@@ -61,7 +63,7 @@ public class DefaultViewController {
 	}
 
 	// Sitemap
-	@RequestMapping(value = "/sitemap", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+	@GetMapping(value = "/sitemap", produces = MediaType.APPLICATION_XML_VALUE)
 	public void getSitemap(HttpServletResponse servletResponse) {
 
 		try {
@@ -73,27 +75,24 @@ public class DefaultViewController {
 			Boolean existPosts = true;
 
 			do {
-				List<BoardFreeOnSitemap> posts = boardFreeService.getBoardFreeOnSitemap(postId, JakdukConst.NUMBER_OF_ITEMS_EACH_PAGES);
+				List<ArticleOnSitemap> articles = articleService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
-				if (ObjectUtils.isEmpty(posts)) {
+				if (CollectionUtils.isEmpty(articles)) {
 					existPosts = false;
 				} else {
-					BoardFreeOnSitemap post = posts.stream()
-							.sorted(Comparator.comparing(BoardFreeOnSitemap::getId))
+					ArticleOnSitemap article = articles.stream()
+							.sorted(Comparator.comparing(ArticleOnSitemap::getId))
 							.findFirst()
-							.orElseThrow(() -> new ServiceException(ServiceError.INTERNAL_SERVER_ERROR));
+							.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
-					postId = new ObjectId(post.getId());
+					postId = new ObjectId(article.getId());
 				}
 
 				if (existPosts) {
-					posts.forEach(post-> {
+					articles.forEach(post-> {
 						try {
 							WebSitemapUrl url = new WebSitemapUrl
-									.Options(
-									String.format("%s/%s/%d", jakdukProperties.getWebServerUrl(),
-											jakdukProperties.getApiUrlPath().getBoardFree(), post.getSeq())
-							)
+									.Options(urlGenerationUtils.generateArticleDetailUrl(post.getBoard(), post.getSeq()))
 									.lastMod(DateUtils.localDateTimeToDate(post.getLastUpdated()))
 									.priority(0.5)
 									.changeFreq(ChangeFreq.DAILY)
@@ -108,7 +107,7 @@ public class DefaultViewController {
 			} while (existPosts);
 
 			servletResponse.setContentType(MediaType.APPLICATION_XML_VALUE);
-			servletResponse.setCharacterEncoding(CharEncoding.UTF_8);
+			servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			servletResponse.getWriter().println(wsg.writeAsStrings().get(0));
 
 		} catch (IOException e) {
@@ -125,7 +124,7 @@ public class DefaultViewController {
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-				JakdukConst.IMAGE_TYPE.FULL);
+				Constants.IMAGE_TYPE.FULL);
 		response.setContentType(gallery.getContentType());
 
 		try {
@@ -143,7 +142,7 @@ public class DefaultViewController {
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-				JakdukConst.IMAGE_TYPE.THUMBNAIL);
+				Constants.IMAGE_TYPE.THUMBNAIL);
 		response.setContentType(gallery.getContentType());
 
 		try {

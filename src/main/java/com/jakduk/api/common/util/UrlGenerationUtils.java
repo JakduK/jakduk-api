@@ -1,6 +1,6 @@
 package com.jakduk.api.common.util;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.util.UrlUtils;
@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 @Component
 public class UrlGenerationUtils {
@@ -39,7 +40,7 @@ public class UrlGenerationUtils {
      * @param sizeType size 타입
      * @param id Gallery ID
      */
-    public String generateGalleryUrl(JakdukConst.IMAGE_SIZE_TYPE sizeType, String id) {
+    public String generateGalleryUrl(Constants.IMAGE_SIZE_TYPE sizeType, String id) {
 
         if (StringUtils.isBlank(id))
             return null;
@@ -61,4 +62,41 @@ public class UrlGenerationUtils {
 
         return uriComponents.toUriString();
     }
+
+    /**
+     * 글 상세 API URL 생성
+     *
+     * @param board 게시판
+     * @param seq 글번호
+     */
+    public String generateArticleDetailApiUrl(String board, Integer seq) {
+
+        if (StringUtils.isBlank(board) || Objects.isNull(seq))
+            return null;
+
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(jakdukProperties.getApiServerUrl())
+                .path("/api/board/{board}/{seq}")
+                .buildAndExpand(board.toLowerCase(), seq);
+
+        return uriComponents.toUriString();
+    }
+
+    /**
+     * 글 상세 URL 생성
+     *
+     * @param board 게시판
+     * @param seq 글번호
+     */
+    public String generateArticleDetailUrl(String board, Integer seq) {
+
+        if (StringUtils.isBlank(board) || Objects.isNull(seq))
+            return null;
+
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(jakdukProperties.getWebServerUrl())
+                .path("/board/{board}/{seq}")
+                .buildAndExpand(board.toLowerCase(), seq);
+
+        return uriComponents.toUriString();
+    }
+
 }

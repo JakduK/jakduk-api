@@ -3,7 +3,7 @@ package com.jakduk.api;
 
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.model.db.AttendanceClub;
-import com.jakduk.api.model.etc.SupporterCount;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.repository.AttendanceClubRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

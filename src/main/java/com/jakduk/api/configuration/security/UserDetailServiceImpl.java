@@ -1,6 +1,6 @@
 package com.jakduk.api.configuration.security;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
@@ -41,7 +41,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         } else {
             User user = userRepository.findOneByEmail(username)
                     .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ACCOUNT,
-                            JakdukUtils.getExceptionMessage("exception.not.found.jakduk.account", username)));
+                            JakdukUtils.getMessageSource("exception.not.found.jakduk.account", username)));
 
             String userId = user.getId();
 
@@ -52,9 +52,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
             UserPicture userPicture = user.getUserPicture();
 
             if (! ObjectUtils.isEmpty(userPicture)) {
-                UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture,
-                        authUtils.generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-                        authUtils.generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+                UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture.getId(),
+                        authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+                        authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
                 userDetailsImpl.setPicture(userPictureInfo);
             }

@@ -1,7 +1,7 @@
 package com.jakduk.api.listener;
 
 import com.jakduk.api.model.rabbitmq.EmailPayload;
-import com.jakduk.api.service.EmailService;
+import com.jakduk.api.mail.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +25,13 @@ public class EmailListener {
 
         switch (emailPayload.getType()) {
             case WELCOME:
-                emailService.sendWelcome(emailPayload);
+                emailService.sendBulk(emailPayload);
                 break;
             case RESET_PASSWORD:
                 emailService.sendResetPassword(emailPayload);
+                break;
+            case BULK:
+                emailService.sendBulk(emailPayload);
                 break;
         }
     }

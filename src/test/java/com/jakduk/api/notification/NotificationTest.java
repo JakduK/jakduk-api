@@ -1,14 +1,13 @@
 package com.jakduk.api.notification;
 
 import com.jakduk.api.ApiApplicationTests;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.EmailRoutingKey;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
-
+import com.jakduk.api.mail.EmailService;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
-import com.jakduk.api.service.EmailService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +22,10 @@ import java.util.Locale;
  */
 public class NotificationTest extends ApiApplicationTests {
 
-    @Resource
-    private JakdukProperties jakdukProperties;
+    @Resource private JakdukProperties jakdukProperties;
 
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private RabbitMQPublisher rabbitMQPublisher;
+    @Autowired private EmailService emailService;
+    @Autowired private RabbitMQPublisher rabbitMQPublisher;
 
     @Ignore
     @Test
@@ -47,10 +42,11 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREAN)
-                .type(JakdukConst.EMAIL_TYPE.WELCOME)
+                .type(Constants.EMAIL_TYPE.WELCOME)
                 .recipientEmail("phjang1983@daum.net")
+                .subject("가입 메일 연습")
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("username", "이은상");
                             }
@@ -58,8 +54,7 @@ public class NotificationTest extends ApiApplicationTests {
                 )
                 .build();
 
-        emailService.sendWelcome(emailPayload);
-
+        emailService.sendBulk(emailPayload);
     }
 
     @Ignore
@@ -68,9 +63,9 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREA)
-                .type(JakdukConst.EMAIL_TYPE.RESET_PASSWORD)
+                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail("phjang1983@daum.net")
-                .subject("jakduk.com-" + JakdukUtils.getResourceBundleMessage("messages.user", "user.password.reset.instructions"))
+                .subject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"))
                 .extra(
                         new HashMap<String, String>() {
                             {
@@ -79,7 +74,7 @@ public class NotificationTest extends ApiApplicationTests {
                         }
                 )
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("email", "phjang1983@daum.net");
                             }
@@ -88,7 +83,28 @@ public class NotificationTest extends ApiApplicationTests {
                 .build();
 
         emailService.sendResetPassword(emailPayload);
+    }
 
+    @Ignore
+    @Test
+    public void testSendBulk() throws MessagingException {
+
+        EmailPayload emailPayload = EmailPayload.builder()
+                .locale(Locale.KOREAN)
+                .type(Constants.EMAIL_TYPE.BULK)
+                .templateName("mail/bulk01")
+                .recipientEmail("phjang1983@daum.net")
+                .subject("단체 메일 연습")
+                .body(
+                        new HashMap<String, Object>() {
+                            {
+                                put("username", "이은상");
+                            }
+                        }
+                )
+                .build();
+
+        emailService.sendBulk(emailPayload);
     }
 
     @Ignore
@@ -97,11 +113,11 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREAN)
-                .type(JakdukConst.EMAIL_TYPE.WELCOME)
+                .type(Constants.EMAIL_TYPE.WELCOME)
                 .recipientEmail("phjang1983@daum.net")
                 .subject("K리그 작두왕에 오신것을 환영합니다.")
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("username", "이은상");
                             }
@@ -122,9 +138,9 @@ public class NotificationTest extends ApiApplicationTests {
 
         EmailPayload emailPayload = EmailPayload.builder()
                 .locale(Locale.KOREA)
-                .type(JakdukConst.EMAIL_TYPE.RESET_PASSWORD)
+                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
                 .recipientEmail("phjang1983@daum.net")
-                .subject("jakduk.com-" + JakdukUtils.getResourceBundleMessage("messages.user", "user.password.reset.instructions"))
+                .subject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"))
                 .extra(
                         new HashMap<String, String>() {
                             {
@@ -133,7 +149,7 @@ public class NotificationTest extends ApiApplicationTests {
                         }
                 )
                 .body(
-                        new HashMap<String, String>() {
+                        new HashMap<String, Object>() {
                             {
                                 put("email", "phjang1983@daum.net");
                             }

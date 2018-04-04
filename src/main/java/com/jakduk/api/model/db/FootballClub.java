@@ -25,12 +25,9 @@ public class FootballClub {
 
 	@Id
 	private String id;
-	
 	@DBRef
 	private FootballClubOrigin origin;
-
 	private String active;
-	
 	private List<LocalName> names;
 
 }

@@ -1,8 +1,9 @@
 package com.jakduk.api.model.rabbitmq;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Locale;
 import java.util.Map;
@@ -13,13 +14,15 @@ import java.util.Map;
 
 @Builder
 @Getter
+@ToString
 public class EmailPayload {
 
     private Locale locale;
-    private JakdukConst.EMAIL_TYPE type;
+    private Constants.EMAIL_TYPE type;
+    private String templateName;
     private String recipientEmail;
     private String subject;
     private Map<String, String> extra;
-    private Map<String, String> body;
+    private Map<String, Object> body;
 
 }

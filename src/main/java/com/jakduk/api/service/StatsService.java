@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -14,7 +14,7 @@ import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.db.AttendanceLeague;
 import com.jakduk.api.model.db.Competition;
 import com.jakduk.api.model.db.FootballClubOrigin;
-import com.jakduk.api.model.etc.SupporterCount;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.repository.AttendanceClubRepository;
 import com.jakduk.api.repository.AttendanceLeagueRepository;
 import com.jakduk.api.repository.footballclub.FootballClubOriginRepository;
@@ -112,7 +112,7 @@ public class StatsService {
 		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("average"));
 		List<AttendanceClub> attendances = null;
 
-		if (league.equals(JakdukConst.K_LEAGUE_ABBREVIATION)) {
+		if (league.equals(Constants.K_LEAGUE_ABBREVIATION)) {
 			attendances = attendanceClubRepository.findBySeason(season, sort);
 		} else {
 			attendances = attendanceClubRepository.findBySeasonAndLeague(season, league, sort);

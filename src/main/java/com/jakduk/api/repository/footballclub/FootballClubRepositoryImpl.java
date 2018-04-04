@@ -1,6 +1,6 @@
 package com.jakduk.api.repository.footballclub;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.FootballClub;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class FootballClubRepositoryImpl implements FootballClubRepositoryCustom 
      * 축구단 목록 정렬해서 가져온다.
      */
     @Override
-    public List<FootballClub> findFootballClubs(List<ObjectId> ids, String language, JakdukConst.NAME_TYPE sortNameType) {
+    public List<FootballClub> findFootballClubs(List<ObjectId> ids, String language, Constants.NAME_TYPE sortNameType) {
         Query query = new Query();
         query.addCriteria(Criteria.where("names.language").is(language));
         query.addCriteria(Criteria.where("origin.$id").in(ids));

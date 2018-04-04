@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.admin;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import org.springframework.data.annotation.Id;
 
 import java.util.Date;
@@ -16,7 +16,7 @@ public class JakduScheduleGroupWrite {
 
     private int seq;
 
-    private JakdukConst.JAKDU_GROUP_STATE state;
+    private Constants.JAKDU_GROUP_STATE state;
 
     private Date openDate;
 
@@ -38,11 +38,11 @@ public class JakduScheduleGroupWrite {
         this.seq = seq;
     }
 
-    public JakdukConst.JAKDU_GROUP_STATE getState() {
+    public Constants.JAKDU_GROUP_STATE getState() {
         return state;
     }
 
-    public void setState(JakdukConst.JAKDU_GROUP_STATE state) {
+    public void setState(Constants.JAKDU_GROUP_STATE state) {
         this.state = state;
     }
 

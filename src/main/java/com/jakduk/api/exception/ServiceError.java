@@ -1,11 +1,8 @@
 package com.jakduk.api.exception;
 
+import com.jakduk.api.common.util.JakdukUtils;
 import lombok.Getter;
 import org.apache.http.HttpStatus;
-import org.springframework.context.i18n.LocaleContextHolder;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * @author pyohwan
@@ -43,10 +40,8 @@ public enum ServiceError {
     NOT_FOUND_USER_IMAGE(HttpStatus.SC_NOT_FOUND, "exception.not.found.user.image"),
     NOT_REGISTER_WITH_SNS(HttpStatus.SC_NOT_FOUND, "exception.not.register.with.sns"),
     CANNOT_GET_ATTEMPT_SNS_PROFILE(HttpStatus.SC_NOT_FOUND, "exception.cannot.get.attempt.sns.profile"),
-    ALREADY_EXIST_EMAIL(HttpStatus.SC_NOT_FOUND, "exception.already.email.exists"),
-    ALREADY_EXIST_USERNAME(HttpStatus.SC_NOT_FOUND, "exception.already.username.exists"),
 
-    NOT_FOUND_POST(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
+    NOT_FOUND_ARTICLE(HttpStatus.SC_NOT_FOUND, "exception.not.found.post"),
     NOT_FOUND_COMMENT(HttpStatus.SC_NOT_FOUND, "exception.not.found.comment"),
     NOT_FOUND_CATEGORY(HttpStatus.SC_NOT_FOUND, "exception.not.found.category"),
     NOT_FOUND_FOOTBALL_CLUB(HttpStatus.SC_NOT_FOUND, "exception.not.found.football.club"),
@@ -70,11 +65,13 @@ public enum ServiceError {
     private final String message;
 
     ServiceError(Integer httpStatus, String message) {
-        Locale locale = LocaleContextHolder.getLocale();
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages.exception", locale);
-
         this.httpStatus = httpStatus;
         this.code = this.name();
-        this.message = resourceBundle.getString(message);
+        this.message = message;
     }
+
+    public String getMessage() {
+        return JakdukUtils.getMessageSource(this.message);
+    }
+
 }

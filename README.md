@@ -5,7 +5,7 @@ jakduk-api
 K League Community Web Application.
 
 * https://jakduk.com
-* https://staging.jakduk.com (staging)
+* https://dev-web.jakduk.com (develop)
 
 ### What is K LEAGUE JAKDU KING?
 It's the name of K League Community Web Application.

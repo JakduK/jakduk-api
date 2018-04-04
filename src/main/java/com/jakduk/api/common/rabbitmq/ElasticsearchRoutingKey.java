@@ -13,15 +13,15 @@ import java.util.Arrays;
 @Getter
 public enum ElasticsearchRoutingKey  {
 
-    ELASTICSEARCH_INDEX_DOCUMENT_BOARD("elasticsearch-index-document-board"),
-    ELASTICSEARCH_DELETE_DOCUMENT_BOARD("elasticsearch-delete-document-board"),
-    ELASTICSEARCH_INDEX_DOCUMENT_COMMENT("elasticsearch-index-document-comment"),
-    ELASTICSEARCH_DELETE_DOCUMENT_COMMENT("elasticsearch-delete-document-comment"),
+    ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE("elasticsearch-index-document-article"),
+    ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE("elasticsearch-delete-document-article"),
+    ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT("elasticsearch-index-document-article-comment"),
+    ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE_COMMENT("elasticsearch-delete-document-article-comment"),
     ELASTICSEARCH_INDEX_DOCUMENT_GALLERY("elasticsearch-index-document-gallery"),
     ELASTICSEARCH_DELETE_DOCUMENT_GALLERY("elasticsearch-delete-document-gallery"),
     ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD("elasticsearch-index-document-search-word");
 
-    String routingKey;
+    private String routingKey;
 
     ElasticsearchRoutingKey(String routingKey) {
         this.routingKey = routingKey;

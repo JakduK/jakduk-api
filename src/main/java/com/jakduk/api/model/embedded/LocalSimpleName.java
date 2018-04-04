@@ -1,6 +1,8 @@
 package com.jakduk.api.model.embedded;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author pyohwan
@@ -9,6 +11,7 @@ import lombok.*;
 
 @AllArgsConstructor
 @Getter
+@ToString
 public class LocalSimpleName {
 
     private String language;

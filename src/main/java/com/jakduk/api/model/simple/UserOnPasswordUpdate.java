@@ -1,6 +1,9 @@
 package com.jakduk.api.model.simple;
 
-import lombok.Data;
+import com.jakduk.api.common.Constants;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,12 +13,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@Data
-@Document(collection = "user")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Document(collection = Constants.COLLECTION_USER)
 public class UserOnPasswordUpdate {
-
 	private String id;
-	
 	private String password;
-	
 }

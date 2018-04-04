@@ -1,7 +1,7 @@
 package com.jakduk.api.service;
 
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
@@ -46,7 +46,7 @@ public class FootballService {
      * @param clubType 클럽 성격
      * @param sortNameType 정렬 기준
      */
-    public List<FootballClub> getFootballClubs(String language, JakdukConst.CLUB_TYPE clubType, JakdukConst.NAME_TYPE sortNameType) {
+    public List<FootballClub> getFootballClubs(String language, Constants.CLUB_TYPE clubType, Constants.NAME_TYPE sortNameType) {
 
         List<FootballClubOrigin> footballClubOrigins = footballClubOriginRepository.findByClubType(clubType);
 
@@ -65,7 +65,7 @@ public class FootballService {
      * @param ids footballClub Id 배열
      * @return 축구단 배열
      */
-    public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, JakdukConst.NAME_TYPE sortNameType ) {
+    public List<FootballClub> getFootballClubs(List<ObjectId> ids, String language, Constants.NAME_TYPE sortNameType ) {
 
         return footballClubRepository.findFootballClubs(ids, language, sortNameType);
     }

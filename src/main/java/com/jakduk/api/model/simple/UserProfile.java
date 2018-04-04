@@ -1,6 +1,6 @@
 package com.jakduk.api.model.simple;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.db.UserPicture;
 import lombok.AllArgsConstructor;
@@ -18,25 +18,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @AllArgsConstructor
 @Getter
-@Document(collection = "user")
+@Document(collection = Constants.COLLECTION_USER)
 public class UserProfile {
 
 	@Id
 	private String id;
-
 	private String email;
-
 	private String username;
-
-	private JakdukConst.ACCOUNT_TYPE providerId;		// 제공자
-
+	private Constants.ACCOUNT_TYPE providerId;		// 제공자
 	private String providerUserId;					// SNS USER ID
-
 	private String about;
-
 	@DBRef
 	private FootballClub supportFC;
-
 	@DBRef
 	private UserPicture userPicture;				// 프로필 사진
 }

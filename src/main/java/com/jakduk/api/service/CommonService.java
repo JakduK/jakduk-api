@@ -2,9 +2,7 @@ package com.jakduk.api.service;
 
 
 import com.jakduk.api.model.db.Sequence;
-import com.jakduk.api.model.db.Token;
 import com.jakduk.api.repository.SequenceRepository;
-import com.jakduk.api.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -13,8 +11,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -27,14 +23,8 @@ import java.util.Optional;
 @Service
 public class CommonService {
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
-	
-	@Autowired
-	private SequenceRepository sequenceRepository;
-
-	@Autowired
-	private TokenRepository tokenRepository;
+	@Autowired private MongoTemplate mongoTemplate;
+	@Autowired private SequenceRepository sequenceRepository;
 
 	/**
 	 * 차기 SEQUENCE를 가져온다.
@@ -68,11 +58,6 @@ public class CommonService {
 			nextSeq = sequence.getSeq();
 			return nextSeq;
 		}
-	}
-
-	// 토큰 가져오기.
-	public Optional<Token> getTokenByCode(String code) {
-		return tokenRepository.findOneByCode(code);
 	}
 
 }

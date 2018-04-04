@@ -1,7 +1,6 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.JakdukConst;
-import com.jakduk.api.model.db.UserPicture;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,19 +9,12 @@ import lombok.NoArgsConstructor;
  */
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class UserPictureInfo {
 
     private String id;
-    private JakdukConst.ACCOUNT_TYPE sourceType;
     private String smallPictureUrl;
     private String largePictureUrl;
-
-    public UserPictureInfo(UserPicture userPicture, String smallPictureUrl, String largePictureUrl) {
-        this.id = userPicture.getId();
-        this.sourceType = userPicture.getSourceType();
-        this.smallPictureUrl = smallPictureUrl;
-        this.largePictureUrl = largePictureUrl;
-    }
 
 }

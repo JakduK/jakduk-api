@@ -1,23 +1,22 @@
 package com.jakduk.api.restcontroller;
 
-import com.jakduk.api.common.JakdukConst;
-import com.jakduk.api.common.annotation.SecuredRoleUser;
-import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalName;
+import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
 import com.jakduk.api.restcontroller.vo.admin.JakduCommentWriteRequest;
 import com.jakduk.api.restcontroller.vo.admin.JakduCommentsResponse;
 import com.jakduk.api.restcontroller.vo.admin.MyJakduRequest;
+import com.jakduk.api.restcontroller.vo.jakdu.JakduScheduleResponse;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.service.FootballService;
 import com.jakduk.api.service.JakduService;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
-import com.jakduk.api.restcontroller.vo.UserFeelingResponse;
-import com.jakduk.api.restcontroller.vo.jakdu.JakduScheduleResponse;
-import io.swagger.annotations.Api;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -33,11 +32,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * 작두 API
+ *
  * @author pyohwan
  * 16. 3. 4 오후 11:27
  */
 
-@Api(tags = "Jakduk", description = "작두 API")
 @RestController
 @RequestMapping("/api/jakdu")
 public class JakduRestController {
@@ -73,7 +73,7 @@ public class JakduRestController {
                 competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
         }
 
-        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, JakdukConst.NAME_TYPE.fullName);
+        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, Constants.NAME_TYPE.fullName);
         List<Competition> competitions = footballService.getCompetitions(new ArrayList<>(competitionIds), language);
 
         Map<String, LocalName> fcNames = footballClubs.stream()
@@ -102,22 +102,22 @@ public class JakduRestController {
         JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
         result.put("jakduSchedule", jakduSchedule);
 
-        AuthUserProfile authUserProfile = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
 
         if (AuthUtils.isUser()) {
-            result.put("myJakdu", jakduService.getMyJakdu(authUserProfile.getId(), id));
+            result.put("myJakdu", jakduService.getMyJakdu(sessionUser.getId(), id));
         }
 
         return result;
     }
 
     // 작두 타기
-    @SecuredRoleUser
+    @SecuredUser
     @RequestMapping(value ="/myJakdu", method = RequestMethod.POST)
     public Jakdu myJakduWrite(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
 
         if (Objects.isNull(myJakdu)) {
-            throw new IllegalArgumentException(JakdukUtils.getExceptionMessage("exception.invalid.parameter"));
+            throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
         }
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
@@ -131,7 +131,7 @@ public class JakduRestController {
                                      Device device) {
 
         if (Objects.isNull(jakduCommentWriteRequest))
-            throw new IllegalArgumentException(JakdukUtils.getExceptionMessage("exception.invalid.parameter"));
+            throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
@@ -158,7 +158,7 @@ public class JakduRestController {
     // 작두 댓글 좋아요 싫어요
     @RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
-                                                 @PathVariable JakdukConst.FEELING_TYPE feeling) {
+                                                 @PathVariable Constants.FEELING_TYPE feeling) {
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);

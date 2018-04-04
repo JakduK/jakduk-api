@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.repository.gallery.GalleryRepository;
@@ -178,9 +178,9 @@ public class GalleryOnListTest extends ApiApplicationTests {
 		arrTemp.add(new ObjectId("54c4e4833d96deb0f8592907"));
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrTemp));
-		//AggregationOperation group = Aggregation.group("boardItem").count().as("count");
+		//AggregationOperation group = Aggregation.group("article").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		//AggregationOperation limit = Aggregation.limit(JakdukConst.BOARD_LINE_NUMBER);
+		//AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, /*group, */ sort /*, limit*/);
 		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
 		
@@ -200,7 +200,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 		/*
 		Gallery gallery = galleryRepository.findOne("54d623828bf8513a58f41b60");
 		System.out.println("streamAPITest01=" + gallery);
-		Stream<BoardItem> tests = gallery.getFreePosts().stream();
+		Stream<ArticleItem> tests = gallery.getFreePosts().stream();
 		long count = tests.filter(item -> item.getId().equals("54d6238a8bf8513a58f4b62")).count();
 		System.out.println("streamAPITest01=" + count);
 		*/
@@ -210,7 +210,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 	public void imageCapacity01() {
 		
 		long temp = 2548576;
-		double bb = JakdukConst.GALLERY_MAXIMUM_CAPACITY / (double) temp;
+		double bb = Constants.GALLERY_MAXIMUM_CAPACITY / (double) temp;
 		long width = 100;
 		long height = 90;
 		

@@ -1,7 +1,10 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.JakdukConst;
-import lombok.*;
+import com.jakduk.api.common.Constants;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,13 +13,12 @@ import lombok.*;
  * @desc     :
  */
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class GalleryStatus {
 	
-	private JakdukConst.GALLERY_STATUS_TYPE status;
+	private Constants.GALLERY_STATUS_TYPE status;
 
 }

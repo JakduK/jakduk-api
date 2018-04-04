@@ -20,13 +20,13 @@ import java.util.Map;
 @ConfigurationProperties("jakduk")
 public class JakdukProperties {
 
+    private String rememberMeSeed;
     private Integer rememberMeExpiration;
     private String apiServerUrl;
     private String webServerUrl;
 
     private ApiUrlPath apiUrlPath = new ApiUrlPath();
     private Mongodb mongodb = new Mongodb();
-    private Swagger swagger = new Swagger();
     private Rabbitmq rabbitmq = new Rabbitmq();
     private Elasticsearch elasticsearch = new Elasticsearch();
     private Storage storage = new Storage();
@@ -40,7 +40,6 @@ public class JakdukProperties {
         private String userPictureSmall;
         private String galleryImage;
         private String galleryThumbnail;
-        private String boardFree;
     }
 
     @Getter
@@ -75,15 +74,6 @@ public class JakdukProperties {
         private Integer bulkConcurrentRequests;
         private Integer bulkFlushIntervalSeconds;
         private Integer bulkSizeMb;
-    }
-
-    @Getter
-    @Setter
-    @Configuration
-    @ConfigurationProperties("jakduk.swagger")
-    public class Swagger {
-        private String protocol;
-        private String host;
     }
 
     @Getter

@@ -1,12 +1,13 @@
 package com.jakduk.api.controller;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.simple.BoardFreeOnRSS;
-import com.jakduk.api.service.BoardFreeService;
+import com.jakduk.api.model.simple.ArticleOnRSS;
+import com.jakduk.api.service.ArticleService;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Content;
 import com.rometools.rome.feed.rss.Description;
@@ -36,7 +37,8 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 
 	@Resource private JakdukProperties jakdukProperties;
 
-	@Autowired private BoardFreeService boardFreeService;
+	@Autowired private UrlGenerationUtils urlGenerationUtils;
+	@Autowired private ArticleService articleService;
 
 	/**
 	 * Create a new Channel instance to hold the entries.
@@ -45,8 +47,8 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 	@Override protected Channel newFeed() {
 		Channel channel = new Channel("rss_2.0");
 		channel.setLink(String.format("%s/%s", jakdukProperties.getWebServerUrl(), "/rss"));
-		channel.setTitle(JakdukUtils.getResourceBundleMessage("messages.common", "common.jakduk"));
-		channel.setDescription(JakdukUtils.getResourceBundleMessage("messages.common", "common.jakduk.rss.description"));
+		channel.setTitle(JakdukUtils.getMessageSource("common.jakduk"));
+		channel.setDescription(JakdukUtils.getMessageSource("common.jakduk.rss.description"));
 
 		return channel;
 	}
@@ -59,15 +61,15 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 		List<Item> items = new ArrayList<>();
 
 		do {
-			List<BoardFreeOnRSS> posts = boardFreeService.getBoardFreeOnRss(postId, JakdukConst.NUMBER_OF_ITEMS_EACH_PAGES);
+			List<ArticleOnRSS> posts = articleService.getBoardFreeOnRss(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 			if (ObjectUtils.isEmpty(posts)) {
 				existPosts = false;
 			} else {
-				BoardFreeOnRSS post = posts.stream()
-						.sorted(Comparator.comparing(BoardFreeOnRSS::getId))
+				ArticleOnRSS post = posts.stream()
+						.sorted(Comparator.comparing(ArticleOnRSS::getId))
 						.findFirst()
-						.orElseThrow(() -> new ServiceException(ServiceError.INTERNAL_SERVER_ERROR));
+						.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 				postId = new ObjectId(post.getId());
 			}
@@ -75,7 +77,7 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 			if (existPosts) {
 				List<Item> eachPostsOfRss = posts.stream()
 						.map(post -> {
-							String url = String.format("%s/%s/%d", jakdukProperties.getWebServerUrl(), jakdukProperties.getApiUrlPath().getBoardFree(), post.getSeq());
+							String url = urlGenerationUtils.generateArticleDetailUrl(post.getBoard(), post.getSeq());
 
 							Item item = new Item();
 							item.setAuthor(post.getWriter().getUsername());

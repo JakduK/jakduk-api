@@ -1,12 +1,12 @@
 package com.jakduk.api.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.configuration.security.JakdukAuthority;
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
 import com.jakduk.api.model.embedded.CommonWriter;
-import com.jakduk.api.restcontroller.vo.user.AuthUserProfile;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,7 +128,7 @@ public class AuthUtils {
         if (authentication.getPrincipal() instanceof UserDetailsImpl) {
             UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
-            return userDetail.getProviderId().equals(JakdukConst.ACCOUNT_TYPE.JAKDUK);
+            return userDetail.getProviderId().equals(Constants.ACCOUNT_TYPE.JAKDUK);
         } else {
             return false;
         }
@@ -141,9 +141,9 @@ public class AuthUtils {
         if (authentication.getPrincipal() instanceof UserDetailsImpl) {
             UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
-            JakdukConst.ACCOUNT_TYPE providerId = userDetail.getProviderId();
+            Constants.ACCOUNT_TYPE providerId = userDetail.getProviderId();
 
-            return providerId.equals(JakdukConst.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(JakdukConst.ACCOUNT_TYPE.DAUM);
+            return providerId.equals(Constants.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(Constants.ACCOUNT_TYPE.DAUM);
         } else {
             return false;
         }
@@ -153,8 +153,8 @@ public class AuthUtils {
     /**
      * 로그인 중인 회원 정보를 가져온다.
      */
-    public static AuthUserProfile getAuthUserProfile() {
-        AuthUserProfile authUserProfile = null;
+    public static SessionUser getAuthUserProfile() {
+        SessionUser sessionUser = null;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -167,7 +167,7 @@ public class AuthUtils {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
-            authUserProfile = AuthUserProfile.builder()
+            sessionUser = SessionUser.builder()
                     .id(userDetail.getId())
                     .email(userDetail.getUsername())
                     .username(userDetail.getNickname())
@@ -177,21 +177,21 @@ public class AuthUtils {
                     .build();
         }
 
-        return authUserProfile;
+        return sessionUser;
     }
 
     /**
      * CommonWriter를 가져온다.
      */
     public static CommonWriter getCommonWriter() {
-        AuthUserProfile authUserProfile = getAuthUserProfile();
+        SessionUser sessionUser = getAuthUserProfile();
 
-        if (Objects.nonNull(authUserProfile)) {
+        if (Objects.nonNull(sessionUser)) {
             return CommonWriter.builder()
-                    .userId(authUserProfile.getId())
-                    .username(authUserProfile.getUsername())
-                    .providerId(authUserProfile.getProviderId())
-                    .picture(authUserProfile.getPicture())
+                    .userId(sessionUser.getId())
+                    .username(sessionUser.getUsername())
+                    .providerId(sessionUser.getProviderId())
+                    .picture(sessionUser.getPicture())
                     .build();
         } else {
             return null;
@@ -266,7 +266,7 @@ public class AuthUtils {
      * @param sizeType size 타입
      * @param id UserImage의 ID
      */
-    public String generateUserPictureUrl(JakdukConst.IMAGE_SIZE_TYPE sizeType, String id) {
+    public String generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE sizeType, String id) {
 
         if (StringUtils.isBlank(id))
             return null;

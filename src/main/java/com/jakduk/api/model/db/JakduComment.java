@@ -1,6 +1,6 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.model.embedded.BoardCommentStatus;
+import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Data;
@@ -33,5 +33,5 @@ public class JakduComment {
 
     private List<CommonFeelingUser> usersDisliking;
 
-    private BoardCommentStatus status;
+    private ArticleCommentStatus status;
 }

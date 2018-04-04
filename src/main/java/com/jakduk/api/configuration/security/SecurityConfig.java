@@ -4,7 +4,6 @@ import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.security.handler.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -24,9 +23,8 @@ import javax.annotation.Resource;
  * 16. 4. 6 오후 9:51
  */
 
-@Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity // TODO 훗날 제거
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource private JakdukProperties jakdukProperties;
@@ -52,6 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .failureHandler(new RestJakdukFailureHandler())
 
                 .and().rememberMe()
+                    .key(jakdukProperties.getRememberMeSeed())
                     .tokenValiditySeconds(jakdukProperties.getRememberMeExpiration())
 
                 .and().logout()
@@ -66,26 +65,69 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //Configures url based authorization
                 .and().authorizeRequests()
-                    .antMatchers(
-                            HttpMethod.GET,
-                            "/api/user/exist/email",                // 이메일 중복 검사
-                            "/api/user/exist/username"              // 별명 중복 검사
-                    ).permitAll()
 
-                    .antMatchers(
-                            HttpMethod.POST,
-                            "/api/auth/user",                            // 이메일 기반 회원 가입
-                            "/api/auth/user/*"                      // SNS 기반 회원 가입 및 SNS 임시 프로필 조회
-                    ).anonymous()
-                    .antMatchers(
-                            HttpMethod.GET,
-                            "/api/auth/login",                  // 로그인
-                            "/api/auth/login/*",                    // SNS 로그인
-                            "/api/user/exist/email/anonymous",      // 비 로그인 상태에서 특정 user Id를 제외하고 Email 중복 검사
-                            "/api/user/exist/username/anonymous"    // 비 로그인 상태에서 특정 user Id를 제외하고 별명 중복 검사
-                    ).anonymous()
+                /*
+                  ANONYMOUS ROLE
+                 */
+                .regexMatchers(
+                        HttpMethod.GET,
+                        "/api/auth/user/attempt", // SNS 기반 회원 가입시 필요한 회원 프로필 정보
+                        "/api/user/password/rest/*" // 비밀번호 토큰 코드 검증
+                ).anonymous()
+                .regexMatchers(
+                        HttpMethod.POST,
+                        "/api/user", // 이메일 기반 회원 가입
+                        "/api/auth/login/[a-z]+", // SNS 기반 회원 가입 및 SNS 임시 프로필 저장
+                        "/api/user/password/find", // 비밀번호 찾기 이메일 발송
+                        "/api/user/password/rest" // 비밀번호 재설정 하기
+                ).anonymous()
 
-                    .anyRequest().permitAll();
+                /*
+                  USER ROLE
+                 */
+                .regexMatchers(
+                        HttpMethod.GET,
+                        "/api/auth/user", // 세션에 있는 나의 프로필 정보
+                        "/api/user/profile/me" // 내 프로필 정보 보기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
+                .regexMatchers(
+                        HttpMethod.POST,
+                        "/api/board/[a-z]+", // 글 쓰기
+                        "/api/board/[a-z]+/\\d+/comment", // 댓글 달기
+                        "/api/board/[a-z]+/\\d+/like|dislike", // 글 감정 표현
+                        "/api/board/[a-z]+/comment/[\\da-z]+/like|dislike" // 댓글 감정 표현
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
+                .regexMatchers(
+                        HttpMethod.PUT,
+                        "/api/board/[a-z]+/comment/[\\da-z]+", // 댓글 고치기
+                        "/api/user/profile/me", // 내 프로필 정보 고치기
+                        "/api/user/password" // 비밀번호 바꾸기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
+                .regexMatchers(
+                        HttpMethod.DELETE,
+                        "/api/board/[a-z]+/comment/[\\da-z]+", // 댓글 지우기
+                        "/api/user" // 회원 탈퇴
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
+
+                /*
+                  ADMIN ROLE
+                 */
+                .regexMatchers(
+                        HttpMethod.POST,
+                        "/api/board/[a-z]+/\\d+/notice" // 글의 공지 만들기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_ADMIN.name())
+                .regexMatchers(
+                        HttpMethod.DELETE,
+                        "/api/board/[a-z]+/\\d+/notice" // 글의 공지 없애기
+                ).hasAnyAuthority(
+                JakdukAuthority.ROLE_ADMIN.name())
+
+                .anyRequest().permitAll();
 
     }
 

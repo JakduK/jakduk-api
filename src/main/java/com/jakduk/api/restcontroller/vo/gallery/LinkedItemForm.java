@@ -1,8 +1,6 @@
 package com.jakduk.api.restcontroller.vo.gallery;
 
-import com.jakduk.api.common.JakdukConst;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.jakduk.api.common.Constants;
 import lombok.Getter;
 
 /**
@@ -10,13 +8,7 @@ import lombok.Getter;
  */
 
 @Getter
-@ApiModel(value = "연관된 아이템 폼")
 public class LinkedItemForm {
-
-    @ApiModelProperty(example = "58b9050b807d714eaf50a111", value = "아이템 ID")
-    private String itemId;
-
-    @ApiModelProperty(value = "출처")
-    private JakdukConst.GALLERY_FROM_TYPE from;
-
+    private String itemId; // 아이템 ID
+    private Constants.GALLERY_FROM_TYPE from; // 출처
 }

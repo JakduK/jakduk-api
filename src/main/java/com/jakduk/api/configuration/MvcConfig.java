@@ -1,5 +1,6 @@
 package com.jakduk.api.configuration;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
+
+import java.util.Locale;
 
 /**
  * @author pyohwan
@@ -25,24 +27,28 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("lang");
+        LocaleChangeInterceptor localeInterceptor = new LocaleChangeInterceptor();
+        localeInterceptor.setParamName("lang");
+        localeInterceptor.setIgnoreInvalidLocale(true);
 
-        registry.addInterceptor(localeChangeInterceptor);
+        registry.addInterceptor(localeInterceptor);
     }
 
     @Bean
     public LocaleResolver localeResolver() {
-        return new CookieLocaleResolver();
+        CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+        localeResolver.setDefaultLocale(Locale.ENGLISH);
+
+        return localeResolver;
     }
 
     /**
      * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
      */
     @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
+    public MethodValidationPostProcessor methodValidationPostProcessor(LocalValidatorFactoryBean localValidatorFactoryBean) {
         MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
-        methodValidationPostProcessor.setValidatorFactory(localValidatorFactoryBean());
+        methodValidationPostProcessor.setValidatorFactory(localValidatorFactoryBean);
 
         return methodValidationPostProcessor;
     }
@@ -53,23 +59,16 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder.build();
     }
 
-    // for springfox
-    @Bean
-    public BeanValidatorPluginsConfiguration beanValidatorPluginsConfiguration() {
-        return new BeanValidatorPluginsConfiguration();
-    }
-
+    // yml로 뺄려고 했으나, Bean을 따로 등록 안해주면 thymeleaf에서 인식을 못하더라.
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames(
-                "messages/common", "messages/board", "messages/user", "messages/about", "messages/home",
-                "messages/gallery", "messages/search", "messages/jakdu", "messages/email", "messages/exception"
-        );
+        messageSource.setBasename("messages");
+        messageSource.setFallbackToSystemLocale(false);
 
         return messageSource;
     }

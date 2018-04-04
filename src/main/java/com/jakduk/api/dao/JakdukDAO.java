@@ -1,17 +1,11 @@
 package com.jakduk.api.dao;
 
-import com.jakduk.api.common.JakdukConst;
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.db.Competition;
-import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduScheduleGroup;
-import com.jakduk.api.model.etc.SupporterCount;
-import com.jakduk.api.model.jongo.GalleryFeelingCount;
-import com.jakduk.api.model.simple.GallerySimple;
-import com.jakduk.api.model.simple.UserOnHome;
 import org.bson.types.ObjectId;
-import org.jongo.Jongo;
-import org.jongo.MongoCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -23,7 +17,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -37,30 +32,6 @@ public class JakdukDAO {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
-
-	@Autowired
-	private Jongo jongo;
-
-	/**
-	 * 사진의 좋아요, 싫어요 갯수 가져오기
-	 */
-	public Map<String, GalleryFeelingCount> getGalleryUsersFeelingCount(List<ObjectId> arrId) {
-		MongoCollection boardFreeC = jongo.getCollection(JakdukConst.COLLECTION_GALLERY);
-
-		Iterator<GalleryFeelingCount> iGalleries = boardFreeC.aggregate("{$match:{_id:{$in:#}}}", arrId)
-				.and("{$project:{_id:1, usersLikingCount:{$size:{'$ifNull':['$usersLiking', []]}}, usersDislikingCount:{$size:{'$ifNull':['$usersDisliking', []]}}}}")
-				.as(GalleryFeelingCount.class);
-
-		HashMap<String, GalleryFeelingCount> feelingCount = new HashMap<String, GalleryFeelingCount>();
-
-		while (iGalleries.hasNext()) {
-			GalleryFeelingCount galleryFeelingCount = iGalleries.next();
-			feelingCount.put(galleryFeelingCount.getId().toString(), galleryFeelingCount);
-
-		}
-
-		return feelingCount;
-	}
 
 	public List<SupporterCount> getSupportFCCount(String language) {
 		AggregationOperation match = Aggregation.match(Criteria.where("supportFC").exists(true));
@@ -78,33 +49,6 @@ public class JakdukDAO {
 		}
 
 		return users;
-	}
-
-	public List<UserOnHome> getUserOnHome(String language) {
-		AggregationOperation sort = Aggregation.sort(Direction.DESC, "_id");
-		AggregationOperation limit = Aggregation.limit(JakdukConst.HOME_SIZE_LINE_NUMBER);
-		Aggregation aggregation = Aggregation.newAggregation(sort, limit);
-		
-		AggregationResults<UserOnHome> results = mongoTemplate.aggregate(aggregation, "user", UserOnHome.class);
-		
-		List<UserOnHome> users = results.getMappedResults();
-		
-		for (UserOnHome user : users) {
-			if (user.getSupportFC() != null) {
-				user.getSupportFC().getNames().removeIf(fcName -> !fcName.getLanguage().equals(language));
-			}
-		}
-		
-		return users;
-	}	
-	
-	public HomeDescription getHomeDescription() {
-		
-		Query query = new Query();
-		query.with(new Sort(Direction.DESC, "priority"));
-		HomeDescription homeDescription = mongoTemplate.findOne(query, HomeDescription.class);
-		
-		return homeDescription;
 	}
 
 	// 대회 목록.
@@ -138,7 +82,7 @@ public class JakdukDAO {
 		AggregationOperation match1 = Aggregation.match(Criteria.where("jakduScheduleId").is(jakduScheduleId));
 		AggregationOperation match2 = Aggregation.match(Criteria.where("_id").gt(commentId));
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
-		AggregationOperation limit = Aggregation.limit(JakdukConst.COMMENT_MAX_LIMIT);
+		AggregationOperation limit = Aggregation.limit(Constants.COMMENT_MAX_LIMIT);
 
 		Aggregation aggregation;
 
