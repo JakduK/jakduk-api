@@ -1,20 +1,14 @@
 package com.jakduk.api.service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.dao.JakdukDAO;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
+import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.db.AttendanceLeague;
 import com.jakduk.api.model.db.Competition;
 import com.jakduk.api.model.db.FootballClubOrigin;
-import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.repository.AttendanceClubRepository;
 import com.jakduk.api.repository.AttendanceLeagueRepository;
 import com.jakduk.api.repository.footballclub.FootballClubOriginRepository;
@@ -22,6 +16,12 @@ import com.jakduk.api.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 
 /**
@@ -73,7 +73,7 @@ public class StatsService {
 
 	// 대회별 관중수 하나 지움.
 	public void deleteLeagueAttendance(String id) {
-		attendanceLeagueRepository.delete(id);
+		attendanceLeagueRepository.deleteById(id);
 	}
 
 	public Map<String, Object> getSupportersData(String language) {

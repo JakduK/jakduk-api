@@ -45,7 +45,7 @@ public class CommonGalleryService {
         FileUtils.removeImageFile(storageProperties.getImagePath(), localDate, fileName);
         FileUtils.removeImageFile(storageProperties.getThumbnailPath(), localDate, fileName);
 
-        galleryRepository.delete(id);
+        galleryRepository.deleteById(id);
     }
 
     /**
