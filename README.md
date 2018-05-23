@@ -36,5 +36,7 @@ If you want to help to develop this project, anyone who wants to come is welcome
 * Spring Boot
 
 ---
-_This project is friendly supported by [JetBrains](https://jetbrains.com) & [IntelliJ IDEA](https://www.jetbrains.com/idea)!_
+![JetBrains](https://user-images.githubusercontent.com/860087/40435278-47c3c99c-5eeb-11e8-9977-cfa64f2c8cda.png)
+
+_This project is friendly supported by [JetBrains](https://jetbrains.com) & [All Products Packs](https://www.jetbrains.com/products.html)!_
 
