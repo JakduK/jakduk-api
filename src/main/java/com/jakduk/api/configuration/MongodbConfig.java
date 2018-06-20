@@ -2,14 +2,14 @@ package com.jakduk.api.configuration;
 
 import com.jakduk.api.common.converter.DateToLocalDateTimeConverter;
 import com.jakduk.api.common.converter.LocalDateTimeToDateConverter;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import javax.annotation.Resource;
@@ -37,8 +37,7 @@ public class MongodbConfig extends AbstractMongoConfiguration {
     }
 
     @Override
-    public Mongo mongo() throws Exception {
-
+    public MongoClient mongoClient() {
         List<ServerAddress> seeds = Stream.of(StringUtils.split(mongodbProperties.getHost(), ","))
                 .map(hostName -> {
                     try {
@@ -58,7 +57,7 @@ public class MongodbConfig extends AbstractMongoConfiguration {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new DateToLocalDateTimeConverter());
         converters.add(new LocalDateTimeToDateConverter());
-        return new CustomConversions(converters);
+        return new MongoCustomConversions(converters);
     }
 
 }

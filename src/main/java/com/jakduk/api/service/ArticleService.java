@@ -541,7 +541,7 @@ public class ArticleService {
 		if (! articleComment.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
-		articleCommentRepository.delete(id);
+		articleCommentRepository.deleteById(id);
 
 		// 색인 지움
 		rabbitMQPublisher.deleteDocumentComment(id);

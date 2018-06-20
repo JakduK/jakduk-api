@@ -1,25 +1,30 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.9.RELEASE'
+        springBootVersion = '2.0.2.RELEASE'
     }
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
     }
+}
+
+plugins {
+    id "org.asciidoctor.convert" version "1.5.3"
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.asciidoctor.convert' // Apply the Asciidoctor plugin.
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-springBoot {
-    executable = true
+bootJar {
+    launchScript()
 }
 
 // tag::jar[]
@@ -47,7 +52,8 @@ asciidoctor {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
+    maven { url 'http://repo.spring.io/milestone' }
 }
 
 dependencies {
@@ -57,7 +63,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('org.springframework.boot:spring-boot-starter-amqp')
     compile('org.springframework.boot:spring-boot-starter-security')
-    compile('org.springframework.boot:spring-boot-starter-mobile')
+    compile('org.springframework.boot:spring-boot-starter-mobile:2.0.0.M5')
 
     compile 'com.github.dfabulich:sitemapgen4j:1.0.6'
     compile 'commons-beanutils:commons-beanutils:1.9.3'

@@ -48,7 +48,7 @@ public class JakduService {
     @Autowired private SearchService searchService;
 
     public JakduSchedule findScheduleById(String id) {
-        return jakduScheduleRepository.findOne(id);
+        return jakduScheduleRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
     }
 
     public Page<JakduSchedule> findAll(Pageable pageable) {
@@ -57,7 +57,7 @@ public class JakduService {
 
     // 작두 타기 입력
     public Jakdu setMyJakdu(CommonWriter writer, MyJakduRequest myJakdu) {
-        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(myJakdu.getJakduScheduleId());
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findById(myJakdu.getJakduScheduleId()).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
 
         if (Objects.isNull(jakduSchedule))
             throw new NoSuchElementException(JakdukUtils.getMessageSource("jakdu.msg.not.found.jakdu.schedule.exception"));
@@ -80,7 +80,7 @@ public class JakduService {
 
     // 내 작두 타기 가져오기.
     public JakduOnSchedule getMyJakdu(String userId, String jakdukScheduleId) {
-        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(jakdukScheduleId);
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findById(jakdukScheduleId).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
 
         if (Objects.isNull(jakduSchedule))
             throw new NoSuchElementException(JakdukUtils.getMessageSource("jakdu.msg.not.found.jakdu.schedule.exception"));
@@ -92,7 +92,7 @@ public class JakduService {
      * 댓글 작성.
      */
     public JakduComment setComment(CommonWriter writer, JakduCommentWriteRequest request) {
-        JakduSchedule jakduSchedule = jakduScheduleRepository.findOne(request.getId());
+        JakduSchedule jakduSchedule = jakduScheduleRepository.findById(request.getId()).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
 
         if (Objects.isNull(jakduSchedule)) {
             throw new NoSuchElementException(JakdukUtils.getMessageSource("jakdu.msg.not.found.jakdu.schedule.exception"));
@@ -156,7 +156,7 @@ public class JakduService {
         String userId = writer.getUserId();
         String username = writer.getUsername();
 
-        JakduComment jakduComment = jakduCommentRepository.findOne(commentId);
+        JakduComment jakduComment = jakduCommentRepository.findById(commentId).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
         CommonWriter jakdukWriter = jakduComment.getWriter();
 
         List<CommonFeelingUser> usersLiking = jakduComment.getUsersLiking();
