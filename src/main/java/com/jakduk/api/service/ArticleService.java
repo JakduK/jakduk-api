@@ -18,9 +18,9 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UsersFeeling;
 import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.*;
+import com.jakduk.api.repository.article.ArticleCommentRepository;
 import com.jakduk.api.repository.article.ArticleOnListRepository;
 import com.jakduk.api.repository.article.ArticleRepository;
-import com.jakduk.api.repository.article.ArticleCommentRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;
@@ -251,7 +251,7 @@ public class ArticleService {
 	public GetArticlesResponse getArticles(Constants.BOARD_TYPE board, String categoryCode, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-		Pageable pageable = new PageRequest(page - 1, size, sort);
+		Pageable pageable = PageRequest.of(page - 1, size, sort);
 		Page<ArticleOnList> articlePages;
 
 		if ("ALL".equals(categoryCode)) {

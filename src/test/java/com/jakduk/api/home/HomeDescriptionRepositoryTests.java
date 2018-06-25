@@ -24,7 +24,7 @@ public class HomeDescriptionRepositoryTests {
 
     @Test
     public void findOneByOrderByPriorityDesc() {
-        Optional<HomeDescription> optHomeDescription = repository.findOneByOrderByPriorityDesc();
+        Optional<HomeDescription> optHomeDescription = repository.findFirstByOrderByPriorityDesc();
 
         Assert.assertTrue(optHomeDescription.isPresent());
     }

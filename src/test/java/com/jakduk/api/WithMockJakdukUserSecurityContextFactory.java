@@ -12,7 +12,6 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 
 import java.util.Arrays;
 
-//@TestConfiguration
 public class WithMockJakdukUserSecurityContextFactory implements WithSecurityContextFactory<WithMockJakdukUser> {
 
     @Override

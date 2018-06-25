@@ -43,7 +43,7 @@ public class HomeService {
 
 	// 알림판 가져오기.
 	public HomeDescription getHomeDescription() {
-		return homeDescriptionRepository.findOneByOrderByPriorityDesc()
+		return homeDescriptionRepository.findFirstByOrderByPriorityDesc()
 				.orElseGet(HomeDescription::new);
 	}
 	
