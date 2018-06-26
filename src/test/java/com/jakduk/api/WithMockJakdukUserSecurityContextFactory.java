@@ -1,6 +1,7 @@
 package com.jakduk.api;
 
 import com.jakduk.api.common.Constants;
+import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
 import com.jakduk.api.model.embedded.UserPictureInfo;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +21,7 @@ public class WithMockJakdukUserSecurityContextFactory implements WithSecurityCon
 
         UserDetailsImpl userDetails = new UserDetailsImpl("test07@test.com", "a!b@c#",
                 "1234", "test07", Constants.ACCOUNT_TYPE.JAKDUK, true, true,
-                true, true, Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")));
+                true, true, Arrays.asList(new SimpleGrantedAuthority(JakdukAuthority.ROLE_USER_01.name())));
 
         userDetails.setPicture(
                 new UserPictureInfo(

@@ -43,6 +43,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -191,32 +192,31 @@ public class SearchMvcTests {
                                         fieldWithPath("articleResult.took").type(JsonFieldType.NUMBER).description("찾는데 걸린 시간(ms)"),
                                         fieldWithPath("articleResult.totalCount").type(JsonFieldType.NUMBER).description("매칭되는 아이템 수"),
                                         fieldWithPath("articleResult.articles").type(JsonFieldType.ARRAY).description("매칭되는 게시물 목록"),
-                                        fieldWithPath("articleResult.articles").type(JsonFieldType.ARRAY).description("매칭되는 게시물 목록"),
                                         fieldWithPath("articleResult.articles.[].id").type(JsonFieldType.STRING).description("글 ID"),
                                         fieldWithPath("articleResult.articles.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
                                         fieldWithPath("articleResult.articles.[].board").type(JsonFieldType.STRING).description("게시판"),
                                         fieldWithPath("articleResult.articles.[].category").type(JsonFieldType.STRING).description("말머리"),
-                                        fieldWithPath("articleResult.articles.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                                        fieldWithPath("articleResult.articles.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
+                                        subsectionWithPath("articleResult.articles.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                        subsectionWithPath("articleResult.articles.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
                                         fieldWithPath("articleResult.articles.[].score").type(JsonFieldType.NUMBER).description("매칭 점수"),
-                                        fieldWithPath("articleResult.articles.[].highlight").type(JsonFieldType.OBJECT).description("매칭 단어 하이라이트"),
+                                        subsectionWithPath("articleResult.articles.[].highlight").type(JsonFieldType.OBJECT).description("매칭 단어 하이라이트"),
                                         fieldWithPath("commentResult").type(JsonFieldType.OBJECT).description("매칭된 댓글 객체"),
                                         fieldWithPath("commentResult.took").type(JsonFieldType.NUMBER).description("찾는데 걸린 시간(ms)"),
                                         fieldWithPath("commentResult.totalCount").type(JsonFieldType.NUMBER).description("매칭되는 아이템 수"),
                                         fieldWithPath("commentResult.comments").type(JsonFieldType.ARRAY).description("매칭되는 댓글 목록"),
                                         fieldWithPath("commentResult.comments.[].id").type(JsonFieldType.STRING).description("댓글 ID"),
-                                        fieldWithPath("commentResult.comments.[].article").type(JsonFieldType.OBJECT).description("연관 글 객체"),
-                                        fieldWithPath("commentResult.comments.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                        subsectionWithPath("commentResult.comments.[].article").type(JsonFieldType.OBJECT).description("연관 글 객체"),
+                                        subsectionWithPath("commentResult.comments.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
                                         fieldWithPath("commentResult.comments.[].score").type(JsonFieldType.NUMBER).description("매칭 점수"),
-                                        fieldWithPath("commentResult.comments.[].highlight").type(JsonFieldType.OBJECT).description("매칭 단어 하이라이트"),
+                                        subsectionWithPath("commentResult.comments.[].highlight").type(JsonFieldType.OBJECT).description("매칭 단어 하이라이트"),
                                         fieldWithPath("galleryResult").type(JsonFieldType.OBJECT).description("매칭된 그림 객체"),
                                         fieldWithPath("galleryResult.took").type(JsonFieldType.NUMBER).description("찾는데 걸린 시간(ms)"),
                                         fieldWithPath("galleryResult.totalCount").type(JsonFieldType.NUMBER).description("매칭되는 아이템 수"),
-                                        fieldWithPath("galleryResult.galleries").type(JsonFieldType.ARRAY).description("매칭되는 그림 목록"),
+                                        subsectionWithPath("galleryResult.galleries").type(JsonFieldType.ARRAY).description("매칭되는 그림 목록"),
                                         fieldWithPath("galleryResult.galleries.[].id").type(JsonFieldType.STRING).description("그림 ID"),
                                         fieldWithPath("galleryResult.galleries.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
                                         fieldWithPath("galleryResult.galleries.[].score").type(JsonFieldType.NUMBER).description("매칭 점수"),
-                                        fieldWithPath("galleryResult.galleries.[].highlight").type(JsonFieldType.OBJECT).description("매칭 단어 하이라이트")
+                                        subsectionWithPath("galleryResult.galleries.[].highlight").type(JsonFieldType.OBJECT).description("매칭 단어 하이라이트")
                                 )
                         ));
     }

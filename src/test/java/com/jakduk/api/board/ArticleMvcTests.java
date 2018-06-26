@@ -59,6 +59,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -122,12 +123,7 @@ public class ArticleMvcTests {
 
         GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
 
-        writeArticleForm = WriteArticle.builder()
-                .subject("제목입니다.")
-                .content("내용입니다.")
-                .categoryCode(boardCategory.getCode())
-                .galleries(Arrays.asList(galleryOnBoard))
-                .build();
+        writeArticleForm = new WriteArticle("제목입니다.", "내용입니다.", boardCategory.getCode(), Arrays.asList(galleryOnBoard));
 
         galleries = Arrays.asList(
                 Gallery.builder()
@@ -428,8 +424,7 @@ public class ArticleMvcTests {
                 .thenReturn(article);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+                .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         WriteArticleResponse expectResponse = WriteArticleResponse.builder()
                 .seq(article.getSeq())
@@ -438,29 +433,28 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 post("/api/board/{board}", article.getBoard().toLowerCase())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(writeArticleForm)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
-                .andDo(
-                        document("writeArticle",
-                                requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
-                                ),
-                                requestFields(this.getWriteArticleFormDescriptor()),
-                                pathParameters(
-                                        parameterWithName("board").description("게시판 " +
-                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
-                                ),
-                                responseFields(
-                                        fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호"),
-                                        fieldWithPath("board").type(JsonFieldType.STRING).description("게시판")
-                                )
-                        ));
+                .andDo(document("writeArticle",
+                        requestHeaders(
+                                headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
+                        ),
+                        requestFields(this.getWriteArticleFormDescriptor()),
+                        pathParameters(
+                                parameterWithName("board").description("게시판 " +
+                                        Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                        ),
+                        responseFields(
+                                fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호"),
+                                fieldWithPath("board").type(JsonFieldType.STRING).description("게시판")
+                        )
+                ));
     }
 
     @Test
@@ -499,8 +493,7 @@ public class ArticleMvcTests {
                 .thenReturn(article);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+                .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         WriteArticleResponse expectResponse = WriteArticleResponse.builder()
                 .seq(article.getSeq())
@@ -508,10 +501,10 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 put("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(writeArticleForm)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -519,7 +512,7 @@ public class ArticleMvcTests {
                 .andDo(
                         document("editArticle",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 requestFields(this.getWriteArticleFormDescriptor()),
                                 pathParameters(
@@ -548,17 +541,17 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 delete("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
                         document("deleteArticle",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -591,16 +584,16 @@ public class ArticleMvcTests {
         mvc.perform(
                 post("/api/board/{board}/{seq}/{feeling}", article.getBoard().toLowerCase(), article.getSeq(),
                         Constants.FEELING_TYPE.LIKE.name().toLowerCase())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
                         document("setArticleFeeling",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -647,8 +640,8 @@ public class ArticleMvcTests {
                                 ),
                                 responseFields(
                                         fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요 회원 목록"),
-                                        fieldWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요 회원 목록")
+                                        subsectionWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요 회원 목록"),
+                                        subsectionWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요 회원 목록")
                                 )
                         ));
     }
@@ -663,14 +656,15 @@ public class ArticleMvcTests {
         mvc.perform(
                 post("/api/board/{board}/{seq}/notice", article.getBoard().toLowerCase(), article.getSeq())
                         .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
                 .andDo(
                         document("enableArticleNotice",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -689,16 +683,16 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 delete("/api/board/{board}/{seq}/notice", article.getBoard().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
                 .andDo(
                         document("disableArticleNotice",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -716,7 +710,7 @@ public class ArticleMvcTests {
                 fieldWithPath("content").type(JsonFieldType.STRING).description("글 내용. " + userConstraints.descriptionsForProperty("content")),
                 fieldWithPath("categoryCode").type(JsonFieldType.STRING)
                         .description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다."),
-                fieldWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
+                subsectionWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
         };
     }
 

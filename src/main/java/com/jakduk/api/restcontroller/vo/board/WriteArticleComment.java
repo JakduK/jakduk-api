@@ -1,8 +1,8 @@
 package com.jakduk.api.restcontroller.vo.board;
 
 import lombok.*;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
 
