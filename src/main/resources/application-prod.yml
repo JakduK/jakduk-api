@@ -35,12 +35,6 @@ jakduk:
   mongodb:
     database: jakduk_sample
     host: http://192.168.35.194:27017,http://192.168.35.138:27017
-  slackLog: # alert slack
-    enabled: true
-    level: ERROR
-    webhook: https://hooks.slack.com/services/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
-    channel: #jakduk_log
-    username: \uC791\uB450\uD0B9 \uC2EC\uD310
   elasticsearch:
     index-board: jakduk_prd_board
     index-gallery: jakduk_prd_gallery
