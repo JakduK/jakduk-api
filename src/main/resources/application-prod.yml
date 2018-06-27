@@ -4,8 +4,9 @@ logging:
     root: INFO
 
 server:
-  session:
-    timeout: 259200 # 3 days
+  servlet:
+    session:
+      timeout: 1d
 
 spring:
   data:

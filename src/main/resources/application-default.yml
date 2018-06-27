@@ -5,8 +5,9 @@ logging:
     org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
 
 server:
-  session:
-    timeout: 3600 # 1 hour
+  servlet:
+    session:
+      timeout: 1h
 
 spring:
   data:
