@@ -2,8 +2,6 @@ package com.jakduk.api.restcontroller.vo.user;
 
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistUsername;
-import lombok.Builder;
-import lombok.Getter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
