@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.2.RELEASE'
+        springBootVersion = '2.0.3.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -63,7 +63,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('org.springframework.boot:spring-boot-starter-amqp')
     compile('org.springframework.boot:spring-boot-starter-security')
-    compile('org.springframework.boot:spring-boot-starter-mobile:2.0.0.M5')
+    compile('org.springframework.boot:spring-boot-starter-mobile:2.0.0.M3')
 
     compile 'com.github.dfabulich:sitemapgen4j:1.0.6'
     compile 'commons-beanutils:commons-beanutils:1.9.3'
