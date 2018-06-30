@@ -61,7 +61,6 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.boot:spring-boot-starter-mobile:2.0.0.M3')
 
-    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.10'
     compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile 'org.apache.commons:commons-lang3:3.6'
     compile 'org.apache.commons:commons-io:1.3.2'
