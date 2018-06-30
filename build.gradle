@@ -24,11 +24,6 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 bootJar {
-    launchScript()
-}
-
-// tag::jar[]
-jar {
     baseName = 'jakduk-api'
     version =  '0.1.0'
 
@@ -36,8 +31,9 @@ jar {
     from ("${asciidoctor.outputDir}/html5") {
         into 'public/docs'
     }
+
+    launchScript()
 }
-// end::jar[]
 
 // test task 에서 spring.profiles.active 를 위한 설정.
 test {
@@ -65,15 +61,15 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.boot:spring-boot-starter-mobile:2.0.0.M3')
 
-    compile 'com.github.dfabulich:sitemapgen4j:1.0.6'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.10'
     compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile 'org.apache.commons:commons-lang3:3.6'
     compile 'org.apache.commons:commons-io:1.3.2'
     compile 'org.apache.commons:commons-collections4:4.1'
+    compile 'com.github.dfabulich:sitemapgen4j:1.0.6'
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.rometools:rome:1.7.4'
     compile 'net.coobird:thumbnailator:0.4.8'
-    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.10'
     compile 'org.projectlombok:lombok'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
