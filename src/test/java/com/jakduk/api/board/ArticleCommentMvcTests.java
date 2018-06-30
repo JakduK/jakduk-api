@@ -110,7 +110,7 @@ public class ArticleCommentMvcTests {
                 .views(15)
                 .usersLiking(commonFeelingUsers)
                 .usersDisliking(commonFeelingUsers)
-                .status(new ArticleStatus(false, false, Constants.DEVICE_TYPE.NORMAL))
+                .status(new ArticleStatus(false, false))
                 .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
                 .shortContent("본문입니다. (100자)")
                 .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
@@ -120,7 +120,6 @@ public class ArticleCommentMvcTests {
         articleComment = ArticleComment.builder()
                 .id("54b5058c3d96b205dc7e2809")
                 .article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
-                .status(new ArticleCommentStatus(Constants.DEVICE_TYPE.NORMAL))
                 .writer(commonWriter)
                 .content("댓글 내용입니다.")
                 .usersLiking(commonFeelingUsers)
@@ -234,7 +233,7 @@ public class ArticleCommentMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.insertArticleComment(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString(),
-                anyList(), any(Constants.DEVICE_TYPE.class)))
+                anyList()))
                 .thenReturn(articleComment);
 
         doNothing().when(galleryService)
@@ -273,7 +272,7 @@ public class ArticleCommentMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.updateArticleComment(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(),
-                anyList(), any(Constants.DEVICE_TYPE.class)))
+                anyList()))
                 .thenReturn(articleComment);
 
         doNothing().when(galleryService)
@@ -386,7 +385,6 @@ public class ArticleCommentMvcTests {
                         fieldWithPath("comments.[].id").type(JsonFieldType.STRING).description("댓글 ID"),
                         subsectionWithPath("comments.[].article").type(JsonFieldType.OBJECT).description("연동 글"),
                         subsectionWithPath("comments.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                        subsectionWithPath("comments.[].status").type(JsonFieldType.OBJECT).description("댓글 상태"),
                         fieldWithPath("comments.[].content").type(JsonFieldType.STRING).description("댓글 내용"),
                         fieldWithPath("comments.[].numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("comments.[].numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수"),
@@ -417,9 +415,6 @@ public class ArticleCommentMvcTests {
                 fieldWithPath("article.id").type(JsonFieldType.STRING).description("글 ID"),
                 fieldWithPath("article.seq").type(JsonFieldType.NUMBER).description("글 번호"),
                 fieldWithPath("article.board").type(JsonFieldType.STRING).description("게시판"),
-                fieldWithPath("status").type(JsonFieldType.OBJECT).description("댓글 상태"),
-                fieldWithPath("status.device").type(JsonFieldType.STRING).description("디바이스 종류 " +
-                        Stream.of(Constants.DEVICE_TYPE.values()).map(Enum::name).collect(Collectors.toList())),
                 subsectionWithPath("writer").type(JsonFieldType.OBJECT).description("글쓴이"),
                 fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
                 subsectionWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요를 한 회원 목록"),

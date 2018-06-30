@@ -88,15 +88,6 @@ public class Constants {
 	}
 
 	/**
-	 * 디바이스 타입
-     */
-	public enum DEVICE_TYPE {
-		NORMAL,	// PC
-		MOBILE,	// 모바일
-		TABLET	// 태블릿
-	}
-	
-	/**
 	 * 그림의 용량을 축소시키는 기준 값.
 	 */
 	public final static long GALLERY_MAXIMUM_CAPACITY = 1048576; // Byte 단위. 현재 1MB.

@@ -9,7 +9,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.mobile.device.Device;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -129,28 +128,6 @@ public class JakdukUtils {
         } else {
             return false;
         }
-    }
-
-    /**
-     * 모바일 디바이스 정보 가져오기.
-     *
-     * @param device Device 객체
-     * @return Constants.DEVICE_TYPE enum 타입
-     */
-    public static Constants.DEVICE_TYPE getDeviceInfo(Device device) {
-
-        Constants.DEVICE_TYPE returnDeviceType = Constants.DEVICE_TYPE.NORMAL;
-
-        if (Objects.isNull(device))
-            return returnDeviceType;
-
-        if (device.isMobile()) {
-            returnDeviceType = Constants.DEVICE_TYPE.MOBILE;
-        } else if (device.isTablet()) {
-            returnDeviceType = Constants.DEVICE_TYPE.TABLET;
-        }
-
-        return returnDeviceType;
     }
 
     /**

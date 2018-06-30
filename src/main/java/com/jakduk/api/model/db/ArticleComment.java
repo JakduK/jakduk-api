@@ -1,6 +1,9 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.model.embedded.*;
+import com.jakduk.api.model.embedded.ArticleItem;
+import com.jakduk.api.model.embedded.BoardLog;
+import com.jakduk.api.model.embedded.CommonFeelingUser;
+import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,7 +28,6 @@ public class ArticleComment implements UsersFeeling {
 	@Id
 	private String id;
 	private ArticleItem article;
-	private ArticleCommentStatus status;
 	private CommonWriter writer;
 	private String content;
 	private List<CommonFeelingUser> usersLiking;

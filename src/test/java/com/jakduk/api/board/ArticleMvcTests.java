@@ -114,7 +114,7 @@ public class ArticleMvcTests {
                 .views(15)
                 .usersLiking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
                 .usersDisliking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
-                .status(new ArticleStatus(false, false, Constants.DEVICE_TYPE.NORMAL))
+                .status(new ArticleStatus(false, false))
                 .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
                 .shortContent("본문입니다. (100자)")
                 .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
@@ -163,7 +163,7 @@ public class ArticleMvcTests {
                 .seq(3)
                 .category(boardCategory.getCode())
                 .views(15)
-                .status(new ArticleStatus(true, false, Constants.DEVICE_TYPE.NORMAL))
+                .status(new ArticleStatus(true, false))
                 .galleries(simpleGalleries)
                 .shortContent("본문입니다. (100자)")
                 .commentCount(8)
@@ -420,7 +420,7 @@ public class ArticleMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.insertArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
-                anyBoolean(), any(Constants.DEVICE_TYPE.class)))
+                anyBoolean()))
                 .thenReturn(article);
 
         doNothing().when(galleryService)
@@ -489,7 +489,7 @@ public class ArticleMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.updateArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(Constants.DEVICE_TYPE.class)))
+                anyBoolean()))
                 .thenReturn(article);
 
         doNothing().when(galleryService)

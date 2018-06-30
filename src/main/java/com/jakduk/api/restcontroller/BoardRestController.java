@@ -25,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mobile.device.Device;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -115,8 +114,7 @@ public class BoardRestController {
     @PostMapping("/{board}")
     public WriteArticleResponse writeArticle(
             @PathVariable Constants.BOARD_TYPE board,
-            @Valid @RequestBody WriteArticle form,
-            Device device) {
+            @Valid @RequestBody WriteArticle form) {
 
         List<GalleryOnBoard> formGalleries = form.getGalleries();
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
@@ -139,7 +137,7 @@ public class BoardRestController {
                 .collect(Collectors.toList());
 
         Article article = articleService.insertArticle(commonWriter, board, form.getSubject().trim(), form.getContent().trim(),
-                StringUtils.trim(form.getCategoryCode()), ! galleries.isEmpty(), JakdukUtils.getDeviceInfo(device));
+                StringUtils.trim(form.getCategoryCode()), ! galleries.isEmpty());
 
         galleryService.processLinkedGalleries(commonWriter.getUserId(), galleries, formGalleries, null,
                 Constants.GALLERY_FROM_TYPE.ARTICLE, article.getId());
@@ -161,8 +159,7 @@ public class BoardRestController {
             @PathVariable Constants.BOARD_TYPE board,
             @PathVariable Integer seq,
             @Valid @RequestBody WriteArticle form,
-            HttpServletRequest request,
-            Device device) {
+            HttpServletRequest request) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
@@ -184,7 +181,7 @@ public class BoardRestController {
                 .collect(Collectors.toList());
 
         Article article = articleService.updateArticle(commonWriter, board, seq, form.getSubject().trim(), form.getContent().trim(),
-                form.getCategoryCode(), ! galleries.isEmpty(), JakdukUtils.getDeviceInfo(device));
+                form.getCategoryCode(), ! galleries.isEmpty());
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request, Constants.GALLERY_FROM_TYPE.ARTICLE,
                 article.getId());
@@ -237,8 +234,7 @@ public class BoardRestController {
     public ArticleComment writeArticleComment(
             @PathVariable Constants.BOARD_TYPE board,
             @PathVariable Integer seq,
-            @Valid @RequestBody WriteArticleComment form,
-            Device device) {
+            @Valid @RequestBody WriteArticleComment form) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
@@ -254,7 +250,7 @@ public class BoardRestController {
         List<Gallery> galleries = galleryService.findByIdIn(unverifiableGalleryIds);
 
         ArticleComment articleComment =  articleService.insertArticleComment(commonWriter, board, seq, form.getContent().trim(),
-                galleries, JakdukUtils.getDeviceInfo(device));
+                galleries);
 
         galleryService.processLinkedGalleries(commonWriter.getUserId(), galleries, form.getGalleries(), null,
                 Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());
@@ -268,8 +264,7 @@ public class BoardRestController {
             @PathVariable Constants.BOARD_TYPE board,
             @PathVariable String id,
             @Valid @RequestBody WriteArticleComment form,
-            HttpServletRequest request,
-            Device device) {
+            HttpServletRequest request) {
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
@@ -290,8 +285,7 @@ public class BoardRestController {
                 .map(Gallery::getId)
                 .collect(Collectors.toList());
 
-        ArticleComment articleComment = articleService.updateArticleComment(commonWriter, board, id, form.getContent().trim(), galleryIds,
-                JakdukUtils.getDeviceInfo(device));
+        ArticleComment articleComment = articleService.updateArticleComment(commonWriter, board, id, form.getContent().trim(), galleryIds);
 
         List<String> galleryIdsForRemoval = JakdukUtils.getSessionOfGalleryIdsForRemoval(request,
                 Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, articleComment.getId());

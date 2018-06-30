@@ -49,17 +49,16 @@ asciidoctor {
 
 repositories {
     mavenCentral()
-    maven { url 'http://repo.spring.io/milestone' }
 }
 
 dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-mail')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('org.springframework.boot:spring-boot-starter-amqp')
     compile('org.springframework.boot:spring-boot-starter-security')
-    compile('org.springframework.boot:spring-boot-starter-mobile:2.0.0.M3')
 
     compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile 'org.apache.commons:commons-lang3:3.6'

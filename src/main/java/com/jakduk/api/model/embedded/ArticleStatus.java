@@ -1,7 +1,9 @@
 package com.jakduk.api.model.embedded;
 
-import com.jakduk.api.common.Constants;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -15,9 +17,6 @@ import lombok.*;
 @Getter
 @Setter
 public class ArticleStatus {
-
 	private Boolean notice;
 	private Boolean delete;
-	private Constants.DEVICE_TYPE device;
-
 }
