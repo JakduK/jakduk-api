@@ -49,12 +49,12 @@ public class UserRepositoryTests {
 
     @Test
     public void existEmailTest() {
-        Optional<UserProfile> mustFind = userProfileRepository.findOneByEmail(randomUser.getEmail());
-        Assert.assertTrue(mustFind.isPresent());
-
         if (StringUtils.isBlank(randomUser.getEmail())) {
             log.warn("randomUser email is empty : {}", randomUser);
         } else {
+            Optional<UserProfile> mustFind = userProfileRepository.findOneByEmail(randomUser.getEmail());
+            Assert.assertTrue(mustFind.isPresent());
+
             Optional<UserProfile> mustNotFind = userProfileRepository.findByNEIdAndEmail(randomUser.getId(), randomUser.getEmail());
             Assert.assertFalse(mustNotFind.isPresent());
         }
