@@ -3,13 +3,11 @@ package com.jakduk.api.configuration.security.handler;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.restcontroller.vo.RestErrorResponse;
-import org.apache.commons.codec.CharEncoding;
 import org.apache.http.entity.ContentType;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,7 +21,7 @@ import java.io.PrintWriter;
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
 
         ServiceError serviceError = ServiceError.NEED_TO_LOGIN;
 
@@ -32,10 +30,9 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         response.setContentType(ContentType.APPLICATION_JSON.toString());
         response.setStatus(serviceError.getHttpStatus());
-        response.setCharacterEncoding(CharEncoding.UTF_8);
 
         RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError);
-        String errorJson = ObjectMapperUtils.getObjectMapper().writeValueAsString(restErrorResponse);
+        String errorJson = ObjectMapperUtils.writeValueAsString(restErrorResponse);
 
         PrintWriter out = response.getWriter();
         out.print(errorJson);

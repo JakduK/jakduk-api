@@ -49,6 +49,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -89,7 +90,8 @@ public class AuthMvcTests {
                         .accept(MediaType.APPLICATION_JSON)
                         .param("username", "test07@test.com")
                         .param("password", "1111")
-                        .param("remember-me", "1"))
+                        .param("remember-me", "1")
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(cookie().exists("JSESSIONID"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -99,7 +101,8 @@ public class AuthMvcTests {
                                 requestParameters(
                                         parameterWithName("username").description("이메일 주소"),
                                         parameterWithName("password").description("비밀번호"),
-                                        parameterWithName("remember-me").description("(optional) 로그인 유지 여부. 1 or 0")
+                                        parameterWithName("remember-me").description("(optional) 로그인 유지 여부. 1 or 0"),
+                                        parameterWithName("_csrf").description("CSRF 토큰")
                                 ),
                                 responseHeaders(
                                         headerWithName("Set-Cookie").description("인증 쿠키. value는 JSESSIONID=키값").optional()
@@ -139,7 +142,8 @@ public class AuthMvcTests {
                 post("/api/auth/login/{providerId}", providerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(ObjectMapperUtils.writeValueAsString(requestForm)))
+                        .content(ObjectMapperUtils.writeValueAsString(requestForm))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
@@ -214,15 +218,16 @@ public class AuthMvcTests {
     public void logoutTest() throws Exception {
         mvc.perform(
                 post("/api/auth/logout")
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
                 .andDo(
                         document("logout",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 )
                         ));
     }

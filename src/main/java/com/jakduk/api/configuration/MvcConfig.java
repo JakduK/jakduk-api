@@ -1,6 +1,5 @@
 package com.jakduk.api.configuration;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +10,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
@@ -23,7 +22,7 @@ import java.util.Locale;
  */
 
 @Configuration
-public class MvcConfig extends WebMvcConfigurerAdapter {
+public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

@@ -124,7 +124,7 @@ public class SearchService {
 				.setTypes(Constants.ES_TYPE_SEARCH_WORD)
 				.setSize(0)
 				.setQuery(
-						QueryBuilders.rangeQuery("registerDate").gte(gteDate)
+						QueryBuilders.rangeQuery("registerDate").gte(gteDate.toString())
 				)
 				.addAggregation(
 						AggregationBuilders

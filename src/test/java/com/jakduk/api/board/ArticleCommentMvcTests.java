@@ -39,6 +39,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -56,6 +57,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,7 +110,7 @@ public class ArticleCommentMvcTests {
                 .views(15)
                 .usersLiking(commonFeelingUsers)
                 .usersDisliking(commonFeelingUsers)
-                .status(new ArticleStatus(false, false, Constants.DEVICE_TYPE.NORMAL))
+                .status(new ArticleStatus(false, false))
                 .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
                 .shortContent("본문입니다. (100자)")
                 .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
@@ -118,7 +120,6 @@ public class ArticleCommentMvcTests {
         articleComment = ArticleComment.builder()
                 .id("54b5058c3d96b205dc7e2809")
                 .article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
-                .status(new ArticleCommentStatus(Constants.DEVICE_TYPE.NORMAL))
                 .writer(commonWriter)
                 .content("댓글 내용입니다.")
                 .usersLiking(commonFeelingUsers)
@@ -198,7 +199,7 @@ public class ArticleCommentMvcTests {
 
         mvc.perform(
                 get("/api/board/{board}/{seq}/comments", Constants.BOARD_TYPE.FOOTBALL.name().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .param("commentId", "59c2ec0fbe3eb62dfca3ed9c")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -207,7 +208,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("getArticleDetailComments",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -232,18 +233,18 @@ public class ArticleCommentMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.insertArticleComment(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString(),
-                anyListOf(Gallery.class), any(Constants.DEVICE_TYPE.class)))
+                anyList()))
                 .thenReturn(articleComment);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+                .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
+
         mvc.perform(
                 post("/api/board/{board}/{seq}/comment", article.getBoard().toLowerCase(), articleComment.getArticle().getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(writeArticleComment)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -251,7 +252,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("writeArticleComment",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -271,19 +272,18 @@ public class ArticleCommentMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.updateArticleComment(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(),
-                anyListOf(String.class), any(Constants.DEVICE_TYPE.class)))
+                anyList()))
                 .thenReturn(articleComment);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+                .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         mvc.perform(
                 put("/api/board/{board}/comment/{id}", article.getBoard().toLowerCase(), articleComment.getId())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(writeArticleComment)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -291,7 +291,7 @@ public class ArticleCommentMvcTests {
                 .andDo(
                         document("editArticleComment",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -312,17 +312,17 @@ public class ArticleCommentMvcTests {
 
         mvc.perform(
                 delete("/api/board/{board}/comment/{id}", article.getBoard().toLowerCase(), articleComment.getId())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
                 .andDo(
                         document("deleteArticleComment",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -351,16 +351,16 @@ public class ArticleCommentMvcTests {
         mvc.perform(
                 post("/api/board/{board}/comment/{commentId}/{feeling}", articleComment.getArticle().getBoard().toLowerCase(),
                         articleComment.getId(), Constants.FEELING_TYPE.LIKE.name().toLowerCase())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
                         document("setArticleCommentFeeling",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -383,15 +383,14 @@ public class ArticleCommentMvcTests {
                 Arrays.asList(
                         fieldWithPath("comments").type(JsonFieldType.ARRAY).description("댓글 목록"),
                         fieldWithPath("comments.[].id").type(JsonFieldType.STRING).description("댓글 ID"),
-                        fieldWithPath("comments.[].article").type(JsonFieldType.OBJECT).description("연동 글"),
-                        fieldWithPath("comments.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                        fieldWithPath("comments.[].status").type(JsonFieldType.OBJECT).description("댓글 상태"),
+                        subsectionWithPath("comments.[].article").type(JsonFieldType.OBJECT).description("연동 글"),
+                        subsectionWithPath("comments.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
                         fieldWithPath("comments.[].content").type(JsonFieldType.STRING).description("댓글 내용"),
                         fieldWithPath("comments.[].numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("comments.[].numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수"),
                         fieldWithPath("comments.[].myFeeling").type(JsonFieldType.STRING).description("나의 감정 상태. 인증 쿠키가 있고, 감정 표현을 한 경우 포함 된다."),
-                        fieldWithPath("comments.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
-                        fieldWithPath("comments.[].logs").type(JsonFieldType.ARRAY).description("로그 기록 목록")
+                        subsectionWithPath("comments.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
+                        subsectionWithPath("comments.[].logs").type(JsonFieldType.ARRAY).description("로그 기록 목록")
                 )
         );
 
@@ -405,26 +404,23 @@ public class ArticleCommentMvcTests {
 
         return new FieldDescriptor[] {
                 fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용. " + userConstraints.descriptionsForProperty("content")),
-                fieldWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
+                subsectionWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
         };
     }
 
     private FieldDescriptor[] getWriteArticleCommentDescriptor() {
         return new FieldDescriptor[] {
                 fieldWithPath("id").type(JsonFieldType.STRING).description("댓글 ID"),
-                fieldWithPath("article").type(JsonFieldType.OBJECT).description("연동 글"),
+                subsectionWithPath("article").type(JsonFieldType.OBJECT).description("연동 글"),
                 fieldWithPath("article.id").type(JsonFieldType.STRING).description("글 ID"),
                 fieldWithPath("article.seq").type(JsonFieldType.NUMBER).description("글 번호"),
                 fieldWithPath("article.board").type(JsonFieldType.STRING).description("게시판"),
-                fieldWithPath("status").type(JsonFieldType.OBJECT).description("댓글 상태"),
-                fieldWithPath("status.device").type(JsonFieldType.STRING).description("디바이스 종류 " +
-                        Stream.of(Constants.DEVICE_TYPE.values()).map(Enum::name).collect(Collectors.toList())),
-                fieldWithPath("writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                subsectionWithPath("writer").type(JsonFieldType.OBJECT).description("글쓴이"),
                 fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
-                fieldWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요를 한 회원 목록"),
-                fieldWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요를 한 회원 목록"),
+                subsectionWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요를 한 회원 목록"),
+                subsectionWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요를 한 회원 목록"),
                 fieldWithPath("linkedGallery").type(JsonFieldType.BOOLEAN).description("연동 그림 존재 여부"),
-                fieldWithPath("logs").type(JsonFieldType.ARRAY).description("로그 기록 목록")
+                subsectionWithPath("logs").type(JsonFieldType.ARRAY).description("로그 기록 목록")
         };
     }
 

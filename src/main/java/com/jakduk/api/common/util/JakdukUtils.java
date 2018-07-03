@@ -5,11 +5,10 @@ import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalName;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.RandomStringGenerator;
 import org.jsoup.Jsoup;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.mobile.device.Device;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -29,6 +28,10 @@ import java.util.stream.Stream;
 public class JakdukUtils {
 
     private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";
+
+    private static RandomStringGenerator generator = new RandomStringGenerator.Builder()
+            .withinRange('a', 'z')
+            .build();
 
     /**
      * 사용 가능한 언어 코드를 클라이언트의 Locale 에서 뽑아온다.
@@ -132,28 +135,6 @@ public class JakdukUtils {
     }
 
     /**
-     * 모바일 디바이스 정보 가져오기.
-     *
-     * @param device Device 객체
-     * @return Constants.DEVICE_TYPE enum 타입
-     */
-    public static Constants.DEVICE_TYPE getDeviceInfo(Device device) {
-
-        Constants.DEVICE_TYPE returnDeviceType = Constants.DEVICE_TYPE.NORMAL;
-
-        if (Objects.isNull(device))
-            return returnDeviceType;
-
-        if (device.isMobile()) {
-            returnDeviceType = Constants.DEVICE_TYPE.MOBILE;
-        } else if (device.isTablet()) {
-            returnDeviceType = Constants.DEVICE_TYPE.TABLET;
-        }
-
-        return returnDeviceType;
-    }
-
-    /**
      * 좋아요, 싫어요 목록에서 나도 참여 하였는지 검사
      *
      * @param commonWriter 나
@@ -234,7 +215,9 @@ public class JakdukUtils {
      * 임시 이메일 주소를 생선한다.
      */
     public static String generateTemporaryEmail() {
-        return RandomStringUtils.randomAlphanumeric(5) + "@jakduk.com";
+
+
+        return generator.generate(5) + "@jakduk.com";
     }
 
     /**

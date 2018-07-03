@@ -18,9 +18,9 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.db.UsersFeeling;
 import com.jakduk.api.model.embedded.*;
 import com.jakduk.api.model.simple.*;
+import com.jakduk.api.repository.article.ArticleCommentRepository;
 import com.jakduk.api.repository.article.ArticleOnListRepository;
 import com.jakduk.api.repository.article.ArticleRepository;
-import com.jakduk.api.repository.article.ArticleCommentRepository;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;
@@ -75,10 +75,9 @@ public class ArticleService {
      * @param content 글 내용
      * @param categoryCode 글 말머리 Code
      * @param linkedGallery 사진 연동 여부
-     * @param device 디바이스
      */
 	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content, String categoryCode,
-								 Boolean linkedGallery, Constants.DEVICE_TYPE device) {
+								 Boolean linkedGallery) {
 
 		if (BoardCategoryGenerator.notExistCategory(board, categoryCode))
 			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);
@@ -86,10 +85,6 @@ public class ArticleService {
 		// shortContent 만듦
 		String stripHtmlContent = StringUtils.defaultIfBlank(JakdukUtils.stripHtmlTag(content), StringUtils.EMPTY);
 		String shortContent = StringUtils.truncate(stripHtmlContent, Constants.ARTICLE_SHORT_CONTENT_LENGTH);
-
-		// 글 상태
-		ArticleStatus articleStatus = new ArticleStatus();
-		articleStatus.setDevice(device);
 
 		ObjectId objectId = new ObjectId();
 
@@ -102,7 +97,6 @@ public class ArticleService {
 				.shortContent(shortContent)
 				.views(0)
 				.seq(commonService.getNextSequence(Constants.SEQ_BOARD))
-				.status(articleStatus)
 				.logs(this.initBoardLogs(objectId, Constants.ARTICLE_LOG_TYPE.CREATE.name(), writer))
 				.lastUpdated(LocalDateTime.ofInstant(objectId.getDate().toInstant(), ZoneId.systemDefault()))
 				.linkedGallery(linkedGallery)
@@ -124,10 +118,9 @@ public class ArticleService {
 	 * @param content 글 내용
 	 * @param categoryCode 글 말머리 Code
 	 * @param linkedGallery 사진 연동 여부
-	 * @param device 디바이스
 	 */
 	public Article updateArticle(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String subject, String content, String categoryCode,
-								 Boolean linkedGallery, Constants.DEVICE_TYPE device) {
+								 Boolean linkedGallery) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
@@ -147,15 +140,6 @@ public class ArticleService {
 		article.setCategory(Constants.BOARD_TYPE.FREE.equals(board) ? null : categoryCode);
 		article.setShortContent(shortContent);
 		article.setLinkedGallery(linkedGallery);
-
-		// 글 상태
-		ArticleStatus articleStatus = article.getStatus();
-
-		if (Objects.isNull(articleStatus))
-			articleStatus = new ArticleStatus();
-
-        articleStatus.setDevice(device);
-		article.setStatus(articleStatus);
 
 		// boardHistory
 		List<BoardLog> logs = article.getLogs();
@@ -251,7 +235,7 @@ public class ArticleService {
 	public GetArticlesResponse getArticles(Constants.BOARD_TYPE board, String categoryCode, Integer page, Integer size) {
 
 		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-		Pageable pageable = new PageRequest(page - 1, size, sort);
+		Pageable pageable = PageRequest.of(page - 1, size, sort);
 		Page<ArticleOnList> articlePages;
 
 		if ("ALL".equals(categoryCode)) {
@@ -460,8 +444,8 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 달기
 	 */
-	public ArticleComment insertArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String content, List<Gallery> galleries,
-											   Constants.DEVICE_TYPE device) {
+	public ArticleComment insertArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String content,
+											   List<Gallery> galleries) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
@@ -475,7 +459,6 @@ public class ArticleService {
 				.article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
 				.writer(writer)
 				.content(content)
-				.status(new ArticleCommentStatus(device))
 				.linkedGallery(! galleries.isEmpty())
 				.logs(this.initBoardLogs(new ObjectId(), Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), writer))
 				.build();
@@ -492,8 +475,8 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 고치기
 	 */
-	public ArticleComment updateArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, String id, String content, List<String> galleryIds,
-											   Constants.DEVICE_TYPE device) {
+	public ArticleComment updateArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, String id, String content,
+											   List<String> galleryIds) {
 
 		ArticleComment articleComment = articleCommentRepository.findOneById(id)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
@@ -503,15 +486,6 @@ public class ArticleService {
 
 		articleComment.setWriter(writer);
 		articleComment.setContent(StringUtils.trim(content));
-		ArticleCommentStatus articleCommentStatus = articleComment.getStatus();
-
-		if (Objects.isNull(articleCommentStatus)) {
-			articleCommentStatus = new ArticleCommentStatus(device);
-		} else {
-			articleCommentStatus.setDevice(device);
-		}
-
-		articleComment.setStatus(articleCommentStatus);
 		articleComment.setLinkedGallery(! galleryIds.isEmpty());
 
 		// boardLogs

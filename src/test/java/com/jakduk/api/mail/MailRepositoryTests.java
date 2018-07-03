@@ -46,7 +46,7 @@ public class MailRepositoryTests {
 
     @After
     public void after() {
-        repository.delete(mail.getId());
+        repository.deleteById(mail.getId());
     }
 
 }

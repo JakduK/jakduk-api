@@ -41,6 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -49,7 +50,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -58,6 +59,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -112,7 +114,7 @@ public class ArticleMvcTests {
                 .views(15)
                 .usersLiking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
                 .usersDisliking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
-                .status(new ArticleStatus(false, false, Constants.DEVICE_TYPE.NORMAL))
+                .status(new ArticleStatus(false, false))
                 .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
                 .shortContent("본문입니다. (100자)")
                 .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
@@ -121,12 +123,7 @@ public class ArticleMvcTests {
 
         GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
 
-        writeArticleForm = WriteArticle.builder()
-                .subject("제목입니다.")
-                .content("내용입니다.")
-                .categoryCode(boardCategory.getCode())
-                .galleries(Arrays.asList(galleryOnBoard))
-                .build();
+        writeArticleForm = new WriteArticle("제목입니다.", "내용입니다.", boardCategory.getCode(), Arrays.asList(galleryOnBoard));
 
         galleries = Arrays.asList(
                 Gallery.builder()
@@ -166,7 +163,7 @@ public class ArticleMvcTests {
                 .seq(3)
                 .category(boardCategory.getCode())
                 .views(15)
-                .status(new ArticleStatus(true, false, Constants.DEVICE_TYPE.NORMAL))
+                .status(new ArticleStatus(true, false))
                 .galleries(simpleGalleries)
                 .shortContent("본문입니다. (100자)")
                 .commentCount(8)
@@ -196,43 +193,42 @@ public class ArticleMvcTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
-                .andDo(
-                        document("getArticles",
-                                pathParameters(
-                                        parameterWithName("board").description("게시판 " +
-                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
-                                ),
-                                requestParameters(
-                                        parameterWithName("page").description("(optional, default 1) 페이지 번호. 1부터 시작.").optional(),
-                                        parameterWithName("size").description("(optional, default 20) 페이지 크기.").optional(),
-                                        parameterWithName("categoryCode").description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다.").optional()
-                                ),
-                                responseFields(
-                                        fieldWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵. key는 말머리코드, value는 표시되는 이름(Locale 지원)"),
-                                        fieldWithPath("articles").type(JsonFieldType.ARRAY).description("글 목록"),
-                                        fieldWithPath("articles.[].id").type(JsonFieldType.STRING).description("글 ID"),
-                                        fieldWithPath("articles.[].board").type(JsonFieldType.STRING).description("게시판"),
-                                        fieldWithPath("articles.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                                        fieldWithPath("articles.[].subject").type(JsonFieldType.STRING).description("글제목"),
-                                        fieldWithPath("articles.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("articles.[].category").type(JsonFieldType.STRING).description("말머리"),
-                                        fieldWithPath("articles.[].views").type(JsonFieldType.NUMBER).description("읽음 수"),
-                                        fieldWithPath("articles.[].status").type(JsonFieldType.OBJECT).description("글 상태"),
-                                        fieldWithPath("articles.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
-                                        fieldWithPath("articles.[].shortContent").type(JsonFieldType.STRING).description("본문 100자"),
-                                        fieldWithPath("articles.[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
-                                        fieldWithPath("articles.[].likingCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                                        fieldWithPath("articles.[].dislikingCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
-                                        fieldWithPath("notices").type(JsonFieldType.ARRAY).description("공지글 목록. json 형식은 articles와 같음."),
-                                        fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
-                                        fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
-                                        fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                                        fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지당 글 수"),
-                                        fieldWithPath("number").type(JsonFieldType.NUMBER).description("현재 페이지(0부터 시작)"),
-                                        fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현제 페이지에서 글 수"),
-                                        fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("전체 글 수")
-                                )
-                        ));
+                .andDo(document("getArticles",
+                        pathParameters(
+                                parameterWithName("board").description("게시판 " +
+                                        Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                        ),
+                        requestParameters(
+                                parameterWithName("page").description("(optional, default 1) 페이지 번호. 1부터 시작.").optional(),
+                                parameterWithName("size").description("(optional, default 20) 페이지 크기.").optional(),
+                                parameterWithName("categoryCode").description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER 일 때에는 필수다.").optional()
+                        ),
+                        responseFields(
+                                subsectionWithPath("categories").type(JsonFieldType.OBJECT).description("말머리 맵. key는 말머리코드, value는 표시되는 이름(Locale 지원)"),
+                                fieldWithPath("articles").type(JsonFieldType.ARRAY).description("글 목록"),
+                                fieldWithPath("articles.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                fieldWithPath("articles.[].board").type(JsonFieldType.STRING).description("게시판"),
+                                subsectionWithPath("articles.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                fieldWithPath("articles.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                fieldWithPath("articles.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                fieldWithPath("articles.[].category").type(JsonFieldType.STRING).description("말머리"),
+                                fieldWithPath("articles.[].views").type(JsonFieldType.NUMBER).description("읽음 수"),
+                                subsectionWithPath("articles.[].status").type(JsonFieldType.OBJECT).description("글 상태"),
+                                subsectionWithPath("articles.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
+                                fieldWithPath("articles.[].shortContent").type(JsonFieldType.STRING).description("본문 100자"),
+                                fieldWithPath("articles.[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                                fieldWithPath("articles.[].likingCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                fieldWithPath("articles.[].dislikingCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                                subsectionWithPath("notices").type(JsonFieldType.ARRAY).description("공지글 목록. json 형식은 articles와 같음."),
+                                fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                                fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
+                                fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                                fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지당 글 수"),
+                                fieldWithPath("number").type(JsonFieldType.NUMBER).description("현재 페이지(0부터 시작)"),
+                                fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현제 페이지에서 글 수"),
+                                fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("전체 글 수")
+                        )
+                ));
     }
 
     @Test
@@ -276,27 +272,26 @@ public class ArticleMvcTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
-                .andDo(
-                        document("getArticlesTops",
-                                pathParameters(
-                                        parameterWithName("board").description("게시판 " +
-                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
-                                ),
-                                responseFields(
-                                        fieldWithPath("topLikes").type(JsonFieldType.ARRAY).description("주간 좋아요수 선두 목록"),
-                                        fieldWithPath("topLikes.[].id").type(JsonFieldType.STRING).description("글 ID"),
-                                        fieldWithPath("topLikes.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("topLikes.[].subject").type(JsonFieldType.STRING).description("글제목"),
-                                        fieldWithPath("topLikes.[].count").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                                        fieldWithPath("topLikes.[].views").type(JsonFieldType.NUMBER).description("읽음 수"),
-                                        fieldWithPath("topComments").type(JsonFieldType.ARRAY).description("주간 댓글수 선두 목록"),
-                                        fieldWithPath("topComments.[].id").type(JsonFieldType.STRING).description("글 ID"),
-                                        fieldWithPath("topComments.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("topComments.[].subject").type(JsonFieldType.STRING).description("글제목"),
-                                        fieldWithPath("topComments.[].count").type(JsonFieldType.NUMBER).description("댓글 수"),
-                                        fieldWithPath("topComments.[].views").type(JsonFieldType.NUMBER).description("읽음 수")
-                                )
-                        ));
+                .andDo(document("getArticlesTops",
+                        pathParameters(
+                                parameterWithName("board").description("게시판 " +
+                                        Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                        ),
+                        responseFields(
+                                fieldWithPath("topLikes").type(JsonFieldType.ARRAY).description("주간 좋아요수 선두 목록"),
+                                fieldWithPath("topLikes.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                fieldWithPath("topLikes.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                fieldWithPath("topLikes.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                fieldWithPath("topLikes.[].count").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                fieldWithPath("topLikes.[].views").type(JsonFieldType.NUMBER).description("읽음 수"),
+                                fieldWithPath("topComments").type(JsonFieldType.ARRAY).description("주간 댓글수 선두 목록"),
+                                fieldWithPath("topComments.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                fieldWithPath("topComments.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                fieldWithPath("topComments.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                fieldWithPath("topComments.[].count").type(JsonFieldType.NUMBER).description("댓글 수"),
+                                fieldWithPath("topComments.[].views").type(JsonFieldType.NUMBER).description("읽음 수")
+                        )
+                ));
     }
 
     @Test
@@ -375,45 +370,46 @@ public class ArticleMvcTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
-                .andDo(
-                        document("getArticleDetail",
-                                requestHeaders(
-                                        headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
-                                ),
-                                pathParameters(
-                                        parameterWithName("board").description("게시판 " +
-                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
-                                        parameterWithName("seq").description("글 번호")
-                                ),
-                                responseFields(
-                                        fieldWithPath("article").type(JsonFieldType.OBJECT).description("글 상세"),
-                                        fieldWithPath("article.id").type(JsonFieldType.STRING).description("글 ID"),
-                                        fieldWithPath("article.board").type(JsonFieldType.STRING).description("게시판"),
-                                        fieldWithPath("article.writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                                        fieldWithPath("article.subject").type(JsonFieldType.STRING).description("글제목"),
-                                        fieldWithPath("article.seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("article.category").type(JsonFieldType.OBJECT).description("말머리"),
-                                        fieldWithPath("article.views").type(JsonFieldType.NUMBER).description("읽음 수"),
-                                        fieldWithPath("article.numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                                        fieldWithPath("article.numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수"),
-                                        fieldWithPath("article.status").type(JsonFieldType.OBJECT).description("글 상태"),
-                                        fieldWithPath("article.logs").type(JsonFieldType.ARRAY).description("로그 기록 목록"),
-                                        fieldWithPath("article.galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
-                                        fieldWithPath("article.myFeeling").type(JsonFieldType.STRING).description("나의 감정 상태. 인증 쿠키가 있고, 감정 표현을 한 경우 포함 된다."),
-                                        fieldWithPath("prevArticle").type(JsonFieldType.OBJECT).description("이전 글"),
-                                        fieldWithPath("prevArticle.id").type(JsonFieldType.STRING).description("글 ID"),
-                                        fieldWithPath("prevArticle.seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("prevArticle.writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                                        fieldWithPath("prevArticle.board").type(JsonFieldType.STRING).description("게시판"),
-                                        fieldWithPath("nextArticle").type(JsonFieldType.OBJECT).description("다음 글. json 형식은 prevArticle과 같음."),
-                                        fieldWithPath("latestArticlesByWriter").type(JsonFieldType.ARRAY).description("글쓴이의 최근 글."),
-                                        fieldWithPath("latestArticlesByWriter.[].id").type(JsonFieldType.STRING).description("글 ID"),
-                                        fieldWithPath("latestArticlesByWriter.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("latestArticlesByWriter.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
-                                        fieldWithPath("latestArticlesByWriter.[].subject").type(JsonFieldType.STRING).description("글제목"),
-                                        fieldWithPath("latestArticlesByWriter.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록")
-                                )
-                        ));
+                .andDo(document("getArticleDetail",
+                        requestHeaders(
+                                headerWithName("Cookie").description("(optional) 인증 쿠키. value는 JSESSIONID=키값")
+                        ),
+                        pathParameters(
+                                parameterWithName("board").description("게시판 " +
+                                        Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList())),
+                                parameterWithName("seq").description("글 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("article").type(JsonFieldType.OBJECT).description("글 상세"),
+                                fieldWithPath("article.id").type(JsonFieldType.STRING).description("글 ID"),
+                                fieldWithPath("article.board").type(JsonFieldType.STRING).description("게시판"),
+                                subsectionWithPath("article.writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                fieldWithPath("article.subject").type(JsonFieldType.STRING).description("글제목"),
+                                fieldWithPath("article.seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                fieldWithPath("article.content").type(JsonFieldType.STRING).description("글 내용"),
+                                subsectionWithPath("article.category").type(JsonFieldType.OBJECT).description("말머리"),
+                                fieldWithPath("article.views").type(JsonFieldType.NUMBER).description("읽음 수"),
+                                fieldWithPath("article.numberOfLike").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                fieldWithPath("article.numberOfDislike").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                                subsectionWithPath("article.status").type(JsonFieldType.OBJECT).description("글 상태"),
+                                subsectionWithPath("article.logs").type(JsonFieldType.ARRAY).description("로그 기록 목록"),
+                                subsectionWithPath("article.galleries").type(JsonFieldType.ARRAY).description("그림 목록"),
+                                fieldWithPath("article.myFeeling").type(JsonFieldType.STRING).description("나의 감정 상태. 인증 쿠키가 있고, 감정 표현을 한 경우 포함 된다."),
+                                fieldWithPath("prevArticle").type(JsonFieldType.OBJECT).description("이전 글"),
+                                fieldWithPath("prevArticle.id").type(JsonFieldType.STRING).description("글 ID"),
+                                fieldWithPath("prevArticle.seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                fieldWithPath("prevArticle.subject").type(JsonFieldType.STRING).description("글제목"),
+                                subsectionWithPath("prevArticle.writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                fieldWithPath("prevArticle.board").type(JsonFieldType.STRING).description("게시판"),
+                                subsectionWithPath("nextArticle").type(JsonFieldType.OBJECT).description("다음 글. json 형식은 prevArticle과 같음."),
+                                fieldWithPath("latestArticlesByWriter").type(JsonFieldType.ARRAY).description("글쓴이의 최근 글."),
+                                fieldWithPath("latestArticlesByWriter.[].id").type(JsonFieldType.STRING).description("글 ID"),
+                                fieldWithPath("latestArticlesByWriter.[].seq").type(JsonFieldType.NUMBER).description("글번호"),
+                                subsectionWithPath("latestArticlesByWriter.[].writer").type(JsonFieldType.OBJECT).description("글쓴이"),
+                                fieldWithPath("latestArticlesByWriter.[].subject").type(JsonFieldType.STRING).description("글제목"),
+                                subsectionWithPath("latestArticlesByWriter.[].galleries").type(JsonFieldType.ARRAY).description("그림 목록")
+                        )
+                ));
     }
 
     @Test
@@ -424,12 +420,11 @@ public class ArticleMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.insertArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyString(), anyString(), anyString(),
-                anyBoolean(), any(Constants.DEVICE_TYPE.class)))
+                anyBoolean()))
                 .thenReturn(article);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+                .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         WriteArticleResponse expectResponse = WriteArticleResponse.builder()
                 .seq(article.getSeq())
@@ -438,29 +433,28 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 post("/api/board/{board}", article.getBoard().toLowerCase())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(writeArticleForm)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
-                .andDo(
-                        document("writeArticle",
-                                requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
-                                ),
-                                requestFields(this.getWriteArticleFormDescriptor()),
-                                pathParameters(
-                                        parameterWithName("board").description("게시판 " +
-                                                Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
-                                ),
-                                responseFields(
-                                        fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호"),
-                                        fieldWithPath("board").type(JsonFieldType.STRING).description("게시판")
-                                )
-                        ));
+                .andDo(document("writeArticle",
+                        requestHeaders(
+                                headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
+                        ),
+                        requestFields(this.getWriteArticleFormDescriptor()),
+                        pathParameters(
+                                parameterWithName("board").description("게시판 " +
+                                        Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
+                        ),
+                        responseFields(
+                                fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호"),
+                                fieldWithPath("board").type(JsonFieldType.STRING).description("게시판")
+                        )
+                ));
     }
 
     @Test
@@ -495,12 +489,11 @@ public class ArticleMvcTests {
                 .thenReturn(galleries);
 
         when(articleService.updateArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(Constants.DEVICE_TYPE.class)))
+                anyBoolean()))
                 .thenReturn(article);
 
         doNothing().when(galleryService)
-                .processLinkedGalleries(anyString(), anyListOf(Gallery.class), anyListOf(GalleryOnBoard.class), anyListOf(String.class),
-                        any(Constants.GALLERY_FROM_TYPE.class), anyString());
+                .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
         WriteArticleResponse expectResponse = WriteArticleResponse.builder()
                 .seq(article.getSeq())
@@ -508,10 +501,10 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 put("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(writeArticleForm)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -519,7 +512,7 @@ public class ArticleMvcTests {
                 .andDo(
                         document("editArticle",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 requestFields(this.getWriteArticleFormDescriptor()),
                                 pathParameters(
@@ -548,17 +541,17 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 delete("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
                         document("deleteArticle",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -591,16 +584,16 @@ public class ArticleMvcTests {
         mvc.perform(
                 post("/api/board/{board}/{seq}/{feeling}", article.getBoard().toLowerCase(), article.getSeq(),
                         Constants.FEELING_TYPE.LIKE.name().toLowerCase())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
                 .andDo(
                         document("setArticleFeeling",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -647,8 +640,8 @@ public class ArticleMvcTests {
                                 ),
                                 responseFields(
                                         fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글번호"),
-                                        fieldWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요 회원 목록"),
-                                        fieldWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요 회원 목록")
+                                        subsectionWithPath("usersLiking").type(JsonFieldType.ARRAY).description("좋아요 회원 목록"),
+                                        subsectionWithPath("usersDisliking").type(JsonFieldType.ARRAY).description("싫어요 회원 목록")
                                 )
                         ));
     }
@@ -662,16 +655,16 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 post("/api/board/{board}/{seq}/notice", article.getBoard().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
                 .andDo(
                         document("enableArticleNotice",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -690,16 +683,16 @@ public class ArticleMvcTests {
 
         mvc.perform(
                 delete("/api/board/{board}/{seq}/notice", article.getBoard().toLowerCase(), article.getSeq())
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
                 .andDo(
                         document("disableArticleNotice",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 pathParameters(
                                         parameterWithName("board").description("게시판 " +
@@ -717,7 +710,7 @@ public class ArticleMvcTests {
                 fieldWithPath("content").type(JsonFieldType.STRING).description("글 내용. " + userConstraints.descriptionsForProperty("content")),
                 fieldWithPath("categoryCode").type(JsonFieldType.STRING)
                         .description("(optional, default ALL) 말머리. board가 FREE 일때에는 무시된다. FOOTBALL, DEVELOPER일 때에는 필수다."),
-                fieldWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
+                subsectionWithPath("galleries").type(JsonFieldType.ARRAY).description("(optional) 그림 목록")
         };
     }
 

@@ -1,3 +1,11 @@
+2018-04-02
+db.competition.update({"code":"KLCL"}, {$set:{"code":"KL1"}}, {multi:true})
+db.competition.update({"code":"KLCH"}, {$set:{"code":"KL2"}}, {multi:true})
+db.attendanceClub.update({"league":"KLCL"}, {$set:{"league":"KL1"}}, {multi:true})
+db.attendanceClub.update({"league":"KLCH"}, {$set:{"league":"KL2"}}, {multi:true})
+db.article.update({"category":"CLASSIC"}, {$set:{"category":"KL1"}}, {multi:true})
+db.article.update({"category":"CHALLENGE"}, {$set:{"category":"KL2"}}, {multi:true})
+
 v0.7.14 / 2017-11-02
 // sourceType 필드 삭제
 db.gallery.update({}, {$unset:{"sourceType":""}}, {multi:true})

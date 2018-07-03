@@ -2,11 +2,9 @@ package com.jakduk.api.restcontroller.vo.user;
 
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistUsername;
-import lombok.Builder;
-import lombok.Getter;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 /**
@@ -18,8 +16,6 @@ import javax.validation.constraints.Size;
  * @desc     : SNS 기반 회원 가입 폼.
  */
 
-@Getter
-@Builder
 public class SocialUserForm {
 
 	@Size(min = 6, max=30)
@@ -38,4 +34,54 @@ public class SocialUserForm {
 	private String userPictureId; // UserPicture의 ID
 	private String externalLargePictureUrl; // SNS계젱에서 가져온 회원 큰 사진
 
+	public SocialUserForm() {
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getFootballClub() {
+		return footballClub;
+	}
+
+	public void setFootballClub(String footballClub) {
+		this.footballClub = footballClub;
+	}
+
+	public String getAbout() {
+		return about;
+	}
+
+	public void setAbout(String about) {
+		this.about = about;
+	}
+
+	public String getUserPictureId() {
+		return userPictureId;
+	}
+
+	public void setUserPictureId(String userPictureId) {
+		this.userPictureId = userPictureId;
+	}
+
+	public String getExternalLargePictureUrl() {
+		return externalLargePictureUrl;
+	}
+
+	public void setExternalLargePictureUrl(String externalLargePictureUrl) {
+		this.externalLargePictureUrl = externalLargePictureUrl;
+	}
 }

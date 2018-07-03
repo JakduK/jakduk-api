@@ -10,7 +10,6 @@ import com.jakduk.api.model.db.Jakdu;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduSchedule;
 import com.jakduk.api.model.elasticsearch.EsJakduComment;
-import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.JakduOnSchedule;
@@ -98,14 +97,11 @@ public class JakduService {
             throw new NoSuchElementException(JakdukUtils.getMessageSource("jakdu.msg.not.found.jakdu.schedule.exception"));
         }
 
-        ArticleCommentStatus status = new ArticleCommentStatus(request.getDevice());
-
         JakduComment jakduComment = new JakduComment();
 
         jakduComment.setWriter(writer);
         jakduComment.setContents(request.getContents());
         jakduComment.setJakduScheduleId(request.getId());
-        jakduComment.setStatus(status);
 
         jakduCommentRepository.save(jakduComment);
 

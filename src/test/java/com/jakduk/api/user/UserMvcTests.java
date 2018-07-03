@@ -42,6 +42,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Locale;
@@ -58,6 +59,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -132,15 +134,14 @@ public class UserMvcTests {
 
         this.whenCustomValdation();
 
-        UserForm form = UserForm.builder()
-                .email(jakdukUser.getEmail())
-                .username(jakdukUser.getUsername())
-                .password("1111")
-                .passwordConfirm("1111")
-                .about(jakdukUser.getAbout())
-                .footballClub(footballClub.getId())
-                .userPictureId(userPicture.getId())
-                .build();
+        UserForm form = new UserForm();
+        form.setEmail(jakdukUser.getEmail());
+        form.setUsername(jakdukUser.getUsername());
+        form.setPassword("1111");
+        form.setPasswordConfirm("1111");
+        form.setAbout(jakdukUser.getAbout());
+        form.setFootballClub(footballClub.getId());
+        form.setUserPictureId(userPicture.getId());
 
         when(userService.createJakdukUser(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(jakdukUser);
@@ -148,10 +149,12 @@ public class UserMvcTests {
         ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserForm.class, new ValidatorConstraintResolver(),
                 new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
 
-        mvc.perform(post("/api/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(ObjectMapperUtils.writeValueAsString(form)))
+        mvc.perform(
+                post("/api/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(ObjectMapperUtils.writeValueAsString(form)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
@@ -193,14 +196,13 @@ public class UserMvcTests {
         MockHttpSession mockHttpSession = new MockHttpSession();
         mockHttpSession.setAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
 
-        SocialUserForm form = SocialUserForm.builder()
-                .email("example@jakduk.com")
-                .username("SocialUser")
-                .about("안녕하세요.")
-                .footballClub(footballClub.getId())
-                .userPictureId(userPicture.getId())
-                .externalLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2FSjuNejHmr8o0&t=1488000722876")
-                .build();
+        SocialUserForm form = new SocialUserForm();
+        form.setEmail("example@jakduk.com");
+        form.setUsername("SocialUser");
+        form.setAbout("안녕하세요.");
+        form.setFootballClub(footballClub.getId());
+        form.setUserPictureId(userPicture.getId());
+        form.setExternalLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2FSjuNejHmr8o0&t=1488000722876");
 
         User expectUser = User.builder()
                 .id("597df86caaf4fc0545d4f3e9")
@@ -222,10 +224,12 @@ public class UserMvcTests {
         ConstraintDescriptions userConstraints = new ConstraintDescriptions(SocialUserForm.class, new ValidatorConstraintResolver(),
                 new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
 
-        mvc.perform(post("/api/user/social")
-                .session(mockHttpSession)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(ObjectMapperUtils.writeValueAsString(form)))
+        mvc.perform(
+                post("/api/user/social")
+                        .session(mockHttpSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(ObjectMapperUtils.writeValueAsString(form)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
@@ -382,10 +386,10 @@ public class UserMvcTests {
 
         mvc.perform(
                 put("/api/user/profile/me")
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(form)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -393,7 +397,7 @@ public class UserMvcTests {
                 .andDo(
                         document("user-edit-profile-me",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 requestFields(
                                         fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소. " +
@@ -428,10 +432,10 @@ public class UserMvcTests {
 
         mvc.perform(
                 put("/api/user/password")
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(ObjectMapperUtils.writeValueAsString(form)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -439,7 +443,7 @@ public class UserMvcTests {
                 .andDo(
                         document("user-edit-password",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 ),
                                 requestFields(
                                         fieldWithPath("password").type(JsonFieldType.STRING).description("현재 비밀번호. " +
@@ -472,8 +476,10 @@ public class UserMvcTests {
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "sample.png", MediaType.IMAGE_PNG_VALUE, ballBytes);
 
-        mvc.perform(fileUpload("/api/user/picture")
-                .file(mockMultipartFile))
+        mvc.perform(
+                fileUpload("/api/user/picture")
+                        .file(mockMultipartFile)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectUserPicture)))
@@ -500,16 +506,16 @@ public class UserMvcTests {
 
         mvc.perform(
                 delete("/api/user")
-                        .header("Cookie", "JSESSIONID=3F0E029648484BEAEF6B5C3578164E99")
-                        //.cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99")) TODO 이걸로 바꾸고 싶다.
-                        .accept(MediaType.APPLICATION_JSON))
+                        .cookie(new Cookie("JSESSIONID", "3F0E029648484BEAEF6B5C3578164E99"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(EmptyJsonResponse.newInstance())))
                 .andDo(
                         document("user-delete",
                                 requestHeaders(
-                                        headerWithName("Cookie").description("인증 쿠키. value는 JSESSIONID=키값")
+                                        headerWithName("Cookie").optional().description("인증 쿠키. value는 JSESSIONID=키값")
                                 )
                         ));
     }
@@ -534,9 +540,11 @@ public class UserMvcTests {
         ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserPasswordFindForm.class, new ValidatorConstraintResolver(),
                 new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
 
-        mvc.perform(post("/api/user/password/find")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(ObjectMapperUtils.writeValueAsString(form)))
+        mvc.perform(
+                post("/api/user/password/find")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(ObjectMapperUtils.writeValueAsString(form)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))
@@ -572,9 +580,11 @@ public class UserMvcTests {
         ConstraintDescriptions userConstraints = new ConstraintDescriptions(UserPasswordResetForm.class, new ValidatorConstraintResolver(),
                 new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("ValidationMessages")));
 
-        mvc.perform(post("/api/user/password/reset")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(ObjectMapperUtils.writeValueAsString(form)))
+        mvc.perform(
+                post("/api/user/password/reset")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(ObjectMapperUtils.writeValueAsString(form)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ObjectMapperUtils.writeValueAsString(expectResponse)))

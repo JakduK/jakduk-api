@@ -1,13 +1,12 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import lombok.Data;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -32,6 +31,4 @@ public class JakduComment {
     private List<CommonFeelingUser> usersLiking;
 
     private List<CommonFeelingUser> usersDisliking;
-
-    private ArticleCommentStatus status;
 }

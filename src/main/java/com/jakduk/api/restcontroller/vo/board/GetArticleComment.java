@@ -2,7 +2,6 @@ package com.jakduk.api.restcontroller.vo.board;
 
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.embedded.ArticleCommentStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.simple.ArticleSimple;
 import lombok.*;
@@ -25,7 +24,6 @@ public class GetArticleComment {
     private String id; // 댓글ID
     private ArticleSimple article; // 연동 글
     private CommonWriter writer; // 글쓴이
-    private ArticleCommentStatus status; // 댓글상태
     private String content; // 내용
     private Integer numberOfLike; // 좋아요 수
     private Integer numberOfDislike; // 싫어요 수

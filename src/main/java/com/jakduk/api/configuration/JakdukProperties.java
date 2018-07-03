@@ -79,18 +79,6 @@ public class JakdukProperties {
     @Getter
     @Setter
     @Configuration
-    @ConfigurationProperties("jakduk.slack-log")
-    public class SlackLog {
-        private Boolean enabled;
-        private Level level;
-        private String webhook;
-        private String channel;
-        private String username;
-    }
-
-    @Getter
-    @Setter
-    @Configuration
     @ConfigurationProperties("jakduk.storage")
     public class Storage {
         private String imagePath;

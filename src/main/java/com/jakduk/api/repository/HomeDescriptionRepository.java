@@ -13,6 +13,6 @@ import java.util.Optional;
  */
 public interface HomeDescriptionRepository extends MongoRepository<HomeDescription, String> {
 
-    Optional<HomeDescription> findOneByOrderByPriorityDesc();
+    Optional<HomeDescription> findFirstByOrderByPriorityDesc();
 
 }

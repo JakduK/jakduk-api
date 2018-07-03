@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.mobile.device.Device;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -127,16 +126,13 @@ public class JakduRestController {
 
     // 작두 댓글 달기
     @RequestMapping(value ="/schedule/comment", method = RequestMethod.POST)
-    public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest,
-                                     Device device) {
+    public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest) {
 
         if (Objects.isNull(jakduCommentWriteRequest))
             throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
 
         if (! AuthUtils.isUser())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
-
-        jakduCommentWriteRequest.setDevice(JakdukUtils.getDeviceInfo(device));
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
 
