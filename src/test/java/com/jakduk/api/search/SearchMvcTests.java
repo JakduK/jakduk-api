@@ -41,9 +41,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -113,24 +111,25 @@ public class SearchMvcTests {
                 .totalCount(47L)
                 .comments(
                         Arrays.asList(
-                                EsCommentSource.builder()
-                                        .id("578cd13e807d7113f246fa2e")
-                                        .article(
-                                                EsParentArticle.builder()
-                                                        .id("578cd105807d7113f246fa2d")
-                                                        .seq(88)
-                                                        .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                                                        .category(boardCategory.getCode())
-                                                        .subject("글 제목입니다.")
-                                                        .build()
-                                        )
-                                        .writer(commonWriter)
-                                        .score(2.2118008F)
-                                        .highlight(
-                                                new HashMap<String, List<String>>(){{
-                                                    put("content", Arrays.asList("<div class=\\\"description\\\">테스트</div> 합니다. ㅎㅎ"));
-                                                }})
-                                .build()
+                                new EsCommentSource(){{
+                                    setId("578cd13e807d7113f246fa2e");
+                                    setArticle(
+                                            new EsParentArticle(){{
+                                                setId("578cd105807d7113f246fa2d");
+                                                setSeq(88);
+                                                setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
+                                                setCategory(boardCategory.getCode());
+                                                setSubject("글 제목입니다.");
+                                            }}
+                                    );
+                                    setWriter(commonWriter);
+                                    setScore(2.2118008F);
+                                    setHighlight(
+                                            new HashMap<String, List<String>>(){{
+                                                put("content", Arrays.asList("<div class=\\\"description\\\">테스트</div> 합니다. ㅎㅎ"));
+                                            }}
+                                    );
+                                }}
                         ))
                 .build();
 
@@ -139,15 +138,16 @@ public class SearchMvcTests {
                 .totalCount(5L)
                 .galleries(
                         Arrays.asList(
-                                EsGallerySource.builder()
-                                        .id("55d94c23e4b08bb591207f08")
-                                        .writer(commonWriter)
-                                        .score(4.4011974F)
-                                        .highlight(
-                                                new HashMap<String, List<String>>(){{
-                                                    put("name", Arrays.asList("shortContent와 썸네일URL 추가 <div class=\\\"description\\\">테스트</div>"));
-                                                }})
-                                .build()
+                                new EsGallerySource() {{
+                                    setId("55d94c23e4b08bb591207f08");
+                                    setWriter(commonWriter);
+                                    setScore(4.4011974F);
+                                    setHighlight(
+                                            new HashMap<String, List<String>>(){{
+                                                put("name", Arrays.asList("shortContent와 썸네일URL 추가 <div class=\\\"description\\\">테스트</div>"));
+                                            }}
+                                    );
+                                }}
                         )
                 )
                 .build();

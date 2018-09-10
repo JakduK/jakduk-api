@@ -24,17 +24,16 @@ public class RabbitMQPublisherTest extends ApiApplicationTests {
     private RabbitMQPublisher sut;
 
     @Test
-    public void publishElasticsearchTest() throws InterruptedException {
+    public void publishElasticsearchTest() {
 
-        EsArticle esArticle = EsArticle.builder()
-                .id("595bb024290ad3035636f2ba")
-                .seq(262)
-                .writer(CommonWriter.builder().userId("userId").username("testUser").build())
-                .subject("subject01")
-                .content("content01")
-                .category("FREE")
-//                .galleries(Collections.EMPTY_LIST)
-                .build();
+        EsArticle esArticle = new EsArticle();
+        esArticle.setId("595bb024290ad3035636f2ba");
+        esArticle.setSeq(262);
+        esArticle.setWriter(CommonWriter.builder().userId("userId").username("testUser").build());
+        esArticle.setSubject("subject01");
+        esArticle.setContent("content01");
+        esArticle.setCategory("FREE");
+//        esArticle.setGalleries(Collections.EMPTY_LIST);
 
         String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE.getRoutingKey());
 
