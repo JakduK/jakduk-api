@@ -139,10 +139,12 @@ public class SearchService {
 		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
 
 		List<EsTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
-				.map(entry -> EsTermsBucket.builder()
-						.key(entry.getKey().toString())
-						.count(entry.getDocCount())
-						.build())
+				.map(entry -> {
+					EsTermsBucket esTermsBucket = new EsTermsBucket();
+					esTermsBucket.setKey(entry.getKey().toString());
+					esTermsBucket.setCount(entry.getDocCount());
+					return esTermsBucket;
+				})
 				.collect(Collectors.toList());
 
 		return PopularSearchWordResult.builder()

@@ -1,8 +1,6 @@
 package com.jakduk.api.model.elasticsearch;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.*;
 
 import java.util.List;
 import java.util.Map;
@@ -11,11 +9,6 @@ import java.util.Map;
  * Created by pyohwan on 16. 12. 5.
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
-@Setter
 public class EsGallerySource {
 
     private String id;
@@ -24,4 +17,43 @@ public class EsGallerySource {
     private Float score;
     private Map<String, List<String>> highlight;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public CommonWriter getWriter() {
+        return writer;
+    }
+
+    public void setWriter(CommonWriter writer) {
+        this.writer = writer;
+    }
+
+    public Float getScore() {
+        return score;
+    }
+
+    public void setScore(Float score) {
+        this.score = score;
+    }
+
+    public Map<String, List<String>> getHighlight() {
+        return highlight;
+    }
+
+    public void setHighlight(Map<String, List<String>> highlight) {
+        this.highlight = highlight;
+    }
 }

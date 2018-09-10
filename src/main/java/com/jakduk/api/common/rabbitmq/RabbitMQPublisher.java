@@ -39,20 +39,19 @@ public class RabbitMQPublisher {
     @Autowired private RabbitTemplate rabbitTemplate;
 
     public void sendWelcome(Locale locale, String recipientEmail, String userName) {
-        EmailPayload emailPayload = EmailPayload.builder()
-                .locale(locale)
-                .type(Constants.EMAIL_TYPE.WELCOME)
-                .templateName("mail/welcome")
-                .recipientEmail(recipientEmail)
-                .subject("K리그 작두왕에 오신것을 환영합니다.")
-                .body(
-                        new HashMap<String, Object>() {
-                            {
-                                put("username", userName);
-                            }
-                        }
-                )
-                .build();
+        EmailPayload emailPayload = new EmailPayload();
+        emailPayload.setLocale(locale);
+        emailPayload.setType(Constants.EMAIL_TYPE.WELCOME);
+        emailPayload.setTemplateName("mail/welcome");
+        emailPayload.setRecipientEmail(recipientEmail);
+        emailPayload.setSubject("K리그 작두왕에 오신것을 환영합니다.");
+        emailPayload.setBody(
+                new HashMap<String, Object>() {
+                    {
+                        put("username", userName);
+                    }
+                }
+        );
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(EmailRoutingKey.EMAIL_WELCOME.getRoutingKey());
         this.publishEmail(routingKey, emailPayload);
@@ -60,27 +59,26 @@ public class RabbitMQPublisher {
 
     public void sendResetPassword(Locale locale, String recipientEmail, String host) {
 
-        EmailPayload emailPayload = EmailPayload.builder()
-                .locale(locale)
-                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
-                .templateName("mail/resetPassword")
-                .recipientEmail(recipientEmail)
-                .subject(JakdukUtils.getMessageSource("email.user.password.reset.subject"))
-                .extra(
-                        new HashMap<String, String>() {
-                            {
-                                put("host", host);
-                            }
-                        }
-                )
-                .body(
-                        new HashMap<String, Object>() {
-                            {
-                                put("email", recipientEmail);
-                            }
-                        }
-                )
-                .build();
+        EmailPayload emailPayload = new EmailPayload();
+        emailPayload.setLocale(locale);
+        emailPayload.setType(Constants.EMAIL_TYPE.RESET_PASSWORD);
+        emailPayload.setTemplateName("mail/resetPassword");
+        emailPayload.setRecipientEmail(recipientEmail);
+        emailPayload.setSubject(JakdukUtils.getMessageSource("email.user.password.reset.subject"));
+        emailPayload.setExtra(
+                new HashMap<String, String>() {
+                    {
+                        put("host", host);
+                    }
+                }
+        );
+        emailPayload.setBody(
+                new HashMap<String, Object>() {
+                    {
+                        put("email", recipientEmail);
+                    }
+                }
+        );
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(EmailRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
         this.publishEmail(routingKey, emailPayload);
@@ -89,16 +87,15 @@ public class RabbitMQPublisher {
     public void indexDocumentArticle(String id, Integer seq, String board, String category, CommonWriter writer, String subject,
                                      String content, List<String> galleryIds) {
 
-        EsArticle esArticle = EsArticle.builder()
-                .id(id)
-                .seq(seq)
-                .board(board)
-                .category(category)
-                .writer(writer)
-                .subject(JakdukUtils.stripHtmlTag(subject))
-                .content(JakdukUtils.stripHtmlTag(content))
-                .galleries(galleryIds)
-                .build();
+        EsArticle esArticle = new EsArticle();
+        esArticle.setId(id);
+        esArticle.setSeq(seq);
+        esArticle.setBoard(board);
+        esArticle.setCategory(category);
+        esArticle.setWriter(writer);
+        esArticle.setSubject(JakdukUtils.stripHtmlTag(subject));
+        esArticle.setContent(JakdukUtils.stripHtmlTag(content));
+        esArticle.setGalleries(galleryIds);
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE.getRoutingKey());
         this.publishElasticsearch(routingKey, esArticle);
@@ -111,13 +108,11 @@ public class RabbitMQPublisher {
 
     public void indexDocumentComment(String id, ArticleItem articleItem, CommonWriter writer, String content, List<String> galleryIds) {
 
-        EsComment esComment = EsComment.builder()
-                .id(id)
-                .article(articleItem)
-                .writer(writer)
-                .content(JakdukUtils.stripHtmlTag(content))
-                .galleries(galleryIds)
-                .build();
+        EsComment esComment = new EsComment();
+        esComment.setId(id);
+        esComment.setArticle(articleItem);
+        esComment.setContent(JakdukUtils.stripHtmlTag(content));
+        esComment.setGalleries(galleryIds);
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT.getRoutingKey());
         this.publishElasticsearch(routingKey, esComment);
@@ -129,11 +124,10 @@ public class RabbitMQPublisher {
     }
 
     public void indexDocumentGallery(String id, CommonWriter writer, String name) {
-        EsGallery esGallery = EsGallery.builder()
-                .id(id)
-                .writer(writer)
-                .name(name)
-                .build();
+        EsGallery esGallery = new EsGallery();
+        esGallery.setId(id);
+        esGallery.setWriter(writer);
+        esGallery.setName(name);
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_GALLERY.getRoutingKey());
         this.publishElasticsearch(routingKey, esGallery);
@@ -145,11 +139,10 @@ public class RabbitMQPublisher {
     }
 
     public void indexDocumentSearchWord(String word, CommonWriter writer) {
-        EsSearchWord esSearchWord = EsSearchWord.builder()
-                .word(word)
-                .writer(Objects.nonNull(writer) ? new SimpleWriter(writer) : null)
-                .registerDate(LocalDateTime.now())
-                .build();
+        EsSearchWord esSearchWord = new EsSearchWord();
+        esSearchWord.setWord(word);
+        esSearchWord.setWriter(Objects.nonNull(writer) ? new SimpleWriter(writer) : null);
+        esSearchWord.setRegisterDate(LocalDateTime.now());
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD.getRoutingKey());
         this.publishElasticsearch(routingKey, esSearchWord);

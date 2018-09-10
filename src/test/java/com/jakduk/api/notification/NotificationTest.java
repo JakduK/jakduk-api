@@ -40,19 +40,18 @@ public class NotificationTest extends ApiApplicationTests {
     @Test
     public void 가입메일() throws MessagingException {
 
-        EmailPayload emailPayload = EmailPayload.builder()
-                .locale(Locale.KOREAN)
-                .type(Constants.EMAIL_TYPE.WELCOME)
-                .recipientEmail("phjang1983@daum.net")
-                .subject("가입 메일 연습")
-                .body(
-                        new HashMap<String, Object>() {
-                            {
-                                put("username", "이은상");
-                            }
-                        }
-                )
-                .build();
+        EmailPayload emailPayload = new EmailPayload();
+        emailPayload.setLocale(Locale.KOREAN);
+        emailPayload.setType(Constants.EMAIL_TYPE.WELCOME);
+        emailPayload.setRecipientEmail("phjang1983@daum.net");
+        emailPayload.setSubject("가입 메일 연습");
+        emailPayload.setBody(
+                new HashMap<String, Object>() {
+                    {
+                        put("username", "이은상");
+                    }
+                }
+        );
 
         emailService.sendBulk(emailPayload);
     }
@@ -61,26 +60,25 @@ public class NotificationTest extends ApiApplicationTests {
     @Test
     public void 비밀번호_갱신() throws MessagingException {
 
-        EmailPayload emailPayload = EmailPayload.builder()
-                .locale(Locale.KOREA)
-                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
-                .recipientEmail("phjang1983@daum.net")
-                .subject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"))
-                .extra(
-                        new HashMap<String, String>() {
-                            {
-                                put("host", "http://localhost:8080");
-                            }
-                        }
-                )
-                .body(
-                        new HashMap<String, Object>() {
-                            {
-                                put("email", "phjang1983@daum.net");
-                            }
-                        }
-                )
-                .build();
+        EmailPayload emailPayload = new EmailPayload();
+        emailPayload.setLocale(Locale.KOREA);
+        emailPayload.setType(Constants.EMAIL_TYPE.RESET_PASSWORD);
+        emailPayload.setRecipientEmail("phjang1983@daum.net");
+        emailPayload.setSubject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"));
+        emailPayload.setExtra(
+                new HashMap<String, String>() {
+                    {
+                        put("host", "http://localhost:8080");
+                    }
+                }
+        );
+        emailPayload.setBody(
+                new HashMap<String, Object>() {
+                    {
+                        put("email", "phjang1983@daum.net");
+                    }
+                }
+        );
 
         emailService.sendResetPassword(emailPayload);
     }
@@ -89,20 +87,19 @@ public class NotificationTest extends ApiApplicationTests {
     @Test
     public void testSendBulk() throws MessagingException {
 
-        EmailPayload emailPayload = EmailPayload.builder()
-                .locale(Locale.KOREAN)
-                .type(Constants.EMAIL_TYPE.BULK)
-                .templateName("mail/bulk01")
-                .recipientEmail("phjang1983@daum.net")
-                .subject("단체 메일 연습")
-                .body(
-                        new HashMap<String, Object>() {
-                            {
-                                put("username", "이은상");
-                            }
-                        }
-                )
-                .build();
+        EmailPayload emailPayload = new EmailPayload();
+        emailPayload.setLocale(Locale.KOREAN);
+        emailPayload.setType(Constants.EMAIL_TYPE.BULK);
+        emailPayload.setTemplateName("mail/bulk01");
+        emailPayload.setRecipientEmail("phjang1983@daum.net");
+        emailPayload.setSubject("단체 메일 연습");
+        emailPayload.setBody(
+                new HashMap<String, Object>() {
+                    {
+                        put("username", "이은상");
+                    }
+                }
+        );
 
         emailService.sendBulk(emailPayload);
     }
@@ -111,19 +108,18 @@ public class NotificationTest extends ApiApplicationTests {
     @Test
     public void sendWelcomeWithRabbitMQ() throws InterruptedException {
 
-        EmailPayload emailPayload = EmailPayload.builder()
-                .locale(Locale.KOREAN)
-                .type(Constants.EMAIL_TYPE.WELCOME)
-                .recipientEmail("phjang1983@daum.net")
-                .subject("K리그 작두왕에 오신것을 환영합니다.")
-                .body(
-                        new HashMap<String, Object>() {
-                            {
-                                put("username", "이은상");
-                            }
-                        }
-                )
-                .build();
+        EmailPayload emailPayload = new EmailPayload();
+        emailPayload.setLocale(Locale.KOREAN);
+        emailPayload.setType(Constants.EMAIL_TYPE.WELCOME);
+        emailPayload.setRecipientEmail("phjang1983@daum.net");
+        emailPayload.setSubject("K리그 작두왕에 오신것을 환영합니다.");
+        emailPayload.setBody(
+                new HashMap<String, Object>() {
+                    {
+                        put("username", "이은상");
+                    }
+                }
+        );
 
         String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(EmailRoutingKey.EMAIL_WELCOME.getRoutingKey());
 
@@ -136,26 +132,25 @@ public class NotificationTest extends ApiApplicationTests {
     @Test
     public void sendResetPasswordWithRabbitMQ() throws InterruptedException {
 
-        EmailPayload emailPayload = EmailPayload.builder()
-                .locale(Locale.KOREA)
-                .type(Constants.EMAIL_TYPE.RESET_PASSWORD)
-                .recipientEmail("phjang1983@daum.net")
-                .subject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"))
-                .extra(
-                        new HashMap<String, String>() {
-                            {
-                                put("host", "http://localhost:8080");
-                            }
-                        }
-                )
-                .body(
-                        new HashMap<String, Object>() {
-                            {
-                                put("email", "phjang1983@daum.net");
-                            }
-                        }
-                )
-                .build();
+        EmailPayload emailPayload = new EmailPayload();
+        emailPayload.setLocale(Locale.KOREA);
+        emailPayload.setType(Constants.EMAIL_TYPE.RESET_PASSWORD);
+        emailPayload.setRecipientEmail("phjang1983@daum.net");
+        emailPayload.setSubject("jakduk.com-" + JakdukUtils.getMessageSource("email.user.password.reset.about"));
+        emailPayload.setExtra(
+                new HashMap<String, String>() {
+                    {
+                        put("host", "http://localhost:8080");
+                    }
+                }
+        );
+        emailPayload.setBody(
+                new HashMap<String, Object>() {
+                    {
+                        put("email", "phjang1983@daum.net");
+                    }
+                }
+        );
 
         String routingKey = jakdukProperties.getRabbitmq().getRoutingKeys().get(EmailRoutingKey.EMAIL_RESET_PASSWORD.getRoutingKey());
 
