@@ -148,7 +148,7 @@ public class ArticleService {
 			logs = new ArrayList<>();
 
 		ObjectId logId = new ObjectId();
-		logs.add(new BoardLog(logId.toString(), Constants.ARTICLE_LOG_TYPE.EDIT.name(), new SimpleWriter(writer)));
+		logs.add(new BoardLog(logId.toString(), Constants.ARTICLE_LOG_TYPE.EDIT.name(), new SimpleWriter(writer.getUserId(), writer.getUsername())));
 		article.setLogs(logs);
 
 		// lastUpdated
@@ -192,7 +192,7 @@ public class ArticleService {
                 histories = new ArrayList<>();
 
 			ObjectId boardHistoryId = new ObjectId();
-            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.ARTICLE_LOG_TYPE.DELETE.name(), new SimpleWriter(writer));
+            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.ARTICLE_LOG_TYPE.DELETE.name(), new SimpleWriter(writer.getUserId(), writer.getUsername()));
             histories.add(history);
 			article.setLogs(histories);
 
@@ -492,7 +492,7 @@ public class ArticleService {
 		List<BoardLog> logs = Optional.ofNullable(articleComment.getLogs())
 				.orElseGet(ArrayList::new);
 
-		logs.add(new BoardLog(new ObjectId().toString(), Constants.ARTICLE_COMMENT_LOG_TYPE.EDIT.name(), new SimpleWriter(writer)));
+		logs.add(new BoardLog(new ObjectId().toString(), Constants.ARTICLE_COMMENT_LOG_TYPE.EDIT.name(), new SimpleWriter(writer.getUserId(), writer.getUsername())));
 		articleComment.setLogs(logs);
 
 		articleCommentRepository.save(articleComment);
@@ -623,7 +623,7 @@ public class ArticleService {
 			histories = new ArrayList<>();
 
 		String historyType = isEnable ? Constants.ARTICLE_LOG_TYPE.ENABLE_NOTICE.name() : Constants.ARTICLE_LOG_TYPE.DISABLE_NOTICE.name();
-		histories.add(new BoardLog(new ObjectId().toString(), historyType, new SimpleWriter(writer)));
+		histories.add(new BoardLog(new ObjectId().toString(), historyType, new SimpleWriter(writer.getUserId(), writer.getUsername())));
 
 		article.setLogs(histories);
 
@@ -825,7 +825,7 @@ public class ArticleService {
 	 */
 	private List<BoardLog> initBoardLogs(ObjectId objectId, String type, CommonWriter writer) {
 		List<BoardLog> logs = new ArrayList<>();
-		BoardLog history = new BoardLog(objectId.toString(), type, new SimpleWriter(writer));
+		BoardLog history = new BoardLog(objectId.toString(), type, new SimpleWriter(writer.getUserId(), writer.getUsername()));
 		logs.add(history);
 
 		return logs;

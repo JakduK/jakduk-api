@@ -71,11 +71,10 @@ public class HomeMvcTests {
 
     @Before
     public void setUp() {
-        commonWriter = CommonWriter.builder()
-                .userId("571ccf50ccbfc325b20711c5")
-                .username("test07")
-                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
-                .build();
+        commonWriter = new CommonWriter();
+        commonWriter.setUserId("571ccf50ccbfc325b20711c5");
+        commonWriter.setUsername("test07");
+        commonWriter.setProviderId(Constants.ACCOUNT_TYPE.JAKDUK);
 
         List<BoardCategory> categories = BoardCategoryGenerator.getCategories(Constants.BOARD_TYPE.FOOTBALL, JakdukUtils.getLocale());
 

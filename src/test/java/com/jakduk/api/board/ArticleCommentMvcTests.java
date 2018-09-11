@@ -87,11 +87,10 @@ public class ArticleCommentMvcTests {
 
     @Before
     public void setUp(){
-        commonWriter = CommonWriter.builder()
-                .userId("571ccf50ccbfc325b20711c5")
-                .username("test07")
-                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
-                .build();
+        commonWriter = new CommonWriter();
+        commonWriter.setUserId("571ccf50ccbfc325b20711c5");
+        commonWriter.setUsername("test07");
+        commonWriter.setProviderId(Constants.ACCOUNT_TYPE.JAKDUK);
 
         List<CommonFeelingUser> commonFeelingUsers = Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05"));
 

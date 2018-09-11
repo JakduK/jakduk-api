@@ -666,17 +666,8 @@ public class AdminRestController {
 		if (Objects.isNull(footballClubOrigin))
 			throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
 
-		LocalName footballClubNameKr = LocalName.builder()
-			.language(Locale.KOREAN.getLanguage())
-			.fullName(request.getFullNameKr())
-			.shortName(request.getShortNameKr())
-			.build();
-
-		LocalName footballClubNameEn = LocalName.builder()
-			.language(Locale.ENGLISH.getLanguage())
-			.fullName(request.getFullNameEn())
-			.shortName(request.getShortNameEn())
-			.build();
+		LocalName footballClubNameKr = new LocalName(Locale.KOREAN.getLanguage(), request.getFullNameKr(), request.getShortNameKr());
+		LocalName footballClubNameEn = new LocalName(Locale.ENGLISH.getLanguage(), request.getFullNameEn(), request.getShortNameEn());
 
 		ArrayList<LocalName> names = new ArrayList<>();
 		names.add(footballClubNameKr);

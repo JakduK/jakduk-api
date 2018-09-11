@@ -423,16 +423,16 @@ public class AdminService {
 		competition.setCode(competitionWrite.getCode());
 
 		ArrayList<LocalName> names = new ArrayList<LocalName>();
-		names.add(LocalName.builder()
-				.language(Locale.KOREAN.getLanguage())
-				.shortName(competitionWrite.getShortNameKr())
-				.fullName(competitionWrite.getFullNameKr())
-				.build());
-		names.add(LocalName.builder()
-				.language(Locale.ENGLISH.getLanguage())
-				.shortName(competitionWrite.getShortNameEn())
-				.fullName(competitionWrite.getFullNameEn())
-				.build());
+		names.add(new LocalName() {{
+			setLanguage(Locale.KOREAN.getLanguage());
+			setShortName(competitionWrite.getShortNameKr());
+			setFullName(competitionWrite.getFullNameKr());
+		}});
+		names.add(new LocalName() {{
+			setLanguage(Locale.ENGLISH.getLanguage());
+			setShortName(competitionWrite.getShortNameEn());
+			setFullName(competitionWrite.getFullNameEn());
+		}});
 		competition.setNames(names);
 
 		return competitionRepository.save(competition);

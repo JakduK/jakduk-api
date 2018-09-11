@@ -141,7 +141,7 @@ public class RabbitMQPublisher {
     public void indexDocumentSearchWord(String word, CommonWriter writer) {
         EsSearchWord esSearchWord = new EsSearchWord();
         esSearchWord.setWord(word);
-        esSearchWord.setWriter(Objects.nonNull(writer) ? new SimpleWriter(writer) : null);
+        esSearchWord.setWriter(Objects.nonNull(writer) ? new SimpleWriter(writer.getUserId(), writer.getUsername()) : null);
         esSearchWord.setRegisterDate(LocalDateTime.now());
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD.getRoutingKey());

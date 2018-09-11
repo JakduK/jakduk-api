@@ -63,12 +63,14 @@ public class BoardCategoryGenerator {
     public static List<BoardCategory> getCategories(Constants.BOARD_TYPE boardType, Locale locale) {
 		return Category.list(boardType)
 				.stream()
-				.map(category -> BoardCategory.builder()
-						.code(category.name())
-						.names(category.names.stream()
-								.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
-								.collect(Collectors.toList()))
-						.build())
+				.map(category -> new BoardCategory() {{
+							setCode(category.name());
+							setNames(
+									category.names.stream()
+											.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
+											.collect(Collectors.toList()));
+						}}
+				)
 				.collect(Collectors.toList());
 	}
 
@@ -84,12 +86,13 @@ public class BoardCategoryGenerator {
 					.stream()
 					.filter(category -> category.equals(targetCategory))
 					.findFirst()
-					.map(category -> BoardCategory.builder()
-							.code(category.name())
-							.names(category.names.stream()
-									.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
-									.collect(Collectors.toList()))
-							.build()
+					.map(category -> new BoardCategory() {{
+								setCode(category.name());
+								setNames(
+										category.names.stream()
+												.filter(localSimpleName -> locale.getLanguage().equals(localSimpleName.getLanguage()))
+												.collect(Collectors.toList()));
+							}}
 					)
 					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
 		}

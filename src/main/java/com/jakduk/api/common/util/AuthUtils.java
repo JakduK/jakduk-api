@@ -187,12 +187,13 @@ public class AuthUtils {
         SessionUser sessionUser = getAuthUserProfile();
 
         if (Objects.nonNull(sessionUser)) {
-            return CommonWriter.builder()
-                    .userId(sessionUser.getId())
-                    .username(sessionUser.getUsername())
-                    .providerId(sessionUser.getProviderId())
-                    .picture(sessionUser.getPicture())
-                    .build();
+            CommonWriter commonWriter = new CommonWriter();
+            commonWriter.setUserId(sessionUser.getId());
+            commonWriter.setUsername(sessionUser.getUsername());
+            commonWriter.setProviderId(sessionUser.getProviderId());
+            commonWriter.setPicture(sessionUser.getPicture());
+
+            return commonWriter;
         } else {
             return null;
         }

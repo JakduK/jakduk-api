@@ -48,7 +48,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -386,10 +385,7 @@ public class GalleryService {
 	public void processLinkedGalleries(String userId, List<Gallery> galleries, List<GalleryOnBoard> galleriesForInsertion,
 									   List<String> galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE fromType, String itemId) {
 
-		LinkedItem linkedItem = LinkedItem.builder()
-				.id(itemId)
-				.from(fromType)
-				.build();
+		LinkedItem linkedItem = new LinkedItem(itemId, fromType);
 
 		// Galleries 와 해당 Item을 연결 한다.
 		galleries.forEach(gallery -> {
