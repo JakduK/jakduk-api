@@ -137,11 +137,7 @@ public class HomeMvcTests {
         );
 
         List<UserSimple> users = Arrays.asList(
-                UserSimple.builder()
-                        .id("571ccf50ccbfc325b20711c5")
-                        .username("test07")
-                        .about("안녕하세요. 반갑습니다.")
-                        .build()
+                new UserSimple("571ccf50ccbfc325b20711c5", "test07", "안녕하세요. 반갑습니다.")
         );
 
         HomeArticle article = HomeArticle.builder()

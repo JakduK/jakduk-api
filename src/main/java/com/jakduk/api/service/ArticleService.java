@@ -88,19 +88,18 @@ public class ArticleService {
 
 		ObjectId objectId = new ObjectId();
 
-		Article article = Article.builder()
-				.writer(writer)
-				.board(board.name())
-				.category(Constants.BOARD_TYPE.FREE.equals(board) ? null : categoryCode)
-				.subject(subject)
-				.content(content)
-				.shortContent(shortContent)
-				.views(0)
-				.seq(commonService.getNextSequence(Constants.SEQ_BOARD))
-				.logs(this.initBoardLogs(objectId, Constants.ARTICLE_LOG_TYPE.CREATE.name(), writer))
-				.lastUpdated(LocalDateTime.ofInstant(objectId.getDate().toInstant(), ZoneId.systemDefault()))
-				.linkedGallery(linkedGallery)
-				.build();
+		Article article = new Article();
+		article.setWriter(writer);
+		article.setBoard(board.name());
+		article.setCategory(Constants.BOARD_TYPE.FREE.equals(board) ? null : categoryCode);
+		article.setSubject(subject);
+		article.setContent(content);
+		article.setShortContent(shortContent);
+		article.setViews(0);
+		article.setSeq(commonService.getNextSequence(Constants.SEQ_BOARD));
+		article.setLogs(this.initBoardLogs(objectId, Constants.ARTICLE_LOG_TYPE.CREATE.name(), writer));
+		article.setLastUpdated(LocalDateTime.ofInstant(objectId.getDate().toInstant(), ZoneId.systemDefault()));
+		article.setLinkedGallery(linkedGallery);
 
 		articleRepository.save(article);
 

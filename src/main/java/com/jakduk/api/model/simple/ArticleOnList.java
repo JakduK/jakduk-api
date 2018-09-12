@@ -3,7 +3,6 @@ package com.jakduk.api.model.simple;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     : 각종 목록에서 쓰임
  */
 
-@Getter
 @Document(collection = Constants.COLLECTION_ARTICLE)
 public class ArticleOnList {
 	
@@ -30,4 +28,43 @@ public class ArticleOnList {
 	private String shortContent;
 	private Boolean linkedGallery;
 
+	public String getId() {
+		return id;
+	}
+
+	public Integer getSeq() {
+		return seq;
+	}
+
+	public String getBoard() {
+		return board;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public ArticleStatus getStatus() {
+		return status;
+	}
+
+	public CommonWriter getWriter() {
+		return writer;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public Integer getViews() {
+		return views;
+	}
+
+	public String getShortContent() {
+		return shortContent;
+	}
+
+	public Boolean getLinkedGallery() {
+		return linkedGallery;
+	}
 }

@@ -9,9 +9,20 @@ import lombok.Getter;
 * @desc     :
 */
 
-@Getter
 public class BoardFeelingCount {
     private String id;
 	private Integer usersLikingCount;
 	private Integer usersDislikingCount;
+
+	public String getId() {
+		return id;
+	}
+
+	public Integer getUsersLikingCount() {
+		return usersLikingCount;
+	}
+
+	public Integer getUsersDislikingCount() {
+		return usersDislikingCount;
+	}
 }

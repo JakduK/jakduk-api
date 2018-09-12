@@ -102,23 +102,22 @@ public class ArticleMvcTests {
 
         categoriesMap.put("ALL", JakdukUtils.getMessageSource("board.category.all"));
 
-        article = Article.builder()
-                .id("59c8879fa2b594c5d33e6ac4")
-                .seq(2)
-                .writer(commonWriter)
-                .subject("글 제목입니다.")
-                .content("내용입니다. 아주 길 수도 있음.")
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .category(boardCategory.getCode())
-                .views(15)
-                .usersLiking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
-                .usersDisliking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")))
-                .status(new ArticleStatus(false, false))
-                .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
-                .shortContent("본문입니다. (100자)")
-                .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
-                .linkedGallery(true)
-                .build();
+        article = new Article();
+        article.setId("59c8879fa2b594c5d33e6ac4");
+        article.setSeq(2);
+        article.setWriter(commonWriter);
+        article.setSubject("글 제목입니다.");
+        article.setContent("내용입니다. 아주 길 수도 있음.");
+        article.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
+        article.setCategory(boardCategory.getCode());
+        article.setViews(15);
+        article.setUsersLiking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")));
+        article.setUsersDisliking(Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05")));
+        article.setStatus(new ArticleStatus(false, false));
+        article.setLogs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))));
+        article.setShortContent("본문입니다. (100자)");
+        article.setLastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"));
+        article.setLinkedGallery(true);
 
         GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
 
@@ -235,26 +234,26 @@ public class ArticleMvcTests {
     public void getTopsTest() throws Exception {
 
         List<BoardTop> expectTopLikes = Arrays.asList(
-                BoardTop.builder()
-                        .id("58b7b9dd716dce06b10e449a")
-                        .seq(1)
-                        .subject("인기있는 글 제목")
-                        .count(5)
-                        .views(100)
-                        .build()
+                new BoardTop() {{
+                    setId("58b7b9dd716dce06b10e449a");
+                    setSeq(1);
+                    setSubject("인기있는 글 제목");
+                    setCount(5);
+                    setViews(100);
+                }}
         );
 
         when(articleService.getArticlesTopLikes(any(Constants.BOARD_TYPE.class), any(ObjectId.class)))
                 .thenReturn(expectTopLikes);
 
         List<BoardTop> expectTopComments = Arrays.asList(
-                BoardTop.builder()
-                        .id("58b7b9dd716dce06b10e449a")
-                        .seq(2)
-                        .subject("댓글많은 글 제목")
-                        .count(10)
-                        .views(150)
-                        .build()
+                new BoardTop() {{
+                    setId("58b7b9dd716dce06b10e449a");
+                    setSeq(2);
+                    setSubject("댓글많은 글 제목");
+                    setCount(10);
+                    setViews(150);
+                }}
         );
 
         when(articleService.getArticlesTopComments(any(Constants.BOARD_TYPE.class), any(ObjectId.class)))
@@ -328,21 +327,19 @@ public class ArticleMvcTests {
         );
         articleDetail.setMyFeeling(Constants.FEELING_TYPE.LIKE);
 
-        ArticleSimple prevPost = ArticleSimple.builder()
-                .id("59c88b2ea2b594ca18fecf05")
-                .seq(286)
-                .subject("이전 글 제목")
-                .writer(commonWriter)
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .build();
+        ArticleSimple prevPost = new ArticleSimple();
+        prevPost.setId("59c88b2ea2b594ca18fecf05");
+        prevPost.setSeq(286);
+        prevPost.setSubject("이전 글 제목");
+        prevPost.setWriter(commonWriter);
+        prevPost.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
 
-        ArticleSimple nextPost = ArticleSimple.builder()
-                .id("59c8879fa2b594c5d33e6ac4")
-                .seq(285)
-                .subject("다음 글 제목")
-                .writer(commonWriter)
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .build();
+        ArticleSimple nextPost = new ArticleSimple();
+        nextPost.setId("59c8879fa2b594c5d33e6ac4");
+        nextPost.setSeq(285);
+        nextPost.setSubject("다음 글 제목");
+        nextPost.setWriter(commonWriter);
+        nextPost.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
 
         LatestArticle latestArticle = LatestArticle.builder()
                 .id("58e9959b807d71113a999c6e")

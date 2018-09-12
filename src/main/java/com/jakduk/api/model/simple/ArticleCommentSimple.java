@@ -3,7 +3,6 @@ package com.jakduk.api.model.simple;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,10 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
 @Document(collection = Constants.COLLECTION_ARTICLE_COMMENT)
 public class ArticleCommentSimple {
 	
@@ -25,6 +20,25 @@ public class ArticleCommentSimple {
 	private String id;
 	private ArticleItem article;
 	private CommonWriter writer;
-	@Setter private String content;
+	private String content;
 
+	public String getId() {
+		return id;
+	}
+
+	public ArticleItem getArticle() {
+		return article;
+	}
+
+	public CommonWriter getWriter() {
+		return writer;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
 }

@@ -98,23 +98,22 @@ public class ArticleCommentMvcTests {
 
         boardCategory = categories.get(0);
 
-        article = Article.builder()
-                .id("59c8879fa2b594c5d33e6ac4")
-                .seq(2)
-                .writer(commonWriter)
-                .subject("글 제목입니다.")
-                .content("내용입니다. 아주 길 수도 있음.")
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .category(boardCategory.getCode())
-                .views(15)
-                .usersLiking(commonFeelingUsers)
-                .usersDisliking(commonFeelingUsers)
-                .status(new ArticleStatus(false, false))
-                .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
-                .shortContent("본문입니다. (100자)")
-                .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
-                .linkedGallery(true)
-                .build();
+        article = new Article();
+        article.setId("59c8879fa2b594c5d33e6ac4");
+        article.setSeq(2);
+        article.setWriter(commonWriter);
+        article.setSubject("글 제목입니다.");
+        article.setContent("내용입니다. 아주 길 수도 있음.");
+        article.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
+        article.setCategory(boardCategory.getCode());
+        article.setViews(15);
+        article.setUsersLiking(commonFeelingUsers);
+        article.setUsersDisliking(commonFeelingUsers);
+        article.setStatus(new ArticleStatus(false, false));
+        article.setLogs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))));
+        article.setShortContent("본문입니다. (100자)");
+        article.setLastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"));
+        article.setLinkedGallery(true);
 
         articleComment = ArticleComment.builder()
                 .id("54b5058c3d96b205dc7e2809")
