@@ -124,17 +124,17 @@ public class ArticleMvcTests {
         writeArticleForm = new WriteArticle("제목입니다.", "내용입니다.", boardCategory.getCode(), Arrays.asList(galleryOnBoard));
 
         galleries = Arrays.asList(
-                Gallery.builder()
-                        .id(galleryOnBoard.getId())
-                        .name(galleryOnBoard.getName())
-                        .fileName("Cat Profile-48.png")
-                        .contentType("image/png")
-                        .writer(commonWriter)
-                        .size(1149L)
-                        .fileSize(1870L)
-                        .status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
-                        .hash("7eb65b85521d247ab4c5f79e279c03db")
-                        .build()
+                new Gallery() {{
+                    setId(galleryOnBoard.getId());
+                    setName(galleryOnBoard.getName());
+                    setFileName("Cat Profile-48.png");
+                    setContentType("image/png");
+                    setWriter(commonWriter);
+                    setSize(1149L);
+                    setFileSize(1870L);
+                    setStatus(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP));
+                    setHash("7eb65b85521d247ab4c5f79e279c03db");
+                }}
         );
 
         simpleGalleries = Arrays.asList(

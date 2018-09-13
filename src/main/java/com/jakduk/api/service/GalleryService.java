@@ -226,15 +226,14 @@ public class GalleryService {
 		if (oGallery.isPresent())
 			return oGallery.get();
 
-		Gallery gallery = Gallery.builder()
-				.contentType(contentType)
-				.writer(writer)
-				.status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
-				.fileName(fileName)
-				.size(size)
-				.fileSize(size)
-				.hash(DigestUtils.md5DigestAsHex(bytes))
-				.build();
+		Gallery gallery = new Gallery();
+		gallery.setContentType(contentType);
+		gallery.setWriter(writer);
+		gallery.setStatus(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP));
+		gallery.setFileName(fileName);
+		gallery.setSize(size);
+		gallery.setFileSize(size);
+		gallery.setHash(DigestUtils.md5DigestAsHex(bytes));
 
 		galleryRepository.save(gallery);
 

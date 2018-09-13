@@ -115,16 +115,19 @@ public class ArticleCommentMvcTests {
         article.setLastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"));
         article.setLinkedGallery(true);
 
-        articleComment = ArticleComment.builder()
-                .id("54b5058c3d96b205dc7e2809")
-                .article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
-                .writer(commonWriter)
-                .content("댓글 내용입니다.")
-                .usersLiking(commonFeelingUsers)
-                .usersDisliking(commonFeelingUsers)
-                .linkedGallery(true)
-                .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
-                .build();
+        articleComment = new ArticleComment();
+        articleComment.setId("54b5058c3d96b205dc7e2809");
+        articleComment.setArticle(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()));
+        articleComment.setWriter(commonWriter);
+        articleComment.setContent("댓글 내용입니다.");
+        articleComment.setUsersLiking(commonFeelingUsers);
+        articleComment.setUsersDisliking(commonFeelingUsers);
+        articleComment.setLinkedGallery(true);
+        articleComment.setLogs(
+                Arrays.asList(
+                        new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05")))
+        );
+
 
         List<BoardGallerySimple> articleGalleries = Arrays.asList(
                 BoardGallerySimple.builder()
@@ -164,17 +167,17 @@ public class ArticleCommentMvcTests {
         GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
 
         galleries = Arrays.asList(
-                Gallery.builder()
-                        .id(galleryOnBoard.getId())
-                        .name(galleryOnBoard.getName())
-                        .fileName("Cat Profile-48.png")
-                        .contentType("image/png")
-                        .writer(commonWriter)
-                        .size(1149L)
-                        .fileSize(1870L)
-                        .status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
-                        .hash("7eb65b85521d247ab4c5f79e279c03db")
-                        .build()
+                new Gallery() {{
+                    setId(galleryOnBoard.getId());
+                    setName(galleryOnBoard.getName());
+                    setFileName("Cat Profile-48.png");
+                    setContentType("image/png");
+                    setWriter(commonWriter);
+                    setSize(1149L);
+                    setFileSize(1870L);
+                    setStatus(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP));
+                    setHash("7eb65b85521d247ab4c5f79e279c03db");
+                }}
         );
 
         writeArticleComment = WriteArticleComment.builder()

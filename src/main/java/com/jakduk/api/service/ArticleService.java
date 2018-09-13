@@ -454,13 +454,12 @@ public class ArticleService {
 				.map(Gallery::getId)
 				.collect(Collectors.toList());
 
-		ArticleComment articleComment = ArticleComment.builder()
-				.article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
-				.writer(writer)
-				.content(content)
-				.linkedGallery(! galleries.isEmpty())
-				.logs(this.initBoardLogs(new ObjectId(), Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), writer))
-				.build();
+		ArticleComment articleComment = new ArticleComment();
+		articleComment.setArticle(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()));
+		articleComment.setWriter(writer);
+		articleComment.setContent(content);
+		articleComment.setLinkedGallery(! galleries.isEmpty());
+		articleComment.setLogs(this.initBoardLogs(new ObjectId(), Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), writer));
 
 		articleCommentRepository.save(articleComment);
 

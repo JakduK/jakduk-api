@@ -91,23 +91,22 @@ public class UserMvcTests {
 
     @Before
     public void setUp(){
-        FootballClubOrigin footballClubOrigin = FootballClubOrigin.builder()
-                .id("54e1d2a58bf86df3fe819871")
-                .name("SEONGNAM")
-                .clubType(Constants.CLUB_TYPE.FOOTBALL_CLUB)
-                .age(Constants.CLUB_AGE.SENIOR)
-                .sex(Constants.CLUB_SEX.MEN)
-                .build();
+        FootballClubOrigin footballClubOrigin = new FootballClubOrigin();
+        footballClubOrigin.setId("54e1d2a58bf86df3fe819871");
+        footballClubOrigin.setName("SEONGNAM");
+        footballClubOrigin.setClubType(Constants.CLUB_TYPE.FOOTBALL_CLUB);
+        footballClubOrigin.setAge(Constants.CLUB_AGE.SENIOR);
+        footballClubOrigin.setSex(Constants.CLUB_SEX.MEN);
 
-        this.footballClub = FootballClub.builder()
-                .id("54e1d2c68bf86df3fe819874")
-                .origin(footballClubOrigin)
-                .active("active")
-                .names(Arrays.asList(
+        this.footballClub = new FootballClub();
+        footballClub.setId("54e1d2c68bf86df3fe819874");
+        footballClub.setOrigin(footballClubOrigin);
+        footballClub.setActive("active");
+        footballClub.setNames(
+                Arrays.asList(
                         new LocalName(Locale.KOREAN.getLanguage(), "성남FC", "성남"),
-                        new LocalName(Locale.ENGLISH.getLanguage(), "SEONGNAM FC", "SEONGNAM")
-                ))
-                .build();
+                        new LocalName(Locale.ENGLISH.getLanguage(), "SEONGNAM FC", "SEONGNAM"))
+        );
 
         this.userPicture = UserPicture.builder()
                 .id("58b3bd86d6d83b06dac29a69")
