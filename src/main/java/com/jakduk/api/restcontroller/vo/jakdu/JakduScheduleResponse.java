@@ -1,11 +1,7 @@
 package com.jakduk.api.restcontroller.vo.jakdu;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.jakduk.api.model.db.JakduSchedule;
 import com.jakduk.api.model.embedded.LocalName;
-import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
@@ -15,13 +11,32 @@ import java.util.Map;
  * 16. 3. 26 오후 11:28
  */
 
-@Data
-@JsonTypeName(value = "response")
-@JsonTypeInfo(use=JsonTypeInfo.Id.NONE, include= JsonTypeInfo.As.WRAPPER_OBJECT)
 public class JakduScheduleResponse {
     private Map<String, LocalName> fcNames;
     private Map<String, LocalName> competitionNames;
+    private List<JakduSchedule> schedules;
 
-    @JsonProperty(value = "schedules")
-    private List<JakduSchedule> jakduSchedules;
+    public Map<String, LocalName> getFcNames() {
+        return fcNames;
+    }
+
+    public void setFcNames(Map<String, LocalName> fcNames) {
+        this.fcNames = fcNames;
+    }
+
+    public Map<String, LocalName> getCompetitionNames() {
+        return competitionNames;
+    }
+
+    public void setCompetitionNames(Map<String, LocalName> competitionNames) {
+        this.competitionNames = competitionNames;
+    }
+
+    public List<JakduSchedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<JakduSchedule> schedules) {
+        this.schedules = schedules;
+    }
 }

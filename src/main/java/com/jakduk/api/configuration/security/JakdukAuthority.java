@@ -2,7 +2,6 @@ package com.jakduk.api.configuration.security;
 
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import lombok.Getter;
 
 import java.util.Arrays;
 
@@ -13,7 +12,6 @@ import java.util.Arrays;
  * @desc     : 
  */
 
-@Getter
 public enum JakdukAuthority {
 
 	ROLE_USER_01(10), // 이메일 미인증 회원
@@ -35,4 +33,7 @@ public enum JakdukAuthority {
 				.orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
 	}
 
+	public Integer getCode() {
+		return code;
+	}
 }

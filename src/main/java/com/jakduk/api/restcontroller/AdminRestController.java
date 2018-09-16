@@ -10,7 +10,8 @@ import com.jakduk.api.service.AdminService;
 import com.jakduk.api.service.CommonService;
 import com.jakduk.api.service.CompetitionService;
 import com.jakduk.api.service.StatsService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -27,10 +28,11 @@ import java.util.*;
  *         16. 5. 8 오후 11:26
  */
 
-@Slf4j
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private CommonService commonService;

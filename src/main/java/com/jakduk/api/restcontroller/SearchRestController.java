@@ -5,9 +5,9 @@ import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.vo.search.PopularSearchWordResult;
 import com.jakduk.api.restcontroller.vo.search.SearchUnifiedResponse;
 import com.jakduk.api.service.SearchService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 
 /**
@@ -26,11 +27,12 @@ import java.time.LocalDate;
 * @desc     :
 */
 
-@Slf4j
 @Validated
 @RequestMapping("/api/search")
 @RestController
 public class SearchRestController {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired private RabbitMQPublisher rabbitMQPublisher;
 	@Autowired private SearchService searchService;

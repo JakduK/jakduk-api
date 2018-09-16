@@ -16,7 +16,7 @@ import com.jakduk.api.restcontroller.vo.user.*;
 import com.jakduk.api.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

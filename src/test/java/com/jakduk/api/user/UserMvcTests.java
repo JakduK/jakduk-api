@@ -44,10 +44,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -182,13 +179,12 @@ public class UserMvcTests {
 
         this.whenCustomValdation();
 
-        AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
-                .username("daumUser01")
-                .providerId(Constants.ACCOUNT_TYPE.DAUM)
-                .providerUserId("abc123")
-                .externalSmallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
-                .externalLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
-                .build();
+        AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
+        attemptSocialUser.setUsername("daumUser01");
+        attemptSocialUser.setProviderId(Constants.ACCOUNT_TYPE.DAUM);
+        attemptSocialUser.setProviderUserId("abc123");
+        attemptSocialUser.setExternalSmallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
+        attemptSocialUser.setExternalLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
 
         MockHttpSession mockHttpSession = new MockHttpSession();
         mockHttpSession.setAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
@@ -306,20 +302,19 @@ public class UserMvcTests {
 
         String language = JakdukUtils.getLanguageCode();
 
-        UserProfileResponse expectResponse = UserProfileResponse.builder()
-                .email(jakdukUser.getEmail())
-                .username(jakdukUser.getUsername())
-                .about(jakdukUser.getAbout())
-                .providerId(jakdukUser.getProviderId())
-                .footballClubName(JakdukUtils.getLocalNameOfFootballClub(footballClub, language))
-                .picture(
+        UserProfileResponse expectResponse = new UserProfileResponse();
+        expectResponse.setEmail(jakdukUser.getEmail());
+        expectResponse.setUsername(jakdukUser.getUsername());
+        expectResponse.setAbout(jakdukUser.getAbout());
+        expectResponse.setProviderId(jakdukUser.getProviderId());
+        expectResponse.setFootballClubName(JakdukUtils.getLocalNameOfFootballClub(footballClub, language));
+        expectResponse.setPicture(
                         new UserPictureInfo(
                                 "597a0d53807d710f57420aa5",
                                 "https://dev-api.jakduk.com/user/picture/small/597a0d53807d710f57420aa5",
                                 "https://dev-api.jakduk.com/user/picture/597a0d53807d710f57420aa5"
-                        ))
-                .temporaryEmail(false)
-                .build();
+                        ));
+        expectResponse.setTemporaryEmail(false);
 
         when(userService.getProfileMe(anyString(), anyString()))
                 .thenReturn(expectResponse);
@@ -366,13 +361,13 @@ public class UserMvcTests {
         when(userProfileRepository.findByNEIdAndUsername(anyString(), anyString()))
                 .thenReturn(Optional.empty());
 
-        UserProfileEditForm form = UserProfileEditForm.builder()
-                .email(jakdukUser.getEmail())
-                .username(jakdukUser.getUsername())
-                .about(jakdukUser.getAbout())
-                .footballClub(footballClub.getId())
-                .userPictureId(userPicture.getId())
-                .build();
+        Map<String, Object> form = new HashMap<String, Object>() {{
+            put("email", jakdukUser.getEmail());
+            put("username", jakdukUser.getUsername());
+            put("about", jakdukUser.getAbout());
+            put("footballClub", footballClub.getId());
+            put("userPictureId", userPicture.getId());
+        }};
 
         when(userService.editUserProfile(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(jakdukUser);
@@ -414,11 +409,11 @@ public class UserMvcTests {
         when(userService.findUserOnPasswordUpdateById(anyString()))
                 .thenReturn(new UserOnPasswordUpdate(jakdukUser.getId(), jakdukUser.getPassword()));
 
-        UserPasswordForm form = UserPasswordForm.builder()
-                .password("1111")
-                .newPassword("1112")
-                .newPasswordConfirm("1112")
-                .build();
+        Map<String, Object> form = new HashMap<String, Object>() {{
+            put("password", "1111");
+            put("newPassword", "1112");
+            put("newPasswordConfirm", "1112");
+        }};
 
         doNothing().when(userService)
                 .updateUserPassword(anyString(), anyString());
@@ -519,15 +514,13 @@ public class UserMvcTests {
     @WithMockUser
     public void findPasswordTest() throws Exception {
 
-        UserPasswordFindForm form = UserPasswordFindForm.builder()
-                .email(jakdukUser.getEmail())
-                .callbackUrl("http://dev-wev.jakduk/find/password")
-                .build();
+        Map<String, Object> form = new HashMap<String, Object>() {{
+            put("email", jakdukUser.getEmail());
+            put("callbackUrl", "http://dev-wev.jakduk/find/password");
+        }};
 
-        UserPasswordFindResponse expectResponse = UserPasswordFindResponse.builder()
-                .subject(form.getEmail())
-                .message(JakdukUtils.getMessageSource("user.msg.reset.password.send.email"))
-                .build();
+        UserPasswordFindResponse expectResponse = new UserPasswordFindResponse(form.get("email").toString(),
+                JakdukUtils.getMessageSource("user.msg.reset.password.send.email"));
 
         when(userService.sendEmailToResetPassword(anyString(), anyString()))
                 .thenReturn(expectResponse);
@@ -559,15 +552,13 @@ public class UserMvcTests {
     @WithMockUser
     public void resetPasswordTest() throws Exception {
 
-        UserPasswordResetForm form = UserPasswordResetForm.builder()
-                .code("16948f83-1af8-4736-9e12-cf57f03a981c")
-                .password("1112")
-                .build();
+        Map<String, Object> form = new HashMap<String, Object>() {{
+            put("code", "16948f83-1af8-4736-9e12-cf57f03a981c");
+            put("password", "1112");
+        }};
 
-        UserPasswordFindResponse expectResponse = UserPasswordFindResponse.builder()
-                .subject(jakdukUser.getEmail())
-                .message(JakdukUtils.getMessageSource("user.msg.success.change.password"))
-                .build();
+        UserPasswordFindResponse expectResponse = new UserPasswordFindResponse(jakdukUser.getEmail(),
+                JakdukUtils.getMessageSource("user.msg.success.change.password"));
 
         when(userService.resetPasswordWithToken(anyString(), anyString()))
                 .thenReturn(expectResponse);
@@ -601,10 +592,7 @@ public class UserMvcTests {
 
         String code = "16948f83-1af8-4736-9e12-cf57f03a981c";
 
-        UserPasswordFindResponse expectResponse = UserPasswordFindResponse.builder()
-                .subject(jakdukUser.getEmail())
-                .message(code)
-                .build();
+        UserPasswordFindResponse expectResponse = new UserPasswordFindResponse(jakdukUser.getEmail(), code);
 
         when(userService.validPasswordTokenCode(anyString()))
                 .thenReturn(expectResponse);

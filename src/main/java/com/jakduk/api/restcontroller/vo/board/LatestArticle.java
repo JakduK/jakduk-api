@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.*;
 
 import java.util.List;
 
@@ -11,11 +10,6 @@ import java.util.List;
  * Created by pyohwanjang on 2017. 3. 10..
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
-@Setter
 public class LatestArticle {
 
     private String id; // 글ID
@@ -24,4 +18,43 @@ public class LatestArticle {
     private String subject; // 글제목
     private List<BoardGallerySimple> galleries; // 그림 목록
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Integer getSeq() {
+        return seq;
+    }
+
+    public void setSeq(Integer seq) {
+        this.seq = seq;
+    }
+
+    public CommonWriter getWriter() {
+        return writer;
+    }
+
+    public void setWriter(CommonWriter writer) {
+        this.writer = writer;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public List<BoardGallerySimple> getGalleries() {
+        return galleries;
+    }
+
+    public void setGalleries(List<BoardGallerySimple> galleries) {
+        this.galleries = galleries;
+    }
 }

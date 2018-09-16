@@ -41,10 +41,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -83,7 +80,7 @@ public class ArticleCommentMvcTests {
     private BoardCategory boardCategory;
     private List<GetArticleComment> articleComments;
     private List<Gallery> galleries;
-    private WriteArticleComment writeArticleComment;
+    private Map<String, Object> writeArticleComment;
 
     @Before
     public void setUp(){
@@ -130,10 +127,10 @@ public class ArticleCommentMvcTests {
 
 
         List<BoardGallerySimple> articleGalleries = Arrays.asList(
-                BoardGallerySimple.builder()
-                        .id("58b9050b807d714eaf50a111")
-                        .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                        .build()
+                new BoardGallerySimple() {{
+                    setId("58b9050b807d714eaf50a111");
+                    setThumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                }}
         );
 
         articleSimple = new ArticleSimple();
@@ -180,20 +177,17 @@ public class ArticleCommentMvcTests {
                 }}
         );
 
-        writeArticleComment = WriteArticleComment.builder()
-                .content(articleComment.getContent())
-                .galleries(Arrays.asList(galleryOnBoard))
-                .build();
+        writeArticleComment = new HashMap<String, Object>() {{
+            put("content", articleComment.getContent());
+            put("galleries", Arrays.asList(galleryOnBoard));
+        }};
     }
 
     @Test
     @WithMockJakdukUser
     public void getArticleDetailCommentsTest() throws Exception {
 
-        GetArticleDetailCommentsResponse expectResponse = GetArticleDetailCommentsResponse.builder()
-                .comments(articleComments)
-                .count(articleComments.size())
-                .build();
+        GetArticleDetailCommentsResponse expectResponse = new GetArticleDetailCommentsResponse(articleComments, articleComments.size());
 
         when(articleService.getArticleDetailComments(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString()))
                 .thenReturn(expectResponse);
@@ -343,11 +337,10 @@ public class ArticleCommentMvcTests {
         List<CommonFeelingUser> usersLiking = articleComment.getUsersLiking();
         List<CommonFeelingUser> usersDisliking = articleComment.getUsersDisliking();
 
-        UserFeelingResponse expectResponse = UserFeelingResponse.builder()
-                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
-                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
-                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
-                .build();
+        UserFeelingResponse expectResponse = new UserFeelingResponse();
+        expectResponse.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
+        expectResponse.setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
+        expectResponse.setNumberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
 
         mvc.perform(
                 post("/api/board/{board}/comment/{commentId}/{feeling}", articleComment.getArticle().getBoard().toLowerCase(),

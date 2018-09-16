@@ -9,7 +9,8 @@ import com.jakduk.api.model.db.Competition;
 import com.jakduk.api.restcontroller.vo.stats.SupportersDataResponse;
 import com.jakduk.api.service.CompetitionService;
 import com.jakduk.api.service.StatsService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +27,11 @@ import java.util.Objects;
  * 16. 3. 20 오후 11:25
  */
 
-@Slf4j
 @RestController
 @RequestMapping("/api/stats")
 public class StatsRestController {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private StatsService statsService;
@@ -83,10 +85,10 @@ public class StatsRestController {
         String language = JakdukUtils.getLanguageCode();
         Map<String, Object> data = statsService.getSupportersData(language);
 
-        return SupportersDataResponse.builder()
-          .supporters((List<SupporterCount>) data.get("supporters"))
-          .supportersTotal((Integer) data.get("supportersTotal"))
-          .usersTotal((Integer) data.get("usersTotal"))
-          .build();
+        return new SupportersDataResponse() {{
+            setSupporters((List<SupporterCount>) data.get("supporters"));
+            setSupportersTotal((Integer) data.get("supportersTotal"));
+            setUsersTotal((Integer) data.get("usersTotal"));
+        }};
     }
 }

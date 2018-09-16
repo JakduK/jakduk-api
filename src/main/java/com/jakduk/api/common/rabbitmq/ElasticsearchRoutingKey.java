@@ -2,7 +2,6 @@ package com.jakduk.api.common.rabbitmq;
 
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import lombok.Getter;
 
 import java.util.Arrays;
 
@@ -10,7 +9,6 @@ import java.util.Arrays;
  * Created by pyohwanjang on 2017. 7. 3..
  */
 
-@Getter
 public enum ElasticsearchRoutingKey  {
 
     ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE("elasticsearch-index-document-article"),
@@ -34,4 +32,7 @@ public enum ElasticsearchRoutingKey  {
                 .orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
     }
 
+    public String getRoutingKey() {
+        return routingKey;
+    }
 }

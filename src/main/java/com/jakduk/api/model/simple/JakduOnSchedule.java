@@ -1,7 +1,6 @@
 package com.jakduk.api.model.simple;
 
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.Data;
 
 /**
  * @author pyohwan

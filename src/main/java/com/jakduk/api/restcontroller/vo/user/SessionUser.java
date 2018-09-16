@@ -2,10 +2,6 @@ package com.jakduk.api.restcontroller.vo.user;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.UserPictureInfo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -16,10 +12,6 @@ import java.util.List;
  *         16. 7. 14 오전 12:21
  */
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@Getter
 public class SessionUser {
 
     private String id;
@@ -29,4 +21,51 @@ public class SessionUser {
     private List<String> roles;
     private UserPictureInfo picture;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Constants.ACCOUNT_TYPE getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(Constants.ACCOUNT_TYPE providerId) {
+        this.providerId = providerId;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
+    public UserPictureInfo getPicture() {
+        return picture;
+    }
+
+    public void setPicture(UserPictureInfo picture) {
+        this.picture = picture;
+    }
 }

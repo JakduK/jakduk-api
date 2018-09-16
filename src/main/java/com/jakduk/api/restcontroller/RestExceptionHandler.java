@@ -5,7 +5,8 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.restcontroller.vo.RestErrorResponse;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpHeaders;
@@ -39,10 +40,10 @@ import java.util.Set;
  * 16. 3. 4 오전 12:30
  */
 
-@Slf4j
 @ControllerAdvice("com.jakduk.api.restcontroller")
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
     /**

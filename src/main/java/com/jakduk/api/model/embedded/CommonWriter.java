@@ -1,10 +1,6 @@
 package com.jakduk.api.model.embedded;
 
 import com.jakduk.api.common.Constants;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * 공통으로 사용하는 작성자

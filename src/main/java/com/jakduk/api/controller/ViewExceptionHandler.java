@@ -5,7 +5,8 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.restcontroller.vo.RestErrorResponse;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,9 @@ import java.util.Map;
  */
 
 @ControllerAdvice("com.jakduk.api.controller")
-@Slf4j
 public class ViewExceptionHandler {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
     @ExceptionHandler({ ServiceException.class })

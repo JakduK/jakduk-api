@@ -138,8 +138,11 @@ public class ArticleMvcTests {
         );
 
         simpleGalleries = Arrays.asList(
-                new BoardGallerySimple("58b9050b807d714eaf50a111", "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111"));
-
+                new BoardGallerySimple() {{
+                    setId("58b9050b807d714eaf50a111");
+                    setThumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                }}
+        );
     }
 
     @Test
@@ -153,34 +156,32 @@ public class ArticleMvcTests {
         getArticle.setLikingCount(article.getUsersLiking().size());
         getArticle.setDislikingCount(article.getUsersDisliking().size());
 
-        GetArticle notice = GetArticle.builder()
-                .id("58b7b9dd716dce06b10e449a")
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .writer(commonWriter)
-                .subject("공지글 제목입니다.")
-                .seq(3)
-                .category(boardCategory.getCode())
-                .views(15)
-                .status(new ArticleStatus(true, false))
-                .galleries(simpleGalleries)
-                .shortContent("본문입니다. (100자)")
-                .commentCount(8)
-                .likingCount(10)
-                .dislikingCount(2)
-                .build();
+        GetArticle notice = new GetArticle();
+        notice.setId("58b7b9dd716dce06b10e449a");
+        notice.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
+        notice.setWriter(commonWriter);
+        notice.setSubject("공지글 제목입니다.");
+        notice.setSeq(3);
+        notice.setCategory(boardCategory.getCode());
+        notice.setViews(15);
+        notice.setStatus(new ArticleStatus(true, false));
+        notice.setGalleries(simpleGalleries);
+        notice.setShortContent("본문입니다. (100자)");
+        notice.setCommentCount(8);
+        notice.setLikingCount(10);
+        notice.setDislikingCount(2);
 
-        GetArticlesResponse expectResponse = GetArticlesResponse.builder()
-                .categories(categoriesMap)
-                .articles(Arrays.asList(getArticle))
-                .notices(Arrays.asList(notice))
-                .last(false)
-                .first(true)
-                .totalPages(50)
-                .size(20)
-                .number(0)
-                .numberOfElements(20)
-                .totalElements(1011L)
-                .build();
+        GetArticlesResponse expectResponse = new GetArticlesResponse();
+        expectResponse.setCategories(categoriesMap);
+        expectResponse.setArticles(Arrays.asList(getArticle));
+        expectResponse.setNotices(Arrays.asList(notice));
+        expectResponse.setLast(false);
+        expectResponse.setFirst(true);
+        expectResponse.setTotalPages(50);
+        expectResponse.setSize(20);
+        expectResponse.setNumber(0);
+        expectResponse.setNumberOfElements(20);
+        expectResponse.setTotalElements(1011L);
 
         when(articleService.getArticles(any(Constants.BOARD_TYPE.class), anyString(), anyInt(), anyInt()))
                 .thenReturn(expectResponse);
@@ -259,10 +260,7 @@ public class ArticleMvcTests {
         when(articleService.getArticlesTopComments(any(Constants.BOARD_TYPE.class), any(ObjectId.class)))
                 .thenReturn(expectTopComments);
 
-        GetArticlesTopsResponse expectResponse = GetArticlesTopsResponse.builder()
-                .topLikes(expectTopLikes)
-                .topComments(expectTopComments)
-                .build();
+        GetArticlesTopsResponse expectResponse = new GetArticlesTopsResponse(expectTopLikes, expectTopComments);
 
         mvc.perform(
                 get("/api/board/{board}/tops", Constants.BOARD_TYPE.FOOTBALL.name().toLowerCase())
@@ -317,12 +315,12 @@ public class ArticleMvcTests {
         );
         articleDetail.setGalleries(
                 Arrays.asList(
-                        ArticleGallery.builder()
-                                .id("58b9050b807d714eaf50a111")
-                                .name("성남FC 시즌권 사진")
-                                .imageUrl("https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111")
-                                .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                                .build()
+                        new ArticleGallery() {{
+                            setId("58b9050b807d714eaf50a111");
+                            setName("성남FC 시즌권 사진");
+                            setImageUrl("https://dev-api.jakduk.com//gallery/58b9050b807d714eaf50a111");
+                            setThumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                        }}
                 )
         );
         articleDetail.setMyFeeling(Constants.FEELING_TYPE.LIKE);
@@ -341,20 +339,18 @@ public class ArticleMvcTests {
         nextPost.setWriter(commonWriter);
         nextPost.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
 
-        LatestArticle latestArticle = LatestArticle.builder()
-                .id("58e9959b807d71113a999c6e")
-                .seq(216)
-                .writer(commonWriter)
-                .subject("작성자의 최근 글 제목")
-                .galleries(simpleGalleries)
-                .build();
+        LatestArticle latestArticle = new LatestArticle();
+        latestArticle.setId("58e9959b807d71113a999c6e");
+        latestArticle.setSeq(216);
+        latestArticle.setWriter(commonWriter);
+        latestArticle.setSubject("작성자의 최근 글 제목");
+        latestArticle.setGalleries(simpleGalleries);
 
-        GetArticleDetailResponse expectResponse = GetArticleDetailResponse.builder()
-                .article(articleDetail)
-                .prevArticle(prevPost)
-                .nextArticle(nextPost)
-                .latestArticlesByWriter(Arrays.asList(latestArticle))
-                .build();
+        GetArticleDetailResponse expectResponse = new GetArticleDetailResponse();
+        expectResponse.setArticle(articleDetail);
+        expectResponse.setPrevArticle(prevPost);
+        expectResponse.setNextArticle(nextPost);
+        expectResponse.setLatestArticlesByWriter(Arrays.asList(latestArticle));
 
         when(articleService.getArticleDetail(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyBoolean()))
                 .thenReturn(ResponseEntity.ok().body(expectResponse));
@@ -422,10 +418,7 @@ public class ArticleMvcTests {
         doNothing().when(galleryService)
                 .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
-        WriteArticleResponse expectResponse = WriteArticleResponse.builder()
-                .seq(article.getSeq())
-                .board(article.getBoard())
-                .build();
+        WriteArticleResponse expectResponse = new WriteArticleResponse(article.getBoard(), article.getSeq());
 
         mvc.perform(
                 post("/api/board/{board}", article.getBoard().toLowerCase())
@@ -447,8 +440,8 @@ public class ArticleMvcTests {
                                         Stream.of(Constants.BOARD_TYPE.values()).map(Enum::name).map(String::toLowerCase).collect(Collectors.toList()))
                         ),
                         responseFields(
-                                fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호"),
-                                fieldWithPath("board").type(JsonFieldType.STRING).description("게시판")
+                                fieldWithPath("board").type(JsonFieldType.STRING).description("게시판"),
+                                fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호")
                         )
                 ));
     }
@@ -491,9 +484,7 @@ public class ArticleMvcTests {
         doNothing().when(galleryService)
                 .processLinkedGalleries(anyString(), anyList(), anyList(), anyList(), any(Constants.GALLERY_FROM_TYPE.class), anyString());
 
-        WriteArticleResponse expectResponse = WriteArticleResponse.builder()
-                .seq(article.getSeq())
-                .build();
+        WriteArticleResponse expectResponse = new WriteArticleResponse(article.getBoard(), article.getSeq());
 
         mvc.perform(
                 put("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
@@ -517,6 +508,7 @@ public class ArticleMvcTests {
                                         parameterWithName("seq").description("글번호")
                                 ),
                                 responseFields(
+                                        fieldWithPath("board").type(JsonFieldType.STRING).description("게시판"),
                                         fieldWithPath("seq").type(JsonFieldType.NUMBER).description("글 번호")
                                 )
                         ));
@@ -531,9 +523,7 @@ public class ArticleMvcTests {
         when(articleService.deleteArticle(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt()))
                 .thenReturn(expectDeleteType);
 
-        DeleteArticleResponse expectResponse = DeleteArticleResponse.builder()
-                .result(expectDeleteType)
-                .build();
+        DeleteArticleResponse expectResponse = new DeleteArticleResponse(expectDeleteType);
 
         mvc.perform(
                 delete("/api/board/{board}/{seq}", article.getBoard().toLowerCase(), article.getSeq())
@@ -571,11 +561,10 @@ public class ArticleMvcTests {
         List<CommonFeelingUser> usersLiking = article.getUsersLiking();
         List<CommonFeelingUser> usersDisliking = article.getUsersDisliking();
 
-        UserFeelingResponse expectResponse = UserFeelingResponse.builder()
-                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
-                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
-                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
-                .build();
+        UserFeelingResponse expectResponse = new UserFeelingResponse();
+        expectResponse.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
+        expectResponse.setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
+        expectResponse.setNumberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
 
         mvc.perform(
                 post("/api/board/{board}/{seq}/{feeling}", article.getBoard().toLowerCase(), article.getSeq(),
@@ -614,11 +603,7 @@ public class ArticleMvcTests {
         when(articleService.findOneBySeq(any(Constants.BOARD_TYPE.class), anyInt()))
                 .thenReturn(article);
 
-        GetArticleFeelingUsersResponse expectResponse = GetArticleFeelingUsersResponse.builder()
-                .seq(article.getSeq())
-                .usersLiking(article.getUsersLiking())
-                .usersDisliking(article.getUsersDisliking())
-                .build();
+        GetArticleFeelingUsersResponse expectResponse = new GetArticleFeelingUsersResponse(article.getSeq(), article.getUsersLiking(), article.getUsersDisliking());
 
         mvc.perform(
                 get("/api/board/{board}/{seq}/feeling/users",

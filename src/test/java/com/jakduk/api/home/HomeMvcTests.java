@@ -125,34 +125,35 @@ public class HomeMvcTests {
         homeDescription.setPriority(5);
 
         List<HomeGallery> galleries = Arrays.asList(
-                HomeGallery.builder()
-                        .id("58b9050b807d714eaf50a111")
-                        .name("사진찍기")
-                        .writer(commonWriter)
-                        .imageUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                        .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                        .build()
+                new HomeGallery() {{
+                    setId("58b9050b807d714eaf50a111");
+                    setName("사진찍기");
+                    setWriter(commonWriter);
+                    setImageUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                    setThumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                }}
         );
 
         List<UserSimple> users = Arrays.asList(
                 new UserSimple("571ccf50ccbfc325b20711c5", "test07", "안녕하세요. 반갑습니다.")
         );
 
-        HomeArticle article = HomeArticle.builder()
-                .id("59c8879fa2b594c5d33e6ac4")
-                .seq(2)
-                .status(new ArticleStatus(false, false))
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .category(boardCategory.getCode())
-                .writer(commonWriter)
-                .subject("글 제목입니다.")
-                .views(15)
-                .galleries(
-                        Arrays.asList(
-                                new BoardGallerySimple("58b9050b807d714eaf50a111", "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                        ))
-                .shortContent("짧은 내용입니다. (100자)")
-                .build();
+        HomeArticle article = new HomeArticle();
+        article.setId("59c8879fa2b594c5d33e6ac4");
+        article.setSeq(2);
+        article.setStatus(new ArticleStatus(false, false));
+        article.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
+        article.setCategory(boardCategory.getCode());
+        article.setWriter(commonWriter);
+        article.setSubject("글 제목입니다.");
+        article.setViews(15);
+        article.setGalleries(Arrays.asList(
+                                new BoardGallerySimple() {{
+                                    setId("58b9050b807d714eaf50a111");
+                                    setThumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                                }}
+                        ));
+        article.setShortContent("짧은 내용입니다. (100자)");
 
         ArticleSimple articleSimple = new ArticleSimple();
         BeanUtils.copyProperties(article, articleSimple);
@@ -160,12 +161,12 @@ public class HomeMvcTests {
         List<HomeArticle> articles = Arrays.asList(article);
 
         List<HomeArticleComment> comments = Arrays.asList(
-                HomeArticleComment.builder()
-                        .id("54b5058c3d96b205dc7e2809")
-                        .article(articleSimple)
-                        .writer(commonWriter)
-                        .content("댓글 내용입니다.")
-                        .build()
+                new HomeArticleComment() {{
+                    setId("54b5058c3d96b205dc7e2809");
+                    setArticle(articleSimple);
+                    setWriter(commonWriter);
+                    setContent("댓글 내용입니다.");
+                }}
         );
 
         when(homeService.getHomeDescription())
@@ -183,13 +184,12 @@ public class HomeMvcTests {
         when(galleryService.findSimpleById(nullable(ObjectId.class), anyInt()))
                 .thenReturn(galleries);
 
-        HomeLatestItemsResponse response = HomeLatestItemsResponse.builder()
-                .homeDescription(homeDescription)
-                .users(users)
-                .comments(comments)
-                .articles(articles)
-                .galleries(galleries)
-                .build();
+        HomeLatestItemsResponse response = new HomeLatestItemsResponse();
+        response.setHomeDescription(homeDescription);
+        response.setUsers(users);
+        response.setComments(comments);
+        response.setArticles(articles);
+        response.setGalleries(galleries);
 
         mvc.perform(
                 get("/api/home/latest")

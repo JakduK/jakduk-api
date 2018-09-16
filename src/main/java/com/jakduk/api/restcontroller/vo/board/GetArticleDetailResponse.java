@@ -1,10 +1,6 @@
 package com.jakduk.api.restcontroller.vo.board;
 
 import com.jakduk.api.model.simple.ArticleSimple;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -13,10 +9,6 @@ import java.util.List;
  *         16. 7. 16 오후 7:28
  */
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
 public class GetArticleDetailResponse {
 
     private ArticleDetail article; // 글 상세
@@ -24,4 +16,35 @@ public class GetArticleDetailResponse {
     private ArticleSimple nextArticle; // 뒷 글
     private List<LatestArticle> latestArticlesByWriter; // 작성자의 최근 글
 
+    public ArticleDetail getArticle() {
+        return article;
+    }
+
+    public void setArticle(ArticleDetail article) {
+        this.article = article;
+    }
+
+    public ArticleSimple getPrevArticle() {
+        return prevArticle;
+    }
+
+    public void setPrevArticle(ArticleSimple prevArticle) {
+        this.prevArticle = prevArticle;
+    }
+
+    public ArticleSimple getNextArticle() {
+        return nextArticle;
+    }
+
+    public void setNextArticle(ArticleSimple nextArticle) {
+        this.nextArticle = nextArticle;
+    }
+
+    public List<LatestArticle> getLatestArticlesByWriter() {
+        return latestArticlesByWriter;
+    }
+
+    public void setLatestArticlesByWriter(List<LatestArticle> latestArticlesByWriter) {
+        this.latestArticlesByWriter = latestArticlesByWriter;
+    }
 }

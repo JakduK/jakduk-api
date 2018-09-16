@@ -20,11 +20,12 @@ import com.jakduk.api.restcontroller.vo.gallery.GalleryOnList;
 import com.jakduk.api.restcontroller.vo.gallery.GalleryResponse;
 import com.jakduk.api.restcontroller.vo.gallery.SurroundingsGallery;
 import com.jakduk.api.restcontroller.vo.home.HomeGallery;
-import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,9 +57,10 @@ import java.util.stream.Collectors;
  * @desc     :
  */
 
-@Slf4j
 @Service
 public class GalleryService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Resource private JakdukProperties.Storage storageProperties;
 
@@ -207,11 +209,7 @@ public class GalleryService {
                     .collect(Collectors.toList());
         }
 
-		return GalleryResponse.builder()
-				.gallery(galleryDetail)
-				.surroundingsGalleries(surroundingsGalleries)
-          		.linkedPosts(linkedPosts)
-				.build();
+		return new GalleryResponse(galleryDetail, surroundingsGalleries, linkedPosts);
 	}
 
 	/**

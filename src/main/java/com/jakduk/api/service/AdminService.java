@@ -22,9 +22,10 @@ import com.jakduk.api.restcontroller.vo.admin.CompetitionWrite;
 import com.jakduk.api.restcontroller.vo.admin.JakduScheduleGroupWrite;
 import com.jakduk.api.restcontroller.vo.admin.JakduScheduleWrite;
 import com.jakduk.api.restcontroller.vo.admin.ThumbnailSizeWrite;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -50,9 +51,10 @@ import java.util.List;
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  */
 
-@Slf4j
 @Service
 public class AdminService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Resource private JakdukProperties.Storage storageProperties;
 

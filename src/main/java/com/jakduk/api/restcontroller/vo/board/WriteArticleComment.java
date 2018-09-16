@@ -1,7 +1,5 @@
 package com.jakduk.api.restcontroller.vo.board;
 
-import lombok.*;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -13,11 +11,6 @@ import java.util.List;
  * 16. 3. 13 오후 11:05
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
-@Setter
 public class WriteArticleComment {
 
     @NotEmpty
@@ -26,4 +19,11 @@ public class WriteArticleComment {
 
     private List<GalleryOnBoard> galleries; // 사진 목록
 
+    public String getContent() {
+        return content;
+    }
+
+    public List<GalleryOnBoard> getGalleries() {
+        return galleries;
+    }
 }

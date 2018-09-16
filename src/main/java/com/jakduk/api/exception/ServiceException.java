@@ -1,8 +1,5 @@
 package com.jakduk.api.exception;
 
-import lombok.Getter;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 /**
  * @author pyohwan
  * 16. 7. 1 오전 12:30
@@ -10,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 public class ServiceException extends RuntimeException {
 
-    @Getter
     private ServiceError serviceError;
 
     public ServiceException(ServiceError serviceError) {
@@ -31,5 +27,9 @@ public class ServiceException extends RuntimeException {
     public ServiceException(ServiceError serviceError, String message, Throwable throwable) {
         super(message, throwable);
         this.serviceError = serviceError;
+    }
+
+    public ServiceError getServiceError() {
+        return serviceError;
     }
 }

@@ -1,7 +1,6 @@
 package com.jakduk.api.exception;
 
 import com.jakduk.api.common.util.JakdukUtils;
-import lombok.Getter;
 import org.apache.http.HttpStatus;
 
 /**
@@ -9,7 +8,6 @@ import org.apache.http.HttpStatus;
  * 16. 7. 1 오후 11:23
  */
 
-@Getter
 public enum ServiceError {
 
     // COMMON
@@ -77,4 +75,11 @@ public enum ServiceError {
         return JakdukUtils.getMessageSource(this.message);
     }
 
+    public Integer getHttpStatus() {
+        return httpStatus;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }

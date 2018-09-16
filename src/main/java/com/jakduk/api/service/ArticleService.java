@@ -25,10 +25,11 @@ import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;
 import com.jakduk.api.restcontroller.vo.home.HomeArticleComment;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -50,9 +51,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class ArticleService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired private UrlGenerationUtils urlGenerationUtils;
 	@Autowired private ArticleRepository articleRepository;
@@ -257,10 +259,10 @@ public class ArticleService {
 
 				if (! CollectionUtils.isEmpty(galleries)) {
 					List<BoardGallerySimple> boardGalleries = galleries.stream()
-							.map(gallery -> BoardGallerySimple.builder()
-									.id(gallery.getId())
-									.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-									.build())
+							.map(gallery -> new BoardGallerySimple() {{
+								setId(gallery.getId());
+								setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+							}})
 							.collect(Collectors.toList());
 
 					getArticle.setGalleries(boardGalleries);
@@ -322,18 +324,19 @@ public class ArticleService {
 			categoriesMap.put("ALL", JakdukUtils.getMessageSource("board.category.all"));
 		}
 
-		return GetArticlesResponse.builder()
-				.categories(categoriesMap)
-				.articles(getArticles)
-				.notices(getNotices)
-				.first(articlePages.isFirst())
-				.last(articlePages.isLast())
-				.totalPages(articlePages.getTotalPages())
-				.totalElements(articlePages.getTotalElements())
-				.numberOfElements(articlePages.getNumberOfElements())
-				.size(articlePages.getSize())
-				.number(articlePages.getNumber())
-				.build();
+		GetArticlesResponse response = new GetArticlesResponse();
+		response.setCategories(categoriesMap);
+		response.setArticles(getArticles);
+		response.setNotices(getNotices);
+		response.setFirst(articlePages.isFirst());
+		response.setLast(articlePages.isLast());
+		response.setTotalPages(articlePages.getTotalPages());
+		response.setTotalElements(articlePages.getTotalElements());
+		response.setNumberOfElements(articlePages.getNumberOfElements());
+		response.setSize(articlePages.getSize());
+		response.setNumber(articlePages.getNumber());
+
+		return response;
 	}
 
 	/**
@@ -358,10 +361,10 @@ public class ArticleService {
 						List<BoardGallerySimple> boardGalleries = galleries.stream()
 								.sorted(Comparator.comparing(Gallery::getId))
 								.limit(1)
-								.map(gallery -> BoardGallerySimple.builder()
-										.id(gallery.getId())
-										.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-										.build())
+								.map(gallery -> new BoardGallerySimple() {{
+									setId(gallery.getId());
+									setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+								}})
 								.collect(Collectors.toList());
 
 						homeArticle.setGalleries(boardGalleries);
@@ -540,10 +543,7 @@ public class ArticleService {
 		List<GetArticleComment> articleComments = this.toGetArticleComments(commonWriter, comments);
 		Integer count = articleCommentRepository.countByArticle(articleItem);
 
-		return GetArticleDetailCommentsResponse.builder()
-				.comments(articleComments)
-				.count(count)
-				.build();
+		return new GetArticleDetailCommentsResponse(articleComments, count);
 	}
 
 	/**
@@ -743,12 +743,12 @@ public class ArticleService {
 
             if (! CollectionUtils.isEmpty(galleries)) {
                 List<ArticleGallery> postDetailGalleries = galleries.stream()
-                        .map(gallery -> ArticleGallery.builder()
-                                .id(gallery.getId())
-                                .name(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName())
-                                .imageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()))
-                                .thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-                                .build())
+                        .map(gallery -> new ArticleGallery() {{
+                        	setId(gallery.getId());
+                        	setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
+                        	setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+                        	setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+						}})
                         .collect(Collectors.toList());
 
                 articleDetail.setGalleries(postDetailGalleries);
@@ -785,10 +785,10 @@ public class ArticleService {
 
 							if (! ObjectUtils.isEmpty(latestPostGalleries)) {
 								List<BoardGallerySimple> boardGalleries = latestPostGalleries.stream()
-										.map(gallery -> BoardGallerySimple.builder()
-												.id(gallery.getId())
-												.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-												.build())
+										.map(gallery -> new BoardGallerySimple() {{
+											setId(gallery.getId());
+											setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+										}})
 										.collect(Collectors.toList());
 
 								latestArticle.setGalleries(boardGalleries);
@@ -800,13 +800,14 @@ public class ArticleService {
 					.collect(Collectors.toList());
 		}
 
+		GetArticleDetailResponse response = new GetArticleDetailResponse();
+		response.setArticle(articleDetail);
+		response.setPrevArticle(prevPost);
+		response.setNextArticle(nextPost);
+		response.setLatestArticlesByWriter(CollectionUtils.isEmpty(latestArticles) ? null : latestArticles);
+
 		return ResponseEntity.ok()
-				.body(GetArticleDetailResponse.builder()
-						.article(articleDetail)
-						.prevArticle(prevPost)
-						.nextArticle(nextPost)
-						.latestArticlesByWriter(CollectionUtils.isEmpty(latestArticles) ? null : latestArticles)
-						.build());
+				.body(response);
 	}
 
 	/**
@@ -914,10 +915,10 @@ public class ArticleService {
 
 		if (! CollectionUtils.isEmpty(galleries)) {
 			return galleries.stream()
-					.map(gallery -> BoardGallerySimple.builder()
-							.id(gallery.getId())
-							.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()))
-							.build())
+					.map(gallery -> new BoardGallerySimple() {{
+						setId(gallery.getId());
+						setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+					}})
 					.collect(Collectors.toList());
 		}
 

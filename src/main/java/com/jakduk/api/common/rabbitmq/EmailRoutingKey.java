@@ -1,12 +1,9 @@
 package com.jakduk.api.common.rabbitmq;
 
-import lombok.Getter;
-
 /**
  * Created by Jang,Pyohwan on 2017. 6. 15..
  */
 
-@Getter
 public enum EmailRoutingKey {
 
     EMAIL_WELCOME("email-welcome"),
@@ -18,4 +15,7 @@ public enum EmailRoutingKey {
         this.routingKey = routingKey;
     }
 
+    public String getRoutingKey() {
+        return routingKey;
+    }
 }

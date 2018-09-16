@@ -3,8 +3,6 @@ package com.jakduk.api.restcontroller.vo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jakduk.api.exception.ServiceError;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Map;
 
@@ -13,7 +11,6 @@ import java.util.Map;
  * 16. 3. 5 오전 12:31
  */
 
-@Getter
 public class RestErrorResponse {
 
     private String code;
@@ -26,7 +23,6 @@ public class RestErrorResponse {
     private Map<String, String> fields;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @Setter
     private Map<String, Object> detail;
 
     public RestErrorResponse(String code, String message) {
@@ -57,5 +53,29 @@ public class RestErrorResponse {
         this.message = serviceError.getMessage();
         this.httpStatus = serviceError.getHttpStatus();
         this.fields = fields;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public Integer getHttpStatus() {
+        return httpStatus;
+    }
+
+    public Map<String, String> getFields() {
+        return fields;
+    }
+
+    public Map<String, Object> getDetail() {
+        return detail;
+    }
+
+    public void setDetail(Map<String, Object> detail) {
+        this.detail = detail;
     }
 }

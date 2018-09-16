@@ -1,8 +1,5 @@
 package com.jakduk.api.restcontroller.vo.gallery;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.List;
 
 /**
@@ -12,8 +9,17 @@ import java.util.List;
  * 16. 5. 8 오후 11:22
  */
 
-@Builder
-@Getter
 public class GalleriesResponse {
     private List<GalleryOnList> galleries; // 사진 목록
+
+    public GalleriesResponse() {
+    }
+
+    public GalleriesResponse(List<GalleryOnList> galleries) {
+        this.galleries = galleries;
+    }
+
+    public List<GalleryOnList> getGalleries() {
+        return galleries;
+    }
 }

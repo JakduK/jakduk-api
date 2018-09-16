@@ -76,39 +76,44 @@ public class SearchMvcTests {
         boardCategory = categories.get(0);
 
         simpleGalleries = Arrays.asList(
-                new BoardGallerySimple("58b9050b807d714eaf50a111", "https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111"));
+                new BoardGallerySimple() {{
+                    setId("58b9050b807d714eaf50a111");
+                    setThumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                }}
+        );
     }
 
     @Test
     @WithMockJakdukUser
     public void searchUnifiedTest() throws Exception {
 
-        SearchArticleResult searchArticleResult = SearchArticleResult.builder()
-                .took(330L)
-                .totalCount(9L)
-                .articles(
-                        Arrays.asList(
-                                ArticleSource.builder()
-                                        .id("58b7b9dd716dce06b10e449a")
-                                        .seq(2)
-                                        .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                                        .category(boardCategory.getCode())
-                                        .writer(commonWriter)
-                                        .galleries(simpleGalleries)
-                                        .score(4.9219737F)
-                                        .highlight(
-                                                new HashMap<String, List<String>>(){{
-                                                    put("subject", Arrays.asList("Summernote insert-image <div class=\\\"description\\\">테스트</div>"));
-                                                    put("content", Arrays.asList("♪ 오 잘된다"));
-                                                }})
-                                        .build()
-                        ))
-                .build();
+        SearchArticleResult searchArticleResult = new SearchArticleResult();
+        searchArticleResult.setTook(330L);
+        searchArticleResult.setTotalCount(9L);
+        searchArticleResult.setArticles(
+                Arrays.asList(
+                        new ArticleSource() {
+                            {
+                                setId("58b7b9dd716dce06b10e449a");
+                                setSeq(2);
+                                setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
+                                setCategory(boardCategory.getCode());
+                                setWriter(commonWriter);
+                                setGalleries(simpleGalleries);
+                                setScore(4.9219737F);
+                                setHighlight(
+                                        new HashMap<String, List<String>>() {{
+                                            put("subject", Arrays.asList("Summernote insert-image <div class=\\\"description\\\">테스트</div>"));
+                                            put("content", Arrays.asList("♪ 오 잘된다"));
+                                        }}
+                                );
+                            }})
+        );
 
-        SearchCommentResult searchCommentResult = SearchCommentResult.builder()
-                .took(31L)
-                .totalCount(47L)
-                .comments(
+        SearchCommentResult searchCommentResult = new SearchCommentResult();
+        searchCommentResult.setTook(31L);
+        searchCommentResult.setTotalCount(47L);
+        searchCommentResult.setComments(
                         Arrays.asList(
                                 new EsCommentSource(){{
                                     setId("578cd13e807d7113f246fa2e");
@@ -129,13 +134,12 @@ public class SearchMvcTests {
                                             }}
                                     );
                                 }}
-                        ))
-                .build();
+                        ));
 
-        SearchGalleryResult searchGalleryResult = SearchGalleryResult.builder()
-                .took(16L)
-                .totalCount(5L)
-                .galleries(
+        SearchGalleryResult searchGalleryResult = new SearchGalleryResult();
+        searchGalleryResult.setTook(16L);
+        searchGalleryResult.setTotalCount(5L);
+        searchGalleryResult.setGalleries(
                         Arrays.asList(
                                 new EsGallerySource() {{
                                     setId("55d94c23e4b08bb591207f08");
@@ -148,14 +152,12 @@ public class SearchMvcTests {
                                     );
                                 }}
                         )
-                )
-                .build();
+                );
 
-        SearchUnifiedResponse expectResponse = SearchUnifiedResponse.builder()
-                .articleResult(searchArticleResult)
-                .commentResult(searchCommentResult)
-                .galleryResult(searchGalleryResult)
-                .build();
+        SearchUnifiedResponse expectResponse = new SearchUnifiedResponse();
+        expectResponse.setArticleResult(searchArticleResult);
+        expectResponse.setCommentResult(searchCommentResult);
+        expectResponse.setGalleryResult(searchGalleryResult);
 
         when(searchService.searchUnified(anyString(), anyString(), anyInt(), anyInt(), anyString(), anyString()))
                 .thenReturn(expectResponse);
@@ -224,15 +226,14 @@ public class SearchMvcTests {
     @WithMockUser
     public void searchPopularWordsTest() throws Exception {
 
-        PopularSearchWordResult expectResponse = PopularSearchWordResult.builder()
-                .took(18L)
-                .popularSearchWords(
-                        Arrays.asList(
-                                new EsTermsBucket("제목입니다", 33L),
-                                new EsTermsBucket("test", 10L),
-                                new EsTermsBucket("축구", 21L)
-                        ))
-                .build();
+        PopularSearchWordResult expectResponse = new PopularSearchWordResult();
+        expectResponse.setTook(18L);
+        expectResponse.setPopularSearchWords(
+                Arrays.asList(
+                        new EsTermsBucket("제목입니다", 33L),
+                        new EsTermsBucket("test", 10L),
+                        new EsTermsBucket("축구", 21L)
+                ));
 
         when(searchService.aggregateSearchWord(any(LocalDate.class), anyInt()))
                 .thenReturn(expectResponse);

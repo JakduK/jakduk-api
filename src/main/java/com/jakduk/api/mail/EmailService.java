@@ -5,7 +5,8 @@ import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.Token;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
 import com.jakduk.api.repository.TokenRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,9 +21,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-@Slf4j
 @Component
 public class EmailService {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private TokenRepository tokenRepository;

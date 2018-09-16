@@ -167,14 +167,14 @@ public class AuthUtils {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
-            sessionUser = SessionUser.builder()
-                    .id(userDetail.getId())
-                    .email(userDetail.getUsername())
-                    .username(userDetail.getNickname())
-                    .providerId(userDetail.getProviderId())
-                    .picture(userDetail.getPicture())
-                    .roles(roles)
-                    .build();
+            sessionUser = new SessionUser() {{
+                setId(userDetail.getId());
+                setEmail(userDetail.getUsername());
+                setUsername(userDetail.getNickname());
+                setProviderId(userDetail.getProviderId());
+                setPicture(userDetail.getPicture());
+                setRoles(roles);
+            }};
         }
 
         return sessionUser;
@@ -214,10 +214,9 @@ public class AuthUtils {
 
         JsonNode resultNode = jsonNode.get("result");
 
-        SocialProfile profile = SocialProfile.builder()
-                .id(resultNode.get("userid").asText())
-                .nickname(resultNode.get("nickname").asText())
-                .build();
+        SocialProfile profile = new SocialProfile();
+        profile.setId(resultNode.get("userid").asText());
+        profile.setNickname(resultNode.get("nickname").asText());
 
         if (resultNode.has("imagePath")) {
             String imagePath = resultNode.get("imagePath").asText();
@@ -241,10 +240,9 @@ public class AuthUtils {
 
         JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
 
-        SocialProfile profile = SocialProfile.builder()
-                .id(jsonNode.get("id").asText())
-                .nickname(jsonNode.get("name").asText())
-                .build();
+        SocialProfile profile = new SocialProfile();
+        profile.setId(jsonNode.get("id").asText());
+        profile.setNickname(jsonNode.get("name").asText());
 
         if (Objects.nonNull(jsonNode.get("email")))
             profile.setEmail(jsonNode.get("email").asText());
