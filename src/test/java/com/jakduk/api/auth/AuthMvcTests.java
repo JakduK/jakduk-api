@@ -9,8 +9,8 @@ import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.AuthRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
-import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
 import org.junit.Before;
@@ -122,15 +122,15 @@ public class AuthMvcTests {
                 .thenReturn(socialProfile);
 
         Optional<User> optUser = Optional.of(
-                User.builder()
-                        .id("58b2dbf1d6d83b04bf365277")
-                        .email("test0711@test.com")
-                        .username("생글이")
-                        .providerId(providerId)
-                        .providerUserId(socialProfile.getId())
-                        .roles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()))
-                        .about("안녕하세요.")
-                        .build()
+                new User() {{
+                    setId("58b2dbf1d6d83b04bf365277");
+                    setEmail("test07@test.com");
+                    setUsername("생글이");
+                    setProviderId(providerId);
+                    setProviderUserId(socialProfile.getId());
+                    setRoles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()));
+                    setAbout("안녕하세요.");
+                }}
         );
 
         when(userService.findOneByProviderIdAndProviderUserId(any(Constants.ACCOUNT_TYPE.class), anyString()))

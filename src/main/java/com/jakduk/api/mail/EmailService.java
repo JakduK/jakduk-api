@@ -85,14 +85,13 @@ public class EmailService {
 				tokenRepository.save(token);
 			});
 		} else {
-			Token token = Token.builder()
-					.type(Constants.TOKEN_TYPE.RESET_PASSWORD.name())
-					.email(recipientEmail)
-					.code(code)
-					.expireAt(
-							Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
-					)
-					.build();
+			Token token = new Token();
+			token.setType(Constants.TOKEN_TYPE.RESET_PASSWORD.name());
+			token.setEmail(recipientEmail);
+			token.setCode(code);
+			token.setExpireAt(
+					Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
+			);
 
 			tokenRepository.save(token);
 		}

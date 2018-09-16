@@ -1,19 +1,11 @@
 package com.jakduk.api.model.db;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 
-@NoArgsConstructor
-@Getter
-@Setter
 @Document
-@ToString
 public class Sequence {
 	
 	@Id
@@ -22,4 +14,36 @@ public class Sequence {
 	@NotNull
 	private String name; // 이름
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Integer getSeq() {
+		return seq;
+	}
+
+	public void setSeq(Integer seq) {
+		this.seq = seq;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "Sequence{" +
+				"id='" + id + '\'' +
+				", seq=" + seq +
+				", name='" + name + '\'' +
+				'}';
+	}
 }

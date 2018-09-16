@@ -105,14 +105,12 @@ public class UserService {
 
 		UserPicture userPicture = null;
 
-		User user = User.builder()
-				.email(email)
-				.username(username)
-				.password(passwordEncoder.encode(password))
-				.providerId(Constants.ACCOUNT_TYPE.JAKDUK)
-				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
-				.lastLogged(LocalDateTime.now())
-				.build();
+		User user = new User();
+		user.setEmail(email);
+		user.setUsername(username);
+		user.setPassword(passwordEncoder.encode(password));
+		user.setProviderId(Constants.ACCOUNT_TYPE.JAKDUK);
+		user.setRoles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()));
 
 		this.setUserAdditionalInfo(user, footballClub, about);
 
@@ -143,14 +141,12 @@ public class UserService {
 
 		UserPicture userPicture = null;
 
-		User user = User.builder()
-				.email(email)
-				.username(username)
-				.providerId(providerId)
-				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_02.getCode()))
-				.lastLogged(LocalDateTime.now())
-				.build();
+		User user = new User();
+		user.setEmail(email);
+		user.setUsername(username);
+		user.setProviderId(providerId);
+		user.setProviderUserId(providerUserId);
+		user.setRoles(Collections.singletonList(JakdukAuthority.ROLE_USER_02.getCode()));
 
 		this.setUserAdditionalInfo(user, footballClub, about);
 
@@ -170,10 +166,8 @@ public class UserService {
 				if (! StringUtils.startsWithIgnoreCase(fileInfo.getContentType(), "image/"))
 					throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
-				userPicture = UserPicture.builder()
-						.status(Constants.GALLERY_STATUS_TYPE.TEMP)
-						.contentType(fileInfo.getContentType())
-						.build();
+				userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.TEMP);
+				userPicture.setContentType(fileInfo.getContentType());
 
 				userPictureRepository.save(userPicture);
 
@@ -214,6 +208,8 @@ public class UserService {
 
 		if (StringUtils.isNotBlank(about))
 			user.setAbout(about.trim());
+
+		user.setLastLogged(LocalDateTime.now());
 	}
 
 	public User editUserProfile(String userId, String email, String username, String footballClubId, String about,
@@ -359,10 +355,9 @@ public class UserService {
 	 */
 	public UserPicture uploadUserPicture(String contentType, long size, byte[] bytes) {
 
-		UserPicture userPicture = UserPicture.builder()
-				.status(Constants.GALLERY_STATUS_TYPE.TEMP)
-				.contentType(contentType)
-				.build();
+		UserPicture userPicture = new UserPicture();
+		userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.TEMP);
+		userPicture.setContentType(contentType);
 
 		userPictureRepository.save(userPicture);
 

@@ -3,6 +3,7 @@ package com.jakduk.api.model.db;
 import com.jakduk.api.model.embedded.CommonWriter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
  * 16. 1. 2 오후 11:07
  */
 
+@Document
 public class Jakdu {
 
     @Id

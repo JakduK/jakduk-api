@@ -98,7 +98,7 @@ public class UserMvcTests {
         footballClubOrigin.setAge(Constants.CLUB_AGE.SENIOR);
         footballClubOrigin.setSex(Constants.CLUB_SEX.MEN);
 
-        this.footballClub = new FootballClub();
+        footballClub = new FootballClub();
         footballClub.setId("54e1d2c68bf86df3fe819874");
         footballClub.setOrigin(footballClubOrigin);
         footballClub.setActive("active");
@@ -108,23 +108,21 @@ public class UserMvcTests {
                         new LocalName(Locale.ENGLISH.getLanguage(), "SEONGNAM FC", "SEONGNAM"))
         );
 
-        this.userPicture = UserPicture.builder()
-                .id("58b3bd86d6d83b06dac29a69")
-                .status(Constants.GALLERY_STATUS_TYPE.ENABLE)
-                .contentType("image/png")
-                .build();
+        userPicture = new UserPicture();
+        userPicture.setId("58b3bd86d6d83b06dac29a69");
+        userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.ENABLE);
+        userPicture.setContentType("image/png");
 
-        jakdukUser = User.builder()
-                .id("597df86caaf4fc0545d4f3e9")
-                .email("example@jakduk.com")
-                .username("JakdukUser")
-                .password("841db2bc28e4730906bd82d79e69c80633747570d96ffade7dd77f58270f31a222e129e005cb70d2")
-                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
-                .about("안녕하세요.")
-                .roles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()))
-                .supportFC(footballClub)
-                .lastLogged(LocalDateTime.now())
-                .build();
+        jakdukUser = new User();
+        jakdukUser.setId("597df86caaf4fc0545d4f3e9");
+        jakdukUser.setEmail("example@jakduk.com");
+        jakdukUser.setUsername("JakdukUser");
+        jakdukUser.setPassword("841db2bc28e4730906bd82d79e69c80633747570d96ffade7dd77f58270f31a222e129e005cb70d2");
+        jakdukUser.setProviderId(Constants.ACCOUNT_TYPE.JAKDUK);
+        jakdukUser.setAbout("안녕하세요.");
+        jakdukUser.setRoles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()));
+        jakdukUser.setSupportFC(footballClub);
+        jakdukUser.setLastLogged(LocalDateTime.now());
     }
 
     @Test
@@ -203,18 +201,17 @@ public class UserMvcTests {
         form.setUserPictureId(userPicture.getId());
         form.setExternalLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2FSjuNejHmr8o0&t=1488000722876");
 
-        User expectUser = User.builder()
-                .id("597df86caaf4fc0545d4f3e9")
-                .email(form.getEmail())
-                .username(form.getUsername())
-                .password("841db2bc28e4730906bd82d79e69c80633747570d96ffade7dd77f58270f31a222e129e005cb70d2")
-                .providerId(attemptSocialUser.getProviderId())
-                .providerUserId(attemptSocialUser.getProviderUserId())
-                .about(form.getAbout())
-                .roles(Arrays.asList(JakdukAuthority.ROLE_USER_02.getCode()))
-                .supportFC(footballClub)
-                .lastLogged(LocalDateTime.now())
-                .build();
+        User expectUser = new User();
+        expectUser.setId("597df86caaf4fc0545d4f3e9");
+        expectUser.setEmail(form.getEmail());
+        expectUser.setUsername(form.getUsername());
+        expectUser.setPassword("841db2bc28e4730906bd82d79e69c80633747570d96ffade7dd77f58270f31a222e129e005cb70d2");
+        expectUser.setProviderId(attemptSocialUser.getProviderId());
+        expectUser.setProviderUserId(attemptSocialUser.getProviderUserId());
+        expectUser.setAbout(form.getAbout());
+        expectUser.setRoles(Arrays.asList(JakdukAuthority.ROLE_USER_02.getCode()));
+        expectUser.setSupportFC(footballClub);
+        expectUser.setLastLogged(LocalDateTime.now());
 
         when(userService.createSocialUser(anyString(), anyString(), any(Constants.ACCOUNT_TYPE.class), anyString(),
                 anyString(), anyString(), anyString(), anyString()))
@@ -459,11 +456,10 @@ public class UserMvcTests {
     @WithMockUser
     public void uploadUserPictureTest() throws Exception {
 
-        UserPicture expectUserPicture = UserPicture.builder()
-                .id(userPicture.getId())
-                .status(Constants.GALLERY_STATUS_TYPE.TEMP)
-                .contentType(userPicture.getContentType())
-                .build();
+        UserPicture expectUserPicture = new UserPicture();
+        expectUserPicture.setId(userPicture.getId());
+        expectUserPicture.setStatus(Constants.GALLERY_STATUS_TYPE.TEMP);
+        expectUserPicture.setContentType(userPicture.getContentType());
 
         when(userService.uploadUserPicture(anyString(), anyLong(), anyObject()))
                 .thenReturn(expectUserPicture);
