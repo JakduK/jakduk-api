@@ -49,9 +49,7 @@ public class GalleryRestController {
 
         List<GalleryOnList> galleries = galleryService.getGalleries(id, size);
 
-        return GalleriesResponse.builder()
-                .galleries(galleries)
-                .build();
+        return new GalleriesResponse(galleries);
     }
 
     // 사진 올리기

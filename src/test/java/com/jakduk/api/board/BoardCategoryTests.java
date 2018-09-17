@@ -32,12 +32,10 @@ public class BoardCategoryTests {
 
         categories4.forEach(boardCategory -> System.out.println(boardCategory.getNames()));
 
-
-
-        BoardCategory boardCategory = BoardCategory.builder()
-                .code("KL1")
-                .names(Arrays.asList(new LocalSimpleName("ko", "K리그 1")))
-                .build();
+        BoardCategory boardCategory = new BoardCategory() {{
+            setCode("KL1");
+            setNames(Arrays.asList(new LocalSimpleName("ko", "K리그 1")));
+        }};
 
         Assert.assertEquals(boardCategory.toString(), BoardCategoryGenerator.getCategory(Constants.BOARD_TYPE.FOOTBALL, BoardCategoryGenerator.Category.KL1.name(), Locale.KOREA).toString());
 

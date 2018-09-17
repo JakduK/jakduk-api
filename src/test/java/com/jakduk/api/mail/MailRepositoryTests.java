@@ -28,10 +28,9 @@ public class MailRepositoryTests {
 
     @Before
     public void setUp() {
-        mail = Mail.builder()
-                .subject("첫번째 메일 제목입니다.")
-                .templateName("mail/bulk01")
-                .build();
+        mail = new Mail();
+        mail.setSubject("첫번째 메일 제목입니다.");
+        mail.setTemplateName("mail/bulk01");
 
         repository.save(mail);
     }

@@ -44,13 +44,13 @@ public class HomeRestController {
 
         String language = JakdukUtils.getLanguageCode();
 
-        return HomeLatestItemsResponse.builder()
-                .homeDescription(homeService.getHomeDescription())
-                .users(userService.findSimpleUsers())
-                .comments(articleService.getLatestComments())
-                .articles(articleService.getLatestArticles())
-                .galleries(galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY))
-                .build();
+        return new HomeLatestItemsResponse() {{
+            setHomeDescription(homeService.getHomeDescription());
+            setUsers(userService.findSimpleUsers());
+            setComments(articleService.getLatestComments());
+            setArticles(articleService.getLatestArticles());
+            setGalleries(galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY));
+        }};
     }
 
 }

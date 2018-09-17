@@ -76,10 +76,7 @@ public class BoardRestController {
         List<BoardTop> topLikes = articleService.getArticlesTopLikes(board, objectId);
         List<BoardTop> topComments = articleService.getArticlesTopComments(board, objectId);
 
-        return GetArticlesTopsResponse.builder()
-                .topLikes(topLikes)
-                .topComments(topComments)
-                .build();
+        return new GetArticlesTopsResponse(topLikes, topComments);
     }
 
     // 게시판 글 상세
@@ -105,9 +102,7 @@ public class BoardRestController {
 
         List<BoardCategory> categories = BoardCategoryGenerator.getCategories(board, JakdukUtils.getLocale());
 
-        return GetBoardCategoriesResponse.builder()
-                .categories(categories)
-                .build();
+        return new GetBoardCategoriesResponse(categories);
     }
 
     // 게시판 글쓰기
@@ -146,10 +141,7 @@ public class BoardRestController {
         rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
                 article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
-        return WriteArticleResponse.builder()
-                .board(article.getBoard())
-                .seq(article.getSeq())
-                .build();
+        return new WriteArticleResponse(article.getBoard(), article.getSeq());
     }
 
     // 게시판 글 고치기
@@ -195,9 +187,7 @@ public class BoardRestController {
         rabbitMQPublisher.indexDocumentArticle(article.getId(), article.getSeq(), article.getBoard(), article.getCategory(),
                 article.getWriter(), article.getSubject(), article.getContent(), galleryIds);
 
-        return WriteArticleResponse.builder()
-                .seq(article.getSeq())
-                .build();
+        return new WriteArticleResponse(article.getBoard(), article.getSeq());
     }
 
     // 게시판 글 지움
@@ -211,9 +201,7 @@ public class BoardRestController {
 
 		Constants.ARTICLE_DELETE_TYPE deleteType = articleService.deleteArticle(commonWriter, board, seq);
 
-        return DeleteArticleResponse.builder()
-                .result(deleteType)
-                .build();
+        return new DeleteArticleResponse(deleteType);
     }
 
     // 게시판 글의 댓글 목록
@@ -327,11 +315,11 @@ public class BoardRestController {
         List<CommonFeelingUser> usersLiking = article.getUsersLiking();
         List<CommonFeelingUser> usersDisliking = article.getUsersDisliking();
 
-        return UserFeelingResponse.builder()
-                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
-                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
-                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
-                .build();
+        return new UserFeelingResponse() {{
+            setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
+            setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
+            setNumberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
+        }};
     }
 
     // 자유게시판 글의 감정 표현 회원 목록
@@ -342,11 +330,7 @@ public class BoardRestController {
 
         Article article = articleService.findOneBySeq(board, seq);
 
-        return GetArticleFeelingUsersResponse.builder()
-                .seq(seq)
-                .usersLiking(article.getUsersLiking())
-                .usersDisliking(article.getUsersDisliking())
-                .build();
+        return new GetArticleFeelingUsersResponse(seq, article.getUsersLiking(), article.getUsersDisliking());
     }
 
     // 자유게시판 댓글 감정 표현
@@ -363,11 +347,11 @@ public class BoardRestController {
         List<CommonFeelingUser> usersLiking = boardComment.getUsersLiking();
         List<CommonFeelingUser> usersDisliking = boardComment.getUsersDisliking();
 
-        return UserFeelingResponse.builder()
-                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
-                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
-                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
-                .build();
+        return new UserFeelingResponse() {{
+            setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
+            setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
+            setNumberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
+        }};
     }
 
     // 게시판 글의 공지 활성화

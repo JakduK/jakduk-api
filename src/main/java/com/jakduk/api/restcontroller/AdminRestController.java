@@ -10,7 +10,8 @@ import com.jakduk.api.service.AdminService;
 import com.jakduk.api.service.CommonService;
 import com.jakduk.api.service.CompetitionService;
 import com.jakduk.api.service.StatsService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -27,10 +28,11 @@ import java.util.*;
  *         16. 5. 8 오후 11:26
  */
 
-@Slf4j
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRestController {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private CommonService commonService;
@@ -76,23 +78,20 @@ public class AdminRestController {
 
 	// 새 알림판 저장
 	@RequestMapping(value = "/home/description", method = RequestMethod.POST)
-	public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest homeDescriptionRequest) {
+	public Map<String, Object> addHomeDescription(@RequestBody HomeDescriptionRequest request) {
 
-		if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
+		if (Objects.isNull(request.getDesc()) || request.getDesc().isEmpty() == true)
 			throw new IllegalArgumentException("desc는 필수값입니다.");
 
-		if (Objects.isNull(homeDescriptionRequest.getPriority()))
+		if (Objects.isNull(request.getPriority()))
 			throw new IllegalArgumentException("priority는 필수값입니다.");
 
-		HomeDescription homeDescription = HomeDescription.builder()
-			.desc(homeDescriptionRequest.getDesc())
-			.priority(homeDescriptionRequest.getPriority())
-			.build();
+		HomeDescription homeDescription = new HomeDescription();
+		BeanUtils.copyProperties(request, homeDescription);
 
 		adminService.saveHomeDescription(homeDescription);
 
 		Map<String, Object> response = new HashMap();
-
 		response.put("homeDescription", homeDescription);
 
 		return response;
@@ -101,12 +100,12 @@ public class AdminRestController {
 	// 알림판 편집
 	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editHomeDescription(@PathVariable String id,
-	                                               @RequestBody HomeDescriptionRequest homeDescriptionRequest) {
+	                                               @RequestBody HomeDescriptionRequest request) {
 
-		if (Objects.isNull(homeDescriptionRequest.getDesc()) || homeDescriptionRequest.getDesc().isEmpty() == true)
+		if (Objects.isNull(request.getDesc()) || request.getDesc().isEmpty() == true)
 			throw new IllegalArgumentException("desc는 필수값입니다.");
 
-		if (Objects.isNull(homeDescriptionRequest.getPriority()))
+		if (Objects.isNull(request.getPriority()))
 			throw new IllegalArgumentException("priority는 필수값입니다.");
 
 		HomeDescription existHomeDescription = adminService.findHomeDescriptionById(id);
@@ -114,11 +113,9 @@ public class AdminRestController {
 		if (Objects.isNull(existHomeDescription))
 			throw new IllegalArgumentException("id가 " + id + "에 해당하는 알림판이 존재하지 않습니다.");
 
-		HomeDescription homeDescription = HomeDescription.builder()
-			.id(id)
-			.desc(homeDescriptionRequest.getDesc())
-			.priority(homeDescriptionRequest.getPriority())
-			.build();
+		HomeDescription homeDescription = new HomeDescription();
+		BeanUtils.copyProperties(request, homeDescription);
+		homeDescription.setId(id);
 
 		adminService.saveHomeDescription(homeDescription);
 
@@ -433,15 +430,10 @@ public class AdminRestController {
 
 		Competition competition = competitionService.findOneById(form.getCompetitionId());
 
-		AttendanceLeague attendanceLeague = AttendanceLeague.builder()
-				.id(null)
-				.competition(competition)
-				.season(form.getSeason())
-				.games(form.getGames())
-				.total(form.getTotal())
-				.average(form.getAverage())
-				.numberOfClubs(form.getNumberOfClubs())
-				.build();
+		AttendanceLeague attendanceLeague = new AttendanceLeague();
+		BeanUtils.copyProperties(form, attendanceLeague);
+		attendanceLeague.setId(null);
+		attendanceLeague.setCompetition(competition);
 
 		statsService.saveLeagueAttendance(attendanceLeague);
 
@@ -459,15 +451,10 @@ public class AdminRestController {
 
 		Competition competition = competitionService.findOneById(form.getCompetitionId());
 
-		AttendanceLeague attendanceLeague = AttendanceLeague.builder()
-			.id(id)
-			.competition(competition)
-			.season(form.getSeason())
-			.games(form.getGames())
-			.total(form.getTotal())
-			.average(form.getAverage())
-			.numberOfClubs(form.getNumberOfClubs())
-			.build();
+		AttendanceLeague attendanceLeague = new AttendanceLeague();
+		BeanUtils.copyProperties(form, attendanceLeague);
+		attendanceLeague.setId(id);
+		attendanceLeague.setCompetition(competition);
 
 		statsService.saveLeagueAttendance(attendanceLeague);
 
@@ -666,27 +653,20 @@ public class AdminRestController {
 		if (Objects.isNull(footballClubOrigin))
 			throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
 
-		LocalName footballClubNameKr = LocalName.builder()
-			.language(Locale.KOREAN.getLanguage())
-			.fullName(request.getFullNameKr())
-			.shortName(request.getShortNameKr())
-			.build();
-
-		LocalName footballClubNameEn = LocalName.builder()
-			.language(Locale.ENGLISH.getLanguage())
-			.fullName(request.getFullNameEn())
-			.shortName(request.getShortNameEn())
-			.build();
+		LocalName footballClubNameKr = new LocalName(Locale.KOREAN.getLanguage(), request.getFullNameKr(), request.getShortNameKr());
+		LocalName footballClubNameEn = new LocalName(Locale.ENGLISH.getLanguage(), request.getFullNameEn(), request.getShortNameEn());
 
 		ArrayList<LocalName> names = new ArrayList<>();
 		names.add(footballClubNameKr);
 		names.add(footballClubNameEn);
 
-		return FootballClub.builder()
-			.id(id)
-			.active(request.getActive())
-			.origin(footballClubOrigin)
-			.names(names)
-			.build();
+		FootballClub footballClub = new FootballClub();
+		footballClub.setId(id);
+		footballClub.setActive(request.getActive());
+		footballClub.setOrigin(footballClubOrigin);
+		footballClub.setNames(names);
+
+		return footballClub;
 	}
+
 }

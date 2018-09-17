@@ -29,7 +29,11 @@ public class RabbitMQPublisherTest extends ApiApplicationTests {
         EsArticle esArticle = new EsArticle();
         esArticle.setId("595bb024290ad3035636f2ba");
         esArticle.setSeq(262);
-        esArticle.setWriter(CommonWriter.builder().userId("userId").username("testUser").build());
+        esArticle.setWriter(
+                new CommonWriter(){{
+                    setUserId("userId");
+                    setUsername("testUser");
+        }});
         esArticle.setSubject("subject01");
         esArticle.setContent("content01");
         esArticle.setCategory("FREE");

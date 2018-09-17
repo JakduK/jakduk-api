@@ -1,6 +1,6 @@
 package com.jakduk.api.restcontroller.vo.admin;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 
 import java.util.Date;

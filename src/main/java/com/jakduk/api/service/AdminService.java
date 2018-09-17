@@ -22,9 +22,10 @@ import com.jakduk.api.restcontroller.vo.admin.CompetitionWrite;
 import com.jakduk.api.restcontroller.vo.admin.JakduScheduleGroupWrite;
 import com.jakduk.api.restcontroller.vo.admin.JakduScheduleWrite;
 import com.jakduk.api.restcontroller.vo.admin.ThumbnailSizeWrite;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -50,9 +51,10 @@ import java.util.List;
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  */
 
-@Slf4j
 @Service
 public class AdminService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Resource private JakdukProperties.Storage storageProperties;
 
@@ -423,16 +425,16 @@ public class AdminService {
 		competition.setCode(competitionWrite.getCode());
 
 		ArrayList<LocalName> names = new ArrayList<LocalName>();
-		names.add(LocalName.builder()
-				.language(Locale.KOREAN.getLanguage())
-				.shortName(competitionWrite.getShortNameKr())
-				.fullName(competitionWrite.getFullNameKr())
-				.build());
-		names.add(LocalName.builder()
-				.language(Locale.ENGLISH.getLanguage())
-				.shortName(competitionWrite.getShortNameEn())
-				.fullName(competitionWrite.getFullNameEn())
-				.build());
+		names.add(new LocalName() {{
+			setLanguage(Locale.KOREAN.getLanguage());
+			setShortName(competitionWrite.getShortNameKr());
+			setFullName(competitionWrite.getFullNameKr());
+		}});
+		names.add(new LocalName() {{
+			setLanguage(Locale.ENGLISH.getLanguage());
+			setShortName(competitionWrite.getShortNameEn());
+			setFullName(competitionWrite.getFullNameEn());
+		}});
 		competition.setNames(names);
 
 		return competitionRepository.save(competition);

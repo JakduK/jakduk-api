@@ -1,8 +1,6 @@
 package com.jakduk.api.restcontroller.vo.search;
 
 import com.jakduk.api.model.elasticsearch.EsTermsBucket;
-import lombok.Builder;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -11,9 +9,23 @@ import java.util.List;
  * @since 2016. 12. 26.
  */
 
-@Builder
-@Getter
 public class PopularSearchWordResult {
 	private Long took;
 	private List<EsTermsBucket> popularSearchWords;
+
+	public Long getTook() {
+		return took;
+	}
+
+	public void setTook(Long took) {
+		this.took = took;
+	}
+
+	public List<EsTermsBucket> getPopularSearchWords() {
+		return popularSearchWords;
+	}
+
+	public void setPopularSearchWords(List<EsTermsBucket> popularSearchWords) {
+		this.popularSearchWords = popularSearchWords;
+	}
 }

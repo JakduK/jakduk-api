@@ -1,15 +1,7 @@
 package com.jakduk.api.restcontroller.vo.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
 public class UserPasswordFindForm {
 
     @NotEmpty
@@ -18,4 +10,11 @@ public class UserPasswordFindForm {
     @NotEmpty
     private String callbackUrl;
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
 }

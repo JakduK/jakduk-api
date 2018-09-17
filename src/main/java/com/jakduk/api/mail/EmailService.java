@@ -5,7 +5,8 @@ import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.Token;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
 import com.jakduk.api.repository.TokenRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,9 +21,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-@Slf4j
 @Component
 public class EmailService {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private TokenRepository tokenRepository;
@@ -85,14 +87,13 @@ public class EmailService {
 				tokenRepository.save(token);
 			});
 		} else {
-			Token token = Token.builder()
-					.type(Constants.TOKEN_TYPE.RESET_PASSWORD.name())
-					.email(recipientEmail)
-					.code(code)
-					.expireAt(
-							Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
-					)
-					.build();
+			Token token = new Token();
+			token.setType(Constants.TOKEN_TYPE.RESET_PASSWORD.name());
+			token.setEmail(recipientEmail);
+			token.setCode(code);
+			token.setExpireAt(
+					Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
+			);
 
 			tokenRepository.save(token);
 		}

@@ -9,8 +9,8 @@ import com.jakduk.api.model.db.User;
 import com.jakduk.api.restcontroller.AuthRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
-import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
+import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
 import org.junit.Before;
@@ -72,13 +72,12 @@ public class AuthMvcTests {
     public void setup() {
         providerId = Constants.ACCOUNT_TYPE.DAUM;
 
-        socialProfile = SocialProfile.builder()
-                .id("abc123")
-                .nickname("daumUser01")
-                .email("test17@test.com")
-                .smallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
-                .largePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861")
-                .build();
+        socialProfile = new SocialProfile();
+        socialProfile.setId("abc123");
+        socialProfile.setNickname("daumUser01");
+        socialProfile.setEmail("test17@test.com");
+        socialProfile.setSmallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
+        socialProfile.setLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
     }
 
     @Test
@@ -114,23 +113,23 @@ public class AuthMvcTests {
     @WithMockUser
     public void snsLoginTest() throws Exception {
 
-        LoginSocialUserForm requestForm = LoginSocialUserForm.builder()
-                .accessToken("baada13b7df9af000fa20355bf07b25f808940ab69dd7f32b6c009efdd0f6d29")
-                .build();
+        Map<String, Object> requestForm = new HashMap<String, Object>() {{
+            put("accessToken", "baada13b7df9af000fa20355bf07b25f808940ab69dd7f32b6c009efdd0f6d29");
+        }};
 
         when(authUtils.getDaumProfile(anyString()))
                 .thenReturn(socialProfile);
 
         Optional<User> optUser = Optional.of(
-                User.builder()
-                        .id("58b2dbf1d6d83b04bf365277")
-                        .email("test0711@test.com")
-                        .username("생글이")
-                        .providerId(providerId)
-                        .providerUserId(socialProfile.getId())
-                        .roles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()))
-                        .about("안녕하세요.")
-                        .build()
+                new User() {{
+                    setId("58b2dbf1d6d83b04bf365277");
+                    setEmail("test07@test.com");
+                    setUsername("생글이");
+                    setProviderId(providerId);
+                    setProviderUserId(socialProfile.getId());
+                    setRoles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()));
+                    setAbout("안녕하세요.");
+                }}
         );
 
         when(userService.findOneByProviderIdAndProviderUserId(any(Constants.ACCOUNT_TYPE.class), anyString()))
@@ -172,14 +171,13 @@ public class AuthMvcTests {
     @WithMockUser
     public void getAttemptSocialUserTest() throws Exception {
 
-        AttemptSocialUser expectAttemptSocialUser = AttemptSocialUser.builder()
-                .email(socialProfile.getEmail())
-                .username(socialProfile.getNickname())
-                .providerId(providerId)
-                .providerUserId(socialProfile.getId())
-                .externalLargePictureUrl(socialProfile.getLargePictureUrl())
-                .externalSmallPictureUrl(socialProfile.getSmallPictureUrl())
-                .build();
+        AttemptSocialUser expectAttemptSocialUser = new AttemptSocialUser();
+        expectAttemptSocialUser.setEmail(socialProfile.getEmail());
+        expectAttemptSocialUser.setUsername(socialProfile.getNickname());
+        expectAttemptSocialUser.setProviderId(providerId);
+        expectAttemptSocialUser.setProviderUserId(socialProfile.getId());
+        expectAttemptSocialUser.setExternalLargePictureUrl(socialProfile.getLargePictureUrl());
+        expectAttemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
 
         Map<String, Object> sessionAttributes = new HashMap<>();
         sessionAttributes.put(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, expectAttemptSocialUser);

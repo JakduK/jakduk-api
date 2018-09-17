@@ -1,7 +1,7 @@
 package com.jakduk.api.restcontroller.vo.admin;
 
 import com.jakduk.api.model.db.Jakdu;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import java.util.List;
 

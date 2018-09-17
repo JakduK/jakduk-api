@@ -3,7 +3,8 @@ package com.jakduk.api.service;
 
 import com.jakduk.api.model.db.Sequence;
 import com.jakduk.api.repository.SequenceRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,9 +20,10 @@ import org.springframework.stereotype.Service;
  * @desc     : 공통으로 쓰이는 서비스
  */
 
-@Slf4j
 @Service
 public class CommonService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired private MongoTemplate mongoTemplate;
 	@Autowired private SequenceRepository sequenceRepository;

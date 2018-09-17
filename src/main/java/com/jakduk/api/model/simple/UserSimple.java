@@ -1,10 +1,6 @@
 package com.jakduk.api.model.simple;
 
 import com.jakduk.api.common.Constants;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,10 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
 @Document(collection = Constants.COLLECTION_USER)
 public class UserSimple {
 	
@@ -27,4 +19,24 @@ public class UserSimple {
 	private String username;
 	private String about;
 
+	public UserSimple() {
+	}
+
+	public UserSimple(String id, String username, String about) {
+		this.id = id;
+		this.username = username;
+		this.about = about;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getAbout() {
+		return about;
+	}
 }

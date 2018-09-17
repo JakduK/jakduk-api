@@ -9,7 +9,6 @@ import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.elasticsearch.*;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import com.jakduk.api.restcontroller.vo.search.*;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -30,6 +29,8 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,9 +46,10 @@ import java.util.stream.Collectors;
 * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
 */
 
-@Slf4j
 @Service
 public class SearchService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Resource private JakdukProperties.Elasticsearch elasticsearchProperties;
 
@@ -147,10 +149,10 @@ public class SearchService {
 				})
 				.collect(Collectors.toList());
 
-		return PopularSearchWordResult.builder()
-				.took(searchResponse.getTookInMillis())
-				.popularSearchWords(popularWords)
-				.build();
+		return new PopularSearchWordResult() {{
+			setTook(searchResponse.getTookInMillis());
+			setPopularSearchWords(popularWords);
+		}};
 	}
 
 	public void indexDocumentArticle(EsArticle esArticle) {
@@ -316,10 +318,10 @@ public class SearchService {
 						List<BoardGallerySimple> boardGalleries = esArticleSource.getGalleries().stream()
 								.sorted(Comparator.comparing(String::toString))
 								.limit(1)
-								.map(galleryId -> BoardGallerySimple.builder()
-										.id(galleryId)
-										.thumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, galleryId))
-										.build())
+								.map(galleryId -> new BoardGallerySimple() {{
+									setId(galleryId);
+									setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, galleryId));
+								}})
 								.collect(Collectors.toList());
 
 						articleSource.setGalleries(boardGalleries);
@@ -329,11 +331,11 @@ public class SearchService {
 				})
 				.collect(Collectors.toList());
 
-		return SearchArticleResult.builder()
-				.took(searchResponse.getTook().getMillis())
-				.totalCount(searchHits.getTotalHits())
-				.articles(searchList)
-				.build();
+		return new SearchArticleResult() {{
+			setTook(searchResponse.getTook().getMillis());
+			setTotalCount(searchHits.getTotalHits());
+			setArticles(searchList);
+		}};
 	}
 
 	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
@@ -396,11 +398,11 @@ public class SearchService {
 				})
 				.collect(Collectors.toList());
 
-		return SearchCommentResult.builder()
-				.took(searchResponse.getTook().getMillis())
-				.totalCount(searchHits.getTotalHits())
-				.comments(searchList)
-				.build();
+		return new SearchCommentResult() {{
+			setTook(searchResponse.getTook().getMillis());
+			setTotalCount(searchHits.getTotalHits());
+			setComments(searchList);
+		}};
 	}
 
 	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size, String preTags,
@@ -447,11 +449,11 @@ public class SearchService {
 				})
 				.collect(Collectors.toList());
 
-		return SearchGalleryResult.builder()
-				.took(searchResponse.getTook().getMillis())
-				.totalCount(searchHits.getTotalHits())
-				.galleries(searchList)
-				.build();
+		return new SearchGalleryResult() {{
+			setTook(searchResponse.getTook().getMillis());
+			setTotalCount(searchHits.getTotalHits());
+			setGalleries(searchList);
+		}};
 	}
 
 	private Map<String, List<String>> getHighlight(Set<Map.Entry<String, HighlightField>> entrySet) {

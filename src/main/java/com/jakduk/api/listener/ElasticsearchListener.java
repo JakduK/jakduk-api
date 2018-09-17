@@ -10,7 +10,8 @@ import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.elasticsearch.EsGallery;
 import com.jakduk.api.model.elasticsearch.EsSearchWord;
 import com.jakduk.api.service.SearchService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -26,9 +27,10 @@ import java.util.Map;
  * Created by pyohwanjang on 2017. 6. 20..
  */
 
-@Slf4j
 @Component
 public class ElasticsearchListener {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Resource private JakdukProperties.Rabbitmq rabbitmqProperties;
 

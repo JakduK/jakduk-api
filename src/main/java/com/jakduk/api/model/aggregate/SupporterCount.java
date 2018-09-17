@@ -1,7 +1,6 @@
 package com.jakduk.api.model.aggregate;
 
 import com.jakduk.api.model.db.FootballClub;
-import lombok.Getter;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -10,8 +9,15 @@ import lombok.Getter;
  * @desc     :
  */
 
-@Getter
 public class SupporterCount {
 	private FootballClub supportFC;
 	private Integer count;
+
+	public FootballClub getSupportFC() {
+		return supportFC;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
 }

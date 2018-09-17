@@ -1,15 +1,12 @@
 package com.jakduk.api.restcontroller.vo.admin;
 
-import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
-
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
  * Created by pyohwan on 16. 6. 7.
  */
 
-@Getter
 public class LeagueAttendanceForm {
 
     private String id;
@@ -31,4 +28,32 @@ public class LeagueAttendanceForm {
 
     @NotNull
     private Integer numberOfClubs;
+
+    public String getId() {
+        return id;
+    }
+
+    public String getCompetitionId() {
+        return competitionId;
+    }
+
+    public Integer getSeason() {
+        return season;
+    }
+
+    public Integer getGames() {
+        return games;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    public Integer getAverage() {
+        return average;
+    }
+
+    public Integer getNumberOfClubs() {
+        return numberOfClubs;
+    }
 }

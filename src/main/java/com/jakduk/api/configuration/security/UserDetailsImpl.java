@@ -3,8 +3,6 @@ package com.jakduk.api.configuration.security;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.UserPictureInfo;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,10 +15,10 @@ public class UserDetailsImpl implements UserDetails {
 
 	private String password;
 	private String username;									// email
-	@Getter private final String id;
-	@Getter private final String nickname;						// 별명
-	@Getter private final Constants.ACCOUNT_TYPE providerId;
-	@Getter @Setter	private UserPictureInfo picture;
+	private final String id;
+	private final String nickname;						// 별명
+	private final Constants.ACCOUNT_TYPE providerId;
+	private UserPictureInfo picture;
 
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
@@ -113,5 +111,25 @@ public class UserDetailsImpl implements UserDetails {
 
 			return g1.getAuthority().compareTo(g2.getAuthority());
 		}
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public Constants.ACCOUNT_TYPE getProviderId() {
+		return providerId;
+	}
+
+	public UserPictureInfo getPicture() {
+		return picture;
+	}
+
+	public void setPicture(UserPictureInfo picture) {
+		this.picture = picture;
 	}
 }

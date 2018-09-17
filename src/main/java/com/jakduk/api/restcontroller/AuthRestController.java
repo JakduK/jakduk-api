@@ -12,8 +12,9 @@ import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -31,10 +32,11 @@ import java.util.Optional;
  * 16. 6. 29 오전 12:27
  */
 
-@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthRestController {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired private AuthUtils authUtils;
     @Autowired private AuthenticationManager authenticationManager;
@@ -79,11 +81,10 @@ public class AuthRestController {
         }
 
         // 그냥 신규 가입으로 프로필을 세션에 임시 저장한다.
-        AttemptSocialUser attemptSocialUser = AttemptSocialUser.builder()
-                .username(socialProfile.getNickname())
-                .providerId(cvtProviderId)
-                .providerUserId(socialProfile.getId())
-                .build();
+        AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
+        attemptSocialUser.setUsername(socialProfile.getNickname());
+        attemptSocialUser.setProviderId(cvtProviderId);
+        attemptSocialUser.setProviderUserId(socialProfile.getId());
 
         if (StringUtils.isNotBlank(socialProfile.getEmail()))
             attemptSocialUser.setEmail(socialProfile.getEmail());

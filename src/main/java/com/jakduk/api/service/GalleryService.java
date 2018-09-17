@@ -20,11 +20,12 @@ import com.jakduk.api.restcontroller.vo.gallery.GalleryOnList;
 import com.jakduk.api.restcontroller.vo.gallery.GalleryResponse;
 import com.jakduk.api.restcontroller.vo.gallery.SurroundingsGallery;
 import com.jakduk.api.restcontroller.vo.home.HomeGallery;
-import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -57,9 +57,10 @@ import java.util.stream.Stream;
  * @desc     :
  */
 
-@Slf4j
 @Service
 public class GalleryService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Resource private JakdukProperties.Storage storageProperties;
 
@@ -208,11 +209,7 @@ public class GalleryService {
                     .collect(Collectors.toList());
         }
 
-		return GalleryResponse.builder()
-				.gallery(galleryDetail)
-				.surroundingsGalleries(surroundingsGalleries)
-          		.linkedPosts(linkedPosts)
-				.build();
+		return new GalleryResponse(galleryDetail, surroundingsGalleries, linkedPosts);
 	}
 
 	/**
@@ -227,15 +224,14 @@ public class GalleryService {
 		if (oGallery.isPresent())
 			return oGallery.get();
 
-		Gallery gallery = Gallery.builder()
-				.contentType(contentType)
-				.writer(writer)
-				.status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
-				.fileName(fileName)
-				.size(size)
-				.fileSize(size)
-				.hash(DigestUtils.md5DigestAsHex(bytes))
-				.build();
+		Gallery gallery = new Gallery();
+		gallery.setContentType(contentType);
+		gallery.setWriter(writer);
+		gallery.setStatus(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP));
+		gallery.setFileName(fileName);
+		gallery.setSize(size);
+		gallery.setFileSize(size);
+		gallery.setHash(DigestUtils.md5DigestAsHex(bytes));
 
 		galleryRepository.save(gallery);
 
@@ -386,10 +382,7 @@ public class GalleryService {
 	public void processLinkedGalleries(String userId, List<Gallery> galleries, List<GalleryOnBoard> galleriesForInsertion,
 									   List<String> galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE fromType, String itemId) {
 
-		LinkedItem linkedItem = LinkedItem.builder()
-				.id(itemId)
-				.from(fromType)
-				.build();
+		LinkedItem linkedItem = new LinkedItem(itemId, fromType);
 
 		// Galleries 와 해당 Item을 연결 한다.
 		galleries.forEach(gallery -> {

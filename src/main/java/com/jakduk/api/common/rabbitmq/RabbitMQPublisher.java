@@ -11,7 +11,8 @@ import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.SimpleWriter;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,9 +28,10 @@ import java.util.Objects;
  * Created by pyohwanjang on 2017. 6. 17..
  */
 
-@Slf4j
 @Component
 public class RabbitMQPublisher {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final String QUEUE_EMAIL = "email";
     private final String QUEUE_ELASTICSEARCH = "elasticsearch";
@@ -141,7 +143,7 @@ public class RabbitMQPublisher {
     public void indexDocumentSearchWord(String word, CommonWriter writer) {
         EsSearchWord esSearchWord = new EsSearchWord();
         esSearchWord.setWord(word);
-        esSearchWord.setWriter(Objects.nonNull(writer) ? new SimpleWriter(writer) : null);
+        esSearchWord.setWriter(Objects.nonNull(writer) ? new SimpleWriter(writer.getUserId(), writer.getUsername()) : null);
         esSearchWord.setRegisterDate(LocalDateTime.now());
 
         String routingKey = rabbitmqProperties.getRoutingKeys().get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD.getRoutingKey());

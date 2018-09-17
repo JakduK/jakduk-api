@@ -2,7 +2,6 @@ package com.jakduk.api.model.simple;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.CommonWriter;
-import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,7 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
-@Getter
 @Document(collection = Constants.COLLECTION_GALLERY)
 public class GallerySimple {
 	
@@ -22,4 +20,15 @@ public class GallerySimple {
 	private String name;
 	private CommonWriter writer;
 
+	public String getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public CommonWriter getWriter() {
+		return writer;
+	}
 }

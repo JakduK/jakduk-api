@@ -2,15 +2,11 @@ package com.jakduk.api.restcontroller.vo.gallery;
 
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.GalleryStatus;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Created by pyohwanjang on 2017. 4. 3..
  */
 
-@Getter
-@Setter
 public class GalleryDetail {
 
     private String id; // 사진 ID
@@ -20,4 +16,51 @@ public class GalleryDetail {
     private String thumbnailUrl; // 사진 썸네일 URL
     private GalleryStatus status; // 사진 상태
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public CommonWriter getWriter() {
+        return writer;
+    }
+
+    public void setWriter(CommonWriter writer) {
+        this.writer = writer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public GalleryStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(GalleryStatus status) {
+        this.status = status;
+    }
 }

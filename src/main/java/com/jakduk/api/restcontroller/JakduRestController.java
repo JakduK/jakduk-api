@@ -82,7 +82,7 @@ public class JakduRestController {
                 .collect(Collectors.toMap(Competition::getId, competition -> competition.getNames().get(0)));
 
         JakduScheduleResponse response = new JakduScheduleResponse();
-        response.setJakduSchedules(jakduSchedules);
+        response.setSchedules(jakduSchedules);
         response.setFcNames(fcNames);
         response.setCompetitionNames(competitionNames);
 
@@ -166,10 +166,10 @@ public class JakduRestController {
         Integer numberOfLike = Objects.nonNull(jakduComment.getUsersLiking()) ? jakduComment.getUsersLiking().size() : 0;
         Integer numberOfDisLike = Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;
 
-        return UserFeelingResponse.builder()
-                .myFeeling(feeling)
-                .numberOfLike(numberOfLike)
-                .numberOfDislike(numberOfDisLike)
-                .build();
+        return new UserFeelingResponse() {{
+            setMyFeeling(feeling);
+            setNumberOfLike(numberOfLike);
+            setNumberOfDislike(numberOfDisLike);
+        }};
     }
 }

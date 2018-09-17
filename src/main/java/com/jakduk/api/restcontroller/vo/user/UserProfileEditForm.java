@@ -2,13 +2,9 @@ package com.jakduk.api.restcontroller.vo.user;
 
 import com.jakduk.api.common.constraint.ExistEmail;
 import com.jakduk.api.common.constraint.ExistUsername;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 /**
@@ -20,10 +16,6 @@ import javax.validation.constraints.Size;
  * @desc     : 회원 편집 폼
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
 public class UserProfileEditForm {
 
 	@Size(min = 6, max=30)
@@ -40,4 +32,24 @@ public class UserProfileEditForm {
 	private String about; // 자기 소개
 	private String footballClub; // 축구단(FootballClub) ID
 	private String userPictureId; // UserPicture의 ID
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getAbout() {
+		return about;
+	}
+
+	public String getFootballClub() {
+		return footballClub;
+	}
+
+	public String getUserPictureId() {
+		return userPictureId;
+	}
 }

@@ -1,10 +1,6 @@
 package com.jakduk.api.restcontroller.vo.admin;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
-
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -14,14 +10,11 @@ import javax.validation.constraints.NotNull;
  * @desc     :
  */
 
-@NoArgsConstructor
-@Setter
-@Getter
 public class AttendanceClubForm {
 
 	@NotEmpty
 	private String origin;
-	
+
 	@NotEmpty
 	private String league;
 	
@@ -37,4 +30,51 @@ public class AttendanceClubForm {
 	@NotNull
 	private Integer average;
 
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public String getLeague() {
+		return league;
+	}
+
+	public void setLeague(String league) {
+		this.league = league;
+	}
+
+	public Integer getSeason() {
+		return season;
+	}
+
+	public void setSeason(Integer season) {
+		this.season = season;
+	}
+
+	public Integer getGames() {
+		return games;
+	}
+
+	public void setGames(Integer games) {
+		this.games = games;
+	}
+
+	public Integer getTotal() {
+		return total;
+	}
+
+	public void setTotal(Integer total) {
+		this.total = total;
+	}
+
+	public Integer getAverage() {
+		return average;
+	}
+
+	public void setAverage(Integer average) {
+		this.average = average;
+	}
 }

@@ -2,12 +2,8 @@ package com.jakduk.api.restcontroller.vo.user;
 
 import com.jakduk.api.common.constraint.FieldMatch;
 import com.jakduk.api.common.constraint.PasswordMatch;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 /**
@@ -19,10 +15,6 @@ import javax.validation.constraints.Size;
  * @desc     :
  */
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
 @FieldMatch(first = "newPassword", second = "newPasswordConfirm", message = "{validation.msg.new.password.mismatch}")
 public class UserPasswordForm {
 
@@ -38,4 +30,16 @@ public class UserPasswordForm {
 	@Size(min = 4, max=20)
 	@NotEmpty
 	private String newPasswordConfirm;
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public String getNewPasswordConfirm() {
+		return newPasswordConfirm;
+	}
 }

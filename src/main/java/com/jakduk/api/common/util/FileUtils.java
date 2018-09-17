@@ -3,8 +3,6 @@ package com.jakduk.api.common.util;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import lombok.Builder;
-import lombok.Getter;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.commons.io.IOUtils;
@@ -159,20 +157,35 @@ public class FileUtils {
         BufferedInputStream in = new BufferedInputStream(url.openStream());
         byte[] bytes = IOUtils.toByteArray(in);
 
-        return FileInfo.builder()
-                .contentType(contentType)
-                .contentLength(contentLength)
-                .bytes(bytes)
-                .build();
+        return new FileInfo(contentType, contentLength, bytes);
     }
 
-    @Builder
-    @Getter
     public static class FileInfo {
 
         private String contentType;
         private Long contentLength;
         private byte[] bytes;
+
+        public FileInfo() {
+        }
+
+        public FileInfo(String contentType, Long contentLength, byte[] bytes) {
+            this.contentType = contentType;
+            this.contentLength = contentLength;
+            this.bytes = bytes;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public Long getContentLength() {
+            return contentLength;
+        }
+
+        public byte[] getBytes() {
+            return bytes;
+        }
     }
 
     /**

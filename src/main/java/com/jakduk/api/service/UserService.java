@@ -26,9 +26,10 @@ import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
 import com.jakduk.api.restcontroller.vo.user.UserPasswordFindResponse;
 import com.jakduk.api.restcontroller.vo.user.UserProfileResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,9 +44,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class UserService {
+
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Resource private JakdukProperties.Storage storageProperties;
 	@Resource private AuthUtils authUtils;
@@ -105,14 +107,12 @@ public class UserService {
 
 		UserPicture userPicture = null;
 
-		User user = User.builder()
-				.email(email)
-				.username(username)
-				.password(passwordEncoder.encode(password))
-				.providerId(Constants.ACCOUNT_TYPE.JAKDUK)
-				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()))
-				.lastLogged(LocalDateTime.now())
-				.build();
+		User user = new User();
+		user.setEmail(email);
+		user.setUsername(username);
+		user.setPassword(passwordEncoder.encode(password));
+		user.setProviderId(Constants.ACCOUNT_TYPE.JAKDUK);
+		user.setRoles(Collections.singletonList(JakdukAuthority.ROLE_USER_01.getCode()));
 
 		this.setUserAdditionalInfo(user, footballClub, about);
 
@@ -143,14 +143,12 @@ public class UserService {
 
 		UserPicture userPicture = null;
 
-		User user = User.builder()
-				.email(email)
-				.username(username)
-				.providerId(providerId)
-				.providerUserId(providerUserId)
-				.roles(Collections.singletonList(JakdukAuthority.ROLE_USER_02.getCode()))
-				.lastLogged(LocalDateTime.now())
-				.build();
+		User user = new User();
+		user.setEmail(email);
+		user.setUsername(username);
+		user.setProviderId(providerId);
+		user.setProviderUserId(providerUserId);
+		user.setRoles(Collections.singletonList(JakdukAuthority.ROLE_USER_02.getCode()));
 
 		this.setUserAdditionalInfo(user, footballClub, about);
 
@@ -170,10 +168,8 @@ public class UserService {
 				if (! StringUtils.startsWithIgnoreCase(fileInfo.getContentType(), "image/"))
 					throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
-				userPicture = UserPicture.builder()
-						.status(Constants.GALLERY_STATUS_TYPE.TEMP)
-						.contentType(fileInfo.getContentType())
-						.build();
+				userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.TEMP);
+				userPicture.setContentType(fileInfo.getContentType());
 
 				userPictureRepository.save(userPicture);
 
@@ -214,6 +210,8 @@ public class UserService {
 
 		if (StringUtils.isNotBlank(about))
 			user.setAbout(about.trim());
+
+		user.setLastLogged(LocalDateTime.now());
 	}
 
 	public User editUserProfile(String userId, String email, String username, String footballClubId, String about,
@@ -305,10 +303,7 @@ public class UserService {
 			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");
 		}
 
-		return UserPasswordFindResponse.builder()
-				.subject(email)
-				.message(message)
-				.build();
+		return new UserPasswordFindResponse(email, message);
 	}
 
 	public UserPasswordFindResponse validPasswordTokenCode(String code) {
@@ -316,10 +311,7 @@ public class UserService {
 		Token token = tokenRepository.findOneByCode(code)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND, JakdukUtils.getMessageSource("user.msg.reset.password.invalid")));
 
-		return UserPasswordFindResponse.builder()
-				.subject(token.getEmail())
-				.message(token.getCode())
-				.build();
+		return new UserPasswordFindResponse(token.getEmail(), token.getCode());
 	}
 
 	public UserPasswordFindResponse resetPasswordWithToken(String code, String password) {
@@ -348,10 +340,7 @@ public class UserService {
 			message = JakdukUtils.getMessageSource("user.msg.reset.password.invalid");
 		}
 
-		return UserPasswordFindResponse.builder()
-				.subject(subject)
-				.message(message)
-				.build();
+		return new UserPasswordFindResponse(subject, message);
 	}
 
 	/**
@@ -359,10 +348,9 @@ public class UserService {
 	 */
 	public UserPicture uploadUserPicture(String contentType, long size, byte[] bytes) {
 
-		UserPicture userPicture = UserPicture.builder()
-				.status(Constants.GALLERY_STATUS_TYPE.TEMP)
-				.contentType(contentType)
-				.build();
+		UserPicture userPicture = new UserPicture();
+		userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.TEMP);
+		userPicture.setContentType(contentType);
 
 		userPictureRepository.save(userPicture);
 
@@ -389,13 +377,12 @@ public class UserService {
 		UserProfile user = userProfileRepository.findOneById(id)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 
-		UserProfileResponse response = UserProfileResponse.builder()
-				.email(user.getEmail())
-				.username(user.getUsername())
-				.about(user.getAbout())
-				.providerId(user.getProviderId())
-				.temporaryEmail(JakdukUtils.isTempararyEmail(user.getEmail()))
-				.build();
+		UserProfileResponse response = new UserProfileResponse();
+		response.setEmail(user.getEmail());
+		response.setUsername(user.getUsername());
+		response.setAbout(user.getAbout());
+		response.setProviderId(user.getProviderId());
+		response.setTemporaryEmail(JakdukUtils.isTempararyEmail(user.getEmail()));
 
 		FootballClub footballClub = user.getSupportFC();
 		UserPicture userPicture = user.getUserPicture();

@@ -19,8 +19,9 @@ import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
 import com.jakduk.api.restcontroller.vo.admin.JakduCommentWriteRequest;
 import com.jakduk.api.restcontroller.vo.admin.JakduCommentsResponse;
 import com.jakduk.api.restcontroller.vo.admin.MyJakduRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,8 +38,9 @@ import java.util.Objects;
  */
 
 @Service
-@Slf4j
 public class JakduService {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired private JakduRepository jakduRepository;
     @Autowired private JakduScheduleRepository jakduScheduleRepository;
@@ -137,11 +139,7 @@ public class JakduService {
 
         Integer count = jakduCommentRepository.countByJakduScheduleId(jakduScheduleId);
 
-        JakduCommentsResponse response = new JakduCommentsResponse();
-        response.setComments(comments);
-        response.setCount(count);
-
-        return response;
+        return new JakduCommentsResponse(comments, count);
     }
 
     /**

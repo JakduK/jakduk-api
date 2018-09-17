@@ -1,8 +1,6 @@
 package com.jakduk.api.restcontroller.vo.search;
 
 import com.jakduk.api.model.elasticsearch.EsCommentSource;
-import lombok.Builder;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -11,11 +9,33 @@ import java.util.List;
  * @since 2016. 12. 2.
  */
 
-@Builder
-@Getter
 public class SearchCommentResult {
 
 	private Long took;
 	private Long totalCount;
 	private List<EsCommentSource> comments;
+
+	public Long getTook() {
+		return took;
+	}
+
+	public void setTook(Long took) {
+		this.took = took;
+	}
+
+	public Long getTotalCount() {
+		return totalCount;
+	}
+
+	public void setTotalCount(Long totalCount) {
+		this.totalCount = totalCount;
+	}
+
+	public List<EsCommentSource> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<EsCommentSource> comments) {
+		this.comments = comments;
+	}
 }

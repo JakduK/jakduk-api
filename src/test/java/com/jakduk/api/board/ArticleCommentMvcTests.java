@@ -41,10 +41,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -83,15 +80,14 @@ public class ArticleCommentMvcTests {
     private BoardCategory boardCategory;
     private List<GetArticleComment> articleComments;
     private List<Gallery> galleries;
-    private WriteArticleComment writeArticleComment;
+    private Map<String, Object> writeArticleComment;
 
     @Before
     public void setUp(){
-        commonWriter = CommonWriter.builder()
-                .userId("571ccf50ccbfc325b20711c5")
-                .username("test07")
-                .providerId(Constants.ACCOUNT_TYPE.JAKDUK)
-                .build();
+        commonWriter = new CommonWriter();
+        commonWriter.setUserId("571ccf50ccbfc325b20711c5");
+        commonWriter.setUsername("test07");
+        commonWriter.setProviderId(Constants.ACCOUNT_TYPE.JAKDUK);
 
         List<CommonFeelingUser> commonFeelingUsers = Arrays.asList(new CommonFeelingUser("58ee4993807d713fa7735f1d", "566d68d5e4b0dfaaa5b98685", "test05"));
 
@@ -99,40 +95,42 @@ public class ArticleCommentMvcTests {
 
         boardCategory = categories.get(0);
 
-        article = Article.builder()
-                .id("59c8879fa2b594c5d33e6ac4")
-                .seq(2)
-                .writer(commonWriter)
-                .subject("글 제목입니다.")
-                .content("내용입니다. 아주 길 수도 있음.")
-                .board(Constants.BOARD_TYPE.FOOTBALL.name())
-                .category(boardCategory.getCode())
-                .views(15)
-                .usersLiking(commonFeelingUsers)
-                .usersDisliking(commonFeelingUsers)
-                .status(new ArticleStatus(false, false))
-                .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
-                .shortContent("본문입니다. (100자)")
-                .lastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"))
-                .linkedGallery(true)
-                .build();
+        article = new Article();
+        article.setId("59c8879fa2b594c5d33e6ac4");
+        article.setSeq(2);
+        article.setWriter(commonWriter);
+        article.setSubject("글 제목입니다.");
+        article.setContent("내용입니다. 아주 길 수도 있음.");
+        article.setBoard(Constants.BOARD_TYPE.FOOTBALL.name());
+        article.setCategory(boardCategory.getCode());
+        article.setViews(15);
+        article.setUsersLiking(commonFeelingUsers);
+        article.setUsersDisliking(commonFeelingUsers);
+        article.setStatus(new ArticleStatus(false, false));
+        article.setLogs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))));
+        article.setShortContent("본문입니다. (100자)");
+        article.setLastUpdated(LocalDateTime.parse("2017-09-27T23:42:44.810"));
+        article.setLinkedGallery(true);
 
-        articleComment = ArticleComment.builder()
-                .id("54b5058c3d96b205dc7e2809")
-                .article(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()))
-                .writer(commonWriter)
-                .content("댓글 내용입니다.")
-                .usersLiking(commonFeelingUsers)
-                .usersDisliking(commonFeelingUsers)
-                .linkedGallery(true)
-                .logs(Arrays.asList(new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05"))))
-                .build();
+        articleComment = new ArticleComment();
+        articleComment.setId("54b5058c3d96b205dc7e2809");
+        articleComment.setArticle(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()));
+        articleComment.setWriter(commonWriter);
+        articleComment.setContent("댓글 내용입니다.");
+        articleComment.setUsersLiking(commonFeelingUsers);
+        articleComment.setUsersDisliking(commonFeelingUsers);
+        articleComment.setLinkedGallery(true);
+        articleComment.setLogs(
+                Arrays.asList(
+                        new BoardLog("58e9959b807d71113a999c6d", Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), new SimpleWriter("58ee4993807d713fa7735f1d", "test05")))
+        );
+
 
         List<BoardGallerySimple> articleGalleries = Arrays.asList(
-                BoardGallerySimple.builder()
-                        .id("58b9050b807d714eaf50a111")
-                        .thumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111")
-                        .build()
+                new BoardGallerySimple() {{
+                    setId("58b9050b807d714eaf50a111");
+                    setThumbnailUrl("https://dev-api.jakduk.com//gallery/thumbnail/58b9050b807d714eaf50a111");
+                }}
         );
 
         articleSimple = new ArticleSimple();
@@ -166,33 +164,30 @@ public class ArticleCommentMvcTests {
         GalleryOnBoard galleryOnBoard = new GalleryOnBoard("59c2945bbe3eb62dfca3ed97", "공차는사진");
 
         galleries = Arrays.asList(
-                Gallery.builder()
-                        .id(galleryOnBoard.getId())
-                        .name(galleryOnBoard.getName())
-                        .fileName("Cat Profile-48.png")
-                        .contentType("image/png")
-                        .writer(commonWriter)
-                        .size(1149L)
-                        .fileSize(1870L)
-                        .status(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP))
-                        .hash("7eb65b85521d247ab4c5f79e279c03db")
-                        .build()
+                new Gallery() {{
+                    setId(galleryOnBoard.getId());
+                    setName(galleryOnBoard.getName());
+                    setFileName("Cat Profile-48.png");
+                    setContentType("image/png");
+                    setWriter(commonWriter);
+                    setSize(1149L);
+                    setFileSize(1870L);
+                    setStatus(new GalleryStatus(Constants.GALLERY_STATUS_TYPE.TEMP));
+                    setHash("7eb65b85521d247ab4c5f79e279c03db");
+                }}
         );
 
-        writeArticleComment = WriteArticleComment.builder()
-                .content(articleComment.getContent())
-                .galleries(Arrays.asList(galleryOnBoard))
-                .build();
+        writeArticleComment = new HashMap<String, Object>() {{
+            put("content", articleComment.getContent());
+            put("galleries", Arrays.asList(galleryOnBoard));
+        }};
     }
 
     @Test
     @WithMockJakdukUser
     public void getArticleDetailCommentsTest() throws Exception {
 
-        GetArticleDetailCommentsResponse expectResponse = GetArticleDetailCommentsResponse.builder()
-                .comments(articleComments)
-                .count(articleComments.size())
-                .build();
+        GetArticleDetailCommentsResponse expectResponse = new GetArticleDetailCommentsResponse(articleComments, articleComments.size());
 
         when(articleService.getArticleDetailComments(any(CommonWriter.class), any(Constants.BOARD_TYPE.class), anyInt(), anyString()))
                 .thenReturn(expectResponse);
@@ -342,11 +337,10 @@ public class ArticleCommentMvcTests {
         List<CommonFeelingUser> usersLiking = articleComment.getUsersLiking();
         List<CommonFeelingUser> usersDisliking = articleComment.getUsersDisliking();
 
-        UserFeelingResponse expectResponse = UserFeelingResponse.builder()
-                .myFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking))
-                .numberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size())
-                .numberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size())
-                .build();
+        UserFeelingResponse expectResponse = new UserFeelingResponse();
+        expectResponse.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
+        expectResponse.setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
+        expectResponse.setNumberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
 
         mvc.perform(
                 post("/api/board/{board}/comment/{commentId}/{feeling}", articleComment.getArticle().getBoard().toLowerCase(),
