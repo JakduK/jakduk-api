@@ -1,4 +1,6 @@
 logging:
+  pattern:
+    file: "%d{ISO8601} [%thread] [%-5level] [%logger{0}.%M:%line] - %msg%n%rEx"
   file: /jakduk/api/logs/api.log
   level:
     root: DEBUG
