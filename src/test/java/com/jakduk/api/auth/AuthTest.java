@@ -77,6 +77,7 @@ public class AuthTest extends ApiApplicationTests {
 
     }
 
+    @Ignore
     @Test
     public void getKakaoProfileInfo() {
         SocialProfile socialProfile = authUtils.getKakaoProfile("AekzZJgcpLOQaxwpa-TySpBqFsszWctZ09dNSgo8BVUAAAFowxN59A");
