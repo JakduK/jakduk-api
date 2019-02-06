@@ -59,6 +59,9 @@ public class AuthRestController {
             case FACEBOOK:
                 socialProfile = authUtils.getFacebookProfile(form.getAccessToken());
                 break;
+            case KAKAO:
+                socialProfile = authUtils.getKakaoProfile(form.getAccessToken());
+                break;
         }
 
         log.info("loginSnsUser form={}, socialProfile={}", form, socialProfile);
