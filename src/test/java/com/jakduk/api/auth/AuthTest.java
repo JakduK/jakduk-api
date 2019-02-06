@@ -1,7 +1,10 @@
 package com.jakduk.api.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.common.util.AuthUtils;
+import com.jakduk.api.restcontroller.vo.user.SocialProfile;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
  * @author pyohwan
  *         16. 7. 31 오후 8:29
  */
-public class AuthTest {
+public class AuthTest extends ApiApplicationTests {
 
     @Autowired
     private AuthUtils authUtils;
@@ -72,5 +75,11 @@ public class AuthTest {
 
         //System.out.println(userUtils.getDaumProfile("261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095"));
 
+    }
+
+    @Test
+    public void getKakaoProfileInfo() {
+        SocialProfile socialProfile = authUtils.getKakaoProfile("AekzZJgcpLOQaxwpa-TySpBqFsszWctZ09dNSgo8BVUAAAFowxN59A");
+        Assert.assertFalse(socialProfile.getId().isEmpty());
     }
 }

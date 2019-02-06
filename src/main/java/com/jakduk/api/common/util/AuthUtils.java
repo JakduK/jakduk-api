@@ -47,6 +47,7 @@ public class AuthUtils {
     private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
     private final String FACEBOOK_PROFILE_THUMBNAIL_API_URL = "https://graph.facebook.com/v2.8/me?fields=picture.type(small)&format=json";
+    private final String KAKAO_PROFILE_API_URL = "https://kapi.kakao.com/v2/user/me";
 
     /**
      * 손님인지 검사.
@@ -118,7 +119,7 @@ public class AuthUtils {
     }
 
     /**
-     * 로그인 중인 회원이 이메일 기반인지 검사.
+     * 로그인 중인 회원이 이메일 가입 회원 인지 검사.
      * @return 이메일 기반이면 true, 아니면 false
      */
     public static Boolean isJakdukUser() {
@@ -143,7 +144,8 @@ public class AuthUtils {
 
             Constants.ACCOUNT_TYPE providerId = userDetail.getProviderId();
 
-            return providerId.equals(Constants.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(Constants.ACCOUNT_TYPE.DAUM);
+            return providerId.equals(Constants.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(Constants.ACCOUNT_TYPE.DAUM) ||
+                    providerId.equals(Constants.ACCOUNT_TYPE.KAKAO);
         } else {
             return false;
         }
@@ -254,6 +256,30 @@ public class AuthUtils {
             JsonNode jsonNodeThumbnail = fetchProfile(FACEBOOK_PROFILE_THUMBNAIL_API_URL, accessToken);
             String smallPictureUrl = jsonNodeThumbnail.get("picture").get("data").get("url").asText();
             profile.setSmallPictureUrl(smallPictureUrl);
+        }
+
+        return profile;
+    }
+
+    public SocialProfile getKakaoProfile(String accessToken) {
+
+        JsonNode jsonNode = fetchProfile(KAKAO_PROFILE_API_URL, accessToken);
+
+        SocialProfile profile = new SocialProfile();
+        profile.setId(jsonNode.get("id").asText());
+        profile.setNickname(jsonNode.get("properties").get("nickname").asText());
+        profile.setLargePictureUrl(jsonNode.get("properties").get("profile_image").asText());
+        profile.setSmallPictureUrl(jsonNode.get("properties").get("thumbnail_image").asText());
+
+        if (jsonNode.has("kakao_account")) {
+
+            if (jsonNode.get("kakao_account").get("has_email").asBoolean() &&
+                    jsonNode.get("kakao_account").get("is_email_verified").asBoolean()) {
+
+                if (StringUtils.isNotBlank(jsonNode.get("kakao_account").get("email").asText())) {
+                    profile.setEmail(jsonNode.get("kakao_account").get("email").asText());
+                }
+            }
         }
 
         return profile;

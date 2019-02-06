@@ -54,4 +54,15 @@ public class SocialProfile {
     public void setLargePictureUrl(String largePictureUrl) {
         this.largePictureUrl = largePictureUrl;
     }
+
+    @Override
+    public String toString() {
+        return "SocialProfile{" +
+                "id='" + id + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                ", smallPictureUrl='" + smallPictureUrl + '\'' +
+                ", largePictureUrl='" + largePictureUrl + '\'' +
+                '}';
+    }
 }
