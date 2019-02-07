@@ -144,12 +144,17 @@ public class AuthUtils {
 
             Constants.ACCOUNT_TYPE providerId = userDetail.getProviderId();
 
-            return providerId.equals(Constants.ACCOUNT_TYPE.FACEBOOK) || providerId.equals(Constants.ACCOUNT_TYPE.DAUM) ||
-                    providerId.equals(Constants.ACCOUNT_TYPE.KAKAO);
+            switch (providerId) {
+                case KAKAO:
+                case DAUM:
+                case FACEBOOK:
+                    return true;
+                default:
+                    return false;
+            }
         } else {
             return false;
         }
-
     }
 
     /**
