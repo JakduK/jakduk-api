@@ -54,7 +54,7 @@ public class AuthUtils {
     /**
      * 손님인지 검사.
      */
-    public static Boolean amIAnonymous() {
+    public static Boolean isAnonymousSessionUser() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -78,7 +78,7 @@ public class AuthUtils {
      * 로그인 중인 회원이 관리자인지 검사.
      * @return 관리자 이면 true
      */
-    public static Boolean amIAdmin() {
+    public static Boolean isAdminSessionUser() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -101,7 +101,7 @@ public class AuthUtils {
      *
      * @return 회원이면 true
      */
-    public static Boolean amIUserRole() {
+    public static Boolean isSessionUserRole() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -124,7 +124,7 @@ public class AuthUtils {
      * 로그인 중인 회원이 이메일 가입 회원 인지 검사.
      * @return 이메일 기반이면 true, 아니면 false
      */
-    public static Boolean amIJakdukUser() {
+    public static Boolean isJakdukSessionUser() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -137,7 +137,7 @@ public class AuthUtils {
         }
     }
 
-    public static Boolean amISnsUser() {
+    public static Boolean isSnsSessionUser() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -175,7 +175,7 @@ public class AuthUtils {
     /**
      * 로그인 중인 회원 정보를 가져온다.
      */
-    public static SessionUser getMySessionProfile() {
+    public static SessionUser getSessionProfile() {
         SessionUser sessionUser = null;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -205,8 +205,8 @@ public class AuthUtils {
     /**
      * CommonWriter를 가져온다.
      */
-    public static CommonWriter getCommonWriter() {
-        SessionUser sessionUser = getMySessionProfile();
+    public static CommonWriter getCommonWriterFromSession() {
+        SessionUser sessionUser = getSessionProfile();
 
         if (Objects.nonNull(sessionUser)) {
             CommonWriter commonWriter = new CommonWriter();

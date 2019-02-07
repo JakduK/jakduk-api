@@ -32,7 +32,7 @@ public class ExistEmailValidator implements ConstraintValidator<ExistEmail, Stri
         if (StringUtils.isEmpty(value))
             return false;
 
-        SessionUser sessionUser = AuthUtils.getMySessionProfile();
+        SessionUser sessionUser = AuthUtils.getSessionProfile();
 
         if (Objects.isNull(sessionUser)) {
             Optional<UserProfile> optUserProfile = userProfileRepository.findOneByEmail(value.trim());

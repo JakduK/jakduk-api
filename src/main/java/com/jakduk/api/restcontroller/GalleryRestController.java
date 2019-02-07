@@ -65,7 +65,7 @@ public class GalleryRestController {
         if (! StringUtils.startsWithIgnoreCase(contentType, "image/"))
             throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         Gallery gallery = galleryService.uploadImage(commonWriter, file.getOriginalFilename(), file.getSize(),
                 contentType, file.getBytes());
@@ -86,10 +86,10 @@ public class GalleryRestController {
             @RequestBody(required = false) LinkedItemForm form,
             HttpServletRequest request) {
 
-        if (! AuthUtils.amIUserRole())
+        if (! AuthUtils.isSessionUserRole())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        SessionUser sessionUser = AuthUtils.getMySessionProfile();
+        SessionUser sessionUser = AuthUtils.getSessionProfile();
 
         galleryService.deleteGallery(id, sessionUser.getId());
 
