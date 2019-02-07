@@ -47,7 +47,8 @@ public class Constants {
 		JAKDUK,
 		FACEBOOK,
 		KAKAO,
-		NAVER
+		NAVER,
+		GOOGLE
 	}
 
 	// 게시물 감정 표현. 좋아요, 싫어요

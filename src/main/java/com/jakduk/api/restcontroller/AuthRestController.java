@@ -80,11 +80,8 @@ public class AuthRestController {
         if (StringUtils.isNotBlank(socialProfile.getEmail()))
             attemptSocialUser.setEmail(socialProfile.getEmail());
 
-        if (StringUtils.isNotBlank(socialProfile.getLargePictureUrl()))
-            attemptSocialUser.setExternalLargePictureUrl(socialProfile.getLargePictureUrl());
-
-        if (StringUtils.isNotBlank(socialProfile.getSmallPictureUrl()))
-            attemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
+        if (StringUtils.isNotBlank(socialProfile.getPictureUrl()))
+            attemptSocialUser.setExternalLargePictureUrl(socialProfile.getPictureUrl());
 
         session.setAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
 
@@ -105,7 +102,7 @@ public class AuthRestController {
 
     // 세션에 있는 나의 프로필 정보
     @GetMapping("/user")
-    public SessionUser getMySessionProfile() {
+    public SessionUser getSessionProfile() {
 
         SessionUser sessionUser = AuthUtils.getSessionProfile();
 
