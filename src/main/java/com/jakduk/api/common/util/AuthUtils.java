@@ -54,7 +54,7 @@ public class AuthUtils {
     /**
      * 손님인지 검사.
      */
-    public static Boolean isAnonymous() {
+    public static Boolean amIAnonymous() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -78,7 +78,7 @@ public class AuthUtils {
      * 로그인 중인 회원이 관리자인지 검사.
      * @return 관리자 이면 true
      */
-    public static Boolean isAdmin() {
+    public static Boolean amIAdmin() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -101,7 +101,7 @@ public class AuthUtils {
      *
      * @return 회원이면 true
      */
-    public static Boolean isUser() {
+    public static Boolean amIUserRole() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -124,7 +124,7 @@ public class AuthUtils {
      * 로그인 중인 회원이 이메일 가입 회원 인지 검사.
      * @return 이메일 기반이면 true, 아니면 false
      */
-    public static Boolean isJakdukUser() {
+    public static Boolean amIJakdukUser() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -137,7 +137,7 @@ public class AuthUtils {
         }
     }
 
-    public static Boolean isSnsUser() {
+    public static Boolean amISnsUser() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -146,23 +146,36 @@ public class AuthUtils {
 
             Constants.ACCOUNT_TYPE providerId = userDetail.getProviderId();
 
-            switch (providerId) {
-                case KAKAO:
-                case FACEBOOK:
-                case NAVER:
-                    return true;
-                default:
-                    return false;
-            }
+            return AuthUtils.isSnsUser(providerId);
         } else {
             return false;
+        }
+    }
+
+    public static Boolean isJakdukUser(Constants.ACCOUNT_TYPE accountType) {
+        switch (accountType) {
+            case JAKDUK:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static Boolean isSnsUser(Constants.ACCOUNT_TYPE accountType) {
+        switch (accountType) {
+            case KAKAO:
+            case FACEBOOK:
+            case NAVER:
+                return true;
+            default:
+                return false;
         }
     }
 
     /**
      * 로그인 중인 회원 정보를 가져온다.
      */
-    public static SessionUser getAuthUserProfile() {
+    public static SessionUser getMySessionProfile() {
         SessionUser sessionUser = null;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -193,7 +206,7 @@ public class AuthUtils {
      * CommonWriter를 가져온다.
      */
     public static CommonWriter getCommonWriter() {
-        SessionUser sessionUser = getAuthUserProfile();
+        SessionUser sessionUser = getMySessionProfile();
 
         if (Objects.nonNull(sessionUser)) {
             CommonWriter commonWriter = new CommonWriter();

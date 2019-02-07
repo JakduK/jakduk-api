@@ -288,16 +288,13 @@ public class UserService {
 
 		if (optUserProfile.isPresent()) {
 			UserProfile userProfile = optUserProfile.get();
-			switch (userProfile.getProviderId()) {
-				case JAKDUK:
-					message = JakdukUtils.getMessageSource("user.msg.reset.password.send.email");
-					rabbitMQPublisher.sendResetPassword(JakdukUtils.getLocale(), email, host);
-					break;
-				case FACEBOOK:
-				case KAKAO:
-				case NAVER:
-					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", userProfile.getProviderId());
-					break;
+			Constants.ACCOUNT_TYPE providerId = userProfile.getProviderId();
+
+			if (AuthUtils.isJakdukUser(providerId)) {
+				message = JakdukUtils.getMessageSource("user.msg.reset.password.send.email");
+				rabbitMQPublisher.sendResetPassword(JakdukUtils.getLocale(), email, host);
+			} else if (AuthUtils.isSnsUser(providerId)) {
+				message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", providerId);
 			}
 		} else {
 			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");

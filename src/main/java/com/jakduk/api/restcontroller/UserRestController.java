@@ -128,7 +128,7 @@ public class UserRestController {
 
         String language = JakdukUtils.getLanguageCode();
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
         return userService.getProfileMe(language, sessionUser.getId());
     }
@@ -141,20 +141,20 @@ public class UserRestController {
             HttpServletResponse response,
             Authentication authentication) {
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
         User user = userService.editUserProfile(sessionUser.getId(), form.getEmail().trim(), form.getUsername().trim(),
                 form.getFootballClub(), form.getAbout(), form.getUserPictureId());
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 
-        if (AuthUtils.isJakdukUser()) {
+        if (AuthUtils.amIJakdukUser()) {
             Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
                     userDetails, authentication.getCredentials(), authentication.getAuthorities()
             );
 
             AuthUtils.setAuthentication(newAuthentication);
-        } else if (AuthUtils.isSnsUser()) {
+        } else if (AuthUtils.amISnsUser()) {
             Authentication newAuthentication = new SnsAuthenticationToken(userDetails, authentication.getAuthorities());
             AuthUtils.setAuthentication(newAuthentication);
         } else {
@@ -188,10 +188,10 @@ public class UserRestController {
     @PutMapping("/password")
     public EmptyJsonResponse editPassword(@Valid @RequestBody UserPasswordForm form) {
 
-        if (! AuthUtils.isJakdukUser())
+        if (! AuthUtils.amIJakdukUser())
             throw new ServiceException(ServiceError.FORBIDDEN);
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
         userService.updateUserPassword(sessionUser.getId(), form.getNewPassword().trim());
 
@@ -226,7 +226,7 @@ public class UserRestController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
         userService.deleteUser(sessionUser.getId());
 

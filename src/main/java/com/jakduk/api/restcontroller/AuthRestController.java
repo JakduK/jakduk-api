@@ -107,7 +107,7 @@ public class AuthRestController {
     @GetMapping("/user")
     public SessionUser getMySessionProfile() {
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
         if (Objects.isNull(sessionUser))
             throw new ServiceException(ServiceError.ANONYMOUS);

@@ -86,10 +86,10 @@ public class GalleryRestController {
             @RequestBody(required = false) LinkedItemForm form,
             HttpServletRequest request) {
 
-        if (! AuthUtils.isUser())
+        if (! AuthUtils.amIUserRole())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
         galleryService.deleteGallery(id, sessionUser.getId());
 

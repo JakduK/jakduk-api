@@ -101,9 +101,9 @@ public class JakduRestController {
         JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
         result.put("jakduSchedule", jakduSchedule);
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
-        if (AuthUtils.isUser()) {
+        if (AuthUtils.amIUserRole()) {
             result.put("myJakdu", jakduService.getMyJakdu(sessionUser.getId(), id));
         }
 
@@ -131,7 +131,7 @@ public class JakduRestController {
         if (Objects.isNull(jakduCommentWriteRequest))
             throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
 
-        if (! AuthUtils.isUser())
+        if (! AuthUtils.amIUserRole())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();
@@ -156,7 +156,7 @@ public class JakduRestController {
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
                                                  @PathVariable Constants.FEELING_TYPE feeling) {
 
-        if (! AuthUtils.isUser())
+        if (! AuthUtils.amIUserRole())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
         CommonWriter commonWriter = AuthUtils.getCommonWriter();

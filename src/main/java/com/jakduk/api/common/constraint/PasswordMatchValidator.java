@@ -34,9 +34,9 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
         if (StringUtils.isBlank(value))
             return false;
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getMySessionProfile();
 
-        if (! AuthUtils.isJakdukUser())
+        if (! AuthUtils.amIJakdukUser())
             return true;
 
         UserOnPasswordUpdate user = userService.findUserOnPasswordUpdateById(sessionUser.getId());

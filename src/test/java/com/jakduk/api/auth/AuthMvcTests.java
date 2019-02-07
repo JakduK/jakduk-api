@@ -234,7 +234,7 @@ public class AuthMvcTests {
     @WithMockJakdukUser
     public void getMySessionProfileTest() throws Exception {
 
-        SessionUser expectResponse = AuthUtils.getAuthUserProfile();
+        SessionUser expectResponse = AuthUtils.getMySessionProfile();
 
         mvc.perform(
                 get("/api/auth/user")
