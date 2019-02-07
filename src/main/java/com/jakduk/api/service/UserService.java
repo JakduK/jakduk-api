@@ -287,16 +287,15 @@ public class UserService {
 		Optional<UserProfile> optUserProfile = userProfileRepository.findOneByEmail(email);
 
 		if (optUserProfile.isPresent()) {
-			switch (optUserProfile.get().getProviderId()) {
+			UserProfile userProfile = optUserProfile.get();
+			switch (userProfile.getProviderId()) {
 				case JAKDUK:
 					message = JakdukUtils.getMessageSource("user.msg.reset.password.send.email");
 					rabbitMQPublisher.sendResetPassword(JakdukUtils.getLocale(), email, host);
 					break;
-				case DAUM:
-					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.DAUM);
-					break;
 				case FACEBOOK:
-					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", Constants.ACCOUNT_TYPE.FACEBOOK);
+				case KAKAO:
+					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", userProfile.getProviderId());
 					break;
 			}
 		} else {

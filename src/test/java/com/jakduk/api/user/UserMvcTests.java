@@ -181,7 +181,7 @@ public class UserMvcTests {
 
         AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
         attemptSocialUser.setUsername("daumUser01");
-        attemptSocialUser.setProviderId(Constants.ACCOUNT_TYPE.DAUM);
+        attemptSocialUser.setProviderId(Constants.ACCOUNT_TYPE.FACEBOOK);
         attemptSocialUser.setProviderUserId("abc123");
         attemptSocialUser.setExternalSmallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
         attemptSocialUser.setExternalLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");

@@ -70,7 +70,7 @@ public class AuthMvcTests {
 
     @Before
     public void setup() {
-        providerId = Constants.ACCOUNT_TYPE.DAUM;
+        providerId = Constants.ACCOUNT_TYPE.FACEBOOK;
 
         socialProfile = new SocialProfile();
         socialProfile.setId("abc123");
@@ -117,7 +117,7 @@ public class AuthMvcTests {
             put("accessToken", "baada13b7df9af000fa20355bf07b25f808940ab69dd7f32b6c009efdd0f6d29");
         }};
 
-        when(authUtils.getDaumProfile(anyString()))
+        when(authUtils.getFacebookProfile(anyString()))
                 .thenReturn(socialProfile);
 
         Optional<User> optUser = Optional.of(
