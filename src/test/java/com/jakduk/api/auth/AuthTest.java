@@ -23,33 +23,6 @@ public class AuthTest extends ApiApplicationTests {
     @Autowired
     private AuthUtils authUtils;
 
-    // access_token 만료됨.
-    @Ignore
-    @Test
-    public void DAUM_프로필가져오기() {
-
-        String daumApiUrl = "https://apis.daum.net/user/v1/show.json";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer baada13b7df9af000fa20355bf07b25f808940ab69dd7f32b6c009efdd0f6d29");
-        //headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        System.out.println("entity=" + entity);
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        //Map<String, String> result = (Map<String, String>) restTemplate.getForObject("https://apis.daum.net/user/v1/show.json?access_token=261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095", Map.class);
-        ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(daumApiUrl, HttpMethod.GET, entity, JsonNode.class);
-
-        responseEntity.getBody().get("result");
-
-        System.out.println("result=" + responseEntity.getBody().get("result"));
-
-        System.out.println(authUtils.getDaumProfile("261fc08c62a4d9625cb2c61dfa382c584cc37432cdb3bd309fd9b6b2db46e095"));
-
-    }
-
     @Ignore
     @Test
     public void Facebook_프로필가져오기() {

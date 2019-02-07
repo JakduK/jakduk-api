@@ -53,9 +53,6 @@ public class AuthRestController {
         SocialProfile socialProfile = null;
 
         switch (cvtProviderId) {
-            case DAUM:
-                socialProfile = authUtils.getDaumProfile(form.getAccessToken());
-                break;
             case FACEBOOK:
                 socialProfile = authUtils.getFacebookProfile(form.getAccessToken());
                 break;

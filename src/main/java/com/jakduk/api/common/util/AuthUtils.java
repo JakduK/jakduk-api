@@ -44,7 +44,6 @@ public class AuthUtils {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String DAUM_PROFILE_API_URL = "https://apis.daum.net/user/v1/show.json";
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
     private final String FACEBOOK_PROFILE_THUMBNAIL_API_URL = "https://graph.facebook.com/v2.8/me?fields=picture.type(small)&format=json";
     private final String KAKAO_PROFILE_API_URL = "https://kapi.kakao.com/v2/user/me";
@@ -146,7 +145,6 @@ public class AuthUtils {
 
             switch (providerId) {
                 case KAKAO:
-                case DAUM:
                 case FACEBOOK:
                     return true;
                 default:
@@ -208,34 +206,6 @@ public class AuthUtils {
 
     public static Collection<? extends GrantedAuthority> getAuthorities(List<Integer> roles) {
         return getGrantedAuthorities(getRoles(roles));
-    }
-
-    /**
-     * Daum 프로필 가져오기
-     *
-     * @param accessToken accessToken
-     */
-    public SocialProfile getDaumProfile(String accessToken) {
-
-        JsonNode jsonNode = fetchProfile(DAUM_PROFILE_API_URL, accessToken);
-
-        JsonNode resultNode = jsonNode.get("result");
-
-        SocialProfile profile = new SocialProfile();
-        profile.setId(resultNode.get("userid").asText());
-        profile.setNickname(resultNode.get("nickname").asText());
-
-        if (resultNode.has("imagePath")) {
-            String imagePath = resultNode.get("imagePath").asText();
-            profile.setSmallPictureUrl(imagePath);
-        }
-
-        if (resultNode.has("bigImagePath")) {
-            String bigImagePath = resultNode.get("bigImagePath").asText();
-            profile.setLargePictureUrl(bigImagePath);
-        }
-
-        return profile;
     }
 
     /**

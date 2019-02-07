@@ -46,7 +46,6 @@ public class Constants {
 	public enum ACCOUNT_TYPE {
 		JAKDUK,
 		FACEBOOK,
-		DAUM,
 		KAKAO
 	}
 
