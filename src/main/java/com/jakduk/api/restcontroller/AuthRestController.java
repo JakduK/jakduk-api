@@ -49,21 +49,12 @@ public class AuthRestController {
             @Valid @RequestBody LoginSocialUserForm form,
             HttpSession session) {
 
-        Constants.ACCOUNT_TYPE cvtProviderId = Constants.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
-        SocialProfile socialProfile = null;
-
-        switch (cvtProviderId) {
-            case FACEBOOK:
-                socialProfile = authUtils.getFacebookProfile(form.getAccessToken());
-                break;
-            case KAKAO:
-                socialProfile = authUtils.getKakaoProfile(form.getAccessToken());
-                break;
-        }
+        Constants.ACCOUNT_TYPE accountType = Constants.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
+        SocialProfile socialProfile = authUtils.getSnsProfile(accountType, form.getAccessToken());
 
         log.info("loginSnsUser form={}, socialProfile={}", form, socialProfile);
 
-        Optional<User> optUser = userService.findOneByProviderIdAndProviderUserId(cvtProviderId, socialProfile.getId());
+        Optional<User> optUser = userService.findOneByProviderIdAndProviderUserId(accountType, socialProfile.getId());
 
         // 가입 회원이라 로그인
         if (optUser.isPresent()) {
@@ -83,7 +74,7 @@ public class AuthRestController {
         // 그냥 신규 가입으로 프로필을 세션에 임시 저장한다.
         AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
         attemptSocialUser.setUsername(socialProfile.getNickname());
-        attemptSocialUser.setProviderId(cvtProviderId);
+        attemptSocialUser.setProviderId(accountType);
         attemptSocialUser.setProviderUserId(socialProfile.getId());
 
         if (StringUtils.isNotBlank(socialProfile.getEmail()))

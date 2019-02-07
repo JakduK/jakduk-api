@@ -2,6 +2,7 @@ package com.jakduk.api.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jakduk.api.ApiApplicationTests;
+import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import org.junit.Assert;
@@ -53,7 +54,14 @@ public class AuthTest extends ApiApplicationTests {
     @Ignore
     @Test
     public void getKakaoProfileInfo() {
-        SocialProfile socialProfile = authUtils.getKakaoProfile("AekzZJgcpLOQaxwpa-TySpBqFsszWctZ09dNSgo8BVUAAAFowxN59A");
+        SocialProfile socialProfile = authUtils.getSnsProfile(Constants.ACCOUNT_TYPE.KAKAO, "AekzZJgcpLOQaxwpa-TySpBqFsszWctZ09dNSgo8BVUAAAFowxN59A");
+        Assert.assertFalse(socialProfile.getId().isEmpty());
+    }
+
+    @Ignore
+    @Test
+    public void getNaverProfileInfo() {
+        SocialProfile socialProfile = authUtils.getSnsProfile(Constants.ACCOUNT_TYPE.NAVER, "AAAANlOzqsHQ12T3iHXCXR4EEHBe1AmBgMwEoWlumcmsrkgZBDkRJryVBGVlrzPnIkDTwFlFzgF2t2IVEWT5g4pC9TU=");
         Assert.assertFalse(socialProfile.getId().isEmpty());
     }
 }

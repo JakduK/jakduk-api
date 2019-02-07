@@ -5,6 +5,8 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
+import com.jakduk.api.exception.ServiceError;
+import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
@@ -47,6 +49,7 @@ public class AuthUtils {
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
     private final String FACEBOOK_PROFILE_THUMBNAIL_API_URL = "https://graph.facebook.com/v2.8/me?fields=picture.type(small)&format=json";
     private final String KAKAO_PROFILE_API_URL = "https://kapi.kakao.com/v2/user/me";
+    private final String NAVER_PROFILE_API_URL = "https://openapi.naver.com/v1/nid/me";
 
     /**
      * 손님인지 검사.
@@ -146,6 +149,7 @@ public class AuthUtils {
             switch (providerId) {
                 case KAKAO:
                 case FACEBOOK:
+                case NAVER:
                     return true;
                 default:
                     return false;
@@ -208,12 +212,25 @@ public class AuthUtils {
         return getGrantedAuthorities(getRoles(roles));
     }
 
+    public SocialProfile getSnsProfile(Constants.ACCOUNT_TYPE accountType, String accessToken) {
+        switch (accountType) {
+            case FACEBOOK:
+                return this.getFacebookProfile(accessToken);
+            case KAKAO:
+                return this.getKakaoProfile(accessToken);
+            case NAVER:
+                return this.getNaverProfile(accessToken);
+            default:
+                throw new ServiceException(ServiceError.INVALID_ACCOUNT);
+        }
+    }
+
     /**
      * Facebook 프로필 가져오기
      *
      * @param accessToken accessToken
      */
-    public SocialProfile getFacebookProfile(String accessToken) {
+    private SocialProfile getFacebookProfile(String accessToken) {
 
         JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
 
@@ -236,7 +253,7 @@ public class AuthUtils {
         return profile;
     }
 
-    public SocialProfile getKakaoProfile(String accessToken) {
+    private SocialProfile getKakaoProfile(String accessToken) {
 
         JsonNode jsonNode = fetchProfile(KAKAO_PROFILE_API_URL, accessToken);
 
@@ -254,6 +271,46 @@ public class AuthUtils {
                 if (StringUtils.isNotBlank(jsonNode.get("kakao_account").get("email").asText())) {
                     profile.setEmail(jsonNode.get("kakao_account").get("email").asText());
                 }
+            }
+        }
+
+        return profile;
+    }
+
+    private SocialProfile getNaverProfile(String accessToken) {
+
+        JsonNode jsonNode = fetchProfile(NAVER_PROFILE_API_URL, accessToken);
+
+        SocialProfile profile = new SocialProfile();
+
+        if (! jsonNode.has("response")) {
+            throw new ServiceException(ServiceError.INVALID_ACCOUNT);
+        }
+
+        profile.setId(jsonNode.get("response").get("id").asText());
+
+        if (jsonNode.get("response").has("nickname")) {
+            String nickName = jsonNode.get("response").get("nickname").asText();
+
+            if (StringUtils.isNotBlank(nickName)) {
+                profile.setNickname(nickName);
+            }
+        }
+
+        if (jsonNode.get("response").has("email")) {
+            String email = jsonNode.get("response").get("email").asText();
+
+            if (StringUtils.isNotBlank(email)) {
+                profile.setEmail(email);
+            }
+        }
+
+        if (jsonNode.get("response").has("profile_image")) {
+            String profileImage = jsonNode.get("response").get("profile_image").asText();
+
+            if (StringUtils.isNotBlank(profileImage)) {
+                profile.setSmallPictureUrl(profileImage);
+                profile.setLargePictureUrl(profileImage);
             }
         }
 

@@ -295,6 +295,7 @@ public class UserService {
 					break;
 				case FACEBOOK:
 				case KAKAO:
+				case NAVER:
 					message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", userProfile.getProviderId());
 					break;
 			}
