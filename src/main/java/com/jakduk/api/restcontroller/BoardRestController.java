@@ -89,7 +89,7 @@ public class BoardRestController {
 
         Boolean isAddCookie = JakdukUtils.addViewsCookie(request, response, Constants.VIEWS_COOKIE_TYPE.ARTICLE, String.valueOf(seq));
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         return articleService.getArticleDetail(commonWriter, board, seq, isAddCookie);
     }
@@ -112,7 +112,7 @@ public class BoardRestController {
             @Valid @RequestBody WriteArticle form) {
 
         List<GalleryOnBoard> formGalleries = form.getGalleries();
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -153,7 +153,7 @@ public class BoardRestController {
             @Valid @RequestBody WriteArticle form,
             HttpServletRequest request) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -197,7 +197,7 @@ public class BoardRestController {
             @PathVariable Constants.BOARD_TYPE board,
             @PathVariable Integer seq) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
 		Constants.ARTICLE_DELETE_TYPE deleteType = articleService.deleteArticle(commonWriter, board, seq);
 
@@ -212,7 +212,7 @@ public class BoardRestController {
             @RequestParam(required = false) String commentId // 이 CommentId 이후부터 목록 가져옴
     ) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         return articleService.getArticleDetailComments(commonWriter, board, seq, commentId);
     }
@@ -224,7 +224,7 @@ public class BoardRestController {
             @PathVariable Integer seq,
             @Valid @RequestBody WriteArticleComment form) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -254,7 +254,7 @@ public class BoardRestController {
             @Valid @RequestBody WriteArticleComment form,
             HttpServletRequest request) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         // 연관된 사진 id 배열 (검증 전)
         List<String> unverifiableGalleryIds = null;
@@ -294,7 +294,7 @@ public class BoardRestController {
             @PathVariable String id // 댓글 ID
     ) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         articleService.deleteArticleComment(commonWriter, board, id);
 
@@ -308,7 +308,7 @@ public class BoardRestController {
             @PathVariable Integer seq,
             @PathVariable Constants.FEELING_TYPE feeling) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         Article article = articleService.setArticleFeelings(commonWriter, board, seq, feeling);
 
@@ -340,7 +340,7 @@ public class BoardRestController {
             @PathVariable String commentId,
             @PathVariable Constants.FEELING_TYPE feeling) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         ArticleComment boardComment = articleService.setArticleCommentFeeling(commonWriter, commentId, feeling);
 
@@ -360,7 +360,7 @@ public class BoardRestController {
             @PathVariable Constants.BOARD_TYPE board,
             @PathVariable Integer seq) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
 		articleService.enableArticleNotice(commonWriter, board, seq);
 
@@ -373,7 +373,7 @@ public class BoardRestController {
             @PathVariable Constants.BOARD_TYPE board,
             @PathVariable Integer seq) {
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         articleService.disableArticleNotice(commonWriter, board, seq);
 

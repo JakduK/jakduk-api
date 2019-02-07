@@ -31,7 +31,7 @@ public class ExistUsernameValidator implements ConstraintValidator<ExistUsername
         if (StringUtils.isEmpty(value))
             return false;
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getSessionProfile();
 
         if (Objects.isNull(sessionUser)) {
             Optional<UserProfile> optUserProfile = userProfileRepository.findOneByUsername(value.trim());

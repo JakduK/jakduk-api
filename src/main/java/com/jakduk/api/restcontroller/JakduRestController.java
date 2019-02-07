@@ -101,9 +101,9 @@ public class JakduRestController {
         JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
         result.put("jakduSchedule", jakduSchedule);
 
-        SessionUser sessionUser = AuthUtils.getAuthUserProfile();
+        SessionUser sessionUser = AuthUtils.getSessionProfile();
 
-        if (AuthUtils.isUser()) {
+        if (AuthUtils.isSessionUserRole()) {
             result.put("myJakdu", jakduService.getMyJakdu(sessionUser.getId(), id));
         }
 
@@ -119,7 +119,7 @@ public class JakduRestController {
             throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
         }
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         return jakduService.setMyJakdu(commonWriter, myJakdu);
     }
@@ -131,10 +131,10 @@ public class JakduRestController {
         if (Objects.isNull(jakduCommentWriteRequest))
             throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
 
-        if (! AuthUtils.isUser())
+        if (! AuthUtils.isSessionUserRole())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         JakduComment jakduComment = jakduService.setComment(commonWriter, jakduCommentWriteRequest);
 
@@ -156,10 +156,10 @@ public class JakduRestController {
     public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
                                                  @PathVariable Constants.FEELING_TYPE feeling) {
 
-        if (! AuthUtils.isUser())
+        if (! AuthUtils.isSessionUserRole())
             throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-        CommonWriter commonWriter = AuthUtils.getCommonWriter();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
         JakduComment jakduComment = jakduService.setJakduCommentFeeling(commonWriter, commentId, feeling);
 

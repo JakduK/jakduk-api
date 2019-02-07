@@ -67,7 +67,7 @@ public class SearchRestController {
 
 		SearchUnifiedResponse searchUnifiedResponse = searchService.searchUnified(q, w, from, size, preTags, postTags);
 
-		rabbitMQPublisher.indexDocumentSearchWord(StringUtils.lowerCase(q), AuthUtils.getCommonWriter());
+		rabbitMQPublisher.indexDocumentSearchWord(StringUtils.lowerCase(q), AuthUtils.getCommonWriterFromSession());
 
 		return searchUnifiedResponse;
 	}

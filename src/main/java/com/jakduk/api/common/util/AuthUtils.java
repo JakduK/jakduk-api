@@ -5,6 +5,8 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.configuration.security.JakdukAuthority;
 import com.jakduk.api.configuration.security.UserDetailsImpl;
+import com.jakduk.api.exception.ServiceError;
+import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
@@ -47,11 +49,12 @@ public class AuthUtils {
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
     private final String FACEBOOK_PROFILE_THUMBNAIL_API_URL = "https://graph.facebook.com/v2.8/me?fields=picture.type(small)&format=json";
     private final String KAKAO_PROFILE_API_URL = "https://kapi.kakao.com/v2/user/me";
+    private final String NAVER_PROFILE_API_URL = "https://openapi.naver.com/v1/nid/me";
 
     /**
      * 손님인지 검사.
      */
-    public static Boolean isAnonymous() {
+    public static Boolean isAnonymousSessionUser() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -75,7 +78,7 @@ public class AuthUtils {
      * 로그인 중인 회원이 관리자인지 검사.
      * @return 관리자 이면 true
      */
-    public static Boolean isAdmin() {
+    public static Boolean isAdminSessionUser() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -98,7 +101,7 @@ public class AuthUtils {
      *
      * @return 회원이면 true
      */
-    public static Boolean isUser() {
+    public static Boolean isSessionUserRole() {
         Boolean result = false;
 
         if (! SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
@@ -121,7 +124,7 @@ public class AuthUtils {
      * 로그인 중인 회원이 이메일 가입 회원 인지 검사.
      * @return 이메일 기반이면 true, 아니면 false
      */
-    public static Boolean isJakdukUser() {
+    public static Boolean isJakdukSessionUser() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -134,7 +137,7 @@ public class AuthUtils {
         }
     }
 
-    public static Boolean isSnsUser() {
+    public static Boolean isSnsSessionUser() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -143,22 +146,36 @@ public class AuthUtils {
 
             Constants.ACCOUNT_TYPE providerId = userDetail.getProviderId();
 
-            switch (providerId) {
-                case KAKAO:
-                case FACEBOOK:
-                    return true;
-                default:
-                    return false;
-            }
+            return AuthUtils.isSnsUser(providerId);
         } else {
             return false;
+        }
+    }
+
+    public static Boolean isJakdukUser(Constants.ACCOUNT_TYPE accountType) {
+        switch (accountType) {
+            case JAKDUK:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static Boolean isSnsUser(Constants.ACCOUNT_TYPE accountType) {
+        switch (accountType) {
+            case KAKAO:
+            case FACEBOOK:
+            case NAVER:
+                return true;
+            default:
+                return false;
         }
     }
 
     /**
      * 로그인 중인 회원 정보를 가져온다.
      */
-    public static SessionUser getAuthUserProfile() {
+    public static SessionUser getSessionProfile() {
         SessionUser sessionUser = null;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -188,8 +205,8 @@ public class AuthUtils {
     /**
      * CommonWriter를 가져온다.
      */
-    public static CommonWriter getCommonWriter() {
-        SessionUser sessionUser = getAuthUserProfile();
+    public static CommonWriter getCommonWriterFromSession() {
+        SessionUser sessionUser = getSessionProfile();
 
         if (Objects.nonNull(sessionUser)) {
             CommonWriter commonWriter = new CommonWriter();
@@ -208,12 +225,25 @@ public class AuthUtils {
         return getGrantedAuthorities(getRoles(roles));
     }
 
+    public SocialProfile getSnsProfile(Constants.ACCOUNT_TYPE accountType, String accessToken) {
+        switch (accountType) {
+            case FACEBOOK:
+                return this.getFacebookProfile(accessToken);
+            case KAKAO:
+                return this.getKakaoProfile(accessToken);
+            case NAVER:
+                return this.getNaverProfile(accessToken);
+            default:
+                throw new ServiceException(ServiceError.INVALID_ACCOUNT);
+        }
+    }
+
     /**
      * Facebook 프로필 가져오기
      *
      * @param accessToken accessToken
      */
-    public SocialProfile getFacebookProfile(String accessToken) {
+    private SocialProfile getFacebookProfile(String accessToken) {
 
         JsonNode jsonNode = fetchProfile(FACEBOOK_PROFILE_API_URL, accessToken);
 
@@ -236,7 +266,7 @@ public class AuthUtils {
         return profile;
     }
 
-    public SocialProfile getKakaoProfile(String accessToken) {
+    private SocialProfile getKakaoProfile(String accessToken) {
 
         JsonNode jsonNode = fetchProfile(KAKAO_PROFILE_API_URL, accessToken);
 
@@ -254,6 +284,46 @@ public class AuthUtils {
                 if (StringUtils.isNotBlank(jsonNode.get("kakao_account").get("email").asText())) {
                     profile.setEmail(jsonNode.get("kakao_account").get("email").asText());
                 }
+            }
+        }
+
+        return profile;
+    }
+
+    private SocialProfile getNaverProfile(String accessToken) {
+
+        JsonNode jsonNode = fetchProfile(NAVER_PROFILE_API_URL, accessToken);
+
+        SocialProfile profile = new SocialProfile();
+
+        if (! jsonNode.has("response")) {
+            throw new ServiceException(ServiceError.INVALID_ACCOUNT);
+        }
+
+        profile.setId(jsonNode.get("response").get("id").asText());
+
+        if (jsonNode.get("response").has("nickname")) {
+            String nickName = jsonNode.get("response").get("nickname").asText();
+
+            if (StringUtils.isNotBlank(nickName)) {
+                profile.setNickname(nickName);
+            }
+        }
+
+        if (jsonNode.get("response").has("email")) {
+            String email = jsonNode.get("response").get("email").asText();
+
+            if (StringUtils.isNotBlank(email)) {
+                profile.setEmail(email);
+            }
+        }
+
+        if (jsonNode.get("response").has("profile_image")) {
+            String profileImage = jsonNode.get("response").get("profile_image").asText();
+
+            if (StringUtils.isNotBlank(profileImage)) {
+                profile.setSmallPictureUrl(profileImage);
+                profile.setLargePictureUrl(profileImage);
             }
         }
 

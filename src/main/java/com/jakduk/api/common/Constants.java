@@ -46,7 +46,8 @@ public class Constants {
 	public enum ACCOUNT_TYPE {
 		JAKDUK,
 		FACEBOOK,
-		KAKAO
+		KAKAO,
+		NAVER
 	}
 
 	// 게시물 감정 표현. 좋아요, 싫어요
