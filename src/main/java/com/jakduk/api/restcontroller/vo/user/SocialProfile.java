@@ -12,8 +12,7 @@ public class SocialProfile {
     private String id;
     private String nickname;
     private String email;
-    private String smallPictureUrl;
-    private String largePictureUrl;
+    private String pictureUrl;
 
     public String getId() {
         return id;
@@ -39,20 +38,12 @@ public class SocialProfile {
         this.email = email;
     }
 
-    public String getSmallPictureUrl() {
-        return smallPictureUrl;
+    public String getPictureUrl() {
+        return pictureUrl;
     }
 
-    public void setSmallPictureUrl(String smallPictureUrl) {
-        this.smallPictureUrl = smallPictureUrl;
-    }
-
-    public String getLargePictureUrl() {
-        return largePictureUrl;
-    }
-
-    public void setLargePictureUrl(String largePictureUrl) {
-        this.largePictureUrl = largePictureUrl;
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
     }
 
     @Override
@@ -61,8 +52,7 @@ public class SocialProfile {
                 "id='" + id + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", email='" + email + '\'' +
-                ", smallPictureUrl='" + smallPictureUrl + '\'' +
-                ", largePictureUrl='" + largePictureUrl + '\'' +
+                ", pictureUrl='" + pictureUrl + '\'' +
                 '}';
     }
 }

@@ -76,8 +76,7 @@ public class AuthMvcTests {
         socialProfile.setId("abc123");
         socialProfile.setNickname("daumUser01");
         socialProfile.setEmail("test17@test.com");
-        socialProfile.setSmallPictureUrl("https://img1.daumcdn.net/thumb/R55x55/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
-        socialProfile.setLargePictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
+        socialProfile.setPictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
     }
 
     @Test
@@ -117,7 +116,7 @@ public class AuthMvcTests {
             put("accessToken", "baada13b7df9af000fa20355bf07b25f808940ab69dd7f32b6c009efdd0f6d29");
         }};
 
-        when(authUtils.getSnsProfile(providerId, anyString()))
+        when(authUtils.getSnsProfile(any(Constants.ACCOUNT_TYPE.class), anyString()))
                 .thenReturn(socialProfile);
 
         Optional<User> optUser = Optional.of(
@@ -176,8 +175,7 @@ public class AuthMvcTests {
         expectAttemptSocialUser.setUsername(socialProfile.getNickname());
         expectAttemptSocialUser.setProviderId(providerId);
         expectAttemptSocialUser.setProviderUserId(socialProfile.getId());
-        expectAttemptSocialUser.setExternalLargePictureUrl(socialProfile.getLargePictureUrl());
-        expectAttemptSocialUser.setExternalSmallPictureUrl(socialProfile.getSmallPictureUrl());
+        expectAttemptSocialUser.setExternalLargePictureUrl(socialProfile.getPictureUrl());
 
         Map<String, Object> sessionAttributes = new HashMap<>();
         sessionAttributes.put(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, expectAttemptSocialUser);
@@ -205,8 +203,7 @@ public class AuthMvcTests {
                                                                 .collect(Collectors.toList())
                                                 ),
                                         fieldWithPath("providerUserId").type(JsonFieldType.STRING).description("Provider에서 제공한 사용자 ID"),
-                                        fieldWithPath("externalLargePictureUrl").type(JsonFieldType.STRING).description("Provider에서 제공한 큰 사진 URL"),
-                                        fieldWithPath("externalSmallPictureUrl").type(JsonFieldType.STRING).description("Provider에서 제공한 작은 사진 URL")
+                                        fieldWithPath("externalLargePictureUrl").type(JsonFieldType.STRING).description("Provider에서 제공한 큰 사진 URL")
                                 )
                         ));
     }

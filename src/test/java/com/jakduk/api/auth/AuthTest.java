@@ -64,4 +64,11 @@ public class AuthTest extends ApiApplicationTests {
         SocialProfile socialProfile = authUtils.getSnsProfile(Constants.ACCOUNT_TYPE.NAVER, "AAAANlOzqsHQ12T3iHXCXR4EEHBe1AmBgMwEoWlumcmsrkgZBDkRJryVBGVlrzPnIkDTwFlFzgF2t2IVEWT5g4pC9TU=");
         Assert.assertFalse(socialProfile.getId().isEmpty());
     }
+
+    @Ignore
+    @Test
+    public void getGoogleProfileInfo() {
+        SocialProfile socialProfile = authUtils.getSnsProfile(Constants.ACCOUNT_TYPE.GOOGLE, "ya29.GlupBqsyMWcUC6h5j0UJ68hUz7Lqz9gCVcsm3lw5JOoHW6FAmx4h62Hm01PyDCnVHKhhVW0SyERZUIZV8u5-YZHsAUWpRKslgMvQN5Fc-ynJQFQII8l6nhZNK3-o");
+        Assert.assertFalse(socialProfile.getId().isEmpty());
+    }
 }

@@ -47,9 +47,9 @@ public class AuthUtils {
     private RestTemplate restTemplate;
 
     private final String FACEBOOK_PROFILE_API_URL = "https://graph.facebook.com/v2.8/me?fields=name,email,picture.type(large)&format=json";
-    private final String FACEBOOK_PROFILE_THUMBNAIL_API_URL = "https://graph.facebook.com/v2.8/me?fields=picture.type(small)&format=json";
     private final String KAKAO_PROFILE_API_URL = "https://kapi.kakao.com/v2/user/me";
     private final String NAVER_PROFILE_API_URL = "https://openapi.naver.com/v1/nid/me";
+    private final String GOOGLE_PROFILE_API_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
 
     /**
      * 손님인지 검사.
@@ -233,6 +233,8 @@ public class AuthUtils {
                 return this.getKakaoProfile(accessToken);
             case NAVER:
                 return this.getNaverProfile(accessToken);
+            case GOOGLE:
+                return this.getGoogleProfile(accessToken);
             default:
                 throw new ServiceException(ServiceError.INVALID_ACCOUNT);
         }
@@ -256,11 +258,7 @@ public class AuthUtils {
 
         if (jsonNode.has("picture")) {
             String largePictureUrl = jsonNode.get("picture").get("data").get("url").asText();
-            profile.setLargePictureUrl(largePictureUrl);
-
-            JsonNode jsonNodeThumbnail = fetchProfile(FACEBOOK_PROFILE_THUMBNAIL_API_URL, accessToken);
-            String smallPictureUrl = jsonNodeThumbnail.get("picture").get("data").get("url").asText();
-            profile.setSmallPictureUrl(smallPictureUrl);
+            profile.setPictureUrl(largePictureUrl);
         }
 
         return profile;
@@ -273,8 +271,7 @@ public class AuthUtils {
         SocialProfile profile = new SocialProfile();
         profile.setId(jsonNode.get("id").asText());
         profile.setNickname(jsonNode.get("properties").get("nickname").asText());
-        profile.setLargePictureUrl(jsonNode.get("properties").get("profile_image").asText());
-        profile.setSmallPictureUrl(jsonNode.get("properties").get("thumbnail_image").asText());
+        profile.setPictureUrl(jsonNode.get("properties").get("profile_image").asText());
 
         if (jsonNode.has("kakao_account")) {
 
@@ -322,8 +319,40 @@ public class AuthUtils {
             String profileImage = jsonNode.get("response").get("profile_image").asText();
 
             if (StringUtils.isNotBlank(profileImage)) {
-                profile.setSmallPictureUrl(profileImage);
-                profile.setLargePictureUrl(profileImage);
+                profile.setPictureUrl(profileImage);
+            }
+        }
+
+        return profile;
+    }
+
+    private SocialProfile getGoogleProfile(String accessToken) {
+        JsonNode jsonNode = fetchProfile(GOOGLE_PROFILE_API_URL, accessToken);
+
+        SocialProfile profile = new SocialProfile();
+        profile.setId(jsonNode.get("id").asText());
+
+        if (jsonNode.get("verified_email").asBoolean()) {
+            String email = jsonNode.get("email").asText();
+
+            if (StringUtils.isNotBlank(email)) {
+                profile.setEmail(email);
+            }
+        }
+
+        if (jsonNode.has("name")) {
+            String name = jsonNode.get("name").asText();
+
+            if (StringUtils.isNotBlank(name)) {
+                profile.setNickname(name);
+            }
+        }
+
+        if (jsonNode.has("picture")) {
+            String picture = jsonNode.get("picture").asText();
+
+            if (StringUtils.isNotBlank(picture)) {
+                profile.setPictureUrl(picture);
             }
         }
 
