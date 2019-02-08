@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
@@ -53,7 +52,6 @@ public class GalleryRestController {
     }
 
     // 사진 올리기
-    @SecuredUser
     @PostMapping("/gallery")
     public GalleryUploadResponse uploadImage(@RequestParam MultipartFile file) throws IOException {
 
