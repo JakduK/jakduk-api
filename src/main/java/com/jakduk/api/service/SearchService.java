@@ -150,7 +150,7 @@ public class SearchService {
 				.collect(Collectors.toList());
 
 		return new PopularSearchWordResult() {{
-			setTook(searchResponse.getTookInMillis());
+			setTook(searchResponse.getTook().getMillis());
 			setPopularSearchWords(popularWords);
 		}};
 	}
@@ -301,7 +301,7 @@ public class SearchService {
 
 		List<ArticleSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
-					Map<String, Object> sourceMap = searchHit.getSource();
+					Map<String, Object> sourceMap = searchHit.getSourceAsMap();
 					EsArticleSource esArticleSource = ObjectMapperUtils.convertValue(sourceMap, EsArticleSource.class);
 					esArticleSource.setScore(searchHit.getScore());
 
@@ -379,13 +379,13 @@ public class SearchService {
 
 		List<EsCommentSource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
-					Map<String, Object> sourceMap = searchHit.getSource();
+					Map<String, Object> sourceMap = searchHit.getSourceAsMap();
 					EsCommentSource esCommentSource = ObjectMapperUtils.convertValue(sourceMap, EsCommentSource.class);
 					esCommentSource.setScore(searchHit.getScore());
 
 					if (! searchHit.getInnerHits().isEmpty()) {
 						SearchHit[] innerSearchHits = searchHit.getInnerHits().get(Constants.ES_TYPE_ARTICLE).getHits();
-						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSource();
+						Map<String, Object> innerSourceMap = innerSearchHits[ innerSearchHits.length - 1 ].getSourceAsMap();
 						EsParentArticle esParentArticle = ObjectMapperUtils.convertValue(innerSourceMap, EsParentArticle.class);
 
 						esCommentSource.setArticle(esParentArticle);
@@ -438,7 +438,7 @@ public class SearchService {
 
 		List<EsGallerySource> searchList = Arrays.stream(searchHits.getHits())
 				.map(searchHit -> {
-					Map<String, Object> sourceMap = searchHit.getSource();
+					Map<String, Object> sourceMap = searchHit.getSourceAsMap();
 					EsGallerySource esGallerySource = ObjectMapperUtils.convertValue(sourceMap, EsGallerySource.class);
 					esGallerySource.setScore(searchHit.getScore());
 

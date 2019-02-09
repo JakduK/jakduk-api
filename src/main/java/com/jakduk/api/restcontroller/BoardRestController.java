@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller;
 
 import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.annotation.SecuredUser;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
@@ -145,7 +144,6 @@ public class BoardRestController {
     }
 
     // 게시판 글 고치기
-    @SecuredUser
     @PutMapping("/{board}/{seq}")
     public WriteArticleResponse editArticle(
             @PathVariable Constants.BOARD_TYPE board,
@@ -191,7 +189,6 @@ public class BoardRestController {
     }
 
     // 게시판 글 지움
-    @SecuredUser
     @DeleteMapping("/{board}/{seq}")
     public DeleteArticleResponse deleteArticle(
             @PathVariable Constants.BOARD_TYPE board,

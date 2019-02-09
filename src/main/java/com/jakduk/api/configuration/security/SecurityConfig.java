@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,7 +26,6 @@ import javax.annotation.Resource;
  */
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity // TODO 훗날 제거
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource private JakdukProperties jakdukProperties;
@@ -99,20 +97,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/board/[a-z]+", // 글 쓰기
                         "/api/board/[a-z]+/\\d+/comment", // 댓글 달기
                         "/api/board/[a-z]+/\\d+/like|dislike", // 글 감정 표현
-                        "/api/board/[a-z]+/comment/[\\da-z]+/like|dislike" // 댓글 감정 표현
+                        "/api/board/[a-z]+/comment/[\\da-z]+/like|dislike", // 댓글 감정 표현
+                        "/api/gallery", // 사진 올리기
+                        "/api/jakdu/myJakdu" // 작두 타기
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
                 .regexMatchers(
                         HttpMethod.PUT,
                         "/api/board/[a-z]+/comment/[\\da-z]+", // 댓글 고치기
                         "/api/user/profile/me", // 내 프로필 정보 고치기
-                        "/api/user/password" // 비밀번호 바꾸기
+                        "/api/user/password", // 비밀번호 바꾸기
+                        "/api/board/[a-z]+/\\d+" // 게시판 글 고치기
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
                 .regexMatchers(
                         HttpMethod.DELETE,
                         "/api/board/[a-z]+/comment/[\\da-z]+", // 댓글 지우기
-                        "/api/user" // 회원 탈퇴
+                        "/api/user", // 회원 탈퇴
+                        "/api/board/[a-z]+/\\d+" // 게시판 글 지움
                 ).hasAnyAuthority(
                 JakdukAuthority.ROLE_USER_01.name(), JakdukAuthority.ROLE_USER_02.name(), JakdukAuthority.ROLE_USER_03.name())
 
