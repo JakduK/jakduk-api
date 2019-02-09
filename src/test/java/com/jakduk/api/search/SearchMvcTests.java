@@ -1,6 +1,6 @@
 package com.jakduk.api.search;
 
-import com.jakduk.api.WithMockJakdukUser;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;

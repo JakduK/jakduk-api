@@ -1,7 +1,7 @@
 package com.jakduk.api.user;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.WithMockJakdukUser;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;

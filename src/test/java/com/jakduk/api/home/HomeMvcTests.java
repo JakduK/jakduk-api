@@ -52,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(HomeRestController.class)
-@Import(TestMvcConfig.class)
+@Import({TestMvcConfig.class})
 @AutoConfigureRestDocs(outputDir = "build/snippets")
 public class HomeMvcTests {
 

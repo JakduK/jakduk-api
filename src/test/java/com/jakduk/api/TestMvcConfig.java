@@ -1,19 +1,17 @@
 package com.jakduk.api;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.configuration.security.SnsAuthenticationProvider;
+import com.jakduk.api.configuration.security.UserDetailServiceImpl;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
-public class TestMvcConfig implements WebMvcConfigurer {
+@EnableConfigurationProperties
+@Import({JakdukProperties.class, UserDetailServiceImpl.class})
+public class TestMvcConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        DelegatingPasswordEncoder passwordEncoder = (DelegatingPasswordEncoder) PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        passwordEncoder.setDefaultPasswordEncoderForMatches(new StandardPasswordEncoder());
-        return passwordEncoder;
-    }
+    @MockBean
+    private SnsAuthenticationProvider snsAuthenticationProvider;
 
 }

@@ -1,7 +1,8 @@
 package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.WithMockJakdukUser;
+import com.jakduk.api.mock.WithMockAdminUser;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
@@ -628,7 +629,7 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockAdminUser
     public void enableArticleNoticeTest() throws Exception {
 
         doNothing().when(articleService)
@@ -656,7 +657,7 @@ public class ArticleMvcTests {
     }
 
     @Test
-    @WithMockJakdukUser
+    @WithMockAdminUser
     public void disableArticleNoticeTest() throws Exception {
 
         doNothing().when(articleService)
