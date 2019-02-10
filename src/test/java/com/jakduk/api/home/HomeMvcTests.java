@@ -31,10 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -59,12 +59,12 @@ public class HomeMvcTests {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean private RestTemplateBuilder restTemplateBuilder;
-
     @MockBean private HomeService homeService;
     @MockBean private UserService userService;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
+
+    @MockBean private UserDetailsService userDetailsService;
 
     private BoardCategory boardCategory;
     private CommonWriter commonWriter;

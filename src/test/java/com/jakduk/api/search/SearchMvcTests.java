@@ -1,12 +1,13 @@
 package com.jakduk.api.search;
 
-import com.jakduk.api.mock.WithMockJakdukUser;
+import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.model.elasticsearch.EsCommentSource;
 import com.jakduk.api.model.elasticsearch.EsGallerySource;
 import com.jakduk.api.model.elasticsearch.EsParentArticle;
@@ -23,9 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,15 +51,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(SearchRestController.class)
+@Import({TestMvcConfig.class})
 @AutoConfigureRestDocs(outputDir = "build/snippets")
 public class SearchMvcTests {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean private RestTemplateBuilder restTemplateBuilder;
-    @MockBean private RabbitMQPublisher rabbitMQPublisher;
     @MockBean private SearchService searchService;
+
+    @MockBean private RabbitMQPublisher rabbitMQPublisher;
+    @MockBean private UserDetailsService userDetailsService;
 
     private CommonWriter commonWriter;
     private List<BoardCategory> categories;

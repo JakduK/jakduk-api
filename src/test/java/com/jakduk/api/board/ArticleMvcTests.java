@@ -1,8 +1,6 @@
 package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.mock.WithMockAdminUser;
-import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
@@ -10,6 +8,8 @@ import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
+import com.jakduk.api.mock.WithMockAdminUser;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.Gallery;
@@ -30,13 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -73,10 +73,11 @@ public class ArticleMvcTests {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
+
     @MockBean private RabbitMQPublisher rabbitMQPublisher;
+    @MockBean private UserDetailsService userDetailsService;
 
     private CommonWriter commonWriter;
     private Article article;

@@ -1,12 +1,12 @@
 package com.jakduk.api.user;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.security.JakdukAuthority;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.db.FootballClubOrigin;
 import com.jakduk.api.model.db.User;
@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -38,6 +37,7 @@ import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -73,8 +73,6 @@ public class UserMvcTests {
 
     @Autowired
     private MockMvc mvc;
-
-    @MockBean private RestTemplateBuilder restTemplateBuilder;
 
     @MockBean private AuthenticationManager authenticationManager;
     @MockBean private UserService userService;
@@ -123,7 +121,7 @@ public class UserMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithAnonymousUser
     public void createJakdukUserTest() throws Exception {
 
         this.whenCustomValdation();
@@ -511,7 +509,7 @@ public class UserMvcTests {
     }
 
     @Test
-    @WithMockUser
+    @WithAnonymousUser
     public void findPasswordTest() throws Exception {
 
         Map<String, Object> form = new HashMap<String, Object>() {{

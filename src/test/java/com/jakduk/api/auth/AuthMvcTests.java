@@ -1,13 +1,11 @@
 package com.jakduk.api.auth;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.configuration.security.UserDetailServiceImpl;
-import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.security.JakdukAuthority;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.db.FootballClubOrigin;
 import com.jakduk.api.model.db.User;
@@ -24,18 +22,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,19 +56,19 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({AuthRestController.class, AuthMvcTests.Controller.class})
-@Import(TestMvcConfig.class)
+@WebMvcTest({AuthMvcTests.Controller.class, AuthRestController.class})
+@Import({TestMvcConfig.class})
 @AutoConfigureRestDocs(outputDir = "build/snippets")
 public class AuthMvcTests {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private UserService userService;
     @MockBean private AuthUtils authUtils;
-    @MockBean private AuthenticationManager authenticationManager;
     @MockBean private UserRepository userRepository;
+
+    @MockBean private AuthenticationManager authenticationManager;
 
     private SocialProfile socialProfile;
     private Constants.ACCOUNT_TYPE providerId;
@@ -82,6 +77,7 @@ public class AuthMvcTests {
 
     @Before
     public void setup() {
+
         providerId = Constants.ACCOUNT_TYPE.FACEBOOK;
 
         socialProfile = new SocialProfile();
