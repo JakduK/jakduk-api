@@ -1,11 +1,16 @@
 package com.jakduk.api.auth;
 
-import com.jakduk.api.WithMockJakdukUser;
+import com.jakduk.api.TestMvcConfig;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.security.JakdukAuthority;
+import com.jakduk.api.mock.WithMockJakdukUser;
+import com.jakduk.api.model.db.FootballClub;
+import com.jakduk.api.model.db.FootballClubOrigin;
 import com.jakduk.api.model.db.User;
+import com.jakduk.api.model.embedded.LocalName;
+import com.jakduk.api.repository.user.UserRepository;
 import com.jakduk.api.restcontroller.AuthRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.AttemptSocialUser;
@@ -20,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -33,10 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,23 +56,28 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({AuthRestController.class, AuthMvcTests.Controller.class})
+@WebMvcTest({AuthMvcTests.Controller.class, AuthRestController.class})
+@Import({TestMvcConfig.class})
 @AutoConfigureRestDocs(outputDir = "build/snippets")
 public class AuthMvcTests {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private UserService userService;
     @MockBean private AuthUtils authUtils;
+    @MockBean private UserRepository userRepository;
+
     @MockBean private AuthenticationManager authenticationManager;
 
     private SocialProfile socialProfile;
     private Constants.ACCOUNT_TYPE providerId;
+    private FootballClub footballClub;
+    private User jakdukUser;
 
     @Before
     public void setup() {
+
         providerId = Constants.ACCOUNT_TYPE.FACEBOOK;
 
         socialProfile = new SocialProfile();
@@ -77,16 +85,48 @@ public class AuthMvcTests {
         socialProfile.setNickname("daumUser01");
         socialProfile.setEmail("test17@test.com");
         socialProfile.setPictureUrl("https://img1.daumcdn.net/thumb/R158x158/?fname=http%3A%2F%2Ftwg.tset.daumcdn.net%2Fprofile%2F6enovyMT1pI0&t=1507478752861");
+
+        FootballClubOrigin footballClubOrigin = new FootballClubOrigin();
+        footballClubOrigin.setId("54e1d2a58bf86df3fe819871");
+        footballClubOrigin.setName("SEONGNAM");
+        footballClubOrigin.setClubType(Constants.CLUB_TYPE.FOOTBALL_CLUB);
+        footballClubOrigin.setAge(Constants.CLUB_AGE.SENIOR);
+        footballClubOrigin.setSex(Constants.CLUB_SEX.MEN);
+
+        footballClub = new FootballClub();
+        footballClub.setId("54e1d2c68bf86df3fe819874");
+        footballClub.setOrigin(footballClubOrigin);
+        footballClub.setActive("active");
+        footballClub.setNames(
+                Arrays.asList(
+                        new LocalName(Locale.KOREAN.getLanguage(), "성남FC", "성남"),
+                        new LocalName(Locale.ENGLISH.getLanguage(), "SEONGNAM FC", "SEONGNAM"))
+        );
+
+        jakdukUser = new User();
+        jakdukUser.setId("597df86caaf4fc0545d4f3e9");
+        jakdukUser.setEmail("example@jakduk.com");
+        jakdukUser.setUsername("JakdukUser");
+        jakdukUser.setPassword("841db2bc28e4730906bd82d79e69c80633747570d96ffade7dd77f58270f31a222e129e005cb70d2");
+        jakdukUser.setProviderId(Constants.ACCOUNT_TYPE.JAKDUK);
+        jakdukUser.setAbout("안녕하세요.");
+        jakdukUser.setRoles(Arrays.asList(JakdukAuthority.ROLE_USER_01.getCode()));
+        jakdukUser.setSupportFC(footballClub);
+        jakdukUser.setLastLogged(LocalDateTime.now());
     }
 
     @Test
     @WithMockUser
     public void formLoginTest() throws Exception {
+
+        when(userRepository.findOneByEmail(anyString()))
+                .thenReturn(Optional.of(jakdukUser));
+
         mvc.perform(
                 post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
-                        .param("username", "test07@test.com")
+                        .param("username", "example@jakduk.com")
                         .param("password", "1111")
                         .param("remember-me", "1")
                         .with(csrf()))

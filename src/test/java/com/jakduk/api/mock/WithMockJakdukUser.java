@@ -1,4 +1,4 @@
-package com.jakduk.api;
+package com.jakduk.api.mock;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 

@@ -44,6 +44,7 @@ public class Constants {
 	 * Social 프로바이더 종류.
 	 */
 	public enum ACCOUNT_TYPE {
+		DAUM, // deprecated
 		JAKDUK,
 		FACEBOOK,
 		KAKAO,

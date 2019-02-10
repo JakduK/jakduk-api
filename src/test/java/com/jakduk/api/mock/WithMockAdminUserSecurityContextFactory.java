@@ -1,4 +1,4 @@
-package com.jakduk.api;
+package com.jakduk.api.mock;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.security.JakdukAuthority;
@@ -13,15 +13,15 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 
 import java.util.Arrays;
 
-public class WithMockJakdukUserSecurityContextFactory implements WithSecurityContextFactory<WithMockJakdukUser> {
+public class WithMockAdminUserSecurityContextFactory implements WithSecurityContextFactory<WithMockAdminUser> {
 
     @Override
-    public SecurityContext createSecurityContext(WithMockJakdukUser customUser) {
+    public SecurityContext createSecurityContext(WithMockAdminUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        UserDetailsImpl userDetails = new UserDetailsImpl("test07@test.com", "a!b@c#",
-                "1234", "test07", Constants.ACCOUNT_TYPE.JAKDUK, true, true,
-                true, true, Arrays.asList(new SimpleGrantedAuthority(JakdukAuthority.ROLE_USER_01.name())));
+        UserDetailsImpl userDetails = new UserDetailsImpl("jakduk-admin@test.com", "a!b@c#",
+                "1234", "jakduk-admin", Constants.ACCOUNT_TYPE.JAKDUK, true, true,
+                true, true, Arrays.asList(new SimpleGrantedAuthority(JakdukAuthority.ROLE_ADMIN.name())));
 
         userDetails.setPicture(
                 new UserPictureInfo(

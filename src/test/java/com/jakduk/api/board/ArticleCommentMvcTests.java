@@ -1,7 +1,6 @@
 package com.jakduk.api.board;
 
 import com.jakduk.api.TestMvcConfig;
-import com.jakduk.api.WithMockJakdukUser;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
@@ -9,6 +8,7 @@ import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.DateUtils;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.common.util.ObjectMapperUtils;
+import com.jakduk.api.mock.WithMockJakdukUser;
 import com.jakduk.api.model.db.Article;
 import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.model.db.Gallery;
@@ -29,12 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
@@ -67,10 +67,11 @@ public class ArticleCommentMvcTests {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean private RestTemplateBuilder restTemplateBuilder;
     @MockBean private ArticleService articleService;
     @MockBean private GalleryService galleryService;
+
     @MockBean private RabbitMQPublisher rabbitMQPublisher;
+    @MockBean private UserDetailsService userDetailsService;
 
     private CommonWriter commonWriter;
     private Article article;
