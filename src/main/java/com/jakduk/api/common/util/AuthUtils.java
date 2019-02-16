@@ -269,17 +269,17 @@ public class AuthUtils {
         JsonNode jsonNode = fetchProfile(KAKAO_PROFILE_API_URL, accessToken);
 
         SocialProfile profile = new SocialProfile();
-        profile.setId(jsonNode.get("id").asText());
-        profile.setNickname(jsonNode.get("properties").get("nickname").asText());
-        profile.setPictureUrl(jsonNode.get("properties").get("profile_image").asText());
+        profile.setId(jsonNode.path("id").asText());
+        profile.setNickname(jsonNode.path("properties").path("nickname").asText());
+        profile.setPictureUrl(jsonNode.path("properties").path("profile_image").asText());
 
         if (jsonNode.has("kakao_account")) {
 
-            if (jsonNode.get("kakao_account").get("has_email").asBoolean() &&
-                    jsonNode.get("kakao_account").get("is_email_verified").asBoolean()) {
+            if (jsonNode.path("kakao_account").path("has_email").asBoolean() &&
+                    jsonNode.path("kakao_account").path("has_email").asBoolean()) {
 
-                if (StringUtils.isNotBlank(jsonNode.get("kakao_account").get("email").asText())) {
-                    profile.setEmail(jsonNode.get("kakao_account").get("email").asText());
+                if (StringUtils.isNotBlank(jsonNode.path("kakao_account").path("email").asText())) {
+                    profile.setEmail(jsonNode.path("kakao_account").path("email").asText());
                 }
             }
         }
