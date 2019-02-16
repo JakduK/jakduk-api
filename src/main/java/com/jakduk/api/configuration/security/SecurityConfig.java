@@ -96,8 +96,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         HttpMethod.POST,
                         "/api/board/[a-z]+", // 글 쓰기
                         "/api/board/[a-z]+/\\d+/comment", // 댓글 달기
-                        "/api/board/[a-z]+/\\d+/like|dislike", // 글 감정 표현
-                        "/api/board/[a-z]+/comment/[\\da-z]+/like|dislike", // 댓글 감정 표현
+                        "/api/board/[a-z]+/\\d+/(?:like|dislike)", // 글 감정 표현
+                        "/api/board/[a-z]+/comment/[\\da-z]+/(?:like|dislike)", // 댓글 감정 표현
                         "/api/gallery", // 사진 올리기
                         "/api/jakdu/myJakdu" // 작두 타기
                 ).hasAnyAuthority(
