@@ -2,7 +2,6 @@ package com.jakduk.api.configuration.security;
 
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
@@ -33,7 +32,7 @@ public enum JakdukAuthority {
 				.orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
 	}
 
-	static public Boolean isAdminRole(String authority) {
+	static public Boolean isAdminAuthority(String authority) {
 		JakdukAuthority jakdukAuthority = JakdukAuthority.valueOf(authority);
 		switch (jakdukAuthority) {
 			case ROLE_ROOT:
@@ -43,7 +42,7 @@ public enum JakdukAuthority {
 		}
 	}
 
-	static public Boolean isUserRole(String authority) {
+	static public Boolean isUserAuthority(String authority) {
 		JakdukAuthority jakdukAuthority = JakdukAuthority.valueOf(authority);
 		switch (jakdukAuthority) {
 			case ROLE_USER_01:

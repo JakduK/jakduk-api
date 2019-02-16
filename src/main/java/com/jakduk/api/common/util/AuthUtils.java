@@ -79,7 +79,7 @@ public class AuthUtils {
             return false;
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        result = authorities.stream().anyMatch(authority -> JakdukAuthority.isAdminRole(authority.getAuthority()));
+        result = authorities.stream().anyMatch(authority -> JakdukAuthority.isAdminAuthority(authority.getAuthority()));
 
         return result;
     }
@@ -96,7 +96,7 @@ public class AuthUtils {
             return false;
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        result = authorities.stream().anyMatch(authority -> JakdukAuthority.isUserRole(authority.getAuthority()));
+        result = authorities.stream().anyMatch(authority -> JakdukAuthority.isUserAuthority(authority.getAuthority()));
 
         return result;
     }
