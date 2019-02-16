@@ -2,6 +2,7 @@ package com.jakduk.api.configuration.security;
 
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
@@ -13,11 +14,10 @@ import java.util.Arrays;
  */
 
 public enum JakdukAuthority {
-
+	ROLE_ANONYMOUS(1), // 미가입
 	ROLE_USER_01(10), // 이메일 미인증 회원
 	ROLE_USER_02(11), // 이메일 인증 회원
 	ROLE_USER_03(12),
-	ROLE_ADMIN(30),
 	ROLE_ROOT(90);
 
 	private Integer code;
@@ -31,6 +31,28 @@ public enum JakdukAuthority {
 				.filter(commonRole -> commonRole.code.equals(code))
 				.findFirst()
 				.orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
+	}
+
+	static public Boolean isAdminRole(String authority) {
+		JakdukAuthority jakdukAuthority = JakdukAuthority.valueOf(authority);
+		switch (jakdukAuthority) {
+			case ROLE_ROOT:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	static public Boolean isUserRole(String authority) {
+		JakdukAuthority jakdukAuthority = JakdukAuthority.valueOf(authority);
+		switch (jakdukAuthority) {
+			case ROLE_USER_01:
+			case ROLE_USER_02:
+			case ROLE_USER_03:
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	public Integer getCode() {

@@ -61,14 +61,8 @@ public class AuthUtils {
             result = true;
 
         if (! result) {
-            Collection<? extends GrantedAuthority> authorises = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-            for (GrantedAuthority authority : authorises) {
-                if ("ROLE_ANONYMOUS".equals(authority.getAuthority())) {
-                    result = true;
-                    break;
-                }
-            }
+            Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+            result = authorities.stream().anyMatch(authority -> authority.getAuthority().equals(JakdukAuthority.ROLE_ANONYMOUS.name()));
         }
 
         return result;
@@ -85,13 +79,7 @@ public class AuthUtils {
             return false;
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-        for (GrantedAuthority authority : authorities) {
-            if (authority.getAuthority().equals("ROLE_ROOT")) {
-                result = true;
-                break;
-            }
-        }
+        result = authorities.stream().anyMatch(authority -> JakdukAuthority.isAdminRole(authority.getAuthority()));
 
         return result;
     }
@@ -108,14 +96,7 @@ public class AuthUtils {
             return false;
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-        for (GrantedAuthority grantedAuthority : authorities) {
-            String authority = grantedAuthority.getAuthority();
-            if (authority.equals("ROLE_USER_01") || authority.equals("ROLE_USER_02") || authority.equals("ROLE_USER_03")) {
-                result = true;
-                break;
-            }
-        }
+        result = authorities.stream().anyMatch(authority -> JakdukAuthority.isUserRole(authority.getAuthority()));
 
         return result;
     }
