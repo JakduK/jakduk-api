@@ -161,13 +161,13 @@ public class UserService {
 		}
 		// SNS에서 사용중인 사진을 User와 연동
 		else if (StringUtils.isNotBlank(largePictureUrl)) {
-
 			try {
 				FileUtils.FileInfo fileInfo = FileUtils.getBytesByUrl(largePictureUrl);
 
 				if (! StringUtils.startsWithIgnoreCase(fileInfo.getContentType(), "image/"))
 					throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
+				userPicture = new UserPicture();
 				userPicture.setStatus(Constants.GALLERY_STATUS_TYPE.TEMP);
 				userPicture.setContentType(fileInfo.getContentType());
 
