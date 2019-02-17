@@ -21,7 +21,7 @@ public class WithMockAdminUserSecurityContextFactory implements WithSecurityCont
 
         UserDetailsImpl userDetails = new UserDetailsImpl("jakduk-admin@test.com", "a!b@c#",
                 "1234", "jakduk-admin", Constants.ACCOUNT_TYPE.JAKDUK, true, true,
-                true, true, Arrays.asList(new SimpleGrantedAuthority(JakdukAuthority.ROLE_ADMIN.name())));
+                true, true, Arrays.asList(new SimpleGrantedAuthority(JakdukAuthority.ROLE_ROOT.name())));
 
         userDetails.setPicture(
                 new UserPictureInfo(
