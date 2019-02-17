@@ -125,12 +125,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         HttpMethod.POST,
                         "/api/board/[a-z]+/\\d+/notice" // 글의 공지 만들기
                 ).hasAnyAuthority(
-                JakdukAuthority.ROLE_ADMIN.name())
+                JakdukAuthority.ROLE_ROOT.name())
                 .regexMatchers(
                         HttpMethod.DELETE,
                         "/api/board/[a-z]+/\\d+/notice" // 글의 공지 없애기
                 ).hasAnyAuthority(
-                JakdukAuthority.ROLE_ADMIN.name())
+                JakdukAuthority.ROLE_ROOT.name())
 
                 .anyRequest().permitAll();
 

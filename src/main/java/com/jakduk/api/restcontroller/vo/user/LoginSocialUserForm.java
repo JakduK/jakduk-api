@@ -16,4 +16,11 @@ public class LoginSocialUserForm {
     public String getAccessToken() {
         return accessToken;
     }
+
+    @Override
+    public String toString() {
+        return "LoginSocialUserForm{" +
+                "accessToken='" + accessToken + '\'' +
+                '}';
+    }
 }
