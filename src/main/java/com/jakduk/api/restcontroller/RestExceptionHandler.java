@@ -225,7 +225,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody
     public ResponseEntity<RestErrorResponse> runtimeException(RuntimeException ex, HttpServletRequest request) {
-        RestErrorResponse restErrorResponse = new RestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR);
+        RestErrorResponse restErrorResponse = new RestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
         restErrorResponse.setDetail(getErrorAttributes(request, false));
 
         try {
