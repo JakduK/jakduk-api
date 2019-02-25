@@ -279,7 +279,7 @@ public class SearchService {
 				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.should(QueryBuilders.multiMatchQuery(query, "subject^1.5", "content"))
+								.should(QueryBuilders.multiMatchQuery(query, "subject", "content").field("subject", 1.5f))
 				)
 				.setFrom(from)
 				.setSize(size);
