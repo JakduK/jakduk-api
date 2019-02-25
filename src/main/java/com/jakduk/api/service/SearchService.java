@@ -19,6 +19,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.JoinQueryBuilders;
@@ -164,7 +165,7 @@ public class SearchService {
 					.setIndex(elasticsearchProperties.getIndexBoard())
 					.setType(Constants.ES_TYPE_ARTICLE)
 					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esArticle))
+					.setSource(ObjectMapperUtils.writeValueAsString(esArticle), XContentType.JSON)
 					.get();
 
 		} catch (IOException e) {
@@ -194,7 +195,7 @@ public class SearchService {
 					.setType(Constants.ES_TYPE_COMMENT)
 					.setId(id)
 					.setParent(parentBoardId)
-					.setSource(ObjectMapperUtils.writeValueAsString(esComment))
+					.setSource(ObjectMapperUtils.writeValueAsString(esComment), XContentType.JSON)
 					.get();
 
 		} catch (IOException e) {
@@ -226,7 +227,7 @@ public class SearchService {
 					.setIndex(elasticsearchProperties.getIndexGallery())
 					.setType(Constants.ES_TYPE_GALLERY)
 					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esGallery))
+					.setSource(ObjectMapperUtils.writeValueAsString(esGallery), XContentType.JSON)
 					.get();
 
 		} catch (IOException e) {
@@ -250,11 +251,10 @@ public class SearchService {
 
 		try {
 			IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
-
 			IndexResponse response = indexRequestBuilder
 					.setIndex(elasticsearchProperties.getIndexSearchWord())
 					.setType(Constants.ES_TYPE_SEARCH_WORD)
-					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
+					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord), XContentType.JSON)
 					.get();
 
 			log.debug("indexDocumentSearchWord Source:\n {}", indexRequestBuilder.request().getDescription());

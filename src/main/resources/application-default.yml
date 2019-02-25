@@ -3,7 +3,8 @@ logging:
     console: "%d{ISO8601} [%thread] [%-5level] [%logger{0}.%M:%line] - %msg%n%rEx"
   level:
     root: DEBUG
-    org.mongodb.driver.cluster: INFO
+    sun.rmi: INFO
+    org.mongodb.driver: INFO
     org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
 
 server:
@@ -56,7 +57,7 @@ jakduk:
       elasticsearch:
         binding-queue-name: dev.elasticsearch
         binding-routing-key: dev.elasticsearch.*
-        enabled: false
+        enabled: true
     routing-keys:
       email-welcome: dev.email.welcome
       email-reset-password: dev.email.reset-password
