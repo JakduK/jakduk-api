@@ -144,7 +144,7 @@ public class SearchService {
 		List<EsTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
 				.map(entry -> {
 					EsTermsBucket esTermsBucket = new EsTermsBucket();
-					esTermsBucket.setKey(entry.getKey().toString());
+					esTermsBucket.setKey(entry.getKeyAsString());
 					esTermsBucket.setCount(entry.getDocCount());
 					return esTermsBucket;
 				})
@@ -316,7 +316,7 @@ public class SearchService {
 
 					if (! ObjectUtils.isEmpty(esArticleSource.getGalleries())) {
 						List<BoardGallerySimple> boardGalleries = esArticleSource.getGalleries().stream()
-								.sorted(Comparator.comparing(String::toString))
+                                .sorted(Comparator.comparing(String::toString))
 								.limit(1)
 								.map(galleryId -> new BoardGallerySimple() {{
 									setId(galleryId);
@@ -353,10 +353,9 @@ public class SearchService {
 				.setQuery(
 						QueryBuilders.boolQuery()
 								.must(QueryBuilders.matchQuery("content", query))
-								.must(
-										JoinQueryBuilders
-												.hasParentQuery(Constants.ES_TYPE_ARTICLE, QueryBuilders.matchAllQuery(), false)
-												.innerHit(new InnerHitBuilder())
+								.must(JoinQueryBuilders
+                                        .hasParentQuery(Constants.ES_TYPE_ARTICLE, QueryBuilders.matchAllQuery(), false)
+                                        .innerHit(new InnerHitBuilder())
 								)
 				)
 				.setFrom(from)
