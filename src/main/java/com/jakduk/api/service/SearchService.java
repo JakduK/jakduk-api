@@ -19,6 +19,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.JoinQueryBuilders;
@@ -143,7 +144,7 @@ public class SearchService {
 		List<EsTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
 				.map(entry -> {
 					EsTermsBucket esTermsBucket = new EsTermsBucket();
-					esTermsBucket.setKey(entry.getKey().toString());
+					esTermsBucket.setKey(entry.getKeyAsString());
 					esTermsBucket.setCount(entry.getDocCount());
 					return esTermsBucket;
 				})
@@ -164,7 +165,7 @@ public class SearchService {
 					.setIndex(elasticsearchProperties.getIndexBoard())
 					.setType(Constants.ES_TYPE_ARTICLE)
 					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esArticle))
+					.setSource(ObjectMapperUtils.writeValueAsString(esArticle), XContentType.JSON)
 					.get();
 
 		} catch (IOException e) {
@@ -194,7 +195,7 @@ public class SearchService {
 					.setType(Constants.ES_TYPE_COMMENT)
 					.setId(id)
 					.setParent(parentBoardId)
-					.setSource(ObjectMapperUtils.writeValueAsString(esComment))
+					.setSource(ObjectMapperUtils.writeValueAsString(esComment), XContentType.JSON)
 					.get();
 
 		} catch (IOException e) {
@@ -226,7 +227,7 @@ public class SearchService {
 					.setIndex(elasticsearchProperties.getIndexGallery())
 					.setType(Constants.ES_TYPE_GALLERY)
 					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esGallery))
+					.setSource(ObjectMapperUtils.writeValueAsString(esGallery), XContentType.JSON)
 					.get();
 
 		} catch (IOException e) {
@@ -250,11 +251,10 @@ public class SearchService {
 
 		try {
 			IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
-
 			IndexResponse response = indexRequestBuilder
 					.setIndex(elasticsearchProperties.getIndexSearchWord())
 					.setType(Constants.ES_TYPE_SEARCH_WORD)
-					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord))
+					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord), XContentType.JSON)
 					.get();
 
 			log.debug("indexDocumentSearchWord Source:\n {}", indexRequestBuilder.request().getDescription());
@@ -279,7 +279,7 @@ public class SearchService {
 				.setFetchSource(null, new String[]{"subject", "content"})
 				.setQuery(
 						QueryBuilders.boolQuery()
-								.should(QueryBuilders.multiMatchQuery(query, "subject^1.5", "content"))
+								.should(QueryBuilders.multiMatchQuery(query, "subject", "content").field("subject", 1.5f))
 				)
 				.setFrom(from)
 				.setSize(size);
@@ -316,7 +316,7 @@ public class SearchService {
 
 					if (! ObjectUtils.isEmpty(esArticleSource.getGalleries())) {
 						List<BoardGallerySimple> boardGalleries = esArticleSource.getGalleries().stream()
-								.sorted(Comparator.comparing(String::toString))
+                                .sorted(Comparator.comparing(String::toString))
 								.limit(1)
 								.map(galleryId -> new BoardGallerySimple() {{
 									setId(galleryId);
@@ -353,10 +353,9 @@ public class SearchService {
 				.setQuery(
 						QueryBuilders.boolQuery()
 								.must(QueryBuilders.matchQuery("content", query))
-								.must(
-										JoinQueryBuilders
-												.hasParentQuery(Constants.ES_TYPE_ARTICLE, QueryBuilders.matchAllQuery(), false)
-												.innerHit(new InnerHitBuilder())
+								.must(JoinQueryBuilders
+                                        .hasParentQuery(Constants.ES_TYPE_ARTICLE, QueryBuilders.matchAllQuery(), false)
+                                        .innerHit(new InnerHitBuilder())
 								)
 				)
 				.setFrom(from)

@@ -4,7 +4,8 @@ logging:
   file: /jakduk/api/logs/api.log
   level:
     root: DEBUG
-    org.mongodb.driver.cluster: INFO
+    sun.rmi: INFO
+    org.mongodb.driver: INFO
     org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
 
 server:
