@@ -17,7 +17,7 @@ spring:
   data:
     elasticsearch:
       cluster-name: jakduk-elasticsearch
-      cluster-nodes: 192.168.55.156:9300,192.168.55.54:9300
+      cluster-nodes: 192.168.55.199:9300,192.168.55.54:9300
       repositories:
         enabled: false
   rabbitmq:
