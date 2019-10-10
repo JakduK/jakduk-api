@@ -14,11 +14,11 @@ spring:
   data:
     elasticsearch:
       cluster-name: jakduk-elasticsearch
-      cluster-nodes: 192.168.35.151:9300,192.168.35.18:9300
+      cluster-nodes: 192.168.55.199:9300,192.168.55.54:9300
       repositories:
         enabled: false
   rabbitmq:
-    addresses: 192.168.35.74
+    addresses: 192.168.55.156
     username: admin
     password: wkrenakstp@
     listener:
@@ -36,7 +36,7 @@ jakduk:
 
   mongodb:
     database: jakduk_sample
-    host: http://192.168.35.194:27017,http://192.168.35.138:27017
+    host: http://192.168.55.25:27017,http://192.168.55.163:27017
   elasticsearch:
     index-board: jakduk_prd_board
     index-gallery: jakduk_prd_gallery
