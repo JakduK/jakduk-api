@@ -57,13 +57,13 @@ public class DefaultViewController {
 	@Autowired private ArticleService articleService;
 
 	// RSS
-	@RequestMapping(value = "/rss", method = RequestMethod.GET, produces = "application/*")
+	@GetMapping(value = "/rss.xml", produces = MediaType.APPLICATION_XML_VALUE)
 	public String getRss() {
 		return "documentRssFeedView";
 	}
 
 	// Sitemap
-	@GetMapping(value = "/sitemap", produces = MediaType.APPLICATION_XML_VALUE)
+	@GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
 	public void getSitemap(HttpServletResponse servletResponse) {
 
 		try {
