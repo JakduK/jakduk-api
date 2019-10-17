@@ -50,4 +50,14 @@ public class WriteArticle {
     public List<GalleryOnBoard> getGalleries() {
         return galleries;
     }
+
+    @Override
+    public String toString() {
+        return "WriteArticle{" +
+                "subject='" + subject + '\'' +
+                ", content='" + content + '\'' +
+                ", categoryCode='" + categoryCode + '\'' +
+                ", galleries=" + galleries +
+                '}';
+    }
 }

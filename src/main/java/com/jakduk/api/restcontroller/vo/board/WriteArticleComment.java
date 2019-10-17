@@ -26,4 +26,12 @@ public class WriteArticleComment {
     public List<GalleryOnBoard> getGalleries() {
         return galleries;
     }
+
+    @Override
+    public String toString() {
+        return "WriteArticleComment{" +
+                "content='" + content + '\'' +
+                ", galleries=" + galleries +
+                '}';
+    }
 }
