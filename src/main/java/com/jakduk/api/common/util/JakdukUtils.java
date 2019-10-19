@@ -5,20 +5,27 @@ import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.LocalName;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.RandomStringGenerator;
-import org.jsoup.Jsoup;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * @author pyohwan
@@ -26,6 +33,8 @@ import java.util.stream.Stream;
  */
 
 public class JakdukUtils {
+
+    private static Pattern PATTERN_WITHOUT_TAGS = Pattern.compile("</?(.+?)>");
 
     private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";
 
@@ -98,11 +107,8 @@ public class JakdukUtils {
     /**
      * HTML TAG를 제거한다.
      */
-    public static String stripHtmlTag(String htmlTag) {
-        String content = StringUtils.defaultIfBlank(htmlTag, StringUtils.EMPTY);
-        content = Jsoup.parse(content).text();
-
-        return content;
+    public static String stripHtmlTag(String html) {
+        return PATTERN_WITHOUT_TAGS.matcher(html).replaceAll("");
     }
 
     /**
