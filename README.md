@@ -1,5 +1,3 @@
-[![Telegram](https://img.shields.io/badge/join-telegram-blue.svg)](https://t.me/joinchat/EEdSAQ6kK0zyY_N_6TdW_Q)
-
 jakduk-api
 ===================
 K League Community Web Application.
