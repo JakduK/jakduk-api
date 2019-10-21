@@ -22,6 +22,8 @@ import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -46,6 +48,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/board")
 public class BoardRestController {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired private ArticleService articleService;
     @Autowired private GalleryService galleryService;
@@ -109,6 +113,8 @@ public class BoardRestController {
     public WriteArticleResponse writeArticle(
             @PathVariable Constants.BOARD_TYPE board,
             @Valid @RequestBody WriteArticle form) {
+
+        log.info("request board : {}, body : {}", board, form);
 
         List<GalleryOnBoard> formGalleries = form.getGalleries();
         CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
@@ -220,6 +226,9 @@ public class BoardRestController {
             @PathVariable Constants.BOARD_TYPE board,
             @PathVariable Integer seq,
             @Valid @RequestBody WriteArticleComment form) {
+
+        log.info("request board : {}, seq : {}, body : {}", board, seq, form);
+        log.info("content length : {}", form.getContent().length());
 
         CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
