@@ -100,7 +100,7 @@ public class JakdukUtils {
      * HTML TAG를 제거한다.
      */
     public static String stripHtmlTag(String html) {
-        return PATTERN_WITHOUT_TAGS.matcher(StringUtils.defaultIfBlank(html, StringUtils.EMPTY)).replaceAll("");
+        return PATTERN_WITHOUT_TAGS.matcher(StringUtils.defaultIfBlank(html, StringUtils.EMPTY)).replaceAll(StringUtils.EMPTY);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.jakduk.api.utils;
 
 import com.jakduk.api.common.util.JakdukUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class JakdukUtilsTests {
         System.out.println("");
         Assert.assertEquals(27, emojiTag.length());
         Assert.assertEquals(20, JakdukUtils.stripHtmlTag(emojiTag).length());
-        Assert.assertEquals("", JakdukUtils.stripHtmlTag(imgTag));
+        Assert.assertEquals(StringUtils.EMPTY.length(), JakdukUtils.stripHtmlTag(imgTag).length());
         Assert.assertEquals("Visit W3Schools.com!", JakdukUtils.stripHtmlTag(aTag));
     }
 }
