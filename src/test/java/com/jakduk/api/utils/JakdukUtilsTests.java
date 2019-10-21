@@ -15,8 +15,8 @@ public class JakdukUtilsTests {
     @Test
     public void stripHtmlTag() {
         String emojiTag = "<p>\uD83C\uDFC3\u200D♀️\uD83C\uDFC3\u200D♂️\uD83D\uDEB4\u200D♀️\uD83D\uDEB4\u200D♂️</p>";
-        String imgTag = "<img src=\"smiley.gif\" alt=\"Smiley face\" height=\"42\" width=\"42\">️";
-        String aTag = "<a href=\"https://www.w3schools.com\">Visit W3Schools.com!</a>️";
+        String imgTag = "<img src=\"smiley.gif\" alt=\"Smiley face\" height=\"42\" width=\"42\">";
+        String aTag = "<a href=\"https://www.w3schools.com\">Visit W3Schools.com!</a>";
 
         System.out.println("");
         Assert.assertEquals(27, emojiTag.length());
