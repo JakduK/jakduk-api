@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 public class JakdukUtils {
 
-    private final static Pattern PATTERN_WITHOUT_TAGS = Pattern.compile("</?(.+?)>");
+    private final static Pattern PATTERN_WITHOUT_TAGS = Pattern.compile("</?.+?>");
     private final static String GALLERIES_FOR_REMOVAL = ":galleries_for_removal";
 
     private static RandomStringGenerator generator = new RandomStringGenerator.Builder()
