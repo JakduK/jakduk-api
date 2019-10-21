@@ -17,10 +17,9 @@ public class JakdukUtilsTests {
         String imgTag = "<img src=\"smiley.gif\" alt=\"Smiley face\" height=\"42\" width=\"42\">️";
         String aTag = "<a href=\"https://www.w3schools.com\">Visit W3Schools.com!</a>️";
 
+        System.out.println("");
         Assert.assertEquals(27, emojiTag.length());
-        Assert.assertEquals("\uD83C\uDFC3♀️\uD83C\uDFC3♂️\uD83D\uDEB4♀️\uD83D\uDEB4♂️", JakdukUtils.stripHtmlTag(emojiTag));
-        Assert.assertEquals(27, JakdukUtils.stripHtmlTag(emojiTag).length());
-
+        Assert.assertEquals(20, JakdukUtils.stripHtmlTag(emojiTag).length());
         Assert.assertEquals("", JakdukUtils.stripHtmlTag(imgTag));
         Assert.assertEquals("Visit W3Schools.com!", JakdukUtils.stripHtmlTag(aTag));
     }
