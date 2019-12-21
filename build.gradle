@@ -66,6 +66,7 @@ dependencies {
     implementation 'com.github.dfabulich:sitemapgen4j:1.1.2'
     implementation 'com.rometools:rome:1.12.2'
     implementation 'net.coobird:thumbnailator:0.4.8'
+    implementation 'org.jsoup:jsoup:1.12.1'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
