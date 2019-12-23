@@ -18,9 +18,8 @@ import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -32,7 +31,6 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.servlet.http.Cookie;
@@ -54,10 +52,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest({AuthRestController.class})
 @Import({TestMvcConfig.class})
-@AutoConfigureRestDocs(outputDir = "build/snippets")
+@AutoConfigureRestDocs
 public class AuthMvcTests {
 
     @Autowired
@@ -69,13 +66,13 @@ public class AuthMvcTests {
 
     @MockBean private AuthenticationManager authenticationManager;
 
-    private SocialProfile socialProfile;
-    private Constants.ACCOUNT_TYPE providerId;
-    private FootballClub footballClub;
-    private User jakdukUser;
+    private static SocialProfile socialProfile;
+    private static Constants.ACCOUNT_TYPE providerId;
+    private static FootballClub footballClub;
+    private static User jakdukUser;
 
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
 
         providerId = Constants.ACCOUNT_TYPE.FACEBOOK;
 

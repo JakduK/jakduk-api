@@ -12,10 +12,8 @@ import com.jakduk.api.service.StatsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,8 +45,6 @@ public class StatsRestController {
         Competition competition = null;
         List<AttendanceLeague> leagueAttendances;
 
-        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-
         if (Objects.nonNull(competitionId)) {
             competition = competitionService.findOneById(competitionId);
         } else if (Objects.nonNull(competitionCode)) {
@@ -56,9 +52,9 @@ public class StatsRestController {
         }
 
         if (Objects.isNull(competition)) {
-            leagueAttendances = statsService.findLeagueAttendances(sort);
+            leagueAttendances = statsService.findLeagueAttendances(Constants.SORT_BY_ID_ASC);
         } else {
-            leagueAttendances = statsService.findLeagueAttendances(competition, sort);
+            leagueAttendances = statsService.findLeagueAttendances(competition, Constants.SORT_BY_ID_ASC);
         }
 
         return leagueAttendances;

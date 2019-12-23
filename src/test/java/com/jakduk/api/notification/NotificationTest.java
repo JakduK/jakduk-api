@@ -8,8 +8,8 @@ import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.mail.EmailService;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -27,7 +27,7 @@ public class NotificationTest extends ApiApplicationTests {
     @Autowired private EmailService emailService;
     @Autowired private RabbitMQPublisher rabbitMQPublisher;
 
-    @Ignore
+    @Disabled
     @Test
     public void 메일발송() throws MessagingException {
 
@@ -36,7 +36,7 @@ public class NotificationTest extends ApiApplicationTests {
         emailService.sendMailWithInline("Pyohwan", "phjang1983@daum.net", locale);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void 가입메일() throws MessagingException {
 
@@ -56,7 +56,7 @@ public class NotificationTest extends ApiApplicationTests {
         emailService.sendBulk(emailPayload);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void 비밀번호_갱신() throws MessagingException {
 
@@ -83,7 +83,7 @@ public class NotificationTest extends ApiApplicationTests {
         emailService.sendResetPassword(emailPayload);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testSendBulk() throws MessagingException {
 
@@ -104,7 +104,7 @@ public class NotificationTest extends ApiApplicationTests {
         emailService.sendBulk(emailPayload);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void sendWelcomeWithRabbitMQ() throws InterruptedException {
 
@@ -128,7 +128,7 @@ public class NotificationTest extends ApiApplicationTests {
         Thread.sleep(1000 * 5);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void sendResetPasswordWithRabbitMQ() throws InterruptedException {
 

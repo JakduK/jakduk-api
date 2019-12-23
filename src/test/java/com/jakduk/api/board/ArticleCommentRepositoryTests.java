@@ -8,15 +8,13 @@ import com.jakduk.api.model.aggregate.CommonCount;
 import com.jakduk.api.model.db.ArticleComment;
 import com.jakduk.api.repository.article.ArticleCommentRepository;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -25,10 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Created by pyohwanjang on 2017. 3. 27..
  */
-@RunWith(SpringRunner.class)
 @DataMongoTest
 @EnableConfigurationProperties
 @Import({JakdukProperties.class, MongodbConfig.class})
@@ -39,7 +38,7 @@ public class ArticleCommentRepositoryTests {
 
     private ArticleComment randomArticleComment;
 
-    @Before
+    @BeforeEach
     public void setUp(){
         ArticleComment articleComment = repository.findTopByOrderByIdAsc().get();
         LocalDateTime localDateTime = DateUtils.dateToLocalDateTime(new ObjectId(articleComment.getId()).getDate());
@@ -52,7 +51,7 @@ public class ArticleCommentRepositoryTests {
     public void findCommentsCountByIds() {
         List<CommonCount> commentCounts = repository.findCommentsCountByIds(Arrays.asList(new ObjectId(randomArticleComment.getArticle().getId())));
 
-        Assert.assertTrue(! CollectionUtils.isEmpty(commentCounts));
+        assertTrue(! CollectionUtils.isEmpty(commentCounts));
     }
 
     @Test
@@ -60,7 +59,7 @@ public class ArticleCommentRepositoryTests {
 
         List<ArticleComment> comments = repository.findByBoardSeqAndGTId(randomArticleComment.getArticle().getBoard(), randomArticleComment.getArticle().getSeq(), null);
 
-        Assert.assertTrue(! CollectionUtils.isEmpty(comments));
+        assertTrue(! CollectionUtils.isEmpty(comments));
 
     }
 

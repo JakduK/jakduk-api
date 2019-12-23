@@ -235,7 +235,7 @@ public class ArticleService {
      */
 	public GetArticlesResponse getArticles(Constants.BOARD_TYPE board, String categoryCode, Integer page, Integer size) {
 
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+		Sort sort = Constants.SORT_BY_ID_DESC;
 		Pageable pageable = PageRequest.of(page - 1, size, sort);
 		Page<ArticleOnList> articlePages;
 
@@ -343,10 +343,7 @@ public class ArticleService {
 	 * 최근 글 가져오기
 	 */
 	public List<HomeArticle> getLatestArticles() {
-
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-
-		List<ArticleOnList> articles = articleRepository.findLatest(sort, Constants.HOME_SIZE_POST);
+		List<ArticleOnList> articles = articleRepository.findLatest(Constants.SORT_BY_ID_DESC, Constants.HOME_SIZE_POST);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
 		return articles.stream()
@@ -675,20 +672,14 @@ public class ArticleService {
 	 * RSS 용 게시물 목록
 	 */
 	public List<ArticleOnRSS> getBoardFreeOnRss(ObjectId objectId, Integer limit) {
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-
-		return articleRepository.findPostsOnRss(objectId, sort, limit);
-
+		return articleRepository.findPostsOnRss(objectId, Constants.SORT_BY_ID_DESC, limit);
 	}
 
 	/**
 	 * 사이트맵 용 게시물 목록
 	 */
 	public List<ArticleOnSitemap> getBoardFreeOnSitemap(ObjectId objectId, Integer limit) {
-		Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
-
-		return articleRepository.findSitemapArticles(objectId, sort, limit);
-
+		return articleRepository.findSitemapArticles(objectId, Constants.SORT_BY_ID_DESC, limit);
 	}
 
 	/**

@@ -2,13 +2,14 @@ package com.jakduk.api.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jakduk.api.common.util.ObjectMapperUtils;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by pyohwanjang on 2017. 2. 25..
@@ -36,7 +37,7 @@ public class ObjectMapperUtilsTest {
     "2017-09-24T16:45:47.640"
     "2017-09-24T16:45:47.64"
      */
-    @Ignore
+    @Disabled
     @Test
     public void iso8601Test() throws JsonProcessingException {
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -46,7 +47,7 @@ public class ObjectMapperUtilsTest {
         System.out.println(expect);
         System.out.println(ObjectMapperUtils.writeValueAsString(localDateTime));
 
-        Assert.assertTrue(expect.equals(ObjectMapperUtils.writeValueAsString(localDateTime)));
+        assertTrue(expect.equals(ObjectMapperUtils.writeValueAsString(localDateTime)));
     }
 
 }

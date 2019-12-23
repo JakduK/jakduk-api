@@ -2,7 +2,7 @@ package com.jakduk.api.admin;
 
 import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.repository.AttendanceLeagueRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

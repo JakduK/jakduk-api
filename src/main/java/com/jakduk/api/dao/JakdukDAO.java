@@ -70,7 +70,7 @@ public class JakdukDAO {
 	public JakduScheduleGroup getJakduScheduleGroupOrderBySeq() {
 
 		Query query = new Query();
-		query.with(new Sort(Direction.DESC, "seq"));
+		query.with(Sort.by(Direction.DESC, "seq"));
 		query.limit(1);
 
 		JakduScheduleGroup jakduScheduleGroup = mongoTemplate.findOne(query, JakduScheduleGroup.class);

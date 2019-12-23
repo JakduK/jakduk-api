@@ -81,7 +81,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
         if (Objects.nonNull(commentId))
             query.addCriteria(Criteria.where("_id").gt(commentId));
 
-        query.with(new Sort(Sort.Direction.ASC, "_id"));
+        query.with(Constants.SORT_BY_ID_ASC);
         query.limit(Constants.COMMENT_MAX_LIMIT);
 
         return mongoTemplate.find(query, ArticleComment.class);
@@ -107,7 +107,7 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
     @Override
     public List<ArticleCommentSimple> findSimpleComments() {
         Query query = new Query();
-        query.with(new Sort(Sort.Direction.DESC, "_id"));
+        query.with(Constants.SORT_BY_ID_DESC);
         query.limit(Constants.HOME_SIZE_LINE_NUMBER);
 
         return mongoTemplate.find(query, ArticleCommentSimple.class);

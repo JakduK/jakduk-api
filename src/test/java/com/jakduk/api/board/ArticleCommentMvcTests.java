@@ -21,9 +21,8 @@ import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import org.bson.types.ObjectId;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -35,7 +34,6 @@ import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
 
@@ -58,10 +56,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(BoardRestController.class)
 @Import(TestMvcConfig.class)
-@AutoConfigureRestDocs(outputDir = "build/snippets")
+@AutoConfigureRestDocs
 public class ArticleCommentMvcTests {
 
     @Autowired
@@ -73,18 +70,18 @@ public class ArticleCommentMvcTests {
     @MockBean private RabbitMQPublisher rabbitMQPublisher;
     @MockBean private UserDetailsService userDetailsService;
 
-    private CommonWriter commonWriter;
-    private Article article;
-    private ArticleComment articleComment;
-    private ArticleSimple articleSimple;
-    private List<BoardCategory> categories;
-    private BoardCategory boardCategory;
-    private List<GetArticleComment> articleComments;
-    private List<Gallery> galleries;
-    private Map<String, Object> writeArticleComment;
+    private static CommonWriter commonWriter;
+    private static Article article;
+    private static ArticleComment articleComment;
+    private static ArticleSimple articleSimple;
+    private static List<BoardCategory> categories;
+    private static BoardCategory boardCategory;
+    private static List<GetArticleComment> articleComments;
+    private static List<Gallery> galleries;
+    private static Map<String, Object> writeArticleComment;
 
-    @Before
-    public void setUp(){
+    @BeforeAll
+    public static void setUp(){
         commonWriter = new CommonWriter();
         commonWriter.setUserId("571ccf50ccbfc325b20711c5");
         commonWriter.setUsername("test07");

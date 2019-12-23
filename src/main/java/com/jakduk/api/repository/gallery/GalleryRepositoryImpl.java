@@ -5,7 +5,6 @@ import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.model.simple.GallerySimple;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -44,7 +43,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
             }
         }
 
-        query.with(new Sort(Sort.Direction.DESC, "_id"));
+        query.with(Constants.SORT_BY_ID_DESC);
 
         return mongoTemplate.find(query, Gallery.class);
     }
@@ -60,7 +59,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
         query.addCriteria(Criteria.where("linkedItems.from").is(fromType));
         query.limit(limit);
 
-        query.with(new Sort(Sort.Direction.DESC, "_id"));
+        query.with(Constants.SORT_BY_ID_DESC);
 
         return mongoTemplate.find(query, Gallery.class);
     }
@@ -76,7 +75,7 @@ public class GalleryRepositoryImpl implements GalleryRepositoryCustom {
             query.addCriteria(Criteria.where("_id").lt(id));
         }
 
-        query.with(new Sort(Sort.Direction.DESC, "_id"));
+        query.with(Constants.SORT_BY_ID_DESC);
 
         return mongoTemplate.find(query, GallerySimple.class);
     }

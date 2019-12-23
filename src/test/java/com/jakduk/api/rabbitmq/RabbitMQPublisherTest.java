@@ -6,8 +6,8 @@ import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.elasticsearch.EsArticle;
 import com.jakduk.api.model.embedded.CommonWriter;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -44,7 +44,7 @@ public class RabbitMQPublisherTest extends ApiApplicationTests {
         sut.publishElasticsearch(routingKey, esArticle);
     }
 
-    @After
+    @AfterEach
     public void after() throws InterruptedException {
 
         String id = "595bb024290ad3035636f2ba";

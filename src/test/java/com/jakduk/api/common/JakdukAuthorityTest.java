@@ -1,8 +1,9 @@
 package com.jakduk.api.common;
 
 import com.jakduk.api.configuration.security.JakdukAuthority;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JakdukAuthorityTest {
 
@@ -11,7 +12,7 @@ public class JakdukAuthorityTest {
 
         String roleName = JakdukAuthority.findByCode(10).name();
 
-        Assert.assertTrue("ROLE_USER_01".equals(roleName));
+        assertTrue("ROLE_USER_01".equals(roleName));
     }
 
 }

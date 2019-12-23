@@ -1,4 +1,7 @@
 package com.jakduk.api.common;
+
+import org.springframework.data.domain.Sort;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -231,5 +234,8 @@ public class Constants {
 		CREATE,
 		EDIT
 	}
+
+	public static Sort SORT_BY_ID_DESC = Sort.by(Sort.Direction.DESC, "_id");
+	public static Sort SORT_BY_ID_ASC = Sort.by(Sort.Direction.ASC, "_id");
 
 }
