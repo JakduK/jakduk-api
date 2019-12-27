@@ -1,6 +1,7 @@
 package com.jakduk.api.search;
 
 import com.jakduk.api.ApiApplicationTests;
+import com.jakduk.api.restcontroller.vo.search.PopularSearchWordResult;
 import com.jakduk.api.service.SearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,8 @@ public class SearchServiceTest extends ApiApplicationTests {
 	public void aggregateSearchWord() {
 		// 한달전
 		LocalDate oneMonthAgo = LocalDate.now().minusMonths(1L);
-		sut.aggregateSearchWord(oneMonthAgo, 5);
+		PopularSearchWordResult result = sut.aggregateSearchWord(oneMonthAgo, 5);
+		System.out.println("phjang=" + result);
 	}
 
 }
