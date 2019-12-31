@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotEmpty;
+import java.io.IOException;
 import java.time.LocalDate;
 
 /**
@@ -46,7 +47,7 @@ public class SearchRestController {
 			@RequestParam(required = false, defaultValue = "10") Integer size, // 페이지 크기
 			@RequestParam(required = false) String tag, // 하이라이트의 태그
 			@RequestParam(required = false) String styleClass // 하이라이트의 태그 클래스
-	) {
+	) throws IOException {
 
 		log.debug("unified search request q={}, w={}, from={}, size={}, tag={}, styleClass={}", q, w, from, size, tag, styleClass);
 
@@ -76,7 +77,7 @@ public class SearchRestController {
 	@GetMapping("/popular-words")
 	public PopularSearchWordResult searchPopularWords(
 			@RequestParam(required = false, defaultValue = "5") Integer size // 크기
-	) {
+	) throws IOException {
 
 		// 3 주전
 		LocalDate threeWeeksAgo = LocalDate.now().minusWeeks(3);

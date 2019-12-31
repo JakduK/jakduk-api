@@ -4,20 +4,19 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.common.util.UrlGenerationUtils;
 import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.exception.ServiceError;
-import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.elasticsearch.*;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import com.jakduk.api.restcontroller.vo.search.*;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.MultiSearchRequestBuilder;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.InnerHitBuilder;
@@ -28,6 +27,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class SearchService {
 	@Resource private JakdukProperties.Elasticsearch elasticsearchProperties;
 
 	@Autowired private UrlGenerationUtils urlGenerationUtils;
-	@Autowired private Client client;
+	@Autowired private RestHighLevelClient highLevelClient;
 
 	/**
 	 * 통합 검색
@@ -66,31 +66,31 @@ public class SearchService {
 	 * @return	검색 결과
 	 */
 	public SearchUnifiedResponse searchUnified(String query, String include, Integer from, Integer size, String preTags,
-											   String postTags) {
+											   String postTags) throws IOException {
 
 		SearchUnifiedResponse searchUnifiedResponse = new SearchUnifiedResponse();
 		Queue<Constants.SEARCH_INCLUDE_TYPE> searchOrder = new LinkedList<>();
-		MultiSearchRequestBuilder multiSearchRequestBuilder = client.prepareMultiSearch();
+		MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
 
 		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.ARTICLE.name())) {
-			SearchRequestBuilder searchRequestBuilder = getArticleSearchRequestBuilder(query, from, size, preTags, postTags);
-			multiSearchRequestBuilder.add(searchRequestBuilder);
+			SearchRequest searchRequest = this.getArticleSearchRequestBuilder(query, from, size, preTags, postTags);
+			multiSearchRequest.add(searchRequest);
 			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.ARTICLE);
 		}
 
 		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.COMMENT.name())) {
-			SearchRequestBuilder searchRequestBuilder = getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
-			multiSearchRequestBuilder.add(searchRequestBuilder);
+			SearchRequest searchRequest = this.getCommentSearchRequestBuilder(query, from, size, preTags, postTags);
+			multiSearchRequest.add(searchRequest);
 			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.COMMENT);
 		}
 
 		if (StringUtils.contains(include, Constants.SEARCH_INCLUDE_TYPE.GALLERY.name())) {
-			SearchRequestBuilder searchRequestBuilder = getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size, preTags, postTags);
-			multiSearchRequestBuilder.add(searchRequestBuilder);
+			SearchRequest searchRequest = this.getGallerySearchRequestBuilder(query, from, size < 10 ? 4 : size, preTags, postTags);
+			multiSearchRequest.add(searchRequest);
 			searchOrder.offer(Constants.SEARCH_INCLUDE_TYPE.GALLERY);
 		}
 
-		MultiSearchResponse multiSearchResponse = multiSearchRequestBuilder.execute().actionGet();
+		MultiSearchResponse multiSearchResponse = highLevelClient.msearch(multiSearchRequest, RequestOptions.DEFAULT);
 
 		for (MultiSearchResponse.Item item : multiSearchResponse.getResponses()) {
 			SearchResponse searchResponse = item.getResponse();
@@ -102,15 +102,15 @@ public class SearchService {
 			if (! ObjectUtils.isEmpty(order)) {
 				switch (order) {
 					case ARTICLE:
-						SearchArticleResult searchArticleResult = getArticleSearchResponse(searchResponse);
+						SearchArticleResult searchArticleResult = this.getArticleSearchResponse(searchResponse);
 						searchUnifiedResponse.setArticleResult(searchArticleResult);
 						break;
 					case COMMENT:
-						SearchCommentResult searchCommentResult = getCommentSearchResponse(searchResponse);
+						SearchCommentResult searchCommentResult = this.getCommentSearchResponse(searchResponse);
 						searchUnifiedResponse.setCommentResult(searchCommentResult);
 						break;
 					case GALLERY:
-						SearchGalleryResult searchGalleryResult = getGallerySearchResponse(searchResponse);
+						SearchGalleryResult searchGalleryResult = this.getGallerySearchResponse(searchResponse);
 						searchUnifiedResponse.setGalleryResult(searchGalleryResult);
 						break;
 				}
@@ -120,25 +120,24 @@ public class SearchService {
 		return searchUnifiedResponse;
 	}
 
-	public PopularSearchWordResult aggregateSearchWord(LocalDate gteDate, Integer size) {
+	public PopularSearchWordResult aggregateSearchWord(LocalDate gteDate, Integer size) throws IOException {
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		searchSourceBuilder.size(0);
+		searchSourceBuilder.query(
+				QueryBuilders.rangeQuery("registerDate").gte(gteDate.toString())
+		);
+		searchSourceBuilder.aggregation(
+				AggregationBuilders
+						.terms("popular_word_aggs")
+						.field("word")
+						.size(size)
+		);
 
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchProperties.getIndexSearchWord())
-				.setTypes(Constants.ES_TYPE_SEARCH_WORD)
-				.setSize(0)
-				.setQuery(
-						QueryBuilders.rangeQuery("registerDate").gte(gteDate.toString())
-				)
-				.addAggregation(
-						AggregationBuilders
-								.terms("popular_word_aggs")
-								.field("word")
-								.size(size)
-				);
+		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexSearchWord());
+		searchRequest.types(Constants.ES_TYPE_SEARCH_WORD);
+		searchRequest.source(searchSourceBuilder);
 
-		log.debug("aggregateSearchWord Query:\n{}", searchRequestBuilder);
-
-		SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+		SearchResponse searchResponse = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
 		Terms popularWordTerms = searchResponse.getAggregations().get("popular_word_aggs");
 
 		List<EsTermsBucket> popularWords = popularWordTerms.getBuckets().stream()
@@ -156,115 +155,66 @@ public class SearchService {
 		}};
 	}
 
-	public void indexDocumentArticle(EsArticle esArticle) {
-
+	public void indexDocumentArticle(EsArticle esArticle) throws IOException {
 		String id = esArticle.getId();
 
-		try {
-			IndexResponse response = client.prepareIndex()
-					.setIndex(elasticsearchProperties.getIndexBoard())
-					.setType(Constants.ES_TYPE_ARTICLE)
-					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esArticle), XContentType.JSON)
-					.get();
-
-		} catch (IOException e) {
-			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
-		}
+		IndexRequest request = new IndexRequest(elasticsearchProperties.getIndexBoard(), Constants.ES_TYPE_ARTICLE, id);
+		request.source(ObjectMapperUtils.writeValueAsString(esArticle), XContentType.JSON);
+		highLevelClient.index(request, RequestOptions.DEFAULT);
 	}
 
-	public void deleteDocumentBoard(String id) {
-		DeleteResponse response = client.prepareDelete()
-				.setIndex(elasticsearchProperties.getIndexBoard())
-				.setType(Constants.ES_TYPE_ARTICLE)
-				.setId(id)
-				.get();
+	public void deleteDocumentBoard(String id) throws IOException {
+		DeleteRequest request = new DeleteRequest(elasticsearchProperties.getIndexBoard(), Constants.ES_TYPE_ARTICLE, id);
+		DeleteResponse response = highLevelClient.delete(request, RequestOptions.DEFAULT);
 
 		if (! response.status().equals(RestStatus.OK))
-			log.info("board id {} is not found. so can't delete it!", id);
+			log.warn("board id {} is not found. so can't delete it!", id);
 	}
 
-	public void indexDocumentBoardComment(EsComment esComment) {
-
+	public void indexDocumentBoardComment(EsComment esComment) throws IOException {
 		String id = esComment.getId();
 		String parentBoardId = esComment.getArticle().getId();
 
-		try {
-			IndexResponse response = client.prepareIndex()
-					.setIndex(elasticsearchProperties.getIndexBoard())
-					.setType(Constants.ES_TYPE_COMMENT)
-					.setId(id)
-					.setParent(parentBoardId)
-					.setSource(ObjectMapperUtils.writeValueAsString(esComment), XContentType.JSON)
-					.get();
-
-		} catch (IOException e) {
-			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
-		}
+		IndexRequest request = new IndexRequest(elasticsearchProperties.getIndexBoard(), Constants.ES_TYPE_COMMENT, id);
+		request.parent(parentBoardId);
+		request.source(ObjectMapperUtils.writeValueAsString(esComment), XContentType.JSON);
+		highLevelClient.index(request, RequestOptions.DEFAULT);
 	}
 
-	public void deleteDocumentBoardComment(String id) {
+	public void deleteDocumentBoardComment(String id) throws IOException {
 
-		DeleteResponse response = client.prepareDelete()
-				.setIndex(elasticsearchProperties.getIndexBoard())
-				.setType(Constants.ES_TYPE_COMMENT)
-				.setId(id)
-				.get();
+		DeleteRequest request = new DeleteRequest(elasticsearchProperties.getIndexBoard(), Constants.ES_TYPE_COMMENT, id);
+		DeleteResponse response = highLevelClient.delete(request, RequestOptions.DEFAULT);
 
 		if (! response.status().equals(RestStatus.OK))
-			log.info("comment id {} is not found. so can't delete it!", id);
+			log.warn("comment id {} is not found. so can't delete it!", id);
 	}
 
 	// TODO : 구현 해야 함
 	public void createDocumentJakduComment(EsJakduComment EsJakduComment) {}
 
-	public void indexDocumentGallery(EsGallery esGallery) {
-
+	public void indexDocumentGallery(EsGallery esGallery) throws IOException {
 		String id = esGallery.getId();
-
-		try {
-			IndexResponse response = client.prepareIndex()
-					.setIndex(elasticsearchProperties.getIndexGallery())
-					.setType(Constants.ES_TYPE_GALLERY)
-					.setId(id)
-					.setSource(ObjectMapperUtils.writeValueAsString(esGallery), XContentType.JSON)
-					.get();
-
-		} catch (IOException e) {
-			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
-		}
+		IndexRequest request = new IndexRequest(elasticsearchProperties.getIndexGallery(), Constants.ES_TYPE_GALLERY, id);
+		request.source(ObjectMapperUtils.writeValueAsString(esGallery), XContentType.JSON);
+		highLevelClient.index(request, RequestOptions.DEFAULT);
 	}
 
-	public void deleteDocumentGallery(String id) {
-
-		DeleteResponse response = client.prepareDelete()
-				.setIndex(elasticsearchProperties.getIndexGallery())
-				.setType(Constants.ES_TYPE_GALLERY)
-				.setId(id)
-				.get();
+	public void deleteDocumentGallery(String id) throws IOException {
+		DeleteRequest request = new DeleteRequest(elasticsearchProperties.getIndexGallery(), Constants.ES_TYPE_GALLERY, id);
+		DeleteResponse response = highLevelClient.delete(request, RequestOptions.DEFAULT);
 
 		if (! response.status().equals(RestStatus.OK))
-			log.info("gallery id {} is not found. so can't delete it!", id);
+			log.warn("gallery id {} is not found. so can't delete it!", id);
 	}
 
-	public void indexDocumentSearchWord(EsSearchWord esSearchWord) {
-
-		try {
-			IndexRequestBuilder indexRequestBuilder = client.prepareIndex();
-			IndexResponse response = indexRequestBuilder
-					.setIndex(elasticsearchProperties.getIndexSearchWord())
-					.setType(Constants.ES_TYPE_SEARCH_WORD)
-					.setSource(ObjectMapperUtils.writeValueAsString(esSearchWord), XContentType.JSON)
-					.get();
-
-			log.debug("indexDocumentSearchWord Source:\n {}", indexRequestBuilder.request().getDescription());
-
-		} catch (IOException e) {
-			throw new ServiceException(ServiceError.ELASTICSEARCH_INDEX_FAILED, e.getCause());
-		}
+	public void indexDocumentSearchWord(EsSearchWord esSearchWord) throws IOException {
+		IndexRequest request = new IndexRequest(elasticsearchProperties.getIndexSearchWord(), Constants.ES_TYPE_SEARCH_WORD);
+		request.source(ObjectMapperUtils.writeValueAsString(esSearchWord), XContentType.JSON);
+		highLevelClient.index(request, RequestOptions.DEFAULT);
 	}
 
-	private SearchRequestBuilder getArticleSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+	private SearchRequest getArticleSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
 																String postTags) {
 
 		HighlightBuilder highlightBuilder = new HighlightBuilder()
@@ -273,27 +223,27 @@ public class SearchService {
 				.field("subject", Constants.SEARCH_FRAGMENT_SIZE, 0)
 				.field("content", Constants.SEARCH_FRAGMENT_SIZE, 1);
 
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchProperties.getIndexBoard())
-				.setTypes(Constants.ES_TYPE_ARTICLE)
-				.setFetchSource(null, new String[]{"subject", "content"})
-				.setQuery(
-						QueryBuilders.boolQuery()
-								.should(QueryBuilders.multiMatchQuery(query, "subject", "content").field("subject", 1.5f))
-				)
-				.setFrom(from)
-				.setSize(size);
-
 		if (StringUtils.isNotBlank(preTags))
 			highlightBuilder.preTags(preTags);
 
 		if (StringUtils.isNotBlank(postTags))
 			highlightBuilder.postTags(postTags);
 
-		searchRequestBuilder.highlighter(highlightBuilder);
-		log.debug("getArticleSearchRequestBuilder Query:\n{}", searchRequestBuilder);
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		searchSourceBuilder.fetchSource(null, new String[]{"subject", "content"});
+		searchSourceBuilder.query(
+				QueryBuilders.boolQuery()
+						.should(QueryBuilders.multiMatchQuery(query, "subject", "content").field("subject", 1.5f))
+		);
+		searchSourceBuilder.from(from);
+		searchSourceBuilder.size(size);
+		searchSourceBuilder.highlighter(highlightBuilder);
 
-		return searchRequestBuilder;
+		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexBoard());
+		searchRequest.types(Constants.ES_TYPE_ARTICLE);
+		searchRequest.source(searchSourceBuilder);
+
+		return searchRequest;
 	}
 
 	private SearchArticleResult getArticleSearchResponse(SearchResponse searchResponse) {
@@ -338,7 +288,7 @@ public class SearchService {
 		}};
 	}
 
-	private SearchRequestBuilder getCommentSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+	private SearchRequest getCommentSearchRequestBuilder(String query, Integer from, Integer size, String preTags,
 																String postTags) {
 
 		HighlightBuilder highlightBuilder = new HighlightBuilder()
@@ -346,31 +296,31 @@ public class SearchService {
 				.fragmentSize(Constants.SEARCH_FRAGMENT_SIZE)
 				.field("content", Constants.SEARCH_FRAGMENT_SIZE, 1);
 
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchProperties.getIndexBoard())
-				.setTypes(Constants.ES_TYPE_COMMENT)
-				.setFetchSource(null, new String[]{"content"})
-				.setQuery(
-						QueryBuilders.boolQuery()
-								.must(QueryBuilders.matchQuery("content", query))
-								.must(JoinQueryBuilders
-                                        .hasParentQuery(Constants.ES_TYPE_ARTICLE, QueryBuilders.matchAllQuery(), false)
-                                        .innerHit(new InnerHitBuilder())
-								)
-				)
-				.setFrom(from)
-				.setSize(size);
-
 		if (StringUtils.isNotBlank(preTags))
 			highlightBuilder.preTags(preTags);
 
 		if (StringUtils.isNotBlank(postTags))
 			highlightBuilder.postTags(postTags);
 
-		searchRequestBuilder.highlighter(highlightBuilder);
-		log.debug("getBoardCommentSearchRequestBuilder Query:\n{}", searchRequestBuilder);
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		searchSourceBuilder.fetchSource(null, new String[]{"content"});
+		searchSourceBuilder.query(
+				QueryBuilders.boolQuery()
+						.must(QueryBuilders.matchQuery("content", query))
+						.must(JoinQueryBuilders
+								.hasParentQuery(Constants.ES_TYPE_ARTICLE, QueryBuilders.matchAllQuery(), false)
+								.innerHit(new InnerHitBuilder())
+						)
+		);
+		searchSourceBuilder.from(from);
+		searchSourceBuilder.size(size);
+		searchSourceBuilder.highlighter(highlightBuilder);
 
-		return searchRequestBuilder;
+		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexBoard());
+		searchRequest.types(Constants.ES_TYPE_COMMENT);
+		searchRequest.source(searchSourceBuilder);
+
+		return searchRequest;
 	}
 
 	private SearchCommentResult getCommentSearchResponse(SearchResponse searchResponse) {
@@ -404,7 +354,7 @@ public class SearchService {
 		}};
 	}
 
-	private SearchRequestBuilder getGallerySearchRequestBuilder(String query, Integer from, Integer size, String preTags,
+	private SearchRequest getGallerySearchRequestBuilder(String query, Integer from, Integer size, String preTags,
 																String postTags) {
 
 		HighlightBuilder highlightBuilder = new HighlightBuilder()
@@ -412,24 +362,24 @@ public class SearchService {
 				.fragmentSize(Constants.SEARCH_FRAGMENT_SIZE)
 				.field("name", Constants.SEARCH_FRAGMENT_SIZE, 0);
 
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch()
-				.setIndices(elasticsearchProperties.getIndexGallery())
-				.setTypes(Constants.ES_TYPE_GALLERY)
-				.setFetchSource(null, new String[]{"name"})
-				.setQuery(QueryBuilders.matchQuery("name", query))
-				.setFrom(from)
-				.setSize(size);
-
 		if (StringUtils.isNotBlank(preTags))
 			highlightBuilder.preTags(preTags);
 
 		if (StringUtils.isNotBlank(postTags))
 			highlightBuilder.postTags(postTags);
 
-		searchRequestBuilder.highlighter(highlightBuilder);
-		log.debug("getGallerySearchRequestBuilder Query:\n{}", searchRequestBuilder);
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		searchSourceBuilder.fetchSource(null, new String[]{"name"});
+		searchSourceBuilder.query(QueryBuilders.matchQuery("name", query));
+		searchSourceBuilder.from(from);
+		searchSourceBuilder.size(size);
+		searchSourceBuilder.highlighter(highlightBuilder);
 
-		return searchRequestBuilder;
+		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexGallery());
+		searchRequest.types(Constants.ES_TYPE_GALLERY);
+		searchRequest.source(searchSourceBuilder);
+
+		return searchRequest;
 	}
 
 	private SearchGalleryResult getGallerySearchResponse(SearchResponse searchResponse) {

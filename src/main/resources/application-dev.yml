@@ -16,8 +16,6 @@ server:
 spring:
   data:
     elasticsearch:
-      cluster-name: jakduk-elasticsearch
-      cluster-nodes: 192.168.55.199:9300,192.168.55.54:9300
       repositories:
         enabled: false
   rabbitmq:
@@ -41,6 +39,9 @@ jakduk:
     database: jakduk_test
     host: http://192.168.55.25:27017,http://192.168.55.163:27017
   elasticsearch:
+    host-and-port:
+      - 192.168.55.199:9200
+      - 192.168.55.54:9200
     index-board: jakduk_dev_board
     index-gallery: jakduk_dev_gallery
     index-search-word: jakduk_dev_search_word

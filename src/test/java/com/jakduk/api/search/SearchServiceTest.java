@@ -6,6 +6,7 @@ import com.jakduk.api.service.SearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 /**
@@ -18,12 +19,12 @@ public class SearchServiceTest extends ApiApplicationTests {
 	private SearchService sut;
 
 	@Test
-	public void searchUnified() {
+	public void searchUnified() throws IOException {
 		sut.searchUnified("string", "ARTICLE;COMMENT;GALLERY", 0, 10, null, null);
 	}
 
 	@Test
-	public void aggregateSearchWord() {
+	public void aggregateSearchWord() throws IOException {
 		// 한달전
 		LocalDate oneMonthAgo = LocalDate.now().minusMonths(1L);
 		PopularSearchWordResult result = sut.aggregateSearchWord(oneMonthAgo, 5);
