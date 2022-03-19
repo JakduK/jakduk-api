@@ -7,7 +7,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: jakduknoreply
-    password: q1w2e3r$
+    password: mzltmiebmcgrchlf
     test-connection: true
     properties:
       mail.smtp.auth: true
