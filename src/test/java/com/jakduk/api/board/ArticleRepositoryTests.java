@@ -1,25 +1,6 @@
 package com.jakduk.api.board;
 
-import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.util.DateUtils;
-import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.configuration.MongodbConfig;
-import com.jakduk.api.model.aggregate.BoardFeelingCount;
-import com.jakduk.api.model.aggregate.BoardTop;
-import com.jakduk.api.model.db.Article;
-import com.jakduk.api.model.simple.ArticleOnList;
-import com.jakduk.api.model.simple.ArticleOnRSS;
-import com.jakduk.api.model.simple.ArticleOnSitemap;
-import com.jakduk.api.repository.article.ArticleRepository;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Sort;
-import org.springframework.util.CollectionUtils;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,11 +10,25 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
+
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.util.DateUtils;
+import com.jakduk.api.model.aggregate.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardTop;
+import com.jakduk.api.model.db.Article;
+import com.jakduk.api.model.simple.ArticleOnList;
+import com.jakduk.api.model.simple.ArticleOnRSS;
+import com.jakduk.api.model.simple.ArticleOnSitemap;
+import com.jakduk.api.repository.article.ArticleRepository;
 
 @DataMongoTest
-@EnableConfigurationProperties
-@Import({JakdukProperties.class, MongodbConfig.class})
 public class ArticleRepositoryTests {
 
     @Autowired

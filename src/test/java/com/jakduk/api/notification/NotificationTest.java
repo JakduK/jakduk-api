@@ -1,6 +1,5 @@
 package com.jakduk.api.notification;
 
-import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.EmailRoutingKey;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
@@ -20,7 +19,7 @@ import java.util.Locale;
 /**
  * Created by pyohwan on 16. 9. 11.
  */
-public class NotificationTest extends ApiApplicationTests {
+public class NotificationTest {
 
     @Resource private JakdukProperties jakdukProperties;
 

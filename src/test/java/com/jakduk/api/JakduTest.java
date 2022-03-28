@@ -9,6 +9,7 @@ import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,7 +22,8 @@ import java.util.List;
  * 15. 12. 27 오후 11:57
  */
 
-public class JakduTest extends ApiApplicationTests {
+@SpringBootTest
+public class JakduTest {
 
     @Autowired
     private JakdukDAO jakdukDAO;

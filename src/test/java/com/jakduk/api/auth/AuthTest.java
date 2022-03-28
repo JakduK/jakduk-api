@@ -1,7 +1,6 @@
 package com.jakduk.api.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  *         16. 7. 31 오후 8:29
  */
 
-public class AuthTest extends ApiApplicationTests {
+public class AuthTest {
 
     @Autowired
     private AuthUtils authUtils;

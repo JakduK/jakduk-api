@@ -12,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -42,7 +43,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @desc     :
  */
 
-public class GalleryOnListTest extends ApiApplicationTests {
+@SpringBootTest
+public class GalleryOnListTest {
 
 	@Resource private JakdukProperties.Storage storageProperties;
 

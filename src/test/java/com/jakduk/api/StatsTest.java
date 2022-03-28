@@ -7,6 +7,7 @@ import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.repository.AttendanceClubRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -19,7 +20,8 @@ import java.util.stream.Stream;
  * @desc     :
  */
 
-public class StatsTest extends ApiApplicationTests {
+@SpringBootTest
+public class StatsTest {
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
