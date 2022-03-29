@@ -1,12 +1,19 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.util.ObjectMapperUtils;
-import com.jakduk.api.common.util.UrlGenerationUtils;
-import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.model.elasticsearch.*;
-import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
-import com.jakduk.api.restcontroller.vo.search.*;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -38,12 +45,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.util.ObjectMapperUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
+import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.model.elasticsearch.EsArticle;
+import com.jakduk.api.model.elasticsearch.EsArticleSource;
+import com.jakduk.api.model.elasticsearch.EsComment;
+import com.jakduk.api.model.elasticsearch.EsCommentSource;
+import com.jakduk.api.model.elasticsearch.EsGallery;
+import com.jakduk.api.model.elasticsearch.EsGallerySource;
+import com.jakduk.api.model.elasticsearch.EsJakduComment;
+import com.jakduk.api.model.elasticsearch.EsParentArticle;
+import com.jakduk.api.model.elasticsearch.EsSearchWord;
+import com.jakduk.api.model.elasticsearch.EsTermsBucket;
+import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
+import com.jakduk.api.restcontroller.vo.search.ArticleSource;
+import com.jakduk.api.restcontroller.vo.search.PopularSearchWordResult;
+import com.jakduk.api.restcontroller.vo.search.SearchArticleResult;
+import com.jakduk.api.restcontroller.vo.search.SearchCommentResult;
+import com.jakduk.api.restcontroller.vo.search.SearchGalleryResult;
+import com.jakduk.api.restcontroller.vo.search.SearchUnifiedResponse;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -140,7 +162,6 @@ public class SearchService {
 		);
 
 		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexSearchWord());
-		searchRequest.types(Constants.ES_TYPE_SEARCH_WORD);
 		searchRequest.source(searchSourceBuilder);
 
 		SearchResponse searchResponse = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
@@ -171,8 +192,7 @@ public class SearchService {
 	}
 
 	public void deleteDocumentBoard(String id) throws IOException {
-		DeleteRequest request = new DeleteRequest(elasticsearchProperties.getIndexBoard(), Constants.ES_TYPE_ARTICLE,
-			id);
+		DeleteRequest request = new DeleteRequest(elasticsearchProperties.getIndexBoard(), id);
 		DeleteResponse response = highLevelClient.delete(request, RequestOptions.DEFAULT);
 
 		if (!response.status().equals(RestStatus.OK))
@@ -213,8 +233,7 @@ public class SearchService {
 	}
 
 	public void deleteDocumentGallery(String id) throws IOException {
-		DeleteRequest request = new DeleteRequest(elasticsearchProperties.getIndexGallery(), Constants.ES_TYPE_GALLERY,
-			id);
+		DeleteRequest request = new DeleteRequest(elasticsearchProperties.getIndexGallery(), id);
 		DeleteResponse response = highLevelClient.delete(request, RequestOptions.DEFAULT);
 
 		if (!response.status().equals(RestStatus.OK))
@@ -222,8 +241,7 @@ public class SearchService {
 	}
 
 	public void indexDocumentSearchWord(EsSearchWord esSearchWord) throws IOException {
-		IndexRequest request = new IndexRequest(elasticsearchProperties.getIndexSearchWord(),
-			Constants.ES_TYPE_SEARCH_WORD);
+		IndexRequest request = new IndexRequest(elasticsearchProperties.getIndexSearchWord());
 		request.source(ObjectMapperUtils.writeValueAsString(esSearchWord), XContentType.JSON);
 		highLevelClient.index(request, RequestOptions.DEFAULT);
 	}
@@ -254,7 +272,6 @@ public class SearchService {
 		searchSourceBuilder.highlighter(highlightBuilder);
 
 		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexBoard());
-		searchRequest.types(Constants.ES_TYPE_ARTICLE);
 		searchRequest.source(searchSourceBuilder);
 
 		return searchRequest;
@@ -332,7 +349,6 @@ public class SearchService {
 		searchSourceBuilder.highlighter(highlightBuilder);
 
 		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexBoard());
-		searchRequest.types(Constants.ES_TYPE_COMMENT);
 		searchRequest.source(searchSourceBuilder);
 
 		return searchRequest;
@@ -392,7 +408,6 @@ public class SearchService {
 		searchSourceBuilder.highlighter(highlightBuilder);
 
 		SearchRequest searchRequest = new SearchRequest(elasticsearchProperties.getIndexGallery());
-		searchRequest.types(Constants.ES_TYPE_GALLERY);
 		searchRequest.source(searchSourceBuilder);
 
 		return searchRequest;

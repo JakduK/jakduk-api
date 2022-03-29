@@ -5,8 +5,10 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.restcontroller.vo.RestErrorResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,202 +46,203 @@ import java.util.Set;
 @ControllerAdvice("com.jakduk.api.restcontroller")
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
+	private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
-    /**
-     * Hibernate validator Exception
-     */
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+	/**
+	 * Hibernate validator Exception
+	 */
+	@Override
+	protected ResponseEntity<Object> handleMethodArgumentNotValid(
+		MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        BindingResult result = ex.getBindingResult();
+		BindingResult result = ex.getBindingResult();
 
-        List<FieldError> fieldErrors = result.getFieldErrors();
-        List<ObjectError> globalErrors = result.getGlobalErrors();
-        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
+		List<FieldError> fieldErrors = result.getFieldErrors();
+		List<ObjectError> globalErrors = result.getGlobalErrors();
+		ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        Map<String, String> fields = new HashMap<>();
+		Map<String, String> fields = new HashMap<>();
 
-        globalErrors.forEach(
-                error -> fields.put("global_" + error.getCode(), error.getDefaultMessage())
-        );
+		globalErrors.forEach(
+			error -> fields.put("global_" + error.getCode(), error.getDefaultMessage())
+		);
 
-        fieldErrors.forEach(
-                error -> fields.put(error.getField() + "_" + error.getCode(), error.getDefaultMessage())
-        );
+		fieldErrors.forEach(
+			error -> fields.put(error.getField() + "_" + error.getCode(), error.getDefaultMessage())
+		);
 
-        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, fields);
+		RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, fields);
 
-        try {
-            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
-        } catch (JsonProcessingException ignore) {
-            log.warn(ex.getLocalizedMessage(), ex);
-        }
+		try {
+			log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
+		} catch (JsonProcessingException ignore) {
+			log.warn(ex.getLocalizedMessage(), ex);
+		}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
-    }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+	}
 
-    /**
-     * RequestBody에서 request 값들을 객체화 실패했을때
-     */
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
+	/**
+	 * RequestBody에서 request 값들을 객체화 실패했을때
+	 */
+	@Override
+	protected ResponseEntity<Object> handleHttpMessageNotReadable(
+		HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+		ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError);
+		RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError);
 
-        try {
-            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
-        } catch (JsonProcessingException ignore) {
-            log.warn(ex.getLocalizedMessage(), ex);
-        }
+		try {
+			log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
+		} catch (JsonProcessingException ignore) {
+			log.warn(ex.getLocalizedMessage(), ex);
+		}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
-    }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+	}
 
-    /**
-     * 파라미터 검증 실패.
-     *
-     * multipart/form-data 에서 key가 file이 아닐때.
-     */
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+	/**
+	 * 파라미터 검증 실패.
+	 *
+	 * multipart/form-data 에서 key가 file이 아닐때.
+	 */
+	@Override
+	protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex,
+		HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
-        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError);
+		ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
+		RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError);
 
-        try {
-            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
-        } catch (JsonProcessingException ignore) {
-            log.warn(ex.getLocalizedMessage(), ex);
-        }
+		try {
+			log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
+		} catch (JsonProcessingException ignore) {
+			log.warn(ex.getLocalizedMessage(), ex);
+		}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
-    }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+	}
 
-    /**
-     * RequestParam 에서 필드 검증 실패
-     */
-    @ExceptionHandler(value = { ConstraintViolationException.class })
-    public ResponseEntity<Object> constrainViolationException(ConstraintViolationException ex) {
+	/**
+	 * RequestParam 에서 필드 검증 실패
+	 */
+	@ExceptionHandler(value = {ConstraintViolationException.class})
+	public ResponseEntity<Object> constrainViolationException(ConstraintViolationException ex) {
 
-        Map<String, String> fields = new HashMap<>();
-        Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
+		Map<String, String> fields = new HashMap<>();
+		Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
 
-        violations.forEach(violation -> {
-            String field = violation.getPropertyPath().toString();
-            String message = violation.getMessage();
-            fields.put(field, message);
-        });
+		violations.forEach(violation -> {
+			String field = violation.getPropertyPath().toString();
+			String message = violation.getMessage();
+			fields.put(field, message);
+		});
 
-        ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
+		ServiceError serviceError = ServiceError.FORM_VALIDATION_FAILED;
 
-        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, fields);
+		RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, fields);
 
-        try {
-            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
-        } catch (JsonProcessingException ignore) {
-            log.warn(ex.getLocalizedMessage(), ex);
-        }
+		try {
+			log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
+		} catch (JsonProcessingException ignore) {
+			log.warn(ex.getLocalizedMessage(), ex);
+		}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
-    }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+	}
 
-    /**
-     * Spring Security 에서 발생하는 Exception
-     */
-    @ExceptionHandler(AuthenticationException.class)
-    @ResponseBody
-    public ResponseEntity<RestErrorResponse> authenticationException(AuthenticationException ex) {
+	/**
+	 * Spring Security 에서 발생하는 Exception
+	 */
+	@ExceptionHandler(AuthenticationException.class)
+	@ResponseBody
+	public ResponseEntity<RestErrorResponse> authenticationException(AuthenticationException ex) {
 
-        ServiceError serviceError = ServiceError.UNAUTHORIZED_ACCESS;
+		ServiceError serviceError = ServiceError.UNAUTHORIZED_ACCESS;
 
-        if (ex.getCause().getClass().isAssignableFrom(ServiceException.class)) {
-            serviceError = ((ServiceException)ex.getCause()).getServiceError();
-        }
+		if (ex.getCause().getClass().isAssignableFrom(ServiceException.class)) {
+			serviceError = ((ServiceException)ex.getCause()).getServiceError();
+		}
 
-        RestErrorResponse restErrorResponse = new RestErrorResponse(
-                serviceError.getCode(), ex.getLocalizedMessage(), serviceError.getHttpStatus()
-        );
+		RestErrorResponse restErrorResponse = new RestErrorResponse(
+			serviceError.getCode(), ex.getLocalizedMessage(), serviceError.getHttpStatus()
+		);
 
-        try {
-            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
-        } catch (JsonProcessingException ignore) {
-            log.warn(ex.getLocalizedMessage(), ex);
-        }
+		try {
+			log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
+		} catch (JsonProcessingException ignore) {
+			log.warn(ex.getLocalizedMessage(), ex);
+		}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
-    }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+	}
 
-    /**
-     * 접근 거부. 로그인 필요
-     */
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<RestErrorResponse> accessDeniedException(AccessDeniedException ex) {
+	/**
+	 * 접근 거부. 로그인 필요
+	 */
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<RestErrorResponse> accessDeniedException(AccessDeniedException ex) {
 
-        ServiceError serviceError = ServiceError.NEED_TO_LOGIN;
+		ServiceError serviceError = ServiceError.NEED_TO_LOGIN;
 
-        RestErrorResponse restErrorResponse = new RestErrorResponse(
-                serviceError.getCode(), ex.getLocalizedMessage(), serviceError.getHttpStatus()
-        );
+		RestErrorResponse restErrorResponse = new RestErrorResponse(
+			serviceError.getCode(), ex.getLocalizedMessage(), serviceError.getHttpStatus()
+		);
 
-        try {
-            log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse));
-        } catch (JsonProcessingException ignore) {
-            log.warn(ex.getLocalizedMessage());
-        }
+		try {
+			log.warn(ObjectMapperUtils.writeValueAsString(restErrorResponse));
+		} catch (JsonProcessingException ignore) {
+			log.warn(ex.getLocalizedMessage());
+		}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
-    }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+	}
 
+	@ExceptionHandler(ServiceException.class)
+	@ResponseBody
+	public ResponseEntity<RestErrorResponse> serviceException(ServiceException ex) {
+		ServiceError serviceError = ex.getServiceError();
+		HttpStatus httpStatus = HttpStatus.valueOf(serviceError.getHttpStatus());
 
-    @ExceptionHandler(ServiceException.class)
-    @ResponseBody
-    public ResponseEntity<RestErrorResponse> serviceException(ServiceException ex) {
-        ServiceError serviceError = ex.getServiceError();
-        HttpStatus httpStatus = HttpStatus.valueOf(serviceError.getHttpStatus());
+		RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, ex.getLocalizedMessage());
 
-        RestErrorResponse restErrorResponse = new RestErrorResponse(serviceError, ex.getLocalizedMessage());
+		String logMessage;
 
-        String logMessage;
+		try {
+			logMessage = ObjectMapperUtils.writeValueAsString(restErrorResponse);
+		} catch (JsonProcessingException e) {
+			logMessage = "code : " + ex.getServiceError().getCode() + ", message : " + ex.getLocalizedMessage();
+		}
 
-        try {
-            logMessage = ObjectMapperUtils.writeValueAsString(restErrorResponse);
-        } catch (JsonProcessingException e) {
-            logMessage = "code : " + ex.getServiceError().getCode() + ", message : " + ex.getLocalizedMessage();
-        }
+		if (serviceError.equals(ServiceError.ANONYMOUS)) {
+			//            log.info(logMessage);
+		} else if (httpStatus.is4xxClientError()) {
+			log.warn(logMessage, ex);
+		} else if (httpStatus.is5xxServerError()) {
+			log.error(logMessage, ex);
+		}
 
-        if (serviceError.equals(ServiceError.ANONYMOUS)) {
-//            log.info(logMessage);
-        } else if (httpStatus.is4xxClientError()) {
-            log.warn(logMessage, ex);
-        } else if (httpStatus.is5xxServerError()) {
-            log.error(logMessage, ex);
-        }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
+	}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(serviceError.getHttpStatus()));
-    }
+	@ExceptionHandler(RuntimeException.class)
+	@ResponseBody
+	public ResponseEntity<RestErrorResponse> runtimeException(RuntimeException ex, HttpServletRequest request) {
+		RestErrorResponse restErrorResponse = new RestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR,
+			ex.getLocalizedMessage());
+		restErrorResponse.setDetail(getErrorAttributes(request));
 
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseBody
-    public ResponseEntity<RestErrorResponse> runtimeException(RuntimeException ex, HttpServletRequest request) {
-        RestErrorResponse restErrorResponse = new RestErrorResponse(ServiceError.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
-        restErrorResponse.setDetail(getErrorAttributes(request, false));
+		try {
+			log.error(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
+		} catch (JsonProcessingException ignore) {
+			log.error(ex.getLocalizedMessage(), ex);
+		}
 
-        try {
-            log.error(ObjectMapperUtils.writeValueAsString(restErrorResponse), ex);
-        } catch (JsonProcessingException ignore) {
-            log.error(ex.getLocalizedMessage(), ex);
-        }
+		return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(restErrorResponse.getHttpStatus()));
+	}
 
-        return new ResponseEntity<>(restErrorResponse, HttpStatus.valueOf(restErrorResponse.getHttpStatus()));
-    }
-
-    private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
-        WebRequest webRequest = new ServletWebRequest(request);
-        return errorAttributes.getErrorAttributes(webRequest, includeStackTrace);
-    }
+	private Map<String, Object> getErrorAttributes(HttpServletRequest request) {
+		WebRequest webRequest = new ServletWebRequest(request);
+		return errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.defaults());
+	}
 }
