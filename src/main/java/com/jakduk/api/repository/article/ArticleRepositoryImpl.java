@@ -163,11 +163,11 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         switch (operator) {
             case GT:
                 query.addCriteria(Criteria.where("_id").gt(id));
-                query.with(new Sort(Sort.Direction.ASC, "_id"));
+                query.with(Constants.SORT_BY_ID_ASC);
                 break;
             case LT:
                 query.addCriteria(Criteria.where("_id").lt(id));
-                query.with(new Sort(Sort.Direction.DESC, "_id"));
+                query.with(Constants.SORT_BY_ID_DESC);
                 break;
         }
 

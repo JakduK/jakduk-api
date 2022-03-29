@@ -17,9 +17,8 @@ import com.jakduk.api.restcontroller.SearchRestController;
 import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
 import com.jakduk.api.restcontroller.vo.search.*;
 import com.jakduk.api.service.SearchService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,7 +28,6 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -49,10 +47,9 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(SearchRestController.class)
 @Import({TestMvcConfig.class})
-@AutoConfigureRestDocs(outputDir = "build/snippets")
+@AutoConfigureRestDocs
 public class SearchMvcTests {
 
     @Autowired
@@ -63,13 +60,13 @@ public class SearchMvcTests {
     @MockBean private RabbitMQPublisher rabbitMQPublisher;
     @MockBean private UserDetailsService userDetailsService;
 
-    private CommonWriter commonWriter;
-    private List<BoardCategory> categories;
-    private BoardCategory boardCategory;
-    private List<BoardGallerySimple> simpleGalleries;
+    private static CommonWriter commonWriter;
+    private static List<BoardCategory> categories;
+    private static BoardCategory boardCategory;
+    private static List<BoardGallerySimple> simpleGalleries;
 
-    @Before
-    public void setUp(){
+    @BeforeAll
+    public static void setUp(){
         commonWriter = new CommonWriter();
         commonWriter.setUserId("571ccf50ccbfc325b20711c5");
         commonWriter.setUsername("test07");

@@ -1,9 +1,25 @@
 package com.jakduk.api.board;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
+
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
+
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.DateUtils;
-import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.configuration.MongodbConfig;
 import com.jakduk.api.model.aggregate.BoardFeelingCount;
 import com.jakduk.api.model.aggregate.BoardTop;
 import com.jakduk.api.model.db.Article;
@@ -11,28 +27,8 @@ import com.jakduk.api.model.simple.ArticleOnList;
 import com.jakduk.api.model.simple.ArticleOnRSS;
 import com.jakduk.api.model.simple.ArticleOnSitemap;
 import com.jakduk.api.repository.article.ArticleRepository;
-import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Sort;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-
-@RunWith(SpringRunner.class)
 @DataMongoTest
-@EnableConfigurationProperties
-@Import({JakdukProperties.class, MongodbConfig.class})
 public class ArticleRepositoryTests {
 
     @Autowired
@@ -41,7 +37,7 @@ public class ArticleRepositoryTests {
     private Article randomArticle;
     private Constants.BOARD_TYPE board;
 
-    @Before
+    @BeforeEach
     public void setUp(){
         Article firstArticle = repository.findTopByOrderByIdAsc().get();
         LocalDateTime localDateTime = DateUtils.dateToLocalDateTime(new ObjectId(firstArticle.getId()).getDate());
@@ -56,27 +52,26 @@ public class ArticleRepositoryTests {
     public void findOneById() {
         Article article = repository.findOneById(randomArticle.getId()).get();
 
-        Assert.assertTrue(randomArticle.getId().equals(article.getId()));
+        assertTrue(randomArticle.getId().equals(article.getId()));
     }
 
     @Test
     public void findOneBySeq() {
         Article article = repository.findOneByBoardAndSeq(randomArticle.getBoard(), randomArticle.getSeq()).get();
 
-        Assert.assertTrue(randomArticle.getSeq().equals(article.getSeq()));
+        assertTrue(randomArticle.getSeq().equals(article.getSeq()));
     }
 
     @Test
     public void findPostsOnRss() {
-        List<ArticleOnRSS> posts = repository.findPostsOnRss(null,
-                new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
+        List<ArticleOnRSS> posts = repository.findPostsOnRss(null, Constants.SORT_BY_ID_DESC, 10);
 
-        Assert.assertTrue(! CollectionUtils.isEmpty(posts));
+        assertTrue(! CollectionUtils.isEmpty(posts));
     }
 
     @Test
     public void findNotices() {
-        Sort sort = new Sort(Sort.Direction.DESC, Collections.singletonList("_id"));
+        Sort sort = Sort.by(Sort.Direction.DESC, "_id");
         List<ArticleOnList> notices = repository.findNotices(sort);
     }
 
@@ -84,9 +79,9 @@ public class ArticleRepositoryTests {
     public void findPostsOnSitemap() {
 
         List<ArticleOnSitemap> posts = repository.findSitemapArticles(null,
-                new Sort(Sort.Direction.DESC, Collections.singletonList("_id")), 10);
+                Sort.by(Sort.Direction.DESC, "_id"), 10);
 
-        Assert.assertTrue(! CollectionUtils.isEmpty(posts));
+        assertTrue(! CollectionUtils.isEmpty(posts));
     }
 
     @Test
@@ -102,9 +97,9 @@ public class ArticleRepositoryTests {
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
 
-        Assert.assertTrue(boardFeelingCount.getId().equals(randomArticle.getId()));
-        Assert.assertTrue(boardFeelingCount.getUsersLikingCount().equals(CollectionUtils.isEmpty(randomArticle.getUsersLiking()) ? 0 : randomArticle.getUsersLiking().size()));
-        Assert.assertTrue(boardFeelingCount.getUsersDislikingCount().equals(CollectionUtils.isEmpty(randomArticle.getUsersDisliking()) ? 0 : randomArticle.getUsersDisliking().size()));
+        assertTrue(boardFeelingCount.getId().equals(randomArticle.getId()));
+        assertTrue(boardFeelingCount.getUsersLikingCount().equals(CollectionUtils.isEmpty(randomArticle.getUsersLiking()) ? 0 : randomArticle.getUsersLiking().size()));
+        assertTrue(boardFeelingCount.getUsersDislikingCount().equals(CollectionUtils.isEmpty(randomArticle.getUsersDisliking()) ? 0 : randomArticle.getUsersDisliking().size()));
     }
 
     @Test

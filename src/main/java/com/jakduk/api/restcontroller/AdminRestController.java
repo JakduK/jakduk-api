@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -386,8 +385,6 @@ public class AdminRestController {
 		Competition competition = null;
 		List<AttendanceLeague> leagueAttendances;
 
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("_id"));
-
 		if (Objects.nonNull(competitionId)) {
 			competition = competitionService.findOneById(competitionId);
 		} else if (Objects.nonNull(competitionCode)) {
@@ -395,9 +392,9 @@ public class AdminRestController {
 		}
 
 		if (Objects.isNull(competition)) {
-			leagueAttendances = statsService.findLeagueAttendances(sort);
+			leagueAttendances = statsService.findLeagueAttendances(Constants.SORT_BY_ID_ASC);
 		} else {
-			leagueAttendances = statsService.findLeagueAttendances(competition, sort);
+			leagueAttendances = statsService.findLeagueAttendances(competition, Constants.SORT_BY_ID_ASC);
 		}
 
 		List<Competition> competitions = competitionService.findCompetitions();

@@ -19,9 +19,8 @@ import com.jakduk.api.restcontroller.UserRestController;
 import com.jakduk.api.restcontroller.vo.EmptyJsonResponse;
 import com.jakduk.api.restcontroller.vo.user.*;
 import com.jakduk.api.service.UserService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,7 +38,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.servlet.http.Cookie;
@@ -65,10 +63,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 16. 6. 30 오후 11:55
  */
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(UserRestController.class)
 @Import(TestMvcConfig.class)
-@AutoConfigureRestDocs(outputDir = "build/snippets")
+@AutoConfigureRestDocs
 public class UserMvcTests {
 
     @Autowired
@@ -80,12 +77,12 @@ public class UserMvcTests {
     @MockBean private UserDetailsService userDetailsService;
     @MockBean private UserProfileRepository userProfileRepository;
 
-    private FootballClub footballClub;
-    private UserPicture userPicture;
-    private User jakdukUser;
+    private static FootballClub footballClub;
+    private static UserPicture userPicture;
+    private static User jakdukUser;
 
-    @Before
-    public void setUp(){
+    @BeforeAll
+    public static void setUp(){
         FootballClubOrigin footballClubOrigin = new FootballClubOrigin();
         footballClubOrigin.setId("54e1d2a58bf86df3fe819871");
         footballClubOrigin.setName("SEONGNAM");

@@ -1,13 +1,11 @@
 package com.jakduk.api.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jakduk.api.ApiApplicationTests;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.AuthUtils;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,16 +13,19 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * @author pyohwan
  *         16. 7. 31 오후 8:29
  */
-public class AuthTest extends ApiApplicationTests {
+
+public class AuthTest {
 
     @Autowired
     private AuthUtils authUtils;
 
-    @Ignore
+    @Disabled
     @Test
     public void Facebook_프로필가져오기() {
 
@@ -51,24 +52,24 @@ public class AuthTest extends ApiApplicationTests {
 
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void getKakaoProfileInfo() {
         SocialProfile socialProfile = authUtils.getSnsProfile(Constants.ACCOUNT_TYPE.KAKAO, "AekzZJgcpLOQaxwpa-TySpBqFsszWctZ09dNSgo8BVUAAAFowxN59A");
-        Assert.assertFalse(socialProfile.getId().isEmpty());
+        assertFalse(socialProfile.getId().isEmpty());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void getNaverProfileInfo() {
         SocialProfile socialProfile = authUtils.getSnsProfile(Constants.ACCOUNT_TYPE.NAVER, "AAAANlOzqsHQ12T3iHXCXR4EEHBe1AmBgMwEoWlumcmsrkgZBDkRJryVBGVlrzPnIkDTwFlFzgF2t2IVEWT5g4pC9TU=");
-        Assert.assertFalse(socialProfile.getId().isEmpty());
+        assertFalse(socialProfile.getId().isEmpty());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void getGoogleProfileInfo() {
         SocialProfile socialProfile = authUtils.getSnsProfile(Constants.ACCOUNT_TYPE.GOOGLE, "ya29.GlupBqsyMWcUC6h5j0UJ68hUz7Lqz9gCVcsm3lw5JOoHW6FAmx4h62Hm01PyDCnVHKhhVW0SyERZUIZV8u5-YZHsAUWpRKslgMvQN5Fc-ynJQFQII8l6nhZNK3-o");
-        Assert.assertFalse(socialProfile.getId().isEmpty());
+        assertFalse(socialProfile.getId().isEmpty());
     }
 }

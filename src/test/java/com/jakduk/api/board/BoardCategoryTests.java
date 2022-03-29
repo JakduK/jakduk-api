@@ -4,12 +4,13 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.board.category.BoardCategory;
 import com.jakduk.api.common.board.category.BoardCategoryGenerator;
 import com.jakduk.api.model.embedded.LocalSimpleName;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BoardCategoryTests {
 
@@ -37,7 +38,7 @@ public class BoardCategoryTests {
             setNames(Arrays.asList(new LocalSimpleName("ko", "K리그 1")));
         }};
 
-        Assert.assertEquals(boardCategory.toString(), BoardCategoryGenerator.getCategory(Constants.BOARD_TYPE.FOOTBALL, BoardCategoryGenerator.Category.KL1.name(), Locale.KOREA).toString());
+        assertEquals(boardCategory.toString(), BoardCategoryGenerator.getCategory(Constants.BOARD_TYPE.FOOTBALL, BoardCategoryGenerator.Category.KL1.name(), Locale.KOREA).toString());
 
     }
 

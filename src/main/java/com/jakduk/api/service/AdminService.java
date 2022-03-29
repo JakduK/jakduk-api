@@ -27,7 +27,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,8 +43,10 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -148,8 +149,7 @@ public class AdminService {
 	public List<AttendanceClub> getAttendanceClubList() {
 		
 		List<AttendanceClub> attendanceClubs;
-		Sort sort = new Sort(Sort.Direction.ASC, Collections.singletonList("_id"));
-		attendanceClubs = attendanceClubRepository.findAll(sort);
+		attendanceClubs = attendanceClubRepository.findAll(Constants.SORT_BY_ID_ASC);
 		
 		return attendanceClubs;
 	}
@@ -337,8 +337,7 @@ public class AdminService {
 	}
 
 	public List<JakduSchedule> getDataJakduScheduleList() {
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("_id"));
-		return jakduScheduleRepository.findAll(sort);
+		return jakduScheduleRepository.findAll(Constants.SORT_BY_ID_DESC);
 	}
 
 	public JakduScheduleGroupWrite getJakduScheduleGroupWrite(String id) {

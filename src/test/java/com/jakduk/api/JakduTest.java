@@ -7,14 +7,14 @@ import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduSchedule;
 import com.jakduk.api.repository.jakdu.JakduScheduleRepository;
 import org.bson.types.ObjectId;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,7 +22,8 @@ import java.util.List;
  * 15. 12. 27 오후 11:57
  */
 
-public class JakduTest extends ApiApplicationTests {
+@SpringBootTest
+public class JakduTest {
 
     @Autowired
     private JakdukDAO jakdukDAO;
@@ -42,8 +43,8 @@ public class JakduTest extends ApiApplicationTests {
 
     @Test
     public void getSchedulesTest02() {
-        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
-        Pageable pageable = new PageRequest(0, 10, sort);
+        Sort sort = Sort.by(Sort.Direction.ASC, "group", "date");
+        Pageable pageable = PageRequest.of(0, 10, sort);
 
         List<JakduSchedule> jakduSchedules = jakduScheduleRepository.findAll(pageable).getContent();
 

@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,14 +101,14 @@ public class StatsService {
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOneByName(clubOrigin)
 				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
 
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("season", "league"));
+		Sort sort = Sort.by(Sort.Direction.ASC, "season", "league");
 
 		return attendanceClubRepository.findByClub(footballClubOrigin, sort);
 	}
 
 	public List<AttendanceClub> getAttendancesSeason(Integer season, String league) {
 
-		Sort sort = new Sort(Sort.Direction.DESC, Arrays.asList("average"));
+		Sort sort = Sort.by(Sort.Direction.DESC, "average");
 		List<AttendanceClub> attendances = null;
 
 		if (league.equals(Constants.K_LEAGUE_ABBREVIATION)) {

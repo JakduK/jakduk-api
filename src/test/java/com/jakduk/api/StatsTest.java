@@ -2,14 +2,14 @@ package com.jakduk.api;
 
 
 import com.jakduk.api.dao.JakdukDAO;
-import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.aggregate.SupporterCount;
+import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.repository.AttendanceClubRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -20,7 +20,8 @@ import java.util.stream.Stream;
  * @desc     :
  */
 
-public class StatsTest extends ApiApplicationTests {
+@SpringBootTest
+public class StatsTest {
 	
 	@Autowired
 	JakdukDAO jakdukDAO;
@@ -42,7 +43,7 @@ public class StatsTest extends ApiApplicationTests {
 	@Test
 	public void getAttendance01() {
 		
-		Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("average"));
+		Sort sort = Sort.by(Sort.Direction.ASC, "average");
 		List<AttendanceClub> attendances = attendanceClubRepository.findBySeasonAndLeague(2013, "KLCL", sort);
 		
 		System.out.println("attendances=" + attendances);

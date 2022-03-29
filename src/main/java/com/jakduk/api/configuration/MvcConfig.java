@@ -57,19 +57,4 @@ public class MvcConfig implements WebMvcConfigurer {
         return new LocalValidatorFactoryBean();
     }
 
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-        return restTemplateBuilder.build();
-    }
-
-    // yml로 뺄려고 했으나, Bean을 따로 등록 안해주면 thymeleaf에서 인식을 못하더라.
-    @Bean
-    public MessageSource messageSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("messages");
-        messageSource.setFallbackToSystemLocale(false);
-
-        return messageSource;
-    }
-
 }

@@ -9,10 +9,10 @@ import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.repository.gallery.GalleryRepository;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -33,6 +33,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -40,7 +43,8 @@ import java.util.*;
  * @desc     :
  */
 
-public class GalleryOnListTest extends ApiApplicationTests {
+@SpringBootTest
+public class GalleryOnListTest {
 
 	@Resource private JakdukProperties.Storage storageProperties;
 
@@ -76,7 +80,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 	}
 
 	// 파일이 없음.
-	@Ignore
+	@Disabled
 	@Test
 	public void inputOutputFile01() {
 		
@@ -116,9 +120,9 @@ public class GalleryOnListTest extends ApiApplicationTests {
 
 		Map<String, String> map = mapper.readValue(jsn, new TypeReference<HashMap<String, String>>() {});
 
-		Assert.assertEquals(map.get("age"), "32");
-		Assert.assertEquals(map.get("name"), "steave");
-		Assert.assertEquals(map.get("job"), "baker");
+		assertEquals(map.get("age"), "32");
+		assertEquals(map.get("name"), "steave");
+		assertEquals(map.get("job"), "baker");
 	}
 
 	@Test
@@ -133,12 +137,12 @@ public class GalleryOnListTest extends ApiApplicationTests {
 		if (root.isArray()) {
 			JsonNode node = root.get(0);
 
-			Assert.assertEquals("54c4bf443d96ae38d537c5bf", node.path("uid").asText());
-			Assert.assertEquals("t1.search.daumcdn.net.jpeg", node.path("name").asText());
-			Assert.assertEquals(7599, node.path("size").asInt());
+			assertEquals("54c4bf443d96ae38d537c5bf", node.path("uid").asText());
+			assertEquals("t1.search.daumcdn.net.jpeg", node.path("name").asText());
+			assertEquals(7599, node.path("size").asInt());
 
 		} else {
-			Assert.fail();
+			fail();
 		}
 	}
 
@@ -166,7 +170,7 @@ public class GalleryOnListTest extends ApiApplicationTests {
 
 		String result = mapper.writeValueAsString(images);
 
-		Assert.assertEquals(expectResult, result);
+		assertEquals(expectResult, result);
 	}
 
 	

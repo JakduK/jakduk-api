@@ -56,8 +56,8 @@ public class JakduRestController {
 
         String language = JakdukUtils.getLanguageCode();
 
-        Sort sort = new Sort(Sort.Direction.ASC, Arrays.asList("group", "date"));
-        Pageable pageable = new PageRequest(page - 1, size, sort);
+        Sort sort = Sort.by(Sort.Direction.ASC, "group", "date");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Set<ObjectId> fcIds = new HashSet<>();
         Set<ObjectId> competitionIds = new HashSet<>();

@@ -3,6 +3,7 @@ package com.jakduk.api.configuration.security;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.UserPictureInfo;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,9 +15,9 @@ import java.util.*;
 public class UserDetailsImpl implements UserDetails {
 
 	private String password;
-	private String username;									// email
+	private String username;                                    // email
 	private final String id;
-	private final String nickname;						// 별명
+	private final String nickname;                        // 별명
 	private final Constants.ACCOUNT_TYPE providerId;
 	private UserPictureInfo picture;
 
@@ -26,9 +27,9 @@ public class UserDetailsImpl implements UserDetails {
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
 
-	public UserDetailsImpl(String username, String id, String password, String nickname, Constants.ACCOUNT_TYPE providerId,
-                           boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
-                           Collection<? extends GrantedAuthority> authorities) {
+	public UserDetailsImpl(String username, String id, String password, String nickname,
+		Constants.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired,
+		boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 
 		this.username = username;
 		this.nickname = nickname;
@@ -85,7 +86,7 @@ public class UserDetailsImpl implements UserDetails {
 		Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
 		// Ensure array iteration order is predictable (as per UserDetails.getAuthorities() contract and SEC-717)
 		SortedSet<GrantedAuthority> sortedAuthorities =
-				new TreeSet<>(new AuthorityComparator());
+			new TreeSet<>(new AuthorityComparator());
 
 		for (GrantedAuthority grantedAuthority : authorities) {
 			Assert.notNull(grantedAuthority, "GrantedAuthority list cannot contain any null elements");

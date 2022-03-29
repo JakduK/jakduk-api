@@ -14,6 +14,8 @@ server:
 
 spring:
   data:
+    mongodb:
+      uri: mongodb://192.168.0.12/jakduk_test
     elasticsearch:
       cluster-name: jakduk-elasticsearch
       cluster-nodes: 192.168.0.18:9300
@@ -35,11 +37,9 @@ jakduk:
   api-server-url: http://localhost:8080
   web-server-url: http://localhost:3000
   remember-me-expiration: 7200 # 2 hours
-
-  mongodb:
-    database: jakduk_test
-    host: http://192.168.0.12:27017,http://192.168.0.17:27017
   elasticsearch:
+    host-and-port:
+      - 192.168.0.18:9200
     index-board: jakduk_dev_board
     index-gallery: jakduk_dev_gallery
     index-search-word: jakduk_dev_search_word
