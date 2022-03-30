@@ -18,85 +18,85 @@ import javax.validation.constraints.Size;
 @FieldMatch(first = "password", second = "passwordConfirm", message = "{validation.msg.password.mismatch}")
 public class UserForm {
 
-	@Size(min = 6, max = 30)
-	@NotEmpty
-	@Email
-	@ExistEmail
-	private String email;
+    @Size(min = 6, max=30)
+    @NotEmpty
+    @Email
+    @ExistEmail
+    private String email;
 
-	@Size(min = 2, max = 20)
-	@NotEmpty
-	@ExistUsername
-	private String username;
+    @Size(min = 2, max=20)
+    @NotEmpty
+    @ExistUsername
+    private String username;
 
-	@Size(min = 4, max = 20)
-	@NotEmpty
-	private String password;
+    @Size(min = 4, max=20)
+    @NotEmpty
+    private String password;
 
-	@Size(min = 4, max = 20)
-	@NotEmpty
-	private String passwordConfirm;
+    @Size(min = 4, max=20)
+    @NotEmpty
+    private String passwordConfirm;
 
-	private String about; // 자기 소개
-	private String footballClub; // 축구단(FootballClub) ID
-	private String userPictureId; // UserPicture의 ID
+    private String about; // 자기 소개
+    private String footballClub; // 축구단(FootballClub) ID
+    private String userPictureId; // UserPicture의 ID
 
-	public UserForm() {
-	}
+    public UserForm() {
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public String getPasswordConfirm() {
-		return passwordConfirm;
-	}
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
 
-	public void setPasswordConfirm(String passwordConfirm) {
-		this.passwordConfirm = passwordConfirm;
-	}
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
 
-	public String getAbout() {
-		return about;
-	}
+    public String getAbout() {
+        return about;
+    }
 
-	public void setAbout(String about) {
-		this.about = about;
-	}
+    public void setAbout(String about) {
+        this.about = about;
+    }
 
-	public String getFootballClub() {
-		return footballClub;
-	}
+    public String getFootballClub() {
+        return footballClub;
+    }
 
-	public void setFootballClub(String footballClub) {
-		this.footballClub = footballClub;
-	}
+    public void setFootballClub(String footballClub) {
+        this.footballClub = footballClub;
+    }
 
-	public String getUserPictureId() {
-		return userPictureId;
-	}
+    public String getUserPictureId() {
+        return userPictureId;
+    }
 
-	public void setUserPictureId(String userPictureId) {
-		this.userPictureId = userPictureId;
-	}
+    public void setUserPictureId(String userPictureId) {
+        this.userPictureId = userPictureId;
+    }
 }

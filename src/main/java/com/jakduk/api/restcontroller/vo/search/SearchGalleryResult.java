@@ -10,31 +10,31 @@ import java.util.List;
 
 public class SearchGalleryResult {
 
-	private Long took;
-	private Long totalCount;
-	private List<EsGallerySource> galleries;
+    private Long took;
+    private Long totalCount;
+    private List<EsGallerySource> galleries;
 
-	public Long getTook() {
-		return took;
-	}
+    public Long getTook() {
+        return took;
+    }
 
-	public void setTook(Long took) {
-		this.took = took;
-	}
+    public void setTook(Long took) {
+        this.took = took;
+    }
 
-	public Long getTotalCount() {
-		return totalCount;
-	}
+    public Long getTotalCount() {
+        return totalCount;
+    }
 
-	public void setTotalCount(Long totalCount) {
-		this.totalCount = totalCount;
-	}
+    public void setTotalCount(Long totalCount) {
+        this.totalCount = totalCount;
+    }
 
-	public List<EsGallerySource> getGalleries() {
-		return galleries;
-	}
+    public List<EsGallerySource> getGalleries() {
+        return galleries;
+    }
 
-	public void setGalleries(List<EsGallerySource> galleries) {
-		this.galleries = galleries;
-	}
+    public void setGalleries(List<EsGallerySource> galleries) {
+        this.galleries = galleries;
+    }
 }

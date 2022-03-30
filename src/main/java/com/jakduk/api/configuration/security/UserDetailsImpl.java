@@ -14,17 +14,18 @@ import java.util.*;
 
 public class UserDetailsImpl implements UserDetails {
 
+	private String password;
+	private String username;                                    // email
 	private final String id;
 	private final String nickname;                        // 별명
 	private final Constants.ACCOUNT_TYPE providerId;
+	private UserPictureInfo picture;
+
 	private final Set<GrantedAuthority> authorities;
 	private final boolean accountNonExpired;
 	private final boolean accountNonLocked;
 	private final boolean credentialsNonExpired;
 	private final boolean enabled;
-	private String password;
-	private String username;                                    // email
-	private UserPictureInfo picture;
 
 	public UserDetailsImpl(String username, String id, String password, String nickname,
 		Constants.ACCOUNT_TYPE providerId, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired,
@@ -40,20 +41,6 @@ public class UserDetailsImpl implements UserDetails {
 		this.credentialsNonExpired = credentialsNonExpired;
 		this.accountNonLocked = accountNonLocked;
 		this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
-	}
-
-	private static SortedSet<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
-		Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
-		// Ensure array iteration order is predictable (as per UserDetails.getAuthorities() contract and SEC-717)
-		SortedSet<GrantedAuthority> sortedAuthorities =
-			new TreeSet<>(new AuthorityComparator());
-
-		for (GrantedAuthority grantedAuthority : authorities) {
-			Assert.notNull(grantedAuthority, "GrantedAuthority list cannot contain any null elements");
-			sortedAuthorities.add(grantedAuthority);
-		}
-
-		return sortedAuthorities;
 	}
 
 	@Override
@@ -95,24 +82,18 @@ public class UserDetailsImpl implements UserDetails {
 		return authorities;
 	}
 
-	public String getId() {
-		return id;
-	}
+	private static SortedSet<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
+		Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
+		// Ensure array iteration order is predictable (as per UserDetails.getAuthorities() contract and SEC-717)
+		SortedSet<GrantedAuthority> sortedAuthorities =
+			new TreeSet<>(new AuthorityComparator());
 
-	public String getNickname() {
-		return nickname;
-	}
+		for (GrantedAuthority grantedAuthority : authorities) {
+			Assert.notNull(grantedAuthority, "GrantedAuthority list cannot contain any null elements");
+			sortedAuthorities.add(grantedAuthority);
+		}
 
-	public Constants.ACCOUNT_TYPE getProviderId() {
-		return providerId;
-	}
-
-	public UserPictureInfo getPicture() {
-		return picture;
-	}
-
-	public void setPicture(UserPictureInfo picture) {
-		this.picture = picture;
+		return sortedAuthorities;
 	}
 
 	private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
@@ -131,5 +112,25 @@ public class UserDetailsImpl implements UserDetails {
 
 			return g1.getAuthority().compareTo(g2.getAuthority());
 		}
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public Constants.ACCOUNT_TYPE getProviderId() {
+		return providerId;
+	}
+
+	public UserPictureInfo getPicture() {
+		return picture;
+	}
+
+	public void setPicture(UserPictureInfo picture) {
+		this.picture = picture;
 	}
 }

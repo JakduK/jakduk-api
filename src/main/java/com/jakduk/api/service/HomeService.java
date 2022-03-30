@@ -1,12 +1,12 @@
 package com.jakduk.api.service;
 
+
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Encyclopedia;
 import com.jakduk.api.model.db.HomeDescription;
 import com.jakduk.api.repository.EncyclopediaRepository;
 import com.jakduk.api.repository.HomeDescriptionRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -23,10 +23,8 @@ import java.util.List;
 @Service
 public class HomeService {
 
-	@Autowired
-	private EncyclopediaRepository encyclopediaRepository;
-	@Autowired
-	private HomeDescriptionRepository homeDescriptionRepository;
+	@Autowired private EncyclopediaRepository encyclopediaRepository;
+	@Autowired private HomeDescriptionRepository homeDescriptionRepository;
 
 	/**
 	 * 랜덤하게 백과 사전 하나를 가져온다.
@@ -46,7 +44,7 @@ public class HomeService {
 	// 알림판 가져오기.
 	public HomeDescription getHomeDescription() {
 		return homeDescriptionRepository.findFirstByOrderByPriorityDesc()
-			.orElseGet(HomeDescription::new);
+				.orElseGet(HomeDescription::new);
 	}
-
+	
 }

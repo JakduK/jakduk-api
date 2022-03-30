@@ -2,7 +2,6 @@ package com.jakduk.api.model.simple;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.CommonWriter;
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**

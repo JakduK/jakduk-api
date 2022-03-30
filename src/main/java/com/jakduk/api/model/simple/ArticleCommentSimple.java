@@ -3,7 +3,6 @@ package com.jakduk.api.model.simple;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = Constants.COLLECTION_ARTICLE_COMMENT)
 public class ArticleCommentSimple {
-
+	
 	@Id
 	private String id;
 	private ArticleItem article;

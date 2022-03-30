@@ -8,7 +8,6 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.db.Gallery;
 import com.jakduk.api.repository.gallery.GalleryRepository;
-
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,6 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.annotation.Resource;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,39 +46,36 @@ import static org.junit.jupiter.api.Assertions.fail;
 @SpringBootTest
 public class GalleryOnListTest {
 
-	@Resource
-	private JakdukProperties.Storage storageProperties;
+	@Resource private JakdukProperties.Storage storageProperties;
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
-	@Autowired
-	private GalleryRepository galleryRepository;
+	@Autowired private MongoTemplate mongoTemplate;
+	@Autowired private GalleryRepository galleryRepository;
 
 	@Test
 	public void convertDateTime01() {
 		ObjectId objId = new ObjectId("54bd00393d969532bfb7ddc9");
 		Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 		LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-
+		
 		System.out.println("convertDateTime01=" + timePoint);
-		//		System.out.println("convertDateTime01=" + timePoint.getDayOfYear());
-		//		System.out.println("convertDateTime01=" + timePoint.getDayOfMonth());
-		//		System.out.println("convertDateTime01=" + timePoint.getYear());
-		//		System.out.println("convertDateTime01=" + timePoint.getMonthValue());
-
+//		System.out.println("convertDateTime01=" + timePoint.getDayOfYear());
+//		System.out.println("convertDateTime01=" + timePoint.getDayOfMonth());
+//		System.out.println("convertDateTime01=" + timePoint.getYear());
+//		System.out.println("convertDateTime01=" + timePoint.getMonthValue());
+		
 	}
-
+	
 	@Test
 	public void createDirectory01() {
-
+		
 		Path newDirectoryPath = Paths.get(storageProperties.getImagePath(), "test");
-
+		
 		if (Files.notExists(newDirectoryPath, LinkOption.NOFOLLOW_LINKS)) {
-			try {
-				Files.createDirectories(newDirectoryPath);
-			} catch (IOException e) {
-				System.err.println(e);
-			}
+		    try {
+		        Files.createDirectories(newDirectoryPath);
+		    } catch (IOException e) {
+		        System.err.println(e);
+		    }
 		}
 	}
 
@@ -88,10 +83,10 @@ public class GalleryOnListTest {
 	@Disabled
 	@Test
 	public void inputOutputFile01() {
-
+		
 		Path fromPath = Paths.get("/home/Pyohwan/사진", "t1.search.daumcdn.net.jpeg");
 		Path toPath = Paths.get(storageProperties.getImagePath() + "/test", "phjang.jpg");
-
+		
 		if (Files.exists(fromPath)) {
 			try {
 				InputStream is = new FileInputStream(fromPath.toFile());
@@ -102,11 +97,11 @@ public class GalleryOnListTest {
 			}
 		}
 	}
-
+	
 	@Test
 	public void deleteFile01() {
 		Path filePath = Paths.get(storageProperties.getImagePath() + "/test", "phjang.jpg");
-
+		
 		if (Files.exists(filePath)) {
 			try {
 				Files.delete(filePath);
@@ -123,8 +118,7 @@ public class GalleryOnListTest {
 
 		String jsn = "{\"age\":\"32\",\"name\":\"steave\",\"job\":\"baker\"}";
 
-		Map<String, String> map = mapper.readValue(jsn, new TypeReference<HashMap<String, String>>() {
-		});
+		Map<String, String> map = mapper.readValue(jsn, new TypeReference<HashMap<String, String>>() {});
 
 		assertEquals(map.get("age"), "32");
 		assertEquals(map.get("name"), "steave");
@@ -133,10 +127,9 @@ public class GalleryOnListTest {
 
 	@Test
 	public void JSON배열_문자열을_자바객체로변환() throws IOException {
-		String tempJson =
-			"[{\"uid\":\"54c4bf443d96ae38d537c5bf\",\"name\":\"t1.search.daumcdn.net.jpeg\",\"size\":7599,\"thumbUrl\":\"/jakduk/gallery/thumbnail/54c4bf443d96ae38d537c5bf\"}, "
-				+
+		String tempJson = "[{\"uid\":\"54c4bf443d96ae38d537c5bf\",\"name\":\"t1.search.daumcdn.net.jpeg\",\"size\":7599,\"thumbUrl\":\"/jakduk/gallery/thumbnail/54c4bf443d96ae38d537c5bf\"}, " +
 				"{\"uid\":\"54c4bf443d96ae38d537c5bf\",\"name\":\"t1.search.daumcdn.net.jpeg\",\"size\":7599,\"thumbUrl\":\"/jakduk/gallery/thumbnail/54c4bf443d96ae38d537c5bf\"}]";
+
 
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.readTree(tempJson);
@@ -152,6 +145,7 @@ public class GalleryOnListTest {
 			fail();
 		}
 	}
+
 
 	@Test
 	public void 자바배열객체를_JSON문자열로변환() throws JsonProcessingException {
@@ -179,23 +173,24 @@ public class GalleryOnListTest {
 		assertEquals(expectResult, result);
 	}
 
+	
 	@Test
 	public void findById() {
-
+		
 		ArrayList<ObjectId> arrTemp = new ArrayList<ObjectId>();
 		arrTemp.add(new ObjectId("54c4df893d96600d7f55a048"));
 		arrTemp.add(new ObjectId("54c4e4833d96deb0f8592907"));
-
+		
 		AggregationOperation match = Aggregation.match(Criteria.where("_id").in(arrTemp));
 		//AggregationOperation group = Aggregation.group("article").count().as("count");
 		AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
 		//AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, /*group, */ sort /*, limit*/);
 		AggregationResults<Gallery> results = mongoTemplate.aggregate(aggregation, "gallery", Gallery.class);
-
+		
 		System.out.println("findOneById=" + results.getMappedResults());
 	}
-
+	
 	@Test
 	public void splitString() {
 		String sample = "image/jpeg";
@@ -214,15 +209,15 @@ public class GalleryOnListTest {
 		System.out.println("streamAPITest01=" + count);
 		*/
 	}
-
+	
 	@Test
 	public void imageCapacity01() {
-
+		
 		long temp = 2548576;
-		double bb = Constants.GALLERY_MAXIMUM_CAPACITY / (double)temp;
+		double bb = Constants.GALLERY_MAXIMUM_CAPACITY / (double) temp;
 		long width = 100;
 		long height = 90;
-
+		
 		System.out.format("imageCapacity01 = %f\n", 11.22);
 		System.out.println("imageCapacity01 = " + (long)(width * bb) + ", " + height * bb);
 
@@ -230,8 +225,7 @@ public class GalleryOnListTest {
 
 	@Test
 	public void 그림목록() {
-		List<Gallery> galleries = galleryRepository.findByIdIn(
-			Arrays.asList("54c4d42a3d9675d9e50e1bed", "54c4d42e3d9675d9e50e1bee"));
+		List<Gallery> galleries = galleryRepository.findByIdIn(Arrays.asList("54c4d42a3d9675d9e50e1bed", "54c4d42e3d9675d9e50e1bee"));
 		System.out.println("galleries=" + galleries);
 	}
 

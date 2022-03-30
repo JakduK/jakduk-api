@@ -53,18 +53,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 public class SearchMvcTests {
 
-	private static CommonWriter commonWriter;
-	private static List<BoardCategory> categories;
-	private static BoardCategory boardCategory;
-	private static List<BoardGallerySimple> simpleGalleries;
 	@Autowired
 	private MockMvc mvc;
+
 	@MockBean
 	private SearchService searchService;
+
 	@MockBean
 	private RabbitMQPublisher rabbitMQPublisher;
 	@MockBean
 	private UserDetailsService userDetailsService;
+
+	private static CommonWriter commonWriter;
+	private static List<BoardCategory> categories;
+	private static BoardCategory boardCategory;
+	private static List<BoardGallerySimple> simpleGalleries;
 
 	@BeforeAll
 	public static void setUp() {

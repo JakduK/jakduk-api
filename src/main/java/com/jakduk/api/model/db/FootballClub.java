@@ -1,7 +1,6 @@
 package com.jakduk.api.model.db;
 
 import com.jakduk.api.model.embedded.LocalName;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;

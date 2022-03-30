@@ -11,18 +11,16 @@ import java.util.Objects;
  */
 public class DateUtils {
 
-	public static LocalDateTime dateToLocalDateTime(Date date) {
-		return Objects.isNull(date) ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-	}
+    public static LocalDateTime dateToLocalDateTime(Date date) {
+        return Objects.isNull(date) ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    }
 
-	public static Date localDateTimeToDate(LocalDateTime localDateTime) {
-		return Objects.isNull(localDateTime) ? null :
-			Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-	}
+    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
+        return Objects.isNull(localDateTime) ? null : Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
 
-	public static Date localDateToDate(LocalDate localDate) {
-		return Objects.isNull(localDate) ? null :
-			Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-	}
+    public static Date localDateToDate(LocalDate localDate) {
+        return Objects.isNull(localDate) ? null : Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    }
 
 }

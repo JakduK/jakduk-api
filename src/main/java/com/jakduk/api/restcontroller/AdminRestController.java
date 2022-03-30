@@ -1,5 +1,6 @@
 package com.jakduk.api.restcontroller;
 
+
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.*;
 import com.jakduk.api.model.embedded.LocalName;
@@ -9,7 +10,6 @@ import com.jakduk.api.service.AdminService;
 import com.jakduk.api.service.CommonService;
 import com.jakduk.api.service.CompetitionService;
 import com.jakduk.api.service.StatsService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -18,7 +18,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
 import java.util.*;
 
 /**
@@ -100,7 +99,7 @@ public class AdminRestController {
 	// 알림판 편집
 	@RequestMapping(value = "/home/description/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editHomeDescription(@PathVariable String id,
-		@RequestBody HomeDescriptionRequest request) {
+	                                               @RequestBody HomeDescriptionRequest request) {
 
 		if (Objects.isNull(request.getDesc()) || request.getDesc().isEmpty() == true)
 			throw new IllegalArgumentException("desc는 필수값입니다.");
@@ -194,7 +193,7 @@ public class AdminRestController {
 	// 백과사전 편집
 	@RequestMapping(value = "/encyclopedia/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editEncyclopedia(@PathVariable String id,
-		@RequestBody Encyclopedia encyclopedia) {
+	                                            @RequestBody Encyclopedia encyclopedia) {
 
 		Encyclopedia existEncyclopedia = adminService.findEncyclopediaById(id);
 
@@ -272,7 +271,7 @@ public class AdminRestController {
 	// 부모 축구단 하나 편집
 	@RequestMapping(value = "/origin/football/club/{id}", method = RequestMethod.PUT)
 	public Map<String, Object> editOriginFootballClub(@PathVariable String id,
-		@RequestBody FootballClubOrigin footballClubOrigin) {
+	                                                  @RequestBody FootballClubOrigin footballClubOrigin) {
 
 		FootballClubOrigin existFootballClubOrigin = adminService.findOriginFootballClubById(id);
 
@@ -381,7 +380,7 @@ public class AdminRestController {
 	// 대회별 관중수 목록
 	@RequestMapping(value = "/league/attendances", method = RequestMethod.GET)
 	public Map<String, Object> getLeagueAttendances(@RequestParam(required = false) String competitionId,
-		@RequestParam(required = false) String competitionCode) {
+	                                                @RequestParam(required = false) String competitionCode) {
 
 		Competition competition = null;
 		List<AttendanceLeague> leagueAttendances;
@@ -442,7 +441,7 @@ public class AdminRestController {
 	// 대회별 관중수 하나 편집
 	@RequestMapping(value = "/league/attendance/{id}", method = RequestMethod.PUT)
 	public EmptyJsonResponse editLeagueAttendance(@PathVariable String id,
-		@Valid @RequestBody LeagueAttendanceForm form) {
+												  @Valid @RequestBody LeagueAttendanceForm form) {
 
 		// 존재 확인
 		statsService.findOneById(id);
@@ -485,12 +484,12 @@ public class AdminRestController {
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.GET)
 	public Map<String, Object> getAttendanceClub(@PathVariable String id) {
 
-		AttendanceClub attendanceClub = statsService.findAttendanceClubById(id);
+		AttendanceClub attendanceClub =  statsService.findAttendanceClubById(id);
 
 		AttendanceClubForm attendanceClubForm = new AttendanceClubForm();
 		BeanUtils.copyProperties(attendanceClub, attendanceClubForm);
 
-		if (!ObjectUtils.isEmpty(attendanceClub.getClub()))
+		if (! ObjectUtils.isEmpty(attendanceClub.getClub()))
 			attendanceClubForm.setOrigin(attendanceClub.getClub().getId());
 
 		Map<String, Object> response = new HashMap<>();
@@ -502,12 +501,12 @@ public class AdminRestController {
 	// 클럽 관중수 변경
 	@RequestMapping(value = "/club/attendance/{id}", method = RequestMethod.PUT)
 	public EmptyJsonResponse addAttendanceClub(@PathVariable String id,
-		@Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
+											   @Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
 
 		adminService.saveAttendanceClub(
-			id, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
-			attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
-			attendanceClubWrite.getAverage()
+				id, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
+				attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
+				attendanceClubWrite.getAverage()
 		);
 
 		return EmptyJsonResponse.newInstance();
@@ -518,9 +517,9 @@ public class AdminRestController {
 	public EmptyJsonResponse editAttendanceClub(@Valid @RequestBody AttendanceClubForm attendanceClubWrite) {
 
 		adminService.saveAttendanceClub(
-			null, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
-			attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
-			attendanceClubWrite.getAverage()
+				null, attendanceClubWrite.getOrigin(), attendanceClubWrite.getLeague(),
+				attendanceClubWrite.getSeason(), attendanceClubWrite.getGames(), attendanceClubWrite.getTotal(),
+				attendanceClubWrite.getAverage()
 		);
 
 		return EmptyJsonResponse.newInstance();
@@ -592,8 +591,7 @@ public class AdminRestController {
 
 	// 작두 수정
 	@RequestMapping(value = "/jakdu/schedule", method = RequestMethod.PUT)
-	public EmptyJsonResponse editJakduSchedule(@PathVariable String id,
-		@RequestBody JakduScheduleWrite jakduScheduleWrite) {
+	public EmptyJsonResponse editJakduSchedule(@PathVariable String id, @RequestBody JakduScheduleWrite jakduScheduleWrite) {
 		adminService.writeJakduSchedule(id, jakduScheduleWrite);
 		return EmptyJsonResponse.newInstance();
 	}
@@ -627,8 +625,7 @@ public class AdminRestController {
 
 	// 작두그룹 수정
 	@RequestMapping(value = "/jakdu/schedule/group", method = RequestMethod.PUT)
-	public JakduScheduleGroup editJakduScheduleGroup(@PathVariable String id,
-		@RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
+	public JakduScheduleGroup editJakduScheduleGroup(@PathVariable String id, @RequestBody JakduScheduleGroupWrite jakduScheduleGroupWrite) {
 		return adminService.writeJakduScheduleGroup(id, jakduScheduleGroupWrite);
 	}
 
@@ -653,10 +650,8 @@ public class AdminRestController {
 		if (Objects.isNull(footballClubOrigin))
 			throw new IllegalArgumentException("id가 " + request.getOrigin() + "에 해당하는 부모 축구단이 존재하지 않습니다.");
 
-		LocalName footballClubNameKr = new LocalName(Locale.KOREAN.getLanguage(), request.getFullNameKr(),
-			request.getShortNameKr());
-		LocalName footballClubNameEn = new LocalName(Locale.ENGLISH.getLanguage(), request.getFullNameEn(),
-			request.getShortNameEn());
+		LocalName footballClubNameKr = new LocalName(Locale.KOREAN.getLanguage(), request.getFullNameKr(), request.getShortNameKr());
+		LocalName footballClubNameEn = new LocalName(Locale.ENGLISH.getLanguage(), request.getFullNameEn(), request.getShortNameEn());
 
 		ArrayList<LocalName> names = new ArrayList<>();
 		names.add(footballClubNameKr);

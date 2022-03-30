@@ -8,7 +8,6 @@ import com.jakduk.api.service.ArticleService;
 import com.jakduk.api.service.GalleryService;
 import com.jakduk.api.service.HomeService;
 import com.jakduk.api.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,38 +24,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class HomeRestController {
 
-	@Autowired
-	private HomeService homeService;
-	@Autowired
-	private UserService userService;
-	@Autowired
-	private ArticleService articleService;
-	@Autowired
-	private GalleryService galleryService;
+    @Autowired private HomeService homeService;
+    @Autowired private UserService userService;
+    @Autowired private ArticleService articleService;
+    @Autowired private GalleryService galleryService;
 
-	// 랜덤하게 백과사전 하나 가져오기
-	@GetMapping("/home/encyclopedia")
-	public Encyclopedia getEncyclopediaWithRandom() {
+    // 랜덤하게 백과사전 하나 가져오기
+    @GetMapping("/home/encyclopedia")
+    public Encyclopedia getEncyclopediaWithRandom() {
 
-		String language = JakdukUtils.getLanguageCode();
+        String language = JakdukUtils.getLanguageCode();
 
-		return homeService.getEncyclopediaWithRandom(language);
-	}
+        return homeService.getEncyclopediaWithRandom(language);
+    }
 
-	// 홈에서 보여줄 각종 최근 데이터 가져오기
-	@GetMapping("/home/latest")
-	public HomeLatestItemsResponse getLatestItems() {
+    // 홈에서 보여줄 각종 최근 데이터 가져오기
+    @GetMapping("/home/latest")
+    public HomeLatestItemsResponse getLatestItems() {
 
-		String language = JakdukUtils.getLanguageCode();
+        String language = JakdukUtils.getLanguageCode();
 
-		return new HomeLatestItemsResponse() {{
-			setHomeDescription(homeService.getHomeDescription());
-			setUsers(userService.findSimpleUsers());
-			setComments(articleService.getLatestComments());
-			setArticles(articleService.getLatestArticles());
-			setGalleries(galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY));
-		}};
-	}
+        return new HomeLatestItemsResponse() {{
+            setHomeDescription(homeService.getHomeDescription());
+            setUsers(userService.findSimpleUsers());
+            setComments(articleService.getLatestComments());
+            setArticles(articleService.getLatestArticles());
+            setGalleries(galleryService.findSimpleById(null, Constants.HOME_SIZE_GALLERY));
+        }};
+    }
 
 }
 

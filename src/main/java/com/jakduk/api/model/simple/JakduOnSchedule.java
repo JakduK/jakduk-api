@@ -9,24 +9,24 @@ import com.jakduk.api.model.embedded.CommonWriter;
 
 public class JakduOnSchedule {
 
-	private String id;
-	private CommonWriter writer;
-	private int homeScore;
-	private int awayScore;
+    private String id;
+    private CommonWriter writer;
+    private int homeScore;
+    private int awayScore;
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public CommonWriter getWriter() {
-		return writer;
-	}
+    public CommonWriter getWriter() {
+        return writer;
+    }
 
-	public int getHomeScore() {
-		return homeScore;
-	}
+    public int getHomeScore() {
+        return homeScore;
+    }
 
-	public int getAwayScore() {
-		return awayScore;
-	}
+    public int getAwayScore() {
+        return awayScore;
+    }
 }

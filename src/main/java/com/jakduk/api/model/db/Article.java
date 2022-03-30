@@ -4,7 +4,6 @@ import com.jakduk.api.model.embedded.ArticleStatus;
 import com.jakduk.api.model.embedded.BoardLog;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

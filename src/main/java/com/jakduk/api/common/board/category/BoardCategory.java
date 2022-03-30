@@ -28,8 +28,8 @@ public class BoardCategory {
 	@Override
 	public String toString() {
 		return "BoardCategory{" +
-			"code='" + code + '\'' +
-			", names=" + names +
-			'}';
+				"code='" + code + '\'' +
+				", names=" + names +
+				'}';
 	}
 }

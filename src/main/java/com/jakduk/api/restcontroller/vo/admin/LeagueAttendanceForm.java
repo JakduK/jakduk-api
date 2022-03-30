@@ -9,51 +9,51 @@ import javax.validation.constraints.NotNull;
 
 public class LeagueAttendanceForm {
 
-	private String id;
+    private String id;
 
-	@NotEmpty
-	private String competitionId;
+    @NotEmpty
+    private String competitionId;
 
-	@NotNull
-	private Integer season;
+    @NotNull
+    private Integer season;
 
-	@NotNull
-	private Integer games;
+    @NotNull
+    private Integer games;
 
-	@NotNull
-	private Integer total;
+    @NotNull
+    private Integer total;
 
-	@NotNull
-	private Integer average;
+    @NotNull
+    private Integer average;
 
-	@NotNull
-	private Integer numberOfClubs;
+    @NotNull
+    private Integer numberOfClubs;
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getCompetitionId() {
-		return competitionId;
-	}
+    public String getCompetitionId() {
+        return competitionId;
+    }
 
-	public Integer getSeason() {
-		return season;
-	}
+    public Integer getSeason() {
+        return season;
+    }
 
-	public Integer getGames() {
-		return games;
-	}
+    public Integer getGames() {
+        return games;
+    }
 
-	public Integer getTotal() {
-		return total;
-	}
+    public Integer getTotal() {
+        return total;
+    }
 
-	public Integer getAverage() {
-		return average;
-	}
+    public Integer getAverage() {
+        return average;
+    }
 
-	public Integer getNumberOfClubs() {
-		return numberOfClubs;
-	}
+    public Integer getNumberOfClubs() {
+        return numberOfClubs;
+    }
 }

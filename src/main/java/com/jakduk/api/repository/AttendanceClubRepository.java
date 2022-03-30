@@ -2,7 +2,6 @@ package com.jakduk.api.repository;
 
 import com.jakduk.api.model.db.AttendanceClub;
 import com.jakduk.api.model.db.FootballClubOrigin;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -18,11 +17,8 @@ import java.util.Optional;
 public interface AttendanceClubRepository extends MongoRepository<AttendanceClub, String> {
 
 	Optional<AttendanceClub> findOneById(String id);
-
 	List<AttendanceClub> findByClub(FootballClubOrigin club, Sort sort);
-
 	List<AttendanceClub> findBySeasonAndLeague(Integer season, String league, Sort sort);
-
 	List<AttendanceClub> findBySeason(Integer season, Sort sort);
 
 }

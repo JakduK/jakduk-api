@@ -8,30 +8,30 @@ import com.jakduk.api.common.Constants;
 
 public class LinkedItem {
 
-	private String id;
-	private Constants.GALLERY_FROM_TYPE from;
+    private String id;
+    private Constants.GALLERY_FROM_TYPE from;
 
-	public LinkedItem() {
-	}
+    public LinkedItem() {
+    }
 
-	public LinkedItem(String id, Constants.GALLERY_FROM_TYPE from) {
-		this.id = id;
-		this.from = from;
-	}
+    public LinkedItem(String id, Constants.GALLERY_FROM_TYPE from) {
+        this.id = id;
+        this.from = from;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public Constants.GALLERY_FROM_TYPE getFrom() {
-		return from;
-	}
+    public Constants.GALLERY_FROM_TYPE getFrom() {
+        return from;
+    }
 
-	public void setFrom(Constants.GALLERY_FROM_TYPE from) {
-		this.from = from;
-	}
+    public void setFrom(Constants.GALLERY_FROM_TYPE from) {
+        this.from = from;
+    }
 }

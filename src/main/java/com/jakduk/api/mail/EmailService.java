@@ -5,7 +5,6 @@ import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.Token;
 import com.jakduk.api.model.rabbitmq.EmailPayload;
 import com.jakduk.api.repository.TokenRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -26,7 +24,7 @@ import java.util.*;
 @Component
 public class EmailService {
 
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private TokenRepository tokenRepository;
@@ -55,9 +53,9 @@ public class EmailService {
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
 		final MimeMessageHelper message
-			= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
+				= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
 		message.setSubject(emailPayload.getSubject());
-		//		message.setFrom("thymeleaf@example.com");
+//		message.setFrom("thymeleaf@example.com");
 		message.setTo(recipientEmail);
 
 		// Create the HTML body using Thymeleaf
@@ -83,7 +81,7 @@ public class EmailService {
 			optToken.ifPresent(token -> {
 				token.setCode(code);
 				token.setExpireAt(
-					Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
+						Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
 				);
 
 				tokenRepository.save(token);
@@ -94,7 +92,7 @@ public class EmailService {
 			token.setEmail(recipientEmail);
 			token.setCode(code);
 			token.setExpireAt(
-				Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
+					Date.from(LocalDateTime.now().plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant())
 			);
 
 			tokenRepository.save(token);
@@ -126,7 +124,7 @@ public class EmailService {
 	 * Send HTML mail with inline image
 	 */
 	public void sendMailWithInline(final String recipientName, final String recipientEmail, final Locale locale)
-		throws MessagingException {
+			throws MessagingException {
 
 		// Prepare the evaluation context
 		final Context ctx = new Context(locale);
@@ -137,7 +135,7 @@ public class EmailService {
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = mailSender.createMimeMessage();
 		final MimeMessageHelper message
-			= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
+				= new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
 		message.setSubject("Example HTML email with inline image");
 		message.setFrom("thymeleaf@example.com");
 		message.setTo(recipientEmail);
@@ -147,8 +145,8 @@ public class EmailService {
 		message.setText(htmlContent, true /* isHtml */);
 
 		// Add the inline image, referenced from the HTML code as "cid:${imageResourceName}"
-		//		final InputStreamSource imageSource = new ByteArrayResource(imageBytes);
-		//		message.addInline(imageResourceName, imageSource, imageContentType);
+//		final InputStreamSource imageSource = new ByteArrayResource(imageBytes);
+//		message.addInline(imageResourceName, imageSource, imageContentType);
 		message.addInline("sample-image", new ClassPathResource("public/images/logo_type_A_en.png"), "image/png");
 
 		// Send mail

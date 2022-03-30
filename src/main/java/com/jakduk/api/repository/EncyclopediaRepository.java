@@ -1,7 +1,6 @@
 package com.jakduk.api.repository;
 
 import com.jakduk.api.model.db.Encyclopedia;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
  * @desc     :
  */
 public interface EncyclopediaRepository extends MongoRepository<Encyclopedia, String> {
-
+	
 	List<Encyclopedia> findListByLanguage(String language);
 
 }

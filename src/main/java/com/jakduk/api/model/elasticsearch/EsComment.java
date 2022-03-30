@@ -6,15 +6,15 @@ import com.jakduk.api.model.embedded.CommonWriter;
 import java.util.List;
 
 /**
- * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
- * @company  : http://jakduk.com
- * @date     : 2015. 8. 23.
- * @desc     :
- */
+* @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
+* @company  : http://jakduk.com
+* @date     : 2015. 8. 23.
+* @desc     :
+*/
 
 public class EsComment {
-
-	private String id;
+	
+    private String id;
 	private ArticleItem article;
 	private CommonWriter writer;
 	private String content;

@@ -27,9 +27,9 @@ public enum JakdukAuthority {
 
 	static public JakdukAuthority findByCode(Integer code) {
 		return Arrays.stream(JakdukAuthority.values())
-			.filter(commonRole -> commonRole.code.equals(code))
-			.findFirst()
-			.orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
+				.filter(commonRole -> commonRole.code.equals(code))
+				.findFirst()
+				.orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
 	}
 
 	static public Boolean isAdminAuthority(String authority) {

@@ -1,7 +1,6 @@
 package com.jakduk.api.restcontroller.vo.admin;
 
 import com.jakduk.api.model.embedded.CommonWriter;
-
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
@@ -17,7 +16,7 @@ public class BoardFreeWrite {
 
 	@Id
 	private String id;
-
+	
 	private CommonWriter writer;
 
 	@NotNull
@@ -27,14 +26,14 @@ public class BoardFreeWrite {
 	@NotNull
 	@Size(min = 5)
 	private String content;
-
+	
 	private int seq;
-
+	
 	@NotNull
 	private String categoryName;
-
+	
 	private int views = 0;
-
+	
 	private String images;
 
 	public String getId() {
@@ -104,9 +103,10 @@ public class BoardFreeWrite {
 	@Override
 	public String toString() {
 		return "BoardFreeWrite [id=" + id + ", writer=" + writer + ", subject="
-			+ subject + ", content=" + content + ", seq=" + seq
-			+ ", category=" + categoryName + ", views=" + views
-			+ ", images=" + images + "]";
+				+ subject + ", content=" + content + ", seq=" + seq
+				+ ", category=" + categoryName + ", views=" + views
+				+ ", images=" + images + "]";
 	}
+
 
 }

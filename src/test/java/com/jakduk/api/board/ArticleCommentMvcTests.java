@@ -79,6 +79,14 @@ import com.jakduk.api.service.GalleryService;
 @AutoConfigureRestDocs
 public class ArticleCommentMvcTests {
 
+	@Autowired
+	private MockMvc mvc;
+
+	@MockBean
+	private ArticleService articleService;
+	@MockBean
+	private GalleryService galleryService;
+
 	private static CommonWriter commonWriter;
 	private static Article article;
 	private static ArticleComment articleComment;
@@ -88,12 +96,6 @@ public class ArticleCommentMvcTests {
 	private static List<GetArticleComment> articleComments;
 	private static List<Gallery> galleries;
 	private static Map<String, Object> writeArticleComment;
-	@Autowired
-	private MockMvc mvc;
-	@MockBean
-	private ArticleService articleService;
-	@MockBean
-	private GalleryService galleryService;
 
 	@BeforeAll
 	public static void setUp() {

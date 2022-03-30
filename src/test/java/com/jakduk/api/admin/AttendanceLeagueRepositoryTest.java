@@ -25,7 +25,7 @@ public class AttendanceLeagueRepositoryTest {
 	@Test
 	public void findByCompetitionId() {
 		List<AttendanceLeague> attendanceLeagues = repository.findByCompetitionId("57600cef44ab251f9d64b4f8");
-		assertTrue(!CollectionUtils.isEmpty(attendanceLeagues));
+		assertTrue(! CollectionUtils.isEmpty(attendanceLeagues));
 
 	}
 }

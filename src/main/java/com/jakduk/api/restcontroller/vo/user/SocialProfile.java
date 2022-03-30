@@ -9,50 +9,50 @@ package com.jakduk.api.restcontroller.vo.user;
 
 public class SocialProfile {
 
-	private String id;
-	private String nickname;
-	private String email;
-	private String pictureUrl;
+    private String id;
+    private String nickname;
+    private String email;
+    private String pictureUrl;
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getNickname() {
-		return nickname;
-	}
+    public String getNickname() {
+        return nickname;
+    }
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getPictureUrl() {
-		return pictureUrl;
-	}
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
 
-	public void setPictureUrl(String pictureUrl) {
-		this.pictureUrl = pictureUrl;
-	}
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
 
-	@Override
-	public String toString() {
-		return "SocialProfile{" +
-			"id='" + id + '\'' +
-			", nickname='" + nickname + '\'' +
-			", email='" + email + '\'' +
-			", pictureUrl='" + pictureUrl + '\'' +
-			'}';
-	}
+    @Override
+    public String toString() {
+        return "SocialProfile{" +
+                "id='" + id + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                ", pictureUrl='" + pictureUrl + '\'' +
+                '}';
+    }
 }

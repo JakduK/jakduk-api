@@ -10,16 +10,16 @@ import java.util.List;
  */
 
 public class GalleriesResponse {
-	private List<GalleryOnList> galleries; // 사진 목록
+    private List<GalleryOnList> galleries; // 사진 목록
 
-	public GalleriesResponse() {
-	}
+    public GalleriesResponse() {
+    }
 
-	public GalleriesResponse(List<GalleryOnList> galleries) {
-		this.galleries = galleries;
-	}
+    public GalleriesResponse(List<GalleryOnList> galleries) {
+        this.galleries = galleries;
+    }
 
-	public List<GalleryOnList> getGalleries() {
-		return galleries;
-	}
+    public List<GalleryOnList> getGalleries() {
+        return galleries;
+    }
 }

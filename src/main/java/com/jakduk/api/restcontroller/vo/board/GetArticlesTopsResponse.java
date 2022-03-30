@@ -13,22 +13,22 @@ import java.util.List;
 
 public class GetArticlesTopsResponse {
 
-	private List<BoardTop> topLikes; // 주간 좋아요수 선두
-	private List<BoardTop> topComments; // 주간 댓글수 선두
+    private List<BoardTop> topLikes; // 주간 좋아요수 선두
+    private List<BoardTop> topComments; // 주간 댓글수 선두
 
-	public GetArticlesTopsResponse() {
-	}
+    public GetArticlesTopsResponse() {
+    }
 
-	public GetArticlesTopsResponse(List<BoardTop> topLikes, List<BoardTop> topComments) {
-		this.topLikes = topLikes;
-		this.topComments = topComments;
-	}
+    public GetArticlesTopsResponse(List<BoardTop> topLikes, List<BoardTop> topComments) {
+        this.topLikes = topLikes;
+        this.topComments = topComments;
+    }
 
-	public List<BoardTop> getTopLikes() {
-		return topLikes;
-	}
+    public List<BoardTop> getTopLikes() {
+        return topLikes;
+    }
 
-	public List<BoardTop> getTopComments() {
-		return topComments;
-	}
+    public List<BoardTop> getTopComments() {
+        return topComments;
+    }
 }

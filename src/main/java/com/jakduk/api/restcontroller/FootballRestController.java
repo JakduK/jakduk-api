@@ -4,7 +4,6 @@ import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.JakdukUtils;
 import com.jakduk.api.model.db.FootballClub;
 import com.jakduk.api.service.FootballService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,16 +23,15 @@ import java.util.List;
 @RequestMapping("/api/football")
 public class FootballRestController {
 
-	@Autowired
-	private FootballService footballService;
+    @Autowired
+    private FootballService footballService;
 
-	// 축구단 목록
-	@RequestMapping(value = "/clubs", method = RequestMethod.GET)
-	public List<FootballClub> getFootballClubs(@RequestParam String lang) {
+    // 축구단 목록
+    @RequestMapping(value = "/clubs", method = RequestMethod.GET)
+    public List<FootballClub> getFootballClubs(@RequestParam String lang) {
 
-		String language = JakdukUtils.getLanguageCode(lang);
+        String language = JakdukUtils.getLanguageCode(lang);
 
-		return footballService.getFootballClubs(language, Constants.CLUB_TYPE.FOOTBALL_CLUB,
-			Constants.NAME_TYPE.fullName);
-	}
+        return footballService.getFootballClubs(language, Constants.CLUB_TYPE.FOOTBALL_CLUB, Constants.NAME_TYPE.fullName);
+    }
 }

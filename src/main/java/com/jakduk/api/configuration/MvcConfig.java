@@ -24,38 +24,37 @@ import java.util.Locale;
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		LocaleChangeInterceptor localeInterceptor = new LocaleChangeInterceptor();
-		localeInterceptor.setParamName("lang");
-		localeInterceptor.setIgnoreInvalidLocale(true);
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        LocaleChangeInterceptor localeInterceptor = new LocaleChangeInterceptor();
+        localeInterceptor.setParamName("lang");
+        localeInterceptor.setIgnoreInvalidLocale(true);
 
-		registry.addInterceptor(localeInterceptor);
-	}
+        registry.addInterceptor(localeInterceptor);
+    }
 
-	@Bean
-	public LocaleResolver localeResolver() {
-		CookieLocaleResolver localeResolver = new CookieLocaleResolver();
-		localeResolver.setDefaultLocale(Locale.ENGLISH);
+    @Bean
+    public LocaleResolver localeResolver() {
+        CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+        localeResolver.setDefaultLocale(Locale.ENGLISH);
 
-		return localeResolver;
-	}
+        return localeResolver;
+    }
 
-	/**
-	 * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
-	 */
-	@Bean
-	public MethodValidationPostProcessor methodValidationPostProcessor(
-		LocalValidatorFactoryBean localValidatorFactoryBean) {
-		MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
-		methodValidationPostProcessor.setValidatorFactory(localValidatorFactoryBean);
+    /**
+     * RequestParam으로 입수되는 value에 대해서 validation체크를 할 수 있도록 해주는 Bean
+     */
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor(LocalValidatorFactoryBean localValidatorFactoryBean) {
+        MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
+        methodValidationPostProcessor.setValidatorFactory(localValidatorFactoryBean);
 
-		return methodValidationPostProcessor;
-	}
+        return methodValidationPostProcessor;
+    }
 
-	@Bean
-	public LocalValidatorFactoryBean localValidatorFactoryBean() {
-		return new LocalValidatorFactoryBean();
-	}
+    @Bean
+    public LocalValidatorFactoryBean localValidatorFactoryBean() {
+        return new LocalValidatorFactoryBean();
+    }
 
 }

@@ -8,22 +8,22 @@ package com.jakduk.api.restcontroller.vo.board;
  */
 
 public class GalleryOnBoard {
-	private String id; // 사진 ID
-	private String name; // 사진 이름
+    private String id; // 사진 ID
+    private String name; // 사진 이름
 
-	public GalleryOnBoard() {
-	}
+    public GalleryOnBoard() {
+    }
 
-	public GalleryOnBoard(String id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    public GalleryOnBoard(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 }

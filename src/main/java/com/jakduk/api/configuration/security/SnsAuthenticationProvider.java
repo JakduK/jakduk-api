@@ -15,21 +15,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnsAuthenticationProvider implements AuthenticationProvider {
 
-	@Autowired
-	private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-		String email = authentication.getPrincipal().toString();
+        String email = authentication.getPrincipal().toString();
 
-		UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-		return new SnsAuthenticationToken(userDetails, userDetails.getAuthorities());
-	}
+        return new SnsAuthenticationToken(userDetails, userDetails.getAuthorities());
+    }
 
-	@Override
-	public boolean supports(Class<?> authentication) {
-		return SnsAuthenticationToken.class.isAssignableFrom(authentication);
-	}
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return SnsAuthenticationToken.class.isAssignableFrom(authentication);
+    }
 }

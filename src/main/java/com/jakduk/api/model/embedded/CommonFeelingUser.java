@@ -2,6 +2,7 @@ package com.jakduk.api.model.embedded;
 
 import org.springframework.data.annotation.Id;
 
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com

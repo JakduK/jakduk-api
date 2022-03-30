@@ -1,7 +1,6 @@
 package com.jakduk.api.repository;
 
 import com.jakduk.api.model.db.Competition;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
@@ -12,8 +11,7 @@ import java.util.Optional;
  */
 public interface CompetitionRepository extends MongoRepository<Competition, String> {
 
-	Optional<Competition> findOneById(String id);
-
-	Competition findOneByCode(String code);
+    Optional<Competition> findOneById(String id);
+    Competition findOneByCode(String code);
 
 }

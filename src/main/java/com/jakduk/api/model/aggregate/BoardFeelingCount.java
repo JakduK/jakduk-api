@@ -1,14 +1,14 @@
 package com.jakduk.api.model.aggregate;
 
 /**
- * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
- * @company  : http://jakduk.com
- * @date     : 2015. 11. 7.
- * @desc     :
- */
+* @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
+* @company  : http://jakduk.com
+* @date     : 2015. 11. 7.
+* @desc     :
+*/
 
 public class BoardFeelingCount {
-	private String id;
+    private String id;
 	private Integer usersLikingCount;
 	private Integer usersDislikingCount;
 

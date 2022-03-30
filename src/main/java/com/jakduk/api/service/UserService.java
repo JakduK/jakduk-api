@@ -1,5 +1,6 @@
 package com.jakduk.api.service;
 
+
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.common.util.AuthUtils;
@@ -25,7 +26,6 @@ import com.jakduk.api.repository.user.UserProfileRepository;
 import com.jakduk.api.repository.user.UserRepository;
 import com.jakduk.api.restcontroller.vo.user.UserPasswordFindResponse;
 import com.jakduk.api.restcontroller.vo.user.UserProfileResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -35,7 +35,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,28 +49,18 @@ public class UserService {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Resource
-	private JakdukProperties.Storage storageProperties;
-	@Resource
-	private AuthUtils authUtils;
+	@Resource private JakdukProperties.Storage storageProperties;
+	@Resource private AuthUtils authUtils;
 
-	@Autowired
-	private RabbitMQPublisher rabbitMQPublisher;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private FootballClubRepository footballClubRepository;
-	@Autowired
-	private UserProfileRepository userProfileRepository;
-	@Autowired
-	private UserPictureRepository userPictureRepository;
-	@Autowired
-	private TokenRepository tokenRepository;
+	@Autowired private RabbitMQPublisher rabbitMQPublisher;
+	@Autowired private PasswordEncoder passwordEncoder;
+	@Autowired private UserRepository userRepository;
+	@Autowired private FootballClubRepository footballClubRepository;
+	@Autowired private UserProfileRepository userProfileRepository;
+	@Autowired private UserPictureRepository userPictureRepository;
+	@Autowired private TokenRepository tokenRepository;
 
-	public Optional<User> findOneByProviderIdAndProviderUserId(Constants.ACCOUNT_TYPE providerId,
-		String providerUserId) {
+	public Optional<User> findOneByProviderIdAndProviderUserId(Constants.ACCOUNT_TYPE providerId, String providerUserId) {
 		return userRepository.findOneByProviderIdAndProviderUserId(providerId, providerUserId);
 	}
 
@@ -80,8 +69,8 @@ public class UserService {
 	 *
 	 * @param id userID
 	 * @return UserOnPasswordUpdate
-	 */
-	public UserOnPasswordUpdate findUserOnPasswordUpdateById(String id) {
+     */
+	public UserOnPasswordUpdate findUserOnPasswordUpdateById(String id){
 		return userRepository.findUserOnPasswordUpdateById(id);
 	}
 
@@ -103,8 +92,7 @@ public class UserService {
 			user.setEmail(JakdukUtils.generateTemporaryEmail());
 			userRepository.save(user);
 
-			log.info("user({},{}) temporary email:{} has been entered.", user.getId(), user.getUsername(),
-				user.getEmail());
+			log.info("user({},{}) temporary email:{} has been entered.", user.getId(), user.getUsername(), user.getEmail());
 		}
 		// 과거 SNS 가입 회원들은 email이 없는 경우가 있음. 이메일을 DB에 저장
 		else if (StringUtils.isBlank(user.getEmail()) && StringUtils.isNotBlank(snsEmail)) {
@@ -115,8 +103,7 @@ public class UserService {
 		}
 	}
 
-	public User createJakdukUser(String email, String username, String password, String footballClub, String about,
-		String userPictureId) {
+	public User createJakdukUser(String email, String username, String password, String footballClub, String about, String userPictureId) {
 
 		UserPicture userPicture = null;
 
@@ -131,7 +118,7 @@ public class UserService {
 
 		if (StringUtils.isNotBlank(userPictureId)) {
 			userPicture = userPictureRepository.findOneById(userPictureId.trim())
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
 		}
@@ -151,9 +138,8 @@ public class UserService {
 	/**
 	 * SNS 회원 가입
 	 */
-	public User createSocialUser(String email, String username, Constants.ACCOUNT_TYPE providerId,
-		String providerUserId,
-		String footballClub, String about, String userPictureId, String largePictureUrl) {
+	public User createSocialUser(String email, String username, Constants.ACCOUNT_TYPE providerId, String providerUserId,
+								 String footballClub, String about, String userPictureId, String largePictureUrl) {
 
 		UserPicture userPicture = null;
 
@@ -169,7 +155,7 @@ public class UserService {
 		// 직접 올린 사진을 User와 연동
 		if (StringUtils.isNotBlank(userPictureId)) {
 			userPicture = userPictureRepository.findOneById(userPictureId.trim())
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
 		}
@@ -178,7 +164,7 @@ public class UserService {
 			try {
 				FileUtils.FileInfo fileInfo = FileUtils.getBytesByUrl(largePictureUrl);
 
-				if (!StringUtils.startsWithIgnoreCase(fileInfo.getContentType(), "image/"))
+				if (! StringUtils.startsWithIgnoreCase(fileInfo.getContentType(), "image/"))
 					throw new ServiceException(ServiceError.FILE_ONLY_IMAGE_TYPE_CAN_BE_UPLOADED);
 
 				userPicture = new UserPicture();
@@ -190,13 +176,10 @@ public class UserService {
 				ObjectId objectId = new ObjectId(userPicture.getId());
 				LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-				FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(),
-					fileInfo.getContentType(),
-					fileInfo.getContentLength(), fileInfo.getBytes());
-				FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate,
-					userPicture.getId(), fileInfo.getContentType(),
-					Constants.USER_SMALL_PICTURE_SIZE_WIDTH, Constants.USER_SMALL_PICTURE_SIZE_HEIGHT,
-					fileInfo.getBytes());
+				FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), fileInfo.getContentType(),
+						fileInfo.getContentLength(), fileInfo.getBytes());
+				FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), fileInfo.getContentType(),
+						Constants.USER_SMALL_PICTURE_SIZE_WIDTH, Constants.USER_SMALL_PICTURE_SIZE_HEIGHT, fileInfo.getBytes());
 
 				user.setUserPicture(userPicture);
 
@@ -220,7 +203,7 @@ public class UserService {
 	private void setUserAdditionalInfo(User user, String footballClub, String about) {
 		if (StringUtils.isNotBlank(footballClub)) {
 			FootballClub supportFC = footballClubRepository.findOneById(footballClub.trim())
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(supportFC);
 		}
@@ -232,12 +215,12 @@ public class UserService {
 	}
 
 	public User editUserProfile(String userId, String email, String username, String footballClubId, String about,
-		String userPictureId) {
+								String userPictureId) {
 
 		UserPicture userPicture = null;
 
 		User user = userRepository.findOneById(userId)
-			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 
 		if (StringUtils.isNotBlank(email))
 			user.setEmail(StringUtils.trim(email));
@@ -248,7 +231,7 @@ public class UserService {
 		if (StringUtils.isNotBlank(footballClubId)) {
 
 			FootballClub footballClub = footballClubRepository.findOneById(footballClubId)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 
 			user.setSupportFC(footballClub);
 		}
@@ -258,7 +241,7 @@ public class UserService {
 
 		if (StringUtils.isNotBlank(userPictureId)) {
 			userPicture = userPictureRepository.findOneById(userPictureId)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER_IMAGE));
 
 			user.setUserPicture(userPicture);
 		}
@@ -279,10 +262,9 @@ public class UserService {
 	 * 이메일 기반 회원의 비밀번호 변경.
 	 *
 	 * @param newPassword 새 비밀번호
-	 */
+     */
 	public void updateUserPassword(String userId, String newPassword) {
-		User user = userRepository.findOneById(userId)
-			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+		User user = userRepository.findOneById(userId).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 		user.setPassword(passwordEncoder.encode(newPassword.trim()));
 
 		userRepository.save(user);
@@ -291,8 +273,7 @@ public class UserService {
 	}
 
 	public void userPasswordUpdateByEmail(String email, String password) {
-		User user = userRepository.findOneByEmail(email)
-			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+		User user = userRepository.findOneByEmail(email).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 		user.setPassword(passwordEncoder.encode(password.trim()));
 
 		userRepository.save(user);
@@ -316,7 +297,7 @@ public class UserService {
 				message = JakdukUtils.getMessageSource("user.msg.you.connect.with.sns", providerId);
 			}
 		} else {
-			message = JakdukUtils.getMessageSource("user.msg.you.are.not.registered");
+			message = JakdukUtils.getMessageSource( "user.msg.you.are.not.registered");
 		}
 
 		return new UserPasswordFindResponse(email, message);
@@ -325,8 +306,7 @@ public class UserService {
 	public UserPasswordFindResponse validPasswordTokenCode(String code) {
 
 		Token token = tokenRepository.findOneByCode(code)
-			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND,
-				JakdukUtils.getMessageSource("user.msg.reset.password.invalid")));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND, JakdukUtils.getMessageSource("user.msg.reset.password.invalid")));
 
 		return new UserPasswordFindResponse(token.getEmail(), token.getCode());
 	}
@@ -341,7 +321,7 @@ public class UserService {
 			Token token = oToken.get();
 
 			User user = userRepository.findOneByEmail(token.getEmail())
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 
 			user.setPassword(passwordEncoder.encode(password.trim()));
 
@@ -375,11 +355,9 @@ public class UserService {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(),
-				contentType, size, bytes);
-			FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(),
-				contentType,
-				Constants.USER_SMALL_PICTURE_SIZE_WIDTH, Constants.USER_SMALL_PICTURE_SIZE_HEIGHT, bytes);
+			FileUtils.writeImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), contentType, size, bytes);
+			FileUtils.writeSmallImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), contentType,
+					Constants.USER_SMALL_PICTURE_SIZE_WIDTH, Constants.USER_SMALL_PICTURE_SIZE_HEIGHT, bytes);
 
 			return userPicture;
 
@@ -394,7 +372,7 @@ public class UserService {
 	public UserProfileResponse getProfileMe(String language, String id) {
 
 		UserProfile user = userProfileRepository.findOneById(id)
-			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 
 		UserProfileResponse response = new UserProfileResponse();
 		response.setEmail(user.getEmail());
@@ -414,8 +392,8 @@ public class UserService {
 
 		if (Objects.nonNull(userPicture)) {
 			UserPictureInfo userPictureInfo = new UserPictureInfo(userPicture.getId(),
-				authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
-				authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
+					authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.SMALL, userPicture.getId()),
+					authUtils.generateUserPictureUrl(Constants.IMAGE_SIZE_TYPE.LARGE, userPicture.getId()));
 
 			response.setPicture(userPictureInfo);
 		}
@@ -429,7 +407,7 @@ public class UserService {
 	public void updateLastLogged(String id) {
 
 		User user = userRepository.findOneById(id)
-			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_USER));
 
 		user.setLastLogged(LocalDateTime.now());
 		userRepository.save(user);

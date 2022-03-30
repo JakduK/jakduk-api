@@ -16,7 +16,6 @@ import com.jakduk.api.restcontroller.vo.jakdu.JakduScheduleResponse;
 import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.service.FootballService;
 import com.jakduk.api.service.JakduService;
-
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +26,6 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,138 +40,134 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/jakdu")
 public class JakduRestController {
 
-	@Resource
-	LocaleResolver localeResolver;
+    @Resource
+    LocaleResolver localeResolver;
 
-	@Autowired
-	private JakduService jakduService;
+    @Autowired
+    private JakduService jakduService;
 
-	@Autowired
-	private FootballService footballService;
+    @Autowired
+    private FootballService footballService;
 
-	// 작두 일정 목록
-	@RequestMapping(value = "/schedule", method = RequestMethod.GET)
-	public JakduScheduleResponse dataSchedule(@RequestParam(required = false, defaultValue = "1") int page,
-		@RequestParam(required = false, defaultValue = "20") int size) {
+    // 작두 일정 목록
+    @RequestMapping(value = "/schedule", method = RequestMethod.GET)
+    public JakduScheduleResponse dataSchedule(@RequestParam(required = false, defaultValue = "1") int page,
+                                              @RequestParam(required = false, defaultValue = "20") int size) {
 
-		String language = JakdukUtils.getLanguageCode();
+        String language = JakdukUtils.getLanguageCode();
 
-		Sort sort = Sort.by(Sort.Direction.ASC, "group", "date");
-		Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Sort sort = Sort.by(Sort.Direction.ASC, "group", "date");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-		Set<ObjectId> fcIds = new HashSet<>();
-		Set<ObjectId> competitionIds = new HashSet<>();
-		List<JakduSchedule> jakduSchedules = jakduService.findAll(pageable).getContent();
+        Set<ObjectId> fcIds = new HashSet<>();
+        Set<ObjectId> competitionIds = new HashSet<>();
+        List<JakduSchedule> jakduSchedules = jakduService.findAll(pageable).getContent();
 
-		for (JakduSchedule jakduSchedule : jakduSchedules) {
-			fcIds.add(new ObjectId(jakduSchedule.getHome().getId()));
-			fcIds.add(new ObjectId(jakduSchedule.getAway().getId()));
+        for (JakduSchedule jakduSchedule : jakduSchedules) {
+            fcIds.add(new ObjectId(jakduSchedule.getHome().getId()));
+            fcIds.add(new ObjectId(jakduSchedule.getAway().getId()));
 
-			if (Objects.nonNull(jakduSchedule.getCompetition()))
-				competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
-		}
+            if (Objects.nonNull(jakduSchedule.getCompetition()))
+                competitionIds.add(new ObjectId(jakduSchedule.getCompetition().getId()));
+        }
 
-		List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language,
-			Constants.NAME_TYPE.fullName);
-		List<Competition> competitions = footballService.getCompetitions(new ArrayList<>(competitionIds), language);
+        List<FootballClub> footballClubs = footballService.getFootballClubs(new ArrayList<>(fcIds), language, Constants.NAME_TYPE.fullName);
+        List<Competition> competitions = footballService.getCompetitions(new ArrayList<>(competitionIds), language);
 
-		Map<String, LocalName> fcNames = footballClubs.stream()
-			.collect(Collectors.toMap(footballClub -> footballClub.getOrigin().getId(),
-				footballClub -> footballClub.getNames().get(0)));
+        Map<String, LocalName> fcNames = footballClubs.stream()
+                .collect(Collectors.toMap(footballClub -> footballClub.getOrigin().getId(), footballClub -> footballClub.getNames().get(0)));
 
-		Map<String, LocalName> competitionNames = competitions.stream()
-			.collect(Collectors.toMap(Competition::getId, competition -> competition.getNames().get(0)));
+        Map<String, LocalName> competitionNames = competitions.stream()
+                .collect(Collectors.toMap(Competition::getId, competition -> competition.getNames().get(0)));
 
-		JakduScheduleResponse response = new JakduScheduleResponse();
-		response.setSchedules(jakduSchedules);
-		response.setFcNames(fcNames);
-		response.setCompetitionNames(competitionNames);
+        JakduScheduleResponse response = new JakduScheduleResponse();
+        response.setSchedules(jakduSchedules);
+        response.setFcNames(fcNames);
+        response.setCompetitionNames(competitionNames);
 
-		return response;
-	}
+        return response;
+    }
 
-	// 작두 일정 데이터 하나 가져오기.
-	@RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
-	public Map<String, Object> dataSchedule(@PathVariable String id,
-		HttpServletRequest request) {
+    // 작두 일정 데이터 하나 가져오기.
+    @RequestMapping(value = "/schedule/{id}", method = RequestMethod.GET)
+    public Map<String, Object> dataSchedule(@PathVariable String id,
+                                            HttpServletRequest request) {
 
-		Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = localeResolver.resolveLocale(request);
 
-		Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
 
-		JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
-		result.put("jakduSchedule", jakduSchedule);
+        JakduSchedule jakduSchedule = jakduService.findScheduleById(id);
+        result.put("jakduSchedule", jakduSchedule);
 
-		SessionUser sessionUser = AuthUtils.getSessionProfile();
+        SessionUser sessionUser = AuthUtils.getSessionProfile();
 
-		if (AuthUtils.isSessionUserRole()) {
-			result.put("myJakdu", jakduService.getMyJakdu(sessionUser.getId(), id));
-		}
+        if (AuthUtils.isSessionUserRole()) {
+            result.put("myJakdu", jakduService.getMyJakdu(sessionUser.getId(), id));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	// 작두 타기
-	@RequestMapping(value = "/myJakdu", method = RequestMethod.POST)
-	public Jakdu myJakduWrite(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
+    // 작두 타기
+    @RequestMapping(value ="/myJakdu", method = RequestMethod.POST)
+    public Jakdu myJakduWrite(@RequestBody MyJakduRequest myJakdu, HttpServletRequest request) {
 
-		if (Objects.isNull(myJakdu)) {
-			throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
-		}
+        if (Objects.isNull(myJakdu)) {
+            throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
+        }
 
-		CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
-		return jakduService.setMyJakdu(commonWriter, myJakdu);
-	}
+        return jakduService.setMyJakdu(commonWriter, myJakdu);
+    }
 
-	// 작두 댓글 달기
-	@RequestMapping(value = "/schedule/comment", method = RequestMethod.POST)
-	public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest) {
+    // 작두 댓글 달기
+    @RequestMapping(value ="/schedule/comment", method = RequestMethod.POST)
+    public JakduComment commentWrite(@RequestBody JakduCommentWriteRequest jakduCommentWriteRequest) {
 
-		if (Objects.isNull(jakduCommentWriteRequest))
-			throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
+        if (Objects.isNull(jakduCommentWriteRequest))
+            throw new IllegalArgumentException(JakdukUtils.getMessageSource("exception.invalid.parameter"));
 
-		if (!AuthUtils.isSessionUserRole())
-			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+        if (! AuthUtils.isSessionUserRole())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
-		JakduComment jakduComment = jakduService.setComment(commonWriter, jakduCommentWriteRequest);
+        JakduComment jakduComment = jakduService.setComment(commonWriter, jakduCommentWriteRequest);
 
-		return jakduComment;
-	}
+        return jakduComment;
+    }
 
-	// 작두 댓글 목록
-	@RequestMapping(value = "/schedule/comments/{jakduScheduleId}", method = RequestMethod.GET)
-	public JakduCommentsResponse getComments(@PathVariable String jakduScheduleId,
-		@RequestParam(required = false) String commentId) {
+    // 작두 댓글 목록
+    @RequestMapping(value = "/schedule/comments/{jakduScheduleId}", method = RequestMethod.GET)
+    public JakduCommentsResponse getComments(@PathVariable String jakduScheduleId,
+                                             @RequestParam(required = false) String commentId) {
 
-		JakduCommentsResponse response = jakduService.getComments(jakduScheduleId, commentId);
+        JakduCommentsResponse response = jakduService.getComments(jakduScheduleId, commentId);
 
-		return response;
-	}
+        return response;
+    }
 
-	// 작두 댓글 좋아요 싫어요
-	@RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
-	public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
-		@PathVariable Constants.FEELING_TYPE feeling) {
+    // 작두 댓글 좋아요 싫어요
+    @RequestMapping(value = "/schedule/comment/{commentId}/{feeling}", method = RequestMethod.POST)
+    public UserFeelingResponse setCommentFeeling(@PathVariable String commentId,
+                                                 @PathVariable Constants.FEELING_TYPE feeling) {
 
-		if (!AuthUtils.isSessionUserRole())
-			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
+        if (! AuthUtils.isSessionUserRole())
+            throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
-		CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
+        CommonWriter commonWriter = AuthUtils.getCommonWriterFromSession();
 
-		JakduComment jakduComment = jakduService.setJakduCommentFeeling(commonWriter, commentId, feeling);
+        JakduComment jakduComment = jakduService.setJakduCommentFeeling(commonWriter, commentId, feeling);
 
-		Integer numberOfLike =
-			Objects.nonNull(jakduComment.getUsersLiking()) ? jakduComment.getUsersLiking().size() : 0;
-		Integer numberOfDisLike =
-			Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;
+        Integer numberOfLike = Objects.nonNull(jakduComment.getUsersLiking()) ? jakduComment.getUsersLiking().size() : 0;
+        Integer numberOfDisLike = Objects.nonNull(jakduComment.getUsersDisliking()) ? jakduComment.getUsersDisliking().size() : 0;
 
-		return new UserFeelingResponse() {{
-			setMyFeeling(feeling);
-			setNumberOfLike(numberOfLike);
-			setNumberOfDislike(numberOfDisLike);
-		}};
-	}
+        return new UserFeelingResponse() {{
+            setMyFeeling(feeling);
+            setNumberOfLike(numberOfLike);
+            setNumberOfDislike(numberOfDisLike);
+        }};
+    }
 }

@@ -17,16 +17,16 @@ public class AttendanceClubForm {
 
 	@NotEmpty
 	private String league;
-
+	
 	@NotNull
 	private Integer season;
-
+	
 	@NotNull
 	private Integer games;
-
+	
 	@NotNull
 	private Integer total;
-
+	
 	@NotNull
 	private Integer average;
 

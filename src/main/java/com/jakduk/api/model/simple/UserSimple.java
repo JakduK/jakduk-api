@@ -1,7 +1,6 @@
 package com.jakduk.api.model.simple;
 
 import com.jakduk.api.common.Constants;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = Constants.COLLECTION_USER)
 public class UserSimple {
-
+	
 	@Id
 	private String id;
 	private String username;

@@ -7,29 +7,29 @@ package com.jakduk.api.exception;
 
 public class ServiceException extends RuntimeException {
 
-	private ServiceError serviceError;
+    private ServiceError serviceError;
 
-	public ServiceException(ServiceError serviceError) {
-		super(serviceError.getMessage());
-		this.serviceError = serviceError;
-	}
+    public ServiceException(ServiceError serviceError) {
+        super(serviceError.getMessage());
+        this.serviceError = serviceError;
+    }
 
-	public ServiceException(ServiceError serviceError, String message) {
-		super(message);
-		this.serviceError = serviceError;
-	}
+    public ServiceException(ServiceError serviceError, String message) {
+        super(message);
+        this.serviceError = serviceError;
+    }
 
-	public ServiceException(ServiceError serviceError, Throwable throwable) {
-		super(serviceError.getMessage(), throwable);
-		this.serviceError = serviceError;
-	}
+    public ServiceException(ServiceError serviceError, Throwable throwable) {
+        super(serviceError.getMessage(), throwable);
+        this.serviceError = serviceError;
+    }
 
-	public ServiceException(ServiceError serviceError, String message, Throwable throwable) {
-		super(message, throwable);
-		this.serviceError = serviceError;
-	}
+    public ServiceException(ServiceError serviceError, String message, Throwable throwable) {
+        super(message, throwable);
+        this.serviceError = serviceError;
+    }
 
-	public ServiceError getServiceError() {
-		return serviceError;
-	}
+    public ServiceError getServiceError() {
+        return serviceError;
+    }
 }

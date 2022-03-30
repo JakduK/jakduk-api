@@ -3,7 +3,6 @@ package com.jakduk.api.model.db;
 import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.model.embedded.GalleryStatus;
 import com.jakduk.api.model.embedded.LinkedItem;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,7 +17,7 @@ import java.util.List;
 
 @Document
 public class Gallery {
-
+	
 	@Id
 	private String id;
 	private GalleryStatus status;

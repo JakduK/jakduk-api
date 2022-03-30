@@ -9,30 +9,30 @@ import java.util.Arrays;
  * Created by pyohwanjang on 2017. 7. 3..
  */
 
-public enum ElasticsearchRoutingKey {
+public enum ElasticsearchRoutingKey  {
 
-	ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE("elasticsearch-index-document-article"),
-	ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE("elasticsearch-delete-document-article"),
-	ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT("elasticsearch-index-document-article-comment"),
-	ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE_COMMENT("elasticsearch-delete-document-article-comment"),
-	ELASTICSEARCH_INDEX_DOCUMENT_GALLERY("elasticsearch-index-document-gallery"),
-	ELASTICSEARCH_DELETE_DOCUMENT_GALLERY("elasticsearch-delete-document-gallery"),
-	ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD("elasticsearch-index-document-search-word");
+    ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE("elasticsearch-index-document-article"),
+    ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE("elasticsearch-delete-document-article"),
+    ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT("elasticsearch-index-document-article-comment"),
+    ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE_COMMENT("elasticsearch-delete-document-article-comment"),
+    ELASTICSEARCH_INDEX_DOCUMENT_GALLERY("elasticsearch-index-document-gallery"),
+    ELASTICSEARCH_DELETE_DOCUMENT_GALLERY("elasticsearch-delete-document-gallery"),
+    ELASTICSEARCH_INDEX_DOCUMENT_SEARCH_WORD("elasticsearch-index-document-search-word");
 
-	private String routingKey;
+    private String routingKey;
 
-	ElasticsearchRoutingKey(String routingKey) {
-		this.routingKey = routingKey;
-	}
+    ElasticsearchRoutingKey(String routingKey) {
+        this.routingKey = routingKey;
+    }
 
-	static public ElasticsearchRoutingKey find(String value) {
-		return Arrays.stream(ElasticsearchRoutingKey.values())
-			.filter(routingKey -> routingKey.routingKey.equals(value))
-			.findFirst()
-			.orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
-	}
+    static public ElasticsearchRoutingKey find(String value) {
+        return Arrays.stream(ElasticsearchRoutingKey.values())
+                .filter(routingKey -> routingKey.routingKey.equals(value))
+                .findFirst()
+                .orElseThrow(() -> new ServiceException(ServiceError.ILLEGAL_ARGUMENT));
+    }
 
-	public String getRoutingKey() {
-		return routingKey;
-	}
+    public String getRoutingKey() {
+        return routingKey;
+    }
 }

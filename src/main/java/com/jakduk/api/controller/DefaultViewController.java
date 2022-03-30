@@ -17,7 +17,6 @@ import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.W3CDateFormat;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
-
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -50,19 +48,13 @@ import java.util.List;
 @Controller
 public class DefaultViewController {
 
-	@Resource
-	private JakdukProperties jakdukProperties;
-	@Resource
-	private JakdukProperties.Storage storageProperties;
+	@Resource private JakdukProperties jakdukProperties;
+	@Resource private JakdukProperties.Storage storageProperties;
 
-	@Autowired
-	private UrlGenerationUtils urlGenerationUtils;
-	@Autowired
-	private GalleryService galleryService;
-	@Autowired
-	private UserPictureService userPictureService;
-	@Autowired
-	private ArticleService articleService;
+	@Autowired private UrlGenerationUtils urlGenerationUtils;
+	@Autowired private GalleryService galleryService;
+	@Autowired private UserPictureService userPictureService;
+	@Autowired private ArticleService articleService;
 
 	// RSS
 	@GetMapping(value = "/rss.xml", produces = MediaType.APPLICATION_XML_VALUE)
@@ -75,37 +67,36 @@ public class DefaultViewController {
 	public void getSitemap(HttpServletResponse servletResponse) {
 
 		try {
-			WebSitemapGenerator wsg = WebSitemapGenerator.builder(jakdukProperties.getWebServerUrl(), null)
-				.dateFormat(new W3CDateFormat(W3CDateFormat.Pattern.SECOND))
-				.build();
+			WebSitemapGenerator wsg =  WebSitemapGenerator.builder(jakdukProperties.getWebServerUrl(), null)
+					.dateFormat(new W3CDateFormat(W3CDateFormat.Pattern.SECOND))
+					.build();
 
 			ObjectId postId = null;
 			Boolean existPosts = true;
 
 			do {
-				List<ArticleOnSitemap> articles = articleService.getBoardFreeOnSitemap(postId,
-					Constants.NUMBER_OF_ITEMS_EACH_PAGES);
+				List<ArticleOnSitemap> articles = articleService.getBoardFreeOnSitemap(postId, Constants.NUMBER_OF_ITEMS_EACH_PAGES);
 
 				if (CollectionUtils.isEmpty(articles)) {
 					existPosts = false;
 				} else {
 					ArticleOnSitemap article = articles.stream()
-						.sorted(Comparator.comparing(ArticleOnSitemap::getId))
-						.findFirst()
-						.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+							.sorted(Comparator.comparing(ArticleOnSitemap::getId))
+							.findFirst()
+							.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 					postId = new ObjectId(article.getId());
 				}
 
 				if (existPosts) {
-					articles.forEach(post -> {
+					articles.forEach(post-> {
 						try {
 							WebSitemapUrl url = new WebSitemapUrl
-								.Options(urlGenerationUtils.generateArticleDetailUrl(post.getBoard(), post.getSeq()))
-								.lastMod(DateUtils.localDateTimeToDate(post.getLastUpdated()))
-								.priority(0.5)
-								.changeFreq(ChangeFreq.DAILY)
-								.build();
+									.Options(urlGenerationUtils.generateArticleDetailUrl(post.getBoard(), post.getSeq()))
+									.lastMod(DateUtils.localDateTimeToDate(post.getLastUpdated()))
+									.priority(0.5)
+									.changeFreq(ChangeFreq.DAILY)
+									.build();
 
 							wsg.addUrl(url);
 						} catch (MalformedURLException e) {
@@ -128,12 +119,12 @@ public class DefaultViewController {
 	// 사진 가져오기.
 	@GetMapping("/${jakduk.api-url-path.gallery-image}/{id}")
 	public void getGallery(@PathVariable String id,
-		HttpServletResponse response) {
+						   HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-			Constants.IMAGE_TYPE.FULL);
+				Constants.IMAGE_TYPE.FULL);
 		response.setContentType(gallery.getContentType());
 
 		try {
@@ -146,12 +137,12 @@ public class DefaultViewController {
 	// 사진 썸네일 가져오기.
 	@GetMapping("/${jakduk.api-url-path.gallery-thumbnail}/{id}")
 	public void getGalleyThumbnail(@PathVariable String id,
-		HttpServletResponse response) {
+								   HttpServletResponse response) {
 
 		Gallery gallery = galleryService.findOneById(id);
 
 		ByteArrayOutputStream byteStream = galleryService.getGalleryOutStream(gallery.getId(), gallery.getContentType(),
-			Constants.IMAGE_TYPE.THUMBNAIL);
+				Constants.IMAGE_TYPE.THUMBNAIL);
 		response.setContentType(gallery.getContentType());
 
 		try {
@@ -164,7 +155,7 @@ public class DefaultViewController {
 	// 회원 프로필 사진 가져오기.
 	@RequestMapping(value = "/${jakduk.api-url-path.user-picture-large}/{id}", method = RequestMethod.GET)
 	public void getUserPicture(@PathVariable String id,
-		HttpServletResponse response) {
+							 HttpServletResponse response) {
 
 		UserPicture userPicture = userPictureService.findOneById(id);
 
@@ -172,8 +163,7 @@ public class DefaultViewController {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageProperties.getUserPictureLargePath(),
-				localDate, userPicture.getId(), userPicture.getContentType());
+			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageProperties.getUserPictureLargePath(), localDate, userPicture.getId(), userPicture.getContentType());
 			response.setContentType(userPicture.getContentType());
 
 			byteStream.writeTo(response.getOutputStream());
@@ -185,7 +175,7 @@ public class DefaultViewController {
 	// 회원 프로필 작은 사진 가져오기.
 	@RequestMapping(value = "/${jakduk.api-url-path.user-picture-small}/{id}", method = RequestMethod.GET)
 	public void getUserSmallPicture(@PathVariable String id,
-		HttpServletResponse response) {
+									HttpServletResponse response) {
 
 		UserPicture userPicture = userPictureService.findOneById(id);
 
@@ -193,8 +183,7 @@ public class DefaultViewController {
 		LocalDate localDate = objectId.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		try {
-			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageProperties.getUserPictureSmallPath(),
-				localDate, userPicture.getId(), userPicture.getContentType());
+			ByteArrayOutputStream byteStream = FileUtils.readImageFile(storageProperties.getUserPictureSmallPath(), localDate, userPicture.getId(), userPicture.getContentType());
 			response.setContentType(userPicture.getContentType());
 
 			byteStream.writeTo(response.getOutputStream());

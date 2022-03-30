@@ -10,13 +10,13 @@ import javax.validation.constraints.Min;
  */
 
 public class ThumbnailSizeWrite {
-
+	
 	@Min(1)
 	private int width = 1;
-
+	
 	@Min(1)
 	private int height = 1;
-
+	
 	private String galleryId;
 
 	public int getWidth() {
@@ -46,7 +46,7 @@ public class ThumbnailSizeWrite {
 	@Override
 	public String toString() {
 		return "ThumbnailSizeWrite [width=" + width + ", height=" + height
-			+ ", galleryId=" + galleryId + "]";
+				+ ", galleryId=" + galleryId + "]";
 	}
 
 }
