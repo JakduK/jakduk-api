@@ -17,8 +17,6 @@ spring:
     mongodb:
       uri: mongodb://192.168.0.12/jakduk_test
     elasticsearch:
-      cluster-name: jakduk-elasticsearch
-      cluster-nodes: 192.168.0.18:9300
       repositories:
         enabled: false
   rabbitmq:
