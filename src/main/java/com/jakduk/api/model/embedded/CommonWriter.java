@@ -7,7 +7,7 @@ import com.jakduk.api.common.Constants;
  */
 
 public class CommonWriter {
-	
+
 	private String userId;
 	private String username;
 	private Constants.ACCOUNT_TYPE providerId;

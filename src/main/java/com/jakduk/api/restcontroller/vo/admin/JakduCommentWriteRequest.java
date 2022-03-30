@@ -6,14 +6,14 @@ package com.jakduk.api.restcontroller.vo.admin;
  */
 
 public class JakduCommentWriteRequest {
-    private String contents;            // 댓글 내용
-    private String id;                  // 작두일정 ID
+	private String contents;            // 댓글 내용
+	private String id;                  // 작두일정 ID
 
-    public String getContents() {
-        return contents;
-    }
+	public String getContents() {
+		return contents;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 }

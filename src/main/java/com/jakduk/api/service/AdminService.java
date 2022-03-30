@@ -1,6 +1,5 @@
 package com.jakduk.api.service;
 
-
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.dao.JakdukDAO;
@@ -22,6 +21,7 @@ import com.jakduk.api.restcontroller.vo.admin.CompetitionWrite;
 import com.jakduk.api.restcontroller.vo.admin.JakduScheduleGroupWrite;
 import com.jakduk.api.restcontroller.vo.admin.JakduScheduleWrite;
 import com.jakduk.api.restcontroller.vo.admin.ThumbnailSizeWrite;
+
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -57,19 +58,31 @@ public class AdminService {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Resource private JakdukProperties.Storage storageProperties;
+	@Resource
+	private JakdukProperties.Storage storageProperties;
 
-	@Autowired private JakdukDAO jakdukDAO;
-	@Autowired private CommonService commonService;
-	@Autowired private EncyclopediaRepository encyclopediaRepository;
-	@Autowired private FootballClubRepository footballClubRepository;
-	@Autowired private FootballClubOriginRepository footballClubOriginRepository;
-	@Autowired private GalleryRepository galleryRepository;
-	@Autowired private HomeDescriptionRepository homeDescriptionReposotiry;
-	@Autowired private AttendanceClubRepository attendanceClubRepository;
-	@Autowired private JakduScheduleRepository jakduScheduleRepository;
-	@Autowired private JakduScheduleGroupRepository jakduScheduleGroupRepository;
-	@Autowired private CompetitionRepository competitionRepository; // 리팩토링 할때 없애자.
+	@Autowired
+	private JakdukDAO jakdukDAO;
+	@Autowired
+	private CommonService commonService;
+	@Autowired
+	private EncyclopediaRepository encyclopediaRepository;
+	@Autowired
+	private FootballClubRepository footballClubRepository;
+	@Autowired
+	private FootballClubOriginRepository footballClubOriginRepository;
+	@Autowired
+	private GalleryRepository galleryRepository;
+	@Autowired
+	private HomeDescriptionRepository homeDescriptionReposotiry;
+	@Autowired
+	private AttendanceClubRepository attendanceClubRepository;
+	@Autowired
+	private JakduScheduleRepository jakduScheduleRepository;
+	@Autowired
+	private JakduScheduleGroupRepository jakduScheduleGroupRepository;
+	@Autowired
+	private CompetitionRepository competitionRepository; // 리팩토링 할때 없애자.
 
 	// 알림판 목록.
 	public List<HomeDescription> findHomeDescriptions() {
@@ -78,7 +91,8 @@ public class AdminService {
 
 	// 알림판 하나.
 	public HomeDescription findHomeDescriptionById(String id) {
-		return homeDescriptionReposotiry.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_HOMEDESCRIPTION));
+		return homeDescriptionReposotiry.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_HOMEDESCRIPTION));
 	}
 
 	// 알림판 저장.
@@ -93,7 +107,8 @@ public class AdminService {
 
 	// 백과사전 하나.
 	public Encyclopedia findEncyclopediaById(String id) {
-		return encyclopediaRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ENCYCLOPEDIA));
+		return encyclopediaRepository.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ENCYCLOPEDIA));
 	}
 
 	// 백과사전 목록.
@@ -118,7 +133,8 @@ public class AdminService {
 
 	// 부모 축구단 하나.
 	public FootballClubOrigin findOriginFootballClubById(String id) {
-		return footballClubOriginRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
+		return footballClubOriginRepository.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
 	}
 
 	// 새 부모 축구단 저장.
@@ -138,7 +154,8 @@ public class AdminService {
 
 	// 축구단 하나.
 	public FootballClub findFootballClubById(String id) {
-		return footballClubRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+		return footballClubRepository.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 	}
 
 	// 새 부모 축구단 저장.
@@ -147,79 +164,83 @@ public class AdminService {
 	}
 
 	public List<AttendanceClub> getAttendanceClubList() {
-		
+
 		List<AttendanceClub> attendanceClubs;
 		attendanceClubs = attendanceClubRepository.findAll(Constants.SORT_BY_ID_ASC);
-		
+
 		return attendanceClubs;
 	}
-	
+
 	public void thumbnailSizeWrite(ThumbnailSizeWrite thumbnailSizeWrite) {
-		
+
 		List<Gallery> galleries;
-		
+
 		if (thumbnailSizeWrite.getGalleryId() != null && !thumbnailSizeWrite.getGalleryId().isEmpty()) {
 			galleries = new ArrayList<>();
-			galleries.add(galleryRepository.findById(thumbnailSizeWrite.getGalleryId()).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY)));
+			galleries.add(galleryRepository.findById(thumbnailSizeWrite.getGalleryId())
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY)));
 		} else {
 			galleries = galleryRepository.findAll();
 		}
-		
+
 		for (Gallery gallery : galleries) {
 			ObjectId objId = new ObjectId(gallery.getId());
 			Instant instant = Instant.ofEpochMilli(objId.getDate().getTime());
 			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-			
+
 			Path imageDirPath = Paths.get(storageProperties.getImagePath(), String.valueOf(timePoint.getYear()),
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
-			
+				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+
 			Path thumbDirPath = Paths.get(storageProperties.getThumbnailPath(), String.valueOf(timePoint.getYear()),
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
-			
+				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+
 			// 사진 경로.
 			Path imageFilePath = imageDirPath.resolve(gallery.getId());
 			Path thumbFilePath = thumbDirPath.resolve(gallery.getId());
-			
+
 			// 사진 포맷.
 			String formatName = "jpg";
-			
+
 			String splitContentType[] = gallery.getContentType().split("/");
 			if (!splitContentType[1].equals("octet-stream")) {
 				formatName = splitContentType[1];
 			}
-			
+
 			if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-				
+
 				try {
-					
+
 					if (Files.exists(thumbFilePath, LinkOption.NOFOLLOW_LINKS)) {
 						Files.delete(thumbFilePath);
 					}
 
 					log.debug("gallery=" + gallery);
-					
+
 					BufferedInputStream in = new BufferedInputStream(new FileInputStream(imageFilePath.toString()));
-					
+
 					BufferedImage bi = ImageIO.read(in);
-					BufferedImage bufferIm = new BufferedImage(thumbnailSizeWrite.getWidth(), thumbnailSizeWrite.getHeight(), BufferedImage.TYPE_INT_RGB);
-					Image tempImg = bi.getScaledInstance(thumbnailSizeWrite.getWidth(), thumbnailSizeWrite.getHeight(), Image.SCALE_AREA_AVERAGING);
+					BufferedImage bufferIm = new BufferedImage(thumbnailSizeWrite.getWidth(),
+						thumbnailSizeWrite.getHeight(), BufferedImage.TYPE_INT_RGB);
+					Image tempImg = bi.getScaledInstance(thumbnailSizeWrite.getWidth(), thumbnailSizeWrite.getHeight(),
+						Image.SCALE_AREA_AVERAGING);
 					Graphics2D g2 = bufferIm.createGraphics();
 					g2.drawImage(tempImg, 0, 0, thumbnailSizeWrite.getWidth(), thumbnailSizeWrite.getHeight(), null);
-					
-					ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());				
-					
-					in.close();					
+
+					ImageIO.write(bufferIm, formatName, thumbFilePath.toFile());
+
+					in.close();
 				} catch (IOException e) {
 					log.warn(e.getMessage(), e);
 				}
-			}				
+			}
 		}
 	}
 
-	public void saveAttendanceClub(String id, String origin, String league, Integer season, Integer games, Integer total, Integer average) {
+	public void saveAttendanceClub(String id, String origin, String league, Integer season, Integer games,
+		Integer total, Integer average) {
 
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOneById(origin)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
 
 		AttendanceClub attendanceClub;
 
@@ -227,7 +248,7 @@ public class AdminService {
 			attendanceClub = new AttendanceClub();
 		} else {
 			attendanceClub = attendanceClubRepository.findOneById(id)
-					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB));
 		}
 
 		attendanceClub.setClub(footballClubOrigin);
@@ -236,12 +257,13 @@ public class AdminService {
 		attendanceClub.setGames(games);
 		attendanceClub.setTotal(total);
 		attendanceClub.setAverage(average);
-		
+
 		attendanceClubRepository.save(attendanceClub);
 	}
 
 	public JakduScheduleWrite getJakduScheduleWrite(String id) {
-		JakduSchedule jakduSchedule = jakduScheduleRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
+		JakduSchedule jakduSchedule = jakduScheduleRepository.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
 		JakduScheduleScore jakduScore = jakduSchedule.getScore();
 
 		JakduScheduleWrite jakduScheduleWrite = new JakduScheduleWrite();
@@ -275,12 +297,17 @@ public class AdminService {
 	}
 
 	public JakduSchedule writeJakduSchedule(String id, JakduScheduleWrite jakduScheduleWrite) {
-		JakduSchedule jakduSchedule = Objects.isNull(id) ? new JakduSchedule() : jakduScheduleRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
+		JakduSchedule jakduSchedule = Objects.isNull(id) ? new JakduSchedule() : jakduScheduleRepository.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
 
-		FootballClubOrigin home = footballClubOriginRepository.findById(jakduScheduleWrite.getHome()).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
-		FootballClubOrigin away = footballClubOriginRepository.findById(jakduScheduleWrite.getAway()).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
-		Competition competition = competitionRepository.findById(jakduScheduleWrite.getCompetition()).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMPETITION));
-		JakduScheduleGroup jakduScheduleGroup = Objects.isNull(id) ? jakdukDAO.getJakduScheduleGroupOrderBySeq() : jakduScheduleGroupRepository.findBySeq(jakduScheduleWrite.getGroupSeq());
+		FootballClubOrigin home = footballClubOriginRepository.findById(jakduScheduleWrite.getHome())
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
+		FootballClubOrigin away = footballClubOriginRepository.findById(jakduScheduleWrite.getAway())
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
+		Competition competition = competitionRepository.findById(jakduScheduleWrite.getCompetition())
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMPETITION));
+		JakduScheduleGroup jakduScheduleGroup = Objects.isNull(id) ? jakdukDAO.getJakduScheduleGroupOrderBySeq() :
+			jakduScheduleGroupRepository.findBySeq(jakduScheduleWrite.getGroupSeq());
 
 		if (jakduScheduleWrite.isTimeUp()) {
 			JakduScheduleScore jakduScore = new JakduScheduleScore();
@@ -295,7 +322,8 @@ public class AdminService {
 				jakduScore.setAwayOverTime(jakduScheduleWrite.getAwayOverTime());
 			}
 
-			if (jakduScheduleWrite.getHomePenaltyShootout() != null && jakduScheduleWrite.getAwayPenaltyShootout() != null) {
+			if (jakduScheduleWrite.getHomePenaltyShootout() != null
+				&& jakduScheduleWrite.getAwayPenaltyShootout() != null) {
 				jakduScore.setHomePenaltyShootout(jakduScheduleWrite.getHomePenaltyShootout());
 				jakduScore.setAwayPenaltyShootout(jakduScheduleWrite.getAwayPenaltyShootout());
 			}
@@ -324,7 +352,8 @@ public class AdminService {
 	public boolean deleteJakduSchedule(String id) {
 
 		if (!id.isEmpty()) {
-			JakduSchedule jakduSchedule = jakduScheduleRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
+			JakduSchedule jakduSchedule = jakduScheduleRepository.findById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULE));
 
 			if (jakduSchedule != null) {
 				jakduScheduleRepository.delete(jakduSchedule);
@@ -341,7 +370,8 @@ public class AdminService {
 	}
 
 	public JakduScheduleGroupWrite getJakduScheduleGroupWrite(String id) {
-		JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULEGROUP));
+		JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULEGROUP));
 
 		JakduScheduleGroupWrite jakduScheduleGroupWrite = new JakduScheduleGroupWrite();
 		jakduScheduleGroupWrite.setId(jakduScheduleGroup.getId());
@@ -354,7 +384,9 @@ public class AdminService {
 	}
 
 	public JakduScheduleGroup writeJakduScheduleGroup(String id, JakduScheduleGroupWrite jakduScheduleGroupWrite) {
-		JakduScheduleGroup jakduScheduleGroup = Objects.isNull(id) ? new JakduScheduleGroup() : jakduScheduleGroupRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULEGROUP));
+		JakduScheduleGroup jakduScheduleGroup = Objects.isNull(id) ? new JakduScheduleGroup() :
+			jakduScheduleGroupRepository.findById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULEGROUP));
 
 		jakduScheduleGroup.setOpenDate(jakduScheduleGroupWrite.getOpenDate());
 		jakduScheduleGroup.setState(jakduScheduleGroupWrite.getState());
@@ -379,7 +411,8 @@ public class AdminService {
 	public boolean deleteJakduScheduleGroup(String id) {
 
 		if (!id.isEmpty()) {
-			JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULEGROUP));
+			JakduScheduleGroup jakduScheduleGroup = jakduScheduleGroupRepository.findById(id)
+				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_JAKDUSCHEDULEGROUP));
 
 			if (jakduScheduleGroup != null) {
 				jakduScheduleGroupRepository.delete(jakduScheduleGroup);
@@ -396,7 +429,8 @@ public class AdminService {
 	}
 
 	public CompetitionWrite getCompetition(String id) {
-		Competition competition = competitionRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMPETITION));
+		Competition competition = competitionRepository.findById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMPETITION));
 		CompetitionWrite competitionWrite = new CompetitionWrite();
 		competitionWrite.setId(competition.getId());
 		competitionWrite.setCode(competition.getCode());

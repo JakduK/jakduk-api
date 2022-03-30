@@ -15,13 +15,13 @@ import java.util.Objects;
 @JsonInclude
 public class EmptyJsonResponse {
 
-    private static EmptyJsonResponse emptyJsonResponse;
+	private static EmptyJsonResponse emptyJsonResponse;
 
-    public static EmptyJsonResponse newInstance() {
+	public static EmptyJsonResponse newInstance() {
 
-        if (Objects.isNull(emptyJsonResponse))
-            emptyJsonResponse = new EmptyJsonResponse();
+		if (Objects.isNull(emptyJsonResponse))
+			emptyJsonResponse = new EmptyJsonResponse();
 
-        return emptyJsonResponse;
-    }
+		return emptyJsonResponse;
+	}
 }

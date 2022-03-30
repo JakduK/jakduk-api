@@ -10,22 +10,22 @@ import java.util.List;
  */
 
 public class GetArticleDetailCommentsResponse {
-    private List<GetArticleComment> comments; // 댓글 목록
-    private Integer count; // 댓글 수
+	private List<GetArticleComment> comments; // 댓글 목록
+	private Integer count; // 댓글 수
 
-    public GetArticleDetailCommentsResponse() {
-    }
+	public GetArticleDetailCommentsResponse() {
+	}
 
-    public GetArticleDetailCommentsResponse(List<GetArticleComment> comments, Integer count) {
-        this.comments = comments;
-        this.count = count;
-    }
+	public GetArticleDetailCommentsResponse(List<GetArticleComment> comments, Integer count) {
+		this.comments = comments;
+		this.count = count;
+	}
 
-    public List<GetArticleComment> getComments() {
-        return comments;
-    }
+	public List<GetArticleComment> getComments() {
+		return comments;
+	}
 
-    public Integer getCount() {
-        return count;
-    }
+	public Integer getCount() {
+		return count;
+	}
 }

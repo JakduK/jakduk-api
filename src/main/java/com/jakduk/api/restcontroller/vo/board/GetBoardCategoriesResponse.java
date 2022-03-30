@@ -12,16 +12,16 @@ import java.util.List;
  */
 
 public class GetBoardCategoriesResponse {
-    private List<BoardCategory> categories; // 말머리 목록
+	private List<BoardCategory> categories; // 말머리 목록
 
-    public GetBoardCategoriesResponse() {
-    }
+	public GetBoardCategoriesResponse() {
+	}
 
-    public GetBoardCategoriesResponse(List<BoardCategory> categories) {
-        this.categories = categories;
-    }
+	public GetBoardCategoriesResponse(List<BoardCategory> categories) {
+		this.categories = categories;
+	}
 
-    public List<BoardCategory> getCategories() {
-        return categories;
-    }
+	public List<BoardCategory> getCategories() {
+		return categories;
+	}
 }

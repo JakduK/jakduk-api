@@ -2,6 +2,7 @@ package com.jakduk.api.repository.footballclub;
 
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.db.FootballClub;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,30 +20,30 @@ import java.util.List;
 @Repository
 public class FootballClubRepositoryImpl implements FootballClubRepositoryCustom {
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+	@Autowired
+	private MongoTemplate mongoTemplate;
 
-    /**
-     * 축구단 목록 정렬해서 가져온다.
-     */
-    @Override
-    public List<FootballClub> findFootballClubs(List<ObjectId> ids, String language, Constants.NAME_TYPE sortNameType) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("names.language").is(language));
-        query.addCriteria(Criteria.where("origin.$id").in(ids));
-        query.fields().include("active").include("origin").include("names.$");
-        //query.with(new Sort(Sort.Direction.DESC, "names.fullName"));
-        List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
+	/**
+	 * 축구단 목록 정렬해서 가져온다.
+	 */
+	@Override
+	public List<FootballClub> findFootballClubs(List<ObjectId> ids, String language, Constants.NAME_TYPE sortNameType) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("names.language").is(language));
+		query.addCriteria(Criteria.where("origin.$id").in(ids));
+		query.fields().include("active").include("origin").include("names.$");
+		//query.with(new Sort(Sort.Direction.DESC, "names.fullName"));
+		List<FootballClub> footballClubs = mongoTemplate.find(query, FootballClub.class);
 
-        switch (sortNameType) {
-            case fullName:
-                footballClubs.sort(Comparator.comparing(f -> f.getNames().get(0).getFullName()));
-                break;
-            case shortName:
-                footballClubs.sort(Comparator.comparing(f -> f.getNames().get(0).getShortName()));
-                break;
-        }
+		switch (sortNameType) {
+			case fullName:
+				footballClubs.sort(Comparator.comparing(f -> f.getNames().get(0).getFullName()));
+				break;
+			case shortName:
+				footballClubs.sort(Comparator.comparing(f -> f.getNames().get(0).getShortName()));
+				break;
+		}
 
-        return footballClubs;
-    }
+		return footballClubs;
+	}
 }

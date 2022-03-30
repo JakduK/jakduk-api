@@ -16,31 +16,31 @@ import com.jakduk.api.repository.MailRepository;
 @DataMongoTest
 public class MailRepositoryTests {
 
-    @Autowired
-    private MailRepository repository;
+	@Autowired
+	private MailRepository repository;
 
-    private Mail mail;
+	private Mail mail;
 
-    @BeforeEach
-    public void setUp() {
-        mail = new Mail();
-        mail.setSubject("첫번째 메일 제목입니다.");
-        mail.setTemplateName("mail/bulk01");
+	@BeforeEach
+	public void setUp() {
+		mail = new Mail();
+		mail.setSubject("첫번째 메일 제목입니다.");
+		mail.setTemplateName("mail/bulk01");
 
-        repository.save(mail);
-    }
+		repository.save(mail);
+	}
 
-    @Test
-    public void findOneById() {
-        Mail getMail = repository.findOneById(mail.getId())
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
+	@Test
+	public void findOneById() {
+		Mail getMail = repository.findOneById(mail.getId())
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
 
-        assertEquals(getMail, mail);
-    }
+		assertEquals(getMail, mail);
+	}
 
-    @AfterEach
-    public void after() {
-        repository.deleteById(mail.getId());
-    }
+	@AfterEach
+	public void after() {
+		repository.deleteById(mail.getId());
+	}
 
 }

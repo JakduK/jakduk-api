@@ -8,22 +8,22 @@ package com.jakduk.api.restcontroller.vo.board;
  */
 
 public class WriteArticleResponse {
-    private String board; // 게시판ID
-    private Integer seq; // 글번호
+	private String board; // 게시판ID
+	private Integer seq; // 글번호
 
-    public WriteArticleResponse() {
-    }
+	public WriteArticleResponse() {
+	}
 
-    public WriteArticleResponse(String board, Integer seq) {
-        this.board = board;
-        this.seq = seq;
-    }
+	public WriteArticleResponse(String board, Integer seq) {
+		this.board = board;
+		this.seq = seq;
+	}
 
-    public String getBoard() {
-        return board;
-    }
+	public String getBoard() {
+		return board;
+	}
 
-    public Integer getSeq() {
-        return seq;
-    }
+	public Integer getSeq() {
+		return seq;
+	}
 }

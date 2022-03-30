@@ -17,11 +17,11 @@ import java.util.Map;
 public class ObjectMapperUtils {
 
 	private static ObjectMapper objectMapper = new ObjectMapper()
-			.registerModule(new JavaTimeModule())
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-			.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-			.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		.registerModule(new JavaTimeModule())
+		.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+		.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+		.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public static ObjectMapper getObjectMapper() {
 		return objectMapper;

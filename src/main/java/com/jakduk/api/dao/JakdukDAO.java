@@ -5,6 +5,7 @@ import com.jakduk.api.model.aggregate.SupporterCount;
 import com.jakduk.api.model.db.Competition;
 import com.jakduk.api.model.db.JakduComment;
 import com.jakduk.api.model.db.JakduScheduleGroup;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -92,11 +93,12 @@ public class JakdukDAO {
 			aggregation = Aggregation.newAggregation(match1, sort, limit);
 		}
 
-		AggregationResults<JakduComment> results = mongoTemplate.aggregate(aggregation, "jakduComment", JakduComment.class);
+		AggregationResults<JakduComment> results = mongoTemplate.aggregate(aggregation, "jakduComment",
+			JakduComment.class);
 
 		List<JakduComment> comments = results.getMappedResults();
 
 		return comments;
 	}
-	
+
 }

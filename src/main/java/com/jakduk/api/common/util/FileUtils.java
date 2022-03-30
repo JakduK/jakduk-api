@@ -3,8 +3,10 @@ package com.jakduk.api.common.util;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.exception.ServiceError;
 import com.jakduk.api.exception.ServiceException;
+
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,192 +25,196 @@ import java.time.LocalDate;
 
 public class FileUtils {
 
-    /**
-     * 이미지 파일 저장
-     *
-     * @param imagePath     파일 최상위 경로
-     * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
-     * @param fileName      파일 제목 (확장자 제외)
-     * @param contentType   콘텐츠 타입
-     * @param size          콘텐츠 크기
-     * @param bytes         콘텐츠
-     * @throws IOException  예외 처리 필요함
-     */
-    public static void writeImageFile(String imagePath, LocalDate localDate, String fileName, String contentType, long size, byte[] bytes) throws IOException {
+	/**
+	 * 이미지 파일 저장
+	 *
+	 * @param imagePath     파일 최상위 경로
+	 * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
+	 * @param fileName      파일 제목 (확장자 제외)
+	 * @param contentType   콘텐츠 타입
+	 * @param size          콘텐츠 크기
+	 * @param bytes         콘텐츠
+	 * @throws IOException  예외 처리 필요함
+	 */
+	public static void writeImageFile(String imagePath, LocalDate localDate, String fileName, String contentType,
+		long size, byte[] bytes) throws IOException {
 
-        // 사진 포맷.
-        String formatName = StringUtils.split(contentType, "/")[1];
+		// 사진 포맷.
+		String formatName = StringUtils.split(contentType, "/")[1];
 
-        Path imageDirPath = Paths.get(imagePath, String.valueOf(localDate.getYear()),
-                String.valueOf(localDate.getMonthValue()), String.valueOf(localDate.getDayOfMonth()));
+		Path imageDirPath = Paths.get(imagePath, String.valueOf(localDate.getYear()),
+			String.valueOf(localDate.getMonthValue()), String.valueOf(localDate.getDayOfMonth()));
 
-        if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS))
-            Files.createDirectories(imageDirPath);
+		if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS))
+			Files.createDirectories(imageDirPath);
 
-        // 사진 경로.
-        Path imageFilePath = imageDirPath.resolve(fileName + "." + formatName);
+		// 사진 경로.
+		Path imageFilePath = imageDirPath.resolve(fileName + "." + formatName);
 
-        // 사진 저장.
-        if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-            if ("gif".equals(formatName)) {
-                Files.write(imageFilePath, bytes);
-            } else {
+		// 사진 저장.
+		if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
+			if ("gif".equals(formatName)) {
+				Files.write(imageFilePath, bytes);
+			} else {
 
-                double scale = Constants.GALLERY_MAXIMUM_CAPACITY < size ?
-                        Constants.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
+				double scale = Constants.GALLERY_MAXIMUM_CAPACITY < size ?
+					Constants.GALLERY_MAXIMUM_CAPACITY / (double)size : 1;
 
-                InputStream inputStream = new ByteArrayInputStream(bytes);
+				InputStream inputStream = new ByteArrayInputStream(bytes);
 
-                Thumbnails.of(inputStream)
-                        .scale(scale)
-                        .toFile(imageFilePath.toFile());
-            }
-        }
-    }
+				Thumbnails.of(inputStream)
+					.scale(scale)
+					.toFile(imageFilePath.toFile());
+			}
+		}
+	}
 
-    /**
-     * 작은 이미지 파일 저장
-     *
-     * @param imagePath     파일 최상위 경로
-     * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
-     * @param fileName      파일 제목 (확장자 제외)
-     * @param contentType   콘텐츠 타입
-     * @param width         줄일 가로 길이
-     * @param height        줄일 세로 길이
-     * @param bytes         콘텐츠
-     * @throws IOException  예외 처리 필요함
-     */
-    public static void writeSmallImageFile(String imagePath, LocalDate localDate, String fileName, String contentType,
-                                           Integer width, Integer height, byte[] bytes) throws IOException {
+	/**
+	 * 작은 이미지 파일 저장
+	 *
+	 * @param imagePath     파일 최상위 경로
+	 * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
+	 * @param fileName      파일 제목 (확장자 제외)
+	 * @param contentType   콘텐츠 타입
+	 * @param width         줄일 가로 길이
+	 * @param height        줄일 세로 길이
+	 * @param bytes         콘텐츠
+	 * @throws IOException  예외 처리 필요함
+	 */
+	public static void writeSmallImageFile(String imagePath, LocalDate localDate, String fileName, String contentType,
+		Integer width, Integer height, byte[] bytes) throws IOException {
 
-        // 사진 포맷.
-        String formatName = StringUtils.split(contentType, "/")[1];
+		// 사진 포맷.
+		String formatName = StringUtils.split(contentType, "/")[1];
 
-        Path imageDirPath = Paths.get(imagePath, String.valueOf(localDate.getYear()),
-                String.valueOf(localDate.getMonthValue()), String.valueOf(localDate.getDayOfMonth()));
+		Path imageDirPath = Paths.get(imagePath, String.valueOf(localDate.getYear()),
+			String.valueOf(localDate.getMonthValue()), String.valueOf(localDate.getDayOfMonth()));
 
-        if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS))
-            Files.createDirectories(imageDirPath);
+		if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS))
+			Files.createDirectories(imageDirPath);
 
-        // 사진 경로.
-        Path imageFilePath = imageDirPath.resolve(fileName + "." + formatName);
+		// 사진 경로.
+		Path imageFilePath = imageDirPath.resolve(fileName + "." + formatName);
 
-        // 사진 저장.
-        if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
+		// 사진 저장.
+		if (Files.notExists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
 
-            InputStream inputStream = new ByteArrayInputStream(bytes);
+			InputStream inputStream = new ByteArrayInputStream(bytes);
 
-            Thumbnails.of(inputStream)
-                    .size(width, height)
-                    .crop(Positions.CENTER)
-                    .toFile(imageFilePath.toFile());
-        }
-    }
+			Thumbnails.of(inputStream)
+				.size(width, height)
+				.crop(Positions.CENTER)
+				.toFile(imageFilePath.toFile());
+		}
+	}
 
-    /**
-     * 파일 스트림 읽기
-     *
-     * @param imagePath     파일 최상위 경로
-     * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
-     * @param fileName      파일 제목 (확장자 제외)
-     * @param contentType   콘텐츠 타입
-     * @throws IOException  예외 처리 필요함
-     */
-    public static ByteArrayOutputStream readImageFile(String imagePath, LocalDate localDate, String fileName, String contentType) throws IOException {
+	/**
+	 * 파일 스트림 읽기
+	 *
+	 * @param imagePath     파일 최상위 경로
+	 * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
+	 * @param fileName      파일 제목 (확장자 제외)
+	 * @param contentType   콘텐츠 타입
+	 * @throws IOException  예외 처리 필요함
+	 */
+	public static ByteArrayOutputStream readImageFile(String imagePath, LocalDate localDate, String fileName,
+		String contentType) throws IOException {
 
-        // 사진 포맷.
-        String formatName = StringUtils.split(contentType, "/")[1];
+		// 사진 포맷.
+		String formatName = StringUtils.split(contentType, "/")[1];
 
-        Path filePath = Paths.get(imagePath, String.valueOf(localDate.getYear()), String.valueOf(localDate.getMonthValue()),
-                String.valueOf(localDate.getDayOfMonth()), fileName + "." + formatName);
+		Path filePath = Paths.get(imagePath, String.valueOf(localDate.getYear()),
+			String.valueOf(localDate.getMonthValue()),
+			String.valueOf(localDate.getDayOfMonth()), fileName + "." + formatName);
 
-        if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
-            ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
+		if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
+			BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath.toString()));
+			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512);
 
-            int imageByte;
+			int imageByte;
 
-            while ((imageByte = in.read()) != -1){
-                byteStream.write(imageByte);
-            }
+			while ((imageByte = in.read()) != -1) {
+				byteStream.write(imageByte);
+			}
 
-            in.close();
-            return byteStream;
+			in.close();
+			return byteStream;
 
-        } else {
-            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
-        }
-    }
+		} else {
+			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
+		}
+	}
 
-    /**
-     * URL에서 파일을 읽어와 FileInfo 객체로 반환
-     *
-     * @param fileUrl URL
-     * @throws IOException 예외 처리 필요함
-     */
-    public static FileInfo getBytesByUrl(String fileUrl) throws IOException {
+	/**
+	 * URL에서 파일을 읽어와 FileInfo 객체로 반환
+	 *
+	 * @param fileUrl URL
+	 * @throws IOException 예외 처리 필요함
+	 */
+	public static FileInfo getBytesByUrl(String fileUrl) throws IOException {
 
-        URL url = new URL(fileUrl);
+		URL url = new URL(fileUrl);
 
-        URLConnection urlConnection = url.openConnection();
-        String contentType = urlConnection.getContentType();
-        Long contentLength = urlConnection.getContentLengthLong();
+		URLConnection urlConnection = url.openConnection();
+		String contentType = urlConnection.getContentType();
+		Long contentLength = urlConnection.getContentLengthLong();
 
-        BufferedInputStream in = new BufferedInputStream(url.openStream());
-        byte[] bytes = IOUtils.toByteArray(in);
+		BufferedInputStream in = new BufferedInputStream(url.openStream());
+		byte[] bytes = IOUtils.toByteArray(in);
 
-        return new FileInfo(contentType, contentLength, bytes);
-    }
+		return new FileInfo(contentType, contentLength, bytes);
+	}
 
-    public static class FileInfo {
+	/**
+	 * 이미지 파일 지움
+	 *
+	 * @param imagePath     파일 최상위 경로
+	 * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
+	 * @param fileName      파일 제목 (확장자 제외)
+	 */
+	public static void removeImageFile(String imagePath, LocalDate localDate, String fileName) {
 
-        private String contentType;
-        private Long contentLength;
-        private byte[] bytes;
+		Path imageFilePath = Paths.get(imagePath, String.valueOf(localDate.getYear()),
+			String.valueOf(localDate.getMonthValue()),
+			String.valueOf(localDate.getDayOfMonth()), fileName);
 
-        public FileInfo() {
-        }
+		if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
+			try {
+				Files.delete(imageFilePath);
+			} catch (IOException e) {
+				throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
+			}
+		} else {
+			throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
+		}
+	}
 
-        public FileInfo(String contentType, Long contentLength, byte[] bytes) {
-            this.contentType = contentType;
-            this.contentLength = contentLength;
-            this.bytes = bytes;
-        }
+	public static class FileInfo {
 
-        public String getContentType() {
-            return contentType;
-        }
+		private String contentType;
+		private Long contentLength;
+		private byte[] bytes;
 
-        public Long getContentLength() {
-            return contentLength;
-        }
+		public FileInfo() {
+		}
 
-        public byte[] getBytes() {
-            return bytes;
-        }
-    }
+		public FileInfo(String contentType, Long contentLength, byte[] bytes) {
+			this.contentType = contentType;
+			this.contentLength = contentLength;
+			this.bytes = bytes;
+		}
 
-    /**
-     * 이미지 파일 지움
-     *
-     * @param imagePath     파일 최상위 경로
-     * @param localDate     파일 작성일 (년/월/일 로 폴더 나뉘어짐)
-     * @param fileName      파일 제목 (확장자 제외)
-     */
-    public static void removeImageFile(String imagePath, LocalDate localDate, String fileName) {
+		public String getContentType() {
+			return contentType;
+		}
 
-        Path imageFilePath = Paths.get(imagePath, String.valueOf(localDate.getYear()), String.valueOf(localDate.getMonthValue()),
-                String.valueOf(localDate.getDayOfMonth()), fileName);
+		public Long getContentLength() {
+			return contentLength;
+		}
 
-        if (Files.exists(imageFilePath, LinkOption.NOFOLLOW_LINKS)) {
-            try {
-                Files.delete(imageFilePath);
-            } catch (IOException e) {
-                throw new ServiceException(ServiceError.GALLERY_IO_ERROR);
-            }
-        } else {
-            throw new ServiceException(ServiceError.NOT_FOUND_GALLERY_FILE);
-        }
-    }
+		public byte[] getBytes() {
+			return bytes;
+		}
+	}
 
 }

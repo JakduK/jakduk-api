@@ -13,6 +13,7 @@ import com.jakduk.api.repository.AttendanceClubRepository;
 import com.jakduk.api.repository.AttendanceLeagueRepository;
 import com.jakduk.api.repository.footballclub.FootballClubOriginRepository;
 import com.jakduk.api.repository.user.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -61,7 +61,7 @@ public class StatsService {
 	// 대회별 관중수 하나.
 	public AttendanceLeague findOneById(String id) {
 		return attendanceLeagueRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_LEAGUE));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_LEAGUE));
 	}
 
 	// 새 대회별 관중수 저장.
@@ -93,13 +93,13 @@ public class StatsService {
 	public AttendanceClub findAttendanceClubById(String id) {
 
 		return attendanceClubRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_CLUB));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ATTENDANCE_CLUB));
 	}
 
 	public List<AttendanceClub> getAttendanceClub(String clubOrigin) {
 
 		FootballClubOrigin footballClubOrigin = footballClubOriginRepository.findOneByName(clubOrigin)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_FOOTBALL_CLUB_ORIGIN));
 
 		Sort sort = Sort.by(Sort.Direction.ASC, "season", "league");
 

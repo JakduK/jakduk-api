@@ -80,9 +80,11 @@ import com.jakduk.api.service.UserService;
 @AutoConfigureRestDocs
 public class UserMvcTests {
 
+	private static FootballClub footballClub;
+	private static UserPicture userPicture;
+	private static User jakdukUser;
 	@Autowired
 	private MockMvc mvc;
-
 	@MockBean
 	private AuthenticationManager authenticationManager;
 	@MockBean
@@ -93,10 +95,6 @@ public class UserMvcTests {
 	private UserDetailsService userDetailsService;
 	@MockBean
 	private UserProfileRepository userProfileRepository;
-
-	private static FootballClub footballClub;
-	private static UserPicture userPicture;
-	private static User jakdukUser;
 
 	@BeforeAll
 	public static void setUp() {
