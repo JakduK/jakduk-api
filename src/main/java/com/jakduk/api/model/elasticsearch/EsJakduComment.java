@@ -9,40 +9,40 @@ import com.jakduk.api.model.embedded.CommonWriter;
 
 public class EsJakduComment {
 
-    private String id;
-    private String jakduScheduleId;
-    private CommonWriter writer;
-    private String contents;
+	private String id;
+	private String jakduScheduleId;
+	private CommonWriter writer;
+	private String contents;
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getJakduScheduleId() {
-        return jakduScheduleId;
-    }
+	public String getJakduScheduleId() {
+		return jakduScheduleId;
+	}
 
-    public void setJakduScheduleId(String jakduScheduleId) {
-        this.jakduScheduleId = jakduScheduleId;
-    }
+	public void setJakduScheduleId(String jakduScheduleId) {
+		this.jakduScheduleId = jakduScheduleId;
+	}
 
-    public CommonWriter getWriter() {
-        return writer;
-    }
+	public CommonWriter getWriter() {
+		return writer;
+	}
 
-    public void setWriter(CommonWriter writer) {
-        this.writer = writer;
-    }
+	public void setWriter(CommonWriter writer) {
+		this.writer = writer;
+	}
 
-    public String getContents() {
-        return contents;
-    }
+	public String getContents() {
+		return contents;
+	}
 
-    public void setContents(String contents) {
-        this.contents = contents;
-    }
+	public void setContents(String contents) {
+		this.contents = contents;
+	}
 }

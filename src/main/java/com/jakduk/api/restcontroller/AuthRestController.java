@@ -12,6 +12,7 @@ import com.jakduk.api.restcontroller.vo.user.LoginSocialUserForm;
 import com.jakduk.api.restcontroller.vo.user.SessionUser;
 import com.jakduk.api.restcontroller.vo.user.SocialProfile;
 import com.jakduk.api.service.UserService;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,80 +38,84 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthRestController {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired private AuthUtils authUtils;
-    @Autowired private AuthenticationManager authenticationManager;
-    @Autowired private UserService userService;
+	@Autowired
+	private AuthUtils authUtils;
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	@Autowired
+	private UserService userService;
 
-    // SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)
-    @PostMapping("/login/{providerId}")
-    public EmptyJsonResponse loginSnsUser(
-            @PathVariable String providerId,
-            @Valid @RequestBody LoginSocialUserForm form,
-            HttpSession session) {
+	// SNS 기반 로그인 (존재 하지 않는 회원이면 신규가입 진행)
+	@PostMapping("/login/{providerId}")
+	public EmptyJsonResponse loginSnsUser(
+		@PathVariable String providerId,
+		@Valid @RequestBody LoginSocialUserForm form,
+		HttpSession session) {
 
-        Constants.ACCOUNT_TYPE accountType = Constants.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
-        SocialProfile socialProfile = authUtils.getSnsProfile(accountType, form.getAccessToken());
+		Constants.ACCOUNT_TYPE accountType = Constants.ACCOUNT_TYPE.valueOf(providerId.toUpperCase());
+		SocialProfile socialProfile = authUtils.getSnsProfile(accountType, form.getAccessToken());
 
-        log.info("loginSnsUser form={}, socialProfile={}", form, socialProfile);
+		log.info("loginSnsUser form={}, socialProfile={}", form, socialProfile);
 
-        Optional<User> optUser = userService.findOneByProviderIdAndProviderUserId(accountType, socialProfile.getId());
+		Optional<User> optUser = userService.findOneByProviderIdAndProviderUserId(accountType, socialProfile.getId());
 
-        // 가입 회원이라 로그인
-        if (optUser.isPresent()) {
-            User user = optUser.get();
-            userService.checkBackwardCompatibilityOfSnsUser(socialProfile.getEmail(), user);
+		// 가입 회원이라 로그인
+		if (optUser.isPresent()) {
+			User user = optUser.get();
+			userService.checkBackwardCompatibilityOfSnsUser(socialProfile.getEmail(), user);
 
-            // Perform the security
-            Authentication authentication = authenticationManager.authenticate(
-                    new SnsAuthenticationToken(user.getEmail())
-            );
+			// Perform the security
+			Authentication authentication = authenticationManager.authenticate(
+				new SnsAuthenticationToken(user.getEmail())
+			);
 
-            AuthUtils.setAuthentication(authentication);
+			AuthUtils.setAuthentication(authentication);
 
-            return EmptyJsonResponse.newInstance();
-        }
+			return EmptyJsonResponse.newInstance();
+		}
 
-        // 그냥 신규 가입으로 프로필을 세션에 임시 저장한다.
-        AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
-        attemptSocialUser.setUsername(socialProfile.getNickname());
-        attemptSocialUser.setProviderId(accountType);
-        attemptSocialUser.setProviderUserId(socialProfile.getId());
+		// 그냥 신규 가입으로 프로필을 세션에 임시 저장한다.
+		AttemptSocialUser attemptSocialUser = new AttemptSocialUser();
+		attemptSocialUser.setUsername(socialProfile.getNickname());
+		attemptSocialUser.setProviderId(accountType);
+		attemptSocialUser.setProviderUserId(socialProfile.getId());
 
-        if (StringUtils.isNotBlank(socialProfile.getEmail()))
-            attemptSocialUser.setEmail(socialProfile.getEmail());
+		if (StringUtils.isNotBlank(socialProfile.getEmail()))
+			attemptSocialUser.setEmail(socialProfile.getEmail());
 
-        if (StringUtils.isNotBlank(socialProfile.getPictureUrl()))
-            attemptSocialUser.setExternalLargePictureUrl(socialProfile.getPictureUrl());
+		if (StringUtils.isNotBlank(socialProfile.getPictureUrl()))
+			attemptSocialUser.setExternalLargePictureUrl(socialProfile.getPictureUrl());
 
-        session.setAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
+		session.setAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE, attemptSocialUser);
 
-        throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
-    }
+		throw new ServiceException(ServiceError.NOT_REGISTER_WITH_SNS);
+	}
 
-    // SNS 기반 회원 가입시 필요한 회원 프로필 정보
-    @GetMapping("/user/attempt")
-    public AttemptSocialUser getAttemptSocialUser(HttpSession session) {
+	// SNS 기반 회원 가입시 필요한 회원 프로필 정보
+	@GetMapping("/user/attempt")
+	public AttemptSocialUser getAttemptSocialUser(HttpSession session) {
 
-        AttemptSocialUser attemptSocialUser = (AttemptSocialUser) session.getAttribute(Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
+		AttemptSocialUser attemptSocialUser = (AttemptSocialUser)session.getAttribute(
+			Constants.PROVIDER_SIGNIN_ATTEMPT_SESSION_ATTRIBUTE);
 
-        if (Objects.isNull(attemptSocialUser))
-            throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
+		if (Objects.isNull(attemptSocialUser))
+			throw new ServiceException(ServiceError.CANNOT_GET_ATTEMPT_SNS_PROFILE);
 
-        return attemptSocialUser;
-    }
+		return attemptSocialUser;
+	}
 
-    // 세션에 있는 나의 프로필 정보
-    @GetMapping("/user")
-    public SessionUser getSessionProfile() {
+	// 세션에 있는 나의 프로필 정보
+	@GetMapping("/user")
+	public SessionUser getSessionProfile() {
 
-        SessionUser sessionUser = AuthUtils.getSessionProfile();
+		SessionUser sessionUser = AuthUtils.getSessionProfile();
 
-        if (Objects.isNull(sessionUser))
-            throw new ServiceException(ServiceError.ANONYMOUS);
+		if (Objects.isNull(sessionUser))
+			throw new ServiceException(ServiceError.ANONYMOUS);
 
-        return sessionUser;
-    }
+		return sessionUser;
+	}
 
 }

@@ -7,14 +7,14 @@ import com.jakduk.api.common.Constants;
  */
 
 public class LinkedItemForm {
-    private String itemId; // 아이템 ID
-    private Constants.GALLERY_FROM_TYPE from; // 출처
+	private String itemId; // 아이템 ID
+	private Constants.GALLERY_FROM_TYPE from; // 출처
 
-    public String getItemId() {
-        return itemId;
-    }
+	public String getItemId() {
+		return itemId;
+	}
 
-    public Constants.GALLERY_FROM_TYPE getFrom() {
-        return from;
-    }
+	public Constants.GALLERY_FROM_TYPE getFrom() {
+		return from;
+	}
 }

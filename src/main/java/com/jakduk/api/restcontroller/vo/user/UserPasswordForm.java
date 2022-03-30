@@ -18,16 +18,16 @@ import javax.validation.constraints.Size;
 @FieldMatch(first = "newPassword", second = "newPasswordConfirm", message = "{validation.msg.new.password.mismatch}")
 public class UserPasswordForm {
 
-	@Size(min = 4, max=20)
+	@Size(min = 4, max = 20)
 	@NotEmpty
 	@PasswordMatch
 	private String password;
 
-	@Size(min = 4, max=20)
+	@Size(min = 4, max = 20)
 	@NotEmpty
 	private String newPassword;
 
-	@Size(min = 4, max=20)
+	@Size(min = 4, max = 20)
 	@NotEmpty
 	private String newPasswordConfirm;
 

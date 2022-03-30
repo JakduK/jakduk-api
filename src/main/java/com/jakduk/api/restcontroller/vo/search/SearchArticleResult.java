@@ -1,6 +1,5 @@
 package com.jakduk.api.restcontroller.vo.search;
 
-
 import java.util.List;
 
 /**

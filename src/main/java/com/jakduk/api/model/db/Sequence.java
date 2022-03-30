@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 @Document
 public class Sequence {
-	
+
 	@Id
 	private String id;
 	private Integer seq = 1; // 글 번호
@@ -41,9 +41,9 @@ public class Sequence {
 	@Override
 	public String toString() {
 		return "Sequence{" +
-				"id='" + id + '\'' +
-				", seq=" + seq +
-				", name='" + name + '\'' +
-				'}';
+			"id='" + id + '\'' +
+			", seq=" + seq +
+			", name='" + name + '\'' +
+			'}';
 	}
 }

@@ -8,14 +8,14 @@ package com.jakduk.api.restcontroller.vo.user;
  */
 
 public class LoginEmailUserForm {
-    private String username;
-    private String password;
+	private String username;
+	private String password;
 
-    public String getUsername() {
-        return username;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getPassword() {
+		return password;
+	}
 }

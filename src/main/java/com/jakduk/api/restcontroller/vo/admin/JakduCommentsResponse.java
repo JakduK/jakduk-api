@@ -10,22 +10,22 @@ import java.util.List;
  */
 
 public class JakduCommentsResponse {
-    private List<JakduComment> comments;
-    private Integer count;
+	private List<JakduComment> comments;
+	private Integer count;
 
-    public JakduCommentsResponse() {
-    }
+	public JakduCommentsResponse() {
+	}
 
-    public JakduCommentsResponse(List<JakduComment> comments, Integer count) {
-        this.comments = comments;
-        this.count = count;
-    }
+	public JakduCommentsResponse(List<JakduComment> comments, Integer count) {
+		this.comments = comments;
+		this.count = count;
+	}
 
-    public List<JakduComment> getComments() {
-        return comments;
-    }
+	public List<JakduComment> getComments() {
+		return comments;
+	}
 
-    public Integer getCount() {
-        return count;
-    }
+	public Integer getCount() {
+		return count;
+	}
 }

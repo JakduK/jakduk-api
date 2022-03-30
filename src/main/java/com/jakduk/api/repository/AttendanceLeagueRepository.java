@@ -2,6 +2,7 @@ package com.jakduk.api.repository;
 
 import com.jakduk.api.model.db.AttendanceLeague;
 import com.jakduk.api.model.db.Competition;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,9 +16,10 @@ import java.util.Optional;
  * @date     : 2015. 3. 10.
  * @desc     :
  */
-public interface AttendanceLeagueRepository extends MongoRepository<AttendanceLeague, String>{
+public interface AttendanceLeagueRepository extends MongoRepository<AttendanceLeague, String> {
 
 	Optional<AttendanceLeague> findOneById(String id);
+
 	List<AttendanceLeague> findByCompetition(Competition competition, Sort sort);
 
 	List<AttendanceLeague> findByCompetitionId(@Param("competitionId") String competitionId);

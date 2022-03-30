@@ -1,6 +1,7 @@
 package com.jakduk.api.model.db;
 
 import com.jakduk.api.common.Constants;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

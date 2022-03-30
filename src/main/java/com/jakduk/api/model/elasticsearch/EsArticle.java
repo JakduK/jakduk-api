@@ -5,15 +5,15 @@ import com.jakduk.api.model.embedded.CommonWriter;
 import java.util.List;
 
 /**
-* @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
-* @company  : http://jakduk.com
-* @date     : 2015. 8. 3.
-* @desc     :
-*/
+ * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
+ * @company  : http://jakduk.com
+ * @date     : 2015. 8. 3.
+ * @desc     :
+ */
 
 public class EsArticle {
-	
-    private String id;
+
+	private String id;
 	private Integer seq;
 	private String board;
 	private String category;

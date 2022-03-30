@@ -1,11 +1,11 @@
 package com.jakduk.api.model.db;
 
 import com.jakduk.api.model.embedded.LocalName;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
-
 
 /**
  * @author pyohwan
@@ -15,32 +15,32 @@ import java.util.List;
 @Document
 public class Competition {
 
-    @Id
-    private String id;
-    private String code;
-    private List<LocalName> names;
+	@Id
+	private String id;
+	private String code;
+	private List<LocalName> names;
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getCode() {
-        return code;
-    }
+	public String getCode() {
+		return code;
+	}
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+	public void setCode(String code) {
+		this.code = code;
+	}
 
-    public List<LocalName> getNames() {
-        return names;
-    }
+	public List<LocalName> getNames() {
+		return names;
+	}
 
-    public void setNames(List<LocalName> names) {
-        this.names = names;
-    }
+	public void setNames(List<LocalName> names) {
+		this.names = names;
+	}
 }

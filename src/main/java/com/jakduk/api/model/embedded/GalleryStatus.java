@@ -10,7 +10,7 @@ import com.jakduk.api.common.Constants;
  */
 
 public class GalleryStatus {
-	
+
 	private Constants.GALLERY_STATUS_TYPE status;
 
 	public GalleryStatus() {

@@ -54,9 +54,10 @@ import com.jakduk.api.service.UserService;
 @AutoConfigureRestDocs
 public class HomeMvcTests {
 
+	private static BoardCategory boardCategory;
+	private static CommonWriter commonWriter;
 	@Autowired
 	private MockMvc mvc;
-
 	@MockBean
 	private HomeService homeService;
 	@MockBean
@@ -65,9 +66,6 @@ public class HomeMvcTests {
 	private ArticleService articleService;
 	@MockBean
 	private GalleryService galleryService;
-
-	private static BoardCategory boardCategory;
-	private static CommonWriter commonWriter;
 
 	@BeforeAll
 	public static void setUp() {

@@ -12,6 +12,7 @@ import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Content;
 import com.rometools.rome.feed.rss.Description;
 import com.rometools.rome.feed.rss.Item;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.view.feed.AbstractRssFeedView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,16 +37,20 @@ import java.util.stream.Collectors;
 @Component("documentRssFeedView")
 public class DocumentRssFeedView extends AbstractRssFeedView {
 
-	@Resource private JakdukProperties jakdukProperties;
+	@Resource
+	private JakdukProperties jakdukProperties;
 
-	@Autowired private UrlGenerationUtils urlGenerationUtils;
-	@Autowired private ArticleService articleService;
+	@Autowired
+	private UrlGenerationUtils urlGenerationUtils;
+	@Autowired
+	private ArticleService articleService;
 
 	/**
 	 * Create a new Channel instance to hold the entries.
 	 * <p>By default returns an RSS 2.0 channel, but the subclass can specify any channel.
 	 */
-	@Override protected Channel newFeed() {
+	@Override
+	protected Channel newFeed() {
 		Channel channel = new Channel("rss_2.0");
 		channel.setLink(String.format("%s/%s", jakdukProperties.getWebServerUrl(), "/rss"));
 		channel.setTitle(JakdukUtils.getMessageSource("common.jakduk"));
@@ -53,8 +59,9 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 		return channel;
 	}
 
-	@Override protected List<Item> buildFeedItems(Map<String, Object> model, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	@Override
+	protected List<Item> buildFeedItems(Map<String, Object> model, HttpServletRequest request,
+		HttpServletResponse response) throws Exception {
 
 		ObjectId postId = null;
 		Boolean existPosts = true;
@@ -67,29 +74,29 @@ public class DocumentRssFeedView extends AbstractRssFeedView {
 				existPosts = false;
 			} else {
 				ArticleOnRSS post = posts.stream()
-						.sorted(Comparator.comparing(ArticleOnRSS::getId))
-						.findFirst()
-						.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+					.sorted(Comparator.comparing(ArticleOnRSS::getId))
+					.findFirst()
+					.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 				postId = new ObjectId(post.getId());
 			}
 
 			if (existPosts) {
 				List<Item> eachPostsOfRss = posts.stream()
-						.map(post -> {
-							String url = urlGenerationUtils.generateArticleDetailUrl(post.getBoard(), post.getSeq());
+					.map(post -> {
+						String url = urlGenerationUtils.generateArticleDetailUrl(post.getBoard(), post.getSeq());
 
-							Item item = new Item();
-							item.setAuthor(post.getWriter().getUsername());
-							item.setTitle(post.getSubject());
-							item.setUri(url);
-							item.setLink(url);
-							item.setDescription(createDescription(JakdukUtils.stripHtmlTag(post.getContent())));
-							item.setPubDate(new ObjectId(post.getId()).getDate());
+						Item item = new Item();
+						item.setAuthor(post.getWriter().getUsername());
+						item.setTitle(post.getSubject());
+						item.setUri(url);
+						item.setLink(url);
+						item.setDescription(createDescription(JakdukUtils.stripHtmlTag(post.getContent())));
+						item.setPubDate(new ObjectId(post.getId()).getDate());
 
-							return item;
-						})
-						.collect(Collectors.toList());
+						return item;
+					})
+					.collect(Collectors.toList());
 
 				items.addAll(eachPostsOfRss);
 

@@ -1,6 +1,7 @@
 package com.jakduk.api.repository.user;
 
 import com.jakduk.api.model.db.UserPicture;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
@@ -10,5 +11,5 @@ import java.util.Optional;
  */
 public interface UserPictureRepository extends MongoRepository<UserPicture, String> {
 
-    Optional<UserPicture> findOneById(String id);
+	Optional<UserPicture> findOneById(String id);
 }

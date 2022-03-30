@@ -10,17 +10,17 @@ import javax.validation.constraints.NotEmpty;
  */
 
 public class LoginSocialUserForm {
-    @NotEmpty
-    private String accessToken; // OAuth 인증에서 사용하는 AccessToken
+	@NotEmpty
+	private String accessToken; // OAuth 인증에서 사용하는 AccessToken
 
-    public String getAccessToken() {
-        return accessToken;
-    }
+	public String getAccessToken() {
+		return accessToken;
+	}
 
-    @Override
-    public String toString() {
-        return "LoginSocialUserForm{" +
-                "accessToken='" + accessToken + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "LoginSocialUserForm{" +
+			"accessToken='" + accessToken + '\'' +
+			'}';
+	}
 }

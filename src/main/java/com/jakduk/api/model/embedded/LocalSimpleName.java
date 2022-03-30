@@ -7,38 +7,38 @@ package com.jakduk.api.model.embedded;
 
 public class LocalSimpleName {
 
-    private String language;
-    private String name;
+	private String language;
+	private String name;
 
-    public LocalSimpleName() {
-    }
+	public LocalSimpleName() {
+	}
 
-    public LocalSimpleName(String language, String name) {
-        this.language = language;
-        this.name = name;
-    }
+	public LocalSimpleName(String language, String name) {
+		this.language = language;
+		this.name = name;
+	}
 
-    public String getLanguage() {
-        return language;
-    }
+	public String getLanguage() {
+		return language;
+	}
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @Override
-    public String toString() {
-        return "LocalSimpleName{" +
-                "language='" + language + '\'' +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "LocalSimpleName{" +
+			"language='" + language + '\'' +
+			", name='" + name + '\'' +
+			'}';
+	}
 }
