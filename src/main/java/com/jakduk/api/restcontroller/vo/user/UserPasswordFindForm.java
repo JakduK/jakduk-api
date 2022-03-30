@@ -4,17 +4,17 @@ import javax.validation.constraints.NotEmpty;
 
 public class UserPasswordFindForm {
 
-    @NotEmpty
-    private String email;
+	@NotEmpty
+	private String email;
 
-    @NotEmpty
-    private String callbackUrl;
+	@NotEmpty
+	private String callbackUrl;
 
-    public String getEmail() {
-        return email;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getCallbackUrl() {
-        return callbackUrl;
-    }
+	public String getCallbackUrl() {
+		return callbackUrl;
+	}
 }

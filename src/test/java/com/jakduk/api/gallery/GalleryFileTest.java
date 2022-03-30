@@ -13,18 +13,18 @@ import java.nio.file.Paths;
  */
 public class GalleryFileTest {
 
-    @Test
-    public void 디렉터리내용확인() {
-        Path path = Paths.get("/home/pyohwan/storage/image");
+	@Test
+	public void 디렉터리내용확인() {
+		Path path = Paths.get("/home/pyohwan/storage/image");
 
-        try {
-            DirectoryStream<Path> ds = Files.newDirectoryStream(path);
+		try {
+			DirectoryStream<Path> ds = Files.newDirectoryStream(path);
 
-            for (Path file : ds)
-                System.out.println(file);
+			for (Path file : ds)
+				System.out.println(file);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

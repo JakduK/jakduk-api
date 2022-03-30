@@ -6,31 +6,31 @@ package com.jakduk.api.configuration.rabbitmq;
 
 public class RabbitMQ {
 
-    private String bindingQueueName;
-    private String bindingRoutingKey;
-    private Boolean enabled;
+	private String bindingQueueName;
+	private String bindingRoutingKey;
+	private Boolean enabled;
 
-    public String getBindingQueueName() {
-        return bindingQueueName;
-    }
+	public String getBindingQueueName() {
+		return bindingQueueName;
+	}
 
-    public void setBindingQueueName(String bindingQueueName) {
-        this.bindingQueueName = bindingQueueName;
-    }
+	public void setBindingQueueName(String bindingQueueName) {
+		this.bindingQueueName = bindingQueueName;
+	}
 
-    public String getBindingRoutingKey() {
-        return bindingRoutingKey;
-    }
+	public String getBindingRoutingKey() {
+		return bindingRoutingKey;
+	}
 
-    public void setBindingRoutingKey(String bindingRoutingKey) {
-        this.bindingRoutingKey = bindingRoutingKey;
-    }
+	public void setBindingRoutingKey(String bindingRoutingKey) {
+		this.bindingRoutingKey = bindingRoutingKey;
+	}
 
-    public Boolean getEnabled() {
-        return enabled;
-    }
+	public Boolean getEnabled() {
+		return enabled;
+	}
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
 }

@@ -11,67 +11,67 @@ import java.util.Map;
 
 public class EmailPayload {
 
-    private Locale locale;
-    private Constants.EMAIL_TYPE type;
-    private String templateName;
-    private String recipientEmail;
-    private String subject;
-    private Map<String, String> extra;
-    private Map<String, Object> body;
+	private Locale locale;
+	private Constants.EMAIL_TYPE type;
+	private String templateName;
+	private String recipientEmail;
+	private String subject;
+	private Map<String, String> extra;
+	private Map<String, Object> body;
 
-    public Locale getLocale() {
-        return locale;
-    }
+	public Locale getLocale() {
+		return locale;
+	}
 
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-    }
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+	}
 
-    public Constants.EMAIL_TYPE getType() {
-        return type;
-    }
+	public Constants.EMAIL_TYPE getType() {
+		return type;
+	}
 
-    public void setType(Constants.EMAIL_TYPE type) {
-        this.type = type;
-    }
+	public void setType(Constants.EMAIL_TYPE type) {
+		this.type = type;
+	}
 
-    public String getTemplateName() {
-        return templateName;
-    }
+	public String getTemplateName() {
+		return templateName;
+	}
 
-    public void setTemplateName(String templateName) {
-        this.templateName = templateName;
-    }
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
 
-    public String getRecipientEmail() {
-        return recipientEmail;
-    }
+	public String getRecipientEmail() {
+		return recipientEmail;
+	}
 
-    public void setRecipientEmail(String recipientEmail) {
-        this.recipientEmail = recipientEmail;
-    }
+	public void setRecipientEmail(String recipientEmail) {
+		this.recipientEmail = recipientEmail;
+	}
 
-    public String getSubject() {
-        return subject;
-    }
+	public String getSubject() {
+		return subject;
+	}
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
 
-    public Map<String, String> getExtra() {
-        return extra;
-    }
+	public Map<String, String> getExtra() {
+		return extra;
+	}
 
-    public void setExtra(Map<String, String> extra) {
-        this.extra = extra;
-    }
+	public void setExtra(Map<String, String> extra) {
+		this.extra = extra;
+	}
 
-    public Map<String, Object> getBody() {
-        return body;
-    }
+	public Map<String, Object> getBody() {
+		return body;
+	}
 
-    public void setBody(Map<String, Object> body) {
-        this.body = body;
-    }
+	public void setBody(Map<String, Object> body) {
+		this.body = body;
+	}
 }

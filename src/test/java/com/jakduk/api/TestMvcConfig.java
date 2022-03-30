@@ -10,7 +10,7 @@ import com.jakduk.api.configuration.security.SnsAuthenticationProvider;
 
 @Import({JakdukProperties.class})
 @MockBeans({
-    @MockBean(UserDetailsService.class), @MockBean(SnsAuthenticationProvider.class)
+	@MockBean(UserDetailsService.class), @MockBean(SnsAuthenticationProvider.class)
 })
 public class TestMvcConfig {
 }

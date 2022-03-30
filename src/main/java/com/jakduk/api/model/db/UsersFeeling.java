@@ -6,9 +6,12 @@ import java.util.List;
 
 public interface UsersFeeling {
 
-    List<CommonFeelingUser> getUsersLiking();
-    List<CommonFeelingUser> getUsersDisliking();
-    void setUsersLiking(List<CommonFeelingUser> usersLiking);
-    void setUsersDisliking(List<CommonFeelingUser> usersDisliking);
+	List<CommonFeelingUser> getUsersLiking();
+
+	void setUsersLiking(List<CommonFeelingUser> usersLiking);
+
+	List<CommonFeelingUser> getUsersDisliking();
+
+	void setUsersDisliking(List<CommonFeelingUser> usersDisliking);
 
 }

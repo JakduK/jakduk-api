@@ -10,29 +10,29 @@ import java.util.Collection;
  */
 public class SnsAuthenticationToken extends AbstractAuthenticationToken {
 
-    private final Object principal;
+	private final Object principal;
 
-    public SnsAuthenticationToken(Object principal) {
-        super(null);
-        super.setAuthenticated(false);
+	public SnsAuthenticationToken(Object principal) {
+		super(null);
+		super.setAuthenticated(false);
 
-        this.principal = principal;
-    }
+		this.principal = principal;
+	}
 
-    public SnsAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
-        super.setAuthenticated(true);
+	public SnsAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
+		super(authorities);
+		super.setAuthenticated(true);
 
-        this.principal = principal;
-    }
+		this.principal = principal;
+	}
 
-    @Override
-    public Object getCredentials() {
-        return null;
-    }
+	@Override
+	public Object getCredentials() {
+		return null;
+	}
 
-    @Override
-    public Object getPrincipal() {
-        return principal;
-    }
+	@Override
+	public Object getPrincipal() {
+		return principal;
+	}
 }

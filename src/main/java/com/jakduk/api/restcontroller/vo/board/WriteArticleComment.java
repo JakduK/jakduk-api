@@ -2,6 +2,7 @@ package com.jakduk.api.restcontroller.vo.board;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+
 import java.util.List;
 
 /**
@@ -13,25 +14,25 @@ import java.util.List;
 
 public class WriteArticleComment {
 
-    @NotEmpty
-    @Size(min = 1, max=800)
-    private String content; // 댓글 내용
+	@NotEmpty
+	@Size(min = 1, max = 800)
+	private String content; // 댓글 내용
 
-    private List<GalleryOnBoard> galleries; // 사진 목록
+	private List<GalleryOnBoard> galleries; // 사진 목록
 
-    public String getContent() {
-        return content;
-    }
+	public String getContent() {
+		return content;
+	}
 
-    public List<GalleryOnBoard> getGalleries() {
-        return galleries;
-    }
+	public List<GalleryOnBoard> getGalleries() {
+		return galleries;
+	}
 
-    @Override
-    public String toString() {
-        return "WriteArticleComment{" +
-                "content='" + content + '\'' +
-                ", galleries=" + galleries +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "WriteArticleComment{" +
+			"content='" + content + '\'' +
+			", galleries=" + galleries +
+			'}';
+	}
 }

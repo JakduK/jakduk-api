@@ -18,13 +18,13 @@ import javax.validation.constraints.Size;
 
 public class UserProfileEditForm {
 
-	@Size(min = 6, max=30)
+	@Size(min = 6, max = 30)
 	@NotEmpty
 	@Email
 	@ExistEmail
 	private String email;
 
-	@Size(min = 2, max=20)
+	@Size(min = 2, max = 20)
 	@NotEmpty
 	@ExistUsername
 	private String username;

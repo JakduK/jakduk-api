@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface UserRepositoryCustom {
 
-    List<UserSimple> findSimpleUsers();
+	List<UserSimple> findSimpleUsers();
 }

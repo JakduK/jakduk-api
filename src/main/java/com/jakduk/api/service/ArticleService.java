@@ -25,6 +25,7 @@ import com.jakduk.api.repository.gallery.GalleryRepository;
 import com.jakduk.api.restcontroller.vo.board.*;
 import com.jakduk.api.restcontroller.vo.home.HomeArticle;
 import com.jakduk.api.restcontroller.vo.home.HomeArticleComment;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -56,30 +57,39 @@ public class ArticleService {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired private UrlGenerationUtils urlGenerationUtils;
-	@Autowired private ArticleRepository articleRepository;
-	@Autowired private ArticleOnListRepository articleOnListRepository;
-	@Autowired private ArticleCommentRepository articleCommentRepository;
-	@Autowired private GalleryRepository galleryRepository;
-	@Autowired private CommonService commonService;
-	@Autowired private CommonGalleryService commonGalleryService;
-	@Autowired private RabbitMQPublisher rabbitMQPublisher;
+	@Autowired
+	private UrlGenerationUtils urlGenerationUtils;
+	@Autowired
+	private ArticleRepository articleRepository;
+	@Autowired
+	private ArticleOnListRepository articleOnListRepository;
+	@Autowired
+	private ArticleCommentRepository articleCommentRepository;
+	@Autowired
+	private GalleryRepository galleryRepository;
+	@Autowired
+	private CommonService commonService;
+	@Autowired
+	private CommonGalleryService commonGalleryService;
+	@Autowired
+	private RabbitMQPublisher rabbitMQPublisher;
 
 	public Article findOneBySeq(Constants.BOARD_TYPE board, Integer seq) {
-        return articleRepository.findOneByBoardAndSeq(board.name(), seq)
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
-    }
+		return articleRepository.findOneByBoardAndSeq(board.name(), seq)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+	}
 
-    /**
-     * 자유게시판 글쓰기
+	/**
+	 * 자유게시판 글쓰기
 	 *
-     * @param subject 글 제목
-     * @param content 글 내용
-     * @param categoryCode 글 말머리 Code
-     * @param linkedGallery 사진 연동 여부
-     */
-	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content, String categoryCode,
-								 Boolean linkedGallery) {
+	 * @param subject 글 제목
+	 * @param content 글 내용
+	 * @param categoryCode 글 말머리 Code
+	 * @param linkedGallery 사진 연동 여부
+	 */
+	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content,
+		String categoryCode,
+		Boolean linkedGallery) {
 
 		if (BoardCategoryGenerator.notExistCategory(board, categoryCode))
 			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);
@@ -120,13 +130,14 @@ public class ArticleService {
 	 * @param categoryCode 글 말머리 Code
 	 * @param linkedGallery 사진 연동 여부
 	 */
-	public Article updateArticle(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String subject, String content, String categoryCode,
-								 Boolean linkedGallery) {
+	public Article updateArticle(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String subject,
+		String content, String categoryCode,
+		Boolean linkedGallery) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
-		if (! article.getWriter().getUserId().equals(writer.getUserId()))
+		if (!article.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
 		if (BoardCategoryGenerator.notExistCategory(board, categoryCode))
@@ -149,7 +160,8 @@ public class ArticleService {
 			logs = new ArrayList<>();
 
 		ObjectId logId = new ObjectId();
-		logs.add(new BoardLog(logId.toString(), Constants.ARTICLE_LOG_TYPE.EDIT.name(), new SimpleWriter(writer.getUserId(), writer.getUsername())));
+		logs.add(new BoardLog(logId.toString(), Constants.ARTICLE_LOG_TYPE.EDIT.name(),
+			new SimpleWriter(writer.getUserId(), writer.getUsername())));
 		article.setLogs(logs);
 
 		// lastUpdated
@@ -168,72 +180,75 @@ public class ArticleService {
 	 * @param board 게시판
 	 * @param seq 글 seq
 	 * @return Constants.ARTICLE_DELETE_TYPE
-     */
-    public Constants.ARTICLE_DELETE_TYPE deleteArticle(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq) {
+	 */
+	public Constants.ARTICLE_DELETE_TYPE deleteArticle(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq) {
 
-        Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
-        if (! article.getWriter().getUserId().equals(writer.getUserId()))
-            throw new ServiceException(ServiceError.FORBIDDEN);
+		if (!article.getWriter().getUserId().equals(writer.getUserId()))
+			throw new ServiceException(ServiceError.FORBIDDEN);
 
-        ArticleItem articleItem = new ArticleItem(article.getId(), article.getSeq(), article.getBoard());
+		ArticleItem articleItem = new ArticleItem(article.getId(), article.getSeq(), article.getBoard());
 
-        Integer count = articleCommentRepository.countByArticle(articleItem);
+		Integer count = articleCommentRepository.countByArticle(articleItem);
 
-        // 댓글이 하나라도 달리면 글을 몽땅 지우지 못한다.
-        if (count > 0) {
+		// 댓글이 하나라도 달리면 글을 몽땅 지우지 못한다.
+		if (count > 0) {
 			article.setContent(null);
 			article.setSubject(null);
 			article.setWriter(null);
 
-            List<BoardLog> histories = article.getLogs();
+			List<BoardLog> histories = article.getLogs();
 
-            if (Objects.isNull(histories))
-                histories = new ArrayList<>();
+			if (Objects.isNull(histories))
+				histories = new ArrayList<>();
 
 			ObjectId boardHistoryId = new ObjectId();
-            BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.ARTICLE_LOG_TYPE.DELETE.name(), new SimpleWriter(writer.getUserId(), writer.getUsername()));
-            histories.add(history);
+			BoardLog history = new BoardLog(boardHistoryId.toString(), Constants.ARTICLE_LOG_TYPE.DELETE.name(),
+				new SimpleWriter(writer.getUserId(), writer.getUsername()));
+			histories.add(history);
 			article.setLogs(histories);
 
-            ArticleStatus articleStatus = article.getStatus();
+			ArticleStatus articleStatus = article.getStatus();
 
-            if (Objects.isNull(articleStatus))
-                articleStatus = new ArticleStatus();
+			if (Objects.isNull(articleStatus))
+				articleStatus = new ArticleStatus();
 
-            articleStatus.setDelete(true);
+			articleStatus.setDelete(true);
 			article.setStatus(articleStatus);
 			article.setLinkedGallery(false);
 
 			// lastUpdated
-			article.setLastUpdated(LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
+			article.setLastUpdated(
+				LocalDateTime.ofInstant(boardHistoryId.getDate().toInstant(), ZoneId.systemDefault()));
 
 			articleRepository.save(article);
 
 			log.info("A post was deleted(post only). post seq={}, subject={}", article.getSeq(), article.getSubject());
-        }
+		}
 		// 몽땅 지우기
-        else {
-            articleRepository.delete(article);
+		else {
+			articleRepository.delete(article);
 
 			log.info("A post was deleted(all). post seq={}, subject={}", article.getSeq(), article.getSubject());
-        }
+		}
 
-        // 연결된 사진 끊기
-        if (article.getLinkedGallery())
+		// 연결된 사진 끊기
+		if (article.getLinkedGallery())
 			commonGalleryService.unlinkGalleries(article.getId(), Constants.GALLERY_FROM_TYPE.ARTICLE);
 
 		// 색인 지움
 		rabbitMQPublisher.deleteDocumentArticle(article.getId());
 
-        return count > 0 ? Constants.ARTICLE_DELETE_TYPE.CONTENT : Constants.ARTICLE_DELETE_TYPE.ALL;
-    }
+		return count > 0 ? Constants.ARTICLE_DELETE_TYPE.CONTENT : Constants.ARTICLE_DELETE_TYPE.ALL;
+	}
 
 	/**
 	 * 자유게시판 글 목록
-     */
-	public GetArticlesResponse getArticles(Constants.BOARD_TYPE board, String categoryCode, Integer page, Integer size) {
+	 */
+	public GetArticlesResponse getArticles(Constants.BOARD_TYPE board, String categoryCode, Integer page,
+		Integer size) {
 
 		Sort sort = Constants.SORT_BY_ID_DESC;
 		Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -255,15 +270,16 @@ public class ArticleService {
 
 			if (article.getLinkedGallery()) {
 				List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-						new ObjectId(article.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
+					new ObjectId(article.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
 
-				if (! CollectionUtils.isEmpty(galleries)) {
+				if (!CollectionUtils.isEmpty(galleries)) {
 					List<BoardGallerySimple> boardGalleries = galleries.stream()
-							.map(gallery -> new BoardGallerySimple() {{
-								setId(gallery.getId());
-								setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-							}})
-							.collect(Collectors.toList());
+						.map(gallery -> new BoardGallerySimple() {{
+							setId(gallery.getId());
+							setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL,
+								gallery.getId()));
+						}})
+						.collect(Collectors.toList());
 
 					getArticle.setGalleries(boardGalleries);
 				}
@@ -273,12 +289,12 @@ public class ArticleService {
 		};
 
 		List<GetArticle> getArticles = articlePages.getContent().stream()
-				.map(convertToGetArticle)
-				.collect(Collectors.toList());
+			.map(convertToGetArticle)
+			.collect(Collectors.toList());
 
 		List<GetArticle> getNotices = notices.stream()
-				.map(convertToGetArticle)
-				.collect(Collectors.toList());
+			.map(convertToGetArticle)
+			.collect(Collectors.toList());
 
 		// Board ID 뽑아내기.
 		ArrayList<ObjectId> ids = new ArrayList<>();
@@ -288,11 +304,11 @@ public class ArticleService {
 
 		// 게시물의 댓글수
 		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountByIds(ids).stream()
-				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+			.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 
 		// 게시물의 감정수
 		Map<String, BoardFeelingCount> feelingCounts = articleRepository.findUsersFeelingCount(ids).stream()
-				.collect(Collectors.toMap(BoardFeelingCount::getId, Function.identity()));
+			.collect(Collectors.toMap(BoardFeelingCount::getId, Function.identity()));
 
 		// 댓글수, 감정 표현수 합치기.
 		Consumer<GetArticle> applyCounts = article -> {
@@ -317,9 +333,10 @@ public class ArticleService {
 		List<BoardCategory> categories = BoardCategoryGenerator.getCategories(board, JakdukUtils.getLocale());
 		Map<String, String> categoriesMap = null;
 
-		if (! CollectionUtils.isEmpty(categories)) {
+		if (!CollectionUtils.isEmpty(categories)) {
 			categoriesMap = categories.stream()
-					.collect(Collectors.toMap(BoardCategory::getCode, boardCategory -> boardCategory.getNames().get(0).getName()));
+				.collect(Collectors.toMap(BoardCategory::getCode,
+					boardCategory -> boardCategory.getNames().get(0).getName()));
 
 			categoriesMap.put("ALL", JakdukUtils.getMessageSource("board.category.all"));
 		}
@@ -343,33 +360,35 @@ public class ArticleService {
 	 * 최근 글 가져오기
 	 */
 	public List<HomeArticle> getLatestArticles() {
-		List<ArticleOnList> articles = articleRepository.findLatest(Constants.SORT_BY_ID_DESC, Constants.HOME_SIZE_POST);
+		List<ArticleOnList> articles = articleRepository.findLatest(Constants.SORT_BY_ID_DESC,
+			Constants.HOME_SIZE_POST);
 
 		// 게시물 VO 변환 및 썸네일 URL 추가
 		return articles.stream()
-				.map(post -> {
-					HomeArticle homeArticle = new HomeArticle();
-					BeanUtils.copyProperties(post, homeArticle);
+			.map(post -> {
+				HomeArticle homeArticle = new HomeArticle();
+				BeanUtils.copyProperties(post, homeArticle);
 
-					if (post.getLinkedGallery()) {
-						List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-								new ObjectId(post.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
+				if (post.getLinkedGallery()) {
+					List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+						new ObjectId(post.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
 
-						List<BoardGallerySimple> boardGalleries = galleries.stream()
-								.sorted(Comparator.comparing(Gallery::getId))
-								.limit(1)
-								.map(gallery -> new BoardGallerySimple() {{
-									setId(gallery.getId());
-									setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-								}})
-								.collect(Collectors.toList());
+					List<BoardGallerySimple> boardGalleries = galleries.stream()
+						.sorted(Comparator.comparing(Gallery::getId))
+						.limit(1)
+						.map(gallery -> new BoardGallerySimple() {{
+							setId(gallery.getId());
+							setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL,
+								gallery.getId()));
+						}})
+						.collect(Collectors.toList());
 
-						homeArticle.setGalleries(boardGalleries);
-					}
+					homeArticle.setGalleries(boardGalleries);
+				}
 
-					return homeArticle;
-				})
-				.collect(Collectors.toList());
+				return homeArticle;
+			})
+			.collect(Collectors.toList());
 	}
 
 	// 최근 댓글 가져오기.
@@ -379,53 +398,55 @@ public class ArticleService {
 
 		// article id 뽑아내기.
 		List<ObjectId> articleIds = comments.stream()
-				.map(comment -> new ObjectId(comment.getArticle().getId()))
-				.distinct()
-				.collect(Collectors.toList());
+			.map(comment -> new ObjectId(comment.getArticle().getId()))
+			.distinct()
+			.collect(Collectors.toList());
 
 		// 댓글을 가진 글 목록
 		List<ArticleSimple> articles = articleRepository.findArticleSimplesByIds(articleIds);
 
 		Map<String, ArticleSimple> postsHavingComments = articles.stream()
-				.collect(Collectors.toMap(ArticleSimple::getId, Function.identity()));
+			.collect(Collectors.toMap(ArticleSimple::getId, Function.identity()));
 
 		return comments.stream()
-				.map(comment -> {
-					HomeArticleComment homeArticleComment = new HomeArticleComment();
-					BeanUtils.copyProperties(comment, homeArticleComment);
+			.map(comment -> {
+				HomeArticleComment homeArticleComment = new HomeArticleComment();
+				BeanUtils.copyProperties(comment, homeArticleComment);
 
-					homeArticleComment.setArticle(
-							Optional.ofNullable(postsHavingComments.get(comment.getArticle().getId()))
-									.orElse(new ArticleSimple()));
+				homeArticleComment.setArticle(
+					Optional.ofNullable(postsHavingComments.get(comment.getArticle().getId()))
+						.orElse(new ArticleSimple()));
 
-					return homeArticleComment;
-				})
-				.peek(comment -> {
-					String content = JakdukUtils.stripHtmlTag(comment.getContent());
+				return homeArticleComment;
+			})
+			.peek(comment -> {
+				String content = JakdukUtils.stripHtmlTag(comment.getContent());
 
-					if (StringUtils.isNotBlank(content)) {
-						Integer contentLength = content.length() + comment.getWriter().getUsername().length();
+				if (StringUtils.isNotBlank(content)) {
+					Integer contentLength = content.length() + comment.getWriter().getUsername().length();
 
-						if (contentLength > Constants.HOME_COMMENT_CONTENT_MAX_LENGTH) {
-							content = content.substring(0, Constants.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
-							content = String.format("%s...", content);
-						}
-						comment.setContent(content);
+					if (contentLength > Constants.HOME_COMMENT_CONTENT_MAX_LENGTH) {
+						content = content.substring(0,
+							Constants.HOME_COMMENT_CONTENT_MAX_LENGTH - comment.getWriter().getUsername().length());
+						content = String.format("%s...", content);
 					}
-				})
-				.collect(Collectors.toList());
+					comment.setContent(content);
+				}
+			})
+			.collect(Collectors.toList());
 	}
 
-    /**
-     * 글 감정 표현.
-     */
-	public Article setArticleFeelings(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, Constants.FEELING_TYPE feeling) {
+	/**
+	 * 글 감정 표현.
+	 */
+	public Article setArticleFeelings(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq,
+		Constants.FEELING_TYPE feeling) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
-        String userId = writer.getUserId();
-        String username = writer.getUsername();
+		String userId = writer.getUserId();
+		String username = writer.getUsername();
 
 		CommonWriter articleWriter = article.getWriter();
 
@@ -443,29 +464,32 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 달기
 	 */
-	public ArticleComment insertArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String content,
-											   List<Gallery> galleries) {
+	public ArticleComment insertArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq,
+		String content,
+		List<Gallery> galleries) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 		// 연관된 사진 id 배열 (검증 후)
 		List<String> galleryIds = galleries.stream()
-				.map(Gallery::getId)
-				.collect(Collectors.toList());
+			.map(Gallery::getId)
+			.collect(Collectors.toList());
 
 		ArticleComment articleComment = new ArticleComment();
 		articleComment.setArticle(new ArticleItem(article.getId(), article.getSeq(), article.getBoard()));
 		articleComment.setWriter(writer);
 		articleComment.setContent(content);
-		articleComment.setLinkedGallery(! galleries.isEmpty());
-		articleComment.setLogs(this.initBoardLogs(new ObjectId(), Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), writer));
+		articleComment.setLinkedGallery(!galleries.isEmpty());
+		articleComment.setLogs(
+			this.initBoardLogs(new ObjectId(), Constants.ARTICLE_COMMENT_LOG_TYPE.CREATE.name(), writer));
 
 		articleCommentRepository.save(articleComment);
 
 		// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getArticle(), articleComment.getWriter(),
-				articleComment.getContent(), galleryIds);
+		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getArticle(),
+			articleComment.getWriter(),
+			articleComment.getContent(), galleryIds);
 
 		return articleComment;
 	}
@@ -473,31 +497,34 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 고치기
 	 */
-	public ArticleComment updateArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, String id, String content,
-											   List<String> galleryIds) {
+	public ArticleComment updateArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, String id,
+		String content,
+		List<String> galleryIds) {
 
 		ArticleComment articleComment = articleCommentRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
 
-		if (! articleComment.getWriter().getUserId().equals(writer.getUserId()))
+		if (!articleComment.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
 		articleComment.setWriter(writer);
 		articleComment.setContent(StringUtils.trim(content));
-		articleComment.setLinkedGallery(! galleryIds.isEmpty());
+		articleComment.setLinkedGallery(!galleryIds.isEmpty());
 
 		// boardLogs
 		List<BoardLog> logs = Optional.ofNullable(articleComment.getLogs())
-				.orElseGet(ArrayList::new);
+			.orElseGet(ArrayList::new);
 
-		logs.add(new BoardLog(new ObjectId().toString(), Constants.ARTICLE_COMMENT_LOG_TYPE.EDIT.name(), new SimpleWriter(writer.getUserId(), writer.getUsername())));
+		logs.add(new BoardLog(new ObjectId().toString(), Constants.ARTICLE_COMMENT_LOG_TYPE.EDIT.name(),
+			new SimpleWriter(writer.getUserId(), writer.getUsername())));
 		articleComment.setLogs(logs);
 
 		articleCommentRepository.save(articleComment);
 
 		// 엘라스틱서치 색인 요청
-		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getArticle(), articleComment.getWriter(),
-				articleComment.getContent(), galleryIds);
+		rabbitMQPublisher.indexDocumentComment(articleComment.getId(), articleComment.getArticle(),
+			articleComment.getWriter(),
+			articleComment.getContent(), galleryIds);
 
 		return articleComment;
 	}
@@ -508,9 +535,9 @@ public class ArticleService {
 	public void deleteArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, String id) {
 
 		ArticleComment articleComment = articleCommentRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
 
-		if (! articleComment.getWriter().getUserId().equals(writer.getUserId()))
+		if (!articleComment.getWriter().getUserId().equals(writer.getUserId()))
 			throw new ServiceException(ServiceError.FORBIDDEN);
 
 		articleCommentRepository.deleteById(id);
@@ -524,18 +551,20 @@ public class ArticleService {
 	/**
 	 * 게시물 댓글 목록
 	 */
-	public GetArticleDetailCommentsResponse getArticleDetailComments(CommonWriter commonWriter, Constants.BOARD_TYPE board, Integer seq, String commentId) {
+	public GetArticleDetailCommentsResponse getArticleDetailComments(CommonWriter commonWriter,
+		Constants.BOARD_TYPE board, Integer seq, String commentId) {
 
 		List<ArticleComment> comments;
 
 		if (StringUtils.isNotBlank(commentId)) {
-			comments  = articleCommentRepository.findByBoardSeqAndGTId(board.name(), seq, new ObjectId(commentId));
+			comments = articleCommentRepository.findByBoardSeqAndGTId(board.name(), seq, new ObjectId(commentId));
 		} else {
-			comments  = articleCommentRepository.findByBoardSeqAndGTId(board.name(), seq, null);
+			comments = articleCommentRepository.findByBoardSeqAndGTId(board.name(), seq, null);
 		}
 
 		ArticleSimple articleSimple = articleRepository.findBoardFreeOfMinimumBySeq(seq);
-		ArticleItem articleItem = new ArticleItem(articleSimple.getId(), articleSimple.getSeq(), articleSimple.getBoard());
+		ArticleItem articleItem = new ArticleItem(articleSimple.getId(), articleSimple.getSeq(),
+			articleSimple.getBoard());
 
 		List<GetArticleComment> articleComments = this.toGetArticleComments(commonWriter, comments);
 		Integer count = articleCommentRepository.countByArticle(articleItem);
@@ -548,12 +577,13 @@ public class ArticleService {
 	 *
 	 * @param commentId 댓글 ID
 	 * @param feeling 감정표현 종류
-     * @return 자유게시판 댓글 객체
-     */
-	public ArticleComment setArticleCommentFeeling(CommonWriter writer, String commentId, Constants.FEELING_TYPE feeling) {
+	 * @return 자유게시판 댓글 객체
+	 */
+	public ArticleComment setArticleCommentFeeling(CommonWriter writer, String commentId,
+		Constants.FEELING_TYPE feeling) {
 
 		ArticleComment boardComment = articleCommentRepository.findOneById(commentId)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_COMMENT));
 
 		String userId = writer.getUserId();
 		String username = writer.getUsername();
@@ -583,11 +613,11 @@ public class ArticleService {
 	 * 자유게시판 글의 공지를 활성화/비활성화 한다.
 	 * @param seq 글 seq
 	 * @param isEnable 활성화/비활성화
-     */
+	 */
 	private void setArticleNotice(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, Boolean isEnable) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
 		ArticleStatus status = article.getStatus();
 
@@ -600,7 +630,7 @@ public class ArticleService {
 			if (isEnable && isNotice)
 				throw new ServiceException(ServiceError.ALREADY_ENABLE);
 
-			if (! isEnable && ! isNotice)
+			if (!isEnable && !isNotice)
 				throw new ServiceException(ServiceError.ALREADY_DISABLE);
 		}
 
@@ -617,8 +647,10 @@ public class ArticleService {
 		if (CollectionUtils.isEmpty(histories))
 			histories = new ArrayList<>();
 
-		String historyType = isEnable ? Constants.ARTICLE_LOG_TYPE.ENABLE_NOTICE.name() : Constants.ARTICLE_LOG_TYPE.DISABLE_NOTICE.name();
-		histories.add(new BoardLog(new ObjectId().toString(), historyType, new SimpleWriter(writer.getUserId(), writer.getUsername())));
+		String historyType = isEnable ? Constants.ARTICLE_LOG_TYPE.ENABLE_NOTICE.name() :
+			Constants.ARTICLE_LOG_TYPE.DISABLE_NOTICE.name();
+		histories.add(new BoardLog(new ObjectId().toString(), historyType,
+			new SimpleWriter(writer.getUserId(), writer.getUsername())));
 
 		article.setLogs(histories);
 
@@ -628,10 +660,9 @@ public class ArticleService {
 			log.info("Set notice for article. seq={}, type={}", article.getSeq(), status.getNotice());
 	}
 
-
 	/**
 	 * 자유게시판 주간 좋아요수 선두
-     */
+	 */
 	public List<BoardTop> getArticlesTopLikes(Constants.BOARD_TYPE board, ObjectId objectId) {
 		return articleRepository.findTopLikes(board, objectId);
 	}
@@ -642,12 +673,13 @@ public class ArticleService {
 	public List<BoardTop> getArticlesTopComments(Constants.BOARD_TYPE board, ObjectId objectId) {
 
 		// 게시물의 댓글수
-		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountGreaterThanBoardIdAndBoard(objectId, board).stream()
-				.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountGreaterThanBoardIdAndBoard(
+				objectId, board).stream()
+			.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
 
 		List<String> postIds = commentCounts.entrySet().stream()
-				.map(Entry::getKey)
-				.collect(Collectors.toList());
+			.map(Entry::getKey)
+			.collect(Collectors.toList());
 
 		// commentIds를 파라미터로 다시 글을 가져온다.
 		List<Article> posts = articleRepository.findByIdInAndBoard(postIds, board.name());
@@ -657,15 +689,15 @@ public class ArticleService {
 		Comparator<BoardTop> byView = (b1, b2) -> b2.getViews() - b1.getViews();
 
 		return posts.stream()
-				.map(boardFree -> {
-					BoardTop boardTop = new BoardTop();
-					BeanUtils.copyProperties(boardFree, boardTop);
-					boardTop.setCount(commentCounts.get(boardTop.getId()));
-					return boardTop;
-				})
-				.sorted(byCount.thenComparing(byView))
-				.limit(Constants.BOARD_TOP_LIMIT)
-				.collect(Collectors.toList());
+			.map(boardFree -> {
+				BoardTop boardTop = new BoardTop();
+				BeanUtils.copyProperties(boardFree, boardTop);
+				boardTop.setCount(commentCounts.get(boardTop.getId()));
+				return boardTop;
+			})
+			.sorted(byCount.thenComparing(byView))
+			.limit(Constants.BOARD_TOP_LIMIT)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -685,110 +717,121 @@ public class ArticleService {
 	/**
 	 * 글 상세 객체 가져오기
 	 */
-	public ResponseEntity<GetArticleDetailResponse> getArticleDetail(CommonWriter commonWriter, Constants.BOARD_TYPE board, Integer seq, Boolean isAddCookie) {
+	public ResponseEntity<GetArticleDetailResponse> getArticleDetail(CommonWriter commonWriter,
+		Constants.BOARD_TYPE board, Integer seq, Boolean isAddCookie) {
 
 		Article article = articleRepository.findOneBySeq(seq)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_ARTICLE));
 
-		if (! StringUtils.equals(article.getBoard(), board.name())) {
+		if (!StringUtils.equals(article.getBoard(), board.name())) {
 			return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-					.header(HttpHeaders.LOCATION, urlGenerationUtils.generateArticleDetailApiUrl(article.getBoard(), seq))
-					.build();
+				.header(HttpHeaders.LOCATION, urlGenerationUtils.generateArticleDetailApiUrl(article.getBoard(), seq))
+				.build();
 		}
 
 		if (isAddCookie)
 			this.increaseViews(article);
 
-        // 글 상세
+		// 글 상세
 		ArticleDetail articleDetail = new ArticleDetail();
 		BeanUtils.copyProperties(article, articleDetail);
 
-		if (! CollectionUtils.isEmpty(article.getLogs())) {
+		if (!CollectionUtils.isEmpty(article.getLogs())) {
 			List<ArticleLog> logs = article.getLogs().stream()
-					.map(boardLog -> {
-						ArticleLog articleLog = new ArticleLog();
-						BeanUtils.copyProperties(boardLog, articleLog);
-						LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(articleLog.getId()).getDate());
-						articleLog.setType(Constants.ARTICLE_LOG_TYPE.valueOf(boardLog.getType()));
-						articleLog.setTimestamp(timestamp);
+				.map(boardLog -> {
+					ArticleLog articleLog = new ArticleLog();
+					BeanUtils.copyProperties(boardLog, articleLog);
+					LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(articleLog.getId()).getDate());
+					articleLog.setType(Constants.ARTICLE_LOG_TYPE.valueOf(boardLog.getType()));
+					articleLog.setTimestamp(timestamp);
 
-						return articleLog;
-					})
-					.sorted(Comparator.comparing(ArticleLog::getId).reversed())
-					.collect(Collectors.toList());
+					return articleLog;
+				})
+				.sorted(Comparator.comparing(ArticleLog::getId).reversed())
+				.collect(Collectors.toList());
 
 			articleDetail.setLogs(logs);
 		}
 
-		BoardCategory boardCategory = BoardCategoryGenerator.getCategory(board, article.getCategory(), JakdukUtils.getLocale());
+		BoardCategory boardCategory = BoardCategoryGenerator.getCategory(board, article.getCategory(),
+			JakdukUtils.getLocale());
 
 		articleDetail.setBoard(board.name());
 		articleDetail.setCategory(boardCategory);
-		articleDetail.setNumberOfLike(CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size());
-		articleDetail.setNumberOfDislike(CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size());
+		articleDetail.setNumberOfLike(
+			CollectionUtils.isEmpty(article.getUsersLiking()) ? 0 : article.getUsersLiking().size());
+		articleDetail.setNumberOfDislike(
+			CollectionUtils.isEmpty(article.getUsersDisliking()) ? 0 : article.getUsersDisliking().size());
 
 		// 엮인 사진들
 		if (article.getLinkedGallery()) {
-            List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-                    new ObjectId(article.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 100);
+			List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
+				new ObjectId(article.getId()), Constants.GALLERY_FROM_TYPE.ARTICLE, 100);
 
-            if (! CollectionUtils.isEmpty(galleries)) {
-                List<ArticleGallery> postDetailGalleries = galleries.stream()
-                        .map(gallery -> new ArticleGallery() {{
-                        	setId(gallery.getId());
-                        	setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
-                        	setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-                        	setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-						}})
-                        .collect(Collectors.toList());
+			if (!CollectionUtils.isEmpty(galleries)) {
+				List<ArticleGallery> postDetailGalleries = galleries.stream()
+					.map(gallery -> new ArticleGallery() {{
+						setId(gallery.getId());
+						setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
+						setImageUrl(
+							urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+						setThumbnailUrl(
+							urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+					}})
+					.collect(Collectors.toList());
 
-                articleDetail.setGalleries(postDetailGalleries);
-            }
-        }
+				articleDetail.setGalleries(postDetailGalleries);
+			}
+		}
 
-        // 나의 감정 상태
+		// 나의 감정 상태
 		if (Objects.nonNull(commonWriter))
-			articleDetail.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, article.getUsersLiking(), article.getUsersDisliking()));
+			articleDetail.setMyFeeling(
+				JakdukUtils.getMyFeeling(commonWriter, article.getUsersLiking(), article.getUsersDisliking()));
 
 		// 앞, 뒤 글
 		ArticleSimple prevPost = articleRepository.findByIdAndCategoryWithOperator(new ObjectId(articleDetail.getId()),
-				Objects.nonNull(boardCategory) ? boardCategory.getCode() : null, Constants.CRITERIA_OPERATOR.GT);
+			Objects.nonNull(boardCategory) ? boardCategory.getCode() : null, Constants.CRITERIA_OPERATOR.GT);
 		ArticleSimple nextPost = articleRepository.findByIdAndCategoryWithOperator(new ObjectId(articleDetail.getId()),
-				Objects.nonNull(boardCategory) ? boardCategory.getCode() : null, Constants.CRITERIA_OPERATOR.LT);
+			Objects.nonNull(boardCategory) ? boardCategory.getCode() : null, Constants.CRITERIA_OPERATOR.LT);
 
-        // 글쓴이의 최근 글
+		// 글쓴이의 최근 글
 		List<LatestArticle> latestArticles = null;
 
-		if (Objects.isNull(articleDetail.getStatus()) || BooleanUtils.isNotTrue(articleDetail.getStatus().getDelete())) {
+		if (Objects.isNull(articleDetail.getStatus()) || BooleanUtils.isNotTrue(
+			articleDetail.getStatus().getDelete())) {
 
 			List<ArticleOnList> latestPostsByWriter = articleRepository.findByIdAndUserId(
-					new ObjectId(articleDetail.getId()), articleDetail.getWriter().getUserId(), 3);
+				new ObjectId(articleDetail.getId()), articleDetail.getWriter().getUserId(), 3);
 
 			// 게시물 VO 변환 및 썸네일 URL 추가
 			latestArticles = latestPostsByWriter.stream()
-					.map(post -> {
-						LatestArticle latestArticle = new LatestArticle();
-						BeanUtils.copyProperties(post, latestArticle);
+				.map(post -> {
+					LatestArticle latestArticle = new LatestArticle();
+					BeanUtils.copyProperties(post, latestArticle);
 
-						if (! post.getLinkedGallery()) {
-							List<Gallery> latestPostGalleries = galleryRepository.findByItemIdAndFromType(new ObjectId(post.getId()),
-									Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
+					if (!post.getLinkedGallery()) {
+						List<Gallery> latestPostGalleries = galleryRepository.findByItemIdAndFromType(
+							new ObjectId(post.getId()),
+							Constants.GALLERY_FROM_TYPE.ARTICLE, 1);
 
-							if (! ObjectUtils.isEmpty(latestPostGalleries)) {
-								List<BoardGallerySimple> boardGalleries = latestPostGalleries.stream()
-										.map(gallery -> new BoardGallerySimple() {{
-											setId(gallery.getId());
-											setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-										}})
-										.collect(Collectors.toList());
+						if (!ObjectUtils.isEmpty(latestPostGalleries)) {
+							List<BoardGallerySimple> boardGalleries = latestPostGalleries.stream()
+								.map(gallery -> new BoardGallerySimple() {{
+									setId(gallery.getId());
+									setThumbnailUrl(
+										urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL,
+											gallery.getId()));
+								}})
+								.collect(Collectors.toList());
 
-								latestArticle.setGalleries(boardGalleries);
-							}
+							latestArticle.setGalleries(boardGalleries);
 						}
+					}
 
-						return latestArticle;
-					})
-					.collect(Collectors.toList());
+					return latestArticle;
+				})
+				.collect(Collectors.toList());
 		}
 
 		GetArticleDetailResponse response = new GetArticleDetailResponse();
@@ -798,7 +841,7 @@ public class ArticleService {
 		response.setLatestArticlesByWriter(CollectionUtils.isEmpty(latestArticles) ? null : latestArticles);
 
 		return ResponseEntity.ok()
-				.body(response);
+			.body(response);
 	}
 
 	/**
@@ -815,7 +858,8 @@ public class ArticleService {
 	 */
 	private List<BoardLog> initBoardLogs(ObjectId objectId, String type, CommonWriter writer) {
 		List<BoardLog> logs = new ArrayList<>();
-		BoardLog history = new BoardLog(objectId.toString(), type, new SimpleWriter(writer.getUserId(), writer.getUsername()));
+		BoardLog history = new BoardLog(objectId.toString(), type,
+			new SimpleWriter(writer.getUserId(), writer.getUsername()));
 		logs.add(history);
 
 		return logs;
@@ -829,23 +873,26 @@ public class ArticleService {
 	 * @param feeling 입력받은 감정
 	 * @param usersFeeling 편집할 객체
 	 */
-	private void setUsersFeeling(String userId, String username, Constants.FEELING_TYPE feeling, UsersFeeling usersFeeling) {
+	private void setUsersFeeling(String userId, String username, Constants.FEELING_TYPE feeling,
+		UsersFeeling usersFeeling) {
 
 		List<CommonFeelingUser> usersLiking = usersFeeling.getUsersLiking();
 		List<CommonFeelingUser> usersDisliking = usersFeeling.getUsersDisliking();
 
-		if (CollectionUtils.isEmpty(usersLiking)) usersLiking = new ArrayList<>();
-		if (CollectionUtils.isEmpty(usersDisliking)) usersDisliking = new ArrayList<>();
+		if (CollectionUtils.isEmpty(usersLiking))
+			usersLiking = new ArrayList<>();
+		if (CollectionUtils.isEmpty(usersDisliking))
+			usersDisliking = new ArrayList<>();
 
 		// 해당 회원이 좋아요를 이미 했는지 검사
 		Optional<CommonFeelingUser> alreadyLike = usersLiking.stream()
-				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
-				.findFirst();
+			.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+			.findFirst();
 
 		// 해당 회원이 싫어요를 이미 했는지 검사
 		Optional<CommonFeelingUser> alreadyDislike = usersDisliking.stream()
-				.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
-				.findFirst();
+			.filter(commonFeelingUser -> commonFeelingUser.getUserId().equals(userId))
+			.findFirst();
 
 		CommonFeelingUser feelingUser = new CommonFeelingUser(new ObjectId().toString(), userId, username);
 
@@ -902,15 +949,16 @@ public class ArticleService {
 	private List<BoardGallerySimple> getArticleCommentGalleries(String articleCommentId) {
 
 		List<Gallery> galleries = galleryRepository.findByItemIdAndFromType(
-				new ObjectId(articleCommentId), Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, 100);
+			new ObjectId(articleCommentId), Constants.GALLERY_FROM_TYPE.ARTICLE_COMMENT, 100);
 
-		if (! CollectionUtils.isEmpty(galleries)) {
+		if (!CollectionUtils.isEmpty(galleries)) {
 			return galleries.stream()
-					.map(gallery -> new BoardGallerySimple() {{
-						setId(gallery.getId());
-						setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-					}})
-					.collect(Collectors.toList());
+				.map(gallery -> new BoardGallerySimple() {{
+					setId(gallery.getId());
+					setThumbnailUrl(
+						urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+				}})
+				.collect(Collectors.toList());
 		}
 
 		return null;
@@ -922,63 +970,66 @@ public class ArticleService {
 	 * @param commonWriter 글쓴이
 	 * @param articleComments ArticleComment 배열
 	 */
-	private List<GetArticleComment> toGetArticleComments(CommonWriter commonWriter, List<ArticleComment> articleComments) {
+	private List<GetArticleComment> toGetArticleComments(CommonWriter commonWriter,
+		List<ArticleComment> articleComments) {
 
 		// article id 뽑아내기.
 		List<ObjectId> articleIds = articleComments.stream()
-				.map(comment -> new ObjectId(comment.getArticle().getId()))
-				.distinct()
-				.collect(Collectors.toList());
+			.map(comment -> new ObjectId(comment.getArticle().getId()))
+			.distinct()
+			.collect(Collectors.toList());
 
 		// 댓글을 가진 글 목록
 		List<ArticleSimple> articles = articleRepository.findArticleSimplesByIds(articleIds);
 
 		Map<String, ArticleSimple> postsHavingComments = articles.stream()
-				.collect(Collectors.toMap(ArticleSimple::getId, Function.identity()));
+			.collect(Collectors.toMap(ArticleSimple::getId, Function.identity()));
 
 		return articleComments.stream()
-				.map(boardFreeComment -> {
-					GetArticleComment getArticleComment = new GetArticleComment();
-					BeanUtils.copyProperties(boardFreeComment, getArticleComment);
+			.map(boardFreeComment -> {
+				GetArticleComment getArticleComment = new GetArticleComment();
+				BeanUtils.copyProperties(boardFreeComment, getArticleComment);
 
-					getArticleComment.setArticle(
-							Optional.ofNullable(postsHavingComments.get(boardFreeComment.getArticle().getId()))
-									.orElse(new ArticleSimple())
-					);
+				getArticleComment.setArticle(
+					Optional.ofNullable(postsHavingComments.get(boardFreeComment.getArticle().getId()))
+						.orElse(new ArticleSimple())
+				);
 
-					List<CommonFeelingUser> usersLiking = boardFreeComment.getUsersLiking();
-					List<CommonFeelingUser> usersDisliking = boardFreeComment.getUsersDisliking();
+				List<CommonFeelingUser> usersLiking = boardFreeComment.getUsersLiking();
+				List<CommonFeelingUser> usersDisliking = boardFreeComment.getUsersDisliking();
 
-					getArticleComment.setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
-					getArticleComment.setNumberOfDislike(CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
+				getArticleComment.setNumberOfLike(CollectionUtils.isEmpty(usersLiking) ? 0 : usersLiking.size());
+				getArticleComment.setNumberOfDislike(
+					CollectionUtils.isEmpty(usersDisliking) ? 0 : usersDisliking.size());
 
-					if (Objects.nonNull(commonWriter))
-						getArticleComment.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
+				if (Objects.nonNull(commonWriter))
+					getArticleComment.setMyFeeling(JakdukUtils.getMyFeeling(commonWriter, usersLiking, usersDisliking));
 
-					if (! CollectionUtils.isEmpty(boardFreeComment.getLogs())) {
-						List<ArticleCommentLog> logs = boardFreeComment.getLogs().stream()
-								.map(boardLog -> {
-									ArticleCommentLog articleCommentLog = new ArticleCommentLog();
-									BeanUtils.copyProperties(boardLog, articleCommentLog);
-									LocalDateTime timestamp = DateUtils.dateToLocalDateTime(new ObjectId(articleCommentLog.getId()).getDate());
-									articleCommentLog.setType(Constants.ARTICLE_COMMENT_LOG_TYPE.valueOf(boardLog.getType()));
-									articleCommentLog.setTimestamp(timestamp);
+				if (!CollectionUtils.isEmpty(boardFreeComment.getLogs())) {
+					List<ArticleCommentLog> logs = boardFreeComment.getLogs().stream()
+						.map(boardLog -> {
+							ArticleCommentLog articleCommentLog = new ArticleCommentLog();
+							BeanUtils.copyProperties(boardLog, articleCommentLog);
+							LocalDateTime timestamp = DateUtils.dateToLocalDateTime(
+								new ObjectId(articleCommentLog.getId()).getDate());
+							articleCommentLog.setType(Constants.ARTICLE_COMMENT_LOG_TYPE.valueOf(boardLog.getType()));
+							articleCommentLog.setTimestamp(timestamp);
 
-									return articleCommentLog;
-								})
-								.sorted(Comparator.comparing(ArticleCommentLog::getId).reversed())
-								.collect(Collectors.toList());
+							return articleCommentLog;
+						})
+						.sorted(Comparator.comparing(ArticleCommentLog::getId).reversed())
+						.collect(Collectors.toList());
 
-						getArticleComment.setLogs(logs);
-					}
+					getArticleComment.setLogs(logs);
+				}
 
-					// 엮인 사진들
-					if (boardFreeComment.getLinkedGallery())
-						getArticleComment.setGalleries(this.getArticleCommentGalleries(boardFreeComment.getId()));
+				// 엮인 사진들
+				if (boardFreeComment.getLinkedGallery())
+					getArticleComment.setGalleries(this.getArticleCommentGalleries(boardFreeComment.getId()));
 
-					return getArticleComment;
-				})
-				.collect(Collectors.toList());
+				return getArticleComment;
+			})
+			.collect(Collectors.toList());
 	}
 
 }

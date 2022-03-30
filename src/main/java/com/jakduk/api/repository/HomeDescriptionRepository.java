@@ -1,6 +1,7 @@
 package com.jakduk.api.repository;
 
 import com.jakduk.api.model.db.HomeDescription;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
@@ -13,6 +14,6 @@ import java.util.Optional;
  */
 public interface HomeDescriptionRepository extends MongoRepository<HomeDescription, String> {
 
-    Optional<HomeDescription> findFirstByOrderByPriorityDesc();
+	Optional<HomeDescription> findFirstByOrderByPriorityDesc();
 
 }

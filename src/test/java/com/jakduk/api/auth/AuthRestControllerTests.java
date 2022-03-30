@@ -71,23 +71,20 @@ import com.jakduk.api.service.UserService;
 @AutoConfigureRestDocs
 public class AuthRestControllerTests {
 
+	private static SocialProfile socialProfile;
+	private static Constants.ACCOUNT_TYPE providerId;
+	private static FootballClub footballClub;
+	private static User jakdukUser;
 	@Autowired
 	private MockMvc mvc;
-
 	@SpyBean
 	private UserDetailServiceImpl userDetailService;
-
 	@MockBean
 	private UserService userService;
 	@MockBean
 	private AuthUtils authUtils;
 	@MockBean
 	private UserRepository userRepository;
-
-	private static SocialProfile socialProfile;
-	private static Constants.ACCOUNT_TYPE providerId;
-	private static FootballClub footballClub;
-	private static User jakdukUser;
 
 	@BeforeAll
 	public static void setup() {

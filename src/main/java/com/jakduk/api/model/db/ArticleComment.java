@@ -4,6 +4,7 @@ import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.BoardLog;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -28,7 +29,7 @@ public class ArticleComment implements UsersFeeling {
 	private List<CommonFeelingUser> usersDisliking;
 	private Boolean linkedGallery;
 	private List<BoardLog> logs;
-    private List<String> batch;
+	private List<String> batch;
 
 	public String getId() {
 		return id;

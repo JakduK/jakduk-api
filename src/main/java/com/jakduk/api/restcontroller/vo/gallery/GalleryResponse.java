@@ -12,7 +12,8 @@ public class GalleryResponse {
 	public GalleryResponse() {
 	}
 
-	public GalleryResponse(GalleryDetail gallery, List<SurroundingsGallery> surroundingsGalleries, List<ArticleSimple> linkedPosts) {
+	public GalleryResponse(GalleryDetail gallery, List<SurroundingsGallery> surroundingsGalleries,
+		List<ArticleSimple> linkedPosts) {
 		this.gallery = gallery;
 		this.surroundingsGalleries = surroundingsGalleries;
 		this.linkedPosts = linkedPosts;

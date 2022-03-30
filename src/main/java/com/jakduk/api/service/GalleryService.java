@@ -20,8 +20,10 @@ import com.jakduk.api.restcontroller.vo.gallery.GalleryOnList;
 import com.jakduk.api.restcontroller.vo.gallery.GalleryResponse;
 import com.jakduk.api.restcontroller.vo.gallery.SurroundingsGallery;
 import com.jakduk.api.restcontroller.vo.home.HomeGallery;
+
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
+
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -62,30 +65,39 @@ public class GalleryService {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Resource private JakdukProperties.Storage storageProperties;
+	@Resource
+	private JakdukProperties.Storage storageProperties;
 
-	@Autowired private UrlGenerationUtils urlGenerationUtils;
-	@Autowired private GalleryRepository galleryRepository;
-	@Autowired private ArticleRepository articleRepository;
-	@Autowired private CommonGalleryService commonGalleryService;
-	@Autowired private RabbitMQPublisher rabbitMQPublisher;
+	@Autowired
+	private UrlGenerationUtils urlGenerationUtils;
+	@Autowired
+	private GalleryRepository galleryRepository;
+	@Autowired
+	private ArticleRepository articleRepository;
+	@Autowired
+	private CommonGalleryService commonGalleryService;
+	@Autowired
+	private RabbitMQPublisher rabbitMQPublisher;
 
 	public Gallery findOneById(String id) {
-		return galleryRepository.findOneById(id).orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+		return galleryRepository.findOneById(id)
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 	}
 
 	public List<Gallery> findByIdIn(List<String> galleryIds) {
 		return galleryRepository.findByIdIn(galleryIds);
 	}
 
-	public List<HomeGallery>findSimpleById(ObjectId id, Integer limit) {
+	public List<HomeGallery> findSimpleById(ObjectId id, Integer limit) {
 		return galleryRepository.findSimpleById(id, limit).stream()
-				.map(HomeGallery::new)
-				.peek(gallery -> {
-					gallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-					gallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
-				})
-				.collect(Collectors.toList());
+			.map(HomeGallery::new)
+			.peek(gallery -> {
+				gallery.setImageUrl(
+					urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+				gallery.setThumbnailUrl(
+					urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+			})
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -99,38 +111,46 @@ public class GalleryService {
 			objectId = new ObjectId(id);
 
 		return galleryRepository.findGalleriesById(objectId, Constants.CRITERIA_OPERATOR.LT, size).stream()
-				.map(gallery -> {
-					GalleryOnList galleryOnList = new GalleryOnList();
-					BeanUtils.copyProperties(gallery, galleryOnList);
+			.map(gallery -> {
+				GalleryOnList galleryOnList = new GalleryOnList();
+				BeanUtils.copyProperties(gallery, galleryOnList);
 
-					galleryOnList.setName(StringUtils.isNotBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
-					galleryOnList.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-					galleryOnList.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+				galleryOnList.setName(
+					StringUtils.isNotBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
+				galleryOnList.setImageUrl(
+					urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+				galleryOnList.setThumbnailUrl(
+					urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
-					return galleryOnList;
-				})
-				.collect(Collectors.toList());
+				return galleryOnList;
+			})
+			.collect(Collectors.toList());
 	}
 
-    public GalleryResponse getGalleryDetail(String id) {
+	public GalleryResponse getGalleryDetail(String id) {
 
 		Gallery gallery = galleryRepository.findOneById(id)
-				.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 
 		GalleryDetail galleryDetail = new GalleryDetail();
 		BeanUtils.copyProperties(gallery, galleryDetail);
 
 		galleryDetail.setName(StringUtils.isNoneBlank(gallery.getName()) ? gallery.getName() : gallery.getFileName());
-		galleryDetail.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
-		galleryDetail.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
+		galleryDetail.setImageUrl(
+			urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, gallery.getId()));
+		galleryDetail.setThumbnailUrl(
+			urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, gallery.getId()));
 
 		// 사진첩 보기의 앞, 뒤 사진을 가져온다.
-		List<Gallery> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id), Constants.CRITERIA_OPERATOR.GT,
-				Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
-		List<Gallery> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id), Constants.CRITERIA_OPERATOR.LT,
-				Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
+		List<Gallery> surroundingsPrevGalleries = galleryRepository.findGalleriesById(new ObjectId(id),
+			Constants.CRITERIA_OPERATOR.GT,
+			Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
+		List<Gallery> surroundingsNextGalleries = galleryRepository.findGalleriesById(new ObjectId(id),
+			Constants.CRITERIA_OPERATOR.LT,
+			Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY);
 
-		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY = Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
+		final Integer HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY =
+			Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY / 2;
 		Integer prevGalleriesLimit = 0;
 		Integer nextGalleriesLimit = 0;
 		List<SurroundingsGallery> surroundingsGalleries = new ArrayList<>();
@@ -140,29 +160,31 @@ public class GalleryService {
 			SurroundingsGallery surroundingsGallery = new SurroundingsGallery();
 			BeanUtils.copyProperties(surroundingsPrevGallery, surroundingsGallery);
 
-			surroundingsGallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, surroundingsPrevGallery.getId()));
-			surroundingsGallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, surroundingsPrevGallery.getId()));
+			surroundingsGallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE,
+				surroundingsPrevGallery.getId()));
+			surroundingsGallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL,
+				surroundingsPrevGallery.getId()));
 
 			surroundingsGalleries.add(surroundingsGallery);
 		};
 
 		// 앞 사진 목록과 뒷 사진 목록이 모두 5개 이상일때
 		if (surroundingsPrevGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
-				&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
+			&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
 			prevGalleriesLimit = HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY;
 			nextGalleriesLimit = HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY;
 		}
 		// 뒷 사진 목록이 5개 미만일때
 		else if (surroundingsPrevGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
-				&& surroundingsNextGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
+			&& surroundingsNextGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
 			prevGalleriesLimit = Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsNextGalleries.size();
 			nextGalleriesLimit = surroundingsNextGalleries.size();
 		}
 		// 앞 사진 목록이 5개 미만일때
 		else if (surroundingsPrevGalleries.size() < HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY
-				&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
+			&& surroundingsNextGalleries.size() >= HALF_NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY) {
 
 			prevGalleriesLimit = surroundingsPrevGalleries.size();
 			nextGalleriesLimit = Constants.NUMBER_OF_ITEMS_IN_SURROUNDINGS_GALLERY - surroundingsPrevGalleries.size();
@@ -170,56 +192,59 @@ public class GalleryService {
 
 		// 현재 보는 사진 포함 11장을 조합한다.
 		surroundingsPrevGalleries.stream()
-				.limit(prevGalleriesLimit)
-				.forEach(extractSurroundingsGalleries);
+			.limit(prevGalleriesLimit)
+			.forEach(extractSurroundingsGalleries);
 
 		SurroundingsGallery surroundingsViewingGallery = new SurroundingsGallery();
 		BeanUtils.copyProperties(gallery, surroundingsViewingGallery);
 
-		surroundingsViewingGallery.setImageUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, surroundingsViewingGallery.getId()));
-		surroundingsViewingGallery.setThumbnailUrl(urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, surroundingsViewingGallery.getId()));
+		surroundingsViewingGallery.setImageUrl(
+			urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.LARGE, surroundingsViewingGallery.getId()));
+		surroundingsViewingGallery.setThumbnailUrl(
+			urlGenerationUtils.generateGalleryUrl(Constants.IMAGE_SIZE_TYPE.SMALL, surroundingsViewingGallery.getId()));
 
 		surroundingsGalleries.add(surroundingsViewingGallery);
 
 		surroundingsNextGalleries.stream()
-				.limit(nextGalleriesLimit)
-				.forEach(extractSurroundingsGalleries);
+			.limit(nextGalleriesLimit)
+			.forEach(extractSurroundingsGalleries);
 
 		// 이 사진을 사용하는 게시물 목록
-        // TODO 댓글도 보여줘야지?
-        List<ArticleSimple> linkedPosts = null;
+		// TODO 댓글도 보여줘야지?
+		List<ArticleSimple> linkedPosts = null;
 
-        List<LinkedItem> linkedItems = gallery.getLinkedItems();
+		List<LinkedItem> linkedItems = gallery.getLinkedItems();
 
-        if (! ObjectUtils.isEmpty(linkedItems)) {
-            List<String> ids = linkedItems.stream()
-                    .filter(linkedItem -> linkedItem.getFrom().equals(Constants.GALLERY_FROM_TYPE.ARTICLE))
-                    .map(LinkedItem::getId)
-                    .collect(Collectors.toList());
+		if (!ObjectUtils.isEmpty(linkedItems)) {
+			List<String> ids = linkedItems.stream()
+				.filter(linkedItem -> linkedItem.getFrom().equals(Constants.GALLERY_FROM_TYPE.ARTICLE))
+				.map(LinkedItem::getId)
+				.collect(Collectors.toList());
 
-            List<Article> posts = articleRepository.findByIdInAndLinkedGalleryIsTrue(ids);
+			List<Article> posts = articleRepository.findByIdInAndLinkedGalleryIsTrue(ids);
 
-            linkedPosts = posts.stream()
-                    .map(post -> {
-                        ArticleSimple articleSimple = new ArticleSimple();
-                        BeanUtils.copyProperties(post, articleSimple);
+			linkedPosts = posts.stream()
+				.map(post -> {
+					ArticleSimple articleSimple = new ArticleSimple();
+					BeanUtils.copyProperties(post, articleSimple);
 
-                        return articleSimple;
-                    })
-                    .collect(Collectors.toList());
-        }
+					return articleSimple;
+				})
+				.collect(Collectors.toList());
+		}
 
 		return new GalleryResponse(galleryDetail, surroundingsGalleries, linkedPosts);
 	}
 
 	/**
 	 * 사진 올리기
-     */
+	 */
 	public Gallery uploadImage(CommonWriter writer, String fileName, long size, String contentType, byte[] bytes) {
 
 		// hash를 뽑아 DB에 같은게 있는지 찾아보고, 있으면 찾은걸 응답.
 		String hash = DigestUtils.md5DigestAsHex(bytes);
-		Optional<Gallery> oGallery = galleryRepository.findOneByHashAndStatusStatus(hash, Constants.GALLERY_STATUS_TYPE.ENABLE);
+		Optional<Gallery> oGallery = galleryRepository.findOneByHashAndStatusStatus(hash,
+			Constants.GALLERY_STATUS_TYPE.ENABLE);
 
 		if (oGallery.isPresent())
 			return oGallery.get();
@@ -246,10 +271,10 @@ public class GalleryService {
 			LocalDateTime timePoint = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
 			Path imageDirPath = Paths.get(storageProperties.getImagePath(), String.valueOf(timePoint.getYear()),
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
 
 			Path thumbDirPath = Paths.get(storageProperties.getThumbnailPath(), String.valueOf(timePoint.getYear()),
-					String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
+				String.valueOf(timePoint.getMonthValue()), String.valueOf(timePoint.getDayOfMonth()));
 
 			if (Files.notExists(imageDirPath, LinkOption.NOFOLLOW_LINKS))
 				Files.createDirectories(imageDirPath);
@@ -268,13 +293,13 @@ public class GalleryService {
 				} else {
 
 					double scale = Constants.GALLERY_MAXIMUM_CAPACITY < size ?
-							Constants.GALLERY_MAXIMUM_CAPACITY / (double) size : 1;
+						Constants.GALLERY_MAXIMUM_CAPACITY / (double)size : 1;
 
-                    InputStream originalInputStream = new ByteArrayInputStream(bytes);
+					InputStream originalInputStream = new ByteArrayInputStream(bytes);
 
 					Thumbnails.of(originalInputStream)
-							.scale(scale)
-							.toFile(imageFilePath.toFile());
+						.scale(scale)
+						.toFile(imageFilePath.toFile());
 
 					BasicFileAttributes attr = Files.readAttributes(imageFilePath, BasicFileAttributes.class);
 
@@ -289,9 +314,9 @@ public class GalleryService {
 				InputStream thumbInputStream = new ByteArrayInputStream(bytes);
 
 				Thumbnails.of(thumbInputStream)
-						.size(Constants.GALLERY_THUMBNAIL_SIZE_WIDTH, Constants.GALLERY_THUMBNAIL_SIZE_HEIGHT)
-                        .crop(Positions.TOP_CENTER)
-						.toFile(thumbFilePath.toFile());
+					.size(Constants.GALLERY_THUMBNAIL_SIZE_WIDTH, Constants.GALLERY_THUMBNAIL_SIZE_HEIGHT)
+					.crop(Positions.TOP_CENTER)
+					.toFile(thumbFilePath.toFile());
 			}
 
 		} catch (IOException e) {
@@ -324,8 +349,9 @@ public class GalleryService {
 
 		String formatName = StringUtils.split(contentType, "/")[1];
 
-		Path filePath = Paths.get(imagePath, String.valueOf(timePoint.getYear()), String.valueOf(timePoint.getMonthValue()),
-				String.valueOf(timePoint.getDayOfMonth()), id + "." + formatName);
+		Path filePath = Paths.get(imagePath, String.valueOf(timePoint.getYear()),
+			String.valueOf(timePoint.getMonthValue()),
+			String.valueOf(timePoint.getDayOfMonth()), id + "." + formatName);
 
 		if (Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)) {
 			try {
@@ -334,7 +360,7 @@ public class GalleryService {
 
 				int imageByte;
 
-				while ((imageByte = in.read()) != -1){
+				while ((imageByte = in.read()) != -1) {
 					byteStream.write(imageByte);
 				}
 
@@ -355,14 +381,14 @@ public class GalleryService {
 	public void deleteGallery(String id, String userId) {
 
 		Gallery gallery = galleryRepository.findOneById(id)
-                .orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
+			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND_GALLERY));
 
 		if (Objects.isNull(gallery.getWriter()))
 			throw new ServiceException(ServiceError.UNAUTHORIZED_ACCESS);
 
 		if (gallery.getStatus().getStatus().equals(Constants.GALLERY_STATUS_TYPE.TEMP)) {
 
-			if (! userId.equals(gallery.getWriter().getUserId()))
+			if (!userId.equals(gallery.getWriter().getUserId()))
 				throw new ServiceException(ServiceError.FORBIDDEN);
 
 			commonGalleryService.deleteGallery(id, gallery.getContentType());
@@ -379,8 +405,9 @@ public class GalleryService {
 	 * @param fromType 아이템 타입
 	 * @param itemId 아이템 ID
 	 */
-	public void processLinkedGalleries(String userId, List<Gallery> galleries, List<GalleryOnBoard> galleriesForInsertion,
-									   List<String> galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE fromType, String itemId) {
+	public void processLinkedGalleries(String userId, List<Gallery> galleries,
+		List<GalleryOnBoard> galleriesForInsertion,
+		List<String> galleryIdsForRemoval, Constants.GALLERY_FROM_TYPE fromType, String itemId) {
 
 		LinkedItem linkedItem = new LinkedItem(itemId, fromType);
 
@@ -400,11 +427,11 @@ public class GalleryService {
 			// 사용자가 입력한 이름이 있다면 그걸 입력. 그림 글쓴이만 이름을 고칠 수 있다.
 			if (userId.equals(gallery.getWriter().getUserId())) {
 				galleriesForInsertion.stream()
-						.filter(galleryOnBoard -> galleryOnBoard.getId().equals(gallery.getId()))
-						.findFirst()
-						.ifPresent(galleryOnBoard -> {
-							gallery.setName(galleryOnBoard.getName());
-						});
+					.filter(galleryOnBoard -> galleryOnBoard.getId().equals(gallery.getId()))
+					.findFirst()
+					.ifPresent(galleryOnBoard -> {
+						gallery.setName(galleryOnBoard.getName());
+					});
 			}
 
 			GalleryStatus status = gallery.getStatus();
@@ -419,24 +446,25 @@ public class GalleryService {
 			// 엘라스틱서치 색인 요청
 			rabbitMQPublisher.indexDocumentGallery(gallery.getId(), gallery.getWriter(), gallery.getName());
 
-			if (! CollectionUtils.isEmpty(galleryIdsForRemoval) && galleryIdsForRemoval.contains(gallery.getId()))
+			if (!CollectionUtils.isEmpty(galleryIdsForRemoval) && galleryIdsForRemoval.contains(gallery.getId()))
 				galleryIdsForRemoval.remove(gallery.getId());
 		});
 
 		// Galleries 와 해당 Item을 연결 해제한다. Gallery 가 지워질 수도 있음.
-		if (! CollectionUtils.isEmpty(galleryIdsForRemoval)) {
+		if (!CollectionUtils.isEmpty(galleryIdsForRemoval)) {
 			List<Gallery> galleriesForRemoval = galleryRepository.findByIdIn(galleryIdsForRemoval);
 
 			galleriesForRemoval.forEach(gallery -> {
 				List<LinkedItem> linkedItems = gallery.getLinkedItems();
 
-				if (! CollectionUtils.isEmpty(linkedItems) &&
-						gallery.getStatus().getStatus().equals(Constants.GALLERY_STATUS_TYPE.ENABLE)) {
+				if (!CollectionUtils.isEmpty(linkedItems) &&
+					gallery.getStatus().getStatus().equals(Constants.GALLERY_STATUS_TYPE.ENABLE)) {
 
 					linkedItems.stream()
-							.filter(item -> item.getId().equals(linkedItem.getId()) && item.getFrom().equals(linkedItem.getFrom()))
-							.findFirst()
-							.ifPresent(linkedItems::remove);
+						.filter(item -> item.getId().equals(linkedItem.getId()) && item.getFrom()
+							.equals(linkedItem.getFrom()))
+						.findFirst()
+						.ifPresent(linkedItems::remove);
 
 					// 모두 지움.
 					if (linkedItems.size() < 1) {

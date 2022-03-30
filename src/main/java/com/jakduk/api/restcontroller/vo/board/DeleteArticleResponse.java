@@ -8,16 +8,16 @@ import com.jakduk.api.common.Constants;
  */
 
 public class DeleteArticleResponse {
-    Constants.ARTICLE_DELETE_TYPE result;
+	Constants.ARTICLE_DELETE_TYPE result;
 
-    public DeleteArticleResponse() {
-    }
+	public DeleteArticleResponse() {
+	}
 
-    public DeleteArticleResponse(Constants.ARTICLE_DELETE_TYPE result) {
-        this.result = result;
-    }
+	public DeleteArticleResponse(Constants.ARTICLE_DELETE_TYPE result) {
+		this.result = result;
+	}
 
-    public Constants.ARTICLE_DELETE_TYPE getResult() {
-        return result;
-    }
+	public Constants.ARTICLE_DELETE_TYPE getResult() {
+		return result;
+	}
 }
