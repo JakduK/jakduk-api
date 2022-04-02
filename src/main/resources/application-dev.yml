@@ -15,11 +15,13 @@ server:
 
 spring:
   data:
+    mongodb:
+      uri: mongodb://192.168.0.17/jakduk_test
     elasticsearch:
       repositories:
         enabled: false
   rabbitmq:
-    addresses: 192.168.55.156
+    addresses: 192.168.0.15
     username: admin
     password: wkrenakstp@
     listener:
@@ -34,14 +36,9 @@ jakduk:
   api-server-url: https://dev-api.jakduk.com
   web-server-url: https://dev-web.jakduk.com
   remember-me-expiration: 14400 # 4 hours
-
-  mongodb:
-    database: jakduk_test
-    host: http://192.168.55.25:27017,http://192.168.55.163:27017
   elasticsearch:
     host-and-port:
-      - 192.168.55.199:9200
-      - 192.168.55.54:9200
+      - 192.168.0.18:9200
     index-board: jakduk_dev_board
     index-gallery: jakduk_dev_gallery
     index-search-word: jakduk_dev_search_word

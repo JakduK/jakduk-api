@@ -15,7 +15,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://192.168.0.12/jakduk_test
+      uri: mongodb://192.168.0.17/jakduk_test
     elasticsearch:
       repositories:
         enabled: false
