@@ -1,7 +1,7 @@
 logging:
   pattern:
     file: "%d{ISO8601} [%thread] [%-5level] [%logger{0}.%M:%line] - %msg%n%rEx"
-  file: /jakduk/api/logs/api.log
+  file: /usr/local/jakduk-api/logs/api.log
   level:
     root: DEBUG
     sun.rmi: INFO
@@ -68,7 +68,7 @@ jakduk:
       elasticsearch-delete-document-gallery: dev.elasticsearch.delete-document-gallery
       elasticsearch-index-document-search-word: dev.elasticsearch.index-document-search-word
   storage:
-    image-path: /jakduk/storage/image/
-    thumbnail-path: /jakduk/storage/thumbnail/
-    user-picture-large-path: /jakduk/storage/user/picture/large/
-    user-picture-small-path: /jakduk/storage/user/picture/small/
+    image-path: /usr/local/jakduk-storage/image/
+    thumbnail-path: /usr/local/jakduk-storage/thumbnail/
+    user-picture-large-path: /usr/local/jakduk-storage/user/picture/large/
+    user-picture-small-path: /usr/local/jakduk-storage/picture/small/
