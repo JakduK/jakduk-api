@@ -1,4 +1,6 @@
 logging:
+  pattern:
+    console: # disable console
   file:
     name: /usr/local/jakduk-api/logs/jakduk-api.log
   level:
