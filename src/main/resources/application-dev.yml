@@ -1,7 +1,8 @@
 logging:
   pattern:
-    file: "%d{ISO8601} [%thread] [%-5level] [%logger{0}.%M:%line] - %msg%n%rEx"
-  file: /jakduk/api/logs/api.log
+    console: # disable console
+  file:
+    name: /usr/local/jakduk-api/logs/jakduk-api.log
   level:
     root: DEBUG
     sun.rmi: INFO
@@ -15,11 +16,13 @@ server:
 
 spring:
   data:
+    mongodb:
+      uri: mongodb://192.168.0.17/jakduk_test
     elasticsearch:
       repositories:
         enabled: false
   rabbitmq:
-    addresses: 192.168.55.156
+    addresses: 192.168.0.15
     username: admin
     password: wkrenakstp@
     listener:
@@ -34,14 +37,9 @@ jakduk:
   api-server-url: https://dev-api.jakduk.com
   web-server-url: https://dev-web.jakduk.com
   remember-me-expiration: 14400 # 4 hours
-
-  mongodb:
-    database: jakduk_test
-    host: http://192.168.55.25:27017,http://192.168.55.163:27017
   elasticsearch:
     host-and-port:
-      - 192.168.55.199:9200
-      - 192.168.55.54:9200
+      - 192.168.0.18:9200
     index-board: jakduk_dev_board
     index-gallery: jakduk_dev_gallery
     index-search-word: jakduk_dev_search_word
@@ -71,7 +69,7 @@ jakduk:
       elasticsearch-delete-document-gallery: dev.elasticsearch.delete-document-gallery
       elasticsearch-index-document-search-word: dev.elasticsearch.index-document-search-word
   storage:
-    image-path: /jakduk/storage/image/
-    thumbnail-path: /jakduk/storage/thumbnail/
-    user-picture-large-path: /jakduk/storage/user/picture/large/
-    user-picture-small-path: /jakduk/storage/user/picture/small/
+    image-path: /usr/local/jakduk-storage/image/
+    thumbnail-path: /usr/local/jakduk-storage/thumbnail/
+    user-picture-large-path: /usr/local/jakduk-storage/user/picture/large/
+    user-picture-small-path: /usr/local/jakduk-storage/picture/small/
