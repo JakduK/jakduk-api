@@ -15,11 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DateUtilsTest {
 
 	@Test
-	public void dateFormatTest() throws ParseException {
-		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.ENGLISH);
-		SimpleDateFormat sf = (SimpleDateFormat)df;
-		String p1 = sf.toPattern();
-		String p2 = sf.toLocalizedPattern();
+	public void dateFormatTest() {
+		SimpleDateFormat df = (SimpleDateFormat)DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.ENGLISH);
+		String p1 = df.toPattern();
+		String p2 = df.toLocalizedPattern();
 
 		assertTrue("MMM d, yyyy h:mm a".equals(p1));
 		assertTrue("MMM d, yyyy h:mm a".equals(p2));

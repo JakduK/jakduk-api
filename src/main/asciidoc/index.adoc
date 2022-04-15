@@ -1,5 +1,5 @@
-= jakduk-api REST Docs
-Doc Writer <phjang1983@daum.net>
+= JAKDUK-API Application REST Docs
+Doc Writer <vhgksl@daum.net>
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -65,8 +65,6 @@ use of HTTP status codes.
 
 [[Error-format]]
 === Error format
-
-[[Error-format]]
 .Error Format Example
 
 [source,json]
