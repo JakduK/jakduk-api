@@ -65,8 +65,6 @@ use of HTTP status codes.
 
 [[Error-format]]
 === Error format
-
-[[Error-format]]
 .Error Format Example
 
 [source,json]

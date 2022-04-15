@@ -48,26 +48,33 @@ dependencies {
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
+//    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo' this version does not support 32Bit: Version{3.5.5}:OS_X:B32 에러 남
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation('org.springframework.security:spring-security-test')
-
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
 test {
     outputs.dir snippetsDir
     useJUnitPlatform()
+
+    testLogging { exceptionFormat = 'full' }
 }
 
 asciidoctor {
     inputs.dir snippetsDir
+    sourceDir 'src/main/asciidoc'
+    attributes 'snippets': file(snippetsDir)
     dependsOn test
 }
 
 bootJar {
-    dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}/html5") {
-        into 'public/docs'
+    // gradle build 시 publishDocs 파라미터가 들어와야만 동작 함
+    if (project.hasProperty('publishDocs')) {
+        // build/asciidoc/html5 에 있는 documentation 을 jar file 로 package 하기 위함
+        from("${asciidoctor.outputDir}/html5") {
+            into 'public/docs'
+        }
     }
 
     launchScript()
