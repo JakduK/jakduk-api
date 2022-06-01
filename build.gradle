@@ -48,9 +48,13 @@ dependencies {
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
-//    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo' this version does not support 32Bit: Version{3.5.5}:OS_X:B32 에러 남
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation('org.springframework.security:spring-security-test')
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 

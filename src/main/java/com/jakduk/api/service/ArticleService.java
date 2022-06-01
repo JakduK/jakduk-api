@@ -88,8 +88,7 @@ public class ArticleService {
 	 * @param linkedGallery 사진 연동 여부
 	 */
 	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content,
-		String categoryCode,
-		Boolean linkedGallery) {
+		String categoryCode, Boolean linkedGallery) {
 
 		if (BoardCategoryGenerator.notExistCategory(board, categoryCode))
 			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);

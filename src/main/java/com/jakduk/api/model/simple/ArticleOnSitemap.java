@@ -1,15 +1,22 @@
 package com.jakduk.api.model.simple;
 
-import com.jakduk.api.common.Constants;
+import java.time.LocalDateTime;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import com.jakduk.api.common.Constants;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created by pyohwanjang on 2017. 3. 14..
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Document(collection = Constants.COLLECTION_ARTICLE)
 public class ArticleOnSitemap {
 
@@ -18,19 +25,4 @@ public class ArticleOnSitemap {
 	private Integer seq;
 	private LocalDateTime lastUpdated;
 
-	public String getId() {
-		return id;
-	}
-
-	public String getBoard() {
-		return board;
-	}
-
-	public Integer getSeq() {
-		return seq;
-	}
-
-	public LocalDateTime getLastUpdated() {
-		return lastUpdated;
-	}
 }
