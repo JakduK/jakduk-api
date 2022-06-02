@@ -1,14 +1,23 @@
 package com.jakduk.api.model.db;
 
-import com.jakduk.api.common.Constants;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.jakduk.api.common.Constants;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created by pyohwan on 17. 2. 16.
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 @Document
 public class UserPicture {
 
@@ -17,27 +26,4 @@ public class UserPicture {
 	private Constants.GALLERY_STATUS_TYPE status;
 	private String contentType;
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Constants.GALLERY_STATUS_TYPE getStatus() {
-		return status;
-	}
-
-	public void setStatus(Constants.GALLERY_STATUS_TYPE status) {
-		this.status = status;
-	}
-
-	public String getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
 }
