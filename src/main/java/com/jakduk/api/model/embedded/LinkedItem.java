@@ -2,36 +2,20 @@ package com.jakduk.api.model.embedded;
 
 import com.jakduk.api.common.Constants;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * Created by pyohwanjang on 2017. 4. 10..
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class LinkedItem {
-
 	private String id;
 	private Constants.GALLERY_FROM_TYPE from;
-
-	public LinkedItem() {
-	}
-
-	public LinkedItem(String id, Constants.GALLERY_FROM_TYPE from) {
-		this.id = id;
-		this.from = from;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Constants.GALLERY_FROM_TYPE getFrom() {
-		return from;
-	}
-
-	public void setFrom(Constants.GALLERY_FROM_TYPE from) {
-		this.from = from;
-	}
 }
