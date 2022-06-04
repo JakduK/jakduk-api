@@ -1,14 +1,19 @@
 package com.jakduk.api.model.db;
 
+import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.BoardLog;
 import com.jakduk.api.model.embedded.CommonFeelingUser;
 import com.jakduk.api.model.embedded.CommonWriter;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -17,6 +22,10 @@ import java.util.List;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 @Document
 public class ArticleComment implements UsersFeeling {
 
@@ -30,38 +39,6 @@ public class ArticleComment implements UsersFeeling {
 	private Boolean linkedGallery;
 	private List<BoardLog> logs;
 	private List<String> batch;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public ArticleItem getArticle() {
-		return article;
-	}
-
-	public void setArticle(ArticleItem article) {
-		this.article = article;
-	}
-
-	public CommonWriter getWriter() {
-		return writer;
-	}
-
-	public void setWriter(CommonWriter writer) {
-		this.writer = writer;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
 
 	@Override
 	public List<CommonFeelingUser> getUsersLiking() {
@@ -83,27 +60,4 @@ public class ArticleComment implements UsersFeeling {
 		this.usersDisliking = usersDisliking;
 	}
 
-	public Boolean getLinkedGallery() {
-		return linkedGallery;
-	}
-
-	public void setLinkedGallery(Boolean linkedGallery) {
-		this.linkedGallery = linkedGallery;
-	}
-
-	public List<BoardLog> getLogs() {
-		return logs;
-	}
-
-	public void setLogs(List<BoardLog> logs) {
-		this.logs = logs;
-	}
-
-	public List<String> getBatch() {
-		return batch;
-	}
-
-	public void setBatch(List<String> batch) {
-		this.batch = batch;
-	}
 }

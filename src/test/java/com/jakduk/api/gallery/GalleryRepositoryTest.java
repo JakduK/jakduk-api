@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,6 +142,16 @@ public class GalleryRepositoryTest {
 		assertEquals(2, galleries.size());
 		assertTrue(CollectionUtils.contains(galleries.iterator(), articleGallery01));
 		assertTrue(CollectionUtils.contains(galleries.iterator(), articleGallery02));
+	}
+
+	@AfterEach
+	public void after() {
+		repository.deleteById(articleGallery01.getId());
+		assertFalse(repository.findById(articleGallery01.getId()).isPresent());
+		repository.deleteById(articleGallery02.getId());
+		repository.deleteById(articleCommentGallery.getId());
+		repository.deleteById(tempGallery.getId());
+		assertEquals(0, repository.findAll().size());
 	}
 
 }

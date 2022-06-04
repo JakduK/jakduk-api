@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 
-import com.jakduk.api.exception.ServiceError;
-import com.jakduk.api.exception.ServiceException;
 import com.jakduk.api.model.db.Mail;
 import com.jakduk.api.repository.MailRepository;
 
@@ -32,15 +30,14 @@ public class MailRepositoryTests {
 
 	@Test
 	public void findOneById() {
-		Mail getMail = repository.findOneById(mail.getId())
-			.orElseThrow(() -> new ServiceException(ServiceError.NOT_FOUND));
-
+		Mail getMail = repository.findOneById(mail.getId()).get();
 		assertEquals(getMail, mail);
 	}
 
 	@AfterEach
 	public void after() {
 		repository.deleteById(mail.getId());
+		assertEquals(0, repository.findAll().size());
 	}
 
 }
