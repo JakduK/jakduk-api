@@ -1,5 +1,11 @@
 package com.jakduk.api.model.aggregate;
 
+import com.jakduk.api.model.embedded.ArticleItem;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -7,15 +13,10 @@ package com.jakduk.api.model.aggregate;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class CommonCount {
-	private String id;
+	private ArticleItem id;
 	private Integer count;
-
-	public String getId() {
-		return id;
-	}
-
-	public Integer getCount() {
-		return count;
-	}
 }

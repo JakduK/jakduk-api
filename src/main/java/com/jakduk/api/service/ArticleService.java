@@ -1,30 +1,17 @@
 package com.jakduk.api.service;
 
-import com.jakduk.api.common.Constants;
-import com.jakduk.api.common.board.category.BoardCategory;
-import com.jakduk.api.common.board.category.BoardCategoryGenerator;
-import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
-import com.jakduk.api.common.util.DateUtils;
-import com.jakduk.api.common.util.JakdukUtils;
-import com.jakduk.api.common.util.UrlGenerationUtils;
-import com.jakduk.api.exception.ServiceError;
-import com.jakduk.api.exception.ServiceException;
-import com.jakduk.api.model.aggregate.BoardFeelingCount;
-import com.jakduk.api.model.aggregate.BoardTop;
-import com.jakduk.api.model.aggregate.CommonCount;
-import com.jakduk.api.model.db.Article;
-import com.jakduk.api.model.db.ArticleComment;
-import com.jakduk.api.model.db.Gallery;
-import com.jakduk.api.model.db.UsersFeeling;
-import com.jakduk.api.model.embedded.*;
-import com.jakduk.api.model.simple.*;
-import com.jakduk.api.repository.article.ArticleCommentRepository;
-import com.jakduk.api.repository.article.ArticleOnListRepository;
-import com.jakduk.api.repository.article.ArticleRepository;
-import com.jakduk.api.repository.gallery.GalleryRepository;
-import com.jakduk.api.restcontroller.vo.board.*;
-import com.jakduk.api.restcontroller.vo.home.HomeArticle;
-import com.jakduk.api.restcontroller.vo.home.HomeArticleComment;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,13 +31,50 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.board.category.BoardCategory;
+import com.jakduk.api.common.board.category.BoardCategoryGenerator;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
+import com.jakduk.api.common.util.DateUtils;
+import com.jakduk.api.common.util.JakdukUtils;
+import com.jakduk.api.common.util.UrlGenerationUtils;
+import com.jakduk.api.exception.ServiceError;
+import com.jakduk.api.exception.ServiceException;
+import com.jakduk.api.model.aggregate.BoardFeelingCount;
+import com.jakduk.api.model.aggregate.BoardTop;
+import com.jakduk.api.model.aggregate.CommonCount;
+import com.jakduk.api.model.db.Article;
+import com.jakduk.api.model.db.ArticleComment;
+import com.jakduk.api.model.db.Gallery;
+import com.jakduk.api.model.db.UsersFeeling;
+import com.jakduk.api.model.embedded.ArticleItem;
+import com.jakduk.api.model.embedded.ArticleStatus;
+import com.jakduk.api.model.embedded.BoardLog;
+import com.jakduk.api.model.embedded.CommonFeelingUser;
+import com.jakduk.api.model.embedded.CommonWriter;
+import com.jakduk.api.model.embedded.SimpleWriter;
+import com.jakduk.api.model.simple.ArticleCommentSimple;
+import com.jakduk.api.model.simple.ArticleOnList;
+import com.jakduk.api.model.simple.ArticleOnRSS;
+import com.jakduk.api.model.simple.ArticleOnSitemap;
+import com.jakduk.api.model.simple.ArticleSimple;
+import com.jakduk.api.repository.article.ArticleCommentRepository;
+import com.jakduk.api.repository.article.ArticleOnListRepository;
+import com.jakduk.api.repository.article.ArticleRepository;
+import com.jakduk.api.repository.gallery.GalleryRepository;
+import com.jakduk.api.restcontroller.vo.board.ArticleCommentLog;
+import com.jakduk.api.restcontroller.vo.board.ArticleDetail;
+import com.jakduk.api.restcontroller.vo.board.ArticleGallery;
+import com.jakduk.api.restcontroller.vo.board.ArticleLog;
+import com.jakduk.api.restcontroller.vo.board.BoardGallerySimple;
+import com.jakduk.api.restcontroller.vo.board.GetArticle;
+import com.jakduk.api.restcontroller.vo.board.GetArticleComment;
+import com.jakduk.api.restcontroller.vo.board.GetArticleDetailCommentsResponse;
+import com.jakduk.api.restcontroller.vo.board.GetArticleDetailResponse;
+import com.jakduk.api.restcontroller.vo.board.GetArticlesResponse;
+import com.jakduk.api.restcontroller.vo.board.LatestArticle;
+import com.jakduk.api.restcontroller.vo.home.HomeArticle;
+import com.jakduk.api.restcontroller.vo.home.HomeArticleComment;
 
 @Service
 public class ArticleService {
@@ -88,8 +112,7 @@ public class ArticleService {
 	 * @param linkedGallery 사진 연동 여부
 	 */
 	public Article insertArticle(CommonWriter writer, Constants.BOARD_TYPE board, String subject, String content,
-		String categoryCode,
-		Boolean linkedGallery) {
+		String categoryCode, Boolean linkedGallery) {
 
 		if (BoardCategoryGenerator.notExistCategory(board, categoryCode))
 			throw new ServiceException(ServiceError.NOT_FOUND_CATEGORY);
@@ -304,7 +327,7 @@ public class ArticleService {
 
 		// 게시물의 댓글수
 		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountByIds(ids).stream()
-			.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+			.collect(Collectors.toMap(commonCount -> commonCount.getId().getId(), CommonCount::getCount));
 
 		// 게시물의 감정수
 		Map<String, BoardFeelingCount> feelingCounts = articleRepository.findUsersFeelingCount(ids).stream()
@@ -464,8 +487,7 @@ public class ArticleService {
 	/**
 	 * 게시판 댓글 달기
 	 */
-	public ArticleComment insertArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq,
-		String content,
+	public ArticleComment insertArticleComment(CommonWriter writer, Constants.BOARD_TYPE board, Integer seq, String content,
 		List<Gallery> galleries) {
 
 		Article article = articleRepository.findOneByBoardAndSeq(board.name(), seq)
@@ -675,7 +697,7 @@ public class ArticleService {
 		// 게시물의 댓글수
 		Map<String, Integer> commentCounts = articleCommentRepository.findCommentsCountGreaterThanBoardIdAndBoard(
 				objectId, board).stream()
-			.collect(Collectors.toMap(CommonCount::getId, CommonCount::getCount));
+			.collect(Collectors.toMap(commonCount -> commonCount.getId().getId(), CommonCount::getCount));
 
 		List<String> postIds = commentCounts.entrySet().stream()
 			.map(Entry::getKey)

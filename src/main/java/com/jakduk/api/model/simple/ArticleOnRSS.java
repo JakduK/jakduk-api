@@ -1,9 +1,13 @@
 package com.jakduk.api.model.simple;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.model.embedded.CommonWriter;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -12,6 +16,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Document(collection = Constants.COLLECTION_ARTICLE)
 public class ArticleOnRSS {
 
@@ -22,27 +29,4 @@ public class ArticleOnRSS {
 	private String subject;
 	private String content;
 
-	public String getId() {
-		return id;
-	}
-
-	public String getBoard() {
-		return board;
-	}
-
-	public Integer getSeq() {
-		return seq;
-	}
-
-	public CommonWriter getWriter() {
-		return writer;
-	}
-
-	public String getSubject() {
-		return subject;
-	}
-
-	public String getContent() {
-		return content;
-	}
 }

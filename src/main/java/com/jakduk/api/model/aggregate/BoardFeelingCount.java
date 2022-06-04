@@ -1,5 +1,9 @@
 package com.jakduk.api.model.aggregate;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -7,20 +11,12 @@ package com.jakduk.api.model.aggregate;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class BoardFeelingCount {
 	private String id;
 	private Integer usersLikingCount;
 	private Integer usersDislikingCount;
 
-	public String getId() {
-		return id;
-	}
-
-	public Integer getUsersLikingCount() {
-		return usersLikingCount;
-	}
-
-	public Integer getUsersDislikingCount() {
-		return usersDislikingCount;
-	}
 }

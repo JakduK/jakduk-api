@@ -1,14 +1,14 @@
 package com.jakduk.api.repository.article;
 
-import com.jakduk.api.model.db.Article;
-import com.jakduk.api.model.simple.ArticleSimple;
+import java.util.List;
+import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import java.util.List;
-import java.util.Optional;
+import com.jakduk.api.model.db.Article;
+import com.jakduk.api.model.simple.ArticleSimple;
 
 public interface ArticleRepository extends MongoRepository<Article, String>, ArticleRepositoryCustom {
 
@@ -26,9 +26,6 @@ public interface ArticleRepository extends MongoRepository<Article, String>, Art
 
 	@Query(value = "{'seq' : ?0}")
 	ArticleSimple findBoardFreeOfMinimumBySeq(Integer seq);
-
-	// for JUnit
-	Optional<Article> findTopByOrderByIdAsc();
 
 	Optional<Article> findTopByIdLessThanEqualOrderByIdDesc(ObjectId id);
 

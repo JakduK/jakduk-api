@@ -1,9 +1,7 @@
 package com.jakduk.api.repository.article;
 
-import com.jakduk.api.common.Constants;
-import com.jakduk.api.model.aggregate.CommonCount;
-import com.jakduk.api.model.db.ArticleComment;
-import com.jakduk.api.model.simple.ArticleCommentSimple;
+import java.util.List;
+import java.util.Objects;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +15,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
-import java.util.List;
-import java.util.Objects;
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.model.aggregate.CommonCount;
+import com.jakduk.api.model.db.ArticleComment;
+import com.jakduk.api.model.simple.ArticleCommentSimple;
 
 /**
  * Created by pyohwan on 16. 11. 30.
@@ -64,8 +64,8 @@ public class ArticleCommentRepositoryImpl implements ArticleCommentRepositoryCus
 		//AggregationOperation sort = Aggregation.sort(Direction.ASC, "_id");
 		//AggregationOperation limit = Aggregation.limit(Constants.BOARD_LINE_NUMBER);
 		Aggregation aggregation = Aggregation.newAggregation(match, group/*, sort, limit*/);
-		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation,
-			Constants.COLLECTION_ARTICLE_COMMENT, CommonCount.class);
+		AggregationResults<CommonCount> results = mongoTemplate.aggregate(aggregation, Constants.COLLECTION_ARTICLE_COMMENT,
+			CommonCount.class);
 
 		return results.getMappedResults();
 	}

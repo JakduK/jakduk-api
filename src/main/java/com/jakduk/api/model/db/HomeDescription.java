@@ -3,6 +3,11 @@ package com.jakduk.api.model.db;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -10,6 +15,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 @Document
 public class HomeDescription {
 
@@ -18,27 +27,4 @@ public class HomeDescription {
 	private String desc;
 	private Integer priority;
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getDesc() {
-		return desc;
-	}
-
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
-
-	public Integer getPriority() {
-		return priority;
-	}
-
-	public void setPriority(Integer priority) {
-		this.priority = priority;
-	}
 }
