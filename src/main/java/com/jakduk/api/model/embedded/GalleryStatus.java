@@ -2,6 +2,10 @@ package com.jakduk.api.model.embedded;
 
 import com.jakduk.api.common.Constants;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
  * @company  : http://jakduk.com
@@ -9,22 +13,9 @@ import com.jakduk.api.common.Constants;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class GalleryStatus {
-
 	private Constants.GALLERY_STATUS_TYPE status;
-
-	public GalleryStatus() {
-	}
-
-	public GalleryStatus(Constants.GALLERY_STATUS_TYPE status) {
-		this.status = status;
-	}
-
-	public Constants.GALLERY_STATUS_TYPE getStatus() {
-		return status;
-	}
-
-	public void setStatus(Constants.GALLERY_STATUS_TYPE status) {
-		this.status = status;
-	}
 }
