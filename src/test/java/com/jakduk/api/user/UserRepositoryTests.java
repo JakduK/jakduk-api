@@ -124,7 +124,6 @@ public class UserRepositoryTests {
 
 	@Test
 	public void findOneByUsername() {
-
 		Optional<UserProfile> mustFind = userProfileRepository.findOneByUsername(jakdukUser.getUsername());
 		assertTrue(mustFind.isPresent());
 
