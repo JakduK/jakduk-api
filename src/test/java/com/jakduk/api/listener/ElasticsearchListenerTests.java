@@ -1,19 +1,18 @@
 package com.jakduk.api.listener;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,7 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.jakduk.api.common.Constants;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.JakdukProperties;
@@ -38,9 +36,7 @@ import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.service.SearchService;
 import com.rabbitmq.client.Channel;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
-
-@Ignore
+@Disabled
 @SpringJUnitConfig(ElasticsearchListenerTests.Config.class)
 @SpringRabbitTest
 @TestPropertySource(properties = "jakduk.rabbitmq.queues.elasticsearch.binding-queue-name = dev.elasticsearch.index-document-article-comment")
