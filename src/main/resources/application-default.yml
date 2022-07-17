@@ -3,7 +3,7 @@ logging:
     root: DEBUG
     sun.rmi: INFO
     org.mongodb.driver: INFO
-    org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
+#    org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
 
 server:
   servlet:

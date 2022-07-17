@@ -17,6 +17,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
@@ -41,9 +42,7 @@ public class ElasticsearchListener {
 	private SearchService searchService;
 
 	@RabbitListener(queues = "${jakduk.rabbitmq.queues.elasticsearch.binding-queue-name}")
-	public void receive(Message message, @Header(AmqpHeaders.RECEIVED_ROUTING_KEY) String routingKey) throws
-		IOException {
-
+	public void receive(Message message, @Header(value = AmqpHeaders.RECEIVED_ROUTING_KEY, required = false) String routingKey, MessageHeaders messageHeaders) throws IOException {
 		String findKey = rabbitmqProperties.getRoutingKeys().entrySet().stream()
 			.filter(entity -> entity.getValue().equals(routingKey))
 			.findFirst()
