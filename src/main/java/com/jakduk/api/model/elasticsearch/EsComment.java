@@ -1,9 +1,13 @@
 package com.jakduk.api.model.elasticsearch;
 
+import java.util.List;
+
 import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="mailto:phjang1983@daum.net">Jang,Pyohwan</a>
@@ -12,51 +16,13 @@ import java.util.List;
  * @desc     :
  */
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class EsComment {
-
 	private String id;
 	private ArticleItem article;
 	private CommonWriter writer;
 	private String content;
 	private List<String> galleries;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public ArticleItem getArticle() {
-		return article;
-	}
-
-	public void setArticle(ArticleItem article) {
-		this.article = article;
-	}
-
-	public CommonWriter getWriter() {
-		return writer;
-	}
-
-	public void setWriter(CommonWriter writer) {
-		this.writer = writer;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public List<String> getGalleries() {
-		return galleries;
-	}
-
-	public void setGalleries(List<String> galleries) {
-		this.galleries = galleries;
-	}
 }

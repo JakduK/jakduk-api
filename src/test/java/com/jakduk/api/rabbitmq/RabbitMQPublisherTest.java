@@ -1,25 +1,32 @@
 package com.jakduk.api.rabbitmq;
 
-import com.jakduk.api.common.rabbitmq.ElasticsearchRoutingKey;
-import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
-import com.jakduk.api.configuration.JakdukProperties;
-import com.jakduk.api.model.elasticsearch.EsArticle;
-import com.jakduk.api.model.embedded.CommonWriter;
+import java.util.ArrayList;
+
+import javax.annotation.Resource;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
+import com.jakduk.api.common.Constants;
+import com.jakduk.api.common.rabbitmq.ElasticsearchRoutingKey;
+import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
+import com.jakduk.api.configuration.JakdukProperties;
+import com.jakduk.api.listener.ElasticsearchListenerTests;
+import com.jakduk.api.model.elasticsearch.EsArticle;
+import com.jakduk.api.model.embedded.ArticleItem;
+import com.jakduk.api.model.embedded.CommonWriter;
 
 /**
  * Created by pyohwanjang on 2017. 7. 5..
  */
+@SpringBootTest
 public class RabbitMQPublisherTest {
 
 	@Resource
-	private JakdukProperties jakdukProperties;
+	private JakdukProperties.Rabbitmq rabbitProperties;
 
 	@Autowired
 	private RabbitMQPublisher sut;
@@ -41,11 +48,26 @@ public class RabbitMQPublisherTest {
 		esArticle.setCategory("FREE");
 		//        esArticle.setGalleries(Collections.EMPTY_LIST);
 
-		String routingKey = jakdukProperties.getRabbitmq()
-			.getRoutingKeys()
+		String routingKey = rabbitProperties.getRoutingKeys()
 			.get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE.getRoutingKey());
 
 		sut.publishElasticsearch(routingKey, esArticle);
+	}
+
+	@Test
+	public void publishElasticsearchWithArticleComment() {
+		ElasticsearchListenerTests.EsComment esCommentTests = new ElasticsearchListenerTests.EsComment();
+		esCommentTests.setId("test-comment-id");
+		esCommentTests.setArticle(new ArticleItem("test-article-id", 10, Constants.BOARD_TYPE.FREE.name()));
+		esCommentTests.setContent("Hello World");
+		esCommentTests.setGalleries(new ArrayList<String>() {{
+			add("test-gallery-id");
+		}});
+
+		String routingKey = rabbitProperties.getRoutingKeys()
+			.get(ElasticsearchRoutingKey.ELASTICSEARCH_INDEX_DOCUMENT_ARTICLE_COMMENT.getRoutingKey());
+
+		sut.publishElasticsearch(routingKey, esCommentTests);
 	}
 
 	@Disabled
@@ -54,8 +76,7 @@ public class RabbitMQPublisherTest {
 
 		String id = "595bb024290ad3035636f2ba";
 
-		String routingKey = jakdukProperties.getRabbitmq()
-			.getRoutingKeys()
+		String routingKey = rabbitProperties.getRoutingKeys()
 			.get(ElasticsearchRoutingKey.ELASTICSEARCH_DELETE_DOCUMENT_ARTICLE.getRoutingKey());
 
 		sut.publishElasticsearch(routingKey, id);
