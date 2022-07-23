@@ -48,7 +48,6 @@ dependencies {
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
-    testCompile('com.github.fridujo:rabbitmq-mock:1.1.1')
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation('org.springframework.security:spring-security-test')

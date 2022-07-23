@@ -16,6 +16,7 @@ import com.jakduk.api.common.rabbitmq.RabbitMQPublisher;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.listener.ElasticsearchListenerTests;
 import com.jakduk.api.model.elasticsearch.EsArticle;
+import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.embedded.ArticleItem;
 import com.jakduk.api.model.embedded.CommonWriter;
 
@@ -54,9 +55,10 @@ public class RabbitMQPublisherTest {
 		sut.publishElasticsearch(routingKey, esArticle);
 	}
 
+	@Disabled
 	@Test
 	public void publishElasticsearchWithArticleComment() {
-		ElasticsearchListenerTests.EsComment esCommentTests = new ElasticsearchListenerTests.EsComment();
+		EsComment esCommentTests = new EsComment();
 		esCommentTests.setId("test-comment-id");
 		esCommentTests.setArticle(new ArticleItem("test-article-id", 10, Constants.BOARD_TYPE.FREE.name()));
 		esCommentTests.setContent("Hello World");

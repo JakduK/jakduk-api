@@ -55,11 +55,11 @@ public class ElasticsearchListenerTests {
 
 	@Test
 	public void indexDocumentBoardComment() throws IOException {
-		EsComment esCommentTests = new EsComment();
-		esCommentTests.setId("test-comment-id");
-		esCommentTests.setArticle(new ArticleItem("test-article-id", 10, Constants.BOARD_TYPE.FREE.name()));
-		esCommentTests.setContent("Hello World");
-		esCommentTests.setGalleries(new ArrayList<String>() {{
+		EsComment esComment = new EsComment();
+		esComment.setId("test-comment-id");
+		esComment.setArticle(new ArticleItem("test-article-id", 10, Constants.BOARD_TYPE.FREE.name()));
+		esComment.setContent("Hello World");
+		esComment.setGalleries(new ArrayList<String>() {{
 			add("test-gallery-id");
 		}});
 
@@ -68,26 +68,13 @@ public class ElasticsearchListenerTests {
 				put("elasticsearch-index-document-article-comment", ElasticsearchListenerTests.ROUTING_KEY);
 			}});
 
-		rabbitTemplate.convertAndSend(ElasticsearchListenerTests.ROUTING_KEY, esCommentTests, message -> {
+		rabbitTemplate.convertAndSend(ElasticsearchListenerTests.ROUTING_KEY, esComment, message -> {
 			message.getMessageProperties().getHeaders().put(AmqpHeaders.RECEIVED_ROUTING_KEY, ElasticsearchListenerTests.ROUTING_KEY);
+			message.getMessageProperties().getHeaders().put("__TypeId__", "com.jakduk.api.model.notexists.elasticsearch"); // 일부러 존재 하지 않는 packace 를 넣는다.
 			return message;
 		});
 
-		com.jakduk.api.model.elasticsearch.EsComment esComment = ObjectMapperUtils.getObjectMapper().convertValue(esCommentTests,
-			com.jakduk.api.model.elasticsearch.EsComment.class);
-
 		verify(searchService, times(1)).indexDocumentBoardComment(eq(esComment));
-	}
-
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Data
-	public static class EsComment {
-		private String id;
-		private ArticleItem article;
-		private CommonWriter writer;
-		private String content;
-		private List<String> galleries;
 	}
 
 	@TestConfiguration
