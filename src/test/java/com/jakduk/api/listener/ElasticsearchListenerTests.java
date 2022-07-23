@@ -5,13 +5,12 @@ import static org.mockito.BDDMockito.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.test.TestRabbitTemplate;
 import org.springframework.amqp.rabbit.test.context.SpringRabbitTest;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -29,13 +28,8 @@ import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.JakdukProperties;
 import com.jakduk.api.model.elasticsearch.EsComment;
 import com.jakduk.api.model.embedded.ArticleItem;
-import com.jakduk.api.model.embedded.CommonWriter;
 import com.jakduk.api.service.SearchService;
 import com.rabbitmq.client.Channel;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @SpringJUnitConfig(ElasticsearchListenerTests.Config.class)
 @SpringRabbitTest
@@ -43,7 +37,7 @@ import lombok.NoArgsConstructor;
 public class ElasticsearchListenerTests {
 
 	@Autowired
-	private RabbitTemplate rabbitTemplate;
+	private TestRabbitTemplate rabbitTemplate;
 
 	@MockBean
 	private JakdukProperties.Rabbitmq rabbitmqProperties;
@@ -53,8 +47,9 @@ public class ElasticsearchListenerTests {
 
 	public final static String ROUTING_KEY = "dev.elasticsearch.index-document-article-comment";
 
+	@DisplayName("MQ 메시지 send 할때 __TypeId__ 가 receive 쪽에서 일치 하지 않으면 에러가 발생하는데 RabbitTemplate 에서 헤더를 지워 준다")
 	@Test
-	public void indexDocumentBoardComment() throws IOException {
+	public void indexDocumentBoardCommentWithTypeIdHeaderValidation() throws IOException {
 		EsComment esComment = new EsComment();
 		esComment.setId("test-comment-id");
 		esComment.setArticle(new ArticleItem("test-article-id", 10, Constants.BOARD_TYPE.FREE.name()));
@@ -70,7 +65,7 @@ public class ElasticsearchListenerTests {
 
 		rabbitTemplate.convertAndSend(ElasticsearchListenerTests.ROUTING_KEY, esComment, message -> {
 			message.getMessageProperties().getHeaders().put(AmqpHeaders.RECEIVED_ROUTING_KEY, ElasticsearchListenerTests.ROUTING_KEY);
-			message.getMessageProperties().getHeaders().put("__TypeId__", "com.jakduk.api.model.notexists.elasticsearch"); // 일부러 존재 하지 않는 packace 를 넣는다.
+			message.getMessageProperties().getHeaders().put("__TypeId__", "com.jakduk.api.model.notexists.elasticsearch"); // 일부러 존재 하지 않는 package 를 넣는다.
 			return message;
 		});
 
@@ -84,6 +79,10 @@ public class ElasticsearchListenerTests {
 		public TestRabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
 			TestRabbitTemplate rabbitTemplate = new TestRabbitTemplate(connectionFactory);
 			rabbitTemplate.setMessageConverter(messageConverter);
+			rabbitTemplate.addBeforePublishPostProcessors(message -> {
+				message.getMessageProperties().getHeaders().remove("__TypeId__");
+				return message;
+			});
 			return rabbitTemplate;
 		}
 
@@ -99,9 +98,12 @@ public class ElasticsearchListenerTests {
 		}
 
 		@Bean
-		public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+		public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
+			MessageConverter messageConverter) {
+
 			SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
 			factory.setConnectionFactory(connectionFactory);
+			factory.setMessageConverter(messageConverter);
 			return factory;
 		}
 
