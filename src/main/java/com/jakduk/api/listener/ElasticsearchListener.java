@@ -1,5 +1,17 @@
 package com.jakduk.api.listener;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.stereotype.Component;
+
 import com.jakduk.api.common.rabbitmq.ElasticsearchRoutingKey;
 import com.jakduk.api.common.util.ObjectMapperUtils;
 import com.jakduk.api.configuration.JakdukProperties;
@@ -11,28 +23,15 @@ import com.jakduk.api.model.elasticsearch.EsGallery;
 import com.jakduk.api.model.elasticsearch.EsSearchWord;
 import com.jakduk.api.service.SearchService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.support.AmqpHeaders;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-
-import java.io.IOException;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by pyohwanjang on 2017. 6. 20..
  */
 
+@Slf4j
 @Component
 public class ElasticsearchListener {
-
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Resource
 	private JakdukProperties.Rabbitmq rabbitmqProperties;
@@ -41,8 +40,9 @@ public class ElasticsearchListener {
 	private SearchService searchService;
 
 	@RabbitListener(queues = "${jakduk.rabbitmq.queues.elasticsearch.binding-queue-name}")
-	public void receive(Message message, @Header(AmqpHeaders.RECEIVED_ROUTING_KEY) String routingKey) throws
-		IOException {
+	public void receive(Message message, @Header(AmqpHeaders.RECEIVED_ROUTING_KEY) String routingKey) throws IOException {
+
+		log.info("{}", message);
 
 		String findKey = rabbitmqProperties.getRoutingKeys().entrySet().stream()
 			.filter(entity -> entity.getValue().equals(routingKey))
