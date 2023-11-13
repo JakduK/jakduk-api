@@ -158,17 +158,17 @@ public class GalleryOnListTest {
 
 		ObjectMapper mapper = new ObjectMapper();
 
-		String expectResult = "[{\"uid\":\"a1\",\"size\":100,\"name\":\"test01\"},{\"uid\":\"a2\",\"size\":200,\"name\":\"test02\"}]";
+		String expectResult = "[{\"uid\":\"a1\",\"name\":\"test01\",\"size\":100},{\"uid\":\"a2\",\"name\":\"test02\",\"size\":200}]";
 
 		List<Map<String, Object>> images = new ArrayList<>();
 
-		Map<String, Object> image01 = new HashMap<>();
+		Map<String, Object> image01 = new LinkedHashMap<>();
 		image01.put("uid", "a1");
 		image01.put("name", "test01");
 		image01.put("size", 100);
 		images.add(image01);
 
-		Map<String, Object> image02 = new HashMap<>();
+		Map<String, Object> image02 = new LinkedHashMap<>();
 		image02.put("uid", "a2");
 		image02.put("name", "test02");
 		image02.put("size", 200);
